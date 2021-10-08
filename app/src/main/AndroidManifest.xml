@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bonushub.crdb">
+
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+    <uses-permission android:name="titan.extperm.SETTING_GET"/>
+    <uses-permission android:name="titan.extperm.SETTING_SET"/>
+    <uses-permission android:name="titan.extperm.CERTIFICATE_SET"/>
+    <uses-permission android:name="titan.extperm.STORAGE_GET"/>
+    <uses-permission android:name="titan.extperm.USB_SET"/>
+    <uses-permission android:name="titan.extperm.USB_GET"/>
+    <uses-permission android:name="titan.extperm.PROCESS_SET"/>
+    <uses-permission android:name="titan.extperm.TELEPHONY_GET"/>
+    <uses-permission android:name="titan.extperm.TELEPHONY_SET"/>
+    <uses-permission android:name="titan.extperm.APPLICATION_GET"/>
+    <uses-permission android:name="titan.extperm.APPLICATION_SET"/>
+    <uses-permission android:name="titan.extperm.SENSITIVEUX_GET"/>
+    <uses-permission android:name="titan.extperm.UX_GET"/>
+    <uses-permission android:name="titan.extperm.UX_SET"/>
+    <uses-permission android:name="titan.extperm.LOCATION_GET"/>
+    <uses-permission android:name="titan.extperm.LOCATION_SET"/>
+    <uses-permission android:name="titan.extperm.PROPERTY_GET"/>
+    <uses-permission android:name="titan.extperm.RESTORE"/>
+    <uses-permission android:name="titan.extperm.EMVL1_LOCK_SET"/>
+    <uses-permission android:name="titan.extperm.EMVL2_LOCK_SET"/>
+    <uses-permission android:name="titan.extperm.NET_SET"/>
+    <uses-permission android:name="titan.extperm.UPDATE_GET"/>
+    <uses-permission android:name="titan.extperm.UPDATE_SET"/>
+    <uses-permission android:name="titan.extperm.PERSIST_SET"/>
+    <uses-permission android:name="titan.extperm.PERSIST_GET"/>
+    <uses-permission android:name="titan.extperm.DEVICE_ADMIN"/>
+
+    <application
+        android:name=".HDFCApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
