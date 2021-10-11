@@ -1,24 +1,27 @@
 /*
 package com.bonushub.crdb.utils
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.Context.BATTERY_SERVICE
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
+import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.*
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,26 +34,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-
-
-var isExpanded = false
-var isMerchantPrinted = false
-var isDashboardOpen = false
-val simpleTimeFormatter = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
-val simpleDateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
-
 val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 val NEW_IP_ADDRESS = "122.176.84.29"
 var PORT = 8101//4124
 
-class Utilities @Inject constructor(private val appDatabase: AppDatabase){
+class Utilities @Inject constructor(appDatabase: AppDatabase)  {
 
-    fun doAThing1(): String{
-        System.out.println("App data in Utils->"+appDatabase.appDao)
-        return "Look I got:"
+    init {
+        println("Student has got a name as $appDatabase")
     }
 
+    constructor(sectionName: String, id: Int):this(appDatabase) {
+
+    }
 
     //region======================Read Local Init File======================
     suspend fun readLocalInitFile(callback: suspend (Boolean, String) -> Unit) {
@@ -96,7 +93,13 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
                 }.close()
 
                 val fin =
-                    BufferedReader(InputStreamReader(HDFCApplication.appContext.openFileInput(filename)))
+                    BufferedReader(
+                        InputStreamReader(
+                            HDFCApplication.appContext.openFileInput(
+                                filename
+                            )
+                        )
+                    )
 
                 var line: String? = fin.readLine()
 
@@ -141,7 +144,9 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
                         when (terminalCommunicationTable.actionId) {
                             "1", "2" -> {
                                 insertStatus = appDatabase?.appDao
-                                    ?.insertTerminalCommunicationDataInTable(terminalCommunicationTable)
+                                    ?.insertTerminalCommunicationDataInTable(
+                                        terminalCommunicationTable
+                                    )
                                     ?: 0L
                             }
                             "3" -> appDatabase?.appDao
@@ -159,10 +164,14 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
                         when (issuerParameterTable.actionId) {
                             "1", "2" -> {
                                 insertStatus =
-                                    appDatabase?.appDao?.insertIssuerDataInTable(issuerParameterTable)
+                                    appDatabase?.appDao?.insertIssuerDataInTable(
+                                        issuerParameterTable
+                                    )
                                         ?: 0L
                             }
-                            "3" -> appDatabase?.appDao?.deleteIssuerParameterTable(issuerParameterTable)
+                            "3" -> appDatabase?.appDao?.deleteIssuerParameterTable(
+                                issuerParameterTable
+                            )
                         }
                         Log.d("Issuer Insert:- ", insertStatus.toString())
                     }
@@ -177,7 +186,8 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
                             "1", "2" -> {
                                 terminalParameterTable.stan = "000001"
                                 insertStatus = appDatabase?.appDao
-                                    ?.insertTerminalParameterDataInTable(terminalParameterTable) ?: 0L
+                                    ?.insertTerminalParameterDataInTable(terminalParameterTable)
+                                    ?: 0L
                             }
                             "3" -> appDatabase?.appDao
                                 ?.deleteTerminalParameterTable(terminalParameterTable)
@@ -225,7 +235,8 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
                         var insertStatus = 0L
                         when (hdfcCdt.actionId) {
                             "1", "2" -> {
-                                insertStatus = appDatabase?.appDao?.insertHDFCCDTInTable(hdfcCdt) ?: 0L
+                                insertStatus =
+                                    appDatabase?.appDao?.insertHDFCCDTInTable(hdfcCdt) ?: 0L
                             }
                             "3" -> appDatabase?.appDao?.deleteHDFCCDT(hdfcCdt)
                         }
@@ -244,28 +255,26 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
     private val pc1Tables = arrayOf(101, 102, 107, 106, 109)
 
 
-
-
-
-   */
-/* * savePcs takes take pc number and table id and as per table id
-    * it save largest pc number 1 and 2 in the system.
-    **//*
-
-
+    */
+/**
+     * savePcs takes take pc number and table id and as per table id
+     * it save largest pc number 1 and 2 in the system.
+     * *//*
 
 
     private fun savePcs(pcNum: String, table: String) {
         try {
             val tn = table.toInt()
             if (tn in pc2Tables) {
-                val ppc = AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName).toInt()
+                val ppc =
+                    AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName).toInt()
                 if (pcNum.toInt() > ppc) {
                     AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName, pcNum)
                 }
             }
             if (tn in pc1Tables) {
-                val ppc = AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName).toInt()
+                val ppc =
+                    AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName).toInt()
                 if (pcNum.toInt() > ppc) {
                     AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName, pcNum)
                 }
@@ -304,12 +313,39 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
     }
 //endregion
 
+    //region========================Increment ROC===============
+    fun incrementRoc() {
+        var increasedRoc = 0
+        val roc = appDatabase?.appDao?.getRoc()
+        if (!TextUtils.isEmpty(roc) && roc?.toInt() != 0) {
+            increasedRoc = roc?.toInt()?.plus(1) ?: 0
+            if (increasedRoc > 999999) {
+                increasedRoc = 1
+                appDatabase?.appDao?.updateRoc(
+                    addPad(increasedRoc, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code
+                )
+            } else {
+                appDatabase?.appDao?.updateRoc(
+                    addPad(increasedRoc, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code
+                )
+            }
+        }
+    }
+//endregion
 
     fun getROC(): String? {
         return runBlocking(Dispatchers.IO) { appDatabase?.appDao?.getRoc() }
     }
 
-
+    //region========================Reset ROC===============
+    fun resetRoc() =
+        appDatabase?.appDao?.clearRoc(
+            addPad(1, "0", 6, true),
+            TableType.TERMINAL_PARAMETER_TABLE.code
+        )
+//endregion
 
     //region========================Get Invoice=================
     fun getInvoice(): String? {
@@ -317,6 +353,73 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
     }
 //endregion
 
+    //region========================Increment ROC===============
+    fun incrementInvoice() {
+        var increaseInvoice = 0
+        val invoice = appDatabase?.appDao?.getInvoice()
+        if (!TextUtils.isEmpty(invoice) && invoice?.toInt() != 0) {
+            increaseInvoice = invoice?.toInt()?.plus(1) ?: 0
+            appDatabase?.appDao?.updateInvoice(
+                addPad(increaseInvoice, "0", 6, true),
+                TableType.TERMINAL_PARAMETER_TABLE.code
+            )
+        }
+    }
+//endregion
+
+    //region======================Reset Invoice Number==============
+    fun resetInvoiceNumber() = appDatabase?.appDao
+        ?.clearInvoice(addPad(1, "0", 6, true), TableType.TERMINAL_PARAMETER_TABLE.code)
+//endregion
+
+    //region=======================Increment Batch Number================
+    fun incrementBatchNumber() {
+        var increaseBatch = 0
+        val batch = appDatabase?.appDao?.getBatchNumber()
+        if (!TextUtils.isEmpty(batch) && batch?.toInt() != 0) {
+            increaseBatch = batch?.toInt()?.plus(1) ?: 0
+            appDatabase?.appDao?.updateBatchNumber(
+                addPad(increaseBatch, "0", 6, true),
+                TableType.TERMINAL_PARAMETER_TABLE.code
+            )
+        }
+    }
+//endregion
+
+    //region======================Reset Batch Number==============
+    fun resetBatchNumber() = appDatabase?.appDao
+        ?.clearBatchNumber(addPad(1, "0", 6, true), TableType.TERMINAL_PARAMETER_TABLE.code)
+//endregion
+
+    //region=========================Get Pax Device Modal Name:-
+    fun getDeviceModelName(): String? {
+        val service = DeviceHelper.getDeviceModel()
+        if (service != null) {
+            return when {
+                service.length > 6 -> service.takeLast(6)
+                service.length < 6 -> addPad(service, " ", 6, false)
+                else -> service
+            }
+        }
+        return service
+    }
+//endregion
+
+    //region==========================Get Pax Device Serial Number:-
+    fun getDeviceSerialNumber(): String? {
+        //  val service = NeptuneService.dal.sys.termInfo[ETermInfoKey.SN] ?: ""
+        val service = DeviceHelper.getDeviceSerialNo()
+        if (service != null) {
+            return when {
+                service.length > 15 -> service.substring(service.length - 15, service.length)
+                service.length < 15 -> addPad(service, " ", 15)
+                else -> service
+            }
+        }
+
+        return service
+    }
+//endregion
 
     //region=======Logging============
     @JvmOverloads
@@ -332,15 +435,62 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
         }
     }
 
+    // For logging
+    fun logger(tag: String, msg: HashMap<Byte, IsoField>, type: String = "d") {
+        if (BuildConfig.DEBUG) {
+            for ((k, v) in msg) {
+                logger(v.fieldName + "---->>", "$k = ${v.rawData}", type)
+            }
+        }
+    }
+
+//endregion
 
 
-    //region============= ROC, ConnectionTime========
-    fun getF48TimeStamp(): String {
-        val currentTime = Calendar.getInstance().time
-        val sdf = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
-        return sdf.format(currentTime)
+    // region ===ConnectionTimestamp==========
+    object ConnectionTimeStamps {
+        var identifier: String = ""
+        var dialStart = ""
+        var dialConnected = ""
+        var startTransaction = ""
+        var recieveTransaction = ""
+        private var stamp = "~~~~"
+
+        init {
+            stamp = AppPreference.getString(AppPreference.F48_STAMP)
+        }
+
+        fun reset() {
+            identifier = ""
+            dialStart = ""
+            dialConnected = ""
+            startTransaction = ""
+            recieveTransaction = ""
+        }
+
+        fun saveStamp() {
+            stamp = getFormattedStamp()
+            AppPreference.saveString(AppPreference.F48_STAMP, stamp)
+            reset()
+        }
+
+        fun getFormattedStamp(): String =
+            "$identifier~$startTransaction~$recieveTransaction~$dialStart~$dialConnected"
+
+        fun saveStamp(f48: String) {
+            identifier = f48.split("~")[0]
+            saveStamp()
+        }
+
+
+        fun getStamp(): String = if (stamp.isNotEmpty()) stamp else "~~~~"
+
+        fun getOtherInfo(): String {
+            return "~${HDFCApplication.networkStrength}~${""}~${HDFCApplication.imeiNo}~${HDFCApplication.simNo}~${HDFCApplication.operatorName}"
+        }
     }
 //endregion
+
 
 
     //region====================INTERNET CONNECTION CHECK:-
@@ -403,16 +553,29 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
 
 // region ============getIpPort===========
 
-    fun getIpPort(): InetSocketAddress?{
+    fun getIpPort(): InetSocketAddress? {
         val tct = getTptData()
         return if (tct != null) {
-            InetSocketAddress(InetAddress.getByName(""), tct.actionId.toInt())
-        }else{
+            InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
+        } else {
             InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
         }
     }
 
 
+//region=====================================Get IP Port:-
+*/
+/*fun getIpPort(): InetSocketAddress {
+
+    val cdt: TerminalCommunicationTable? = getCDTData()
+    return if (cdt != null) {
+        InetSocketAddress(InetAddress.getByName(cdt.hostPrimaryIp), cdt.hostPrimaryPortNo.toInt())
+    } else {
+        InetSocketAddress(InetAddress.getByName(LYRA_IP_ADDRESS), PORT2)
+    }
+}*//*
+
+//endregion
 
     open class OnTextChange(private val cb: (String) -> Unit) : TextWatcher {
 
@@ -427,7 +590,6 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
         }
 
     }
-
 
 
     //region==============================Method to Hide Soft System Keyboard of Android Device:-
@@ -446,6 +608,10 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
     }
 //endregion
 
+    //region===============================Below method is used to show Invoice with Padding:-
+    fun invoiceWithPadding(invoiceNo: String) =
+        addPad(input = invoiceNo, padChar = "0", totalLen = 6, toLeft = true)
+//endregion
 
     //region=================================Get Current Date and Time Data:-
     fun getCurrentDateTime(): Pair<String?, String?> {
@@ -495,9 +661,187 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
     }
 //endregion
 
+    //region==========================Navigate Fragment from Any Fragment to Dashboard Fragment:-
+    fun switchToDashboard(context: Context) {
+        context.startActivity(Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        })
+    }
+//endregion
+
+    // region ========== converting value in BCD format:-
+    fun convertValue2BCD(optionValue: String): String {
+        val optionsBinaryValue = optionValue.toInt(16).let { Integer.toBinaryString(it) }
+        return addPad(optionsBinaryValue, "0", 8, toLeft = true)
+    }
+//endregion
+
+    //region==================Below method is used to convert 12 length String to 6 bit Byte Array:-
+    fun convertStr2Nibble2Str(data: String): String {
+        var tempData = ""
+        val splitData = data.chunked(2)
+        for (i in splitData.indices) {
+            if (splitData[i].toInt() != 0) {
+                val convertData = str2NibbleArr(splitData[i])[0].toString()
+                if (convertData.length == 1)
+                    tempData = "${tempData}0${convertData}"
+                else
+                    tempData += convertData
+                continue
+            }
+            tempData += splitData[i]
+        }
+        return tempData
+    }
+//endregion
+
+    //region=========================Below method to check HDFC TPT Fields Check:-
+    fun checkHDFCTPTFieldsBitOnOff(transactionType: TransactionType): Boolean {
+        val hdfcTPTData = runBlocking(Dispatchers.IO) { getHDFCTptData() }
+        Log.d("HDFC TPT:- ", hdfcTPTData.toString())
+        var data: String? = null
+        if (hdfcTPTData != null) {
+            when (transactionType) {
+                TransactionType.VOID -> {
+                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    return data[1] == '1' // checking second position of data for on/off case
+                }
+                TransactionType.REFUND -> {
+                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    return data[2] == '1' // checking third position of data for on/off case
+                }
+                TransactionType.TIP_ADJUSTMENT -> {
+                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    return data[3] == '1' // checking fourth position of data for on/off case
+                }
+                TransactionType.TIP_SALE -> {
+                    data = convertValue2BCD(hdfcTPTData.option1)
+                    return data[2] == '1' // checking third position of data for on/off case
+                }
+                else -> {
+                }
+            }
+        }
+
+        return false
+    }
+//endregion
+
+    //region=========================Below method to check HDFC CDT Fields Check:-
+    fun checkForAccountTypeDialog(panNumber: String): Boolean {
+        val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
+        Log.d("HDFC TPT:- ", hdfcCDTData.toString())
+        var data: String? = null
+        return if (hdfcCDTData != null) {
+            data = convertValue2BCD(hdfcCDTData.option1)
+            data[0] == '1' // checking first position of data for on/off case
+        } else
+            true
+    }
+//endregion
+
+    //region Check for Type of Transaction Allowed or not on Pan:-
+//region=========================Below method to check HDFC CDT Fields Check:-
+    fun checkForTransactionAllowedOrNot(
+        panNumber: String,
+        transactionType: TransactionType
+    ): Boolean {
+        val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
+        Log.d("HDFC TPT:- ", hdfcCDTData.toString())
+        var data: String? = null
+        return if (hdfcCDTData != null) {
+            when (transactionType) {
+                TransactionType.TIP_ADJUSTMENT -> {
+                    data = convertValue2BCD(hdfcCDTData.option1)
+                    data[7] == '1' // checking eight position of data for on/off case
+                }
+                TransactionType.PRE_AUTH -> {
+                    data = convertValue2BCD(hdfcCDTData.option2)
+                    data[7] == '1' // checking eight position of data for on/off case
+                }
+                TransactionType.REFUND -> {
+                    data = convertValue2BCD(hdfcCDTData.option2)
+                    data[6] == '1' // checking seventh position of data for on/off case
+                }
+                TransactionType.SALE_WITH_CASH -> {
+                    data = convertValue2BCD(hdfcCDTData.option3)
+                    data[1] == '1' // checking second position of data for on/off case
+                }
+                TransactionType.CASH_AT_POS -> {
+                    data = convertValue2BCD(hdfcCDTData.option3)
+                    data[6] == '1' // checking seventh position of data for on/off case
+                }
+                else -> true
+            }
+        } else
+            true
+    }
+//endregion
+
+    //region===============Check for Sign Print on Charge Slip in Transaction or not:-
+    fun checkForSignPrintOrNot(panNumber: String): Boolean {
+        val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
+        Log.d("HDFC TPT:- ", hdfcCDTData.toString())
+        var data: String? = null
+        return if (hdfcCDTData != null) {
+            data = convertValue2BCD(hdfcCDTData.option3)
+            data[2] == '1' // checking third position of data for on/off case
+        } else
+            false
+    }
+//endregion
+
+    // region===============Check for Sign Print on Charge Slip in Transaction or not:-
+    fun checkForNoRefundPrint(panNumber: String): Boolean {
+        val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
+        Log.d("HDFC TPT:- ", hdfcCDTData.toString())
+        var data: String? = null
+        return if (hdfcCDTData != null) {
+            data = convertValue2BCD(hdfcCDTData.option3)
+            data[3] == '1' // checking fourth position of data for on/off case
+        } else
+            false
+    }
+//endregion
+
+    // region===============Check for Void of Transaction Allowed ot Not:-
+    fun checkForVoidAllowedOrNot(panNumber: String): Boolean {
+        val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
+        Log.d("HDFC TPT:- ", hdfcCDTData.toString())
+        var data: String? = null
+        return if (hdfcCDTData != null) {
+            data = convertValue2BCD(hdfcCDTData.option3)
+            data[0] != '1' // checking first position of data for on/off case
+        } else
+            false
+    }
+//endregion
+
+//region ============================Get System DateTime in millis:-
+*/
+/*fun getSystemDateTimeInMillis(): String {
+    return NeptuneService.dal.sys.date ?: ""
+}*//*
+
+//endregion
+
+// region ============================Get System Time in 24Hour Format:-
+*/
+/*fun getSystemTimeIn24Hour(): String {
+    return NeptuneService.dal.sys.date.substring(8, NeptuneService.dal.sys.date.length - 2)
+}*//*
+
+//endregion
 
 
-
+*/
+/* Below Point Need to Implement When Manual Sale is Implemented and Also we need to Check Luhn Check:-
+* short fChkLuhn--------------optionTwo[0] & 0x01-------------default we have to check--NA;
+* short fExpDtReqd-------------optionOne[0] & 0x08;              expiry date required in case of manual sale//
+* short fCheckExpDt----------------optionTwo[0] & 0x10;--------validate expiry date
+* short fManEntry-----------------optionOne[0] & 0x04;// need to check manual sale -
+*
+*  *//*
 
 
 
@@ -576,7 +920,7 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
 
     fun getBtry(): Int {
         return if (Build.VERSION.SDK_INT >= 21) {
-            val bm = HDFCApplication.appContext.getSystemService(BATTERY_SERVICE) as BatteryManager
+            val bm = HDFCApplication.appContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
             bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
         } else {
             logger("Btry StatusError", "Error in Btry percent")
@@ -584,24 +928,47 @@ class Utilities @Inject constructor(private val appDatabase: AppDatabase){
         }
     }
 
+}
 
-    // Field 48 connection time stamp and other info
-    object Field48ResponseTimestamp {
-        var identifier = ""
-        var oldSuccessTransDate = ""
+// Field 48 connection time stamp and other info
+object Field48ResponseTimestamp {
+    var identifier = ""
+    var oldSuccessTransDate = ""
 
-        fun saveF48IdentifierAndTxnDate(f48: String): String {
-            identifier = f48.split("~")[0]
-           // oldSuccessTransDate = getF48TimeStamp()
-            val value = "$identifier~$oldSuccessTransDate"
-            AppPreference.saveString(AppPreference.F48IdentifierAndSuccesssTxn, value)
-            Log.e("IDTXNDATE", value)
-            return value
+    fun saveF48IdentifierAndTxnDate(f48: String): String {
+        identifier = f48.split("~")[0]
+        oldSuccessTransDate = getF48TimeStamp()
+        val value = "$identifier~$oldSuccessTransDate"
+        AppPreference.saveString(AppPreference.F48IdentifierAndSuccesssTxn, value)
+        Log.e("IDTXNDATE", value)
+        return value
+    }
+
+    fun getF48Data(): String {
+        val idTxnDate = AppPreference.getString(AppPreference.F48IdentifierAndSuccesssTxn)
+        val identifier = idTxnDate.split("~")[0]
+        val startTran = getF48TimeStamp()
+        var receiveTransTime = ""
+        if (idTxnDate != "") {
+            receiveTransTime = idTxnDate.split("~")[1]
         }
-
+        val dialStart = getF48TimeStamp()
+        val dialConnect = getF48TimeStamp()
+        val timeStamp =
+            "${identifier}~${startTran}~${receiveTransTime}~${dialStart}~${dialConnect}"
+        Log.e("timeStamp", timeStamp)
+        val otherInfo = Utility.ConnectionTimeStamps.getOtherInfo()
+        return timeStamp + otherInfo
     }
 
 
-
+    //region============= ROC, ConnectionTime========
+    fun getF48TimeStamp(): String {
+        val currentTime = Calendar.getInstance().time
+        val sdf = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
+        return sdf.format(currentTime)
+    }
+//endregion
 }
+
 */

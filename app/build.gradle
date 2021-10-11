@@ -16,7 +16,9 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
+        buildConfigField "long", "REVISION_ID", "210105"
+        versionName "02.01.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

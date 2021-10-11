@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.bonushub.crdb.model.BatchFileDataTable
+import com.bonushub.pax.utils.addPad
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.json.JSONArray
@@ -85,7 +86,11 @@ object AppPreference {
     //endregion
 
 
-
+    @JvmStatic
+    fun getBankCode(): String {
+        val tBc = getString(BANK_CODE_KEY)
+        return addPad(if (tBc.isNotEmpty()) tBc else BANKCODE, "0", 2)
+    }
 
     fun setBankCode(bankCode: String) = saveString(BANK_CODE_KEY, bankCode)
 

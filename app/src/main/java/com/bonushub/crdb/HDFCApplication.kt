@@ -3,8 +3,12 @@ package com.bonushub.crdb
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Build
 import android.telephony.PhoneStateListener
 import android.telephony.SignalStrength
@@ -44,6 +48,14 @@ class HDFCApplication : Application() {
             private set
     }
 
+    private val mBatteryReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val level = intent?.getIntExtra("level", 0) ?: 0
+            batteryStrength = if (level != 0) level.toString() else ""
+        }
+    }
+
+
     private val mTelephonyManager: TelephonyManager by lazy { getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager }
 
 
@@ -53,7 +65,10 @@ class HDFCApplication : Application() {
         initDefaultConfig()
         DeviceHelper.bindService()
         initializeEncryptedSharedPreferences(appContext)
-      //  setNetworkStrength()
+        setNetworkStrength()
+
+      //  registerReceiver(mConnectionReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+        registerReceiver(mBatteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
     }
 
     private fun initDefaultConfig() {
@@ -80,11 +95,15 @@ class HDFCApplication : Application() {
 
                 }
 
-                if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                operatorName = mTelephonyManager.networkOperatorName
+                simNo = mTelephonyManager.simSerialNumber ?: ""
+                imeiNo = mTelephonyManager.deviceId
+
+             /*   if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
                     operatorName = mTelephonyManager.networkOperatorName
                     simNo = mTelephonyManager.simSerialNumber ?: ""
                     imeiNo = mTelephonyManager.deviceId
-                }
+                }*/
             }
         }
         mTelephonyManager.listen(nl, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS)
@@ -94,6 +113,7 @@ class HDFCApplication : Application() {
         //  LogUtil.d("-------------------onTerminate-------------------")
         super.onTerminate()
         DeviceHelper.unbindService()
+        unregisterReceiver(mBatteryReceiver)
     }
 
 

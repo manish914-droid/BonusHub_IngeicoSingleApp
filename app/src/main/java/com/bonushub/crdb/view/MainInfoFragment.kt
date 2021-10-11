@@ -1,6 +1,8 @@
 package com.bonushub.crdb.view
 
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +14,14 @@ import androidx.lifecycle.Observer
 import com.bonushub.crdb.R
 import com.bonushub.crdb.model.TerminalCommunicationTable
 import com.bonushub.crdb.viewmodel.MainViewModel
+import com.bonushub.pax.utils.KeyExchanger
+import com.bonushub.pax.utils.Utility
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_info.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainInfoFragment : Fragment() {
@@ -40,22 +47,25 @@ class MainInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val student = getEnteredStudentDetails()
-        mainViewModel.insertInfo(student)
+     //   val student = getEnteredStudentDetails()
+      //  mainViewModel.insertInfo(student)
 
-       /* button_save.setOnClickListener {
-            val student = getEnteredStudentDetails()
-            mainViewModel.insertInfo(student)
+        button_save.setOnClickListener {
+
+          //  val student = getEnteredStudentDetails()
+          //  mainViewModel.insertInfo(student)
+
         }
         button_cancel.setOnClickListener {
             activity?.let{
 
                 activity?.supportFragmentManager?.popBackStack()
             }
-        }*/
+        }
         observeViewModel()
 
     }
+
 
 
     fun getEnteredStudentDetails() : TerminalCommunicationTable {

@@ -1,63 +1,63 @@
-/*
-package com.bonushub.pax.model.remote
+
 
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
+import com.bonushub.pax.utils.Field48ResponseTimestamp.getF48TimeStamp
 import java.io.DataInputStream
 import java.io.FileOutputStream
 import java.net.Socket
 import java.nio.channels.ServerSocketChannel
 
-
 val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 val NEW_IP_ADDRESS = "122.176.84.29"
 var PORT = 8101//4124
-object HitServer {
+object HitServer  {
 
     private val TAG = HitServer::class.java.simpleName
     private var tct: TerminalCommunicationTable?= null
     private var callback: ServerMessageCallback? = null
     private var callbackSale: ServerMessageCallbackSale? = null
-    var reversalToBeSaved: IsoDataWriter?=null
+    var reversalToBeSaved:IsoDataWriter?=null
 
     @Synchronized
     suspend fun hitServer(data: ByteArray, callback: ServerMessageCallback, progressMsg: ProgressCallback){
         this@HitServer.callback = callback
         try {
-            if (checkInternetConnection()) {
-                with(ConnectionTimeStamps) {
+            if (Utility().checkInternetConnection()) {
+                with(Utility.ConnectionTimeStamps) {
                     reset()
                     dialStart = getF48TimeStamp()
                 }
                 openSocket { socket ->
-                    logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
-                    ConnectionTimeStamps.dialConnected = getF48TimeStamp()
+                    Utility().logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
+                    Utility.ConnectionTimeStamps.dialConnected = getF48TimeStamp()
                     progressMsg("Please wait sending data to Bonushub server")
-                    logger(TAG, "Data Send = ${data.byteArr2HexStr()}")
-                    ConnectionTimeStamps.startTransaction = getF48TimeStamp()
+                    Utility().logger(TAG, "Data Send = ${data.byteArr2HexStr()}")
+                    Utility.ConnectionTimeStamps.startTransaction = getF48TimeStamp()
                     val sos = socket.getOutputStream()
                     sos?.write(data)
                     sos.flush()
                     if (reversalToBeSaved != null) {
-                      //  AppPreference.saveReversal(reversalToBeSaved!!)
+                       // AppPreference.saveReversal(reversalToBeSaved!!)
                     }
                     progressMsg("Please wait receiving data from Bonushub server")
                     val dis = DataInputStream(socket.getInputStream())
                     val len = dis.readShort().toInt()
                     val response = ByteArray(len)
                     dis.readFully(response)
-                    ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
+                    Utility.ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
 
                     val responseStr = response.byteArr2HexStr()
                     val reader = readIso(responseStr,false)
                     Field48ResponseTimestamp.saveF48IdentifierAndTxnDate(reader.isoMap[48]?.parseRaw2String()?:"")
 
-                    logger(TAG, "len=$len, data = $responseStr")
+                    Utility().logger(TAG, "len=$len, data = $responseStr")
                     socket.close()
                     //
                     callback(responseStr, true)
@@ -71,7 +71,7 @@ object HitServer {
 
         } catch (ex: Exception) {
             callback("NO RESPONSE...", false)
-            logger("EXCEPTION","NO RESPONSE...","e")
+            Utility().logger("EXCEPTION","NO RESPONSE...","e")
             this@HitServer.callback = null
         }
     }
@@ -84,13 +84,13 @@ object HitServer {
         try {
 //VerifoneApp.internetConnection
             if (true) {
-                with(ConnectionTimeStamps) {
+                with(Utility.ConnectionTimeStamps) {
                     reset()
                     dialStart = getF48TimeStamp()
                 }
                 openSocket { socket ->
 
-                    logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
+                    Utility().logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
 
                     var nextCounter = ""
 
@@ -100,10 +100,10 @@ object HitServer {
                         val data =
                             keInit.createInitIso(nextCounter, isFirstCall).generateIsoByteRequest()
                         val formattedInitPackets = data.byteArr2HexStr()
-                        logger(TAG, "init iso = $formattedInitPackets")
+                        Utility().logger(TAG, "init iso = $formattedInitPackets")
                         //println("Init iso packet send --- > $formattedInitPackets")
-                        ConnectionTimeStamps.dialConnected = getF48TimeStamp()
-                        ConnectionTimeStamps.startTransaction = getF48TimeStamp()
+                        Utility.ConnectionTimeStamps.dialConnected = getF48TimeStamp()
+                        Utility.ConnectionTimeStamps.startTransaction = getF48TimeStamp()
                         progressMsg("Please wait sending data to Bonushub server")
                         val sos = socket.getOutputStream()
                         sos?.write(data)
@@ -114,36 +114,32 @@ object HitServer {
                         val len = dis.readShort().toInt()
                         val response = ByteArray(len)
                         dis.readFully(response)
-                        ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
+                        Utility.ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
                         val responseStr = response.byteArr2HexStr()
                         //println("Init iso packet Recieve --- > $formattedInitPackets")
-                        logger(TAG, "len=$len, data = $responseStr")
-                       */
-/* writeInitPacketLog(
-                            "$formattedInitPackets||",
-                            "$responseStr||",
-                            fos,
-                            FILE_NAME
-                        )*//*
-
+                        Utility().logger(TAG, "len=$len, data = $responseStr")
+                        /* writeInitPacketLog(
+                             "$formattedInitPackets||",
+                             "$responseStr||",
+                             fos,
+                             FILE_NAME
+                         )*/
 
                         val reader = readIso(responseStr)
 
 
                         val roc = reader.isoMap[11]
                         if (roc != null)
-                        incrementRoc()
-                        */
-/*ROCProviderV2.incrementFromResponse(
+                            Utility().incrementRoc()
+                        /*ROCProviderV2.incrementFromResponse(
                             roc.rawData,
                             AppPreference.HDFC_BANK_CODE
-                        ) else ROCProviderV2.increment(AppPreference.HDFC_BANK_CODE)*//*
-
+                        ) else ROCProviderV2.increment(AppPreference.HDFC_BANK_CODE)*/
 
                         if (reader.isoMap[39]?.parseRaw2String() == "00") {
 
                             val f48 = reader.isoMap[48]
-                            if (f48 != null) ConnectionTimeStamps.saveStamp(f48.parseRaw2String())
+                            if (f48 != null) Utility.ConnectionTimeStamps.saveStamp(f48.parseRaw2String())
 
                             val f60 = reader.isoMap[60]
 
@@ -153,18 +149,18 @@ object HitServer {
                                 nextCounter = f60Arr.sliceArray(4..17).byteArr2Str()
                                 isFirstCall = false
 
-                                logger(TAG, "nextCounter = $nextCounter")
+                                Utility().logger(TAG, "nextCounter = $nextCounter")
 
                                 val f60Str = f60Arr.sliceArray(48..f60Arr.lastIndex)
 
                                 initList.add(f60Str)
 
-                                logger(TAG, f60Str.byteArr2Str())
+                                Utility().logger(TAG, f60Str.byteArr2Str())
                             }
                             val pCode = reader.isoMap[3]?.rawData ?: ""
-                            logger(TAG, "Processing code $pCode")
+                            Utility().logger(TAG, "Processing code $pCode")
                             if (pCode != ProcessingCode.INIT_MORE.code) {
-                                readInitServer(initList) { result, message ->
+                                Utility().readInitServer(initList) { result, message ->
                                     callback(message, result)
                                 }
                                 break
@@ -177,8 +173,8 @@ object HitServer {
                     }
                     socket.close()
                     fos.close()
-                    resetRoc()
-                   // ROCProviderV2.resetRoc(AppPreference.getBankCode())
+                    Utility().resetRoc()
+                    // ROCProviderV2.resetRoc(AppPreference.getBankCode())
                     this@HitServer.callback = null
                 }
 
@@ -198,10 +194,10 @@ object HitServer {
         Log.d("Socket Start:- " , "Socket Started Here.....")
 
         try {
-            tct = getTctData()// always get tct it may get refresh meanwhile
+            tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
 
-                val sAddress = getIpPort()
+                val sAddress = Utility().getIpPort()
 
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
@@ -228,58 +224,56 @@ object HitServer {
 
         } catch (ex: Exception) {
             ex.printStackTrace()
-          //  callback?.invoke(ex.message ?: "Connection Error", false)
+            //  callback?.invoke(ex.message ?: "Connection Error", false)
             callback?.invoke("Socket Time out", false)
-            logger("EXCEPTION","SOCKET NOT CONNECTED","e")
+            Utility().logger("EXCEPTION","SOCKET NOT CONNECTED","e")
         } finally {
             Log.d("Finally Call:- ", "Final Block Runs Here.....")
         }
     }
 
-  */
-/*  suspend fun openSocket(): Socket? {
-        try {
-            tct = TerminalCommunicationTable.selectFromSchemeTable()  // always get tct it may get refresh meanwhile
-            if (tct != null) {
+    /*  suspend fun openSocket(): Socket? {
+          try {
+              tct = TerminalCommunicationTable.selectFromSchemeTable()  // always get tct it may get refresh meanwhile
+              if (tct != null) {
 
-                val sAddress = VFService.getIpPort()
+                  val sAddress = VFService.getIpPort()
 
-                ServerSocketChannel.open().apply {
-                    configureBlocking(false)
-                }
+                  ServerSocketChannel.open().apply {
+                      configureBlocking(false)
+                  }
 
-                val socket = Socket()
+                  val socket = Socket()
 
-                val connTimeOut = try {
-                    (tct as TerminalCommunicationTable).connectTimeOut.toInt() * 1000
-                } catch (ex: Exception) {
-                    30 * 1000
-                }
+                  val connTimeOut = try {
+                      (tct as TerminalCommunicationTable).connectTimeOut.toInt() * 1000
+                  } catch (ex: Exception) {
+                      30 * 1000
+                  }
 
-                val resTimeOut = try {
-                    (tct as TerminalCommunicationTable).responseTimeOut.toInt() * 1000
-                } catch (ex: Exception) {
-                    30 * 1000
-                }
-                socket.connect(sAddress, connTimeOut)
-                socket.soTimeout = resTimeOut
-                return socket
+                  val resTimeOut = try {
+                      (tct as TerminalCommunicationTable).responseTimeOut.toInt() * 1000
+                  } catch (ex: Exception) {
+                      30 * 1000
+                  }
+                  socket.connect(sAddress, connTimeOut)
+                  socket.soTimeout = resTimeOut
+                  return socket
 
-            } else return null
+              } else return null
 
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            return null
-        }
-    }*//*
-
+          } catch (ex: Exception) {
+              ex.printStackTrace()
+              return null
+          }
+      }*/
 
     suspend fun openSocket(): Socket? {
         try {
-            tct = getTctData()
+            tct = Utility().getTctData()
             if (tct != null) {
 
-                val sAddress = getIpPort()
+                val sAddress = Utility().getIpPort()
 
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
@@ -313,14 +307,12 @@ object HitServer {
 
 }
 
-*/
 /**
  * This class is used to communicate with server for multiple byte request and response
  * call open only once,
  * call close only once and in the end
  * use send function to send the data
- * *//*
-
+ * */
 class ServerCommunicator {
 
     companion object {
@@ -331,12 +323,12 @@ class ServerCommunicator {
 
     suspend fun open(): Boolean {
         var isconn = false
-      //  if (VerifoneApp.internetConnection) {
-            val soc = HitServer.openSocket()
-            if (soc != null) {
-                socket = soc
-                isconn = true
-        //    }
+        //  if (VerifoneApp.internetConnection) {
+        val soc = HitServer.openSocket()
+        if (soc != null) {
+            socket = soc
+            isconn = true
+            //    }
         }
         return isconn
     }
@@ -345,11 +337,11 @@ class ServerCommunicator {
         if (socket != null) {
             try {
                 val soc = socket as Socket
-                logger(TAG, "address = ${soc.inetAddress}, port = ${soc.port}", "e")
-                ConnectionTimeStamps.dialConnected = getF48TimeStamp()
+                Utility().logger(TAG, "address = ${soc.inetAddress}, port = ${soc.port}", "e")
+                Utility.ConnectionTimeStamps.dialConnected = getF48TimeStamp()
 
-                logger(TAG, "Data Send = ${data.byteArr2HexStr()}")
-                ConnectionTimeStamps.startTransaction = getF48TimeStamp()
+                Utility().logger(TAG, "Data Send = ${data.byteArr2HexStr()}")
+                Utility.ConnectionTimeStamps.startTransaction = getF48TimeStamp()
                 val sos = soc.getOutputStream()
                 sos?.write(data)
                 sos.flush()
@@ -359,9 +351,9 @@ class ServerCommunicator {
                 val len = dis.readShort().toInt()
                 val response = ByteArray(len)
                 dis.readFully(response)
-                ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
+                Utility.ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
                 val responseStr = response.byteArr2HexStr()
-                logger(TAG, "len=$len, data = $responseStr")
+                Utility().logger(TAG, "len=$len, data = $responseStr")
                 return responseStr
             }catch (ex:Exception){return ""}
         } else {
@@ -379,18 +371,16 @@ class ServerCommunicator {
 }
 
 
-*/
 /**
  * HitServer class do not modifies anything in packet
  * it simply takes data string and return response string
  * in case of no communication , is comm will be false and response string will contain message
  *
- * *//*
-
+ * */
 typealias ServerMessageCallbackSale = (String, Boolean,String) -> Unit
 
 typealias ServerMessageCallback = (String, Boolean) -> Unit
 
 typealias ProgressCallback = (String) -> Unit
 
-typealias OnSocketComplete = suspend (socket: Socket) -> Unit*/
+typealias OnSocketComplete = suspend (socket: Socket) -> Unit

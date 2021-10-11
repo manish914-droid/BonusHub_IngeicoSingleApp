@@ -149,7 +149,7 @@ object DeviceHelper : ServiceConnection  {
         return UDeviceManager.Stub.asInterface(iBinder)
     }
 
-    fun getSerialno(): String?{
+    fun getDeviceSerialNo(): String?{
         Log.d(TAG, "=> Device Serial no (${getDeviceManager()!!.deviceInfo?.serialNo})")
        // System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.serialNo)
         return getDeviceManager()!!.deviceInfo?.serialNo
