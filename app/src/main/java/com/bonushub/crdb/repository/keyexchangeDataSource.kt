@@ -125,7 +125,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
     }
 
-     suspend fun startExchange(tid: String) {
+     suspend fun startExchange(tid: String) : Result<NoResponseException> {
             val isoW = createKeyExchangeIso(tid)
             val bData = isoW.generateIsoByteRequest()
             HitServer.apply {
@@ -214,7 +214,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             })
 
 
-        return
+        return Result.error("Key Injection fail","")
     }
 
     private fun insertBitsInPublicKey(privatePublicDatum: String): String {

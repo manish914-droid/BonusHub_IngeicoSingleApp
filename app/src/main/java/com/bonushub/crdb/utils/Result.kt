@@ -3,7 +3,7 @@ package com.bonushub.crdb.utils
 /**
  * Generic class for holding success response, error response and loading status
  */
-data class Result<out T>(val status: Status, val data: T?, val error: Error?, val message: String?) {
+data class Result<out T>(val status: Status, val data: T?, val error: String?, val message: String?) {
 
     enum class Status {
         SUCCESS,
@@ -16,7 +16,7 @@ data class Result<out T>(val status: Status, val data: T?, val error: Error?, va
             return Result(Status.SUCCESS, data, null, null)
         }
 
-        fun <T> error(message: String, error: Error?): Result<T> {
+        fun <T> error(message: String, error: String?): Result<T> {
             return Result(Status.ERROR, null, error, message)
         }
 
