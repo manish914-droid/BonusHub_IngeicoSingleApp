@@ -15,9 +15,10 @@ class RoomDBRepository @Inject  constructor(private val appDao: AppDao,
     suspend fun  insertdata(student: TerminalCommunicationTable) = appDao.insert(student)
     suspend fun  fetchdata() = appDao.fetch()
 
-     fun  insertTid(tid: String,backToCalled: ApiCallback) = keyexchangeDataSource.startExchange(tid,backToCalled)
+     suspend fun  insertTid(tid: String, backToCalled: ApiCallback) = keyexchangeDataSource.startExchange(tid)
 
-    suspend fun fetchTrendingMovies(): Flow<Result<NoResponseException>> = flow{
+    suspend fun fetchTrendingMovies(tid: String): Flow<Result<NoResponseException>> = flow{
+        emit(keyexchangeDataSource.startExchange(tid))
 
     }
 

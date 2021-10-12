@@ -14,6 +14,7 @@ import com.bonushub.crdb.utils.RSAProvider
 import com.bonushub.crdb.utils.Result
 import com.bonushub.pax.utils.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -124,15 +125,13 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
     }
 
-    fun startExchange(tid: String,backToCalled: ApiCallback) : NoResponseException{
-        GlobalScope.launch {
+     suspend fun startExchange(tid: String) {
             val isoW = createKeyExchangeIso(tid)
             val bData = isoW.generateIsoByteRequest()
             HitServer.apply {
                 reversalToBeSaved = null
             }.hitServer(bData, { result, success ->
                 if (success && !TextUtils.isEmpty(result)) {
-                    launch {
                         val iso = readIso(result)
                         Utility().logger(KeyExchanger.TAG, iso.isoMap)
                         val resp = iso.isoMap[39]
@@ -156,7 +155,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                                     tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
                                     tmk = tmk.substring(0, 512)
                                 }
-                                startExchange(tid,backToCalled)
+                              //  startExchange(tid,backToCalled)
                             } else {
                                 val ppkDpk = iso.isoMap[59]?.rawData ?: ""
                                 Utility().logger(KeyExchanger.TAG, "RAW PPKDPK = $ppkDpk")
@@ -195,27 +194,27 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                                         }
                                     }*/
                                 } else {
-                                     NoResponseException("Key exchange error", false, false)
+                                     NoResponseException("Key exchange error", false, false,false)
                                     //  backToCalled("Key exchange error", false, false,false)
                                 }
                             }
                         } else {
                             val msg = iso.isoMap[58]?.parseRaw2String() ?: ""
-                            NoResponseException("",true,true)
+                            NoResponseException(msg,false, false,false)
                           //  backToCalled(msg, false, false,false)
                         }
                     }
-                } else
-                    NoResponseException("",true,true)
+                else
+                    NoResponseException(result, false, false,false)
                     //backToCalled(result, false, false,false)
 
             }, {
-                NoResponseException("",true,true)
+                NoResponseException(it, false, true,false)
                // backToCalled(it, false, true,false)
             })
 
-        }
-        return NoResponseException("",true,true)
+
+        return
     }
 
     private fun insertBitsInPublicKey(privatePublicDatum: String): String {
