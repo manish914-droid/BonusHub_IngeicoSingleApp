@@ -85,6 +85,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
             callback(msg, success, isProgressType, false)
         }
     }
+/*
 
     fun startExchange() {
         GlobalScope.launch {
@@ -92,7 +93,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
             val bData = isoW.generateIsoByteRequest()
             HitServer.apply {
                 reversalToBeSaved = null
-            }.hitServer(bData, { result, success ->
+            }.hitServer(isoW, { result, success ->
                 if (success && !TextUtils.isEmpty(result)) {
                     launch {
                         val iso = readIso(result)
@@ -169,6 +170,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
 
         }
     }
+*/
 
     override suspend fun createKeyExchangeIso(): IWriter = IsoDataWriter().apply {
         mti = Mti.MTI_LOGON.mti
@@ -372,7 +374,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                 result = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
                     ?.loadEncKey(KeyType.TDK_KEY, KEYID_MAIN, KEYID_TRACK, dpk, ppkKcv) ?: false
                 System.out.println("TDK is success "+result)
-                //  result = NeptuneService.Device.writeTdk(dpk, dpkKcv)
+               //  result = NeptuneService.Device.writeTdk(dpk, dpkKcv)
                 // NeptuneService.beepKey(EBeepMode.FREQUENCE_LEVEL_6,1000)
             }
         } catch (e: Exception) {

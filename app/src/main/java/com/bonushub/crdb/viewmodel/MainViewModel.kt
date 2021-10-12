@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.bonushub.crdb.model.TerminalCommunicationTable
 import com.bonushub.crdb.repository.RoomDBRepository
+import com.bonushub.crdb.utils.RespMessageStatusData
 import kotlinx.coroutines.launch
 
 class MainViewModel @ViewModelInject constructor(private val roomDBRepository: RoomDBRepository) :
@@ -43,12 +44,12 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
 
     fun insertInfo1(tid: String) {
         viewModelScope.launch {
-            if(tid.isNullOrEmpty()){
+            if(tid.isEmpty()){
                 error.postValue( "Input Fields cannot be Empty")
 
             }else{
-                val userId: Unit = roomDBRepository.insertTid(tid,::onInitResponse)
-                //  insertedId.postValue(userId)
+                val userId: RespMessageStatusData = roomDBRepository.insertTid(tid,::onInitResponse)
+               //   insertedId.postValue(userId)
             }
         }
     }

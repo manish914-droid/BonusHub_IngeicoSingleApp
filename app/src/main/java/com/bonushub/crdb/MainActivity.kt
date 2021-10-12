@@ -6,30 +6,20 @@ import android.os.RemoteException
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.db.AppDatabase
-import com.bonushub.crdb.utils.BytesUtil
 import com.bonushub.crdb.utils.DemoConfig
-import com.bonushub.crdb.utils.DemoConfig.KEYID_MAIN
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.replaceFragmentWithNoHistory
 import com.bonushub.crdb.view.MainInfoListFragment
-import com.bonushub.pax.utils.IWriter
-import com.bonushub.pax.utils.KeyExchanger
 import com.bonushub.pax.utils.Utility
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
-import com.usdk.apiservice.aidl.pinpad.KeyType
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.components.ApplicationComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {

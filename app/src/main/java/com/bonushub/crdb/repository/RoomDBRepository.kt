@@ -2,8 +2,7 @@ package com.bonushub.crdb.repository
 
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.*
-import com.bonushub.crdb.utils.NoResponseException
-import com.bonushub.crdb.utils.Result
+import com.bonushub.crdb.utils.RespMessageStatusData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -17,7 +16,8 @@ class RoomDBRepository @Inject  constructor(private val appDao: AppDao,
 
      suspend fun  insertTid(tid: String, backToCalled: ApiCallback) = keyexchangeDataSource.startExchange(tid)
 
-    suspend fun fetchInitData(tid: String): Flow<Result<NoResponseException>> = flow{
+
+     suspend fun fetchInitData(tid: String): Flow<RespMessageStatusData> = flow{
         emit(keyexchangeDataSource.startExchange(tid))
 
     }
