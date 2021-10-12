@@ -47,8 +47,8 @@ class MainInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-     //   val student = getEnteredStudentDetails()
-      //  mainViewModel.insertInfo(student)
+
+        mainViewModel.insertInfo1("41501379")
 
         button_save.setOnClickListener {
 
@@ -62,8 +62,9 @@ class MainInfoFragment : Fragment() {
                 activity?.supportFragmentManager?.popBackStack()
             }
         }
-        observeViewModel()
+       // observeViewModel()
 
+        observeMainViewModel()
     }
 
 
@@ -100,6 +101,15 @@ class MainInfoFragment : Fragment() {
                 }
 
             })
+    }
+
+    fun observeMainViewModel(){
+
+        mainViewModel.fetchInitResponse().observe(viewLifecycleOwner, Observer<Boolean> { it ->
+            Toast.makeText(activity,"Init Sucessfully $it", Toast.LENGTH_LONG).show()
+        })
+
+
     }
 
 }

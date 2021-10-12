@@ -52,7 +52,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
     var afterSettlement = false
 
     companion object {
-        private val TAG = KeyExchanger::class.java.simpleName
+        val TAG = KeyExchanger::class.java.simpleName
 
         fun getF61(): String {
             val appName =
@@ -312,10 +312,9 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
             val appName =
                 addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
 
-            val deviceModel = DeviceHelper.getDeviceModel()
+            val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
 
-            val buildDate: String =
-                SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
+            val buildDate: String = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
             val version = "${BuildConfig.VERSION_NAME}.$buildDate"
             val connectionType = ConnectionType.GPRS.code
             val pccNo =

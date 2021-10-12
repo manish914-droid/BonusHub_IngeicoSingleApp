@@ -10,6 +10,9 @@ import com.bonushub.crdb.utils.BytesUtil
 import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DemoConfig.KEYID_MAIN
 import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.replaceFragmentWithNoHistory
+import com.bonushub.crdb.view.MainInfoListFragment
+import com.bonushub.pax.utils.IWriter
 import com.bonushub.pax.utils.KeyExchanger
 import com.bonushub.pax.utils.Utility
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -17,11 +20,16 @@ import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.components.ApplicationComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
@@ -43,9 +51,9 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
 
         DeviceHelper.setServiceListener(this)
 
-        println("App database is" + appDatabase.appDao)
+     //   println("App database is" + appDatabase.appDao)
       //  println("App database will is"+utilitys.doAThing1())
-      //  replaceFragmentWithNoHistory(MainInfoListFragment(), R.id.container_fragment)
+        replaceFragmentWithNoHistory(MainInfoListFragment(), R.id.container_fragment)
     }
 
     protected fun initDeviceInstance() {
@@ -70,7 +78,7 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
             }
 
 
-      /*      // isKeyExist();
+        /*    // isKeyExist();
             val key = "6AC292FAA1315B4D858AB3A3D7D5933A"
 
             val keyId: Int = KEYID_MAIN
@@ -87,8 +95,8 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
                 println("TMK is$isSucc")
                 // outputPinpadError("loadPlainTextKey fail");
                 // return;
-            }*/
-
+            }
+*/
         }, 100)
 
 
@@ -116,16 +124,16 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
                 }
             }
         }
-        Handler().postDelayed(Runnable {
+      /*  Handler().postDelayed(Runnable {
             KeyExchanger(this, "41501379", ::onInitResponse).apply {
                 keWithInit = true
             }.startExchange()
-        },500)
+        },500)*/
 
     }
 
     private fun onInitResponse(res: String, success: Boolean, progress: Boolean, isReversalFail: Boolean = false) {
-
+        System.out.println("Init Sucessfull msg "+success)
     }
 
     private fun unregister() {
@@ -147,5 +155,4 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
         }
     }
 }
-
 

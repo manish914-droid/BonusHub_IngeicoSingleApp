@@ -57,7 +57,7 @@ val simpleDateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
     init {
-        println("Student has got a name as $appDatabase")
+        println("Utility has got a name as $appDatabase")
     }
 
 

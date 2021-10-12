@@ -12,6 +12,10 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
     private  val insertedId =  MutableLiveData<Long>()
     private val  error = MutableLiveData<String>()
 
+    private  val initResponseMessage =  MutableLiveData<String>()
+    private  val initResponse =  MutableLiveData<Boolean>()
+    private  val initprogress =  MutableLiveData<Boolean>()
+
     var userFinalList: LiveData<MutableList<TerminalCommunicationTable>> = MutableLiveData<MutableList<TerminalCommunicationTable>>()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -37,8 +41,35 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
          }
      }
 
+    fun insertInfo1(tid: String) {
+        viewModelScope.launch {
+            if(tid.isNullOrEmpty()){
+                error.postValue( "Input Fields cannot be Empty")
+
+            }else{
+                val userId: Unit = roomDBRepository.insertTid(tid,::onInitResponse)
+                //  insertedId.postValue(userId)
+            }
+        }
+    }
+
+    private fun onInitResponse(res: String, success: Boolean, progress: Boolean,nothing : Boolean) {
+            initResponseMessage.postValue(res)
+            initResponse.postValue(success)
+            initprogress.postValue(progress)
+
+
+    }
+
     fun fetchError(): LiveData<String> = error
 
     fun fetchInsertedId():LiveData<Long> = insertedId
+
+    fun fetchInitResponse(): LiveData<Boolean> = initResponse
+
+    fun fetchInitMessage(): LiveData<String> = initResponseMessage
+
+    fun fetchInitProgress(): LiveData<Boolean> = initprogress
+
 
 }

@@ -6,7 +6,9 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.repository.IKeyExchange
 import com.bonushub.crdb.repository.RoomDBRepository
+import com.bonushub.crdb.repository.keyexchangeDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +16,6 @@ import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @InstallIn(ApplicationComponent::class)
@@ -37,10 +38,7 @@ object DBModule {
             .fallbackToDestructiveMigration()
             .build()*/
 
-        appDatabase =  Room.databaseBuilder(
-            appContext,
-            AppDatabase::class.java, "database.db"
-        )
+        appDatabase =  Room.databaseBuilder(appContext, AppDatabase::class.java, "database.db")
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
@@ -55,10 +53,19 @@ object DBModule {
     }
 
 
+    @Singleton
     @Provides
-    fun provideStudentDBRepository(appDao: AppDao) = RoomDBRepository(appDao)
+    fun providekeyechangeDataSource(appDao: AppDao): IKeyExchange {
+        return keyexchangeDataSource(appDao)
+    }
+
+
+    @Provides
+    fun provideStudentDBRepository(appDao: AppDao,keyexcngeDataSource: keyexchangeDataSource) = RoomDBRepository(appDao,keyexcngeDataSource)
 
 }
+
+
 
 
 //https://codelabs.developers.google.com/codelabs/android-hilt/#6
