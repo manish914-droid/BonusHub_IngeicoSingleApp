@@ -2,25 +2,15 @@ package com.bonushub.crdb.repository
 
 
 
-import android.text.TextUtils
-import android.widget.Toast
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.RespMessageStatusData
+import com.bonushub.crdb.utils.RSAProvider
 import com.bonushub.pax.utils.*
-import com.usdk.apiservice.aidl.pinpad.DeviceName
-import com.usdk.apiservice.aidl.pinpad.KAPId
-import com.usdk.apiservice.aidl.pinpad.KeyType
-import com.usdk.apiservice.limited.pinpad.PinpadLimited
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 interface IKeyExchangeInit{
@@ -127,353 +117,77 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
     }
 
     override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter = IsoDataWriter().apply  {
-        mti = Mti.MTI_LOGON.mti
-        // adding processing code and field 59 for public and private key
-        addField(
-                3, if (isFirstCall) {
-            addFieldByHex(60, "${addPad(0, "0", 8)}BP${addPad(0, "0", 4)}")
-            ProcessingCode.INIT.code
-        } else {
-            addFieldByHex(60, nextCounter)
-            ProcessingCode.INIT_MORE.code
-        }
-        )
-        //adding stan (padding of stan is internally handled by iso)
-        paddingInvoiceRoc(DBModule.appDatabase?.appDao?.getRoc())?.let { addField(11, it) }
-        //adding nii
-        addField(24, Nii.DEFAULT.nii)
-
-        //adding tid
-        addFieldByHex(41, "41501379")
-
-        //adding field 48
-        addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
-
-        //region=========adding field 61=============
-        val appName =
-                addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
-
-        val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
-
-        val buildDate: String = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
-        val version = "${BuildConfig.VERSION_NAME}.$buildDate"
-        val connectionType = ConnectionType.GPRS.code
-        val pccNo =
-                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
-        val pcNo2 =
-                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
-        val f61 = "$connectionType$deviceModel$appName$version$pccNo$pcNo2"
-        addFieldByHex(61, f61)
-        //endregion
-
-        //region=====adding field 63============
-        val bankCode: String = AppPreference.getBankCode()
-//            val customerId = "00"
-//            val walletIssuerId = AppPreference.WALLET_ISSUER_ID
-        val deviceSerial = addPad(
-                DeviceHelper.getDeviceSerialNo() ?: "",
-                " ",
-                15,
-                false
-        ) // right padding of 15 byte
-        val f63 = "$deviceSerial$bankCode"
-        addFieldByHex(63, f63)
-        //endregion
 
     }
 
-    suspend fun startExchange1(tid: String) : Result<ResponseHandler> {
-
-
-        return try {
-            var strmsg: String? = null
-
-            val isoW = createKeyExchangeIso(tid)
-            val bData = isoW.generateIsoByteRequest()
-            val (strResult,strSucess,foo) = socketConnection(bData)
-
-            if (null !=strResult && strSucess == true) {
-                val iso = readIso(strResult)
-                Utility().logger(KeyExchanger.TAG, iso.isoMap)
-                val resp = iso.isoMap[39]
-                val f11 = iso.isoMap[11]
-
-                val f48 = iso.isoMap[48]
-
-                if (f48 != null) Utility.ConnectionTimeStamps.saveStamp(f48.parseRaw2String())
-
-                if (f11 != null) Utility().incrementRoc()
-
-                if (resp != null && resp.rawData.hexStr2ByteArr().byteArr2Str() == "00") {
-                    if (tmk.isEmpty()) {
-                        tmk = iso.isoMap[59]?.rawData
-                                ?: "" // tmk len should be 256 byte or 512 hex char
-                        Utility().logger(KeyExchanger.TAG, "RAW TMK = $tmk")
-                        if (tmk.length == 518) {  // if tmk len is 259 byte , it means last 3 bytes are tmk KCV
-                            tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
-                            tmk = tmk.substring(0, 512)
-                        } else if (tmk.length == 524) { // if tmk len is 262 byte, it means last 6 bytes are tmk KCV and tmk wallet KCV
-                            tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
-                            tmk = tmk.substring(0, 512)
-                        }
-                        startExchange1(tid)
-                    }
-                    else {
-                        val ppkDpk = iso.isoMap[59]?.rawData ?: ""
-                        Utility().logger(KeyExchanger.TAG, "RAW PPKDPK = $ppkDpk")
-                        if (ppkDpk.length == 64 || ppkDpk.length == 76) { // if ppkDpk.length is 76 it mean last 6 bytes belongs to KCV of dpk and ppk
-
-                            var ppkKcv = byteArrayOf()
-                            var dpkKcv = byteArrayOf()
-                            val dpk = ppkDpk.substring(0, 32)
-                            val ppk = ppkDpk.substring(32, 64)
-
-                            if (ppkDpk.length == 76)
-                                ppkDpk.substring(32)
-                            else {
-                                ppkKcv = ppkDpk.substring(64, 70).hexStr2ByteArr()
-                                dpkKcv = ppkDpk.substring(70).hexStr2ByteArr()
-                            }
-
-                            //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
-                            //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
-
-                            var insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
-                            if (insertkeys) {
-                                AppPreference.saveLogin(true)
-                                if (keWithInit) {
-                                    val (strResult,strSucess,foo) = startInit()
-                                    if(strSucess == true){
-                                        return Result.success(ResponseHandler("Init Successful",true,false,false))
-                                    }
-                                    else{
-                                        return Result.error(strResult.toString(),"")
-                                    }
-                                } else {
-                                    return  Result.success(ResponseHandler("Key Exchange Successful",true,false,false))
+     suspend fun startExchange(tid: String) : RespMessageStatusData {
+         val isoW = createKeyExchangeIso(tid)
+            val keyExchangeStatus=HitServer.hitServer(isoW)
+            if(keyExchangeStatus.isSuccess){
+                val isoReader=keyExchangeStatus.anyData as IsoDataReader
+                        Utility().logger(KeyExchanger.TAG, isoReader.isoMap)
+                        val f11 = isoReader.isoMap[11]
+                        val f48 = isoReader.isoMap[48]
+                        if (f48 != null) Utility.ConnectionTimeStamps.saveStamp(f48.parseRaw2String())
+                        if (f11 != null) Utility().incrementRoc() // ROCProviderV2.incrementFromResponse(f11.rawData, AppPreference.HDFC_BANK_CODE) else ROCProviderV2.increment(AppPreference.HDFC_BANK_CODE)
+                            if (tmk.isEmpty()) {
+                                tmk = isoReader.isoMap[59]?.rawData ?: "" // tmk len should be 256 byte or 512 hex char
+                                Utility().logger(KeyExchanger.TAG, "RAW TMK = $tmk")
+                                if (tmk.length == 518) {  // if tmk len is 259 byte , it means last 3 bytes are tmk KCV
+                                    tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
+                                    tmk = tmk.substring(0, 512)
+                                } else if (tmk.length == 524) { // if tmk len is 262 byte, it means last 6 bytes are tmk KCV and tmk wallet KCV
+                                    tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
+                                    tmk = tmk.substring(0, 512)
                                 }
-                            } else {
-                                AppPreference.saveLogin(false)
-                                return Result.error("Error in key insertion","")
+                              //  startExchange(tid,backToCalled)
+                                return RespMessageStatusData()
                             }
-
-                        }
-                        else
-                            return Result.error("","")
-                            //backToCalled("Key exchange error", false, false)
+                            else {
+                                val ppkDpk = isoReader.isoMap[59]?.rawData ?: ""
+                                Utility().logger(KeyExchanger.TAG, "RAW PPKDPK = $ppkDpk")
+                                if (ppkDpk.length == 64 || ppkDpk.length == 76) {
+                                    // if ppkDpk.length is 76 it mean last 6 bytes belongs to KCV of dpk and ppk
+                                    var ppkKcv = byteArrayOf()
+                                    var dpkKcv = byteArrayOf()
+                                    val dpk = ppkDpk.substring(0, 32)
+                                    val ppk = ppkDpk.substring(32, 64)
+                                    if (ppkDpk.length == 76)
+                                        ppkDpk.substring(32)
+                                    else {
+                                        ppkKcv = ppkDpk.substring(64, 70).hexStr2ByteArr()
+                                        dpkKcv = ppkDpk.substring(70).hexStr2ByteArr()
+                                    }
+                                    //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
+                                    //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
+                                    /*insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv) {
+                                        if (it) {
+                                            launch { AppPreference.saveLogin(true) }
+                                            if (keWithInit) {
+                                                startInit()
+                                            } else {
+                                                backToCalled(
+                                                        "Key Exchange Successful",
+                                                        success,
+                                                        false
+                                                )
+                                            }
+                                        } else {
+                                            launch { AppPreference.saveLogin(false) }
+                                            backToCalled("Error in key insertion", false, false)
+                                        }
+                                    }*/
+                           return RespMessageStatusData("Success Key Init", true)
+                                } else {
+                                    //Result.error("Key Injection fail","")
+                                   return RespMessageStatusData("Key exchange error", false)
+                                }
+                            }
                     }
-
-                }
-                else{
-                    val msg = iso.isoMap[58]?.parseRaw2String() ?: ""
-                   return Result.error(msg,"")
-                }
+                else {
+                return keyExchangeStatus
             }
-            else{
-                return Result.success(ResponseHandler("",false,false,false))
             }
-        } catch (e: Throwable) {
-            return Result.error("Outside","")
-           // Result.error("Unknown Error", null)
-        }
-    }
-
-     suspend fun startExchange(tid: String) : Result<ResponseHandler> {
-
-
-         var result: Result<ResponseHandler> = Result.error("","")
-
-
-         var strmsg: String? = null
-
-            val isoW = createKeyExchangeIso(tid)
-            val bData = isoW.generateIsoByteRequest()
-             val (strResult,strSucess,foo) = socketConnection(bData)
-
-          if (null !=strResult && strSucess == true) {
-              val iso = readIso(strResult)
-              Utility().logger(KeyExchanger.TAG, iso.isoMap)
-              val resp = iso.isoMap[39]
-              val f11 = iso.isoMap[11]
-
-              val f48 = iso.isoMap[48]
-
-              if (f48 != null) Utility.ConnectionTimeStamps.saveStamp(f48.parseRaw2String())
-
-              if (f11 != null) Utility().incrementRoc()
-
-              if (resp != null && resp.rawData.hexStr2ByteArr().byteArr2Str() == "00") {
-                  if (tmk.isEmpty()) {
-                      tmk = iso.isoMap[59]?.rawData
-                              ?: "" // tmk len should be 256 byte or 512 hex char
-                      Utility().logger(KeyExchanger.TAG, "RAW TMK = $tmk")
-                      if (tmk.length == 518) {  // if tmk len is 259 byte , it means last 3 bytes are tmk KCV
-                          tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
-                          tmk = tmk.substring(0, 512)
-                      } else if (tmk.length == 524) { // if tmk len is 262 byte, it means last 6 bytes are tmk KCV and tmk wallet KCV
-                          tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
-                          tmk = tmk.substring(0, 512)
-                      }
-                      startExchange(tid)
-                  } else {
-                      val ppkDpk = iso.isoMap[59]?.rawData ?: ""
-                      Utility().logger(KeyExchanger.TAG, "RAW PPKDPK = $ppkDpk")
-                      if (ppkDpk.length == 64 || ppkDpk.length == 76) { // if ppkDpk.length is 76 it mean last 6 bytes belongs to KCV of dpk and ppk
-
-                          var ppkKcv = byteArrayOf()
-                          var dpkKcv = byteArrayOf()
-                          val dpk = ppkDpk.substring(0, 32)
-                          val ppk = ppkDpk.substring(32, 64)
-
-                          if (ppkDpk.length == 76)
-                              ppkDpk.substring(32)
-                          else {
-                              ppkKcv = ppkDpk.substring(64, 70).hexStr2ByteArr()
-                              dpkKcv = ppkDpk.substring(70).hexStr2ByteArr()
-                          }
-
-                          //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
-                          //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
-
-                              var insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
-                              if (insertkeys) {
-                                   AppPreference.saveLogin(true)
-                                  if (keWithInit) {
-                                      val (strResult,strSucess,foo) = startInit()
-                                      if(strSucess == true){
-                                          strmsg = "Init Successful"
-                                          //return Result.success(NoResponseException("Init Successful",true,false,false))
-                                      }
-                                      else{
-                                        //  result.success(strSucess)
-                                       //   result.error<NoResponseException>(strResult ?: "", strSucess.toString() ?: "")
-                                          strmsg = strResult.toString()
-                                       //   return Result.error(strResult.toString(),"")
-                                      }
-                                  } else {
-                                    return  Result.success(ResponseHandler("Key Exchange Successful",true,false,false))
-                                  }
-                              } else {
-                                   AppPreference.saveLogin(false)
-                                  strmsg = "Error in key insertion"
-                                 // return Result.error("Error in key insertion","")
-                              }
-
-                      } else {
-                          strmsg = "Key exchange error"
-                         // return Result.error("Key exchange error","")
-
-                      }
-                  }
-              } else {
-                  val msg = iso.isoMap[58]?.parseRaw2String() ?: ""
-                  strmsg = msg.toString()
-              //   return Result.error(msg,"")
-
-              }
-          }
-
-         return Result.error(strmsg ?: "","")
-    }
-
-    private fun insertSecurityKeys(ppk: ByteArray, dpk: ByteArray, ppkKcv: ByteArray, dpkKcv: ByteArray): Boolean {
-
-        var pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(0, 0), 0, DeviceName.IPP)
-
-        var result = true
-        try {
-            val dTmkArr = RSAProvider.decriptTMK(tmk.hexStr2ByteArr(), rsa)
-            // val decriptedTmk = dTmkArr[0].hexStr2ByteArr()
-
-            val decriptedTmk = BytesUtil.hexString2Bytes(dTmkArr[0])
-
-            val x = "TMK=${decriptedTmk.byteArr2HexStr()}\nPPK=${ppk.byteArr2HexStr()} KCV=${ppkKcv.byteArr2HexStr()}\nDPK=${dpk.byteArr2HexStr()} KCV=${dpkKcv.byteArr2HexStr()}"
-            Utility().logger(KeyExchanger.TAG, x)
-            result = pinpadLimited.loadPlainTextKey(KeyType.MAIN_KEY, DemoConfig.KEYID_MAIN, decriptedTmk)
-            System.out.println("TMK is success "+result)
-            //result = NeptuneService.Device.writeTmk(decriptedTmk, tmkKcv)
-            // NeptuneService.beepNormal()
-            if (result) {
-                result = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.loadEncKey(KeyType.PIN_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_PIN, ppk, ppkKcv) ?: false
-                System.out.println("PPK is success "+result)
-
-                //     result = NeptuneService.Device.writeTpk(ppk, ppkKcv)
-                //   NeptuneService.beepNormal()
-            }
-            if (result) {
-                result = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
-                        ?.loadEncKey(KeyType.TDK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_TRACK, dpk, ppkKcv) ?: false
-                System.out.println("TDK is success "+result)
-                //  result = NeptuneService.Device.writeTdk(dpk, dpkKcv)
-                // NeptuneService.beepKey(EBeepMode.FREQUENCE_LEVEL_6,1000)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Utility().logger("Key Exc callback(result)hange", e.message ?: "")
-            result = false
-        } finally {
-            try {
-            } catch (ex: Exception) {
-            }
-          //  callback(result)
-        }
-        
-        return result
-    }
-
-    suspend fun startInit(): Triple<String?, Boolean?, Boolean> {
-        var strResult: String? = null
-        var strSucess: Boolean? = null
-        val waitFor = CoroutineScope(Dispatchers.IO).async {
-
-            HitServer.hitInitServer({ result, success ->
-                System.out.println("Init Suceesuffly msg2 " + success)
-                if (success) {
-                    strResult = result
-                    strSucess = success
-                    Toast.makeText(HDFCApplication.appContext, "Init Suceesuffly msg " + strSucess, Toast.LENGTH_LONG).show()
-                    // System.out.println("Init Suceesuffly msg "+strSucess)
-                } else {
-                    strResult = result
-                    strSucess = success
-                }
-            }, {
-                // strResult = it
-                //    strSucess  = false
-
-            }, this@keyexchangeDataSource)
-
-            return@async strSucess
-        }
-        waitFor.await()
-
-      //  System.out.println("Init Suceesuffly msg1 "+strSucess)
-
-        return Triple(strResult,strSucess,false)
-    }
-
-
-    private suspend fun socketConnection(bData: ByteArray) : Triple<String?, Boolean?, Boolean> {
-        var strResult: String? = null
-        var strSucess: Boolean? = null
-        HitServer.apply {
-            reversalToBeSaved = null
-        }.hitServer(bData, { result, success ->
-            if (success && !TextUtils.isEmpty(result)) {
-               strResult = result
-                strSucess = success
-            }
-            else{
-                strResult = result
-                strSucess = success
-            }
-            }, {
-                strResult = it
-                strSucess  = false
-        })
-
-        return Triple(strResult,strSucess,false)
-    }
 
     private fun insertBitsInPublicKey(privatePublicDatum: String): String {
         val stringBuilder = StringBuilder(privatePublicDatum.length + 7)
