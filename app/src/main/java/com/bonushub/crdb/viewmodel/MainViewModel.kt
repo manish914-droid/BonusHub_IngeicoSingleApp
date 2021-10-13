@@ -4,6 +4,10 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.bonushub.crdb.model.TerminalCommunicationTable
 import com.bonushub.crdb.repository.RoomDBRepository
+import com.bonushub.crdb.utils.ResponseHandler
+import com.bonushub.crdb.utils.Result
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainViewModel @ViewModelInject constructor(private val roomDBRepository: RoomDBRepository) :
@@ -15,6 +19,9 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
     private  val initResponseMessage =  MutableLiveData<String>()
     private  val initResponse =  MutableLiveData<Boolean>()
     private  val initprogress =  MutableLiveData<Boolean>()
+
+    private val _movieList = MutableLiveData<Result<ResponseHandler>>()
+    val mutableLiveData = _movieList
 
     var userFinalList: LiveData<MutableList<TerminalCommunicationTable>> = MutableLiveData<MutableList<TerminalCommunicationTable>>()
 
@@ -42,12 +49,15 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
      }
 
     fun insertInfo1(tid: String) {
-        viewModelScope.launch {
+        viewModelScope.launch{
             if(tid.isNullOrEmpty()){
                 error.postValue( "Input Fields cannot be Empty")
 
             }else{
-                val userId: Unit = roomDBRepository.insertTid(tid,::onInitResponse)
+                val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)
+                roomDBRepository.fetchInitData(tid).collect {
+                    mutableLiveData.value = it
+                }
                 //  insertedId.postValue(userId)
             }
         }

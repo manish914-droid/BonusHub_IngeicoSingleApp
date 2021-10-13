@@ -5,7 +5,6 @@ import ServerCommunicator
 import android.content.Context
 import android.text.TextUtils
 import com.bonushub.crdb.di.DBModule.appDatabase
-import android.util.Log
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
@@ -22,7 +21,6 @@ import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.sql.Types.TIMESTAMP
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -119,7 +117,8 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                                     tmk = tmk.substring(0, 512)
                                 }
                                 startExchange()
-                            } else {
+                            }
+                            else {
                                 val ppkDpk = iso.isoMap[59]?.rawData ?: ""
                                 Utility().logger(TAG, "RAW PPKDPK = $ppkDpk")
                                 if (ppkDpk.length == 64 || ppkDpk.length == 76) { // if ppkDpk.length is 76 it mean last 6 bytes belongs to KCV of dpk and ppk
@@ -143,7 +142,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                                         if (it) {
                                             launch { AppPreference.saveLogin(true) }
                                             if (keWithInit) {
-                                                startInit()
+                                                //startInit()
                                             } else {
                                                 backToCalled(
                                                     "Key Exchange Successful",
@@ -267,7 +266,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
         return stringBuilder.toString()
     }
 
-    fun startInit() {
+  /*  fun startInit() {
         GlobalScope.launch {
             HitServer.hitInitServer({ result, success ->
                 if (success) {
@@ -282,7 +281,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                 backToCalled(it, false, true)
             }, this@KeyExchanger)
         }
-    }
+    }*/
 
     override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter =
         IsoDataWriter().apply {

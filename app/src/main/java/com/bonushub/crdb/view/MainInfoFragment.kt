@@ -11,17 +11,19 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.bonushub.crdb.R
 import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.viewmodel.MainViewModel
-import com.bonushub.pax.utils.KeyExchanger
-import com.bonushub.pax.utils.Utility
+
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_info.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.Result as Result1
 
 @AndroidEntryPoint
 class MainInfoFragment : Fragment() {
@@ -54,6 +56,7 @@ class MainInfoFragment : Fragment() {
 
           //  val student = getEnteredStudentDetails()
           //  mainViewModel.insertInfo(student)
+            mainViewModel.insertInfo1("41501379")
 
         }
         button_cancel.setOnClickListener {
@@ -104,9 +107,23 @@ class MainInfoFragment : Fragment() {
     }
 
     fun observeMainViewModel(){
+        mainViewModel.mutableLiveData.observe(viewLifecycleOwner, Observer { result ->
 
-        mainViewModel.fetchInitResponse().observe(viewLifecycleOwner, Observer<Boolean> { it ->
-            Toast.makeText(activity,"Init Sucessfully $it", Toast.LENGTH_LONG).show()
+            when (result.status) {
+                Result.Status.SUCCESS -> {
+
+                    Toast.makeText(activity,"Success called $", Toast.LENGTH_LONG).show()
+                }
+
+                Result.Status.ERROR -> {
+                    Toast.makeText(activity,"Error called  ${result.message}", Toast.LENGTH_LONG).show()
+                }
+
+                Result.Status.LOADING -> {
+                    Toast.makeText(activity,"Loading called $", Toast.LENGTH_LONG).show()
+                }
+            }
+
         })
 
 

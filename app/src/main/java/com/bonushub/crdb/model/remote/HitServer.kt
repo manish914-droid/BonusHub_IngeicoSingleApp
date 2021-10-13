@@ -4,7 +4,7 @@ import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.model.TerminalCommunicationTable
-import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.repository.keyexchangeDataSource
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
 import com.bonushub.pax.utils.Field48ResponseTimestamp.getF48TimeStamp
@@ -77,7 +77,7 @@ object HitServer  {
     }
 
     @Synchronized
-    suspend fun hitInitServer(callback: ServerMessageCallback, progressMsg: ProgressCallback, keInit: IKeyExchangeInit) {
+    suspend fun hitInitServer(callback: ServerMessageCallback, progressMsg: ProgressCallback, keInit: keyexchangeDataSource) {
         this@HitServer.callback = callback
         val FILE_NAME = "init_packet_request_logs.txt"
         val fos : FileOutputStream = HDFCApplication.appContext.openFileOutput(FILE_NAME, MODE_PRIVATE)
