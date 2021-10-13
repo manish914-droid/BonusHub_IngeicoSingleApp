@@ -9,19 +9,19 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.repository.IKeyExchange
 import com.bonushub.crdb.repository.RoomDBRepository
 import com.bonushub.crdb.repository.keyexchangeDataSource
+import com.bonushub.crdb.repository.keyexchangeDataSourcenew
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ApplicationComponent::class)
 object DBModule {
     lateinit var appDatabase: AppDatabase
 
@@ -52,6 +52,12 @@ object DBModule {
         return appDatabase
     }
 
+
+    @Singleton
+    @Provides
+    fun providekeyechangeDataSourcenew(appDao: AppDao): IKeyExchange {
+        return keyexchangeDataSourcenew(appDao)
+    }
 
     @Singleton
     @Provides
