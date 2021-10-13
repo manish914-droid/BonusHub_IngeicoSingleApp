@@ -16,9 +16,7 @@ import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -186,11 +184,11 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
 
         return try {
-            var strmsg: String? = null
+            var strinitSuccess: Boolean? = null
 
             val isoW = createKeyExchangeIso(tid)
             val bData = isoW.generateIsoByteRequest()
-            val (strResult,strSucess,foo) = socketConnection(bData)
+            val (strResult,strSucess,_) = socketConnection(bData)
 
             if (null !=strResult && strSucess == true) {
                 val iso = readIso(strResult)
@@ -206,8 +204,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
                 if (resp != null && resp.rawData.hexStr2ByteArr().byteArr2Str() == "00") {
                     if (tmk.isEmpty()) {
-                        tmk = iso.isoMap[59]?.rawData
-                                ?: "" // tmk len should be 256 byte or 512 hex char
+                        tmk = iso.isoMap[59]?.rawData ?: "" // tmk len should be 256 byte or 512 hex char
                         Utility().logger(KeyExchanger.TAG, "RAW TMK = $tmk")
                         if (tmk.length == 518) {  // if tmk len is 259 byte , it means last 3 bytes are tmk KCV
                             tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
@@ -242,12 +239,12 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
                                 if (keWithInit) {
-                                    val (strResult,strSucess,foo) = startInit()
+                                    val (strResult,strSucess,_) = startInit()
                                     if(strSucess == true){
                                         return Result.success(ResponseHandler("Init Successful",true,false,false))
                                     }
                                     else{
-                                        return Result.error(strResult.toString(),"")
+                                        return Result.error(strResult ?: "","")
                                     }
                                 } else {
                                     return  Result.success(ResponseHandler("Key Exchange Successful",true,false,false))
@@ -424,33 +421,35 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
     suspend fun startInit(): Triple<String?, Boolean?, Boolean> {
         var strResult: String? = null
         var strSucess: Boolean? = null
-        val waitFor = CoroutineScope(Dispatchers.IO).async {
 
-            HitServer.hitInitServer({ result, success ->
-                System.out.println("Init Suceesuffly msg2 " + success)
+            HitServer.apply {
+                reversalToBeSaved = null
+            }.hitInitServer({ result, success ->
+                System.out.println("Init Suceesuffly msg2 " + result)
                 if (success) {
                     strResult = result
                     strSucess = success
-                    Toast.makeText(HDFCApplication.appContext, "Init Suceesuffly msg " + strSucess, Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        HDFCApplication.appContext, "Init Suceesuffly msg " + strSucess, Toast.LENGTH_LONG
+                    ).show()
                     // System.out.println("Init Suceesuffly msg "+strSucess)
                 } else {
                     strResult = result
                     strSucess = success
                 }
             }, {
-                // strResult = it
-                //    strSucess  = false
+                 strResult = it
+                strSucess  = true
 
             }, this@keyexchangeDataSource)
 
-            return@async strSucess
-        }
-        waitFor.await()
 
-      //  System.out.println("Init Suceesuffly msg1 "+strSucess)
+          System.out.println("Init Suceesuffly msg1 "+strResult)
+
 
         return Triple(strResult,strSucess,false)
     }
+
 
 
     private suspend fun socketConnection(bData: ByteArray) : Triple<String?, Boolean?, Boolean> {

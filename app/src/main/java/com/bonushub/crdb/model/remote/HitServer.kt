@@ -164,7 +164,7 @@ object HitServer  {
                                 Utility().readInitServer(initList) { result, message ->
                                     callback(message, result)
                                 }
-                                break
+                               break
                             }
                         } else {
                             callback(reader.isoMap[58]?.parseRaw2String() ?: "", false)
