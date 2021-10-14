@@ -1,17 +1,22 @@
-package com.bonushub.crdb.view
+package com.bonushub.crdb.view.fragments
 
+import android.app.Activity
+import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
+import com.bonushub.crdb.IDialog
 import com.bonushub.crdb.R
 import com.bonushub.crdb.model.TerminalCommunicationTable
 import com.bonushub.crdb.utils.Result
@@ -20,22 +25,27 @@ import com.bonushub.crdb.viewmodel.MainViewModel
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_info.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlin.Result as Result1
 
 @AndroidEntryPoint
 class MainInfoFragment : Fragment() {
-
+    private var iDialog: IDialog? = null
     private val mainViewModel : MainViewModel by viewModels()
     private var mainInfoView : View? = null
+    private lateinit var progressDialog: Dialog
+    lateinit var progressTitleMsg: TextView
+    lateinit var progressPercent: ProgressBar
+    lateinit var progressPercentTv: TextView
+    lateinit var horizontalPLL: LinearLayout
+    lateinit var verticalProgressBar: ProgressBar
     var mContainerId:Int = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if(context is IDialog) iDialog = context
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -123,10 +133,13 @@ class MainInfoFragment : Fragment() {
                     Toast.makeText(activity,"Loading called $", Toast.LENGTH_LONG).show()
                 }
             }
-
+            mainViewModel.isLoading().observe(viewLifecycleOwner, Observer {
+                if(it) {
+                    Toast.makeText(activity, "loding", Toast.LENGTH_SHORT).show()
+                }else
+                    Toast.makeText(activity, "done", Toast.LENGTH_SHORT).show()
+            })
         })
-
-
     }
 
 }

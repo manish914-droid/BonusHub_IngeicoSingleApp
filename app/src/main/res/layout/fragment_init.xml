@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dashboard_img_height"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/tid_crd_view"
+            style="@style/CardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_10"
+
+            >
+
+            <EditText
+                android:id="@+id/if_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_edge"
+                android:cursorVisible="false"
+                android:drawableStart="@drawable/ic_tid"
+                android:drawablePadding="@dimen/pad_20"
+                android:ems="10"
+                android:hint="@string/enter_tid_colon"
+                android:imeOptions="actionDone"
+                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+                android:inputType="number"
+                android:maxLength="8"
+                android:paddingStart="@dimen/pad_16"
+                android:paddingTop="@dimen/pad_10"
+                android:paddingEnd="@dimen/pad_16"
+                android:paddingBottom="@dimen/pad_10"
+
+                android:textColor="@color/black"
+                android:textColorHint="@color/hint_color"
+                />
+
+        </androidx.cardview.widget.CardView>
+
+
+        <Button
+            android:id="@+id/if_proceed_btn"
+            style="@style/Widget.Neumorph.Button"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/pad_8"
+            android:layout_marginTop="@dimen/pad_40"
+            android:padding="@dimen/pad_2"
+            android:text="@string/proceed_to_init"
+
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_small"
+            android:background="@drawable/edge_button" />
+
+
+    </LinearLayout>
+
+
+</androidx.core.widget.NestedScrollView>

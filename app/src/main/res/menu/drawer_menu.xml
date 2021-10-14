@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/bankFunction"
+        android:icon="@drawable/ic_bankfunction"
+        android:title="@string/bank_functions"
+        android:iconTint="@color/colorPrimary"
+
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/reportFunction"
+        android:icon="@drawable/ic_reports"
+        android:title="@string/reports"
+       android:iconTint="@color/colorPrimary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/settlement"
+        android:icon="@drawable/ic_settlement"
+        android:title="@string/reports"
+        android:iconTint="@color/colorPrimary"
+        app:showAsAction="ifRoom" />
+
+</menu>

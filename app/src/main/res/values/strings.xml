@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">BonusHub</string>
+
+    <!--Init-->
+    <string name="enter_tid_colon">Enter TID :</string>
+    <string name="proceed_to_init">Proceed To Init</string>
+    <string name="please_wait">Please Wait....</string>
+    <string name="please_wait_host">Please Wait init Process Start....</string>
+
+    <!--navigation drawer strings-->
+    <string name="merchant_name">ME Name  : </string>
+    <string name="terminal_id">Terminal Id</string>
+    <string name="merchant_id">Merchant Id</string>
+    <string name="bank_functions">Bank Functions</string>
+    <string name="settings">Settings</string>
+    <string name="reports">Reports</string>
+
+    <string name="help_desk_number_hint">Help Desk No: 0120252525</string>
+    <string name="settlement">Settlement</string>
+    <string name="versionHint">App Version: v1.0.2</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

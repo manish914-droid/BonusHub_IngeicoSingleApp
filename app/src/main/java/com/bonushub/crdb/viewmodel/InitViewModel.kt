@@ -10,19 +10,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class MainViewModel @ViewModelInject constructor(private val roomDBRepository: RoomDBRepository) :
-    ViewModel(),LifecycleObserver {
+class InitViewModel @ViewModelInject constructor(private val roomDBRepository: RoomDBRepository) :
+    ViewModel() {
 
     private  val insertedId =  MutableLiveData<Long>()
     private val  error = MutableLiveData<String>()
+    private var _errorMessage = MutableLiveData<String>()
     private val _isLoading = MutableLiveData<Boolean>()
-
     private val mutableLiveDataList = MutableLiveData<Result<ResponseHandler>>()
     val mutableLiveData = mutableLiveDataList
-
     var userFinalList: LiveData<MutableList<TerminalCommunicationTable>> = MutableLiveData<MutableList<TerminalCommunicationTable>>()
+
     fun isLoading(): LiveData<Boolean> = _isLoading
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+
     fun fetchData(){
         viewModelScope.launch {
 
@@ -55,8 +55,8 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
                 val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)
                 roomDBRepository.fetchInitData(tid).collect {
                     mutableLiveData.value = it
+                    _isLoading.postValue(false)
                 }
-                _isLoading.postValue(false)
                 //  insertedId.postValue(userId)
             }
         }

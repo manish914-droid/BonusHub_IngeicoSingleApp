@@ -1,4 +1,4 @@
-package com.bonushub.crdb.view
+package com.bonushub.crdb.view.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +17,7 @@ class MainAdapter(var postList : ArrayList<TerminalCommunicationTable>) : Recycl
     override fun getItemCount(): Int  = postList.size
 
 
-    override fun onBindViewHolder(holder: MainAdapter.PostViewHolder, position: Int)  =  holder.bind(postList[position])
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int)  =  holder.bind(postList[position])
 
      fun refreshAdapter(newPostList : List<TerminalCommunicationTable>){
         postList.clear()

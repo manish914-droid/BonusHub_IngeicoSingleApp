@@ -1,4 +1,4 @@
-package com.bonushub.crdb.view
+package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,7 @@ import com.bonushub.crdb.R
 
 import com.bonushub.crdb.model.TerminalCommunicationTable
 import com.bonushub.crdb.utils.replaceFragment
+import com.bonushub.crdb.view.adapter.MainAdapter
 import com.bonushub.crdb.viewmodel.MainViewModel
 
 import dagger.hilt.android.AndroidEntryPoint

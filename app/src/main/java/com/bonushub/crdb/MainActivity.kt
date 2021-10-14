@@ -1,15 +1,23 @@
 package com.bonushub.crdb
 
+import android.app.Activity
+import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.RemoteException
 import android.util.Log
+import android.view.View
+import android.view.Window
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.model.BatchFileDataTable
 import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.replaceFragmentWithNoHistory
-import com.bonushub.crdb.view.MainInfoListFragment
+import com.bonushub.crdb.view.fragments.MainInfoListFragment
 import com.bonushub.pax.utils.Utility
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -23,7 +31,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
-
     private var deviceserialno: String? = null
     private var devicemodelno: String? = null
     private var pinpad: UPinpad? = null
@@ -144,5 +151,32 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
             //  toast("register fail: " + e.message)
         }
     }
-}
 
+
+
+}
+interface IDialog {
+
+    fun getMsgDialog(
+        title: String,
+        msg: String,
+        positiveTxt: String,
+        negativeTxt: String,
+        positiveAction: () -> Unit,
+        negativeAction: () -> Unit,
+        isCancellable: Boolean = false
+    )
+
+    fun setProgressTitle(title: String)
+    //fun onEvents(event: VxEvent)
+
+    fun showToast(msg: String)
+    fun showProgress(progressMsg: String = "Please Wait....")
+    fun hideProgress()
+    fun getInfoDialog(title: String, msg: String, acceptCb: () -> Unit)
+    fun getInfoDialogdoubletap(title: String, msg: String, acceptCb: (Boolean, Dialog) -> Unit)
+
+    fun updatePercentProgress(percent:Int)
+    fun showPercentDialog(progressMsg: String = "Please Wait....")
+
+}

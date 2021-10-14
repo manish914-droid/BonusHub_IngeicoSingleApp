@@ -6,5 +6,30 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="AppThemeNoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="VerifoneToolbarStyle" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="android:colorBackground">@color/colorAccent</item>
+        <item name="android:textColor">@color/text_active</item>
 
+    </style>
+    <style name="CardViewStyle" parent="CardView">
+        <item name="cardCornerRadius">10dp</item>
+        <item name="cardElevation">15dp</item>
+    </style>
+    <style name="Widget.Neumorph.Button" parent="Widget.AppCompat.Button">
+        <item name="android:textAppearance">?android:attr/textAppearanceButton</item>
+        <item name="android:minHeight">72dip</item>
+        <item name="android:minWidth">112dip</item>
+        <item name="android:paddingLeft">@dimen/design_btn_padding_left</item>
+        <item name="android:paddingRight">@dimen/design_btn_padding_right</item>
+        <item name="android:paddingTop">@dimen/design_btn_padding_top</item>
+        <item name="android:paddingBottom">@dimen/design_btn_padding_bottom</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="color">@color/init_button</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
 </resources>
