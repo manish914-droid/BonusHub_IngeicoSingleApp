@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
+
     private var navigationBinding: ActivityNavigationBinding?=null
     private var navHostFragment: NavHostFragment? = null
     private var isToExit = false
@@ -164,9 +166,22 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
         }
     }
     //endregion
+
+    //region============================fragment transaction
+    open fun transactFragment(fragment: Fragment, isBackStackAdded: Boolean = false): Boolean {
+        val trans = supportFragmentManager.beginTransaction().apply {
+            replace(R.id.nav_host_fragment, fragment, fragment::class.java.simpleName)
+            addToBackStack(fragment::class.java.simpleName)
+        }
+        if (isBackStackAdded) trans.addToBackStack(null)
+        return trans.commitAllowingStateLoss() >= 0
+    }
+    //endregion
+
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
 interface ShowLessOnBackPress {
     fun showLessDashOptions()
 }
 //endregion
+

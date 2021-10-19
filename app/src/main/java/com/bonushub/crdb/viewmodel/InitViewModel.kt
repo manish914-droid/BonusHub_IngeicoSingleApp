@@ -18,6 +18,7 @@ class InitViewModel @ViewModelInject constructor(private val roomDBRepository: R
     private var _errorMessage = MutableLiveData<String>()
     private val _isLoading = MutableLiveData<Boolean>()
     private val mutableLiveDataList = MutableLiveData<Result<ResponseHandler>>()
+
     val mutableLiveData = mutableLiveDataList
     var userFinalList: LiveData<MutableList<TerminalCommunicationTable>> = MutableLiveData<MutableList<TerminalCommunicationTable>>()
 
@@ -26,7 +27,7 @@ class InitViewModel @ViewModelInject constructor(private val roomDBRepository: R
     fun fetchData(){
         viewModelScope.launch {
 
-            userFinalList = roomDBRepository.fetchdata()
+          //  userFinalList = roomDBRepository.fetchdata()
         }
     }
 
@@ -50,6 +51,8 @@ class InitViewModel @ViewModelInject constructor(private val roomDBRepository: R
         viewModelScope.launch{
             if(tid.isNullOrEmpty()){
                 error.postValue( "Input Fields cannot be Empty")
+               // mutableLiveData.postValue(Resource.success(userList))
+
                 _isLoading.postValue(false)
             }else{
                 val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)

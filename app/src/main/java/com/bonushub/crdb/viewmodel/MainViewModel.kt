@@ -26,7 +26,7 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
     fun fetchData(){
         viewModelScope.launch {
 
-            userFinalList = roomDBRepository.fetchdata()
+           // userFinalList = roomDBRepository.fetchdata()
         }
     }
 
@@ -52,10 +52,10 @@ class MainViewModel @ViewModelInject constructor(private val roomDBRepository: R
                 error.postValue( "Input Fields cannot be Empty")
                 _isLoading.postValue(false)
             }else{
-                val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)
+             /*   val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)
                 roomDBRepository.fetchInitData(tid).collect {
                     mutableLiveData.value = it
-                }
+                }*/
                 _isLoading.postValue(false)
                 //  insertedId.postValue(userId)
             }

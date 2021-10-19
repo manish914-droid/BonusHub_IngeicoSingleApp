@@ -1,6 +1,7 @@
 package com.bonushub.crdb.db
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.bonushub.crdb.model.*
 import kotlinx.coroutines.runBlocking
@@ -12,7 +13,7 @@ interface AppDao{
     suspend  fun insert(student: TerminalCommunicationTable) : Long
 
     @Query("select * From TerminalCommunicationTable")
-    fun  fetch() : LiveData<MutableList<TerminalCommunicationTable>>
+    fun  fetch() : MutableList<TerminalCommunicationTable>
 
     //region================================Batch Data Table Manipulation:-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
