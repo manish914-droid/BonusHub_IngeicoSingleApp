@@ -105,24 +105,22 @@ class InitFragment : Fragment(),IDialog {
             }
         }
     }
-    fun observeMainViewModel(){
+    private fun observeMainViewModel(){
 
-        initViewModel.mutableLiveData.observe(viewLifecycleOwner, Observer { result ->
+        initViewModel._initData.observe(viewLifecycleOwner, Observer { result ->
 
             when (result.status) {
                 Result.Status.SUCCESS -> {
                     hideProgress()
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 }
-
                 Result.Status.ERROR -> {
                     hideProgress()
                     Toast.makeText(activity,"Error called  ${result.message}", Toast.LENGTH_LONG).show()
                 }
-
                 Result.Status.LOADING -> {
-                    showProgress("start")
-                    Toast.makeText(activity,"Loading called $", Toast.LENGTH_LONG).show()
+                    showProgress("Sending/Receiving From Host")
+
                 }
             }
 

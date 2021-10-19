@@ -41,19 +41,12 @@ class DashboardFragment : Fragment() {
     private val itemList = mutableListOf<EDashboardItem>()
     private val list1 = arrayListOf<EDashboardItem>()
     private val list2 = arrayListOf<EDashboardItem>()
-    /* private val mAdapter by lazy {
-         DashBoardAdapter(iFragmentRequest, ::onItemLessMoreClick)
-     }*/
     private val dashBoardAdapter by lazy {
         DashBoardAdapter(iFragmentRequest, ::onItemLessMoreClick)
     }
     private var animShow: Animation? = null
     private var animHide: Animation? = null
     private var binding: FragmentDashboardBinding? = null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
