@@ -23,10 +23,11 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.Utility
+import com.bonushub.crdb.utils.isExpanded
 
 import com.bonushub.pax.utils.NavControllerFragmentLabel
-import com.bonushub.pax.utils.Utility
-import com.bonushub.pax.utils.isExpanded
+
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId

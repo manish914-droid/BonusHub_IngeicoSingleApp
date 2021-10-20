@@ -17,12 +17,11 @@ class InitViewModel @ViewModelInject constructor(private val roomDBRepository: R
     fun insertInfo1(tid: String) {
         viewModelScope.launch{
             initData.postValue(Result.loading(null))
-            if(tid.isNullOrEmpty()){
+            if(tid.isEmpty()){
                 initData.postValue(Result.error("Something Went Wrong", null))
             }else{
                 val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)
                 roomDBRepository.fetchInitData(tid).collect {
-
                     initData.postValue(Result.success(it))
 
                 }

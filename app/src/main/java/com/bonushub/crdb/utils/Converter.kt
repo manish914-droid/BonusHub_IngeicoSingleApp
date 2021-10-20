@@ -1,5 +1,5 @@
 @file:JvmName("Converter")
-package com.bonushub.pax.utils
+package com.bonushub.crdb.utils
 
 import kotlin.experimental.and
 import kotlin.experimental.or

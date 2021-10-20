@@ -25,7 +25,6 @@ class RoomDBRepository @Inject  constructor(private val appDao: AppDao,
 
     suspend fun fetchInitData(tid: String): Flow<Result<ResponseHandler>> = flow{
         emit(keyexchangeDataSource.startExchange1(tid))
-
     }.flowOn(Dispatchers.IO)
 
   //  suspend fun execute(): Flow<DataState<List<Blog>>> = flow

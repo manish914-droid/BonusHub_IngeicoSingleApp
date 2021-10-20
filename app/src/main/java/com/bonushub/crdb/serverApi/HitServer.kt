@@ -1,5 +1,4 @@
-
-
+package com.bonushub.crdb.serverApi
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
@@ -7,7 +6,7 @@ import com.bonushub.crdb.model.TerminalCommunicationTable
 import com.bonushub.crdb.repository.keyexchangeDataSource
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
-import com.bonushub.pax.utils.Field48ResponseTimestamp.getF48TimeStamp
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getF48TimeStamp
 import java.io.DataInputStream
 import java.io.FileOutputStream
 import java.net.Socket
@@ -20,7 +19,7 @@ var PORT = 8101//4124
 
 object HitServer  {
 
-    private val TAG = HitServer::class.java.simpleName
+    val TAG = HitServer::class.java.simpleName
     private var tct: TerminalCommunicationTable?= null
     private var callback: ServerMessageCallback? = null
     private var callbackSale: ServerMessageCallbackSale? = null

@@ -19,14 +19,15 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.utils.Result
+import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.Field48ResponseTimestamp.checkInternetConnection
+
 import com.bonushub.pax.utils.KeyExchanger
 import com.bonushub.pax.utils.UiAction
-import com.bonushub.pax.utils.isExpanded
+
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*

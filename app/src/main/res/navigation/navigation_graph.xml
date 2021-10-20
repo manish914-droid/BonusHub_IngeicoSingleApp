@@ -9,7 +9,9 @@
         android:id="@+id/initFragment"
         android:name="com.bonushub.crdb.view.fragments.InitFragment"
         android:label="fragment_init"
-        tools:layout="@layout/fragment_init"></fragment>
+        tools:layout="@layout/fragment_init">
+
+    </fragment>
 
     <fragment
         android:id="@+id/dashBoardFragment"

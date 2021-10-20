@@ -1,6 +1,5 @@
 package com.bonushub.crdb.view.fragments
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -16,14 +15,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.bonushub.crdb.NavigationActivity
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.viewmodel.InitViewModel
-import com.bonushub.crdb.viewmodel.MainViewModel
-import com.bonushub.pax.utils.Utility
 import androidx.lifecycle.Observer
 import com.bonushub.crdb.IDialog
+import com.bonushub.crdb.utils.Utility
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

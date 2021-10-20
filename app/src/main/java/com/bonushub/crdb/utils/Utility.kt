@@ -1,5 +1,5 @@
 
-package com.bonushub.pax.utils
+package com.bonushub.crdb.utils
 
 import android.app.Activity
 import android.content.Context
@@ -23,7 +23,7 @@ import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.*
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -992,7 +992,7 @@ object Field48ResponseTimestamp {
 
     fun checkInternetConnection(): Boolean {
         val cm =
-            VerifoneApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            HDFCApplication.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting
     }

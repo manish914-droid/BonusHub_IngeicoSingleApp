@@ -4,9 +4,12 @@ import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.serverApi.ProgressCallback
+import com.bonushub.crdb.serverApi.ServerMessageCallback
+import com.bonushub.crdb.serverApi.ServerMessageCallbackSale
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
-import com.bonushub.pax.utils.Field48ResponseTimestamp.getF48TimeStamp
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getF48TimeStamp
 import java.io.DataInputStream
 import java.io.FileOutputStream
 import java.net.Socket
