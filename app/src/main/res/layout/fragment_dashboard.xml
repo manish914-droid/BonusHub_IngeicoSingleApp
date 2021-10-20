@@ -8,11 +8,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:layout_marginBottom="?attr/actionBarSize">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dashboard_RV"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layoutAnimation="@anim/layout_anim"
             android:padding="@dimen/pad_4"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -25,6 +26,7 @@
             android:layout_height="0dp"
             android:layout_below="@+id/dashboard_RV"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

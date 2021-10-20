@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--theam-->
     <color name="colorPrimary">#013480</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="heading">#222222</color>
     <color name="background">#FFFFFF</color>
-    <color name="hint_color">#4D4F51</color>
+    <color name="themeBackground">#001F79</color>
+    <!--Init-->
     <color name="init_button">#ED1C24</color>
     <color name="colorGrey">#A9A9A9</color>
     <color name="darkgray">#A9A9A9</color>
@@ -13,10 +15,9 @@
     <color name="black">#000000</color>
     <color name="text_active">@color/heading</color>
     <color name="text_inactive">#777777</color>
-    <color name="purple_d">#683992</color>
-    <color name="themeBackground">#001F79</color>
-    <color name="testupershadow">#001F90</color>
-    <color name="colorPrimaryTrans">#990D47A1</color>
+    <!--progress bar-->
     <color name="darkgreen">#006400</color>
+    <!--text and hint-->
     <color name="txt_color">#013480</color>
+    <color name="hint_color">#4D4F51</color>
 </resources>

@@ -144,26 +144,38 @@ enum class EDrawerSubmenuGroup {
 // endregion
 
 
-enum class UiAction(val tvalue: Int = 0, val title: String = "") {
-    INIT, KEY_EXCHANGE, INIT_WITH_KEY_EXCHANGE, START_SALE(title = "Sale"), SETTLEMENT, APP_UPDATE, PRE_AUTH(
-        title = "Pre-Auth"
+enum class UiAction(val title: String = "Not Declared", val res: Int = R.drawable.ic_bank_emi) {
+    INIT, KEY_EXCHANGE, INIT_WITH_KEY_EXCHANGE, START_SALE(
+        "Sale",
+        R.drawable.ic_bbg
     ),
-    REFUND(title = "Refund"),
-    BANK_EMI(title = "Bank EMI"), OFFLINE_SALE(title = "Offline Sale"), CASH_AT_POS(title = "Cash Advance"), SALE_WITH_CASH(
-        title = "Sale With Cash"
-    );
-
-    fun getTransactionType(): TransactionType {
-        return when (this) {
-            START_SALE -> TransactionType.SALE
-            PRE_AUTH -> TransactionType.PRE_AUTH
-            REFUND -> TransactionType.REFUND
-            BANK_EMI -> TransactionType.EMI_SALE
-            OFFLINE_SALE -> TransactionType.OFFLINE_SALE
-            else -> TransactionType.NONE
-        }
-    }
+    SETTLEMENT, APP_UPDATE, PRE_AUTH(
+        title = "Pre-Auth",R.drawable.ic_preauth
+    ),
+    REFUND("Refund", R.drawable.ic_refund),
+    BANK_EMI(
+        "Bank EMI",
+        R.drawable.ic_bank_emi
+    ),
+    OFFLINE_SALE(title = "Offline Sale"), CASH_AT_POS(
+        "Cash Advance",
+        R.drawable.ic_cash_at_pos
+    ),
+    SALE_WITH_CASH("Sale With Cash", R.drawable.ic_salewithcash),
+    PRE_AUTH_COMPLETE(title = "Pre Auth Complete"), EMI_ENQUIRY(
+        "EMI Catalogue",
+        R.drawable.ic_emicatalogue
+    ),
+    BRAND_EMI("Brand EMI", R.drawable.ic_brandemi),
+    TEST_EMI("Test EMI TXN", R.drawable.ic_brand_emi_code),
+    FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_at_pos),
+  //  DEFAUTL("Not Declared", R.drawable.ic_sad),
+    BRAND_EMI_CATALOGUE("Brand EMI Catalogue", R.drawable.ic_sale),
+    BANK_EMI_CATALOGUE("Bank EMI Catalogue", R.drawable.ic_sale),
+   // BANK_EMI_BY_ACCESS_CODE("Brand Emi By Code", R.drawable.ic_brand_emi),
+    //DYNAMIC_QR("Dynamic QR", R.drawable.ic_qr_code)
 }
+
 
 //Below Enum Class is used to detect different card Types:-
 enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {
@@ -383,7 +395,7 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     REFUND("Refund", R.drawable.ic_refund, 11),
     VOID_REFUND("Void Refund", R.drawable.ic_void, 12),
     VOID_SALE("Void", R.drawable.ic_void, 13),
-    CROSS_SELL("BNPL", R.drawable.ic_void, 14),
+    CROSS_SELL("BNPL", R.drawable.ic_crosssell, 14),
 
     SALE_WITH_CASH("Sale With Cash", R.drawable.ic_salewithcash),
     CASH_ADVANCE("Cash Advance", R.drawable.ic_cash_at_pos),

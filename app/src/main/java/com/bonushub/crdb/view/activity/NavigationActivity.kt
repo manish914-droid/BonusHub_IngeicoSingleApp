@@ -4,11 +4,13 @@ import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.RemoteException
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
@@ -17,18 +19,22 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
+import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DeviceHelper
+
+import com.bonushub.pax.utils.NavControllerFragmentLabel
 import com.bonushub.pax.utils.Utility
+import com.bonushub.pax.utils.isExpanded
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.lang.Runnable
 
 @AndroidEntryPoint
 class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
@@ -44,6 +50,8 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     private var isoPacketByteArray: ByteArray? = null
     private var deviceserialno: String? = null
     private var devicemodelno: String? = null
+    private var tid: String? = null
+    private var mid: String? = null
     private var pinpad: UPinpad? = null
     private var pinpadLimited: PinpadLimited? = null
     private val dialog by lazy {   Dialog(this) }
@@ -74,7 +82,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
         headerView = navigationBinding?.navView?.getHeaderView(0)
         mainDrawerBinding = headerView?.let { MainDrawerBinding.bind(it) }
         // endregion
-
+      decideDashBoard()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -98,6 +106,31 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
         }
     }
     //endregion
+
+    //region  Checked that the terminal is initialized or not.
+    private fun decideDashBoard() {
+        if (AppPreference.getLogin()) {
+         //   refreshDrawer()
+            navHostFragment?.navController?.popBackStack()
+            Log.e("NAV", "DECIDE HOME")
+            navHostFragment?.navController?.navigate(R.id.dashBoardFragment)
+
+        } else {
+            GlobalScope.launch(Dispatchers.IO) {
+                Utility().readLocalInitFile { status, msg ->
+                    Log.d("Init File Read Status ", status.toString())
+                    Log.d("Message ", msg)
+
+                       // refreshDrawer()
+
+                }
+            }
+            navHostFragment?.navController?.popBackStack()
+            navHostFragment?.navController?.navigate(R.id.initFragment)
+        }
+    }
+
+    //endregion==========
     //region============================ready
     override fun onReady(version: String?) {
         register(true)
@@ -124,6 +157,9 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
         }
     }
     //endregion
+
+
+
 
     //region============================initDeviceInstance
     protected fun initDeviceInstance() {
@@ -178,6 +214,57 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     }
     //endregion
 
+
+//region==========Setting for sidebar details==========
+   private fun refreshDrawer() {
+         val appDao: AppDao?=null
+      runBlocking(Dispatchers.IO) {
+        val tpt = appDao?.getAllTerminalParameterTableData()?.get(0)
+          val merchantName = tpt?.receiptHeaderOne
+           tid = getString(R.string.terminal_id) + "   : " + tpt?.terminalId
+           mid = getString(R.string.merchant_id) + "  : " + tpt?.merchantId
+
+      }
+
+    runBlocking(Dispatchers.Main)  {
+        mainDrawerBinding?.mdTidTv?.text = tid
+        mainDrawerBinding?.mdMidTv?.text = mid
+    }
+
+    }
+
+    //region============================On Back Pressed======================
+    override fun onBackPressed() {
+        if (navHostFragment?.navController?.currentDestination?.label ==
+            NavControllerFragmentLabel.DASHBOARD_FRAGMENT_LABEL.destinationLabel
+        ) {
+            Log.d("Dashboard:- ", "Inflated")
+            if (isExpanded)
+                showLessOnBackPress?.showLessDashOptions()
+            else {
+                if (navigationBinding?.mainDl?.isDrawerOpen(GravityCompat.START)!!)
+                    navigationBinding?.mainDl?.closeDrawer(GravityCompat.START)
+                else
+                    exitApp()
+            }
+        }
+    }
+    //endregion
+
+    //region======================================================method to exitApp:-
+    private fun exitApp() {
+        if (isToExit) {
+            super.finishAffinity()
+        } else {
+            isToExit = true
+            Handler(Looper.getMainLooper()).postDelayed({
+                isToExit = false
+                Toast.makeText(this, "Double click back button to exit.", Toast.LENGTH_SHORT).show()
+
+            }, 1000)
+        }
+    }
+    //endregion
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
 interface ShowLessOnBackPress {

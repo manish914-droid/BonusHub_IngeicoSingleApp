@@ -13,26 +13,17 @@ import kotlinx.coroutines.launch
 class InitViewModel @ViewModelInject constructor(private val roomDBRepository: RoomDBRepository) :
     ViewModel() {
 
-    private  val insertedId =  MutableLiveData<Long>()
-    private val  error = MutableLiveData<String>()
-    private var _errorMessage = MutableLiveData<String>()
-    private val mutableLiveDataList = MutableLiveData<Result<ResponseHandler>>()
-    val _initData = MutableLiveData<Result<Result<ResponseHandler>>>()
-    val mutableLiveData = mutableLiveDataList
-    var userFinalList: LiveData<MutableList<TerminalCommunicationTable>> = MutableLiveData<MutableList<TerminalCommunicationTable>>()
-
+    val initData = MutableLiveData<Result<Result<ResponseHandler>>>()
     fun insertInfo1(tid: String) {
         viewModelScope.launch{
-            _initData.postValue(Result.loading(null))
+            initData.postValue(Result.loading(null))
             if(tid.isNullOrEmpty()){
-                error.postValue( "Input Fields cannot be Empty")
-                _initData.postValue(Result.error("Something Went Wrong", null))
+                initData.postValue(Result.error("Something Went Wrong", null))
             }else{
                 val userId: Flow<Result<ResponseHandler>> = roomDBRepository.fetchInitData(tid)
                 roomDBRepository.fetchInitData(tid).collect {
-                    mutableLiveData.value = it
 
-                    _initData.postValue(Result.success(it))
+                    initData.postValue(Result.success(it))
 
                 }
 

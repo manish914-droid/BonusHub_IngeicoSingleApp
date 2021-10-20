@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.fragments
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -22,6 +23,8 @@ import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.pax.utils.Field48ResponseTimestamp.checkInternetConnection
+import com.bonushub.pax.utils.KeyExchanger
 import com.bonushub.pax.utils.UiAction
 import com.bonushub.pax.utils.isExpanded
 import com.google.gson.Gson
@@ -29,10 +32,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.util.HashMap
 
 @AndroidEntryPoint
-class DashboardFragment : Fragment() {
+class DashboardFragment : Fragment(),IFragmentRequest {
     companion object {
         var toRefresh = true
     }
@@ -44,96 +49,124 @@ class DashboardFragment : Fragment() {
     private val dashBoardAdapter by lazy {
         DashBoardAdapter(iFragmentRequest, ::onItemLessMoreClick)
     }
+    private  var data: MutableList<BannerConfigModal>?=null
     private var animShow: Animation? = null
     private var animHide: Animation? = null
     private var binding: FragmentDashboardBinding? = null
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDashboardBinding.inflate(inflater, container, false)
-
         return binding?.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("Dashboard:- ", "onViewCreated")
         dashboardViewModel.fetchtptData()
         observeDashboardViewModel()
     }
 
-    fun observeDashboardViewModel(){
+    private fun observeDashboardViewModel(){
         dashboardViewModel.mutableLiveData.observe(viewLifecycleOwner, Observer {
             Log.d("tpt===>:- ", Gson().toJson(it))
-            if (it != null) {
-                Log.d("tpt===>:- ", Gson().toJson(it))
-                val tableClass =
-                    it::class.java //Class Name (class com.bonushub.pax.utilss.TerminalParameterTable)
-                for (e in tableClass.declaredFields) {
-                    val ann = e.getAnnotation(BHDashboardItem::class.java)
-                    //If table's field  having the particular annotation as @BHDasboardItem then it returns the value ,If not then return null
-                    if (ann != null) {
-                        e.isAccessible = true
-                        val t = e.get(it) as String
-                        if (t == "1") {
-                            itemList.add(ann.item)
-                            if (ann.childItem != EDashboardItem.NONE) {
-                                itemList.add(ann.childItem)
+            val tpt=it
+            if (toRefresh || itemList.isEmpty()) {
+                itemList.clear()
+                list1.clear()
+                list2.clear()
+
+                if (tpt != null) {
+                    val tableClass = tpt::class.java //Class Name (class com.bonushub.pax.utilss.TerminalParameterTable)
+                    for (e in tableClass.declaredFields) {
+                        val ann = e.getAnnotation(BHDashboardItem::class.java)
+                        //If table's field  having the particular annotation as @BHDasboardItem then it returns the value ,If not then return null
+                        if (ann != null) {
+                            e.isAccessible = true
+                            val t = e.get(tpt) as String
+                            if (t == "1") {
+                                itemList.add(ann.item)
+                                if (ann.childItem != EDashboardItem.NONE) {
+                                    itemList.add(ann.childItem)
+                                }
                             }
                         }
                     }
+          
+                } else {
+                    itemList.add(EDashboardItem.NONE)
                 }
                 Log.d("itemList===>:- ", Gson().toJson(itemList))
-                //Adding Field HDFC Cross Sell in Dashboard List:-
-                  it.reservedValues = "00000000000000010000"
-                when {
-                    it.reservedValues[13].toString().toInt() == 1 ||
-                            it.reservedValues[14].toString().toInt() == 1 ||
-                            it.reservedValues[15].toString().toInt() == 1 ||
-                            it.reservedValues[16].toString().toInt() == 1 -> itemList.add(
-                        EDashboardItem.CROSS_SELL
-                    )
-                }
+                itemList.add(EDashboardItem.MERCHANT_REFERRAL)
+                itemList.add(EDashboardItem.CROSS_SELL)
+                Log.d("itemList===>:- ", Gson().toJson(itemList))
+                // This list is a list where all types of preath available which was enable by backend
+                val totalPreAuthItem = mutableListOf<EDashboardItem>()
+                totalPreAuthItem.addAll(itemList)
 
-            } else {
-                itemList.add(EDashboardItem.NONE)
-            }
-
-            // This list is a list where all types of preath available which was enable by backend
-            val totalPreAuthItem = mutableListOf<EDashboardItem>()
-            totalPreAuthItem.addAll(itemList)
-
-            //After converting we are getting the total preauth trans type available(by retainAll fun)
-            //It returns true if any praauth item is available and return false if no preauth item found
-            val isAnyPreAuthItemAvailable = totalPreAuthItem.retainAll { item ->
-                item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
-                        || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
-            }
-
-            if (isAnyPreAuthItemAvailable) {
-                itemList.removeAll { item ->
+                //After converting we are getting the total preauth trans type available(by retainAll fun)
+                //It returns true if any praauth item is available and return false if no preauth item found
+                val isAnyPreAuthItemAvailable = totalPreAuthItem.retainAll { item ->
                     item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
                             || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
                 }
-            /*    val preAuth = EDashboardItem.PREAUTHCATAGORY
-                preAuth.childList = totalPreAuthItem
-                itemList.add(preAuth)*/
-            }
 
-            itemList.sortWith(compareBy { it.rank })
-            // Below code is used for dashboard items divided into view less and view more functionality
-            for (lst in itemList.indices) {
-                if (lst <= 5) {
-                    list1.add(itemList[lst])
-                } else {
-                    list1[5] = EDashboardItem.MORE
-                    list2.addAll(itemList)
-                    list2.add(EDashboardItem.LESS)
-                    break
+                if (isAnyPreAuthItemAvailable) {
+                    itemList.removeAll { item ->
+                        item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
+                                || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
+                    }
+                    if(totalPreAuthItem.size > 0) {
+                        val preAuth = EDashboardItem.PRE_AUTH_CATAGORY
+                        preAuth.childList = totalPreAuthItem
+                        itemList.add(preAuth)
+                    }
+                }
+
+                itemList.sortWith(compareBy { it.rank })
+                // Below code is used for dashboard items divided into view less and view more functionality
+                for (lst in itemList.indices) {
+                    if(data?.isNotEmpty() == true){
+                        if (lst <= 5) {
+                            list1.add(itemList[lst])
+                        } else {
+                            list1[5] = EDashboardItem.MORE
+                            list2.addAll(itemList)
+                            list2.add(EDashboardItem.LESS)
+                            break
+                        }
+                    }
+                    else {
+                        list1.addAll(itemList)
+                        break
+
+                    }
+
+                    /*    if (lst <= 5) {
+                            list1.add(itemList[lst])
+                        } else {
+                            list1[5] = EDashboardItem.MORE
+                            list2.addAll(itemList)
+                            list2.add(EDashboardItem.LESS)
+                            break
+                        }*/
+                }
+
+                // Setting up recyclerview of DashBoard Items
+                setupRecyclerview()
+
+            } else {
+                binding?.dashboardRV?.apply {
+                    layoutManager = GridLayoutManager(activity, 3)
+                    itemAnimator = DefaultItemAnimator()
+                    adapter = dashBoardAdapter
+                    if (isExpanded) dashBoardAdapter.onUpdatedItem(list2) else dashBoardAdapter.onUpdatedItem(
+                        list1
+                    )
+                    scheduleLayoutAnimation()
                 }
             }
 
-            setupRecyclerview()
       
 
         })
@@ -176,6 +209,19 @@ class DashboardFragment : Fragment() {
             }
         }
     }
+
+    override fun onFragmentRequest(
+        action: UiAction,
+        data: Any,
+        extraPair: Triple<String, String, Boolean>?
+    ) {
+
+        }
+
+
+    override fun onDashBoardItemClick(action: EDashboardItem) {
+        TODO("Not yet implemented")
+    }
 }
 
 
@@ -190,3 +236,15 @@ interface IFragmentRequest {
 
 
 }
+
+//region===================BannerConfigModal:-
+data class BannerConfigModal(
+    var bannerImageBitmap: Bitmap,
+    var bannerID: String,
+    var bannerDisplayOrderID: String,
+    var bannerShowOrHideID: String,
+    var clickableOrNot: String,
+    var bannerClickActionID: String,
+    var bannerClickMessageData: String
+)
+//endregion

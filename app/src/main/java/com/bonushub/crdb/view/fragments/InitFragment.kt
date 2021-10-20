@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.bonushub.crdb.NavigationActivity
 import com.bonushub.crdb.R
@@ -61,20 +62,16 @@ class InitFragment : Fragment(),IDialog {
         // it's handling for init button is enable or disable ----> it will be enable when Tid length is equal to 8
         progressBar = ProgressBar(activity as NavigationActivity)
         setProgressDialog()
- /*       fragmentInitBinding?.ifProceedBtn?.isEnabled = false
+        fragmentInitBinding?.ifProceedBtn?.isEnabled = false
         fragmentInitBinding?.ifProceedBtn?.isClickable = false
         fragmentInitBinding?.ifEt?.addTextChangedListener(textWatcher)
         fragmentInitBinding?.ifEt?.transformationMethod = null
         fragmentInitBinding?.ifEt?.addTextChangedListener(Utility.OnTextChange {
             fragmentInitBinding?.ifProceedBtn?.isEnabled = it.length == 8
             if (fragmentInitBinding?.ifProceedBtn?.isEnabled)
-                fragmentInitBinding?.ifProceedBtn?.context?.resources?.let { it1 ->
-                    fragmentInitBinding?.ifProceedBtn?.setBackgroundColor(
-                        it1.getColor(R.color.init_button)
-                    )
-                };
+                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button);
 
-        })*/
+        })
 
         fragmentInitBinding?.ifProceedBtn.setOnClickListener {
           //  iDialog?.showProgress(getString(R.string.please_wait_host))
@@ -91,23 +88,16 @@ class InitFragment : Fragment(),IDialog {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
             if (start < 8) {
-
-                fragmentInitBinding?.ifProceedBtn?.context?.resources?.let { it1 ->
-                    fragmentInitBinding?.ifProceedBtn?.setBackgroundColor(
-                        it1.getColor(R.color.colorGrey))
-                };
+                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_inactive);
             }
             else if(start>=8){
-                fragmentInitBinding?.ifProceedBtn?.context?.resources?.let { it1 ->
-                    fragmentInitBinding?.ifProceedBtn?.setBackgroundColor(
-                        it1.getColor(R.color.init_button))
-                };
+                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button);
             }
         }
     }
     private fun observeMainViewModel(){
 
-        initViewModel._initData.observe(viewLifecycleOwner, Observer { result ->
+        initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
 
             when (result.status) {
                 Result.Status.SUCCESS -> {

@@ -467,7 +467,7 @@ data class TerminalParameterTable(
     var panMaskConfig: String = "",
 
 
-    //  @field:BHDashboardItem(EDashboardItem.SALE)
+      @field:BHDashboardItem(EDashboardItem.SALE)
     @field:BHFieldParseIndex(35)
     var sale: String = "",
 

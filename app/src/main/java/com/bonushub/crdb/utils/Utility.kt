@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
@@ -985,4 +986,15 @@ object Field48ResponseTimestamp {
     //region=================Format Date by replacing colon:-
     fun String.replaceTimeColon() = this.replace(":", "")
 //endregion
+
+
+
+
+    fun checkInternetConnection(): Boolean {
+        val cm =
+            VerifoneApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting
+    }
+
 }
