@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class RoomDBRepository @Inject  constructor(private val appDao: AppDao,
@@ -15,13 +16,15 @@ class RoomDBRepository @Inject  constructor(private val appDao: AppDao,
 
 
     suspend fun  insertdata(student: TerminalCommunicationTable) = appDao.insert(student)
-    suspend fun  fetchdata() = appDao.fetch()
+    suspend fun  fetchdata() =appDao.fetch()
+    //region======================Get TPT Data:-
+    suspend fun  fetcDashboarddata() = appDao.getAllTerminalParameterTableData()?.get(0)
+    //endregion
 
    //  suspend fun  insertTid(tid: String, backToCalled: ApiCallback) = keyexchangeDataSource.startExchange(tid)
 
     suspend fun fetchInitData(tid: String): Flow<Result<ResponseHandler>> = flow{
         emit(keyexchangeDataSource.startExchange1(tid))
-
     }.flowOn(Dispatchers.IO)
 
   //  suspend fun execute(): Flow<DataState<List<Blog>>> = flow

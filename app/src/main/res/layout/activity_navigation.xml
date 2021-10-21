@@ -48,22 +48,21 @@
                     </LinearLayout>
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>
             </LinearLayout>
-
             <com.google.android.material.navigation.NavigationView
                 android:id="@+id/nav_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
                 android:fitsSystemWindows="true"
+                android:background="@color/white"
                 app:headerLayout="@layout/main_drawer"
-                app:itemIconTint="@color/black"
-                app:itemTextColor="@color/black"
+                app:itemIconTint="@color/txt_color"
+                app:itemTextColor="@color/txt_color"
                 app:menu="@menu/drawer_menu">
-
                 <include
+                    android:visibility="gone"
                     android:id="@+id/footer"
                     layout="@layout/navigation_footer_layout" />
-
             </com.google.android.material.navigation.NavigationView>
         </androidx.drawerlayout.widget.DrawerLayout>
 

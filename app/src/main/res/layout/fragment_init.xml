@@ -59,10 +59,9 @@
             android:layout_marginTop="@dimen/pad_40"
             android:padding="@dimen/pad_2"
             android:text="@string/proceed_to_init"
-
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_small"
-            android:background="@drawable/edge_button" />
+            android:background="@drawable/edge_button_inactive" />
 
 
     </LinearLayout>

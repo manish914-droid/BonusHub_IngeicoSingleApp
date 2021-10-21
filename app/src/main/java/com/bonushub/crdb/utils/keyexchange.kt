@@ -1,19 +1,16 @@
 package com.bonushub.pax.utils
 
 
-import ServerCommunicator
 import android.content.Context
-import android.text.TextUtils
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.model.TerminalParameterTable
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.utils.BytesUtil
+import com.bonushub.crdb.serverApi.ServerCommunicator
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.DemoConfig.*
-import com.bonushub.crdb.utils.DeviceHelper
-import com.bonushub.crdb.utils.RSAProvider
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType

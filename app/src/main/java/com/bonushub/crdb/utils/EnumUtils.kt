@@ -1,5 +1,6 @@
 package com.bonushub.pax.utils
 
+import com.bonushub.crdb.R
 
 
 //region=================Preference Keys==============
@@ -143,26 +144,38 @@ enum class EDrawerSubmenuGroup {
 // endregion
 
 
-enum class UiAction(val tvalue: Int = 0, val title: String = "") {
-    INIT, KEY_EXCHANGE, INIT_WITH_KEY_EXCHANGE, START_SALE(title = "Sale"), SETTLEMENT, APP_UPDATE, PRE_AUTH(
-        title = "Pre-Auth"
+enum class UiAction(val title: String = "Not Declared", val res: Int = R.drawable.ic_bank_emi) {
+    INIT, KEY_EXCHANGE, INIT_WITH_KEY_EXCHANGE, START_SALE(
+        "Sale",
+        R.drawable.ic_bbg
     ),
-    REFUND(title = "Refund"),
-    BANK_EMI(title = "Bank EMI"), OFFLINE_SALE(title = "Offline Sale"), CASH_AT_POS(title = "Cash Advance"), SALE_WITH_CASH(
-        title = "Sale With Cash"
-    );
-
-    fun getTransactionType(): TransactionType {
-        return when (this) {
-            START_SALE -> TransactionType.SALE
-            PRE_AUTH -> TransactionType.PRE_AUTH
-            REFUND -> TransactionType.REFUND
-            BANK_EMI -> TransactionType.EMI_SALE
-            OFFLINE_SALE -> TransactionType.OFFLINE_SALE
-            else -> TransactionType.NONE
-        }
-    }
+    SETTLEMENT, APP_UPDATE, PRE_AUTH(
+        title = "Pre-Auth",R.drawable.ic_preauth
+    ),
+    REFUND("Refund", R.drawable.ic_refund),
+    BANK_EMI(
+        "Bank EMI",
+        R.drawable.ic_bank_emi
+    ),
+    OFFLINE_SALE(title = "Offline Sale"), CASH_AT_POS(
+        "Cash Advance",
+        R.drawable.ic_cash_at_pos
+    ),
+    SALE_WITH_CASH("Sale With Cash", R.drawable.ic_salewithcash),
+    PRE_AUTH_COMPLETE(title = "Pre Auth Complete"), EMI_ENQUIRY(
+        "EMI Catalogue",
+        R.drawable.ic_emicatalogue
+    ),
+    BRAND_EMI("Brand EMI", R.drawable.ic_brandemi),
+    TEST_EMI("Test EMI TXN", R.drawable.ic_brand_emi_code),
+    FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_at_pos),
+  //  DEFAUTL("Not Declared", R.drawable.ic_sad),
+    BRAND_EMI_CATALOGUE("Brand EMI Catalogue", R.drawable.ic_sale),
+    BANK_EMI_CATALOGUE("Bank EMI Catalogue", R.drawable.ic_sale),
+   // BANK_EMI_BY_ACCESS_CODE("Brand Emi By Code", R.drawable.ic_brand_emi),
+    //DYNAMIC_QR("Dynamic QR", R.drawable.ic_qr_code)
 }
+
 
 //Below Enum Class is used to detect different card Types:-
 enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {
@@ -360,4 +373,54 @@ enum class CrossSellRequestType(val requestTypeCode: Int,val requestName:String=
     HDFC_CREDIT_CARD_OTP_VERIFY_REQUEST_TYPE(10),
     DOWNLOAD_AND_PRINT_MONTHLY_REPORT_ON_POS(11),
     SENT_REPORT_ON_MAIL_OR_SMS(12),
+}
+
+
+enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, var childList:MutableList<EDashboardItem>?=null) {
+    NONE("No Option Found", R.drawable.ic_sale),
+    SALE("Sale", R.drawable.ic_sale, 1),
+    DIGI_POS("Digi POS", R.drawable.ic_digi_pos, 2),
+    BANK_EMI("Bank EMI", R.drawable.ic_bank_emi, 3),
+    BRAND_EMI("Brand EMI", R.drawable.ic_brandemi,4),
+    EMI_PRO("Brand EMI By Code", R.drawable.ic_brand_emi_code, 5),
+    EMI_ENQUIRY("EMI Catalogue", R.drawable.ic_emicatalogue, 6),
+    PREAUTH("Pre-Auth", R.drawable.ic_preauth, 7),
+
+   PREAUTH_COMPLETE("Pre-Auth Complete", R.drawable.ic_preauth, 5),
+    PENDING_PREAUTH("Pending Preauth", R.drawable.ic_preauth, 6),
+    OFFLINE_SALE("Offline Sale", R.drawable.ic_sale, 7),
+    VOID_OFFLINE_SALE("Void Offline Sale", R.drawable.ic_void, 8),
+    SALE_TIP("Tip Adjust", R.drawable.ic_tipadjust, 9),
+    VOID_PREAUTH("Void Preauth", R.drawable.ic_void, 10),
+    REFUND("Refund", R.drawable.ic_refund, 11),
+    VOID_REFUND("Void Refund", R.drawable.ic_void, 12),
+    VOID_SALE("Void", R.drawable.ic_void, 13),
+    CROSS_SELL("BNPL", R.drawable.ic_crosssell, 14),
+
+    SALE_WITH_CASH("Sale With Cash", R.drawable.ic_salewithcash),
+    CASH_ADVANCE("Cash Advance", R.drawable.ic_cash_at_pos),
+
+  ///  PENDING_OFFLINE_SALE("View Offline Sale", R.drawable.ic_pending_preauth),
+    PRE_AUTH_CATAGORY("Pre-Auth", R.drawable.ic_preauth, 9),
+    MORE("View More", R.drawable.ic_digi_pos, 999),
+    BONUS_PROMO("Bonus Promo", R.drawable.ic_merchant_promo, 15),
+
+    EMI_CATALOGUE("EMI Catalogue", R.drawable.ic_emicatalogue, 17),
+    BRAND_EMI_CATALOGUE("Brand EMI Catalogue", R.drawable.ic_brandemi, 18),
+    BANK_EMI_CATALOGUE("Bank EMI Catalogue", R.drawable.ic_sale, 19),
+    MERCHANT_REFERRAL("MRP", R.drawable.ic_merchant_referal_program, 20),
+    LESS("View Less", R.drawable.ic_digi_pos, 888),
+    // just for handling the test emi not used in dashboard items
+ /*   TEST_EMI("Test Emi TXN", R.drawable.ic_brand_emi_catalogue, 777),
+    FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_advance, 666),
+    LESS("View Less", R.drawable.ic_arrow_up, 888),
+
+    UPI("UPI COLLECT", R.drawable.upi_icon, 901),
+    SMS_PAY("SMS PAY", R.drawable.sms_icon, 902),
+    TXN_LIST("TXN LIST", R.drawable.sms_icon, 903),
+    PENDING_TXN("Pending Txn", R.drawable.pending_txn, 903),
+    STATIC_QR("Static QR", R.drawable.ic_qr_code, 904),
+    BHARAT_QR("Bharat QR", R.drawable.ic_qr_code, 905),*/
+
+
 }

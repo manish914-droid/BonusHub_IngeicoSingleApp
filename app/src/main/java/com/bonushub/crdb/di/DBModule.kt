@@ -14,6 +14,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -43,7 +44,7 @@ object DBModule {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     GlobalScope.launch {
-                     //   AppDatabase.onCreate(appDatabase, appContext) // in companion of MyDatabase
+                    //   AppDatabase.onCreate(appDatabase, appContext) // in companion of MyDatabase
                     }
 
                 }

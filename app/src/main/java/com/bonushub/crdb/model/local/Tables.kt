@@ -2,7 +2,9 @@ package com.bonushub.crdb.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
+import com.bonushub.pax.utils.EDashboardItem
 import java.io.Serializable
 
 
@@ -412,7 +414,7 @@ data class TerminalParameterTable(
     var currencySymbol: String = "",
 
     @field:BHFieldParseIndex(18)
-    //  @field:BHDashboardItem(EDashboardItem.SALE_TIP)
+     @field:BHDashboardItem(EDashboardItem.SALE_TIP)
     var tipProcessing: String = "",
 
     @field:BHFieldParseIndex(19)
@@ -443,11 +445,11 @@ data class TerminalParameterTable(
     var forceSettleTime: String = "",
 
     @field:BHFieldParseIndex(28)
-    //  @field:BHDashboardItem(EDashboardItem.SALE_WITH_CASH)
+    @field:BHDashboardItem(EDashboardItem.SALE_WITH_CASH)
     var saleWithCash: String = "",
 
     @field:BHFieldParseIndex(29)
-    // @field:BHDashboardItem(EDashboardItem.CASH_ADVANCE)
+    @field:BHDashboardItem(EDashboardItem.CASH_ADVANCE)
     var cashAdvance: String = "",
 
     @field:BHFieldParseIndex(30)
@@ -465,40 +467,40 @@ data class TerminalParameterTable(
     var panMaskConfig: String = "",
 
 
-    //  @field:BHDashboardItem(EDashboardItem.SALE)
+      @field:BHDashboardItem(EDashboardItem.SALE)
     @field:BHFieldParseIndex(35)
     var sale: String = "",
 
-    //  @field:BHDashboardItem(EDashboardItem.VOID_SALE)
+    @field:BHDashboardItem(EDashboardItem.VOID_SALE)
     @field:BHFieldParseIndex(36)
     var voidSale: String = "",
 
-    //  @field:BHDashboardItem(EDashboardItem.REFUND)
+    @field:BHDashboardItem(EDashboardItem.REFUND)
     @field:BHFieldParseIndex(37)
     var refund: String = "",
 
-    //  @field:BHDashboardItem(EDashboardItem.VOID_REFUND)
+     @field:BHDashboardItem(EDashboardItem.VOID_REFUND)
     @field:BHFieldParseIndex(38)
     var voidRefund: String = "",
 
-    /*  @field:BHDashboardItem(
+      @field:BHDashboardItem(
           EDashboardItem.PREAUTH,
           EDashboardItem.PREAUTH_COMPLETE
-      )*/
+      )
     @field:BHFieldParseIndex(39)
     var preAuth: String = "",
 
     @field:BHFieldParseIndex(31)
     var maxAmtEntryDigits: String = "",
 
-    /* @field:BHDashboardItem(
+     @field:BHDashboardItem(
          EDashboardItem.BANK_EMI,
          EDashboardItem.EMI_ENQUIRY
-     )*/
+     )
     @field:BHFieldParseIndex(40)
     var bankEmi: String = "",
 
-    // @field:BHDashboardItem(EDashboardItem.BRAND_EMI)
+     @field:BHDashboardItem(EDashboardItem.BRAND_EMI)
     @field:BHFieldParseIndex(41)
     var brandEmi: String = "",
 
@@ -514,9 +516,9 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(45)
     var fManEntry: String = "",
 
-    /*   @field:BHDashboardItem(
+       @field:BHDashboardItem(
            EDashboardItem.OFFLINE_SALE
-       )*/
+       )
     @field:BHFieldParseIndex(46)
     var fManOfflineSale: String = "",
 
@@ -525,15 +527,15 @@ data class TerminalParameterTable(
 
     var stan: String = "",
 
-    //  @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
+     @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
     @field:BHFieldParseIndex(48)
     var fVoidPreauth: String = "",
 
-    //   @field:BHDashboardItem(EDashboardItem.VOID_OFFLINE_SALE)
+       @field:BHDashboardItem(EDashboardItem.VOID_OFFLINE_SALE)
     @field:BHFieldParseIndex(49)
     var fVoidOfflineSale: String = "",
 
-//    @field:BHDashboardItem(EDashboardItem.PENDING_PREAUTH)
+    @field:BHDashboardItem(EDashboardItem.PENDING_PREAUTH)
     @field:BHFieldParseIndex(50)
     var fPendingPreauthTrans: String = "",
 

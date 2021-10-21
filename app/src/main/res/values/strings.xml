@@ -9,8 +9,8 @@
 
     <!--navigation drawer strings-->
     <string name="merchant_name">ME Name  : </string>
-    <string name="terminal_id">Terminal Id</string>
-    <string name="merchant_id">Merchant Id</string>
+    <string name="terminal_id">TID:41501372</string>
+    <string name="merchant_id">MID:41501002</string>
     <string name="bank_functions">Bank Functions</string>
     <string name="settings">Settings</string>
     <string name="reports">Reports</string>

@@ -10,6 +10,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
 import com.usdk.apiservice.aidl.pinpad.DeviceName
