@@ -19,4 +19,9 @@
     <color name="colorPrimaryTrans">#990D47A1</color>
     <color name="darkgreen">#006400</color>
     <color name="txt_color">#013480</color>
+
+
+    <color name="gray">#808080</color>
+    <color name="blue_normal">#0087FF</color>
+
 </resources>

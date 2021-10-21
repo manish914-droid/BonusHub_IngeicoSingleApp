@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:paddingTop="10dp"
+	android:layout_width="270dp"
+	android:layout_height="wrap_content"
+	android:layout_centerHorizontal="true"
+	android:layout_centerVertical="true"
+	android:background="@drawable/shape_white_normal"
+	android:layout_gravity="center"
+	android:orientation="vertical">
+
+	<TextView
+		android:id="@+id/tvHeader"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:padding="9dp"
+		android:textSize="14sp"
+		android:textColor="@android:color/black"
+		android:maxLines="1"
+		android:gravity="center_horizontal"
+
+		/>
+
+	<View
+		android:id="@+id/viewLine1"
+		android:layout_below="@+id/tvHeader"
+		android:layout_width="fill_parent"
+		android:layout_height="0.1dp"
+		android:background="#00FFFF"
+		/>
+
+	<ListView
+		android:id="@+id/listView"
+		android:layout_below="@+id/viewLine1"
+		android:layout_width="match_parent"
+		android:layout_margin="5dp"
+		android:layout_height="110dp"
+		android:dividerHeight="0dp"
+		android:divider="@color/gray"
+		android:choiceMode="singleChoice"
+		android:scrollbarThumbVertical="@color/blue_normal"
+		android:scrollbarSize="2dp"
+		android:cacheColorHint="@android:color/transparent"
+		android:listSelector="@android:color/transparent">
+	</ListView>
+
+	<View
+		android:id="@+id/viewLine"
+		android:layout_below="@+id/listView"
+		android:layout_width="fill_parent"
+		android:layout_height="0.1dp"
+		android:background="#00FFFF"
+		/>
+
+	<LinearLayout
+		android:id="@+id/layoutBtn"
+		android:layout_below="@+id/viewLine"
+		android:layout_width="match_parent"
+		android:layout_height="45dp"
+		android:orientation="horizontal"
+		android:gravity="center"
+		>
+
+		<Button android:id="@+id/btnCancel"
+			android:layout_height="wrap_content"
+			android:layout_width="0dp"
+			android:maxLines="1"
+			android:layout_weight="1"
+			android:background="@null"
+			android:textSize="14sp"
+			android:textColor="#0050ef"
+			android:text="@string/cancel"
+			/>
+	</LinearLayout>
+
+</LinearLayout>

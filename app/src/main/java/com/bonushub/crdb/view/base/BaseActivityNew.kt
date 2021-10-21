@@ -11,7 +11,7 @@ import com.bonushub.crdb.R
 
 
 
-abstract class BaseActivity : AppCompatActivity(), IDialog {
+abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     private lateinit var progressDialog: Dialog
     lateinit var progressTitleMsg: TextView
     lateinit var progressPercent:ProgressBar

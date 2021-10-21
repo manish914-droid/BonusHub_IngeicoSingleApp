@@ -20,4 +20,15 @@
     <string name="versionHint">App Version: v1.0.2</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- TODO: Emv related string -->
+    <string name="pass_card_again"> Please tap card again </string>
+    <string name="exception_prompt"> Exception prompt </string>
+    <string name="error_prompt"> Error prompt </string>
+    <string name="insert_pass_swipe_card"> Insert Swipe card </string>
+
+    <string name="cancel"> cancel </string>
+    <string name="ok"> ok </string>
+
+
 </resources>

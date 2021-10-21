@@ -127,6 +127,7 @@ object DeviceHelper : ServiceConnection  {
         }
     }
 
+    @JvmStatic
     @Throws(IllegalStateException::class)
     fun getEMV(): UEMV? {
         val iBinder = object : IBinderCreator() {
@@ -161,6 +162,7 @@ object DeviceHelper : ServiceConnection  {
         return getDeviceManager()!!.deviceInfo?.model
     }
 
+    @JvmStatic
     @Throws(IllegalStateException::class)
     fun getPinpad(kapId: KAPId?, keySystem: Int, deviceName: String?): UPinpad? {
         val iBinder = object : IBinderCreator() {

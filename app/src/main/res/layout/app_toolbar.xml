@@ -57,6 +57,7 @@
                     android:src="@drawable/ic_hdfcsvg"
                     android:visibility="visible" />
 
+/.\
                 <ImageView
                     android:visibility="gone"
                     android:id="@+id/main_toolbar_BhLogo"
@@ -68,7 +69,6 @@
                     android:paddingTop="@dimen/pad_2"
                     android:paddingEnd="@dimen/pad_4"
                     android:paddingBottom="@dimen/pad_2"
-                    android:src="@drawable/bonushub_white"
                     android:textSize="@dimen/text_size_xregular" />
             </LinearLayout>
 
