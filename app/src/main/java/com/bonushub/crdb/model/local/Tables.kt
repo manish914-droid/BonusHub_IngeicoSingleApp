@@ -1,10 +1,11 @@
-package com.bonushub.crdb.model
+package com.bonushub.crdb.model.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.pax.utils.EDashboardItem
+import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
 
@@ -264,7 +265,7 @@ data class TerminalCommunicationTable(
     @field:BHFieldParseIndex(42)
     var tid: String = ""
 
-    )
+)
 
 @Entity
 data class IssuerParameterTable(
@@ -414,7 +415,7 @@ data class TerminalParameterTable(
     var currencySymbol: String = "",
 
     @field:BHFieldParseIndex(18)
-     @field:BHDashboardItem(EDashboardItem.SALE_TIP)
+    @field:BHDashboardItem(EDashboardItem.SALE_TIP)
     var tipProcessing: String = "",
 
     @field:BHFieldParseIndex(19)
@@ -467,7 +468,7 @@ data class TerminalParameterTable(
     var panMaskConfig: String = "",
 
 
-      @field:BHDashboardItem(EDashboardItem.SALE)
+    @field:BHDashboardItem(EDashboardItem.SALE)
     @field:BHFieldParseIndex(35)
     var sale: String = "",
 
@@ -479,28 +480,28 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(37)
     var refund: String = "",
 
-     @field:BHDashboardItem(EDashboardItem.VOID_REFUND)
+    @field:BHDashboardItem(EDashboardItem.VOID_REFUND)
     @field:BHFieldParseIndex(38)
     var voidRefund: String = "",
 
-      @field:BHDashboardItem(
-          EDashboardItem.PREAUTH,
-          EDashboardItem.PREAUTH_COMPLETE
-      )
+    @field:BHDashboardItem(
+        EDashboardItem.PREAUTH,
+        EDashboardItem.PREAUTH_COMPLETE
+    )
     @field:BHFieldParseIndex(39)
     var preAuth: String = "",
 
     @field:BHFieldParseIndex(31)
     var maxAmtEntryDigits: String = "",
 
-     @field:BHDashboardItem(
-         EDashboardItem.BANK_EMI,
-         EDashboardItem.EMI_ENQUIRY
-     )
+    @field:BHDashboardItem(
+        EDashboardItem.BANK_EMI,
+        EDashboardItem.EMI_ENQUIRY
+    )
     @field:BHFieldParseIndex(40)
     var bankEmi: String = "",
 
-     @field:BHDashboardItem(EDashboardItem.BRAND_EMI)
+    @field:BHDashboardItem(EDashboardItem.BRAND_EMI)
     @field:BHFieldParseIndex(41)
     var brandEmi: String = "",
 
@@ -516,9 +517,9 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(45)
     var fManEntry: String = "",
 
-       @field:BHDashboardItem(
-           EDashboardItem.OFFLINE_SALE
-       )
+    @field:BHDashboardItem(
+        EDashboardItem.OFFLINE_SALE
+    )
     @field:BHFieldParseIndex(46)
     var fManOfflineSale: String = "",
 
@@ -527,11 +528,11 @@ data class TerminalParameterTable(
 
     var stan: String = "",
 
-     @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
+    @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
     @field:BHFieldParseIndex(48)
     var fVoidPreauth: String = "",
 
-       @field:BHDashboardItem(EDashboardItem.VOID_OFFLINE_SALE)
+    @field:BHDashboardItem(EDashboardItem.VOID_OFFLINE_SALE)
     @field:BHFieldParseIndex(49)
     var fVoidOfflineSale: String = "",
 
@@ -853,3 +854,95 @@ data class BrandTAndCTable(
     var brandTAndC: String? = null
 )
 //region
+
+// region===============Brand EMI Master Category TimeStamps Table:-
+@Entity
+data class BrandEMIMasterTimeStamps(
+    @PrimaryKey
+    var brandTimeStamp: String = "",
+    var brandCategoryUpdatedTimeStamp: String = "",
+    var issuerTAndCTimeStamp: String = "",
+    var brandTAndCTimeStamp: String = ""
+)
+//endregion
+
+// region===============Brand EMI Sub-Category Data Table:-
+@Entity
+data class BrandEMISubCategoryTable(
+    @PrimaryKey
+    var categoryID: String = "",
+    var brandID: String = "",
+    var parentCategoryID: String = "",
+    var categoryName: String = ""
+)
+//endregion
+
+//region===============Brand EMI Data Table:-
+@Entity
+data class BrandEMIDataTable(    // @PrimaryKey
+    var hostInvoice: String = "",
+    var brandID: String = "",
+    var brandName: String = "",
+    var brandReservedValues: String = "",
+    var categoryID: String = "",
+    var categoryName: String = "",
+    var productID: String = "",
+    var productName: String = "",
+    var childSubCategoryID: String = "",
+    var childSubCategoryName: String = "",
+    var validationTypeName: String = "",
+    var isRequired: String = "",
+    var inputDataType: String = "",
+    var imeiNumber: String = "",
+    var serialNumber: String = "",
+    var emiType: String = "",
+    var producatDesc: String = "",
+    var hostTid: String = ""
+)
+//endregion
+
+//region================Brand EMI By Access Code Table:-
+@Entity
+data class BrandEMIAccessDataModalTable(
+    var hostInvoice: String = "",
+    var hostTid: String = "",
+    var emiCode: String = "",
+    var bankID: String = "",
+    var bankTID: String = "",
+    var issuerID: String = "",
+    var tenure: String = "",
+    var brandID: String = "",
+    var productID: String = "",
+    var emiSchemeID: String = "",
+    var transactionAmount: String = "",
+    var discountAmount: String = "",
+    var loanAmount: String = "",
+    var interestAmount: String = "",
+    var emiAmount: String = "",
+    var cashBackAmount: String = "",
+    var netPayAmount: String = "",
+    var processingFee: String = "",
+    var processingFeeRate: String = "",
+    var totalProcessingFee: String = "",
+    var brandName: String = "",
+    var issuerName: String = "",
+    var productName: String = "",
+    var productCode: String = "",
+    var productModal: String = "",
+    var productCategoryName: String = "",
+    var productSerialCode: String = "",
+    var skuCode: String = "",
+    var totalInterest: String = "",
+    var schemeTAndC: String = "",
+    var schemeTenureTAndC: String = "",
+    var schemeDBDTAndC: String = "",
+    var discountCalculatedValue: String = "",
+    var cashBackCalculatedValue: String = "",
+    var orignalTxnAmt: String = "",
+    var mobileNo: String = "",
+    var brandReservField: String = "",
+    var productBaseCat: String = "",
+    var issuerTimeStamp: String = "",
+    var brandTimeStamp: String = ""
+)
+//endregion

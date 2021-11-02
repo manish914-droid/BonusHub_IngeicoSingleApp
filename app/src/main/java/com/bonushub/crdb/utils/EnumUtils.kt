@@ -106,6 +106,7 @@ enum class ProcessingCode(val code: String) {
     PRE_AUTH("920000"),
     CROSS_SELL("982001"),
     BRAND_EMI("982002"),
+
 }
 //endregion
 
@@ -115,7 +116,8 @@ enum class Nii(val nii: String) {
     SOURCE("0001"),
     SMS_PAY("0411"),
     HDFC_DEFAULT("0002"),
-    BRAND_EMI_MASTER("0028")
+    BRAND_EMI_MASTER("0028"),
+
 }
 //endregion
 

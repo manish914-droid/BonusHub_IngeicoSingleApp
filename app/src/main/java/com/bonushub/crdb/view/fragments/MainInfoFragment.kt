@@ -1,13 +1,11 @@
 package com.bonushub.crdb.view.fragments
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -18,7 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bonushub.crdb.IDialog
 import com.bonushub.crdb.R
-import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.viewmodel.MainViewModel
 

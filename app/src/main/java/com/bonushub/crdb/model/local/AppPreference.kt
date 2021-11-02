@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.bonushub.crdb.model.BatchFileDataTable
 import com.bonushub.crdb.utils.addPad
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken

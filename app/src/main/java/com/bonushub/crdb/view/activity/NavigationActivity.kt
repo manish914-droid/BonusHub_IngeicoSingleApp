@@ -1,4 +1,4 @@
-package com.bonushub.crdb
+package com.bonushub.crdb.view.activity
 
 import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
@@ -17,14 +17,17 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.isExpanded
+import com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment
 
 import com.bonushub.pax.utils.NavControllerFragmentLabel
 
@@ -36,6 +39,7 @@ import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.lang.Runnable
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
@@ -56,6 +60,10 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     private var pinpad: UPinpad? = null
     private var pinpadLimited: PinpadLimited? = null
     private val dialog by lazy {   Dialog(this) }
+
+    @Inject
+    lateinit var appDatabase: AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navigationBinding = ActivityNavigationBinding.inflate(layoutInflater)
@@ -87,7 +95,9 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        TODO("Not yet implemented")
+      //  TODO("Not yet implemented")
+        transactFragment(BrandEmiMasterCategoryFragment())
+        return true
     }
     //region==========================SetUp Drawer Layout================
     private fun setupNavigationDrawerLayout() {
@@ -121,9 +131,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())
                     Log.d("Message ", msg)
-
                        // refreshDrawer()
-
                 }
             }
             navHostFragment?.navController?.popBackStack()

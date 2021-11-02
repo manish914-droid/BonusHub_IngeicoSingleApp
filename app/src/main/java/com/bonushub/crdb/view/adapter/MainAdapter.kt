@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
-import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.TerminalCommunicationTable
 
 import kotlinx.android.synthetic.main.main_list_item.view.*
 

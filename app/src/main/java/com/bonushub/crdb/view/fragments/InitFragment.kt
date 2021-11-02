@@ -11,9 +11,8 @@ import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import com.bonushub.crdb.NavigationActivity
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.utils.Result

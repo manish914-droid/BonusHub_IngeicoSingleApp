@@ -31,4 +31,6 @@
     <string name="ok"> ok </string>
 
 
+    <string name="brand_name">Brand Name </string>
+    <string name="searchBrand">Search</string>
 </resources>

@@ -6,7 +6,7 @@ import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
-import com.bonushub.crdb.model.TerminalParameterTable
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.serverApi.ServerCommunicator
 import com.bonushub.crdb.utils.*

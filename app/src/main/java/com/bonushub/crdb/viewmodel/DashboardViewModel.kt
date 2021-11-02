@@ -4,7 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bonushub.crdb.model.TerminalParameterTable
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.repository.RoomDBRepository
 import com.bonushub.crdb.utils.ResponseHandler
 import com.bonushub.crdb.utils.Result

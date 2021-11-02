@@ -1,9 +1,8 @@
 package com.bonushub.crdb.db
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
-import com.bonushub.crdb.model.*
+import com.bonushub.crdb.model.local.*
 import kotlinx.coroutines.runBlocking
 
 @Dao
@@ -260,6 +259,36 @@ interface AppDao{
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updateBatchDataTableRecord(batch: BatchFileDataTable): Int
+
+    // region =========== Saving Brand TimeStamps method========
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBrandEMIMasterTimeStamps(timestamps: BrandEMIMasterTimeStamps): Long?
+    // endregion
+
+    // region =========== Saving Brand TimeStamps method========
+    @Query("SELECT * FROM BrandEMIMasterTimeStamps")
+    suspend fun getBrandEMIDateTimeStamps():List<BrandEMIMasterTimeStamps>?
+    // endregion
+    // region =========== Saving Brand Subcat data method========
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBrandEMISubCategoryData(brandSubCat: BrandEMISubCategoryTable): Long?
+    // endregion
+    // region =========== Saving Brand TimeStamps method========
+    @Query("SELECT * FROM BrandEMISubCategoryTable")
+    suspend fun getBrandEMISubCategoryData():List<BrandEMISubCategoryTable>?
+    // endregion
+suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
+   val list= getBrandEMIDateTimeStamps()
+    return if(list.isNullOrEmpty()){
+        null
+    }else{
+        list[0]
+    }
+
+}
+
+
+
 
     //region==============================BrandEMI Helper Methods:-
     /*fun insertBrandEMIMasterCategoryDataInDB(model: BrandEMIMasterCategoryTable): Long? {

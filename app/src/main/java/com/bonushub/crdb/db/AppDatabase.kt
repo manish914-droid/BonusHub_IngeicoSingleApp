@@ -1,26 +1,28 @@
 package com.bonushub.crdb.db
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.bonushub.crdb.model.*
+import com.bonushub.crdb.model.local.*
 
 @Database(entities = [TerminalCommunicationTable::class, IssuerParameterTable::class,
     TerminalParameterTable::class, CardDataTable::class,
     HDFCTpt::class, HDFCCdt::class, BatchFileDataTable::class,
     BrandEMIMasterCategoryTable::class, BrandEMIMasterSubCategoryTable::class,
-    IssuerTAndCTable::class, BrandTAndCTable::class], version = 1, exportSchema = false)
+    IssuerTAndCTable::class, BrandTAndCTable::class, BrandEMIMasterTimeStamps::class,BrandEMISubCategoryTable::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     /**
      * Connects the database to the DAO.
      */
     abstract val appDao: AppDao
 
-   /* companion object {
+    companion object {
 
         @Volatile
-        private var INSTANCE: AppDB? = null
+        private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context): AppDB {
+        fun getInstance(context: Context): AppDatabase {
             // Multiple threads can ask for the database at the same time, ensure we only initialize
             // it once by using synchronized. Only one thread may enter a synchronized block at a
             // time.
@@ -34,7 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        AppDB::class.java,
+                        AppDatabase::class.java,
                         "sleep_history_database"
                     )
                         // Wipes and rebuilds instead of migrating if no Migration object.
@@ -51,5 +53,5 @@ abstract class AppDatabase : RoomDatabase() {
                 return instance
             }
         }
-    }*/
+    }
 }

@@ -2,6 +2,7 @@ package com.bonushub.crdb.model.remote
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
 
 //region=============================Brand EMI Master Category Data Modal==========================
@@ -10,7 +11,7 @@ data class BrandEMIMasterDataModal(
     var brandID: String,
     var brandName: String,
     var mobileNumberBillNumberFlag: String
-) : Parcelable
+) : Parcelable,Serializable
 //endregion
 
 

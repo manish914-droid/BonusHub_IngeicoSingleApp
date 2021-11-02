@@ -12,7 +12,7 @@ sealed class Response(val data:IsoDataReader?=null,val errorMessage:String?=null
 
 sealed class GenericResponse<T>(val data:T?=null,val errorMessage:String?=null){
     class Loading<T>:GenericResponse<T>()
-    class Success<T>(isoDataReader: T):GenericResponse<T>(data=isoDataReader)
+    class Success<T>(data: T):GenericResponse<T>(data=data)
     class Error<T>(errorMsg: String):GenericResponse<T>(errorMessage = errorMsg)
 }
 

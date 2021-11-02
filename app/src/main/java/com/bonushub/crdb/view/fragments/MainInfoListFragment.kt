@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonushub.crdb.R
 
-import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.utils.replaceFragment
 import com.bonushub.crdb.view.adapter.MainAdapter
 import com.bonushub.crdb.viewmodel.MainViewModel

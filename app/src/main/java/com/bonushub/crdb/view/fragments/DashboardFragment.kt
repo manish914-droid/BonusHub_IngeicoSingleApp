@@ -8,24 +8,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bonushub.crdb.NavigationActivity
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.di.scope.BHDashboardItem
-import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
-import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.EDashboardItem
 
-import com.bonushub.pax.utils.KeyExchanger
 import com.bonushub.pax.utils.UiAction
 
 import com.google.gson.Gson
@@ -33,9 +27,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import java.util.HashMap
 
 @AndroidEntryPoint
 class DashboardFragment : Fragment(),IFragmentRequest {

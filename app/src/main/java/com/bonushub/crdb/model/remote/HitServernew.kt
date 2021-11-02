@@ -3,7 +3,7 @@
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.serverApi.ProgressCallback
 import com.bonushub.crdb.serverApi.ServerMessageCallback
 import com.bonushub.crdb.serverApi.ServerMessageCallbackSale

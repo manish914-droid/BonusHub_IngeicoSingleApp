@@ -17,12 +17,10 @@ import android.view.inputmethod.InputMethodManager
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
-import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
-import com.bonushub.crdb.model.*
-import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.*
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers

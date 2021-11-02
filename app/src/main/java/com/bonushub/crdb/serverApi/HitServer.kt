@@ -2,7 +2,7 @@ package com.bonushub.crdb.serverApi
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.repository.keyexchangeDataSource
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*

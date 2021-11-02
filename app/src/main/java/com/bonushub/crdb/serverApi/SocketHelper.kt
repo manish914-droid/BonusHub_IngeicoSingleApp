@@ -1,7 +1,7 @@
 package com.bonushub.crdb.serverApi
 
 import android.util.Log
-import com.bonushub.crdb.model.TerminalCommunicationTable
+import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
 import java.io.DataInputStream

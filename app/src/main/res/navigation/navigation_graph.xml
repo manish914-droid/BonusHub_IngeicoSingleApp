@@ -20,4 +20,13 @@
         tools:layout="@layout/fragment_dashboard">
 
     </fragment>
+
+    <fragment
+        android:id="@+id/brandEmiMasterCategoryFragment"
+        android:name="com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment"
+        android:label="brand_Emi_MasterCategory_Fragment"
+        tools:layout="@layout/brand_emi_list_and_search_ui">
+
+    </fragment>
+
 </navigation>

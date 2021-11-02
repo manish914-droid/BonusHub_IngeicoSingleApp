@@ -1,7 +1,7 @@
 package com.bonushub.crdb.serverApi
 
 import com.bonushub.crdb.di.DBModule
-import com.bonushub.crdb.model.TerminalParameterTable
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.utils.*
@@ -11,9 +11,9 @@ class RemoteService {
 //:LiveData<GenericResponse<IsoDataReader>>
 
 // region  ------ Service for getting brand data from server ------
-    suspend fun getBrandDataService(counter:String):GenericResponse<IsoDataReader?>{
-        val field57RequestData ="${EMIRequestType.BRAND_DATA.requestType}^$counter"
-        val isoDataWriter = IsoPacketCreator.createBrandDataIsoPacket(field57RequestData)
+    suspend fun field57GenericService(field57RequestData:String):GenericResponse<IsoDataReader?>{
+       // val field57RequestData ="${EMIRequestType.BRAND_DATA.requestType}^$counter"
+        val isoDataWriter = IsoPacketCreator.createIsoPacketWithF57(field57RequestData)
         val response = SocketHelper.getResponseFromServer(isoDataWriter)
        // val liveData= MutableLiveData<GenericResponse<IsoDataReader>>()
         return if(response.isSuccess){
@@ -28,11 +28,13 @@ class RemoteService {
     }
 // endregion
 
+
 }
 
 
 object IsoPacketCreator{
-    fun createBrandDataIsoPacket(field57RequestData: String)
+
+    fun createIsoPacketWithF57(field57RequestData: String)
             : IsoDataWriter =
         IsoDataWriter().apply {
             val terminalData: TerminalParameterTable? = (Utility().getTptData())
@@ -67,8 +69,6 @@ object IsoPacketCreator{
                 addFieldByHex(63, f63)
             }
         }
-
-
 }
 
 
