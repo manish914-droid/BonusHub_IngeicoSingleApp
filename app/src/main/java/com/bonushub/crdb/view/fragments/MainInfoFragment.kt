@@ -58,13 +58,13 @@ class MainInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.insertInfo1("41501379")
+        mainViewModel.insertInfo1("41501375")
 
         button_save.setOnClickListener {
 
           //  val student = getEnteredStudentDetails()
           //  mainViewModel.insertInfo(student)
-            mainViewModel.insertInfo1("41501379")
+            mainViewModel.insertInfo1("41501375")
 
         }
         button_cancel.setOnClickListener {

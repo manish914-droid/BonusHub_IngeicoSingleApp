@@ -26,3 +26,23 @@ data class BrandEMIMasterSubCategoryDataModal(
 ) : Parcelable
 
 
+//region=============================Brand EMI Master Category Data Modal==========================
+@Parcelize
+data class BrandEMIProductDataModal(
+    var productID: String,
+    var productName: String,
+    var skuCode: String,
+    var productMinAmount: String,
+    var productMaxAmount: String,
+    var amountRangeValidationFlag: String,
+    var validationTypeName: String,
+    var isRequired: String,
+    var inputDataType: String,
+    var minLength: String,
+    var maxLength: String,
+    var productCategoryName: String,
+    var producatDesc:String,
+) : Parcelable
+//endregion
+
+

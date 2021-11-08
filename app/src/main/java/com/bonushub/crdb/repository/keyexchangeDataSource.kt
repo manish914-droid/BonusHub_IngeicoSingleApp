@@ -143,7 +143,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         addField(24, Nii.DEFAULT.nii)
 
         //adding tid
-        addFieldByHex(41, "41501379")
+        addFieldByHex(41, "41501375")
 
         //adding field 48
         addFieldByHex(48, Field48ResponseTimestamp.getF48Data())

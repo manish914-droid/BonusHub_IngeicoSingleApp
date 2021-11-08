@@ -3,6 +3,7 @@ package com.bonushub.crdb.repository
 
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.db.AppDatabase
@@ -12,18 +13,25 @@ import com.bonushub.crdb.model.local.BrandTAndCTable
 import com.bonushub.crdb.model.local.IssuerTAndCTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterSubCategoryDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.pax.utils.SplitterTypes
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ServerRepository( val appDB: AppDatabase, private val remoteService: RemoteService) {
+    private val brandEMIMasterCategoryMLData = MutableLiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>()
+    val brandLiveEMIMasterCategoryData: LiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>
+        get() = brandEMIMasterCategoryMLData
+
 
     private var moreDataFlag = "0"
-    private var totalRecord: String? = null
+    private var totalRecord= "0"
 
     // region ====== TIME STAMPS =========
     private var brandTimeStamp: String? = null
@@ -57,11 +65,12 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private var brandEmiMasterSubCategoryDataList = mutableListOf<BrandEMIMasterSubCategoryDataModal>()
 
     // endregion ========
-    private val brandEMIMasterCategoryMLData = MutableLiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>()
-    val brandLiveEMIMasterCategoryData: LiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>
-        get() = brandEMIMasterCategoryMLData
 
-     suspend fun getBrandData(dataCounter:String="0") {
+    private val brandEmiProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
+    private val brandEmiSearchedProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
+
+
+    suspend fun getBrandData(dataCounter:String="0") {
        // val genericResp = remoteService.getBrandDataService(dataCounter)
      //   brandMLData.postValue(genericResp)
         val field57= "${EMIRequestType.BRAND_DATA.requestType}^$dataCounter"
@@ -79,7 +88,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
             }
         }
     }
-    suspend fun getBrandTnc(dataCounter: String="0"){
+    private suspend fun getBrandTnc(dataCounter: String="0"){
         val field57= "${EMIRequestType.BRAND_T_AND_C.requestType}^$dataCounter"
         when(val genericResp = remoteService.field57GenericService(field57)){
             is GenericResponse.Success->{
@@ -95,7 +104,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
             }
         }
     }
-     suspend fun getIssuerTnc(dataCounter:String="0"){
+     private suspend fun getIssuerTnc(dataCounter:String="0"){
         val field57= "${EMIRequestType.ISSUER_T_AND_C.requestType}^$dataCounter"
         when(val genericResp = remoteService.field57GenericService(field57)){
             is GenericResponse.Success->{
@@ -119,8 +128,8 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
         when(val genericResp = remoteService.field57GenericService(field57)){
             is GenericResponse.Success->{
                 val isoDataReader=genericResp.data
-                val tncString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
-                stubbingBrandEMIMasterSubCategoryDataToList(tncString)
+                val brandSubCatDataString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
+                stubbingBrandEMIMasterSubCategoryDataToList(brandSubCatDataString)
             }
             is GenericResponse.Error->{
                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
@@ -132,6 +141,29 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
 
     }
+
+    private suspend fun getBrandEmiProductData(dataCounter: String="0",brandID:String?,categoryID:String?){
+
+        val field57=  "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
+
+        when(val genericResp = remoteService.field57GenericService(field57)){
+            is GenericResponse.Success->{
+                val isoDataReader=genericResp.data
+                val brandEmiProductDataString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
+                stubbingBrandEMIProductDataToList(brandEmiProductDataString,brandID,categoryID)
+
+            }
+            is GenericResponse.Error->{
+                brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+            }
+            is GenericResponse.Loading->{
+
+            }
+        }
+
+
+    }
+
 
     //region=================================Stubbing BrandEMI Master Data to List:-
     private suspend fun stubbingBrandEMIMasterDataToList(brandEMIMasterData: String) {
@@ -365,6 +397,59 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
     }
     //endregion
+
+    //region=================================Stubbing BrandEMI Product Data and Display in List:-
+    private suspend fun stubbingBrandEMIProductDataToList(brandEMIProductData: String, brandID: String?,catagoryID:String?) {
+            if (!TextUtils.isEmpty(brandEMIProductData)) {
+                val dataList = Utility().parseDataListWithSplitter("|", brandEMIProductData)
+                if (dataList.isNotEmpty()) {
+                    moreDataFlag = dataList[0]
+                    perPageRecord = dataList[1]
+                    totalRecord = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
+                    //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
+                    // and iterate further on record data only:-
+                    var tempDataList = mutableListOf<String>()
+                    tempDataList = dataList.subList(2, dataList.size)
+                    for (i in tempDataList.indices) {
+                        //Below we are splitting Data from tempDataList to extract brandID , categoryID , parentCategoryID , categoryName:-
+                        if (!TextUtils.isEmpty(tempDataList[i])) {
+                            val splitData =Utility().parseDataListWithSplitter(
+                                SplitterTypes.CARET.splitter,
+                                tempDataList[i]
+                            )
+                            brandEmiProductDataList.add(
+                                BrandEMIProductDataModal(
+                                    splitData[0], splitData[1],
+                                    splitData[2], splitData[3],
+                                    splitData[4], splitData[5],
+                                    splitData[6], splitData[7],
+                                    splitData[8], splitData[9],
+                                    splitData[10],"","subCat")
+                            )
+                        }
+                    }
+
+                    if (brandEmiProductDataList.isNotEmpty()) {
+                      //  binding?.emptyViewPlaceholder?.visibility = View.INVISIBLE
+                      //  brandEMIProductAdapter.refreshAdapterList(brandEmiProductDataList)
+                    }
+
+                    //Refresh Field57 request value for Pagination if More Record Flag is True:-
+                    if (moreDataFlag == "1") {
+                     getBrandEmiProductData(totalRecord,brandID ,catagoryID)
+                        Log.d("FullDataList:- ", brandEmiProductDataList.toString())
+                    } /*else {
+                        iDialog?.hideProgress()
+                        Log.d("Full Product Data:- ", Gson().toJson(brandEmiProductDataList))
+                    }*/
+                }
+            } else {
+              //  Empty product data in f57
+            }
+
+    }
+    //endregion
+
 
     //region==============Save Brand Master Data TimeStamps:-
     private suspend fun saveBrandMasterTimeStampsData() {

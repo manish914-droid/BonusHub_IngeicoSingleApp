@@ -10,10 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.view.activity.NavigationActivity
-
 import com.bonushub.crdb.databinding.BrandEmiListAndSearchUiBinding
-
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
@@ -21,6 +18,7 @@ import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
@@ -32,10 +30,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class BrandEmiMasterCategoryFragment : Fragment() {
 
-/** need to use Hilt for instance initializing here..*/
-    private val remoteService:RemoteService=RemoteService()
-    private val dbObj : AppDatabase=AppDatabase.getInstance(HDFCApplication.appContext)
-    private val serverRepository:ServerRepository=ServerRepository(dbObj, remoteService)
+    /** need to use Hilt for instance initializing here..*/
+    private val remoteService: RemoteService = RemoteService()
+    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
 
 
     private lateinit var brandEmiMasterCategoryViewModel: BrandEmiMasterCategoryViewModel
@@ -59,25 +57,28 @@ class BrandEmiMasterCategoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        brandEmiMasterCategoryViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(
-            BrandEmiMasterCategoryViewModel::class.java
-        )
-        brandEmiMasterCategoryViewModel.brandEMIMasterSubCategoryLivedata.observe(viewLifecycleOwner, {
-            when (val genericResp = it) {
-                is GenericResponse.Success -> {
-                    println(Gson().toJson(genericResp.data))
-                    setUpRecyclerView()
-                    brandEMIMasterCategoryAdapter.submitList(genericResp.data)
-                }
-                is GenericResponse.Error -> {
-                    ToastUtils.showToast(activity, genericResp.errorMessage)
-                    println(genericResp.errorMessage.toString())
-                }
-                is GenericResponse.Loading -> {
+        brandEmiMasterCategoryViewModel =
+            ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(
+                BrandEmiMasterCategoryViewModel::class.java
+            )
+        brandEmiMasterCategoryViewModel.brandEMIMasterSubCategoryLivedata.observe(
+            viewLifecycleOwner,
+            {
+                when (val genericResp = it) {
+                    is GenericResponse.Success -> {
+                        println(Gson().toJson(genericResp.data))
+                        setUpRecyclerView()
+                        brandEMIMasterCategoryAdapter.submitList(genericResp.data)
+                    }
+                    is GenericResponse.Error -> {
+                        ToastUtils.showToast(activity, genericResp.errorMessage)
+                        println(genericResp.errorMessage.toString())
+                    }
+                    is GenericResponse.Loading -> {
 
+                    }
                 }
-            }
-        })
+            })
     }
 
     //region===========================SetUp RecyclerView :-
@@ -95,25 +96,26 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         println("On Brand Clicked " + Gson().toJson(brandDataMaster))
         ToastUtils.showToast(activity, Gson().toJson(brandDataMaster))
 
-lifecycleScope.launch(Dispatchers.IO) {
-val brandSubCatList:ArrayList<BrandEMISubCategoryTable> =dbObj.appDao.getBrandEMISubCategoryData() as ArrayList<BrandEMISubCategoryTable>
-    if (brandSubCatList.isNotEmpty()) {
-        (activity as NavigationActivity).transactFragment(BrandEmiSubCategoryFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable("brandDataMaster", brandDataMaster)
-                putSerializable("brandSubCatList",brandSubCatList)
-               // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
-            }
-        })
+        lifecycleScope.launch(Dispatchers.IO) {
+            val brandSubCatList: ArrayList<BrandEMISubCategoryTable> =
+                dbObj.appDao.getBrandEMISubCategoryData() as ArrayList<BrandEMISubCategoryTable>
+            if (brandSubCatList.isNotEmpty()) {
+                (activity as NavigationActivity).transactFragment(BrandEmiSubCategoryFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("brandDataMaster", brandDataMaster)
+                        putSerializable("brandSubCatList", brandSubCatList)
+                        // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
+                    }
+                })
 
-    }else{
-        (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable("brandDataMaster", brandDataMaster)
+            } else {
+                (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("brandDataMaster", brandDataMaster)
+                    }
+                })
             }
-        })
-    }
-}
+        }
     }
 
 }
