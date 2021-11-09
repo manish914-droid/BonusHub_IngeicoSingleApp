@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.bonushub.crdb.IDialog
+import com.bonushub.crdb.NavigationActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
 import com.bonushub.crdb.utils.KeyboardModel
@@ -314,11 +315,22 @@ class NewInputAmountFragment : Fragment() {
         if (saleAmountStr != "") {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
+        (activity as NavigationActivity).transactFragment(EMIIssuerList().apply {
+            arguments = Bundle().apply {
+              //  putSerializable("type", action)
+                // putString("proc_code", ProcessingCode.PRE_AUTH.code)
+               /// putString("mobileNumber", extraPair?.first)
+                putString("enquiryAmt", saleAmount.toString().trim())
+                // putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
+                //  putSerializable("brandEMIDataModal", brandEMIDataModal)
 
-        iFrReq?.onFragmentRequest(
+            }
+        })
+
+        /*iFrReq?.onFragmentRequest(
             UiAction.EMI_ENQUIRY,
             Pair(saleAmount.toString().trim(), "0")
-        )
+        )*/
     }
     private fun initAnimation() {
         animShow = AnimationUtils.loadAnimation(activity, R.anim.view_show)
