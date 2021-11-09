@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/shadow_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_4"
+        android:background="@drawable/top_shadow"
+        android:elevation="@dimen/pad_16" />
+    <LinearLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key1"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_1"
+            android:background="@drawable/keyboard_bg"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key2"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_2"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+          />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key3"
+            style="@style/Keyboard_Btn_Neumorphic"
+
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_3"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+             />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key4"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_4"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key5"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_5"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key6"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_6"
+            android:textSize="@dimen/text_size_large"
+             />
+
+
+  
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key7"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_7"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key8"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_8"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key9"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_9"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key000"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_000"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key00"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_00"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/key0"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="@drawable/keyboard_bg"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_0"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/keyClr"
+
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="#E40A22"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_cancel"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/keyDelete"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_gravity="center"
+            android:background="#FDD835"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_delete"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/keyOK"
+            style="@style/Keyboard_Btn_Neumorphic"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="#2D9414"
+            android:padding="@dimen/pad_4"
+            android:text="@string/key_ok"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

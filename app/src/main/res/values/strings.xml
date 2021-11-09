@@ -18,6 +18,71 @@
     <string name="help_desk_number_hint">Help Desk No: 0120252525</string>
     <string name="settlement">Settlement</string>
     <string name="versionHint">App Version: v1.0.2</string>
+
+    <!--sub header-->
+    <string name="back">Back</string>
+    <string name="dashboard">Dashboard</string>
+
+    <!--emi catalouge-->
+    <string name="bankEmi">Bank EMI</string>
+    <string name="emi_catalogue">EMI CATALOGUE</string>
+    <string name="brandEmiCatalogue">Brand EMI Catalogue</string>
+    <string name="bankEmiCatalogue">BANK EMI CATALOGUE</string>
+    <string name="brandEmi">Brand EMI</string>
+
+    <!--Keyboard-->
+    <string name="key_1">1</string>
+    <string name="key_2">2</string>
+    <string name="key_3">3</string>
+    <string name="key_4">4</string>
+    <string name="key_5">5</string>
+    <string name="key_6">6</string>
+    <string name="key_7">7</string>
+    <string name="key_8">8</string>
+    <string name="key_9">9</string>
+    <string name="key_0">0</string>
+    <string name="key_00">00</string>
+    <string name="key_000">000</string>
+    <string name="key_cancel">Cancel</string>
+    <string name="key_delete">Delete</string>
+    <string name="key_ok">OK</string>
+
+    <!--catalogue-->
+    <string name="enter_amount">Enter Amount</string>
+    <string name="enter_cash_amount">Enter Cash Amount</string>
+    <string name="enter_mobile_number">Enter Mobile Number</string>
+    <string name="enter_description_optional">Enter Description (optional)</string>
+    <string name="calculate_and_compare_emi_offers"><![CDATA[Calculate & Compare EMI Offers:]]></string>
+    <string name="compare_by_tenure">Compare Tenure</string>
+    <string name="compare_by_bank">Compare Bank</string>
+    <string name="issuer_icon">Issuer Bank Icon</string>
+    <string name="select_tenure">1. Select Tenure:</string>
+    <string name="select_banks_to_compare">2. Select Banks To Compare:</string>
+    <string name="select_all_banks">Select All Banks</string>
+    <string name="select_bank_to_compare_tenure">1. Select Bank To Compare Tenure</string>
+    <string name="select_bank_to_compare">2. Select Bank To Compare</string>
+    <string name="select_bank">Select Bank</string>
+    <string name="unselect_all_banks">UnSelect All Banks</string>
+    <string name="Proceed">Proceed</string>
+    <string name="transactionAmountNew">Transaction \n Amount(\u20B9)</string>
+    <string name="discountAmountNew">Discount \n Amount(\u20B9)</string>
+    <string name="loanNew">Loan(\u20B9)</string>
+    <string name="roiNew">Roi(%)</string>
+    <string name="emiNew">Emi(\u20B9)</string>
+    <string name="totalWithInterestNew">Total \n (With Int.)</string>
+    <string name="cashbackNew">Cashback(\u20B9)</string>
+    <string name="netCostNew">Net Cost(\u20B9)</string>
+    <string name="additionalOfferNew">Add. Offer</string>
+    <string name="tenure_hint">3 MONTHS</string>
+    <string name="success_message">SUCCESS</string>
+    <string name="success_transaction">Success Transaction</string>
+    <string name="checked">Checked</string>
+    <string name="selectAll">Select All</string>
+    <string name="tenure">Tenure</string>
+    <string name="please_select_one_or_multiple_issuer_banks">Please Select Issuer(s) Bank</string>
+    <string name="please_select_tenure">Please select Tenure </string>
+    <string name="please_select_one_issuer_bank">Please Select 1 Issuer Bank</string>
+    <string name="total_amount_with_interest">Total Amount \n (With Interest)</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -27,8 +92,8 @@
     <string name="error_prompt"> Error prompt </string>
     <string name="insert_pass_swipe_card"> Insert Swipe card </string>
 
-    <string name="cancel"> cancel </string>
-    <string name="ok"> ok </string>
+    <string name="cancel">cancel</string>
+    <string name="ok">ok</string>
 
 
     <string name="brand_name">Brand Name </string>
