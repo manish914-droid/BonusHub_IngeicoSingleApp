@@ -98,4 +98,15 @@
 
     <string name="brand_name">Brand Name </string>
     <string name="searchBrand">Search</string>
+
+    <!--bank functions-->
+    <string name="bank_functions_header">BANK FUNCTIONS</string>
+    <string name="admin_vas_header">ADMIN VAS</string>
+    <string name="terminal_param_header">TERMINAL PARAM</string>
+    <string name="init_payment_app_header">INIT PAYMENT APP</string>
+    <string name="admin_password">ADMIN PASSWORD</string>
+    <string name="hint_enter_admin_password">**** ENTER ADMIN PASSWORD</string>
+    <string name="super_admin_password">SUPER ADMIN PASSWORD</string>
+    <string name="hint_enter_super_admin_password">**** ENTER SUPER ADMIN PASSWORD</string>
+
 </resources>
