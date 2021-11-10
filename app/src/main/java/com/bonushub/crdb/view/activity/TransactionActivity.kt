@@ -8,7 +8,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.bonushub.crdb.R
+import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.viewmodel.SearchViewModel
+import com.ingenico.hdfcpayment.listener.OnPaymentListener
+import com.ingenico.hdfcpayment.request.SaleRequest
+import com.ingenico.hdfcpayment.response.PaymentResult
+import com.ingenico.hdfcpayment.response.TransactionResponse
+import com.ingenico.hdfcpayment.type.ResponseCode
+import com.ingenico.hdfcpayment.type.TransactionType
 
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,7 +103,7 @@ class TransactionActivity : AppCompatActivity(){
                  }
 */
 
-               /*   var ecrID: String
+                  var ecrID: String
                    try {
                        DeviceHelper.doSaleTransaction(
                            SaleRequest(
@@ -135,7 +142,7 @@ class TransactionActivity : AppCompatActivity(){
                    }
               catch (exc: Exception){
                   exc.printStackTrace()
-              }*/
+              }
 
                Toast.makeText(
                    this,
