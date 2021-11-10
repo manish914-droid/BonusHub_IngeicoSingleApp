@@ -19,6 +19,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.viewmodel.MainViewModel
+import com.mindorks.example.coroutines.utils.Status
 
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -118,16 +119,16 @@ class MainInfoFragment : Fragment() {
         mainViewModel.mutableLiveData.observe(viewLifecycleOwner, Observer { result ->
 
             when (result.status) {
-                Result.Status.SUCCESS -> {
+                Status.SUCCESS -> {
 
                     Toast.makeText(activity,"Success called $", Toast.LENGTH_LONG).show()
                 }
 
-                Result.Status.ERROR -> {
+                Status.ERROR -> {
                     Toast.makeText(activity,"Error called  ${result.message}", Toast.LENGTH_LONG).show()
                 }
 
-                Result.Status.LOADING -> {
+                Status.LOADING -> {
                     Toast.makeText(activity,"Loading called $", Toast.LENGTH_LONG).show()
                 }
             }

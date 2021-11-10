@@ -1,13 +1,13 @@
 
 package com.bonushub.crdb.utils
 
+import com.mindorks.example.coroutines.utils.Status
+
 
 class RespMessageStatusData(var message: String="Unknown Error", var isSuccess: Boolean=false, var anyData:Any?=null)
 
-class ResponseHandler(message: String?, response: Boolean, response1: Boolean, response2: Boolean) {
+class ResponseHandler(status: Status, message: String?, response: Boolean, response1: Boolean) {
 
-    operator fun invoke(result: String, success: Boolean, b: Boolean, b1: Boolean): ResponseHandler {
-
-        return ResponseHandler(result,success,b,b1)
-    }
 }
+
+class EmvHanndler(var message: String?)

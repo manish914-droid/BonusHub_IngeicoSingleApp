@@ -144,15 +144,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     override fun onReady(version: String?) {
         register(true)
         initDeviceInstance()
-        GlobalScope.launch(Dispatchers.IO) {
-            Utility().readLocalInitFile { status, msg ->
-                Log.d("Init File Read Status ", status.toString())
-                Log.d("Message ", msg)
-                if (status){
 
-                }
-            }
-        }
     }
     //endregion
 
