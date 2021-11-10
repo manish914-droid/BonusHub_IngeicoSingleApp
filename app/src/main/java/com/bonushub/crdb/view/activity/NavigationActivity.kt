@@ -1,7 +1,7 @@
 package com.bonushub.crdb.view.activity
 
+
 import android.app.Dialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
@@ -23,14 +24,12 @@ import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.utils.DemoConfig
-import com.bonushub.crdb.utils.DeviceHelper
-import com.bonushub.crdb.utils.Utility
-import com.bonushub.crdb.utils.isExpanded
+import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.view.fragments.BankFunctionsFragment
 import com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment
-
 import com.bonushub.pax.utils.NavControllerFragmentLabel
-
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -40,6 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.lang.Runnable
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
@@ -96,7 +96,13 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
       //  TODO("Not yet implemented")
-        transactFragment(BrandEmiMasterCategoryFragment())
+
+        if(item.itemId == R.id.bankFunction){
+            DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel)
+           // transactFragment(BankFunctionsFragment())
+        }else {
+            transactFragment(BrandEmiMasterCategoryFragment())
+        }
         return true
     }
     //region==========================SetUp Drawer Layout================
@@ -274,10 +280,26 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
         }
     }
     //endregion
+
+    // written by kushal region == dialog click
+    var onClickDialogOkCancel:OnClickDialogOkCancel = object : OnClickDialogOkCancel{
+
+        override fun onClickOk() {
+            transactFragment(BankFunctionsFragment())
+        }
+
+        override fun onClickCancel() {
+
+        }
+
+    }
+// endregion
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
 interface ShowLessOnBackPress {
     fun showLessDashOptions()
 }
 //endregion
+
+
 

@@ -19,10 +19,14 @@
     <color name="darkgreen">#006400</color>
     <!--text and hint-->
     <color name="txt_color">#013480</color>
+    <color name="txt_color_transparent">#59013480</color>
 
 
     <color name="gray">#808080</color>
     <color name="blue_normal">#0087FF</color>
 
     <color name="hint_color">#4D4F51</color>
+
+    <!--bank functions-->
+    <color name="text_gray">#9F9F9F</color>
 </resources>

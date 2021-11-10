@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/edge_blue">
+
+    <TextView
+        android:id="@+id/textViewHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_xsmall" />
+
+    <EditText
+        android:id="@+id/edtTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewHeader"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="36dp"
+        android:background="@drawable/edge_gray_bg_white"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textColor="@color/txt_color"
+        android:textColorHint="@color/txt_color_transparent"
+        android:textSize="@dimen/text_size_xsmall" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtTextPassword"
+        android:layout_marginStart="45dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="45dp"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtViewCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/edge_bg_white"
+            android:gravity="center"
+            android:padding="7dp"
+            android:text="@string/cancel"
+            android:textAllCaps="true"
+            android:textSize="@dimen/text_size_xsmall" />
+
+
+        <TextView
+            android:id="@+id/txtViewOk"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/edge_white_bg_blue"
+            android:gravity="center"
+            android:padding="7dp"
+            android:text="@string/ok"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_xsmall" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

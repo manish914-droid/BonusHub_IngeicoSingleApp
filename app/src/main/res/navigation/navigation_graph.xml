@@ -28,5 +28,10 @@
         tools:layout="@layout/brand_emi_list_and_search_ui">
 
     </fragment>
+    <fragment
+        android:id="@+id/bankFunctionsFragment"
+        android:name="com.bonushub.crdb.view.fragments.BankFunctionsFragment"
+        android:label="fragment_bank_functions"
+        tools:layout="@layout/fragment_bank_functions" />
 
 </navigation>
