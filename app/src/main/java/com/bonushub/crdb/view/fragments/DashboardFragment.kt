@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.fragments
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.utils.isExpanded
+import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.pax.utils.EDashboardItem
@@ -34,12 +36,12 @@ class DashboardFragment : Fragment(),IFragmentRequest {
         var toRefresh = true
     }
     private val dashboardViewModel : DashboardViewModel by viewModels()
-    private var iFragmentRequest: IFragmentRequest? = null
+   // private var iFragmentRequest: IFragmentRequest? = null
     private val itemList = mutableListOf<EDashboardItem>()
     private val list1 = arrayListOf<EDashboardItem>()
     private val list2 = arrayListOf<EDashboardItem>()
     private val dashBoardAdapter by lazy {
-        DashBoardAdapter(iFragmentRequest, ::onItemLessMoreClick)
+        DashBoardAdapter(this, ::onItemLessMoreClick)
     }
     private  var data: MutableList<BannerConfigModal>?=null
     private var animShow: Animation? = null
@@ -212,7 +214,8 @@ class DashboardFragment : Fragment(),IFragmentRequest {
 
 
     override fun onDashBoardItemClick(action: EDashboardItem) {
-        TODO("Not yet implemented")
+        val intent = Intent (getActivity(), TransactionActivity::class.java)
+        getActivity()?.startActivity(intent)
     }
 }
 

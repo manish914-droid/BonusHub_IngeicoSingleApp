@@ -26,13 +26,12 @@ import javax.inject.Singleton
 @InstallIn(ActivityComponent::class)
 object ActivityModule {
 
- /*   @Provides
+    @Provides
     @ActivityScoped
     fun provideShoppingrepository(emv: UEMV?,@ActivityContext context: Context) : SearchCardRepository{
 
         return SearchCardDefaultRepository(emv,context)
     }
-*/
 
 }
 
