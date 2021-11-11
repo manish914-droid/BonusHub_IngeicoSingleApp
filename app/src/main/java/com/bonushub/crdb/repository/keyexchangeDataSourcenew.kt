@@ -105,7 +105,7 @@ class keyexchangeDataSourcenew @Inject constructor(private val appDao: AppDao) :
         //endregion
     }
 
-    override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter = IsoDataWriter().apply  {
+    override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter = IsoDataWriter().apply  {
 
     }
 

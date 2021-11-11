@@ -24,7 +24,7 @@ import java.util.*
 import javax.inject.Inject
 
 interface IKeyExchangeInit{
-    suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter
+    suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter
 }
 
 interface IKeyExchange : IKeyExchangeInit{
@@ -126,7 +126,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         //endregion
     }
 
-    override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter = IsoDataWriter().apply  {
+    override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter = IsoDataWriter().apply  {
         mti = Mti.MTI_LOGON.mti
         // adding processing code and field 59 for public and private key
         addField(
@@ -144,7 +144,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         addField(24, Nii.DEFAULT.nii)
 
         //adding tid
-        addFieldByHex(41, "41501379")
+        addFieldByHex(41, tid)
 
         //adding field 48
         addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
@@ -239,7 +239,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
                                 if (keWithInit) {
-                                    val (strResult,strSucess,_) = startInit()
+                                    val (strResult,strSucess,_) = startInit(tid)
                                     if(strSucess == true){
                                         return Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,false))
                                     }
@@ -320,7 +320,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         return result
     }
 
-    suspend fun startInit(): Triple<String?, Boolean?, Boolean> {
+    suspend fun startInit(tid: String): Triple<String?, Boolean?, Boolean> {
         var strResult: String? = null
         var strSucess: Boolean? = null
 
@@ -343,7 +343,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                  strResult = it
                 strSucess  = true
 
-            }, this@keyexchangeDataSource)
+            }, this@keyexchangeDataSource,tid)
 
 
           System.out.println("Init Suceesuffly msg1 "+strResult)

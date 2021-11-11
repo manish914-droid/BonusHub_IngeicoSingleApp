@@ -77,7 +77,7 @@ object HitServer  {
     }
 
     @Synchronized
-    suspend fun hitInitServer(callback: ServerMessageCallback, progressMsg: ProgressCallback, keInit: keyexchangeDataSource) {
+    suspend fun hitInitServer(callback: ServerMessageCallback, progressMsg: ProgressCallback, keInit: keyexchangeDataSource, tid: String) {
         this@HitServer.callback = callback
         val FILE_NAME = "init_packet_request_logs.txt"
         val fos : FileOutputStream = HDFCApplication.appContext.openFileOutput(FILE_NAME, MODE_PRIVATE)
@@ -97,8 +97,7 @@ object HitServer  {
                     var isFirstCall = true
                     val initList = ArrayList<ByteArray>()
                     while (true) {
-                        val data =
-                            keInit.createInitIso(nextCounter, isFirstCall).generateIsoByteRequest()
+                        val data = keInit.createInitIso(nextCounter, isFirstCall,tid).generateIsoByteRequest()
                         val formattedInitPackets = data.byteArr2HexStr()
                         Utility().logger(TAG, "init iso = $formattedInitPackets")
                         //println("Init iso packet send --- > $formattedInitPackets")
