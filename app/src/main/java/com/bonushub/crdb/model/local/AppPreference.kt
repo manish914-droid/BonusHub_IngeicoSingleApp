@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.utils.addPad
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -33,6 +34,7 @@ object AppPreference {
     const val PC_NUMBER_KEY_2 = "pc_number_key_2"*/
     const val LOGIN_KEY="login_key"
     const val F48IdentifierAndSuccesssTxn="f48id_txnDate"
+    const val ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE = "enquiry_amount_for_emi_catalogue"
 
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
@@ -90,6 +92,21 @@ object AppPreference {
     }
 
     fun setBankCode(bankCode: String) = saveString(BANK_CODE_KEY, bankCode)
+
+    @JvmStatic
+    fun getLongData(key: String): Long {
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        return v?.getLong(key, 0L) ?: 0L
+    }
+
+    @JvmStatic
+    fun setLongData(key: String, value: Long) {
+        val p = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val edit = p?.edit()
+        edit?.putLong(key, value)
+        edit?.apply()
+    }
+
 
     fun clearReversal() {
        // logger(TAG, "========CLEAR Reversal=========", "e")

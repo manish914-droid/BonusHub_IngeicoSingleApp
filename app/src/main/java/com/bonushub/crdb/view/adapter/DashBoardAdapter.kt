@@ -1,5 +1,7 @@
 package com.bonushub.crdb.view.adapter
 
+import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +10,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+
 import com.bonushub.crdb.R
+import com.bonushub.crdb.utils.Field48ResponseTimestamp
+import com.bonushub.crdb.view.fragments.EMICatalogue
 import com.bonushub.crdb.view.fragments.IFragmentRequest
 import com.bonushub.pax.utils.EDashboardItem
 import java.util.ArrayList
@@ -35,6 +40,7 @@ class DashBoardAdapter(private val fragReq: IFragmentRequest?, var lessMoreClick
                 lessMoreClick(mList[position])
             else
                 fragReq?.onDashBoardItemClick(mList[position])
+
         }
 
     }

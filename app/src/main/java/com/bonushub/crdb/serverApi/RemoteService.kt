@@ -1,5 +1,6 @@
 package com.bonushub.crdb.serverApi
 
+import android.util.Log
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.local.AppPreference
@@ -54,7 +55,8 @@ object IsoPacketCreator{
                 addField(24, Nii.BRAND_EMI_MASTER.nii)
 
                 //TID Field 41
-                addFieldByHex(41, terminalData.terminalId)
+                addFieldByHex(41, "41501363")
+                Log.d("terminalId:- ", terminalData.terminalId.toString())
 
                 //adding field 57
                 addFieldByHex(57, field57RequestData)

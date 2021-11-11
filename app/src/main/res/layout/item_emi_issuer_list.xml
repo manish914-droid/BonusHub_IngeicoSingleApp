@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frame_banks"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/pad_80"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/issuerBankLogo"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/pad_4"
+        android:contentDescription="@string/issuer_icon"
+        android:fitsSystemWindows="true"
+        android:scaleType="centerCrop"
+        android:padding="@dimen/pad_4"
+        android:src="@drawable/indusind_issuer_icon" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/issuerBankName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/pad_4"
+        android:background="@color/white"
+        android:hint="@string/success_message"
+        android:scaleType="centerCrop"
+        android:textColor="@color/themeBackground"
+        android:textColorHint="@color/themeBackground"
+        android:textSize="@dimen/text_size_small"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/issuerCheckedIV"
+        android:layout_width="@dimen/pad_16"
+        android:layout_height="@dimen/pad_16"
+        android:layout_gravity="top"
+        android:layout_marginStart="@dimen/pad_4"
+        android:layout_marginTop="@dimen/pad_16"
+        android:clickable="false"
+        android:contentDescription="@string/checked"
+        android:src="@drawable/circle_with_tick_mark"
+        android:visibility="gone" />
+</FrameLayout>

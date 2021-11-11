@@ -11,10 +11,11 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.bonushub.crdb.IDialog
-import com.bonushub.crdb.NavigationActivity
+
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
 import com.bonushub.crdb.utils.KeyboardModel
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.pax.utils.EDashboardItem
 import com.bonushub.pax.utils.UiAction
 import kotlinx.coroutines.Dispatchers
@@ -321,7 +322,7 @@ class NewInputAmountFragment : Fragment() {
                 // putString("proc_code", ProcessingCode.PRE_AUTH.code)
                /// putString("mobileNumber", extraPair?.first)
                 putString("enquiryAmt", saleAmount.toString().trim())
-                // putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
+                //putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
                 //  putSerializable("brandEMIDataModal", brandEMIDataModal)
 
             }

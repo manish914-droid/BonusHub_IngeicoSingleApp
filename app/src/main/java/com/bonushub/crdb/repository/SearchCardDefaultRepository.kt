@@ -8,18 +8,32 @@ import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.entity.EMVOption
 import com.bonushub.crdb.model.CardProcessedDataModal
+import com.bonushub.crdb.utils.BytesUtil
+import com.bonushub.crdb.utils.getEncryptedPan
+import com.bonushub.crdb.utils.getEncryptedTrackData
 import com.bonushub.crdb.utils.ingenico.DemoConfig
 import com.bonushub.crdb.utils.ingenico.DialogUtil
 import com.bonushub.crdb.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.utils.ingenico.TLV
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.TransactionActivity
-import com.bonushub.crdb.view.activity.TransactionActivity.*
+import com.bonushub.crdb.view.activity.TransactionActivity.DetectCardType
+import com.usdk.apiservice.aidl.BaseError
+import com.usdk.apiservice.aidl.algorithm.AlgError
+import com.usdk.apiservice.aidl.algorithm.AlgMode
+import com.usdk.apiservice.aidl.algorithm.UAlgorithm
+import com.usdk.apiservice.aidl.data.BytesValue
 import com.usdk.apiservice.aidl.emv.*
+import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
+import com.usdk.apiservice.aidl.pinpad.UPinpad
 import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
 
-class SearchCardDefaultRepository(var emv: UEMV?,@ActivityContext private val context: Context): SearchCardRepository {
+class SearchCardDefaultRepository @Inject constructor(private var algorithm: UAlgorithm?,
+                                                      private var pinpad: UPinpad?,
+                                                      private var emv: UEMV?,
+                                                      @ActivityContext private val context: Context): SearchCardRepository {
 
     val TAG = SearchCardDefaultRepository::class.java.simpleName
 
@@ -81,7 +95,9 @@ class SearchCardDefaultRepository(var emv: UEMV?,@ActivityContext private val co
                     }
 
                     cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
-                    cardProcessedDataModal.setTrack2Data(track.getString(EMVData.TRACK2) ?: "")
+                    var encryptTrack2data =getEncryptedTrackData(track.getString(EMVData.TRACK2) ?: "",pinpad)
+                    println("Track data is"+track.getString(EMVData.TRACK2))
+                    cardProcessedDataModal.setTrack2Data(encryptTrack2data ?: "")
                     _insertCardStatus.postValue(cardProcessedDataModal)
                     emv?.stopSearch()
                 }
@@ -271,6 +287,10 @@ class SearchCardDefaultRepository(var emv: UEMV?,@ActivityContext private val co
     fun doReadRecord(record: CardRecord?, cardProcessedDataModal: CardProcessedDataModal) {
         cardProcessedDataModal.setPanNumberData(EMVInfoUtil.getRecordDataDesc(record))
         System.out.println("Card pannumber data"+EMVInfoUtil.getRecordDataDesc(record))
+        var encrptedPan = getEncryptedPan(EMVInfoUtil.getRecordDataDesc(record),algorithm)
+        cardProcessedDataModal.setEncryptedPan(encrptedPan)
+        println("Pannumber is"+EMVInfoUtil.getRecordDataDesc(record))
+        TDES(EMVInfoUtil.getRecordDataDesc(record))
         return _insertCardStatus.postValue(cardProcessedDataModal)
         // outputText("=> onReadRecord | " + EMVInfoUtil.getRecordDataDesc(record))
         // outputResult(emv.respondEvent(null), "...onReadRecord: respondEvent")
@@ -286,4 +306,66 @@ class SearchCardDefaultRepository(var emv: UEMV?,@ActivityContext private val co
         })
     }
 
+    private fun TDES(recordDataDesc: String) {
+        try {
+            logger(TAG, "=> TDES")
+            val key: ByteArray = BytesUtil.hexString2Bytes("31313131313131313131313131313131")
+            val dataIn: ByteArray = BytesUtil.hexString2Bytes(recordDataDesc)
+            var mode = AlgMode.EM_alg_TDESENCRYPT or AlgMode.EM_alg_TDESTECBMODE
+            val encResult = BytesValue()
+            var ret = algorithm?.TDES(mode, key, dataIn, encResult)
+            if (ret != AlgError.SUCCESS) {
+                ret?.let { getErrorDetail(it) }?.let { logger(TAG, it) }
+                return
+            }
+            logger(TAG,"Encrypt result : " + encResult.toHexString())
+            val decResult = BytesValue()
+            mode = AlgMode.EM_alg_TDESDECRYPT or AlgMode.EM_alg_TDESTECBMODE
+            ret = algorithm?.TDES(mode, key, encResult.data, decResult)
+            if (ret != AlgError.SUCCESS) {
+                ret?.let { getErrorDetail(it) }?.let { logger(TAG, it) }
+                return
+            }
+            logger(TAG,"Decrypt result : " + decResult.toHexString())
+        } catch (e: Exception) {
+           // handleException(e)
+        }
+    }
+
+    fun getErrorDetail(error: Int): String {
+        val message = getErrorMessage(error)
+        return if (error < 0) {
+            "$message[$error]"
+        } else message + String.format("[0x%02X]", error)
+    }
+
+    fun getErrorMessage(error: Int): String {
+        val message: String
+        message = when (error) {
+            BaseError.SERVICE_CRASH -> "SERVICE_CRASH"
+            BaseError.REQUEST_EXCEPTION -> "REQUEST_EXCEPTION"
+            BaseError.ERROR_CANNOT_EXECUTABLE -> "ERROR_CANNOT_EXECUTABLE"
+            BaseError.ERROR_INTERRUPTED -> "ERROR_INTERRUPTED"
+            BaseError.ERROR_HANDLE_INVALID -> "ERROR_HANDLE_INVALID"
+            else -> "Unknown error"
+        }
+        return message
+    }
+
+    fun encryptMagTrack(keyId: Int) {
+       // outputBlueText(">>> encryptMagTrack")
+        try {
+            val mode = MagTrackEncMode.MTEM_ECBMODE
+            val trackData = "12345678"
+            val result: ByteArray? =
+                pinpad?.encryptMagTrack(mode, keyId, BytesUtil.hexString2Bytes(trackData))
+            if (result == null) {
+               // outputPinpadError("encryptMagTrack fail")
+                return
+            }
+         //   outputText("ECB encrypt result = " + BytesUtil.bytes2HexString(result))
+        } catch (e: Exception) {
+           // handleException(e)
+        }
+    }
 }

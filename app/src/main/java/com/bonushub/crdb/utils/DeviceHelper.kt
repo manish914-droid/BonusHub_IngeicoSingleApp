@@ -14,6 +14,7 @@ import com.ingenico.hdfcpayment.request.SaleRequest
 import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
 import com.usdk.apiservice.aidl.DeviceServiceData
 import com.usdk.apiservice.aidl.UDeviceService
+import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.device.DeviceInfo
 import com.usdk.apiservice.aidl.device.UDeviceManager
 import com.usdk.apiservice.aidl.emv.UEMV
@@ -214,6 +215,18 @@ object DeviceHelper   {
 
         }.start()
         return UEMV.Stub.asInterface(iBinder)
+    }
+
+    @JvmStatic
+    @Throws(IllegalStateException::class)
+    fun getAlgorithm(): UAlgorithm? {
+        val iBinder = object : IBinderCreator() {
+            @Throws(RemoteException::class)
+            override fun create(): IBinder {
+                return vfDeviceService!!.algorithm
+            }
+        }.start()
+        return UAlgorithm.Stub.asInterface(iBinder)
     }
 
     @Throws(IllegalStateException::class)
