@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">BonusHub</string>
 
-    <!--Init-->
+    <!--TODO: Init-->
     <string name="enter_tid_colon">Enter TID :</string>
     <string name="proceed_to_init">Proceed To Init</string>
     <string name="please_wait">Please Wait....</string>
     <string name="please_wait_host">Please Wait init Process Start....</string>
 
-    <!--navigation drawer strings-->
+    <!--TODO: navigation drawer strings-->
     <string name="merchant_name">ME Name  : </string>
     <string name="terminal_id">TID:41501372</string>
     <string name="merchant_id">MID:41501002</string>
@@ -19,18 +19,18 @@
     <string name="settlement">Settlement</string>
     <string name="versionHint">App Version: v1.0.2</string>
 
-    <!--sub header-->
+    <!--TODO: sub header-->
     <string name="back">Back</string>
     <string name="dashboard">Dashboard</string>
 
-    <!--emi catalouge-->
+    <!--TODO: emi catalouge-->
     <string name="bankEmi">Bank EMI</string>
     <string name="emi_catalogue">EMI CATALOGUE</string>
     <string name="brandEmiCatalogue">Brand EMI Catalogue</string>
     <string name="bankEmiCatalogue">BANK EMI CATALOGUE</string>
     <string name="brandEmi">Brand EMI</string>
 
-    <!--Keyboard-->
+    <!--TODO: Keyboard-->
     <string name="key_1">1</string>
     <string name="key_2">2</string>
     <string name="key_3">3</string>
@@ -47,7 +47,7 @@
     <string name="key_delete">Delete</string>
     <string name="key_ok">OK</string>
 
-    <!--catalogue-->
+    <!--TODO: catalogue-->
     <string name="enter_amount">Enter Amount</string>
     <string name="enter_cash_amount">Enter Cash Amount</string>
     <string name="enter_mobile_number">Enter Mobile Number</string>
@@ -83,6 +83,19 @@
     <string name="please_select_tenure">Please select Tenure </string>
     <string name="please_select_one_issuer_bank">Please Select 1 Issuer Bank</string>
     <string name="total_amount_with_interest">Total Amount \n (With Interest)</string>
+    <string name="amex">AMEX</string>
+    <string name="hdfc">HDFC</string>
+    <string name="cancel">cancel</string>
+    <string name="ok">ok</string>
+    <string name="_500_00">\u20B9 500.00</string>
+    <string name="rupees_symbol">\u20B9</string>
+    <string name="invoice">Invoice</string>
+    <string name="amount">Amount</string>
+    <string name="date">Date</string>
+    <string name="continue_">Continue</string>
+    <string name="_500">500</string>
+    <string name="no_internet_available_please_check_your_internet">No Internet Available , Please check your Internet and try again</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -91,10 +104,6 @@
     <string name="exception_prompt"> Exception prompt </string>
     <string name="error_prompt"> Error prompt </string>
     <string name="insert_pass_swipe_card"> Insert Swipe card </string>
-
-    <string name="cancel">cancel</string>
-    <string name="ok">ok</string>
-
 
     <string name="brand_name">Brand Name </string>
     <string name="searchBrand">Search</string>

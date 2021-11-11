@@ -5,19 +5,21 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.db.AppDatabase
-import com.bonushub.crdb.model.local.BrandEMIMasterTimeStamps
-import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
-import com.bonushub.crdb.model.local.BrandTAndCTable
-import com.bonushub.crdb.model.local.IssuerTAndCTable
+import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterSubCategoryDataModal
 import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Utility
+import com.bonushub.crdb.view.fragments.CompareActionType
+import com.bonushub.crdb.view.fragments.IssuerBankModal
+import com.bonushub.crdb.view.fragments.TenureBankModal
 import com.bonushub.pax.utils.SplitterTypes
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ServerRepository( val appDB: AppDatabase, private val remoteService: RemoteService) {
@@ -49,83 +51,101 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private var brandTAndCTotalRecord: Int = 0
     private var brandTAndCRecordData: String? = null
     private var brandTermsAndConditionsDataList = mutableListOf<String>()
-    //endregion
 
+    //endregionIssuerTenureList
+    //region====================EMIIssuerList Variables:-
+    private var allIssuerBankList: MutableList<IssuerBankModal> = mutableListOf()
+    private var allIssuerTenureList: MutableList<TenureBankModal> = mutableListOf()
+    private val allIssuerTenureListMLData = MutableLiveData<GenericResponse<List<TenureBankModal?>>>()
+    val allIssuerTenureLisLiveData: LiveData<GenericResponse<List<TenureBankModal?>>>
+    get() = allIssuerTenureListMLData
+    private val issuerListMLData = MutableLiveData<GenericResponse<List<IssuerBankModal?>>>()
+      val allIssuerBankListLiveData: LiveData<GenericResponse<List<IssuerBankModal?>>>
+        get() = issuerListMLData
+
+
+    //endregion
     //region  =======Sub categories
     private var perPageRecord: String? = "0"
 
-    private var brandEmiMasterSubCategoryDataList = mutableListOf<BrandEMIMasterSubCategoryDataModal>()
+    private var brandEmiMasterSubCategoryDataList =
+        mutableListOf<BrandEMIMasterSubCategoryDataModal>()
 
     // endregion ========
-    private val brandEMIMasterCategoryMLData = MutableLiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>()
+    private val brandEMIMasterCategoryMLData =
+        MutableLiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>()
     val brandLiveEMIMasterCategoryData: LiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>
         get() = brandEMIMasterCategoryMLData
 
-     suspend fun getBrandData(dataCounter:String="0") {
-       // val genericResp = remoteService.getBrandDataService(dataCounter)
-     //   brandMLData.postValue(genericResp)
-        val field57= "${EMIRequestType.BRAND_DATA.requestType}^$dataCounter"
-        when(val genericResp = remoteService.field57GenericService(field57)){
-            is GenericResponse.Success->{
-                val isoDataReader=genericResp.data
-                val brandEMIMasterData = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
-               stubbingBrandEMIMasterDataToList(brandEMIMasterData)
+    suspend fun getBrandData(dataCounter: String = "0") {
+        // val genericResp = remoteService.getBrandDataService(dataCounter)
+        //   brandMLData.postValue(genericResp)
+        val field57 = "${EMIRequestType.BRAND_DATA.requestType}^$dataCounter"
+        when (val genericResp = remoteService.field57GenericService(field57)) {
+            is GenericResponse.Success -> {
+                val isoDataReader = genericResp.data
+                val brandEMIMasterData =
+                    isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
+                stubbingBrandEMIMasterDataToList(brandEMIMasterData)
             }
-            is GenericResponse.Error->{
+            is GenericResponse.Error -> {
                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
-            is GenericResponse.Loading->{
+            is GenericResponse.Loading -> {
 
             }
         }
     }
-    suspend fun getBrandTnc(dataCounter: String="0"){
-        val field57= "${EMIRequestType.BRAND_T_AND_C.requestType}^$dataCounter"
-        when(val genericResp = remoteService.field57GenericService(field57)){
-            is GenericResponse.Success->{
-                val isoDataReader=genericResp.data
+
+    suspend fun getBrandTnc(dataCounter: String = "0") {
+        val field57 = "${EMIRequestType.BRAND_T_AND_C.requestType}^$dataCounter"
+        when (val genericResp = remoteService.field57GenericService(field57)) {
+            is GenericResponse.Success -> {
+                val isoDataReader = genericResp.data
                 val tncString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
                 stubbingBrandTAndCData(tncString)
             }
-            is GenericResponse.Error->{
+            is GenericResponse.Error -> {
                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
-            is GenericResponse.Loading->{
+            is GenericResponse.Loading -> {
 
             }
         }
     }
-     suspend fun getIssuerTnc(dataCounter:String="0"){
-        val field57= "${EMIRequestType.ISSUER_T_AND_C.requestType}^$dataCounter"
-        when(val genericResp = remoteService.field57GenericService(field57)){
-            is GenericResponse.Success->{
-                val isoDataReader=genericResp.data
+
+    suspend fun getIssuerTnc(dataCounter: String = "0") {
+        val field57 = "${EMIRequestType.ISSUER_T_AND_C.requestType}^$dataCounter"
+        when (val genericResp = remoteService.field57GenericService(field57)) {
+            is GenericResponse.Success -> {
+                val isoDataReader = genericResp.data
                 val tncString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
                 stubbingIssuerTAndCData(tncString)
             }
-            is GenericResponse.Error->{
+            is GenericResponse.Error -> {
                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
-            is GenericResponse.Loading->{
+            is GenericResponse.Loading -> {
 
             }
         }
     }
 
-    private suspend fun getBrandSubCategoryData(dataCounter: String="0"){
+    private suspend fun getBrandSubCategoryData(dataCounter: String = "0") {
 
-        val field57=  "${EMIRequestType.BRAND_SUB_CATEGORY.requestType}^$totalRecord^${brandEmiMasterDataList[0].brandID }"
+        val field57 =
+            "${EMIRequestType.BRAND_SUB_CATEGORY.requestType}^$totalRecord^${brandEmiMasterDataList[0].brandID}"
 
-        when(val genericResp = remoteService.field57GenericService(field57)){
-            is GenericResponse.Success->{
-                val isoDataReader=genericResp.data
+        when (val genericResp = remoteService.field57GenericService(field57)) {
+            is GenericResponse.Success -> {
+                val isoDataReader = genericResp.data
                 val tncString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
                 stubbingBrandEMIMasterSubCategoryDataToList(tncString)
             }
-            is GenericResponse.Error->{
+            is GenericResponse.Error -> {
                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
-            is GenericResponse.Loading->{
+            is GenericResponse.Loading -> {
 
             }
         }
@@ -133,145 +153,181 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
     }
 
+    suspend fun getIssuerList(enquiryAmount:String) {
+        totalRecord="0"
+        val  field57RequestData =
+            if (AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE) != 0L)
+                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^${
+                    AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE)
+                }"
+            else
+                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^$enquiryAmount"
+        when (val genericResp = remoteService.field57GenericService(field57RequestData)) {
+            is GenericResponse.Success -> {
+                val isoDataReader = genericResp.data
+                val issuerListData = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
+                parseAndStubbingBankEMICatalogueDataToList(issuerListData)
+            }
+            is GenericResponse.Error -> {
+                brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+            }
+            is GenericResponse.Loading -> {
+
+            }
+        }
+    }
+
+
     //region=================================Stubbing BrandEMI Master Data to List:-
     private suspend fun stubbingBrandEMIMasterDataToList(brandEMIMasterData: String) {
-                val dataList = Utility().parseDataListWithSplitter("|", brandEMIMasterData)
-                if (dataList.isNotEmpty()) {
-                    moreDataFlag = dataList[0]
-                    totalRecord = dataList[1]
-                    brandTimeStamp = dataList[2]
-                    brandCategoryUpdatedTimeStamp = dataList[3]
-                    issuerTAndCTimeStamp = dataList[4]
-                    brandTAndCTimeStamp = dataList[5]
-                    //Store DataList in Temporary List and remove first 5 index values to get sublist from 5th index till dataList size
-                    // and iterate further on record data only:-
-                    val tempDataList: MutableList<String> = dataList.subList(6, dataList.size)
-                    for (i in tempDataList.indices) {
-                        if (!TextUtils.isEmpty(tempDataList[i])) {
-                            /* Below parseDataWithSplitter gives following data:-
+        val dataList = Utility().parseDataListWithSplitter("|", brandEMIMasterData)
+        if (dataList.isNotEmpty()) {
+            moreDataFlag = dataList[0]
+            totalRecord = dataList[1]
+            brandTimeStamp = dataList[2]
+            brandCategoryUpdatedTimeStamp = dataList[3]
+            issuerTAndCTimeStamp = dataList[4]
+            brandTAndCTimeStamp = dataList[5]
+            //Store DataList in Temporary List and remove first 5 index values to get sublist from 5th index till dataList size
+            // and iterate further on record data only:-
+            val tempDataList: MutableList<String> = dataList.subList(6, dataList.size)
+            for (i in tempDataList.indices) {
+                if (!TextUtils.isEmpty(tempDataList[i])) {
+                    /* Below parseDataWithSplitter gives following data:-
                                  0 index -> Brand ID
                                  1 index -> Brand Name
                                  2 index -> Mobile Number Capture Flag / Bill Invoice Capture Flag
                                */
-                            if (!TextUtils.isEmpty(tempDataList[i])) {
-                                val brandData = Utility().parseDataListWithSplitter(SplitterTypes.CARET.splitter, tempDataList[i])
-                                brandEmiMasterDataList.add(BrandEMIMasterDataModal(brandData[0], brandData[1], brandData[2]))
-                            }
-                        }
+                    if (!TextUtils.isEmpty(tempDataList[i])) {
+                        val brandData = Utility().parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter,
+                            tempDataList[i]
+                        )
+                        brandEmiMasterDataList.add(
+                            BrandEMIMasterDataModal(
+                                brandData[0],
+                                brandData[1],
+                                brandData[2]
+                            )
+                        )
                     }
-                    //Refresh Field57 request value for Pagination if More Record Flag is True:-
-                    if (moreDataFlag == "1") {
-                        getBrandData(totalRecord!!)
-                    } else {
-
-                        getBrandTnc()
-                     //   brandEMIMasterCategoryMLData.postValue(GenericResponse.Success(brandEmiMasterDataList))
-                    }
-                } else {
-                    brandEMIMasterCategoryMLData.postValue(GenericResponse.Error("Data list is empty"))
                 }
+            }
+            //Refresh Field57 request value for Pagination if More Record Flag is True:-
+            if (moreDataFlag == "1") {
+                getBrandData(totalRecord!!)
+            } else {
+
+                getBrandTnc()
+                //   brandEMIMasterCategoryMLData.postValue(GenericResponse.Success(brandEmiMasterDataList))
+            }
+        } else {
+            brandEMIMasterCategoryMLData.postValue(GenericResponse.Error("Data list is empty"))
+        }
     }
+
     //endregion
     //region===========================Below method is used to Stubbing issuer terms and conditions data:-
     private suspend fun stubbingIssuerTAndCData(issuerTAndC: String) {
-            if (!TextUtils.isEmpty(issuerTAndC)) {
-                val dataList = Utility().parseDataListWithSplitter("|", issuerTAndC)
-                if (dataList.isNotEmpty()) {
-                    issuerTAndCMoreDataFlag = dataList[0]
-                    issuerTAndCPerPageRecord = dataList[1].toInt()
-                    issuerTAndCTotalRecord += issuerTAndCPerPageRecord
-                    issuerTAndCRecordData = dataList[2]
+        if (!TextUtils.isEmpty(issuerTAndC)) {
+            val dataList = Utility().parseDataListWithSplitter("|", issuerTAndC)
+            if (dataList.isNotEmpty()) {
+                issuerTAndCMoreDataFlag = dataList[0]
+                issuerTAndCPerPageRecord = dataList[1].toInt()
+                issuerTAndCTotalRecord += issuerTAndCPerPageRecord
+                issuerTAndCRecordData = dataList[2]
 
-                    //Store DataList in Temporary List and remove first 2 index values to get sublist from 3th index till dataList size
-                    // and iterate further on record data only:-
-                    var tempDataList = mutableListOf<String>()
-                    tempDataList = dataList.subList(2, dataList.size - 1)
-                    for (i in tempDataList.indices) {
-                        Log.d("IssuerTAndC:- ", tempDataList[i])
-                        issuerTermsAndConditionsDataList.add(tempDataList[i])
-                    }
-                    if (issuerTAndCMoreDataFlag == "1") {
-                      /*  issuerField57Data =
+                //Store DataList in Temporary List and remove first 2 index values to get sublist from 3th index till dataList size
+                // and iterate further on record data only:-
+                var tempDataList = mutableListOf<String>()
+                tempDataList = dataList.subList(2, dataList.size - 1)
+                for (i in tempDataList.indices) {
+                    Log.d("IssuerTAndC:- ", tempDataList[i])
+                    issuerTermsAndConditionsDataList.add(tempDataList[i])
+                }
+                if (issuerTAndCMoreDataFlag == "1") {
+                    /*  issuerField57Data =
                             "${EMIRequestType.ISSUER_T_AND_C.requestType}^$issuerTAndCTotalRecord"
                         fetchIssuerTAndC()*/
-                        getIssuerTnc(issuerTAndCTotalRecord.toString())
+                    getIssuerTnc(issuerTAndCTotalRecord.toString())
 
-                    } else {
-                        if (issuerTermsAndConditionsDataList.isNotEmpty()) {
-                            //region================Insert IssuerTAndC and Brand TAndC in DB:-
-                            //Issuer TAndC Inserting:-
-                            for (i in 0 until issuerTermsAndConditionsDataList.size) {
-                                val issuerModel = IssuerTAndCTable()
-                                if (!TextUtils.isEmpty(issuerTermsAndConditionsDataList[i])) {
-                                    val splitData = Utility().parseDataListWithSplitter(
-                                        SplitterTypes.CARET.splitter,
-                                        issuerTermsAndConditionsDataList[i]
+                } else {
+                    if (issuerTermsAndConditionsDataList.isNotEmpty()) {
+                        //region================Insert IssuerTAndC and Brand TAndC in DB:-
+                        //Issuer TAndC Inserting:-
+                        for (i in 0 until issuerTermsAndConditionsDataList.size) {
+                            val issuerModel = IssuerTAndCTable()
+                            if (!TextUtils.isEmpty(issuerTermsAndConditionsDataList[i])) {
+                                val splitData = Utility().parseDataListWithSplitter(
+                                    SplitterTypes.CARET.splitter,
+                                    issuerTermsAndConditionsDataList[i]
 
-                                    )
-                                    if (splitData.size > 2) {
-                                        issuerModel.issuerId = splitData[0]
-                                        issuerModel.headerTAndC = splitData[1]
-                                        issuerModel.footerTAndC = splitData[2]
-                                    } else {
-                                        issuerModel.issuerId = splitData[0]
-                                        issuerModel.headerTAndC = splitData[1]
-                                    }
-                                    //save issuer tnc here..........
-                                    appDB.appDao.insertIssuerTAndCData(issuerModel)
+                                )
+                                if (splitData.size > 2) {
+                                    issuerModel.issuerId = splitData[0]
+                                    issuerModel.headerTAndC = splitData[1]
+                                    issuerModel.footerTAndC = splitData[2]
+                                } else {
+                                    issuerModel.issuerId = splitData[0]
+                                    issuerModel.headerTAndC = splitData[1]
                                 }
+                                //save issuer tnc here..........
+                                appDB.appDao.insertIssuerTAndCData(issuerModel)
                             }
-
-                            getBrandSubCategoryData()
-
                         }
 
+                        getBrandSubCategoryData()
+
                     }
+
                 }
             }
+        }
     }
+
     //endregion
     //region===========================Below method is used to Stubbing brand terms and conditions data:-
     private suspend fun stubbingBrandTAndCData(brandTAndC: String) {
-            if (!TextUtils.isEmpty(brandTAndC)) {
-                val dataList = Utility().parseDataListWithSplitter("|", brandTAndC)
-                if (dataList.isNotEmpty()) {
-                    brandTAndCMoreDataFlag = dataList[0]
-                    brandTAndCPerPageRecord = dataList[1].toInt()
-                    brandTAndCTotalRecord += brandTAndCPerPageRecord
-                    brandTAndCRecordData = dataList[2]
-                    //Store DataList in Temporary List and remove first 2 index values to get sublist from 3th index till dataList size
-                    // and iterate further on record data only:-
-                    var tempDataList = mutableListOf<String>()
-                    tempDataList = dataList.subList(2, dataList.size - 1)
-                    for (i in tempDataList.indices) {
-                        Log.d("IssuerTAndC:- ", tempDataList[i])
-                        brandTermsAndConditionsDataList.add(tempDataList[i])
-                    }
-                    if (brandTAndCMoreDataFlag == "1") {
-                       // brandField57Data = "$brandRequestType^$brandTAndCTotalRecord"
-                        getBrandTnc(brandTAndCTotalRecord.toString())
-                    } else {
-                        if (brandTermsAndConditionsDataList.isNotEmpty()) {
-                            for (i in 0 until brandTermsAndConditionsDataList.size) {
-                                val brandModel = BrandTAndCTable()
-                                if (!TextUtils.isEmpty(brandTermsAndConditionsDataList[i])) {
-                                    val splitData = Utility().parseDataListWithSplitter(
-                                        SplitterTypes.CARET.splitter,
-                                        brandTermsAndConditionsDataList[i]
-                                    )
-                                    brandModel.brandId = splitData[0]
-                                    brandModel.brandTAndC = splitData[1]
-                                    // saving data to db
-                                    appDB.appDao.insertBrandTAndCData(brandModel)
+        if (!TextUtils.isEmpty(brandTAndC)) {
+            val dataList = Utility().parseDataListWithSplitter("|", brandTAndC)
+            if (dataList.isNotEmpty()) {
+                brandTAndCMoreDataFlag = dataList[0]
+                brandTAndCPerPageRecord = dataList[1].toInt()
+                brandTAndCTotalRecord += brandTAndCPerPageRecord
+                brandTAndCRecordData = dataList[2]
+                //Store DataList in Temporary List and remove first 2 index values to get sublist from 3th index till dataList size
+                // and iterate further on record data only:-
+                var tempDataList = mutableListOf<String>()
+                tempDataList = dataList.subList(2, dataList.size - 1)
+                for (i in tempDataList.indices) {
+                    Log.d("IssuerTAndC:- ", tempDataList[i])
+                    brandTermsAndConditionsDataList.add(tempDataList[i])
+                }
+                if (brandTAndCMoreDataFlag == "1") {
+                    // brandField57Data = "$brandRequestType^$brandTAndCTotalRecord"
+                    getBrandTnc(brandTAndCTotalRecord.toString())
+                } else {
+                    if (brandTermsAndConditionsDataList.isNotEmpty()) {
+                        for (i in 0 until brandTermsAndConditionsDataList.size) {
+                            val brandModel = BrandTAndCTable()
+                            if (!TextUtils.isEmpty(brandTermsAndConditionsDataList[i])) {
+                                val splitData = Utility().parseDataListWithSplitter(
+                                    SplitterTypes.CARET.splitter,
+                                    brandTermsAndConditionsDataList[i]
+                                )
+                                brandModel.brandId = splitData[0]
+                                brandModel.brandTAndC = splitData[1]
+                                // saving data to db
+                                appDB.appDao.insertBrandTAndCData(brandModel)
 
-                                }
                             }
-                            getIssuerTnc()
-
                         }
+                        getIssuerTnc()
+
                     }
                 }
             }
+        }
 
     }
     //endregion
@@ -280,61 +336,64 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private suspend fun stubbingBrandEMIMasterSubCategoryDataToList(
         brandEMIMasterSubCategoryData: String
     ) {
-            if (!TextUtils.isEmpty(brandEMIMasterSubCategoryData)) {
-                val dataList = Utility().parseDataListWithSplitter("|", brandEMIMasterSubCategoryData)
-                if (dataList.isNotEmpty()) {
-                    moreDataFlag = dataList[0]
-                    perPageRecord = dataList[1]
-                    totalRecord = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
-                    //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
-                    // and iterate further on record data only:-
-                    var tempDataList = mutableListOf<String>()
-                    tempDataList = dataList.subList(2, dataList.size)
-                    for (i in tempDataList.indices) {
-                        //Below we are splitting Data from tempDataList to extract brandID , categoryID , parentCategoryID , categoryName:-
-                        if (!TextUtils.isEmpty(tempDataList[i])) {
-                            val splitData =  Utility().parseDataListWithSplitter(
-                                SplitterTypes.CARET.splitter,
-                                tempDataList[i]
+        if (!TextUtils.isEmpty(brandEMIMasterSubCategoryData)) {
+            val dataList = Utility().parseDataListWithSplitter("|", brandEMIMasterSubCategoryData)
+            if (dataList.isNotEmpty()) {
+                moreDataFlag = dataList[0]
+                perPageRecord = dataList[1]
+                totalRecord = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
+                //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
+                // and iterate further on record data only:-
+                var tempDataList = mutableListOf<String>()
+                tempDataList = dataList.subList(2, dataList.size)
+                for (i in tempDataList.indices) {
+                    //Below we are splitting Data from tempDataList to extract brandID , categoryID , parentCategoryID , categoryName:-
+                    if (!TextUtils.isEmpty(tempDataList[i])) {
+                        val splitData = Utility().parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter,
+                            tempDataList[i]
+                        )
+                        brandEmiMasterSubCategoryDataList.add(
+                            BrandEMIMasterSubCategoryDataModal(
+                                splitData[0], splitData[1],
+                                splitData[2], splitData[3]
                             )
-                            brandEmiMasterSubCategoryDataList.add(
-                                BrandEMIMasterSubCategoryDataModal(
-                                    splitData[0], splitData[1],
-                                    splitData[2], splitData[3]
-                                )
-                            )
-                        }
+                        )
                     }
+                }
 
-                    //Notify RecyclerView DataList on UI with Category Data that has ParentCategoryID == 0 && BrandID = selected brandID :-
-                    val totalDataList = brandEmiMasterSubCategoryDataList
-                    Log.d("TotalDataList:- ", Gson().toJson(totalDataList))
+                //Notify RecyclerView DataList on UI with Category Data that has ParentCategoryID == 0 && BrandID = selected brandID :-
+                val totalDataList = brandEmiMasterSubCategoryDataList
+                Log.d("TotalDataList:- ", Gson().toJson(totalDataList))
 
-                    //Refresh Field57 request value for Pagination if More Record Flag is True:-
-                    if (moreDataFlag == "1") {
-                      /*  field57RequestData =
+                //Refresh Field57 request value for Pagination if More Record Flag is True:-
+                if (moreDataFlag == "1") {
+                    /*  field57RequestData =
                             "${EMIRequestType.BRAND_SUB_CATEGORY.requestType}^$totalRecord^${brandEmiMasterDataList[0].brandID}"
                         fetchBrandEMIMasterSubCategoryDataFromHost()*/
-                        getBrandSubCategoryData()
-                        Log.d("FullDataList:- ", brandEmiMasterSubCategoryDataList.toString())
-                    } else {
-                        withContext(Dispatchers.Main) {
+                    getBrandSubCategoryData()
+                    Log.d("FullDataList:- ", brandEmiMasterSubCategoryDataList.toString())
+                } else {
+                    withContext(Dispatchers.Main) {
                         //    if (brandEmiMasterSubCategoryDataList.isEmpty()) {
-                         //       navigateToProductPage(isSubCategoryItem = false, -1)
-                                // todo navigate product page
+                        //       navigateToProductPage(isSubCategoryItem = false, -1)
+                        // todo navigate product page
                         //    } else {
-                                withContext(Dispatchers.IO) {
-                                    saveAllSubCategoryDataInDB(brandEmiMasterSubCategoryDataList)
-                                }
-                                Log.e(
-                                    "Sub Category Data:- ",
-                                    Gson().toJson(brandEmiMasterSubCategoryDataList)
-                                )
-                                brandEMIMasterCategoryMLData.postValue(GenericResponse.Success(brandEmiMasterDataList))
+                        withContext(Dispatchers.IO) {
+                            saveAllSubCategoryDataInDB(brandEmiMasterSubCategoryDataList)
+                        }
+                        Log.e(
+                            "Sub Category Data:- ",
+                            Gson().toJson(brandEmiMasterSubCategoryDataList)
+                        )
+                        brandEMIMasterCategoryMLData.postValue(
+                            GenericResponse.Success(
+                                brandEmiMasterDataList
+                            )
+                        )
 
 
-
-                                /*  brandEMIAllDataList = brandEmiMasterSubCategoryDataList
+                        /*  brandEMIAllDataList = brandEmiMasterSubCategoryDataList
 
                                   //region=====================Line added to resolve category only issue===================== By Manish
                                   brandEmiMasterSubCategoryDataList =
@@ -348,20 +407,20 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                       brandEmiMasterSubCategoryDataList
                                   )*/
                         //    }
-                           // iDialog?.hideProgress()
-                        }
+                        // iDialog?.hideProgress()
                     }
                 }
-            } else {
-               /* withContext(Dispatchers.Main) {
+            }
+        } else {
+            /* withContext(Dispatchers.Main) {
                     iDialog?.hideProgress()
                     *//*iDialog?.alertBoxWithAction(null, null,
                         getString(R.string.error), hostMsg,
                         false, getString(R.string.positive_button_ok),
                         {}, {})*//*
                 }*/
-                // todo in case of empty subcatlist
-            }
+            // todo in case of empty subcatlist
+        }
 
     }
     //endregion
@@ -375,17 +434,19 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
         model.brandTAndCTimeStamp = brandTAndCTimeStamp ?: ""
         appDB.appDao.insertBrandEMIMasterTimeStamps(model)
     }
+
     //endregion
     //region=======================Check Whether we got Updated Data from Host or to use Previous BrandEMIMaster Store Data:-
     private suspend fun matchHostAndDBTimeStamp(): Boolean {
         val dbTimeStamps = appDB.appDao.getBrandTimeStampFromDB()
-        var isDataMatch=false
+        var isDataMatch = false
         if (!dbTimeStamps?.brandTAndCTimeStamp.isNullOrBlank() &&
             !dbTimeStamps?.issuerTAndCTimeStamp.isNullOrBlank() &&
-            !dbTimeStamps?.brandCategoryUpdatedTimeStamp.isNullOrBlank()) {
+            !dbTimeStamps?.brandCategoryUpdatedTimeStamp.isNullOrBlank()
+        ) {
             isDataMatch = issuerTAndCTimeStamp == dbTimeStamps?.issuerTAndCTimeStamp &&
                     brandTAndCTimeStamp == dbTimeStamps?.brandTAndCTimeStamp &&
-                    brandCategoryUpdatedTimeStamp==dbTimeStamps?.brandCategoryUpdatedTimeStamp
+                    brandCategoryUpdatedTimeStamp == dbTimeStamps?.brandCategoryUpdatedTimeStamp
         }
         return isDataMatch
     }
@@ -394,15 +455,92 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     //region======================save all sub-category data in DB:-
     private suspend fun saveAllSubCategoryDataInDB(subCategoryDataList: MutableList<BrandEMIMasterSubCategoryDataModal>) {
         val modal = BrandEMISubCategoryTable()
-       // BrandEMISubCategoryTable.clear()
+        // BrandEMISubCategoryTable.clear()
         for (value in subCategoryDataList) {
             modal.brandID = value.brandID
             modal.categoryID = value.categoryID
             modal.parentCategoryID = value.parentCategoryID
             modal.categoryName = value.categoryName
             appDB.appDao.insertBrandEMISubCategoryData(modal)
-          //  BrandEMISubCategoryTable.performOperation(modal)
+            //  BrandEMISubCategoryTable.performOperation(modal)
         }
     }
     //endregion
+
+    //region=================Parse and Stubbing BankEMI Data To List:-
+    private fun parseAndStubbingBankEMICatalogueDataToList(bankEMICatalogueHostResponseData: String) {
+        if (!TextUtils.isEmpty(bankEMICatalogueHostResponseData)) {
+            val parsingDataWithVerticalLineSeparator =
+                Utility().parseDataListWithSplitter("|", bankEMICatalogueHostResponseData)
+            if (parsingDataWithVerticalLineSeparator.isNotEmpty()) {
+                moreDataFlag = parsingDataWithVerticalLineSeparator[0]
+                perPageRecord = parsingDataWithVerticalLineSeparator[1]
+                totalRecord = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
+                //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
+                // and iterate further on record data only:-
+                var tempDataList = mutableListOf<String>()
+                tempDataList = parsingDataWithVerticalLineSeparator.subList(
+                    2,
+                    parsingDataWithVerticalLineSeparator.size
+                )
+
+                //region=========================Stub Data in AllIssuerList:-
+                for (i in tempDataList.indices) {
+                    if (!TextUtils.isEmpty(tempDataList[i])) {
+                        val splitData = Utility().parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter,
+                            tempDataList[i]
+                        )
+                        allIssuerBankList.add(
+                            IssuerBankModal(
+                                splitData[0], splitData[1],
+                                splitData[2], splitData[3],
+                                splitData[4], splitData[5],
+                                splitData[6], splitData[7],
+                                splitData[8], splitData[9],
+                                splitData[10], splitData[11],
+                                splitData[12], splitData[13],
+                                splitData[14], splitData[15],
+                                splitData[16], splitData[17],
+                                splitData[18], splitData[19],
+                                splitData[20], splitData[21],
+                                splitData[22], splitData[23]
+                            )
+                        )
+                    }
+                }
+                //endregion
+                //region========================Stub Data in AllTenureList:-
+                if (allIssuerBankList.isNotEmpty()) {
+                    val dataLength = allIssuerBankList.size
+                    for (i in 0 until dataLength)
+                        allIssuerTenureList.add(
+                            TenureBankModal(
+                                allIssuerBankList[i].issuerBankTenure,
+                                isTenureSelected = false
+                            )
+                        )
+                    issuerListMLData.postValue(
+                        GenericResponse.Success(
+                            allIssuerBankList
+                        )
+                    )
+                    allIssuerTenureListMLData.postValue(
+                        GenericResponse.Success(
+                            allIssuerTenureList
+                        )
+                    )
+
+
+                }
+                //endregion
+                Log.d("AllIssuerList:- ", allIssuerBankList.toString())
+                Log.d("AllTenureList:- ", allIssuerTenureList.toString())
+
+
+
+            }
+
+        }
+    }
 }

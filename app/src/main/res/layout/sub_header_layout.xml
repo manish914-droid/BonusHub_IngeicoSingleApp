@@ -54,7 +54,7 @@
             android:gravity="center"
             android:text="@string/dashboard"
             android:textAllCaps="true"
-            android:textColor="@color/black"
+            android:textColor="@color/txt_color"
             android:textSize="@dimen/text_size_regular"
             android:textStyle="normal" />
 
@@ -70,6 +70,7 @@
         android:layout_marginEnd="8dp"
         android:scaleType="fitXY"
         android:src="@drawable/ic_home"
+
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
