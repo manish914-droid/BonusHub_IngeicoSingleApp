@@ -27,6 +27,11 @@
 
     <color name="hint_color">#4D4F51</color>
 
+    <!--catalogue-->
+    <color name="rippleColor">#9F9F9F</color>
+    <color name="hdfc_red_color">#ED1C24</color>
+    <color name="transparent_white">#99ffffff</color>
+
     <!--bank functions-->
     <color name="text_gray">#9F9F9F</color>
 </resources>

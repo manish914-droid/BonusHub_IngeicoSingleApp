@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Context.BATTERY_SERVICE
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
@@ -14,6 +15,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
@@ -574,7 +576,12 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         } else {
             InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
         }
-    }
+    }/*    fun checkInternetConnection(): Boolean {
+        val cm =
+            VerifoneApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetworkInfo
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting
+    }*/
 
 
 //region=====================================Get IP Port:-
@@ -993,6 +1000,63 @@ object Field48ResponseTimestamp {
             HDFCApplication.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting
+    }
+/*
+    //region == this fun for getting battry from vfService
+    fun getbatteryinfo(context: Context): String? {
+        return try {
+            VFService.vfDeviceService?.deviceInfo?.batteryLevel
+        } catch (e: Exception) {
+            getbatteryinfoAndroid(context)
+        }
+    }
+    //endregion*/
+
+    //region === this is for getting battery from android
+    fun getbatteryinfoAndroid (context: Context):String{
+        // Call battery manager service
+        val bm = context.getSystemService(BATTERY_SERVICE) as BatteryManager
+        // Get the battery percentage and store it in a INT variable
+        val batLevel:Int = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        return batLevel.toString()
+    }
+    //endregion
+
+    //region  ==== this fun is return charger is connected or not
+    fun getChargerStatus(context: Context):Boolean{
+        val batteryStatus: Intent? =
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                context.registerReceiver(null, ifilter)
+            }
+        val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        var isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+                || status == BatteryManager.BATTERY_STATUS_FULL
+        val chargePlug: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        val usbCharge: Boolean = chargePlug == BatteryManager.BATTERY_PLUGGED_USB
+        val acCharge: Boolean = chargePlug == BatteryManager.BATTERY_PLUGGED_AC
+        when {
+            usbCharge -> {
+
+                isCharging=true
+            }
+            acCharge -> {
+                isCharging=true
+            }
+
+            else -> {
+                isCharging=false
+            }
+        }
+        return isCharging
+    }
+
+    //endregion
+
+    //Below method is used to show Toast on UI Thread:-
+    fun showToast(message: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(HDFCApplication.appContext, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

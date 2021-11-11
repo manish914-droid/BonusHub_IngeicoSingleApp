@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -14,10 +15,17 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
+
+import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.utils.DeviceHelper
+
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
+import com.bonushub.crdb.utils.Result
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.isExpanded
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
@@ -31,6 +39,7 @@ import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
+
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
@@ -43,10 +52,12 @@ class DashboardFragment : Fragment(),IFragmentRequest {
     }
     private var defaultScope = CoroutineScope(Dispatchers.IO)
     private val dashboardViewModel : DashboardViewModel by viewModels()
-   // private var iFragmentRequest: IFragmentRequest? = null
+   private var iFragmentRequest: IFragmentRequest? = null
     private val itemList = mutableListOf<EDashboardItem>()
     private val list1 = arrayListOf<EDashboardItem>()
     private val list2 = arrayListOf<EDashboardItem>()
+    private var battery: String? = null
+    private var batteryINper: Int = 0
     private val dashBoardAdapter by lazy {
         DashBoardAdapter(this, ::onItemLessMoreClick)
     }
@@ -66,6 +77,13 @@ class DashboardFragment : Fragment(),IFragmentRequest {
         Log.d("Dashboard:- ", "onViewCreated")
         dashboardViewModel.fetchtptData()
         observeDashboardViewModel()
+    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+            iFragmentRequest = this
+
+
     }
 
     private fun observeDashboardViewModel(){
@@ -176,7 +194,7 @@ class DashboardFragment : Fragment(),IFragmentRequest {
                     }
                 }
             }
-      
+
 
         })
 
@@ -265,6 +283,23 @@ class DashboardFragment : Fragment(),IFragmentRequest {
 
 
     override fun onDashBoardItemClick(action: EDashboardItem) {
+        Log.e("action ob d--->",""+action)
+        when (action) {
+                EDashboardItem.EMI_ENQUIRY -> {
+                    if (checkInternetConnection()) {
+                        (activity as NavigationActivity).transactFragment(EMICatalogue().apply {
+                            arguments = Bundle().apply {
+                                putSerializable("type", EDashboardItem.EMI_CATALOGUE)
+                              //  putString(INPUT_SUB_HEADING, "")
+                            }
+                        })
+
+                    } else {
+                  ToastUtils.showToast(activity,getString(R.string.no_internet_available_please_check_your_internet))
+                    }
+
+            }
+        }
         val intent = Intent (getActivity(), TransactionActivity::class.java)
         getActivity()?.startActivity(intent)
     }
