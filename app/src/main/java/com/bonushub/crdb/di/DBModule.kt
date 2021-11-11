@@ -6,19 +6,17 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.repository.IKeyExchange
-import com.bonushub.crdb.repository.RoomDBRepository
-import com.bonushub.crdb.repository.keyexchangeDataSource
-import com.bonushub.crdb.repository.keyexchangeDataSourcenew
+import com.bonushub.crdb.repository.*
+import com.bonushub.crdb.utils.DeviceHelper
+import com.usdk.apiservice.aidl.emv.UEMV
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.*
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -53,7 +51,6 @@ object DBModule {
         return appDatabase
     }
 
-
     @Singleton
     @Provides
     fun providekeyechangeDataSourcenew(appDao: AppDao): IKeyExchange {
@@ -66,12 +63,30 @@ object DBModule {
         return keyexchangeDataSource(appDao)
     }
 
+    @Singleton
+    @MainCoroutineScope
+    @Provides
+    fun providesIOCoroutineScope(@IoDispatcher ioDispatcher: CoroutineDispatcher): CoroutineScope
+            = CoroutineScope(SupervisorJob() + ioDispatcher)
+
+
+    @Singleton
+    @Provides
+    fun provideDBRepository(appDao: AppDao,keyexcngeDataSource: keyexchangeDataSource,
+                                   @IoDispatcher ioDispatcher: CoroutineDispatcher,
+                                   @MainCoroutineScope  coroutineScope: CoroutineScope
+    ) = RoomDBRepository(appDao,keyexcngeDataSource,ioDispatcher,coroutineScope)
 
     @Provides
-    fun provideStudentDBRepository(appDao: AppDao,keyexcngeDataSource: keyexchangeDataSource) = RoomDBRepository(appDao,keyexcngeDataSource)
+    fun provideUemv() : UEMV?{
+        return DeviceHelper.getEMV()
+    }
 
 }
 
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class MainCoroutineScope
 
 
 

@@ -7,6 +7,11 @@ import android.content.ServiceConnection
 import android.os.*
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication.Companion.appContext
+import com.ingenico.hdfcpayment.IPaymentService
+import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.listener.OnPaymentListener
+import com.ingenico.hdfcpayment.request.SaleRequest
+import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
 import com.usdk.apiservice.aidl.DeviceServiceData
 import com.usdk.apiservice.aidl.UDeviceService
 import com.usdk.apiservice.aidl.device.DeviceInfo
@@ -16,9 +21,22 @@ import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.limited.DeviceServiceLimited
 
-object DeviceHelper : ServiceConnection  {
+object DeviceHelper   {
 
-    private const val TAG = "DeviceHelper"
+
+    @JvmStatic
+    private  val PACKAGE_ID = "com.ingenico.ingp.standalone"
+
+    @JvmStatic
+    private  val ACTION = "com.ingenico.hdfcpayment.PaymentService.BIND"
+
+    @JvmStatic
+    private  val PACKAGE_ID_USDK = "com.usdk.apiservice"
+
+    @JvmStatic
+    private  val ACTIONUSDKSERVICE = "com.usdk.apiservice"
+
+    private  val TAG = DeviceHelper::class.java.simpleName
 
     // 最大重绑定次数
     private const val MAX_RETRY_COUNT = 3
@@ -45,6 +63,9 @@ object DeviceHelper : ServiceConnection  {
     @JvmStatic
     lateinit var deviceInfo: DeviceInfo
 
+    @JvmStatic
+    var iRemoteService: IPaymentService? = null
+
     fun setServiceListener(listener: ServiceReadyListener) {
         serviceListener = listener
         if (isBinded) {
@@ -64,67 +85,123 @@ object DeviceHelper : ServiceConnection  {
 
 
     fun bindService() {
-
         if (isBinded) {
             return
         }
-        val intent = Intent().apply {
-            action = "com.usdk.apiservice"
-            `package`= "com.usdk.apiservice"
-        }
-        val bindSucc = appContext.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        val bindUSDKSucc =  appContext?.bindService(
+            Intent(ACTIONUSDKSERVICE).apply { setPackage(PACKAGE_ID_USDK) },
+            remoteUsdkServiceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+
+        /* val bindSucc =  appContext?.bindService(
+             Intent(ACTION).apply { setPackage(PACKAGE_ID) },
+             remoteServiceConnection,
+             Context.BIND_AUTO_CREATE
+         )*/
 
         // 绑定失败, 则重新绑定
-        if (!bindSucc && retry++ < MAX_RETRY_COUNT) {
+        if (!bindUSDKSucc  && retry++ < MAX_RETRY_COUNT) {
             Log.e(TAG, "=> bind fail, rebind ($retry)")
             Handler().postDelayed({ bindService() }, RETRY_INTERVALS)
         }
     }
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        retry = 0
-        isBinded = true
-        vfDeviceService = UDeviceService.Stub.asInterface(service)
-        vfUEMV         = UEMV.Stub.asInterface(service)
-        vfDeviceManager         = UDeviceManager.Stub.asInterface(service)
+    private val remoteUsdkServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            retry = 0
+            isBinded = true
+            vfDeviceService = UDeviceService.Stub.asInterface(service)
+            /* vfUEMV         = UEMV.Stub.asInterface(service)
+             vfDeviceManager         = UDeviceManager.Stub.asInterface(service)*/
+            //here I stub VFPayment Service
+            DeviceServiceLimited.bind(appContext, vfDeviceService, object : DeviceServiceLimited.ServiceBindListener {
+                override fun onSuccess() {
+                    Log.d(TAG, "=> DeviceServiceLimited | bindSuccess")
+                    try {
+                        // Log.d(TAG, "=> Emv is"+ vfDeviceService?.emv)
+                        Log.d(TAG, "=> Version is"+ vfDeviceService?.version)
+                    }
+                    catch (ex: RemoteException){
+                        ex.printStackTrace()
+                    }
 
-        DeviceServiceLimited.bind(appContext, vfDeviceService, object :
-            DeviceServiceLimited.ServiceBindListener {
-            override fun onSuccess() {
-                Log.d(TAG, "=> DeviceServiceLimited | bindSuccess")
-                try {
-                    // Log.d(TAG, "=> Emv is"+ vfDeviceService?.emv)
-                    Log.d(TAG, "=> Version is"+ vfDeviceService?.version)
                 }
-                catch (ex: RemoteException){
-                    ex.printStackTrace()
+
+                override fun onFail() {
+                    Log.e(TAG, "=> bind DeviceServiceLimited fail")
                 }
+            })
 
-            }
+            notifyReady()
+        }
 
-            override fun onFail() {
-                Log.e(TAG, "=> bind DeviceServiceLimited fail")
-            }
-        })
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.e(TAG, "=> onServiceDisconnected")
+            vfDeviceService = null
+            isBinded = false
+            DeviceServiceLimited.unbind(appContext)
+            bindService()
+        }
 
-        notifyReady()
     }
 
-    override fun onServiceDisconnected(name: ComponentName?) {
-        Log.e(TAG, "=> onServiceDisconnected")
-        vfDeviceService = null
-        isBinded = false
-        DeviceServiceLimited.unbind(appContext)
-        bindService()
+    /**
+     * handle remote service connection
+     * */
+    private val remoteServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Log.d(TAG, "Service has connected")
+            iRemoteService = IPaymentService.Stub.asInterface(service)
+            notifyReady()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d(TAG, "Service has unexpectedly disconnected")
+        }
+
+
     }
+
+    fun connect() {
+        if (iRemoteService == null) {
+            //  activity = context as? BaseActivity
+            appContext?.bindService(
+                Intent(ACTION).apply { setPackage(PACKAGE_ID) },
+                remoteServiceConnection,
+                Context.BIND_AUTO_CREATE
+            )
+        }
+    }
+
+    /**
+     * check if remote service is connected or not
+     * */
+    fun isServiceConnected() = iRemoteService != null
 
     fun unbindService() {
         if (isBinded) {
             Log.e(TAG, "=> unbindService")
-            appContext.unbindService(this)
+            appContext.unbindService(remoteUsdkServiceConnection)
             DeviceServiceLimited.unbind(appContext)
+            // appContext.unbindService(remoteServiceConnection)
+            //  iRemoteService = null
             isBinded = false
         }
+    }
+
+    /**
+     * Execute Terminal Initialization transaction
+     * */
+    fun doTerminalInitialization(request: TerminalInitializationRequest?, listener: OnOperationListener?) {
+        iRemoteService?.doTerminalInitialization(request, listener)
+    }
+
+    /**
+     * Execute Sale transaction
+     * */
+    fun doSaleTransaction(request: SaleRequest, listener: OnPaymentListener?) {
+        iRemoteService?.doSaleTransaction(request, listener)
     }
 
     @JvmStatic
@@ -132,7 +209,7 @@ object DeviceHelper : ServiceConnection  {
     fun getEMV(): UEMV? {
         val iBinder = object : IBinderCreator() {
             override fun create(): IBinder {
-               return vfDeviceService!!.emv
+                return vfDeviceService!!.emv
             }
 
         }.start()
@@ -152,13 +229,13 @@ object DeviceHelper : ServiceConnection  {
 
     fun getDeviceSerialNo(): String?{
         Log.d(TAG, "=> Device Serial no (${getDeviceManager()!!.deviceInfo?.serialNo})")
-       // System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.serialNo)
+        // System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.serialNo)
         return getDeviceManager()!!.deviceInfo?.serialNo
     }
 
     fun getDeviceModel(): String?{
         Log.d(TAG, "=> Device Model no (${getDeviceManager()!!.deviceInfo?.model})")
-     //   System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.mode)
+        //   System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.mode)
         return getDeviceManager()!!.deviceInfo?.model
     }
 

@@ -20,6 +20,7 @@ import com.bonushub.crdb.viewmodel.InitViewModel
 import androidx.lifecycle.Observer
 import com.bonushub.crdb.IDialog
 import com.bonushub.crdb.utils.Utility
+import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -96,15 +97,15 @@ class InitFragment : Fragment(),IDialog {
         initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
 
             when (result.status) {
-                Result.Status.SUCCESS -> {
+                Status.SUCCESS -> {
                     hideProgress()
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 }
-                Result.Status.ERROR -> {
+                Status.ERROR -> {
                     hideProgress()
-                    Toast.makeText(activity,"Error called  ${result.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
                 }
-                Result.Status.LOADING -> {
+                Status.LOADING -> {
                     showProgress("Sending/Receiving From Host")
 
                 }

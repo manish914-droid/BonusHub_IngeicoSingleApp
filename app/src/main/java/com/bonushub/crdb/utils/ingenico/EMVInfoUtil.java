@@ -50,7 +50,7 @@ public class EMVInfoUtil {
     }
 
     public static String getRecordDataDesc(CardRecord recordData) {
-        return String.format("Pan = %s, PanSn = %s", BytesUtil.bytes2HexString(recordData.getPan()), recordData.getPanSN());
+        return String.format("Pan = %s", BytesUtil.bytes2HexString(recordData.getPan()));
     }
 
     public static String getCVMDataDesc(CVMMethod cvm) {

@@ -13,6 +13,7 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.pax.utils.*
+import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType
@@ -23,7 +24,7 @@ import java.util.*
 import javax.inject.Inject
 
 interface IKeyExchangeInit{
-    suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter
+    suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter
 }
 
 interface IKeyExchange : IKeyExchangeInit{
@@ -125,7 +126,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         //endregion
     }
 
-    override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter = IsoDataWriter().apply  {
+    override suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter = IsoDataWriter().apply  {
         mti = Mti.MTI_LOGON.mti
         // adding processing code and field 59 for public and private key
         addField(
@@ -143,7 +144,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         addField(24, Nii.DEFAULT.nii)
 
         //adding tid
-        addFieldByHex(41, "41501375")
+        addFieldByHex(41, tid)
 
         //adding field 48
         addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
@@ -182,8 +183,6 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
     }
 
     suspend fun startExchange1(tid: String) : Result<ResponseHandler> {
-
-
         return try {
             var strinitSuccess: Boolean? = null
 
@@ -240,138 +239,40 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
                                 if (keWithInit) {
-                                    val (strResult,strSucess,_) = startInit()
+                                    val (strResult,strSucess,_) = startInit(tid)
                                     if(strSucess == true){
-                                        return Result.success(ResponseHandler("Init Successful",true,false,false))
+                                        return Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,false))
                                     }
                                     else{
-                                        return Result.error(strResult ?: "","")
+                                        return Result.error(ResponseHandler(Status.ERROR,strResult ?: "",false,false),strResult ?: "")
                                     }
                                 } else {
-                                    return  Result.success(ResponseHandler("Key Exchange Successful",true,false,false))
+                                    return  Result.success(ResponseHandler(Status.SUCCESS,"Key Exchange Successful",false,false))
                                 }
                             } else {
                                 AppPreference.saveLogin(false)
-                                return Result.error("Error in key insertion","")
+                                return Result.error(ResponseHandler(Status.ERROR,"Error in key insertion",false,false),"Error in key insertion")
                             }
 
                         }
                         else
-                            return Result.error("","")
-                            //backToCalled("Key exchange error", false, false)
+                            return Result.error(ResponseHandler(Status.ERROR,"Key exchange error",false,false),"Key exchange error")
+
                     }
 
                 }
                 else{
                     val msg = iso.isoMap[58]?.parseRaw2String() ?: ""
-                   return Result.error(msg,"")
+                    return Result.error(ResponseHandler(Status.ERROR,msg,false,false),msg)
                 }
             }
             else{
-                return Result.success(ResponseHandler("",false,false,false))
+                return Result.error(ResponseHandler(Status.ERROR,strResult ?: "Something Went Wrong",false,false),strResult ?: "Something Went Wrong")
+
             }
-        } catch (e: Throwable) {
-            return Result.error("Outside","")
-           // Result.error("Unknown Error", null)
+        } catch (ex: Throwable) {
+            return Result.error(ResponseHandler(Status.ERROR,ex.message ?: "Something Went Wrong",false,false),ex.message ?: "Something Went Wrong")
         }
-    }
-
-     suspend fun startExchange(tid: String) : Result<ResponseHandler> {
-
-
-         var result: Result<ResponseHandler> = Result.error("","")
-
-
-         var strmsg: String? = null
-
-            val isoW = createKeyExchangeIso(tid)
-            val bData = isoW.generateIsoByteRequest()
-             val (strResult,strSucess,foo) = socketConnection(bData)
-
-          if (null !=strResult && strSucess == true) {
-              val iso = readIso(strResult)
-              Utility().logger(KeyExchanger.TAG, iso.isoMap)
-              val resp = iso.isoMap[39]
-              val f11 = iso.isoMap[11]
-
-              val f48 = iso.isoMap[48]
-
-              if (f48 != null) Utility.ConnectionTimeStamps.saveStamp(f48.parseRaw2String())
-
-              if (f11 != null) Utility().incrementRoc()
-
-              if (resp != null && resp.rawData.hexStr2ByteArr().byteArr2Str() == "00") {
-                  if (tmk.isEmpty()) {
-                      tmk = iso.isoMap[59]?.rawData
-                              ?: "" // tmk len should be 256 byte or 512 hex char
-                      Utility().logger(KeyExchanger.TAG, "RAW TMK = $tmk")
-                      if (tmk.length == 518) {  // if tmk len is 259 byte , it means last 3 bytes are tmk KCV
-                          tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
-                          tmk = tmk.substring(0, 512)
-                      } else if (tmk.length == 524) { // if tmk len is 262 byte, it means last 6 bytes are tmk KCV and tmk wallet KCV
-                          tmkKcv = tmk.substring(512, 518).hexStr2ByteArr()
-                          tmk = tmk.substring(0, 512)
-                      }
-                      startExchange(tid)
-                  } else {
-                      val ppkDpk = iso.isoMap[59]?.rawData ?: ""
-                      Utility().logger(KeyExchanger.TAG, "RAW PPKDPK = $ppkDpk")
-                      if (ppkDpk.length == 64 || ppkDpk.length == 76) { // if ppkDpk.length is 76 it mean last 6 bytes belongs to KCV of dpk and ppk
-
-                          var ppkKcv = byteArrayOf()
-                          var dpkKcv = byteArrayOf()
-                          val dpk = ppkDpk.substring(0, 32)
-                          val ppk = ppkDpk.substring(32, 64)
-
-                          if (ppkDpk.length == 76)
-                              ppkDpk.substring(32)
-                          else {
-                              ppkKcv = ppkDpk.substring(64, 70).hexStr2ByteArr()
-                              dpkKcv = ppkDpk.substring(70).hexStr2ByteArr()
-                          }
-
-                          //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
-                          //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
-
-                              var insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
-                              if (insertkeys) {
-                                   AppPreference.saveLogin(true)
-                                  if (keWithInit) {
-                                      val (strResult,strSucess,foo) = startInit()
-                                      if(strSucess == true){
-                                          strmsg = "Init Successful"
-                                          //return Result.success(NoResponseException("Init Successful",true,false,false))
-                                      }
-                                      else{
-                                        //  result.success(strSucess)
-                                       //   result.error<NoResponseException>(strResult ?: "", strSucess.toString() ?: "")
-                                          strmsg = strResult.toString()
-                                       //   return Result.error(strResult.toString(),"")
-                                      }
-                                  } else {
-                                    return  Result.success(ResponseHandler("Key Exchange Successful",true,false,false))
-                                  }
-                              } else {
-                                   AppPreference.saveLogin(false)
-                                  strmsg = "Error in key insertion"
-                                 // return Result.error("Error in key insertion","")
-                              }
-
-                      } else {
-                          strmsg = "Key exchange error"
-                         // return Result.error("Key exchange error","")
-
-                      }
-                  }
-              } else {
-                  val msg = iso.isoMap[58]?.parseRaw2String() ?: ""
-                  strmsg = msg.toString()
-              //   return Result.error(msg,"")
-
-              }
-          }
-
-         return Result.error(strmsg ?: "","")
     }
 
     private fun insertSecurityKeys(ppk: ByteArray, dpk: ByteArray, ppkKcv: ByteArray, dpkKcv: ByteArray): Boolean {
@@ -419,7 +320,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         return result
     }
 
-    suspend fun startInit(): Triple<String?, Boolean?, Boolean> {
+    suspend fun startInit(tid: String): Triple<String?, Boolean?, Boolean> {
         var strResult: String? = null
         var strSucess: Boolean? = null
 
@@ -442,7 +343,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                  strResult = it
                 strSucess  = true
 
-            }, this@keyexchangeDataSource)
+            }, this@keyexchangeDataSource,tid)
 
 
           System.out.println("Init Suceesuffly msg1 "+strResult)
