@@ -1,6 +1,7 @@
 package com.bonushub.crdb.utils
 
 import com.bonushub.crdb.model.CardProcessedDataModal
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.vxutils.Utility.*
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
@@ -87,7 +88,7 @@ private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
    return try {
 
        // logger(TAG, "=> TDES")
-        val key: ByteArray = BytesUtil.hexString2Bytes("31313131313131313131313131313131")
+        val key: ByteArray = BytesUtil.hexString2Bytes(AppPreference.getString("dpk"))
         val dataIn: ByteArray = BytesUtil.hexString2Bytes(dataDescription)
         var mode = AlgMode.EM_alg_TDESENCRYPT or AlgMode.EM_alg_TDESTECBMODE
         val encResult = BytesValue()

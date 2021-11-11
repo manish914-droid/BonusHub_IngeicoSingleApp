@@ -277,6 +277,8 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
     private fun insertSecurityKeys(ppk: ByteArray, dpk: ByteArray, ppkKcv: ByteArray, dpkKcv: ByteArray): Boolean {
 
+        AppPreference.saveString("dpk",dpk.toString())
+
         var pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(0, 0), 0, DeviceName.IPP)
 
         var result = true
