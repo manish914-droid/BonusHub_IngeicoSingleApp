@@ -8,7 +8,9 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.repository.*
 import com.bonushub.crdb.utils.DeviceHelper
+import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.emv.UEMV
+import com.usdk.apiservice.aidl.pinpad.UPinpad
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,9 +30,11 @@ object ActivityModule {
 
     @Provides
     @ActivityScoped
-    fun provideShoppingrepository(emv: UEMV?,@ActivityContext context: Context) : SearchCardRepository{
+    fun provideShoppingrepository(@USDKScope algo: UAlgorithm?,
+                                  @USDKScope ipinpad: UPinpad?,@USDKScope emv: UEMV?,
+                                  @ActivityContext context: Context) : SearchCardRepository{
 
-        return SearchCardDefaultRepository(emv,context)
+        return SearchCardDefaultRepository(algo,ipinpad,emv,context)
     }
 
 }
