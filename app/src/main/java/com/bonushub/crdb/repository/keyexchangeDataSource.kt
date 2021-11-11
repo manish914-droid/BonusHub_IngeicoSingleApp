@@ -12,6 +12,7 @@ import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.vxutils.Utility.*
 import com.bonushub.pax.utils.*
 import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -277,7 +278,8 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
     private fun insertSecurityKeys(ppk: ByteArray, dpk: ByteArray, ppkKcv: ByteArray, dpkKcv: ByteArray): Boolean {
 
-        AppPreference.saveString("dpk",dpk.toString())
+        AppPreference.saveString("dpk", byte2HexStr(dpk))
+        println("dpk value is"+byte2HexStr(dpk))
 
         var pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(0, 0), 0, DeviceName.IPP)
 
