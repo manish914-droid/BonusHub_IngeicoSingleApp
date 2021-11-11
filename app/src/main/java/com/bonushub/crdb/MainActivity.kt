@@ -105,21 +105,6 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
     override fun onReady(version: String?) {
         register(true)
         initDeviceInstance()
-        GlobalScope.launch(Dispatchers.IO) {
-            Utility().readLocalInitFile { status, msg ->
-                Log.d("Init File Read Status ", status.toString())
-                Log.d("Message ", msg)
-                if (status){
-
-                }
-            }
-        }
-      /*  Handler().postDelayed(Runnable {
-            KeyExchanger(this, "41501379", ::onInitResponse).apply {
-                keWithInit = true
-            }.startExchange()
-        },500)*/
-
     }
 
     private fun onInitResponse(res: String, success: Boolean, progress: Boolean, isReversalFail: Boolean = false) {
