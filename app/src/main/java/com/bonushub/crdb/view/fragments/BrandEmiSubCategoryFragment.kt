@@ -15,9 +15,10 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BrandEMISubCategoryAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
+// var FRAGMENT_COUNTER=0
 @AndroidEntryPoint
 class BrandEmiSubCategoryFragment : Fragment() {
-    private var brandMasterBinding: BrandEmiListAndSearchUiBinding? = null
+    private var brandSubCatBinding: BrandEmiListAndSearchUiBinding? = null
     private var brandDataMaster: BrandEMIMasterDataModal? = null
     private var brandSubCatList: ArrayList<BrandEMISubCategoryTable>? = null
     private var filteredSubCat: ArrayList<BrandEMISubCategoryTable> = arrayListOf()
@@ -25,15 +26,14 @@ class BrandEmiSubCategoryFragment : Fragment() {
         BrandEMISubCategoryAdapter(::onCategoryItemClick)
     }
 
-
-    override fun onCreateView(
+  override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        brandMasterBinding =
+        brandSubCatBinding =
             BrandEmiListAndSearchUiBinding.inflate(layoutInflater, container, false)
-        return brandMasterBinding?.root
+        return brandSubCatBinding?.root
     }
 
 
@@ -41,13 +41,21 @@ class BrandEmiSubCategoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.e("OPEN FRAG", "TOUCHED")
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
-        brandSubCatList =
-            arguments?.getSerializable("brandSubCatList") as? ArrayList<BrandEMISubCategoryTable>
+        brandSubCatList = arguments?.getSerializable("brandSubCatList") as? ArrayList<BrandEMISubCategoryTable>
+filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandEMISubCategoryTable>
 
-        filteredSubCat =
+        brandSubCatBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+        //  brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
+
+        brandSubCatBinding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
+
+
+    /*    filteredSubCat =
             brandSubCatList?.filter {
                 it.brandID == brandDataMaster?.brandID && it.parentCategoryID == "0"
-            } as ArrayList<BrandEMISubCategoryTable>
+            } as ArrayList<BrandEMISubCategoryTable>*/
         setUpRecyclerView()
         brandEMISubCategoryAdapter.submitList(filteredSubCat)
 
@@ -56,7 +64,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
 
     //region===========================SetUp RecyclerView :-
     private fun setUpRecyclerView() {
-        brandMasterBinding?.brandEmiMasterRV?.apply {
+        brandSubCatBinding?.brandEmiMasterRV?.apply {
             layoutManager = LinearLayoutManager(context)
             hasFixedSize()
             itemAnimator = DefaultItemAnimator()
@@ -66,18 +74,29 @@ class BrandEmiSubCategoryFragment : Fragment() {
 
     private fun onCategoryItemClick(brandEMISubCategoryTable: BrandEMISubCategoryTable) {
         Log.d("CategoryName:- ", brandEMISubCategoryTable.toString())
-        filteredSubCat =
-            brandSubCatList?.filter { brandEMISubCategoryTable.categoryID == it.parentCategoryID }
+        filteredSubCat = brandSubCatList?.filter { brandEMISubCategoryTable.categoryID == it.parentCategoryID }
                     as ArrayList<BrandEMISubCategoryTable>
-        Log.e(
-            "FILTEREDLIST",
-            filteredSubCat.toString() + "  Filter List Size --->  ${filteredSubCat.size}"
-        )
+        Log.e("FILTEREDLIST", filteredSubCat.toString() + "  Filter List Size --->  ${filteredSubCat.size}")
         if (filteredSubCat.isNotEmpty()) {
-            brandEMISubCategoryAdapter.submitList(filteredSubCat)
+        //    FRAGMENT_COUNTER += 1
+        /*    (activity as NavigationActivity).transactFragment(BrandEmiSubCategoryFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable("brandDataMaster", brandDataMaster)
+                    putSerializable("brandSubCatList", brandSubCatList)
+                    putSerializable("filteredSubCat", filteredSubCat)
+
+                    //  putBoolean("navigateFromMaster",true)
+                    // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
+                }
+            },name =FRAGMENT_COUNTER.toString())*/
+            (activity as NavigationActivity).transactSubCatFragment(false,brandDataMaster,brandSubCatList,filteredSubCat)
+
+          //  brandEMISubCategoryAdapter.submitList(filteredSubCat)
         } else {
+             //   FRAGMENT_COUNTER= "0".toInt()
             (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
                 arguments = Bundle().apply {
+                    putSerializable("brandEmiSubCat", brandEMISubCategoryTable)
                     putSerializable("brandDataMaster", brandDataMaster)
                 }
             })

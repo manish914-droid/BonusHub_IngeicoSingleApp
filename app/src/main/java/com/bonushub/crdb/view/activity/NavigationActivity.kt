@@ -1,7 +1,7 @@
 package com.bonushub.crdb.view.activity
 
+
 import android.app.Dialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
@@ -23,17 +24,15 @@ import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.utils.DemoConfig
-import com.bonushub.crdb.utils.DeviceHelper
-
-import com.bonushub.crdb.utils.Utility
+import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
-import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.fragments.BankFunctionsFragment
 import com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment
-
+import com.bonushub.crdb.view.fragments.BrandEmiSubCategoryFragment
 import com.bonushub.pax.utils.NavControllerFragmentLabel
-
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -100,7 +99,13 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
       //  TODO("Not yet implemented")
-        transactFragment(BrandEmiMasterCategoryFragment())
+
+        if(item.itemId == R.id.bankFunction){
+            DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel)
+           // transactFragment(BankFunctionsFragment())
+        }else {
+         //   transactFragment(BrandEmiMasterCategoryFragment())
+        }
         return true
     }
     //region==========================SetUp Drawer Layout================
@@ -148,15 +153,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     override fun onReady(version: String?) {
         register(true)
         initDeviceInstance()
-        GlobalScope.launch(Dispatchers.IO) {
-            Utility().readLocalInitFile { status, msg ->
-                Log.d("Init File Read Status ", status.toString())
-                Log.d("Message ", msg)
-                if (status){
 
-                }
-            }
-        }
     }
     //endregion
 
@@ -228,6 +225,28 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     //endregion
 
 
+    //region============================fragment transaction
+    fun transactSubCatFragment(isBackStackAdded: Boolean = false, brandDataMaster: BrandEMIMasterDataModal?, brandSubCatList: ArrayList<BrandEMISubCategoryTable>?, filteredSubCat: ArrayList<BrandEMISubCategoryTable>?): Boolean {
+        val trans = supportFragmentManager.beginTransaction().apply {
+            val fragment= BrandEmiSubCategoryFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable("brandDataMaster", brandDataMaster)
+                    putSerializable("brandSubCatList", brandSubCatList)
+                    putSerializable("filteredSubCat", filteredSubCat)
+
+                    //  putBoolean("navigateFromMaster",true)
+                    // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
+                }
+            }
+            replace(R.id.nav_host_fragment, fragment, fragment::class.java.simpleName)
+            addToBackStack(fragment::class.java.simpleName)
+        }
+        if (isBackStackAdded) trans.addToBackStack(null)
+        return trans.commitAllowingStateLoss() >= 0
+    }
+    //endregion
+
+
 //region==========Setting for sidebar details==========
    private fun refreshDrawer() {
          val appDao: AppDao?=null
@@ -280,7 +299,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     //endregion
 
     // written by kushal region == dialog click
-    var onClickDialogOkCancel: OnClickDialogOkCancel = object : OnClickDialogOkCancel{
+    var onClickDialogOkCancel:OnClickDialogOkCancel = object : OnClickDialogOkCancel{
 
         override fun onClickOk() {
             transactFragment(BankFunctionsFragment())

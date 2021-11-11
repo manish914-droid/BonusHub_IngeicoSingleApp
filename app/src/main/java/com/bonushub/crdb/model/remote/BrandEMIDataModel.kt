@@ -42,7 +42,21 @@ data class BrandEMIProductDataModal(
     var maxLength: String,
     var productCategoryName: String,
     var producatDesc:String,
-) : Parcelable
+) : Parcelable,Serializable
 //endregion
+
+class BrandEmiBillSerialMobileValidationModel : Serializable {
+    var isMobileNumReq = false
+    var isBillNumReq = false
+    var isSerialNumReq = false
+    var isImeiNumReq = false
+
+    var isMobileNumMandatory = false
+    var isBillNumMandatory = false
+    var isSerialNumMandatory = false
+    var isImeiNumMandatory = false
+
+    var isIemeiOrSerialNumReq = false
+}
 
 

@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonushub.crdb.HDFCApplication
+import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.BrandEmiListAndSearchUiBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
@@ -57,10 +58,16 @@ class BrandEmiMasterCategoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        brandMasterBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+      //  brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
+
+        brandMasterBinding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+
+        }
+
         brandEmiMasterCategoryViewModel =
-            ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(
-                BrandEmiMasterCategoryViewModel::class.java
-            )
+            ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
         brandEmiMasterCategoryViewModel.brandEMIMasterSubCategoryLivedata.observe(
             viewLifecycleOwner,
             {
@@ -104,6 +111,14 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                     arguments = Bundle().apply {
                         putSerializable("brandDataMaster", brandDataMaster)
                         putSerializable("brandSubCatList", brandSubCatList)
+
+                      val  filteredSubCat =
+                            brandSubCatList.filter {
+                                it.brandID == brandDataMaster.brandID && it.parentCategoryID == "0"
+                            } as ArrayList<BrandEMISubCategoryTable>
+                        putSerializable("filteredSubCat", filteredSubCat)
+
+                      //  putBoolean("navigateFromMaster",true)
                         // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
                     }
                 })

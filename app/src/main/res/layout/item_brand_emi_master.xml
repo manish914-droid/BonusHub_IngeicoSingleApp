@@ -5,19 +5,21 @@
     android:id="@+id/brand_emi_master_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="@dimen/pad_4"
+        app:cardCornerRadius="@dimen/pad_12"
         android:layout_margin="@dimen/pad_8">
         <TextView
             android:id="@+id/tv_brand_master_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/card_edge"
             android:layout_gravity="center_vertical"
-            android:gravity="start"
-            android:paddingTop="@dimen/pad_4"
-            android:paddingBottom="@dimen/pad_4"
+            android:gravity="center"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingBottom="@dimen/pad_12"
             android:paddingStart="@dimen/pad_20"
             android:paddingEnd="@dimen/pad_20"
             android:textStyle="bold"

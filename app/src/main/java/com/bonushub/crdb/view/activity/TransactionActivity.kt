@@ -7,7 +7,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
+import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.repository.ServerRepository
+import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -19,12 +24,19 @@ import com.ingenico.hdfcpayment.type.TransactionType
 
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionActivity : AppCompatActivity(){
+
+    /** need to use Hilt for instance initializing here..*/
+    private val remoteService: RemoteService = RemoteService()
+    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+
 
     val TAG = TransactionActivity::class.java.simpleName
 
@@ -110,7 +122,7 @@ class TransactionActivity : AppCompatActivity(){
                                amount = 300L ?: 0,
                                tipAmount = 0L ?: 0,
                                transactionType = TransactionType.SALE,
-                               tid = "41501379",
+                               tid = "41501375",
                                transactionUuid = UUID.randomUUID().toString().also {
                                    ecrID = it
 
@@ -149,6 +161,10 @@ class TransactionActivity : AppCompatActivity(){
                    cardProcessedDataModal.getPanNumberData().toString(),
                    Toast.LENGTH_LONG
                ).show()
+
+               lifecycleScope.launch(Dispatchers.IO) {
+                   serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+               }
            }
 
        })

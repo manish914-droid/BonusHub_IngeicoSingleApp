@@ -10,21 +10,38 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import com.bonushub.crdb.IDialog
+import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.HDFCApplication
 
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
+import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
+import com.bonushub.crdb.repository.ServerRepository
+import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.KeyboardModel
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.UiAction
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 
 class NewInputAmountFragment : Fragment() {
+
+    /** need to use Hilt for instance initializing here..*/
+    private val remoteService: RemoteService = RemoteService()
+    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+
+
+    var brandEntryValidationModel: BrandEmiBillSerialMobileValidationModel? = null
+
+    private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
+    private var brandEmiProductData: BrandEMIProductDataModal? = null
+    private var brandDataMaster: BrandEMIMasterDataModal? = null
+
     private var binding: FragmentNewInputAmountBinding? = null
     private val keyModelSaleAmount: KeyboardModel by lazy {
         KeyboardModel()
@@ -64,8 +81,25 @@ class NewInputAmountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
+        brandEmiProductData = arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
+        brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
         initAnimation()
+
+        isMobileNumBillEntryAndSerialNumRequiredOnBrandEmi {
+            if (it != null) {
+                //  brandEmiValidationModel = it
+                if (it.isMobileNumReq || it.isMobileNumMandatory) {
+                    binding?.mobNoCrdView?.visibility = View.VISIBLE
+                } else {
+                    binding?.mobNoCrdView?.visibility = View.GONE
+                }
+            }
+        }
 
         // keyModelMobNumber.isInutSimpleDigit = true
         binding?.mainKeyBoard?.root?.visibility = View.VISIBLE
@@ -316,18 +350,20 @@ class NewInputAmountFragment : Fragment() {
         if (saleAmountStr != "") {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
-        (activity as NavigationActivity).transactFragment(EMIIssuerList().apply {
+       /* (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
             arguments = Bundle().apply {
               //  putSerializable("type", action)
                 // putString("proc_code", ProcessingCode.PRE_AUTH.code)
                /// putString("mobileNumber", extraPair?.first)
                 putString("enquiryAmt", saleAmount.toString().trim())
-                //putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
+                // putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
                 //  putSerializable("brandEMIDataModal", brandEMIDataModal)
 
             }
-        })
-
+        })*/
+lifecycleScope.launch(Dispatchers.IO) {
+    serverRepository.getEMITenureData()
+}
         /*iFrReq?.onFragmentRequest(
             UiAction.EMI_ENQUIRY,
             Pair(saleAmount.toString().trim(), "0")
@@ -337,4 +373,57 @@ class NewInputAmountFragment : Fragment() {
         animShow = AnimationUtils.loadAnimation(activity, R.anim.view_show)
         animHide = AnimationUtils.loadAnimation(activity, R.anim.view_hide)
     }
+
+
+    // fun for checking mobile number, Bill number and serial number on Brand Emi sale
+    private fun isMobileNumBillEntryAndSerialNumRequiredOnBrandEmi(cb: (BrandEmiBillSerialMobileValidationModel?) -> Unit) {
+
+                brandEntryValidationModel = BrandEmiBillSerialMobileValidationModel()
+                when (brandDataMaster?.mobileNumberBillNumberFlag?.get(0)) {
+                    '0' -> {
+                        brandEntryValidationModel?.isMobileNumReq = false
+                    }// not required
+                    '1' -> {
+                        brandEntryValidationModel?.isMobileNumReq = true
+                    }
+                    '2' -> {
+                        brandEntryValidationModel?.isMobileNumMandatory = true
+                    }
+                }
+                when (brandDataMaster?.mobileNumberBillNumberFlag?.get(2)) {
+                    '0' -> {
+                        brandEntryValidationModel?.isBillNumReq = false
+                    }// not required
+                    '1' -> {
+                        brandEntryValidationModel?.isBillNumReq = true
+                    }
+                    '2' -> {
+                        brandEntryValidationModel?.isBillNumMandatory = true
+                    }
+                }
+                brandEntryValidationModel?.isSerialNumReq = isShowSerialDialog()
+                brandEntryValidationModel?.isImeiNumReq = isShowIMEIDialog()
+                brandEntryValidationModel?.isIemeiOrSerialNumReq =
+                    ( brandEmiProductData?.isRequired == "1" && brandEmiProductData?.validationTypeName?.isNotBlank() == true)|| (brandEmiProductData?.isRequired == "0" && brandEmiProductData?.validationTypeName?.isNotBlank() == true)
+
+                cb(brandEntryValidationModel)
+
+    }
+
+    //region=====================Condition to check Whether we need to show Serial input or not:-
+    private fun isShowSerialDialog(): Boolean {
+        return brandEmiProductData?.validationTypeName == "SerialNo" ||
+                brandEmiProductData?.validationTypeName == "SerialNo"
+    }
+
+    //endregion
+    //region=====================Condition to check Whether we need to show IMEI input or not:-
+    private fun isShowIMEIDialog(): Boolean {
+        return brandEmiProductData?.validationTypeName == "IMEI" ||
+                brandEmiProductData?.validationTypeName == "imei"
+
+    }
+    //endregion
+
+
 }

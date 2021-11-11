@@ -874,7 +874,7 @@ data class BrandEMISubCategoryTable(
     var brandID: String = "",
     var parentCategoryID: String = "",
     var categoryName: String = ""
-)
+):Serializable
 //endregion
 
 //region===============Brand EMI Data Table:-

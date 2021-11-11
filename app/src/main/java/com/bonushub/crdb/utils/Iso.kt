@@ -395,6 +395,17 @@ class IsoDataWriter : IsoParent(), IWriter,Serializable {
             addField(fieldNo, data.byteArr2Str())
     }
 
+    fun addField56(fieldNo: Byte, data: String) {
+        val iso = IsoField(56, "Encipher pan", fieldType = ISO_FIELD_TYPE.LLVR, len = 2)
+        iso.rawData = if (iso.isFixedLen) {
+            if (data.length < iso.len * 2) addPad(data, "0", iso.len * 2)
+            else data
+        } else {
+            data
+        }
+        activeField.add(fieldNo)
+        isoMap[fieldNo] = iso
+    }
 
     override fun generateIsoByteRequest(): ByteArray {
         val request = mutableListOf<Byte>()

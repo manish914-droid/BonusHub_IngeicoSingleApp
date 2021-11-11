@@ -8,7 +8,7 @@ import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.entity.EMVOption
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.repository.SearchCardRepository
-import kotlinx.coroutines.async
+
 import kotlinx.coroutines.launch
 
 

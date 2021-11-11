@@ -13,18 +13,15 @@
  *  2020/05/19 	         Qinny Zhou           	Create/Add/Modify/Delete
  *  ===========================================================================================
  */
-
 package com.bonushub.crdb.utils;
 
 import android.content.Context;
 import android.widget.Toast;
 
 public class ToastUtils {
-
     public static void showToast(Context context, String msg) {
         Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
-
     public static void showToast(Context context, int resId) {
         Toast.makeText(context.getApplicationContext(), context.getString(resId), Toast.LENGTH_SHORT).show();
     }

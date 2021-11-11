@@ -6,6 +6,13 @@
     android:orientation="vertical"
     tools:context=".view.fragments.BrandEmiMasterCategoryFragment">
 
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible"
+       />
+
+
     <LinearLayout
         android:id="@+id/searchViewLV"
         android:layout_width="match_parent"

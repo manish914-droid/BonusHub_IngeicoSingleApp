@@ -1,17 +1,18 @@
 package com.bonushub.crdb.view.fragments
 
+
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,7 +23,7 @@ import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.utils.DeviceHelper
 
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
-import com.bonushub.crdb.utils.Result
+
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -40,12 +41,14 @@ import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
 
+
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
 
+
 @AndroidEntryPoint
-class DashboardFragment : Fragment(),IFragmentRequest {
+class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
     companion object {
         var toRefresh = true
         val TAG = DashboardFragment::class.java.simpleName
@@ -87,7 +90,7 @@ class DashboardFragment : Fragment(),IFragmentRequest {
     }
 
     private fun observeDashboardViewModel(){
-        dashboardViewModel.mutableLiveData.observe(viewLifecycleOwner, Observer {
+        dashboardViewModel.mutableLiveData.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             defaultScope.launch {
                 Log.d("tpt===>:- ", Gson().toJson(it))
                 val tpt = it
@@ -176,7 +179,7 @@ class DashboardFragment : Fragment(),IFragmentRequest {
                         val result = async { setupRecyclerview() }.await()
                         val result1 = async {
                             delay(2000)
-                              setUpInitializtion()
+                            setUpInitializtion()
                         }.await()
                     }
 
@@ -206,7 +209,7 @@ class DashboardFragment : Fragment(),IFragmentRequest {
             DeviceHelper.doTerminalInitialization(
                 request = TerminalInitializationRequest(
                     1,
-                    listOf("41501379")
+                    listOf("41501375")
                 ),
                 listener = object : OnOperationListener.Stub() {
                     override fun onCompleted(p0: OperationResult?) {
@@ -297,11 +300,19 @@ class DashboardFragment : Fragment(),IFragmentRequest {
                     } else {
                   ToastUtils.showToast(activity,getString(R.string.no_internet_available_please_check_your_internet))
                     }
+            }
+
+            EDashboardItem.BRAND_EMI->{
+                (activity as NavigationActivity).transactFragment(BrandEmiMasterCategoryFragment())
+
+            }
+            else->{
+                val intent = Intent (activity, TransactionActivity::class.java)
+                activity?.startActivity(intent)
 
             }
         }
-        val intent = Intent (getActivity(), TransactionActivity::class.java)
-        getActivity()?.startActivity(intent)
+
     }
 }
 

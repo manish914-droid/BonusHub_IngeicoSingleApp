@@ -106,6 +106,7 @@ enum class ProcessingCode(val code: String) {
     PRE_AUTH("920000"),
     CROSS_SELL("982001"),
     BRAND_EMI("982002"),
+    BANK_EMI("982002"),
 
 }
 //endregion
