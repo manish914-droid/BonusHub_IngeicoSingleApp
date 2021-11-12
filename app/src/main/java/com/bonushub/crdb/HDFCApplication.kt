@@ -64,6 +64,7 @@ class HDFCApplication : Application() {
         appContext = this
         initDefaultConfig()
         DeviceHelper.bindService()
+        DeviceHelper.connect()
         initializeEncryptedSharedPreferences(appContext)
         setNetworkStrength()
 
