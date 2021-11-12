@@ -7,19 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
-import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.adapter.BankFunctionsAdapter
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
+import com.bonushub.pax.utils.BankFunctionsAdminVasItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class BankFunctionsAdminVasFragment : Fragment() {
+class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemClick{
 
-
+    private val adminVasListItem: MutableList<BankFunctionsAdminVasItem> by lazy { mutableListOf<BankFunctionsAdminVasItem>() }
+    private var iBankFunctionsAdminVasItemClick:IBankFunctionsAdminVasItemClick? = null
 
     var binding:FragmentBankFunctionsAdminVasBinding? = null
     override fun onCreateView(
@@ -27,7 +26,6 @@ class BankFunctionsAdminVasFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-       // return inflater.inflate(R.layout.fragment_bank_functions_admin_vas, container, false)
         binding = FragmentBankFunctionsAdminVasBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -35,6 +33,8 @@ class BankFunctionsAdminVasFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        iBankFunctionsAdminVasItemClick = this
+        adminVasListItem.addAll(BankFunctionsAdminVasItem.values())
         setupRecyclerview()
     }
 
@@ -42,40 +42,45 @@ class BankFunctionsAdminVasFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.Main) {
             binding?.let {
                 it.recyclerView.layoutManager = GridLayoutManager(activity, 1)
-                it.recyclerView.adapter = BankFunctionsAdminVasAdapter(this@BankFunctionsAdminVasFragment)
+                it.recyclerView.adapter = BankFunctionsAdminVasAdapter(iBankFunctionsAdminVasItemClick, adminVasListItem)
             }
 
         }
     }
 
-    fun itemClick(position:Int)
-    {
-        when(position){
-            0 ->{
+
+    override fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem) {
+        when(bankFunctionsAdminVasItem){
+            BankFunctionsAdminVasItem.INIT ->{
                 // INIT
             }
 
-            1 ->{
+            BankFunctionsAdminVasItem.TEST_EMI ->{
                 // TEST EMI
             }
 
-            2 ->{
+            BankFunctionsAdminVasItem.TERMINAL_PARAM ->{
                 // TERMINAL PARAM
-                (activity as NavigationActivity).transactFragment(BankFunctionsTerminalFragment())
+                (activity as NavigationActivity).transactFragment(BankFunctionsTerminalFragment(), true)
             }
 
-            3 ->{
+            BankFunctionsAdminVasItem.COMM_PARAM ->{
                 // COMM PARAM
             }
 
-            4 ->{
+            BankFunctionsAdminVasItem.ENV_PARAM ->{
                 // ENV PARAM
             }
 
-            5 ->{
+            BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
                 // INIT PAYMENT APP
-                (activity as NavigationActivity).transactFragment(BankFunctionsInitPaymentAppFragment())
+                (activity as NavigationActivity).transactFragment(BankFunctionsInitPaymentAppFragment(), true)
             }
         }
     }
+}
+
+interface IBankFunctionsAdminVasItemClick{
+
+    fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem:BankFunctionsAdminVasItem)
 }

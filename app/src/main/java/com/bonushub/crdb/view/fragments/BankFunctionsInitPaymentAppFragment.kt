@@ -5,7 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.databinding.FragmentBankFunctionsInitPaymentAppBinding
+import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
+import com.bonushub.crdb.view.adapter.BankFunctionsInitPaymentAppAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BankFunctionsInitPaymentAppFragment : Fragment() {
 
@@ -24,5 +30,18 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupRecyclerview()
     }
+
+    private fun setupRecyclerview(){
+        lifecycleScope.launch(Dispatchers.Main) {
+            binding?.let {
+                it.recyclerView.layoutManager = GridLayoutManager(activity, 1)
+                it.recyclerView.adapter = BankFunctionsInitPaymentAppAdapter()
+            }
+
+        }
+    }
+
+
 }

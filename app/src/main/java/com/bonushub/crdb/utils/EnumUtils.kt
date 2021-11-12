@@ -427,3 +427,33 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
 
 
 }
+
+// written by kushal
+// region for bank functions
+enum class BankFunctionsItem(val _name: String){
+    ADMIN_VAS("ADMIN VAS"),
+    ADMIN_PAYMENT("ADMIN PAYMENT")
+}
+// end region
+
+// region for bank functions admin vas
+enum class BankFunctionsAdminVasItem(val _name: String){
+    INIT("INIT"),
+    TEST_EMI("TEST EMI"),
+    TERMINAL_PARAM("TERMINAL PARAM"),
+    COMM_PARAM("COMM PARAM"),
+    ENV_PARAM("ENV PARAM"),
+    INIT_PAYMENT_APP("INIT PAYMENT APP"),
+}
+// end region
+
+// region for bank functions terminal param
+enum class BankFunctionsTerminalItem(val _name: String){
+    BATCH_NUMBER("BATCH NUMBER"),
+    INVOICE_NUMBER("INVOICE NUMBER"),
+    MERCHANT_ID("MERCHANT ID"),
+    STN("STN"),
+    TERMINAL_ID("TERMINAL ID"),
+    CLEAR_FBATCH("CLEAR FBATCH"),
+}
+// end region

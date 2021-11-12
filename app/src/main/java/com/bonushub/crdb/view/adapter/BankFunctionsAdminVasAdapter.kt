@@ -7,14 +7,12 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
-import com.bonushub.crdb.view.fragments.BankFunctionsAdminVasFragment
-import com.bonushub.crdb.view.fragments.BankFunctionsFragment
-import com.bonushub.pax.utils.EDashboardItem
-import java.util.*
+import com.bonushub.crdb.view.fragments.IBankFunctionsAdminVasItemClick
+import com.bonushub.pax.utils.BankFunctionsAdminVasItem
 
-class BankFunctionsAdminVasAdapter(var fragment: BankFunctionsAdminVasFragment) : RecyclerView.Adapter<BankFunctionsAdminVasAdapter.BankFunctionsViewHolder>() {
+class BankFunctionsAdminVasAdapter(var iBankFunctionsAdminVasItemClick: IBankFunctionsAdminVasItemClick?, private val listItem: MutableList<BankFunctionsAdminVasItem>) : RecyclerView.Adapter<BankFunctionsAdminVasAdapter.BankFunctionsViewHolder>() {
 
-    var mList: ArrayList<EDashboardItem> = arrayListOf()
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsViewHolder {
         return BankFunctionsViewHolder(
@@ -22,41 +20,17 @@ class BankFunctionsAdminVasAdapter(var fragment: BankFunctionsAdminVasFragment) 
         )
     }
 
-    //override fun getItemCount(): Int = mList.size
-    override fun getItemCount(): Int = 6
+    override fun getItemCount(): Int = listItem.size
+
 
     override fun onBindViewHolder(holder: BankFunctionsViewHolder, position: Int) {
 
-        when(position){
-            0 ->{
-                holder.textView.text = "INIT"
-            }
-
-            1 ->{
-                holder.textView.text = "TEST EMI"
-            }
-
-            2 ->{
-                holder.textView.text = "TERMINAL PARAM"
-            }
-
-            3 ->{
-                holder.textView.text = "COMM PARAM"
-            }
-
-            4 ->{
-                holder.textView.text = "ENV PARAM"
-            }
-
-            5 ->{
-                holder.textView.text = "INIT PAYMENT APP"
-            }
-        }
+        holder.textView.text = listItem[position]._name
 
 
         holder.relLayParent.setOnClickListener {
 
-            fragment.itemClick(position)
+            iBankFunctionsAdminVasItemClick?.bankFunctionsAdminVasItemClick(listItem[position])
         }
 
     }

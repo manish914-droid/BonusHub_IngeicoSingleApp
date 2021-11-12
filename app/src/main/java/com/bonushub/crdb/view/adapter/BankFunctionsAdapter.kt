@@ -7,13 +7,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
-import com.bonushub.crdb.view.fragments.BankFunctionsFragment
-import com.bonushub.pax.utils.EDashboardItem
-import java.util.*
+import com.bonushub.crdb.view.fragments.IBankFunctionItemClick
+import com.bonushub.pax.utils.BankFunctionsItem
 
-class BankFunctionsAdapter(var fragment: BankFunctionsFragment) : RecyclerView.Adapter<BankFunctionsAdapter.BankFunctionsViewHolder>() {
+class BankFunctionsAdapter(private var iBankFunctionItemClick: IBankFunctionItemClick?, private val bankFunctionsItem: MutableList<BankFunctionsItem>) : RecyclerView.Adapter<BankFunctionsAdapter.BankFunctionsViewHolder>() {
 
-    var mList: ArrayList<EDashboardItem> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsViewHolder {
         return BankFunctionsViewHolder(
@@ -21,12 +19,13 @@ class BankFunctionsAdapter(var fragment: BankFunctionsFragment) : RecyclerView.A
         )
     }
 
-    //override fun getItemCount(): Int = mList.size
-    override fun getItemCount(): Int = 2
+    override fun getItemCount(): Int = bankFunctionsItem.size
 
     override fun onBindViewHolder(holder: BankFunctionsViewHolder, position: Int) {
 
-        when(position){
+        holder.textView.text = bankFunctionsItem[position]._name
+
+        /*when(position){
             0 ->{
                 holder.textView.text = "ADMIN VAS"
             }
@@ -34,19 +33,17 @@ class BankFunctionsAdapter(var fragment: BankFunctionsFragment) : RecyclerView.A
             1 ->{
                 holder.textView.text = "ADMIN PAYMENT"
             }
-        }
+        }*/
 
 
         holder.relLayParent.setOnClickListener {
-            when(position){
-                0 ->{
-                   fragment.openSuperAdminDialog()
-                }
 
-                1 ->{
+          /*  if(bankFuntionsItem[position]._name.equals(BankFuntionsItem.ADMIN_VAS._name)){
+                fragment.openSuperAdminDialog()
 
-                }
-            }
+            }*/
+            iBankFunctionItemClick?.bankFunctionItemClick(bankFunctionsItem[position])
+
         }
 
     }
