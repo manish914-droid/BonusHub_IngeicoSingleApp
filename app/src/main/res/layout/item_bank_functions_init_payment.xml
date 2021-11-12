@@ -13,6 +13,7 @@
         android:text="ALL TIDS"
         android:textAllCaps="true"
         android:textSize="@dimen/text_size_small"
+        android:fontFamily="@font/muli_extra_light"
         android:textColor="@color/txt_color"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"/>
@@ -29,7 +30,7 @@
         android:textAllCaps="true"
         android:textColor="@color/txt_color"
         android:textSize="@dimen/text_size_xregular"
-        android:textStyle="bold" />
+        android:fontFamily="@font/muli_regular" />
 
     <ImageView
         android:id="@+id/imgViewTick"
@@ -47,7 +48,7 @@
         android:layout_height="wrap_content"
         android:text="Fail"
         android:textSize="@dimen/text_size_xregular"
-        android:textStyle="normal"
+        android:fontFamily="@font/muli_light"
         android:textColor="@color/txt_color"
         android:layout_toStartOf="@+id/imgViewArrow"
         android:layout_centerVertical="true" />

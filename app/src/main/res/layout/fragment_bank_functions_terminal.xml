@@ -13,7 +13,7 @@
         android:textColor="@color/txt_color"
         android:textSize="@dimen/text_size_xregular"
         android:text="@string/terminal_param_header"
-        android:textStyle="bold"
+        android:fontFamily="@font/muli_bold"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"/>
 
