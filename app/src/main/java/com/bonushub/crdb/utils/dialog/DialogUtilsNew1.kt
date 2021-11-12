@@ -15,11 +15,11 @@ class DialogUtilsNew1 {
 
     companion object
     {
-        fun showDialog(activity: Activity?, header:String?, hint:String?, onClick:OnClickDialogOkCancel) {
+        fun showDialog(activity: Activity?, header:String?, hint:String?, onClick:OnClickDialogOkCancel, setCancelable:Boolean = true) {
             val dialog = Dialog(activity!!)
             dialog.getWindow()?.setBackgroundDrawable( ColorDrawable(Color.TRANSPARENT));
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setCancelable(true)
+            dialog.setCancelable(setCancelable)
             dialog.setContentView(com.bonushub.crdb.R.layout.dialog_admin)
             val textViewHeader = dialog.findViewById<View>(R.id.textViewHeader) as TextView
             val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as EditText
@@ -31,8 +31,8 @@ class DialogUtilsNew1 {
 
             txtViewOk.setOnClickListener {
 
-                onClick.onClickOk()
-                dialog.dismiss()
+                onClick.onClickOk(dialog = dialog, password = edtTextPassword.text.toString())
+                //dialog.dismiss()
             }
 
             txtViewCancel.setOnClickListener {

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -32,6 +33,7 @@ import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.fragments.BankFunctionsFragment
 import com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment
 import com.bonushub.crdb.view.fragments.BrandEmiSubCategoryFragment
+import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.pax.utils.NavControllerFragmentLabel
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -97,14 +99,28 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
       decideDashBoard()
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-      //  TODO("Not yet implemented")
+    lateinit var bankFunctionsViewModel:BankFunctionsViewModel
 
-        if(item.itemId == R.id.bankFunction){
-            DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel)
-           // transactFragment(BankFunctionsFragment())
-        }else {
-         //   transactFragment(BrandEmiMasterCategoryFragment())
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+
+        //==============kushal ======= implemented drawer menu
+        when(item.itemId)
+        {
+            R.id.bankFunction -> {
+
+                bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
+
+                DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel, false)
+            }
+
+            R.id.reportFunction -> {
+
+            }
+
+            R.id.settlement -> {
+
+            }
         }
         return true
     }
@@ -298,11 +314,31 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     }
     //endregion
 
+    // region =========kushal=== Close Drawer ==========
+    private fun closeDrawer() {
+        if (navigationBinding?.mainDl!!.isDrawerOpen(GravityCompat.START)) {
+            navigationBinding?.mainDl?.closeDrawer(GravityCompat.START, true)
+        }
+    }
+    //endregion
+
     // written by kushal region == dialog click
     var onClickDialogOkCancel:OnClickDialogOkCancel = object : OnClickDialogOkCancel{
 
-        override fun onClickOk() {
-            transactFragment(BankFunctionsFragment())
+        override fun onClickOk(dialog: Dialog, password:String) {
+
+            bankFunctionsViewModel.isAdminPassword(password)?.observe(this@NavigationActivity,{
+
+                if(it)
+                {
+                    dialog.dismiss()
+                    closeDrawer()
+                    transactFragment(BankFunctionsFragment())
+                }else{
+                    Toast.makeText(this@NavigationActivity,"Password not match",Toast.LENGTH_LONG).show()
+                }
+            })
+            //transactFragment(BankFunctionsFragment())
         }
 
         override fun onClickCancel() {
