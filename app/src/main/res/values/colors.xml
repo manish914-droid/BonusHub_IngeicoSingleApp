@@ -34,4 +34,5 @@
 
     <!--bank functions-->
     <color name="text_gray">#9F9F9F</color>
+    <color name="footer_color">#25282D</color>
 </resources>
