@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".view.fragments.BankFunctionsInitPaymentAppFragment">
 
     <TextView
@@ -12,7 +13,7 @@
         android:textColor="@color/txt_color"
         android:textSize="@dimen/text_size_xregular"
         android:text="@string/init_payment_app_header"
-        android:textStyle="bold"
+        android:fontFamily="@font/muli_bold"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"/>
 

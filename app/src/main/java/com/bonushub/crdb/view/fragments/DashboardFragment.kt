@@ -41,7 +41,6 @@ import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
 
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*

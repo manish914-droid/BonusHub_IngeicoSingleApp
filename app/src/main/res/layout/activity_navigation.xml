@@ -29,25 +29,39 @@
                     android:layout_height="match_parent"
                     tools:context=".view.navigation.NavigationActivity">
 
-                    <include layout="@layout/app_toolbar"
-                        android:id="@+id/toobar" />
 
-                    <LinearLayout
+
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
                         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+                        <include layout="@layout/app_toolbar"
+                            android:id="@+id/toobar" />
+
                         <androidx.fragment.app.FragmentContainerView
                             android:id="@+id/nav_host_fragment"
                             android:name="androidx.navigation.fragment.NavHostFragment"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:defaultNavHost="true"
-                            app:navGraph="@navigation/navigation_graph" />
+                            app:navGraph="@navigation/navigation_graph"
+                            android:layout_above="@+id/footerApp"
+                            android:layout_below="@+id/toobar"/>
 
-                    </LinearLayout>
+                        <include layout="@layout/footer_app"
+                            android:id="@+id/footerApp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="31dp"/>
+                    </RelativeLayout>
+
+
+
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>
             </LinearLayout>
+
             <com.google.android.material.navigation.NavigationView
                 android:id="@+id/nav_view"
                 android:layout_width="wrap_content"

@@ -14,7 +14,7 @@
         android:text=""
         android:textAllCaps="true"
         android:textSize="@dimen/text_size_regular"
-        android:textStyle="bold"
+        android:fontFamily="@font/muli_semi_bold"
         android:textColor="@color/text_gray"/>
 
     <ImageView

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/edge_blue_2"
+    android:layout_marginBottom="13dp"
+    android:id="@+id/relLayParent">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ALL TIDS"
+        android:textAllCaps="true"
+        android:textSize="@dimen/text_size_small"
+        android:fontFamily="@font/muli_extra_light"
+        android:textColor="@color/txt_color"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewTitle"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:text="BASE 41501377"
+        android:textAllCaps="true"
+        android:textColor="@color/txt_color"
+        android:textSize="@dimen/text_size_xregular"
+        android:fontFamily="@font/muli_regular" />
+
+    <ImageView
+        android:id="@+id/imgViewTick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/textViewStatus"
+        android:src="@drawable/ic_init_payment_pass" />
+
+    <TextView
+        android:id="@+id/textViewStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fail"
+        android:textSize="@dimen/text_size_xregular"
+        android:fontFamily="@font/muli_light"
+        android:textColor="@color/txt_color"
+        android:layout_toStartOf="@+id/imgViewArrow"
+        android:layout_centerVertical="true" />
+
+    <ImageView
+        android:id="@+id/imgViewArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/ic_arrow_blue"
+        android:layout_centerVertical="true"/>
+</RelativeLayout>

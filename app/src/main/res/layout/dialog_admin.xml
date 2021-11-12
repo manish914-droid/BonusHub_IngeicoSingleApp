@@ -11,7 +11,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         android:textColor="@color/white"
-        android:textSize="@dimen/text_size_xsmall" />
+        android:textSize="@dimen/text_size_xsmall"
+        android:fontFamily="@font/muli_regular"/>
 
     <EditText
         android:id="@+id/edtTextPassword"
@@ -24,6 +25,7 @@
         android:background="@drawable/edge_gray_bg_white"
         android:inputType="textPassword"
         android:padding="10dp"
+        android:fontFamily="@font/muli_regular"
         android:textColor="@color/txt_color"
         android:textColorHint="@color/txt_color_transparent"
         android:textSize="@dimen/text_size_xsmall" />
@@ -49,6 +51,8 @@
             android:padding="7dp"
             android:text="@string/cancel"
             android:textAllCaps="true"
+            android:textColor="@color/txt_color"
+            android:fontFamily="@font/muli_regular"
             android:textSize="@dimen/text_size_xsmall" />
 
 
@@ -64,7 +68,8 @@
             android:text="@string/ok"
             android:textAllCaps="true"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_xsmall" />
+            android:textSize="@dimen/text_size_xsmall"
+            android:fontFamily="@font/muli_regular"/>
 
     </LinearLayout>
 
