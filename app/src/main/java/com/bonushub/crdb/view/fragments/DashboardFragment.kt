@@ -208,7 +208,7 @@ class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
             DeviceHelper.doTerminalInitialization(
                 request = TerminalInitializationRequest(
                     1,
-                    listOf("41501375")
+                    listOf("41501370")
                 ),
                 listener = object : OnOperationListener.Stub() {
                     override fun onCompleted(p0: OperationResult?) {

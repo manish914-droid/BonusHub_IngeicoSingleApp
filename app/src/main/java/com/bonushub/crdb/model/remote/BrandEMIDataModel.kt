@@ -45,6 +45,7 @@ data class BrandEMIProductDataModal(
 ) : Parcelable,Serializable
 //endregion
 
+
 class BrandEmiBillSerialMobileValidationModel : Serializable {
     var isMobileNumReq = false
     var isBillNumReq = false
@@ -58,5 +59,52 @@ class BrandEmiBillSerialMobileValidationModel : Serializable {
 
     var isIemeiOrSerialNumReq = false
 }
+
+//region==================Data Modal For BankEMI Issuer TAndC Data:-
+@Parcelize
+data class BankEMIIssuerTAndCDataModal(
+    var emiSchemeID: String,
+    var issuerID: String,
+    var issuerName: String,
+    var schemeTAndC: String,
+    var updateIssuerTAndCTimeStamp: String
+) : Parcelable
+//endregion
+
+//region==================Data Modal For BankEMI Data:-
+// VX990 --> BankEMIDataModal
+@Parcelize
+data class BankEMITenureDataModal(
+    var tenure: String,
+    var tenureInterestRate: String,
+    var effectiveRate: String,
+
+    var instantDiscount: String="",
+
+    var transactionAmount: String = "0",
+    var discountAmount: String = "0",
+    var discountFixedValue: String,
+    var discountPercentage: String,
+    var loanAmount: String = "0",
+    var emiAmount: String,
+    var totalEmiPay: String,
+
+    var processingFee: String,
+    var processingRate: String,
+
+    var totalProcessingFee: String,
+    var totalInterestPay: String = "0",
+    val cashBackAmount: String = "0",
+    var netPay: String,
+    var tenureTAndC: String,
+    var tenureWiseDBDTAndC: String,
+    var discountCalculatedValue: String,
+    var cashBackCalculatedValue: String
+) : Parcelable
+//endregion
+
+data class TenuresWithIssuerTncs( private var bankEMIIssuerTAndCList: MutableList<BankEMIIssuerTAndCDataModal>
+        ,private var bankEMISchemesDataList: MutableList<BankEMITenureDataModal>
+)
 
 

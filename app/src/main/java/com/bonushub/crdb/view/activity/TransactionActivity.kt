@@ -15,10 +15,15 @@ import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.viewmodel.SearchViewModel
+import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.request.SaleRequest
+import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
+import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.PaymentResult
+import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.response.TransactionResponse
+import com.ingenico.hdfcpayment.type.RequestStatus
 import com.ingenico.hdfcpayment.type.ResponseCode
 import com.ingenico.hdfcpayment.type.TransactionType
 
@@ -78,13 +83,12 @@ class TransactionActivity : AppCompatActivity(){
        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
            if(cardProcessedDataModal.getPanNumberData() !=null) {
                cardProcessedDataModal.getPanNumberData()
-
-            /*    try {
-
+/*
+                try {
                     DeviceHelper.doTerminalInitialization(
                         request = TerminalInitializationRequest(
                             1,
-                            "41501379".split(",")
+                            "41501370".split(",")
                         ),
                         listener = object : OnOperationListener.Stub() {
                             override fun onCompleted(p0: OperationResult?) {
@@ -112,8 +116,7 @@ class TransactionActivity : AppCompatActivity(){
                 }
                  catch (ex: Exception){
                      ex.printStackTrace()
-                 }
-*/
+                 }*/
 
                   var ecrID: String
                    try {
@@ -122,7 +125,7 @@ class TransactionActivity : AppCompatActivity(){
                                amount = 300L ?: 0,
                                tipAmount = 0L ?: 0,
                                transactionType = TransactionType.SALE,
-                               tid = "41501375",
+                               tid = "41501370",
                                transactionUuid = UUID.randomUUID().toString().also {
                                    ecrID = it
 
@@ -150,7 +153,6 @@ class TransactionActivity : AppCompatActivity(){
                                }
                            }
                        )
-
                    }
               catch (exc: Exception){
                   exc.printStackTrace()
@@ -162,9 +164,10 @@ class TransactionActivity : AppCompatActivity(){
                    Toast.LENGTH_LONG
                ).show()
 
-               lifecycleScope.launch(Dispatchers.IO) {
-                   serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-               }
+              /* lifecycleScope.launch(Dispatchers.IO) {
+                  // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+                   serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
+               }*/
            }
 
        })

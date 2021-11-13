@@ -29,9 +29,9 @@ class RemoteService {
     }
 // endregion
 
-    suspend fun getEMITenureService(pan:String):GenericResponse<IsoDataReader?>{
+    suspend fun getEMITenureService(pan:String,field57RequestData: String):GenericResponse<IsoDataReader?>{
         // val field57RequestData ="${EMIRequestType.BRAND_DATA.requestType}^$counter"
-        val isoDataWriter = IsoPacketCreator.createGetTenureIso(pan)
+        val isoDataWriter = IsoPacketCreator.createGetTenureIso(pan,field57RequestData)
         val response = SocketHelper.getResponseFromServer(isoDataWriter)
         // val liveData= MutableLiveData<GenericResponse<IsoDataReader>>()
         return if(response.isSuccess){
@@ -70,7 +70,7 @@ object IsoPacketCreator{
                 addField(24, Nii.BRAND_EMI_MASTER.nii)
 
                 //TID Field 41
-                addFieldByHex(41, "41501375")
+                addFieldByHex(41,  terminalData.terminalId.toString())
                 Log.d("terminalId:- ", terminalData.terminalId.toString())
 
                 //adding field 57
@@ -88,7 +88,7 @@ object IsoPacketCreator{
         }
 
     //region=========================BankEMI ISO Request Packet===============================
-     suspend fun createGetTenureIso(pan:String): IsoDataWriter = IsoDataWriter().apply {
+     suspend fun createGetTenureIso(pan:String,field57RequestData: String): IsoDataWriter = IsoDataWriter().apply {
         val terminalData: TerminalParameterTable? = (Utility().getTptData())
         if (terminalData != null) {
             mti = Mti.EIGHT_HUNDRED_MTI.mti
@@ -120,7 +120,7 @@ object IsoPacketCreator{
 
             //adding Field 57
           //  addFieldByHex(57, field57Request ?: "")
-            addFieldByHex(57, "4^0^11^2377^^^500000" ?: "")
+            addFieldByHex(57, "4^0^11^2367^^^500000" ?: "")
 
             //adding Field 61
             addFieldByHex(61,  KeyExchanger.getF61())

@@ -1,22 +1,18 @@
 package com.bonushub.crdb.repository
 
-
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.db.AppDatabase
-import com.bonushub.crdb.model.local.BrandEMIMasterTimeStamps
-import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
-import com.bonushub.crdb.model.local.BrandTAndCTable
-import com.bonushub.crdb.model.local.IssuerTAndCTable
-import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.model.remote.BrandEMIMasterSubCategoryDataModal
-import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.model.local.*
+import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.serverApi.EMIRequestType
+import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Utility
+import com.bonushub.pax.utils.IsoDataReader
 import com.bonushub.pax.utils.SplitterTypes
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ServerRepository( val appDB: AppDatabase, private val remoteService: RemoteService) {
+
+    // Live objs for
     private val brandEMIMasterCategoryMLData = MutableLiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>()
     val brandLiveEMIMasterCategoryData: LiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>
         get() = brandEMIMasterCategoryMLData
@@ -33,6 +31,10 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private val brandEMIProductMLData = MutableLiveData<GenericResponse<List<BrandEMIProductDataModal?>>>()
     val brandLiveEMIProductData: LiveData<GenericResponse<List<BrandEMIProductDataModal?>>>
         get() = brandEMIProductMLData
+
+    private val emiTenureMLData = MutableLiveData<GenericResponse<TenuresWithIssuerTncs?>>()
+    val emiTenureLiveData: LiveData<GenericResponse<TenuresWithIssuerTncs?>>
+        get() = emiTenureMLData
 
 
     private var moreDataFlag = "0"
@@ -74,6 +76,9 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private val brandEmiProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
     private val brandEmiSearchedProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
 
+// === EMI Tenure
+    private var bankEMIIssuerTAndCList: MutableList<BankEMIIssuerTAndCDataModal> = mutableListOf()
+    private var bankEMISchemesDataList: MutableList<BankEMITenureDataModal> = mutableListOf()
 
     suspend fun getBrandData(dataCounter:String="0") {
        // val genericResp = remoteService.getBrandDataService(dataCounter)
@@ -166,23 +171,28 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
     }
 
-    suspend fun getEMITenureData(pan:String="0"){
-
-        when(val genericResp = remoteService.getEMITenureService(pan)){
+    suspend fun getEMITenureData(pan:String="0",counter:String="0"){
+       /* val field57=  "$bankEMIRequestCode^0^${brandEmiData?.brandID}^${brandEmiData?.productID}^${brandEmiData?.imeiORserailNum}" +
+                "^${*//*cardBinValue.substring(0, 8)*//*""}^$transactionAmount"
+        */
+        val field57="4^0^11^2367^^^500000"
+        when(val genericResp = remoteService.getEMITenureService(pan,field57)){
             is GenericResponse.Success->{
                 val isoDataReader=genericResp.data
                 val tenureTnc = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
                 Log.e("Tenure",tenureTnc)
-             //   stubbingBrandTAndCData(tncString)
+                stubbingEMITenureDataToList(tenureTnc)
             }
             is GenericResponse.Error->{
-                brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+                emiTenureMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
             is GenericResponse.Loading->{
 
             }
         }
     }
+
+
 
     //region=================================Stubbing BrandEMI Master Data to List:-
     private suspend fun stubbingBrandEMIMasterDataToList(brandEMIMasterData: String) {
@@ -473,6 +483,129 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     }
     //endregion
 
+    //region=================Parse and Stubbing BankEMI Data To List:-
+    private suspend fun stubbingEMITenureDataToList(
+        bankEMITenureResponseData: String) {
+            if (!TextUtils.isEmpty(bankEMITenureResponseData)) {
+                val parsingDataWithCurlyBrace =
+                    Utility().parseDataListWithSplitter("}", bankEMITenureResponseData)
+                val parsingDataWithVerticalLineSeparator =
+                    Utility().parseDataListWithSplitter("|", parsingDataWithCurlyBrace[0])
+                if (parsingDataWithVerticalLineSeparator.isNotEmpty()) {
+                    moreDataFlag = parsingDataWithVerticalLineSeparator[0]
+                    perPageRecord = parsingDataWithVerticalLineSeparator[1]
+                    totalRecord =
+                        (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
+                    //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
+                    // and iterate further on record data only:-
+                    var tempDataList = mutableListOf<String>()
+                    tempDataList = parsingDataWithVerticalLineSeparator.subList(
+                        2,
+                        parsingDataWithVerticalLineSeparator.size
+                    )
+
+                    for (i in tempDataList.indices) {
+                        if (!TextUtils.isEmpty(tempDataList[i])) {
+                            val splitData = Utility().parseDataListWithSplitter(
+                                SplitterTypes.CARET.splitter,
+                                tempDataList[i]
+                            )
+                            bankEMISchemesDataList.add(
+                                BankEMITenureDataModal(
+                                    splitData[0], splitData[1],
+                                    splitData[2], splitData[3],
+                                    splitData[4], splitData[5],
+                                    splitData[6], splitData[7],
+                                    splitData[8], splitData[9],
+                                    splitData[10], splitData[11],
+                                    splitData[12], splitData[13],
+                                    splitData[14], splitData[15],
+                                    splitData[16], splitData[17],
+                                    splitData[18], splitData[19],
+                                    splitData[20]
+                                )
+                            )
+                        }
+                    }
+
+                    //Parsing and Stubbing BankEMI TAndC Data:-
+                    val issuerRelatedData =  Utility().parseDataListWithSplitter(
+                        SplitterTypes.VERTICAL_LINE.splitter,
+                        parsingDataWithCurlyBrace[1]
+                    )
+                    if (!TextUtils.isEmpty(issuerRelatedData[0])) {
+                        val issuerTAndCData =  Utility().parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter,
+                            issuerRelatedData[0]
+                        )
+
+                        Log.d("IssuerSchemeID", issuerTAndCData[0])
+                        Log.d("IssuerID", issuerTAndCData[1])
+                        Log.d("IssuerName", issuerTAndCData[2])
+                        if (issuerTAndCData.size > 3) {
+                            bankEMIIssuerTAndCList.add(
+                                BankEMIIssuerTAndCDataModal(
+                                    issuerTAndCData[0],
+                                    issuerTAndCData[1],
+                                    issuerTAndCData[2],
+                                    issuerTAndCData[3],
+                                    issuerRelatedData[1]
+                                )
+                            )
+                        } else {
+                            bankEMIIssuerTAndCList.add(
+                                BankEMIIssuerTAndCDataModal(
+                                    issuerTAndCData[0],
+                                    issuerTAndCData[1],
+                                    issuerTAndCData[2],
+                                    "",
+                                    issuerRelatedData[1]
+                                )
+                            )
+                        }
+                    }
+                    //Refresh Field57 request value for Pagination if More Record Flag is True:-
+                    if (moreDataFlag == "1") {
+                   /*     field57Request =
+                            if (cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI.type) {
+                                "$bankEMIRequestCode^$totalRecord^${brandEmiData?.brandID}^${brandEmiData?.productID}^^${
+                                    cardBinValue.substring(
+                                        0,
+                                        8
+                                    )
+                                }^$transactionAmount"
+                            } else {
+                                "$bankEMIRequestCode^$totalRecord^1^0^^${
+                                    cardBinValue.substring(
+                                        0,
+                                        8
+                                    )
+                                }^$transactionAmount"
+                            }*/
+                        getEMITenureData(counter = totalRecord)
+                    } else {
+                        Log.d("Total BankEMI Data:- ", bankEMISchemesDataList.toString())
+                        Log.d("Total BankEMI TAndC:- ", parsingDataWithCurlyBrace[1])
+                      /*  ROCProviderV2.incrementFromResponse(
+                            ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
+                            AppPreference.getBankCode()
+                        )*/
+                       /* callback(
+                            Pair(bankEMISchemesDataList, bankEMIIssuerTAndCList),
+                            Triple(isBool, "", true)
+                        )*/
+                        val tenuresWithIssuerTncs=TenuresWithIssuerTncs(bankEMIIssuerTAndCList,bankEMISchemesDataList)
+                        emiTenureMLData.postValue(GenericResponse.Success(tenuresWithIssuerTncs))
+
+                    }
+                }
+            }
+            else{
+                emiTenureMLData.postValue(GenericResponse.Error("Empty Data received from server"))
+            }
+
+        //endregion
+    }
 
     //region==============Save Brand Master Data TimeStamps:-
     private suspend fun saveBrandMasterTimeStampsData() {
