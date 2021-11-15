@@ -36,8 +36,7 @@ interface IKeyExchange : IKeyExchangeInit{
 
 typealias ApiCallback = (String, Boolean, Boolean,Boolean) -> Unit
 
-class keyexchangeDataSource @Inject constructor(private val appDao: AppDao,
-                                                @USDKScope pinpad: UPinpad?) : IKeyExchange {
+class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IKeyExchange {
 
     var keWithInit = true
     var isHdfc = false

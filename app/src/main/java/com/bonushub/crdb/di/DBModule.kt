@@ -80,8 +80,8 @@ object DBModule {
 
 
     @Provides
-    fun providekeyechangeDataSource(appDao: AppDao, @USDKScope pinpad: UPinpad?): IKeyExchange {
-        return keyexchangeDataSource(appDao,pinpad)
+    fun providekeyechangeDataSource(appDao: AppDao): IKeyExchange {
+        return keyexchangeDataSource(appDao)
     }
 
     @Singleton
