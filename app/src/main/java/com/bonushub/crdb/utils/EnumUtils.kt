@@ -1,5 +1,6 @@
 package com.bonushub.pax.utils
 
+import androidx.fragment.app.Fragment
 import com.bonushub.crdb.R
 
 
@@ -426,6 +427,17 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     BHARAT_QR("Bharat QR", R.drawable.ic_qr_code, 905),*/
 
 
+}
+sealed class VxEvent {
+    data class ChangeTitle(val titleName: String) : VxEvent()
+    data class ReplaceFragment(val fragment: Fragment) : VxEvent()
+    object AutoSettle : VxEvent()
+    data class Emi(val amt: Double, val type: EDashboardItem) : VxEvent()
+    object ForceSettle : VxEvent()
+    object Home : VxEvent()
+    object InitTerminal : VxEvent()
+    object AppUpdate : VxEvent()
+    object DownloadTMKForHDFC : VxEvent()
 }
 
 // written by kushal

@@ -119,11 +119,22 @@
     <string name="hint_enter_super_admin_password">**** ENTER SUPER ADMIN PASSWORD</string>
 
 
-    <string name="test_emi">Test EMI TXN</string>
-    <string name="bill_num">Enter bill number</string>
-    <string name="brand_min_max_amt_limit_txn"><![CDATA[Entered Amount Should be in Product Min & Max Amount Range]]></string>
-    <string name="enterValid_serial_iemei_no">Enter valid serial/IMEI no</string>
-    <string name="enter_imei_number">Enter IMEI Number</string>
-    <string name="enter_serial_number">Enter Serial Number</string>
-    <string name="proceed">Proceed</string>
+    <!--Base Activity-->
+    <string name="app_name_2">BonusHub</string>
+    <string name="settle_batch">Settle Batch</string>
+    <string name="proceed_txn">Proceed Txn</string>
+    <string name="printing_str">Printing.......</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="do_you_to_print_summary_reports">Do you want to print summary reports?</string>
+    <string name="transaction_type">Txn Type</string>
+    <string name="do_you_want_to_print_customer_copy">Do You Want To Print Customer Copy?</string>
+    <string name="alert">Alert</string>
+    <string name="customer_copy_print_success">Customer copy print successfully</string>
+    <string name="please_use_swipe_for_transaction">Please Swipe Card for Transaction</string>
+    <string name="error_hint">Error</string>
+    <string name="print_customer_copy">Print Customer Copy</string>
+    <string name="print_merchant_copy">Print Merchant Copy</string>
+    <string name="sms_upi_pay">SMS/UPI Pay</string>
+
 </resources>

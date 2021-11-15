@@ -36,7 +36,7 @@
         <item name="cardElevation">@dimen/pad_15</item>
         <item name="cardCornerRadius">10dp</item>
     </style>
-
+    <!-- Using in Keyboard. -->
     <style name="Keyboard_Btn_Neumorphic" parent="Widget.AppCompat.Button">
     <item name="android:layout_width">0dp</item>
     <item name="android:layout_height">60dp</item>
@@ -44,10 +44,15 @@
     <item name="android:textColor">@color/black</item>
         <item name="android:layout_weight">1</item></style>
     <style name="MAppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <!-- Using in EMICatalogue. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <!-- Using in BaseActivity. -->
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/anim_enter</item>
+        <item name="android:windowExitAnimation">@anim/anim_exit</item>
     </style>
 
 

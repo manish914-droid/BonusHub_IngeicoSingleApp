@@ -12,29 +12,21 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentInitBinding
-import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.viewmodel.InitViewModel
 import androidx.lifecycle.Observer
 import com.bonushub.crdb.IDialog
 import com.bonushub.crdb.utils.Utility
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class InitFragment : Fragment(),IDialog {
+class InitFragment : Fragment() {
     private val initViewModel : InitViewModel by viewModels()
     private var progressBar : ProgressBar? = null
     private var iDialog: IDialog? = null
-    lateinit var progressView: ProgressBar
-    private lateinit var progressDialog: Dialog
-    lateinit var progressTitleMsg: TextView
-    lateinit var progressPercent:ProgressBar
-    lateinit var progressPercentTv: TextView
-    lateinit var horizontalPLL: LinearLayout
-    lateinit var verticalProgressBar: ProgressBar
     private val fragmentInitBinding :FragmentInitBinding by lazy {
         FragmentInitBinding.inflate(layoutInflater)
     }
@@ -42,6 +34,7 @@ class InitFragment : Fragment(),IDialog {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if(context is IDialog) iDialog = context
+
     }
 
     override fun onCreateView(
@@ -57,8 +50,6 @@ class InitFragment : Fragment(),IDialog {
         // for screen awake
         (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // it's handling for init button is enable or disable ----> it will be enable when Tid length is equal to 8
-        progressBar = ProgressBar(activity as NavigationActivity)
-        setProgressDialog()
         fragmentInitBinding?.ifProceedBtn?.isEnabled = false
         fragmentInitBinding?.ifProceedBtn?.isClickable = false
         fragmentInitBinding?.ifEt?.addTextChangedListener(textWatcher)
@@ -71,7 +62,7 @@ class InitFragment : Fragment(),IDialog {
         })
 
         fragmentInitBinding?.ifProceedBtn.setOnClickListener {
-          //  iDialog?.showProgress(getString(R.string.please_wait_host))
+       iDialog?.showProgress(getString(R.string.please_wait_host))
             initViewModel.insertInfo1(fragmentInitBinding.ifEt.text.toString())
         }
         observeMainViewModel()
@@ -98,15 +89,15 @@ class InitFragment : Fragment(),IDialog {
 
             when (result.status) {
                 Status.SUCCESS -> {
-                    hideProgress()
+                    iDialog?.hideProgress()
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 }
                 Status.ERROR -> {
-                    hideProgress()
+                    iDialog?.hideProgress()
                     Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
                 }
                 Status.LOADING -> {
-                    showProgress("Sending/Receiving From Host")
+                    iDialog?.showProgress("Sending/Receiving From Host")
 
                 }
             }
@@ -115,76 +106,7 @@ class InitFragment : Fragment(),IDialog {
 
 
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //Thread.setDefaultUncaughtExceptionHandler(UnCaughtException(this@BaseActivity))
-        setProgressDialog()
-    }
-    private fun setProgressDialog() {
-        progressDialog = activity?.let {
-            Dialog(it).apply {
-                requestWindowFeature(Window.FEATURE_NO_TITLE)
-                setContentView(R.layout.new_tem_progress_dialog)
-                setCancelable(false)
-            }
-        }!!
-        progressTitleMsg = progressDialog.findViewById(R.id.msg_et)
-        progressPercent=progressDialog.findViewById(R.id.pBar)
-        progressPercentTv=progressDialog.findViewById(R.id.downloadPercentTv)
-        horizontalPLL=progressDialog.findViewById(R.id.horizontalProgressLL)
-        verticalProgressBar=progressDialog.findViewById(R.id.verticalProgressbr)
-    }
-    override fun showProgress(progressMsg: String) {
-        if (!progressDialog.isShowing && !(activity)?.isFinishing!!) {
-            progressTitleMsg.text = progressMsg
-            progressDialog.show()
-        }
-    }
-    override fun hideProgress() {
-        if (progressDialog.isShowing && !(activity)?.isFinishing!!) {
-            progressDialog.dismiss()
-            horizontalPLL.visibility=View.GONE
-            verticalProgressBar.visibility=View.VISIBLE
-        }
-    }
 
-    override fun getInfoDialog(title: String, msg: String, acceptCb: () -> Unit) {
-        TODO("Not yet implemented")
-    }
 
-    override fun getInfoDialogdoubletap(
-        title: String,
-        msg: String,
-        acceptCb: (Boolean, Dialog) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
 
-    override fun updatePercentProgress(percent: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun showPercentDialog(progressMsg: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getMsgDialog(
-        title: String,
-        msg: String,
-        positiveTxt: String,
-        negativeTxt: String,
-        positiveAction: () -> Unit,
-        negativeAction: () -> Unit,
-        isCancellable: Boolean
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setProgressTitle(title: String) {
-        //progressTitleMsg.text = title
-    }
-
-    override fun showToast(msg: String) {
-        TODO("Not yet implemented")
-    }
 }

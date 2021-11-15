@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/custom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:orientation="vertical"
+        android:padding="@dimen/pad_16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#BECFFF"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/dialog_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="26dp"
+                android:padding="@dimen/pad_8"
+                android:textColor="@color/themeBackground"
+                android:textSize="@dimen/text_size_regular" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2349B5"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/pad_16"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+
+            <Button
+                android:id="@+id/noBtn"
+                style="@style/Widget.Neumorph.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginEnd="@dimen/pad_8"
+                android:padding="@dimen/pad_2"
+                android:text="@string/no"
+                android:textColor="@color/themeBackground"
+                android:textSize="@dimen/text_size_small"
+
+ />
+
+            <Button
+                android:id="@+id/yesBtn"
+                style="@style/Widget.Neumorph.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginStart="@dimen/pad_8"
+                android:padding="@dimen/pad_2"
+                android:text="@string/yes"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small"
+                 />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_printer"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_printer"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/custom_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/custom_layout" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
