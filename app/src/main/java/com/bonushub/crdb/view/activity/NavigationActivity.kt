@@ -342,7 +342,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     closeDrawer()
                     transactFragment(BankFunctionsFragment())
                 }else{
-                    Toast.makeText(this@NavigationActivity,"Password not match",Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
                 }
             })
             //transactFragment(BankFunctionsFragment())

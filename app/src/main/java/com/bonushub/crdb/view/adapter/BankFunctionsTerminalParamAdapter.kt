@@ -8,32 +8,37 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
+import com.bonushub.crdb.databinding.ItemBankFunctionsTerminalParamBinding
 import com.bonushub.crdb.view.fragments.IBankFunctionsTerminalItemClick
 import com.bonushub.pax.utils.BankFunctionsTerminalItem
 
-class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemClick: IBankFunctionsTerminalItemClick?, private var listItem: MutableList<BankFunctionsTerminalItem>) : RecyclerView.Adapter<BankFunctionsTerminalParamAdapter.BankFunctionsViewHolder>() {
+class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemClick: IBankFunctionsTerminalItemClick?, private var listItem: MutableList<BankFunctionsTerminalItem>) : RecyclerView.Adapter<BankFunctionsTerminalParamAdapter.BankFunctionsTerminalParamViewHolder>() {
 
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsViewHolder {
-        return BankFunctionsViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_bank_functions_terminal_param, parent, false)
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsTerminalParamViewHolder {
+        val itemBinding = ItemBankFunctionsTerminalParamBinding.inflate(LayoutInflater.from(parent.context),
+            parent,
+            false)
+        return BankFunctionsTerminalParamViewHolder(itemBinding)
     }
 
     override fun getItemCount(): Int = listItem.size
 
 
-    override fun onBindViewHolder(holder: BankFunctionsViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BankFunctionsTerminalParamViewHolder, position: Int) {
 
-        holder.textViewTitle.text = listItem[position]._name
+        val model = listItem[position]
 
+        holder.viewBinding.textViewTitle.text = model._name
+
+        holder.viewBinding.textViewValue.text = "000184"
 
         // temparary
-        when(position){
+        /*when(position){
             0 ->{
                 //holder.textViewTitle.text = "BATCH NUMBER"
-                holder.textViewValue.text = "000184"
+                holder.viewBinding.textViewValue.text = "000184"
             }
 
             1 ->{
@@ -60,10 +65,10 @@ class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemCl
                // holder.textViewTitle.text = "CLEAR FBATCH"
                 holder.textViewValue.text = "0"
             }
-        }
+        }*/
 
-        holder.imgViewEdit.setOnClickListener {
-            iBankFunctionsTerminalItemClick?.bankFunctionsTerminalItemClick(listItem[position])
+        holder.viewBinding.imgViewEdit.setOnClickListener {
+            iBankFunctionsTerminalItemClick?.bankFunctionsTerminalItemClick(model)
         }
 
 
@@ -72,11 +77,11 @@ class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemCl
 
 
 
-    inner class BankFunctionsViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
-        val textViewValue: TextView = view.findViewById(R.id.textViewValue)
-        val relLayParent: RelativeLayout = view.findViewById(R.id.relLayParent)
-        val imgViewEdit: ImageView = view.findViewById(R.id.imgViewEdit)
+    inner class BankFunctionsTerminalParamViewHolder(val viewBinding: ItemBankFunctionsTerminalParamBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+//        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
+//        val textViewValue: TextView = view.findViewById(R.id.textViewValue)
+//        val relLayParent: RelativeLayout = view.findViewById(R.id.relLayParent)
+//        val imgViewEdit: ImageView = view.findViewById(R.id.imgViewEdit)
 
     }
 }

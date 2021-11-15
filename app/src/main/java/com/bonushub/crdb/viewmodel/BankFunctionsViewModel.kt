@@ -3,6 +3,7 @@ package com.bonushub.crdb.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.bonushub.crdb.repository.BankFunctionsRepository
+import com.bonushub.crdb.view.fragments.TableEditHelper
 
 class BankFunctionsViewModel:ViewModel() {
 
@@ -20,5 +21,14 @@ class BankFunctionsViewModel:ViewModel() {
 
         isSuperAdminPassword = BankFunctionsRepository.getInstance().isSuperAdminPassword(password)
         return isSuperAdminPassword
+    }
+
+
+    private var terminalParamField:LiveData<ArrayList<TableEditHelper?>>? = null
+
+    suspend fun getTerminalParamField():LiveData<ArrayList<TableEditHelper?>>? {
+
+        terminalParamField = BankFunctionsRepository.getInstance().getTerminalParameterTableData()
+        return terminalParamField
     }
 }
