@@ -1,7 +1,7 @@
 package com.bonushub.crdb.view.activity
 
-
 import android.app.Dialog
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,7 +11,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
@@ -27,14 +26,22 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.DemoConfig
+import com.bonushub.crdb.utils.DeviceHelper
+
+import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.utils.isExpanded
+import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.BankFunctionsFragment
 import com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment
 import com.bonushub.crdb.view.fragments.BrandEmiSubCategoryFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
+
 import com.bonushub.pax.utils.NavControllerFragmentLabel
+import com.bonushub.pax.utils.VxEvent
+
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -47,9 +54,8 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
+class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
-
     private var navigationBinding: ActivityNavigationBinding?=null
     private var navHostFragment: NavHostFragment? = null
     private var isToExit = false
@@ -65,10 +71,8 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     private var pinpad: UPinpad? = null
     private var pinpadLimited: PinpadLimited? = null
     private val dialog by lazy {   Dialog(this) }
-
     @Inject
     lateinit var appDatabase: AppDatabase
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navigationBinding = ActivityNavigationBinding.inflate(layoutInflater)
@@ -99,7 +103,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
       decideDashBoard()
     }
 
-    lateinit var bankFunctionsViewModel:BankFunctionsViewModel
+    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
@@ -169,7 +173,15 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     override fun onReady(version: String?) {
         register(true)
         initDeviceInstance()
+        GlobalScope.launch(Dispatchers.IO) {
+            Utility().readLocalInitFile { status, msg ->
+                Log.d("Init File Read Status ", status.toString())
+                Log.d("Message ", msg)
+                if (status){
 
+                }
+            }
+        }
     }
     //endregion
 
@@ -229,16 +241,7 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
     }
     //endregion
 
-    //region============================fragment transaction
-    open fun transactFragment(fragment: Fragment, isBackStackAdded: Boolean = false): Boolean {
-        val trans = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment, fragment, fragment::class.java.simpleName)
-            addToBackStack(fragment::class.java.simpleName)
-        }
-        if (isBackStackAdded) trans.addToBackStack(null)
-        return trans.commitAllowingStateLoss() >= 0
-    }
-    //endregion
+
 
 
     //region============================fragment transaction
@@ -296,6 +299,10 @@ class NavigationActivity : AppCompatActivity(), DeviceHelper.ServiceReadyListene
                     exitApp()
             }
         }
+    }
+
+    override fun onEvents(event: VxEvent) {
+        TODO("Not yet implemented")
     }
     //endregion
 

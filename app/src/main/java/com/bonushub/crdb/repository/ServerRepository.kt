@@ -12,6 +12,8 @@ import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Utility
+import com.bonushub.crdb.view.fragments.IssuerBankModal
+import com.bonushub.crdb.view.fragments.TenureBankModal
 import com.bonushub.pax.utils.IsoDataReader
 import com.bonushub.pax.utils.SplitterTypes
 import com.google.gson.Gson
@@ -79,6 +81,19 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 // === EMI Tenure
     private var bankEMIIssuerTAndCList: MutableList<BankEMIIssuerTAndCDataModal> = mutableListOf()
     private var bankEMISchemesDataList: MutableList<BankEMITenureDataModal> = mutableListOf()
+
+    //region====================EMIIssuerList Variables:-
+    private var allIssuerBankList: MutableList<IssuerBankModal> = mutableListOf()
+    private var allIssuerTenureList: MutableList<TenureBankModal> = mutableListOf()
+    private val allIssuerTenureListMLData = MutableLiveData<GenericResponse<List<TenureBankModal?>>>()
+    val allIssuerTenureLisLiveData: LiveData<GenericResponse<List<TenureBankModal?>>>
+        get() = allIssuerTenureListMLData
+    private val issuerListMLData = MutableLiveData<GenericResponse<List<IssuerBankModal?>>>()
+    val allIssuerBankListLiveData: LiveData<GenericResponse<List<IssuerBankModal?>>>
+        get() = issuerListMLData
+
+
+    //endregion
 
     suspend fun getBrandData(dataCounter:String="0") {
        // val genericResp = remoteService.getBrandDataService(dataCounter)
@@ -187,6 +202,30 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                 emiTenureMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
             is GenericResponse.Loading->{
+
+            }
+        }
+    }
+
+    suspend fun getIssuerList(enquiryAmount:String) {
+        totalRecord="0"
+        val  field57RequestData =
+            if (AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE) != 0L)
+                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^${
+                    AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE)
+                }"
+            else
+                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^$enquiryAmount"
+        when (val genericResp = remoteService.field57GenericService(field57RequestData)) {
+            is GenericResponse.Success -> {
+                val isoDataReader = genericResp.data
+                val issuerListData = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
+                parseAndStubbingBankEMICatalogueDataToList(issuerListData)
+            }
+            is GenericResponse.Error -> {
+                brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+            }
+            is GenericResponse.Loading -> {
 
             }
         }
@@ -428,6 +467,83 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     }
     //endregion
 
+
+    //region=================Parse and Stubbing BankEMI Data To List:-
+    private fun parseAndStubbingBankEMICatalogueDataToList(bankEMICatalogueHostResponseData: String) {
+
+        if (!TextUtils.isEmpty(bankEMICatalogueHostResponseData)) {
+            val parsingDataWithVerticalLineSeparator =
+                Utility().parseDataListWithSplitter("|", bankEMICatalogueHostResponseData)
+            if (parsingDataWithVerticalLineSeparator.isNotEmpty()) {
+                moreDataFlag = parsingDataWithVerticalLineSeparator[0]
+                perPageRecord = parsingDataWithVerticalLineSeparator[1]
+                totalRecord = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
+                //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
+                // and iterate further on record data only:-
+                var tempDataList = mutableListOf<String>()
+                tempDataList = parsingDataWithVerticalLineSeparator.subList(
+                    2,
+                    parsingDataWithVerticalLineSeparator.size
+                )
+
+                //region=========================Stub Data in AllIssuerList:-
+                for (i in tempDataList.indices) {
+                    if (!TextUtils.isEmpty(tempDataList[i])) {
+                        val splitData = Utility().parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter,
+                            tempDataList[i]
+                        )
+                        allIssuerBankList.add(
+                            IssuerBankModal(
+                                splitData[0], splitData[1],
+                                splitData[2], splitData[3],
+                                splitData[4], splitData[5],
+                                splitData[6], splitData[7],
+                                splitData[8], splitData[9],
+                                splitData[10], splitData[11],
+                                splitData[12], splitData[13],
+                                splitData[14], splitData[15],
+                                splitData[16], splitData[17],
+                                splitData[18], splitData[19],
+                                splitData[20], splitData[21],
+                                splitData[22], splitData[23]
+                            )
+                        )
+                    }
+                }
+                //endregion
+                //region========================Stub Data in AllTenureList:-
+                if (allIssuerBankList.isNotEmpty()) {
+                    val dataLength = allIssuerBankList.size
+                    for (i in 0 until dataLength)
+                        allIssuerTenureList.add(
+                            TenureBankModal(
+                                allIssuerBankList[i].issuerBankTenure,
+                                isTenureSelected = false
+                            )
+                        )
+                    issuerListMLData.postValue(
+                        GenericResponse.Success(
+                            allIssuerBankList
+                        )
+                    )
+                    allIssuerTenureListMLData.postValue(
+                        GenericResponse.Success(
+                            allIssuerTenureList
+                        )
+                    )
+
+
+                }
+                //endregion
+                Log.d("AllIssuerList:- ", allIssuerBankList.toString())
+                Log.d("AllTenureList:- ", allIssuerTenureList.toString())
+
+
+            }
+        }
+    }
+
     //region=================================Stubbing BrandEMI Product Data and Display in List:-
     private suspend fun stubbingBrandEMIProductDataToList(brandEMIProductData: String, brandID: String?,catagoryID:String?) {
             if (!TextUtils.isEmpty(brandEMIProductData)) {
@@ -646,4 +762,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
         }
     }
     //endregion
+
+
+
 }
