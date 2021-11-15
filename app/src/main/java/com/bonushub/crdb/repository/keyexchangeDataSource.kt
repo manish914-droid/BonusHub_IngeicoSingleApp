@@ -9,6 +9,7 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.di.USDKScope
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
@@ -18,6 +19,7 @@ import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType
+import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -34,7 +36,8 @@ interface IKeyExchange : IKeyExchangeInit{
 
 typealias ApiCallback = (String, Boolean, Boolean,Boolean) -> Unit
 
-class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IKeyExchange {
+class keyexchangeDataSource @Inject constructor(private val appDao: AppDao,
+                                                @USDKScope pinpad: UPinpad?) : IKeyExchange {
 
     var keWithInit = true
     var isHdfc = false
@@ -50,7 +53,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
         fun getF61(): String {
             val appName =
-                    addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
+                addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
 
             val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
 
@@ -59,9 +62,9 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             val version = "${BuildConfig.VERSION_NAME}.$buildDate"
             val connectionType = ConnectionType.GPRS.code
             val pccNo =
-                    addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
             val pcNo2 =
-                    addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
+                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
 
             return "$connectionType$deviceModel$appName$version$pccNo${""}"
         }
@@ -76,16 +79,16 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         //Condition to Check if ISO Packet Create for Logon After Settlement or for other cases:-
         if (!afterSettlement) {
             addField(
-                    3, if (tmk.isEmpty()) {
-                //resume after
-                rsa = RSAProvider.generateKeyPair()
-                val publicKey = RSAProvider.getPublicKeyBytes(rsa)
-                val f59 = insertBitsInPublicKey(
+                3, if (tmk.isEmpty()) {
+                    //resume after
+                    rsa = RSAProvider.generateKeyPair()
+                    val publicKey = RSAProvider.getPublicKeyBytes(rsa)
+                    val f59 = insertBitsInPublicKey(
                         publicKey.substring(44).hexStr2ByteArr().byteArr2Str()
-                )
-                addFieldByHex(59, f59)
-                ProcessingCode.KEY_EXCHANGE.code
-            } else ProcessingCode.KEY_EXCHANGE_RESPONSE.code
+                    )
+                    addFieldByHex(59, f59)
+                    ProcessingCode.KEY_EXCHANGE.code
+                } else ProcessingCode.KEY_EXCHANGE_RESPONSE.code
             )
         } else {
             addField(3, ProcessingCode.KEY_EXCHANGE_AFTER_SETTLEMENT.code)
@@ -117,10 +120,10 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         //region=====adding field 63============
         val bankCode: String = AppPreference.getBankCode()
         val deviceSerial = addPad(
-                DeviceHelper.getDeviceSerialNo() ?: "",
-                " ",
-                15,
-                false
+            DeviceHelper.getDeviceSerialNo() ?: "",
+            " ",
+            15,
+            false
         ) // right padding of 15 byte
         val f63 = "$deviceSerial$bankCode"
         addFieldByHex(63, f63)
@@ -131,13 +134,13 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         mti = Mti.MTI_LOGON.mti
         // adding processing code and field 59 for public and private key
         addField(
-                3, if (isFirstCall) {
-            addFieldByHex(60, "${addPad(0, "0", 8)}BP${addPad(0, "0", 4)}")
-            ProcessingCode.INIT.code
-        } else {
-            addFieldByHex(60, nextCounter)
-            ProcessingCode.INIT_MORE.code
-        }
+            3, if (isFirstCall) {
+                addFieldByHex(60, "${addPad(0, "0", 8)}BP${addPad(0, "0", 4)}")
+                ProcessingCode.INIT.code
+            } else {
+                addFieldByHex(60, nextCounter)
+                ProcessingCode.INIT_MORE.code
+            }
         )
         //adding stan (padding of stan is internally handled by iso)
         paddingInvoiceRoc(DBModule.appDatabase?.appDao?.getRoc())?.let { addField(11, it) }
@@ -152,7 +155,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
         //region=========adding field 61=============
         val appName =
-                addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
+            addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
 
         val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
 
@@ -160,9 +163,9 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         val version = "${BuildConfig.VERSION_NAME}.$buildDate"
         val connectionType = ConnectionType.GPRS.code
         val pccNo =
-                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+            addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
         val pcNo2 =
-                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
+            addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
         val f61 = "$connectionType$deviceModel$appName$version$pccNo$pcNo2"
         addFieldByHex(61, f61)
         //endregion
@@ -172,10 +175,10 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 //            val customerId = "00"
 //            val walletIssuerId = AppPreference.WALLET_ISSUER_ID
         val deviceSerial = addPad(
-                DeviceHelper.getDeviceSerialNo() ?: "",
-                " ",
-                15,
-                false
+            DeviceHelper.getDeviceSerialNo() ?: "",
+            " ",
+            15,
+            false
         ) // right padding of 15 byte
         val f63 = "$deviceSerial$bankCode"
         addFieldByHex(63, f63)
@@ -305,7 +308,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             }
             if (result) {
                 result = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
-                        ?.loadEncKey(KeyType.TDK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_TRACK, dpk, ppkKcv) ?: false
+                    ?.loadEncKey(KeyType.TDK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_TRACK, dpk, ppkKcv) ?: false
                 System.out.println("TDK is success "+result)
                 //  result = NeptuneService.Device.writeTdk(dpk, dpkKcv)
                 // NeptuneService.beepKey(EBeepMode.FREQUENCE_LEVEL_6,1000)
@@ -318,9 +321,9 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             try {
             } catch (ex: Exception) {
             }
-          //  callback(result)
+            //  callback(result)
         }
-        
+
         return result
     }
 
@@ -328,29 +331,29 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         var strResult: String? = null
         var strSucess: Boolean? = null
 
-            HitServer.apply {
-                reversalToBeSaved = null
-            }.hitInitServer({ result, success ->
-                System.out.println("Init Suceesuffly msg2 " + result)
-                if (success) {
-                    strResult = result
-                    strSucess = success
-                    Toast.makeText(
-                        HDFCApplication.appContext, "Init Suceesuffly msg " + strSucess, Toast.LENGTH_LONG
-                    ).show()
-                    // System.out.println("Init Suceesuffly msg "+strSucess)
-                } else {
-                    strResult = result
-                    strSucess = success
-                }
-            }, {
-                 strResult = it
-                strSucess  = true
+        HitServer.apply {
+            reversalToBeSaved = null
+        }.hitInitServer({ result, success ->
+            System.out.println("Init Suceesuffly msg2 " + result)
+            if (success) {
+                strResult = result
+                strSucess = success
+                Toast.makeText(
+                    HDFCApplication.appContext, "Init Suceesuffly msg " + strSucess, Toast.LENGTH_LONG
+                ).show()
+                // System.out.println("Init Suceesuffly msg "+strSucess)
+            } else {
+                strResult = result
+                strSucess = success
+            }
+        }, {
+            strResult = it
+            strSucess  = true
 
-            }, this@keyexchangeDataSource,tid)
+        }, this@keyexchangeDataSource,tid)
 
 
-          System.out.println("Init Suceesuffly msg1 "+strResult)
+        System.out.println("Init Suceesuffly msg1 "+strResult)
 
 
         return Triple(strResult,strSucess,false)
@@ -365,16 +368,16 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             reversalToBeSaved = null
         }.hitServer(bData, { result, success ->
             if (success && !TextUtils.isEmpty(result)) {
-               strResult = result
+                strResult = result
                 strSucess = success
             }
             else{
                 strResult = result
                 strSucess = success
             }
-            }, {
-                strResult = it
-                strSucess  = false
+        }, {
+            strResult = it
+            strSucess  = false
         })
 
         return Triple(strResult,strSucess,false)

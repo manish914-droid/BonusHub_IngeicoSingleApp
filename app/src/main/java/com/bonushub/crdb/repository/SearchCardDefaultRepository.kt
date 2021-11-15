@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.RemoteException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.bonushub.crdb.di.USDKScope
 import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.entity.EMVOption
 import com.bonushub.crdb.model.CardProcessedDataModal
@@ -30,9 +31,9 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
 
-class SearchCardDefaultRepository @Inject constructor(private var algorithm: UAlgorithm?,
-                                                      private var pinpad: UPinpad?,
-                                                      private var emv: UEMV?,
+class SearchCardDefaultRepository @Inject constructor(@USDKScope private var algorithm: UAlgorithm?,
+                                                      @USDKScope private var pinpad: UPinpad?,
+                                                      @USDKScope private var emv: UEMV?,
                                                       @ActivityContext private val context: Context): SearchCardRepository {
 
     val TAG = SearchCardDefaultRepository::class.java.simpleName

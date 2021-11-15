@@ -31,7 +31,7 @@ object ActivityModule {
     @Provides
     @ActivityScoped
     fun provideShoppingrepository(@USDKScope algo: UAlgorithm?,
-                                  @USDKScope ipinpad: UPinpad?,@USDKScope emv: UEMV?,
+                                  @USDKScope ipinpad: UPinpad?, @USDKScope emv: UEMV?,
                                   @ActivityContext context: Context) : SearchCardRepository{
 
         return SearchCardDefaultRepository(algo,ipinpad,emv,context)

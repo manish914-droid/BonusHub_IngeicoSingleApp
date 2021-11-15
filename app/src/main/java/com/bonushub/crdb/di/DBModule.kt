@@ -7,13 +7,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.repository.*
-import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DeviceHelper
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.emv.UEMV
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
-import com.usdk.apiservice.aidl.pinpad.KeyType
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import dagger.Module
 import dagger.Provides
@@ -63,10 +61,27 @@ object DBModule {
         return keyexchangeDataSourcenew(appDao)
     }
 
+
     @Singleton
+    @USDKScope
     @Provides
-    fun providekeyechangeDataSource(appDao: AppDao): IKeyExchange {
-        return keyexchangeDataSource(appDao)
+    fun provideAlgoritm() : UAlgorithm?{
+        return DeviceHelper.getAlgorithm()
+    }
+
+
+    @Singleton
+    @USDKScope
+    @Provides
+    fun providePINPAD() : UPinpad?{
+        return DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
+    }
+
+
+
+    @Provides
+    fun providekeyechangeDataSource(appDao: AppDao, @USDKScope pinpad: UPinpad?): IKeyExchange {
+        return keyexchangeDataSource(appDao,pinpad)
     }
 
     @Singleton
@@ -89,17 +104,7 @@ object DBModule {
         return DeviceHelper.getEMV()
     }
 
-    @USDKScope
-    @Provides
-    fun provideAlgoritm() : UAlgorithm?{
-        return DeviceHelper.getAlgorithm()
-    }
 
-    @USDKScope
-    @Provides
-    fun providePINPAD() : UPinpad?{
-        return DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
-    }
 
 }
 
