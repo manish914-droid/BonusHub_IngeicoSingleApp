@@ -103,8 +103,8 @@ data class BankEMITenureDataModal(
 ) : Parcelable
 //endregion
 
-data class TenuresWithIssuerTncs( private var bankEMIIssuerTAndCList: MutableList<BankEMIIssuerTAndCDataModal>
-        ,private var bankEMISchemesDataList: MutableList<BankEMITenureDataModal>
+data class TenuresWithIssuerTncs(  var bankEMIIssuerTAndCList: MutableList<BankEMIIssuerTAndCDataModal>
+        , var bankEMISchemesDataList: MutableList<BankEMITenureDataModal>
 )
 
 

@@ -125,6 +125,16 @@ fun getErrorMessage(error: Int): String {
     return message
 }
 
+//region=========================Divide Amount by 100 and Return Back:-
+fun divideAmountBy100(amount: Int = 0): Double {
+    return if (amount != 0) {
+        val divideAmount = amount.toDouble()
+        divideAmount.div(100)
+    } else
+        0.0
+}
+//endregion
+
 
 
 
