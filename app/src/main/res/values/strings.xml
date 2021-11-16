@@ -117,8 +117,38 @@
     <string name="hint_enter_admin_password">**** ENTER ADMIN PASSWORD</string>
     <string name="super_admin_password">SUPER ADMIN PASSWORD</string>
     <string name="hint_enter_super_admin_password">**** ENTER SUPER ADMIN PASSWORD</string>
+    <string name="invalid_password">Invalid Password</string>
 
 
+    <string name="test_emi">Test EMI TXN</string>
+    <string name="bill_num">Enter bill number</string>
+    <string name="brand_min_max_amt_limit_txn"><![CDATA[Entered Amount Should be in Product Min & Max Amount Range]]></string>
+    <string name="enterValid_serial_iemei_no">Enter valid serial/IMEI no</string>
+    <string name="enter_imei_number">Enter IMEI Number</string>
+    <string name="enter_serial_number">Enter Serial Number</string>
+    <string name="proceed">Proceed</string>
+    <string name="proceed_txn">Proceed Txn</string>
+
+
+
+    <string name="default_amount">0.00</string>
+    <string name="transaction_amount">Transaction Amount</string>
+    <string name="txn_amount">Txn Amount</string>
+    <string name="cash_amount">Enter Cash Amount (\u20B9)</string>
+    <string name="tenure_interest_rate">Tenure Interest Rate</string>
+    <string name="emi_amount">EMI Amount</string>
+    <string name="total_emi">Total EMI</string>
+    <string name="discount_amount">Discount Amount</string>
+    <string name="emi_scheme_and_offer">Please Select EMI Scheme</string>
+    <string name="select_scheme">"Select "</string>
+    <string name="schemes">Scheme</string>
+    <string name="cashback">CashBack Amount</string>
+    <string name="interest_rate">Interest Rate</string>
+    <string name="total_interest_pay">Total Interest Pay</string>
+    <string name="total_emi_pay">Total EMI Pay</string>
+    <string name="please_select_scheme">Please Select Scheme</string>
+    <string name="loan_amount">Loan Amount</string>
+    <string name="roi_pa">R.o.i</string>
     <!--Base Activity-->
     <string name="app_name_2">BonusHub</string>
     <string name="settle_batch">Settle Batch</string>

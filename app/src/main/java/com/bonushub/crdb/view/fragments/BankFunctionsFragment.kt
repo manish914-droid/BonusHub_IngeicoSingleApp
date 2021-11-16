@@ -70,11 +70,10 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
                     dialog.dismiss()
                     (activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment())
                 }else{
-                    Toast.makeText(requireContext(),"Password not match", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(),R.string.invalid_password, Toast.LENGTH_LONG).show()
                 }
             })
 
-            //(activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment())
         }
 
         override fun onClickCancel() {

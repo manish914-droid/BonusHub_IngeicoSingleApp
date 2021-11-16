@@ -49,6 +49,9 @@
             android:name=".MainActivity"
             android:exported="true" />
         <activity
+            android:name=".view.fragments.TenureSchemeActivity"
+            />
+        <activity
             android:name=".view.activity.NavigationActivity"
             android:exported="true">
             <intent-filter>

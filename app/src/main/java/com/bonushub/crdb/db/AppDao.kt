@@ -310,5 +310,13 @@ suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
      }*/
     //endregion
 
+    // region bank functions
+    @Query("SELECT * FROM TerminalParameterTable LIMIT 1")
+    suspend fun getSingleRowTerminalParameterTableData(): TerminalParameterTable?
+
+    @Query("SELECT * FROM TerminalParameterTable")
+    suspend fun getTerminalParameterTableData(): MutableList<TerminalParameterTable?>
+
+    // end region
 
 }

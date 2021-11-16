@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
@@ -14,6 +15,8 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.view.fragments.TenureBankModal
+import com.bonushub.crdb.view.fragments.TenureSchemeActivity
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -37,10 +40,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TransactionActivity : AppCompatActivity(){
 
-    /** need to use Hilt for instance initializing here..*/
-    private val remoteService: RemoteService = RemoteService()
-    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
-    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
 
 
     val TAG = TransactionActivity::class.java.simpleName
@@ -119,7 +118,7 @@ class TransactionActivity : AppCompatActivity(){
                  }*/
 
                   var ecrID: String
-                   try {
+               /*    try {
                        DeviceHelper.doSaleTransaction(
                            SaleRequest(
                                amount = 300L ?: 0,
@@ -156,7 +155,7 @@ class TransactionActivity : AppCompatActivity(){
                    }
               catch (exc: Exception){
                   exc.printStackTrace()
-              }
+              }*/
 
                Toast.makeText(
                    this,
@@ -164,10 +163,14 @@ class TransactionActivity : AppCompatActivity(){
                    Toast.LENGTH_LONG
                ).show()
 
-               lifecycleScope.launch(Dispatchers.IO) {
-                   serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                  // serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-               }
+              /* lifecycleScope.launch(Dispatchers.IO) {
+                  // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+                   serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
+               }*/
+               val intent = Intent (this, TenureSchemeActivity::class.java)
+
+               startActivity(intent)
+
            }
 
        })
