@@ -317,6 +317,9 @@ suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
     @Query("SELECT * FROM TerminalParameterTable")
     suspend fun getTerminalParameterTableData(): MutableList<TerminalParameterTable?>
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateTerminalParameterTable(terminalParameterTable: TerminalParameterTable)
+
     // end region
 
 }

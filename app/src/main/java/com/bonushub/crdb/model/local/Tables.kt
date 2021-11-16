@@ -3,6 +3,7 @@ package com.bonushub.crdb.model.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.bonushub.crdb.di.scope.BHDashboardItem
+import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.pax.utils.EDashboardItem
 import kotlinx.android.parcel.Parcelize
@@ -368,15 +369,19 @@ data class TerminalParameterTable(
     var isActive: String = "",
 
     @field:BHFieldParseIndex(4)
+    @field: BHFieldName("TID")
     var terminalId: String = "",
 
     @field:BHFieldParseIndex(5)
+    @field:BHFieldName("MID")
     var merchantId: String = "",
 
     @field:BHFieldParseIndex(6)
+    @field:BHFieldName("Batch Number")
     var batchNumber: String = "",
 
     @field:BHFieldParseIndex(7)
+    @field:BHFieldName("Invoice Number")
     var invoiceNumber: String = "",
 
     @field:BHFieldParseIndex(8)
@@ -389,11 +394,13 @@ data class TerminalParameterTable(
     var receiptHeaderThree: String = "",
 
     @field:BHFieldParseIndex(11)
+    @field:BHFieldName("Print Receipt")
     var printReceipt: String = "",
 
     @field:BHFieldParseIndex(12)
     var adminPassword: String = "",
 
+    @field:BHFieldName("Manager Password")
     var managerPassword: String = "",
     /*  get() {
           return if (adminPassword.length == 8) adminPassword.substring(0, 4) else adminPassword
@@ -412,55 +419,70 @@ data class TerminalParameterTable(
     var terminalDateTime: String = "",
 
     @field:BHFieldParseIndex(17)
+    @field:BHFieldName("Currency Symbol")
     var currencySymbol: String = "",
 
     @field:BHFieldParseIndex(18)
+    @field:BHFieldName("Tip Processing")
     @field:BHDashboardItem(EDashboardItem.SALE_TIP)
     var tipProcessing: String = "",
 
     @field:BHFieldParseIndex(19)
+    @field:BHFieldName("Tip Percent")
     var tipPercent: String = "",
 
     @field:BHFieldParseIndex(20)
+    @field:BHFieldName("Max Tip Percent")
     var maxTipPercent: String = "",
 
     @field:BHFieldParseIndex(21)
+    @field:BHFieldName("Max Tip Limit")
     var maxTipLimit: String = "",
 
     @field:BHFieldParseIndex(22)
+    @field:BHFieldName("Surcharge")
     var surcharge: String = "",
 
     @field:BHFieldParseIndex(23)
+    @field:BHFieldName("Surcharge Type")
     var surchargeType: String = "",
 
     @field:BHFieldParseIndex(24)
+    @field:BHFieldName("Surcharge Value")
     var surChargeValue: String = "",
 
     @field:BHFieldParseIndex(25)
     var maxSurchargeValue: String = "",
 
     @field:BHFieldParseIndex(26)
+    @field:BHFieldName("Force Settle")
     var forceSettle: String = "",
 
     @field:BHFieldParseIndex(27)
+    @field:BHFieldName("Force Settle Time")
     var forceSettleTime: String = "",
 
     @field:BHFieldParseIndex(28)
+    @field:BHFieldName("Sale With Cash")
     @field:BHDashboardItem(EDashboardItem.SALE_WITH_CASH)
     var saleWithCash: String = "",
 
     @field:BHFieldParseIndex(29)
+    @field:BHFieldName("Cash Advance")
     @field:BHDashboardItem(EDashboardItem.CASH_ADVANCE)
     var cashAdvance: String = "",
 
     @field:BHFieldParseIndex(30)
+    @field:BHFieldName("Cash Advance Limit")
     var cashAdvanceMaxAmountLimit: String = "",
 
     //allowed or not masking 0 -> default masking, 1-> masking based on maskformate
     @field:BHFieldParseIndex(32)
+    @field:BHFieldName("Pan Mask")
     var panMask: String = "",
 
     @field:BHFieldParseIndex(33)
+    @field:BHFieldName("Pan Mash Format")
     var panMaskFormate: String = "",
 
     //on which coppy allowed masking 0->none,1->customer coppy, 2->merchant coppy,3->both
@@ -470,18 +492,22 @@ data class TerminalParameterTable(
 
     @field:BHDashboardItem(EDashboardItem.SALE)
     @field:BHFieldParseIndex(35)
+    @field:BHFieldName("Sale")
     var sale: String = "",
 
     @field:BHDashboardItem(EDashboardItem.VOID_SALE)
     @field:BHFieldParseIndex(36)
+    @field:BHFieldName("Void")
     var voidSale: String = "",
 
     @field:BHDashboardItem(EDashboardItem.REFUND)
     @field:BHFieldParseIndex(37)
+    @field:BHFieldName("Refund")
     var refund: String = "",
 
     @field:BHDashboardItem(EDashboardItem.VOID_REFUND)
     @field:BHFieldParseIndex(38)
+    @field:BHFieldName("Void Refund")
     var voidRefund: String = "",
 
     @field:BHDashboardItem(
@@ -489,6 +515,7 @@ data class TerminalParameterTable(
         EDashboardItem.PREAUTH_COMPLETE
     )
     @field:BHFieldParseIndex(39)
+    @field:BHFieldName("Pre Auth")
     var preAuth: String = "",
 
     @field:BHFieldParseIndex(31)
@@ -499,13 +526,16 @@ data class TerminalParameterTable(
         EDashboardItem.EMI_ENQUIRY
     )
     @field:BHFieldParseIndex(40)
+    @field:BHFieldName("Bank Emi")
     var bankEmi: String = "",
 
     @field:BHDashboardItem(EDashboardItem.BRAND_EMI)
     @field:BHFieldParseIndex(41)
+    @field:BHFieldName("Brand Emi")
     var brandEmi: String = "",
 
     @field:BHFieldParseIndex(42)
+    @field:BHFieldName("Brand Emi By Access Code")
     var emiPro: String = "",
 
     @field:BHFieldParseIndex(43)
@@ -515,29 +545,35 @@ data class TerminalParameterTable(
     var qrTransaction: String = "",
 
     @field:BHFieldParseIndex(45)
+    @field: BHFieldName("Manual Entry")
     var fManEntry: String = "",
 
     @field:BHDashboardItem(
         EDashboardItem.OFFLINE_SALE
     )
     @field:BHFieldParseIndex(46)
+    @field:BHFieldName("Offline Sale")
     var fManOfflineSale: String = "",
 
     @field:BHFieldParseIndex(47)
     var reservedValues: String = "",
 
+    @field:BHFieldName("roc")
     var stan: String = "",
 
     @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
     @field:BHFieldParseIndex(48)
+    @field:BHFieldName("Void Preauth")
     var fVoidPreauth: String = "",
 
     @field:BHDashboardItem(EDashboardItem.VOID_OFFLINE_SALE)
     @field:BHFieldParseIndex(49)
+    @field:BHFieldName("Void Offline Sale")
     var fVoidOfflineSale: String = "",
 
     @field:BHDashboardItem(EDashboardItem.PENDING_PREAUTH)
     @field:BHFieldParseIndex(50)
+    @field:BHFieldName("Pending Preauth")
     var fPendingPreauthTrans: String = "",
 
     @field:BHFieldParseIndex(51)
@@ -547,15 +583,18 @@ data class TerminalParameterTable(
     var minCtlsTransAmt: String = "",
 
     @field:BHFieldParseIndex(53)
+    @field:BHFieldName("Offline Sale Min PAN")
     var minOfflineSalePanLen: String = "",
 
     @field:BHFieldParseIndex(54)
+    @field:BHFieldName("Offline Sale Max PAN")
     var maxOfflineSalePanLen: String = "",
 
     @field:BHFieldParseIndex(55)
     var tlsFlag: String = "",
 
     @field:BHFieldParseIndex(56)
+    @field:BHFieldName("Printing Impact")
     var printingImpact: String = "",
 
     @field:BHFieldParseIndex(57)
@@ -569,15 +608,19 @@ data class TerminalParameterTable(
 
     //region=========New Fields for HDFC===========
     @field:BHFieldParseIndex(60)
+    @field:BHFieldName("Tid Type")
     var tidType: String = "",  // if type is 1 main else child tid
 
     @field:BHFieldParseIndex(61)
+    @field:BHFieldName("Tid Index")
     var tidIndex: String = "",   // sorting order of child tid
 
     @field:BHFieldParseIndex(62)
+    @field:BHFieldName("Tid Bank Code")
     var tidBankCode: String = "",  // relation with bank
 
     @field:BHFieldParseIndex(63)
+    @field:BHFieldName("Tid Name")
     var tidName: String = "",  // name of bank
 
     var clearFBatch: String = "0" //This field is for Server Hit Status
@@ -946,3 +989,4 @@ data class BrandEMIAccessDataModalTable(
     var brandTimeStamp: String = ""
 )
 //endregion
+

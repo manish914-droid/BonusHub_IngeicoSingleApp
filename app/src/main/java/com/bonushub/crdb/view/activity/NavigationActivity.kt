@@ -1,7 +1,6 @@
 package com.bonushub.crdb.view.activity
 
 import android.app.Dialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,7 +12,6 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -35,7 +33,6 @@ import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.BankFunctionsFragment
-import com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment
 import com.bonushub.crdb.view.fragments.BrandEmiSubCategoryFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 

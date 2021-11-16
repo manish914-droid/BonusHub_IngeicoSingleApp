@@ -10,9 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ItemBankFunctionsTerminalParamBinding
 import com.bonushub.crdb.view.fragments.IBankFunctionsTerminalItemClick
+import com.bonushub.crdb.view.fragments.TableEditHelper
 import com.bonushub.pax.utils.BankFunctionsTerminalItem
 
-class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemClick: IBankFunctionsTerminalItemClick?, private var listItem: MutableList<BankFunctionsTerminalItem>) : RecyclerView.Adapter<BankFunctionsTerminalParamAdapter.BankFunctionsTerminalParamViewHolder>() {
+class BankFunctionsTerminalParamAdapter(private var dataList:ArrayList<TableEditHelper?>, private var iBankFunctionsTerminalItemClick: IBankFunctionsTerminalItemClick?) : RecyclerView.Adapter<BankFunctionsTerminalParamAdapter.BankFunctionsTerminalParamViewHolder>() {
 
 
 
@@ -23,16 +24,16 @@ class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemCl
         return BankFunctionsTerminalParamViewHolder(itemBinding)
     }
 
-    override fun getItemCount(): Int = listItem.size
+    override fun getItemCount(): Int = dataList.size
 
 
     override fun onBindViewHolder(holder: BankFunctionsTerminalParamViewHolder, position: Int) {
 
-        val model = listItem[position]
+        val model = dataList[position]
 
-        holder.viewBinding.textViewTitle.text = model._name
+        holder.viewBinding.textViewTitle.text = model?.titleName
 
-        holder.viewBinding.textViewValue.text = "000184"
+        holder.viewBinding.textViewValue.text = model?.titleValue
 
         // temparary
         /*when(position){
@@ -68,7 +69,7 @@ class BankFunctionsTerminalParamAdapter(private var iBankFunctionsTerminalItemCl
         }*/
 
         holder.viewBinding.imgViewEdit.setOnClickListener {
-            iBankFunctionsTerminalItemClick?.bankFunctionsTerminalItemClick(model)
+            iBankFunctionsTerminalItemClick?.bankFunctionsTerminalItemClick(position)
         }
 
 
