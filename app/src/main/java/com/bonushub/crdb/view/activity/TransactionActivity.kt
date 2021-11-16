@@ -164,10 +164,10 @@ class TransactionActivity : AppCompatActivity(){
                    Toast.LENGTH_LONG
                ).show()
 
-              /* lifecycleScope.launch(Dispatchers.IO) {
-                  // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                   serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-               }*/
+               lifecycleScope.launch(Dispatchers.IO) {
+                   serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+                  // serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
+               }
            }
 
        })
