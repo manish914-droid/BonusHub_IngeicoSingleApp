@@ -69,7 +69,7 @@
             android:layout_marginRight="@dimen/pad_20"
             android:layout_marginLeft="@dimen/pad_20"
             android:layout_marginTop="@dimen/pad_10"
-android:visibility="gone"
+            android:visibility="gone"
 
             >
 
@@ -82,13 +82,11 @@ android:visibility="gone"
                 android:ems="9"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
-
                 android:gravity="end"
                 android:inputType="none"
                 android:maxLength="15"
                 android:maxLines="1"
                 android:paddingStart="@dimen/pad_16"
-             
                 android:paddingTop="@dimen/pad_8"
                 android:paddingEnd="@dimen/pad_16"
                 android:hint="@string/enter_cash_amount"

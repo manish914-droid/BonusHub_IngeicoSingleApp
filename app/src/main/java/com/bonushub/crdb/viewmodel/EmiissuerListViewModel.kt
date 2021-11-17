@@ -21,7 +21,7 @@ class EmiissuerListViewModel(private val serverRepository: ServerRepository) : V
     init {
         viewModelScope.launch(Dispatchers.IO) {
             logger("Get DATA","----START----------","e")
-          //  serverRepository.getIssuerList("50000")
+            serverRepository.getIssuerList("50000")
         }
     }
 }

@@ -2,7 +2,6 @@ package com.bonushub.crdb.view.fragments
 
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -17,17 +16,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.utils.DeviceHelper
 
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
-
-import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.isExpanded
-import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.activity.TransactionActivity
+import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.pax.utils.EDashboardItem
@@ -47,7 +41,7 @@ import kotlinx.coroutines.*
 
 
 @AndroidEntryPoint
-class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
+class DashboardFragment : androidx.fragment.app.Fragment() {
     companion object {
         var toRefresh = true
         val TAG = DashboardFragment::class.java.simpleName
@@ -61,7 +55,7 @@ class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
     private var battery: String? = null
     private var batteryINper: Int = 0
     private val dashBoardAdapter by lazy {
-        DashBoardAdapter(this, ::onItemLessMoreClick)
+        DashBoardAdapter(iFragmentRequest, ::onItemLessMoreClick)
     }
     private  var data: MutableList<BannerConfigModal>?=null
     private var animShow: Animation? = null
@@ -82,10 +76,9 @@ class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
     }
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-            iFragmentRequest = this
-
-
+        if (context is IFragmentRequest) {
+            iFragmentRequest = context
+        }
     }
 
     private fun observeDashboardViewModel(){
@@ -164,14 +157,6 @@ class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
 
                         }
 
-                        /*    if (lst <= 5) {
-                            list1.add(itemList[lst])
-                        } else {
-                            list1[5] = EDashboardItem.MORE
-                            list2.addAll(itemList)
-                            list2.add(EDashboardItem.LESS)
-                            break
-                        }*/
                     }
 
                     withContext(Dispatchers.Main) {
@@ -208,7 +193,7 @@ class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
             DeviceHelper.doTerminalInitialization(
                 request = TerminalInitializationRequest(
                     1,
-                    listOf("41501370")
+                    listOf("30160031")
                 ),
                 listener = object : OnOperationListener.Stub() {
                     override fun onCompleted(p0: OperationResult?) {
@@ -275,58 +260,11 @@ class DashboardFragment : androidx.fragment.app.Fragment(),IFragmentRequest {
         }
     }
 
-    override fun onFragmentRequest(
-        action: UiAction,
-        data: Any,
-        extraPair: Triple<String, String, Boolean>?
-    ) {
-
-        }
-
-
-    override fun onDashBoardItemClick(action: EDashboardItem) {
-        Log.e("action ob d--->",""+action)
-        when (action) {
-                EDashboardItem.EMI_ENQUIRY -> {
-                    if (checkInternetConnection()) {
-                        (activity as NavigationActivity).transactFragment(EMICatalogue().apply {
-                            arguments = Bundle().apply {
-                                putSerializable("type", EDashboardItem.EMI_CATALOGUE)
-                              //  putString(INPUT_SUB_HEADING, "")
-                            }
-                        })
-
-                    } else {
-                  ToastUtils.showToast(activity,getString(R.string.no_internet_available_please_check_your_internet))
-                    }
-            }
-
-            EDashboardItem.BRAND_EMI->{
-                (activity as NavigationActivity).transactFragment(BrandEmiMasterCategoryFragment())
-
-            }
-            else->{
-                val intent = Intent (activity, TransactionActivity::class.java)
-                activity?.startActivity(intent)
-
-            }
-        }
-
-    }
-}
-
-
-interface IFragmentRequest {
-    fun onFragmentRequest(
-        action: UiAction,
-        data: Any,
-        extraPair: Triple<String, String, Boolean>? = Triple("", "", third = true)
-    )
-
-    fun onDashBoardItemClick(action: EDashboardItem)
-
 
 }
+
+
+
 
 //region===================BannerConfigModal:-
 data class BannerConfigModal(

@@ -16,9 +16,10 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.viewmodel.InitViewModel
 import androidx.lifecycle.Observer
-import com.bonushub.crdb.IDialog
+
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.view.activity.NavigationActivity
+import com.bonushub.crdb.view.base.IDialog
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 

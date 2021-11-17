@@ -222,6 +222,8 @@ interface AppDao{
     }
 
 
+
+
     @Query("UPDATE TerminalParameterTable SET stan = :roc WHERE tableId = :tableID")
     fun updateRoc(roc: String, tableID: String)
 
@@ -277,7 +279,7 @@ interface AppDao{
     @Query("SELECT * FROM BrandEMISubCategoryTable")
     suspend fun getBrandEMISubCategoryData():List<BrandEMISubCategoryTable>?
     // endregion
-suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
+    suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
    val list= getBrandEMIDateTimeStamps()
     return if(list.isNullOrEmpty()){
         null
@@ -287,6 +289,8 @@ suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
 
 }
 
+    @Query("SELECT * FROM IssuerParameterTable WHERE issuerId = :issuerId ")
+    fun selectFromIssuerParameterTable(issuerId: String): IssuerParameterTable?
 
 
 
@@ -316,6 +320,9 @@ suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
 
     @Query("SELECT * FROM TerminalParameterTable")
     suspend fun getTerminalParameterTableData(): MutableList<TerminalParameterTable?>
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateTerminalParameterTable(terminalParameterTable: TerminalParameterTable)
 
     // end region
 

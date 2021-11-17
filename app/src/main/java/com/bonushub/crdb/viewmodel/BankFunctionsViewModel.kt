@@ -2,6 +2,7 @@ package com.bonushub.crdb.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.repository.BankFunctionsRepository
 import com.bonushub.crdb.view.fragments.TableEditHelper
 
@@ -30,5 +31,17 @@ class BankFunctionsViewModel:ViewModel() {
 
         terminalParamField = BankFunctionsRepository.getInstance().getTerminalParameterTableData()
         return terminalParamField
+    }
+
+    private var terminalParameterTable:LiveData<TerminalParameterTable>? = null
+
+    suspend fun getTerminalParameterTable():LiveData<TerminalParameterTable>? {
+
+        terminalParameterTable = BankFunctionsRepository.getInstance().getTerminalParameterTable()
+        return terminalParameterTable
+    }
+
+    suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>){
+        BankFunctionsRepository.getInstance().updateTerminalParameterTable(dataList)
     }
 }

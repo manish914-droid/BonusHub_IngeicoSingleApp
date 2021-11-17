@@ -20,7 +20,7 @@ object AppPreference {
 
     const val AMEX_BANK_CODE = "07"
     const val ROC_V2 = "roc_tan_v2"
-
+    const val WALLET_ISSUER_ID = "50"
     private val preferenceName = "HDFCPreference"
     private var sharedPreference: SharedPreferences? = null
     private const val PREFERENCE_NAME = "PaxApp"

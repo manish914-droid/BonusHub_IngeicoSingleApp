@@ -23,6 +23,7 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.local.*
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +54,7 @@ var isMerchantPrinted = false
 var isDashboardOpen = false
 val simpleTimeFormatter = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 val simpleDateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
-
+private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
 
 class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
@@ -1057,6 +1058,39 @@ object Field48ResponseTimestamp {
         GlobalScope.launch(Dispatchers.Main) {
             Toast.makeText(HDFCApplication.appContext, message, Toast.LENGTH_SHORT).show()
         }
+    }
+    //getHDFCTptData
+    suspend fun getHDFCTptData(): HDFCTpt? {
+        val hdfcTptRecords =  dbObj.appDao.getAllHDFCTPTTableData()
+        return if (!hdfcTptRecords.isNullOrEmpty())
+            hdfcTptRecords[0]
+        else null
+    }
+    //endregion
+    // region ========== converting value in BCD format:-
+    fun convertValue2BCD(optionValue: String): String {
+        val optionsBinaryValue = optionValue.toInt(16).let { Integer.toBinaryString(it) }
+        return addPad(optionsBinaryValue, "0", 8, toLeft = true)
+    }
+    //endregion
+
+    //region======================Get TPT Data:-
+    fun getTptData(): TerminalParameterTable? {
+        var tptData: TerminalParameterTable? = null
+        runBlocking(Dispatchers.IO) {
+            tptData =  dbObj.appDao.getAllTerminalParameterTableData()?.get(0)
+        }
+        return tptData
+    }
+//endregion
+
+    fun maxAmountLimitDialog(iDialog: IDialog?, maxTxnLimit:Double){
+        GlobalScope.launch(Dispatchers.Main) {
+            val msg=  "Max txn limit Rs ${("%.2f".format((maxTxnLimit)))}"
+
+            iDialog?.getInfoDialog("Amount Limit", msg) {}
+        }
+
     }
 
     // region bank functions

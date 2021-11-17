@@ -1,13 +1,33 @@
 package com.bonushub.crdb.utils
 
+import android.app.Dialog
+import android.content.Context
+import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.Button
+import com.bonushub.crdb.R
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.vxutils.Utility.*
+import com.bonushub.pax.utils.TransactionType
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.data.BytesValue
 import com.usdk.apiservice.aidl.pinpad.*
+import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
+import com.usdk.apiservice.aidl.pinpad.UPinpad
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.nio.charset.StandardCharsets
 
 //Below method is used to encrypt Pannumber data:-
@@ -141,6 +161,254 @@ fun divideAmountBy100(amount: Int = 0): Double {
         0.0
 }
 //endregion
+
+
+//Below method is used to show Pop-Up in case of Sale and Bank EMI to enter either Mobile Number or Bill Number on Condition Base:-
+fun showMobileBillDialog(
+    context: Context?,
+    transactionType: Int,
+    brandEMIDataModal: BrandEMIProductDataModal? = null,
+    dialogCB: (Triple<String, String, Boolean>) -> Unit
+) {
+    runBlocking(Dispatchers.Main) {
+        val dialog = context?.let { Dialog(it) }
+        val inflate = LayoutInflater.from(context).inflate(R.layout.mobile_bill_dialog_view, null)
+        dialog?.setContentView(inflate)
+        dialog?.setCancelable(false)
+        dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
+        val window = dialog?.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        val mobileNumberET: TextInputEditText? = dialog?.findViewById(R.id.mobileNumberET)
+        val billNumberET: TextInputEditText? = dialog?.findViewById(R.id.billNumberET)
+        val billNumberTil: TextInputLayout? = dialog?.findViewById(R.id.bill_number_til)
+        val cancelButton: Button? = dialog?.findViewById(R.id.cancel_btn)
+        val okButton: Button? = dialog?.findViewById(R.id.ok_btn)
+        val tpt = getTptData()
+
+        when (transactionType) {
+            TransactionType.BRAND_EMI.type -> {
+                //Hide Mobile Number Field:-
+                if (brandEMIDataModal?.validationTypeName?.substring(0, 1) == "0") {
+                    mobileNumberET?.visibility = View.GONE
+                } else
+                    mobileNumberET?.visibility = View.VISIBLE
+                //Hide Invoice Number Field:-
+                if (brandEMIDataModal?.validationTypeName?.substring(2, 3) == "0") {
+                    billNumberTil?.visibility = View.GONE
+                } else
+                    billNumberTil?.visibility = View.VISIBLE
+            }
+            else -> {
+                if ((tpt?.reservedValues?.substring(
+                        2,
+                        3
+                    ) == "1" && transactionType == TransactionType.EMI_SALE.type)
+                )
+                    billNumberTil?.visibility = View.VISIBLE
+                else
+                    billNumberTil?.visibility = View.GONE
+            }
+        }
+
+
+        //Cancel Button OnClick:-
+        cancelButton?.setOnClickListener {
+            dialog.dismiss()
+            dialogCB(Triple("", "", third = false))
+        }
+
+        //Ok Button OnClick:-
+        okButton?.setOnClickListener {
+            when (transactionType) {
+                //region=====================Brand EMI Validation:-
+                TransactionType.BRAND_EMI.type -> {
+                    if (brandEMIDataModal?.validationTypeName
+                            ?.substring(0, 1) == "1" && brandEMIDataModal.validationTypeName
+                            ?.substring(2, 3) == "1"
+                    ) {
+                        dialog.dismiss()
+                        dialogCB(
+                            Triple(
+                                mobileNumberET?.text.toString(),
+                                billNumberET?.text.toString(),
+                                third = true
+                            )
+                        )
+                    } else if (brandEMIDataModal?.validationTypeName
+                            ?.substring(0, 1) == "1" && brandEMIDataModal.validationTypeName
+                            ?.substring(2, 3)?.toInt() ?: 0 > "1".toInt()
+                    ) {
+                        if (!TextUtils.isEmpty(billNumberET?.text.toString())) {
+                            dialog.dismiss()
+                            dialogCB(
+                                Triple(
+                                    mobileNumberET?.text.toString(),
+                                    billNumberET?.text.toString(),
+                                    third = true
+                                )
+                            )
+                        } else {
+                             ToastUtils.showToast(context,context.getString(R.string.enter_valid_bill_number))
+                        }
+                    } else if (brandEMIDataModal?.validationTypeName
+                            ?.substring(2, 3) == "1" && brandEMIDataModal.validationTypeName
+                            ?.substring(0, 1)?.toInt() ?: 0 > "1".toInt()
+                    ) {
+                        if (!TextUtils.isEmpty(mobileNumberET?.text.toString()) && mobileNumberET?.text.toString().length in 10..13) {
+                            dialog.dismiss()
+                            dialogCB(
+                                Triple(
+                                    mobileNumberET?.text.toString(),
+                                    billNumberET?.text.toString(),
+                                    third = true
+                                )
+                            )
+                        } else {
+                             ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                        }
+                    } else {
+                        when {
+                            TextUtils.isEmpty(mobileNumberET?.text.toString()) || mobileNumberET?.text.toString().length !in 10..13 ->
+                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                            TextUtils.isEmpty(billNumberET?.text.toString()) && (brandEMIDataModal?.validationTypeName
+                                ?.substring(
+                                    0,
+                                    1
+                                ) == "1" && brandEMIDataModal.validationTypeName
+                                ?.substring(2, 3)
+                                ?.toInt() ?: 0 > "1".toInt()) ->  ToastUtils.showToast(context,
+                                context.getString(
+                                    R.string.enter_valid_bill_number
+                                )
+                            )
+                            else -> {
+                                dialog.dismiss()
+                                dialogCB(
+                                    Triple(
+                                        mobileNumberET?.text.toString(),
+                                        billNumberET?.text.toString(),
+                                        third = true
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                //endregion
+
+                //region Other Transaction Validation:-
+                else -> {
+                    if (transactionType == TransactionType.SALE.type && tpt?.reservedValues?.substring(
+                            0,
+                            1
+                        ) == "1"
+                    ) {
+                        when {
+                            //  when mobile number entered
+                            !TextUtils.isEmpty(mobileNumberET?.text.toString()) -> if (mobileNumberET?.text.toString().length in 10..13) {
+                                dialog.dismiss()
+                                dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
+                            } else
+                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                            TextUtils.isEmpty(mobileNumberET?.text.toString()) -> {
+                                dialog.dismiss()
+                                dialogCB(Triple("", "", third = true))
+                            }
+                        }
+                    } else if (transactionType == TransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
+                            1,
+                            2
+                        ) == "1" && tpt.reservedValues.substring(2, 3) == "1"
+                    ) {
+                        when {
+                            !TextUtils.isEmpty(mobileNumberET?.text.toString()) && !TextUtils.isEmpty(
+                                billNumberET?.text.toString()
+                            ) -> if (mobileNumberET?.text.toString().length in 10..13) {
+                                dialog.dismiss()
+                                dialogCB(
+                                    Triple(
+                                        mobileNumberET?.text.toString(),
+                                        billNumberET?.text.toString(),
+                                        third = true
+                                    )
+                                )
+                            } else
+                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+
+                            !TextUtils.isEmpty(mobileNumberET?.text.toString()) -> if (mobileNumberET?.text.toString().length in 10..13) {
+                                dialog.dismiss()
+                                dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
+                            } else
+                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+
+                            !TextUtils.isEmpty(billNumberET?.text.toString()) -> {
+                                dialog.dismiss()
+                                dialogCB(Triple("", billNumberET?.text.toString(), third = true))
+                            }
+
+                            TextUtils.isEmpty(mobileNumberET?.text.toString()) && TextUtils.isEmpty(
+                                mobileNumberET?.text.toString()
+                            ) -> {
+                                dialog.dismiss()
+                                dialogCB(Triple("", "", third = true))
+                            }
+                        }
+                    } else if (transactionType == TransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
+                            1,
+                            2
+                        ) == "1"
+                    ) {
+                        when {
+                            !TextUtils.isEmpty(mobileNumberET?.text.toString()) -> if (mobileNumberET?.text.toString().length in 10..13) {
+                                dialog.dismiss()
+                                dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
+                            } else
+                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                            TextUtils.isEmpty(mobileNumberET?.text.toString()) -> {
+                                dialog.dismiss()
+                                dialogCB(Triple("", "", third = true))
+                            }
+                        }
+                    } else if (transactionType == TransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
+                            2,
+                            3
+                        ) == "1"
+                    ) {
+                        when {
+                            !TextUtils.isEmpty(billNumberET?.text.toString()) -> {
+                                dialog.dismiss()
+                                dialogCB(Triple("", billNumberET?.text.toString(), third = true))
+                            }
+                            TextUtils.isEmpty(billNumberET?.text.toString()) -> {
+                                dialog.dismiss()
+                                dialogCB(Triple("", "", third = true))
+                            }
+                        }
+                    } else if (transactionType == TransactionType.EMI_ENQUIRY.type) {
+                        when {
+                            !TextUtils.isEmpty(mobileNumberET?.text.toString()) -> if (mobileNumberET?.text.toString().length in 10..13) {
+                                dialog.dismiss()
+                                dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
+                            } else
+                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                        }
+
+                    } else {
+                        dialog.dismiss()
+                        dialogCB(Triple("", "", third = true))
+                    }
+                }
+                //endregion
+            }
+
+        }
+        dialog?.show()
+
+    }
+}
 
 
 

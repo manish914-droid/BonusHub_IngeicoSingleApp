@@ -40,7 +40,20 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TransactionActivity : AppCompatActivity(){
 
+    private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
 
+    //used for other cash amount
+    private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
+
+    private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
+
+    //used in case of sale with cash
+    private val saleAmt by lazy { intent.getStringExtra("saleAmt") ?: "0" }
+    private val mobileNumber by lazy { intent.getStringExtra("mobileNumber") ?: "" }
+
+    private val billNumber by lazy { intent.getStringExtra("billNumber") ?: "0" }
+    private val saleWithTipAmt by lazy { intent.getStringExtra("saleWithTipAmt") ?: "0" }
+    private val title by lazy { intent.getStringExtra("title") }
 
     val TAG = TransactionActivity::class.java.simpleName
 
@@ -117,14 +130,14 @@ class TransactionActivity : AppCompatActivity(){
                      ex.printStackTrace()
                  }*/
 
-           /*       var ecrID: String
-                   try {
+                  var ecrID: String
+               /*    try {
                        DeviceHelper.doSaleTransaction(
                            SaleRequest(
                                amount = 300L ?: 0,
                                tipAmount = 0L ?: 0,
                                transactionType = TransactionType.SALE,
-                               tid = "30160039",
+                               tid = "41501370",
                                transactionUuid = UUID.randomUUID().toString().also {
                                    ecrID = it
 
