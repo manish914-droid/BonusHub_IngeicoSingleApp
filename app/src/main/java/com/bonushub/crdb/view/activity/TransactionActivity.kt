@@ -92,9 +92,9 @@ class TransactionActivity : AppCompatActivity(){
     }
 
     private fun setupEMVObserver() {
-        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
-            if(true) {
-                //cardProcessedDataModal.getPanNumberData()
+       searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
+           if(cardProcessedDataModal.getPanNumberData() !=null) {
+               cardProcessedDataModal.getPanNumberData()
 /*
                 try {
                     DeviceHelper.doTerminalInitialization(
