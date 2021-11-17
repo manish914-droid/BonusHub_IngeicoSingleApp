@@ -111,16 +111,16 @@ class BrandEmiProductFragment : Fragment() {
     private fun onItemClick(productData: BrandEMIProductDataModal) {
         println("On Product Clicked " + Gson().toJson(productData))
         ToastUtils.showToast(activity, Gson().toJson(productData))
-       /* (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
+        (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
             arguments = Bundle().apply {
                 putSerializable("brandEmiProductData", productData)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
                 putSerializable("brandDataMaster", brandDataMaster)
             }
-        })*/
+        })
 
-        val intent = Intent (activity, TransactionActivity::class.java)
-        activity?.startActivity(intent)
+        //val intent = Intent (activity, TransactionActivity::class.java)
+        //activity?.startActivity(intent)
 
     }
 

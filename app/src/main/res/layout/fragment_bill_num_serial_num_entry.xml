@@ -12,7 +12,7 @@
         layout="@layout/sub_header_layout"
         android:visibility="visible" />
 
- <!--   &lt;!&ndash;Bill no&ndash;&gt;
+    <!--Bill no-->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/billno_crd_view"
 
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/pad_8"
         android:visibility="visible"
-        app:neumorph_inset="@dimen/pad_8"
+
 
 
         >
@@ -31,7 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/pad_8"
             android:layout_marginBottom="@dimen/pad_16"
-            android:background="@null"
+            android:background="@drawable/card_edge"
+            android:padding="@dimen/pad_16"
             android:cursorVisible="false"
             android:ems="10"
             android:focusable="false"
@@ -46,12 +47,12 @@
             android:textColor="@color/white"
             android:textColorHint="@color/hint_color"
             android:textSize="@dimen/text_size_regular"
-            app:fname="regular" />
+            />
 
 
     </com.google.android.material.card.MaterialCardView>
 
-    &lt;!&ndash;Serial no&ndash;&gt;
+    <!--Serial no-->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/serialNo_crd_view"
 
@@ -59,13 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/pad_8"
         android:visibility="visible"
-        app:neumorph_inset="@dimen/pad_8"
-        app:neumorph_shadowColorDark="@color/lowerShadow"
-        app:neumorph_shadowColorLight="@color/upperShadow"
-        app:neumorph_shadowElevation="2dp"
-        app:neumorph_shapeAppearance="@style/ShapeAppearance.Neumorph_costom_round_corner_14"
-        app:neumorph_shapeType="flat"
-        app:neumorph_strokeWidth="@dimen/pad_1"
+
 
         >
 
@@ -73,13 +68,13 @@
             android:id="@+id/serialNum_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_4"
+            android:background="@drawable/card_edge"
 
-            android:background="@null"
-            android:cursorVisible="false"
            android:ems="10"
             android:focusable="false"
             android:gravity="center"
-
+android:padding="@dimen/pad_16"
             android:imeOptions="actionDone"
             android:inputType="textEmailAddress"
             android:lines="1"
@@ -90,7 +85,7 @@
             android:textColor="@color/white"
             android:textColorHint="@color/hint_color"
             android:textSize="@dimen/text_size_regular"
-            app:fname="regular" />
+          />
 
 
     </com.google.android.material.card.MaterialCardView>
@@ -101,14 +96,14 @@
         android:layout_width="match_parent"
         android:layout_marginStart="@dimen/pad_40"
         android:layout_height="wrap_content"
-
-        android:textColor="@color/white"
+        android:background="@drawable/card_edge"
+        android:padding="@dimen/pad_16"
+        android:textColor="@color/black"
         android:textSize="@dimen/text_size_regular"
         app:layout_constraintEnd_toEndOf="parent"
 
         android:text="@string/proceed"
-        app:neumorph_shapeAppearance="@style/ShapeAppearance.Neumorph_costom_round_corner_20" />
--->
+ />
 
 
 </LinearLayout>

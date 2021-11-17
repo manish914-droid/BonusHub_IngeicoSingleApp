@@ -1,8 +1,5 @@
 
-class BillNumSerialNumEntryFragment{
 
-}
-/*
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
@@ -19,7 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBillNumSerialNumEntryBinding
+import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.pax.utils.EDashboardItem
 import com.bonushub.pax.utils.UiAction
 
@@ -51,16 +52,20 @@ class BillNumSerialNumEntryFragment : Fragment() {
     val isSerialIEMIRequire: Boolean by lazy {
         arguments?.getBoolean("isSerialImeiNumRequired") as Boolean
     }
-    val brandValidation: BrandEmiBillSerialMobileValidationModel by lazy {
-        arguments?.getSerializable("brandValidation") as BrandEmiBillSerialMobileValidationModel
-    }
-    private val brandEMIDataModal1: BrandEMIDataModal by lazy {
+
+  /*  private val brandEMIDataModal1: BrandEMIDataModal by lazy {
         (arguments?.getSerializable("brandEMIDataModal") ?: BrandEMIDataModal()) as BrandEMIDataModal
     }
 
     private val brandEMIDataModal: BrandEMIDataModal by lazy {
         (arguments?.getSerializable("brandEMIDataModal") ?: BrandEMIDataModal() )as BrandEMIDataModal
-    }
+    }*/
+  val brandValidation: BrandEmiBillSerialMobileValidationModel by lazy {
+      arguments?.getSerializable("brandValidation") as BrandEmiBillSerialMobileValidationModel
+  }
+  private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
+    private var brandEmiProductData: BrandEMIProductDataModal? = null
+    private var brandDataMaster: BrandEMIMasterDataModal? = null
 
     private val transType: EDashboardItem by lazy {
         arguments?.getSerializable("transType") as EDashboardItem
@@ -79,14 +84,16 @@ class BillNumSerialNumEntryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.subHeaderView?.subHeaderText?.text = uiAction.title
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
-
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
-
         }
+        brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
+        brandEmiProductData = arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
+        brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
-        binding?.serialNumEt?.setMaxLength(brandEMIDataModal.maxLength?.toInt() ?: 20)
+
+        binding?.serialNumEt?.setMaxLength(brandEmiProductData?.maxLength?.toInt() ?: 20)
         binding?.billNumEt?.setMaxLength( 16)
         if (isBillRequire) {
             binding?.billnoCrdView?.visibility = View.VISIBLE
@@ -94,7 +101,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
             binding?.billnoCrdView?.visibility = View.GONE
         }
 //0therwise optional
-        if ((brandEMIDataModal.isRequired == "1" && brandEMIDataModal.validationTypeName?.isNotBlank() == true)|| (brandEMIDataModal.isRequired == "0" && brandEMIDataModal.validationTypeName?.isNotBlank() == true) ){
+        if ((brandEmiProductData?.isRequired == "1" && brandEmiProductData?.validationTypeName?.isNotBlank() == true)|| (brandEmiProductData?.isRequired == "0" && brandEmiProductData?.validationTypeName?.isNotBlank() == true) ){
             if (brandValidation.isSerialNumReq) {
                 binding?.serialNumEt?.hint = "Enter serial number"
             }
@@ -109,7 +116,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
         }
 
 
-        when (brandEMIDataModal.inputDataType) {
+        when (brandEmiProductData?.inputDataType) {
             "1" -> {
                 binding?.serialNumEt?.inputType = InputType.TYPE_CLASS_NUMBER
 
@@ -123,7 +130,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
             if (uiAction == UiAction.BANK_EMI || uiAction == UiAction.TEST_EMI) {
                 val pair = Pair(txnAmount, testEmiType)
                 val triple = Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true)
-                (activity as MainActivity).onFragmentRequest(uiAction, pair, triple)
+             //   (activity as MainActivity).onFragmentRequest(uiAction, pair, triple)
 
             } else if (uiAction == UiAction.BRAND_EMI) {
                 navigateToTransaction()
@@ -142,31 +149,30 @@ class BillNumSerialNumEntryFragment : Fragment() {
             if (brandValidation.isBillNumMandatory) {
                 if (TextUtils.isEmpty(binding?.billNumEt?.text.toString().trim())) {
                     context?.getString(R.string.enter_valid_bill_number)?.let { it1 ->
-                        VFService.showToast(it1)
+                        ToastUtils.showToast(activity,it1)
                     }
 
                     return
                 }
             }
         }
-        if (brandEMIDataModal.isRequired == "1" || brandEMIDataModal.isRequired == "0") {
-            if (brandEMIDataModal.isRequired == "1") {
+        if (brandEmiProductData?.isRequired == "1" || brandEmiProductData?.isRequired == "0") {
+            if (brandEmiProductData?.isRequired == "1") {
                 if (TextUtils.isEmpty(binding?.serialNumEt?.text.toString().trim())) {
-                   */
-/* context?.getString(R.string.enterValid_serial_iemei_no)?.let { it1 ->
-                        VFService.showToast(it1)
-                    }*//*
+ context?.getString(R.string.enterValid_serial_iemei_no)?.let { it1 ->
+     ToastUtils.showToast(activity,it1)
+                    }
 
-                        if(brandEMIDataModal.validationTypeName == "IMEI" ||
-                            brandEMIDataModal.validationTypeName == "imei") {
+                        if(brandEmiProductData?.validationTypeName == "IMEI" ||
+                            brandEmiProductData?.validationTypeName == "imei") {
 
-                            VFService.showToast(
+                            ToastUtils.showToast(activity,
                                 getString(
                                     R.string.enterValid_iemei_no
                                 )
                             )
-                        }else if (brandEMIDataModal.validationTypeName == "SerialNo"){
-                            VFService.showToast(
+                        }else if (brandEmiProductData?.validationTypeName == "SerialNo"){
+                            ToastUtils.showToast(activity,
                                 getString(
                                     R.string.enterValid_serial
                                 )
@@ -174,7 +180,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
 
                         }
                     else{
-                            VFService.showToast(
+                            ToastUtils.showToast(activity,
                                 getString(
                                     R.string.enterValid_serial_iemei_no
                                 )
@@ -190,14 +196,14 @@ class BillNumSerialNumEntryFragment : Fragment() {
             //
           //  saveBrandEMIDataToDB( binding?.serialNumEt?.text.toString().trim(),  binding?.serialNumEt?.text.toString().trim(), brandEMIDataModal, transType)
 
-           brandEMIDataModal.imeiORserailNum=binding?.serialNumEt?.text.toString().trim()
+          /* brandEMIDataModal.imeiORserailNum=binding?.serialNumEt?.text.toString().trim()
             withContext(Dispatchers.Main) {
                 (activity as MainActivity).onFragmentRequest(
                     uiAction,
                     Pair(txnAmount, "0"),
                     Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true),brandEMIDataModal
                 )
-            }
+            }*/
         }
 
     }
@@ -209,4 +215,4 @@ fun EditText.setMaxLength(maxLength: Int){
 
     filters = arrayOf<InputFilter>(LengthFilter(maxLength))
 
-}*/
+}
