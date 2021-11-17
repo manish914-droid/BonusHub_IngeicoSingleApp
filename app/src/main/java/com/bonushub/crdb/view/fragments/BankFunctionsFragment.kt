@@ -12,12 +12,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
+import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.pax.utils.BankFunctionsItem
+import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.response.OperationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -95,6 +98,14 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
             BankFunctionsItem.ADMIN_PAYMENT ->{
 
                 // interact with another app
+                DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
+                    override fun onCompleted(p0: OperationResult?) {
+                        p0?.value?.apply {
+                            println("Status = $status")
+                            println("Response code = $responseCode")
+                        }
+                    }
+                })
             }
         }
     }
