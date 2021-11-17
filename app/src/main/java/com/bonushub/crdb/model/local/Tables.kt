@@ -626,6 +626,7 @@ data class TerminalParameterTable(
     var clearFBatch: String = "0" ,//This field is for Server Hit Status,
 
     var bankEnquiryMobNumberEntry: Boolean = false
+
 )
 
 @Entity
