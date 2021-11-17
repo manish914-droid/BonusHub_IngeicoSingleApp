@@ -2,6 +2,7 @@ package com.bonushub.crdb.repository
 
 
 
+import android.os.RemoteException
 import android.text.TextUtils
 import android.widget.Toast
 import com.bonushub.crdb.BuildConfig
@@ -9,17 +10,15 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
-import com.bonushub.crdb.di.USDKScope
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.vxutils.Utility.*
 import com.bonushub.pax.utils.*
 import com.mindorks.example.coroutines.utils.Status
-import com.usdk.apiservice.aidl.pinpad.DeviceName
-import com.usdk.apiservice.aidl.pinpad.KAPId
-import com.usdk.apiservice.aidl.pinpad.KeyType
-import com.usdk.apiservice.aidl.pinpad.UPinpad
+import com.usdk.apiservice.aidl.BaseError
+import com.usdk.apiservice.aidl.data.IntValue
+import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -280,10 +279,46 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
     private fun insertSecurityKeys(ppk: ByteArray, dpk: ByteArray, ppkKcv: ByteArray, dpkKcv: ByteArray): Boolean {
 
-        AppPreference.saveString("dpk", byte2HexStr(dpk))
-        println("dpk value is"+byte2HexStr(dpk))
+        var pinPad = createPinpad(KAPId(0, 0), 0, DeviceName.IPP)
+        var pinpadLimited: PinpadLimited? = null
+        try {
+            val isSucc = pinPad!!.open()
+            if (isSucc) {
+                println("PINPAD "+"Open success")
+            } else {
+                println("PINPAD "+"Open fail")
+            }
+        } catch (e: RemoteException) {
+            //  handleException(e)
+        }
+        try {
+            pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(DemoConfig.REGION_ID, DemoConfig.KAP_NUM), 0, DemoConfig.PINPAD_DEVICE_NAME)
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
 
-        var pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(0, 0), 0, DeviceName.IPP)
+        val kapMode = IntValue()
+        val isSucc1: Boolean = pinPad!!.getKapMode(kapMode)
+        if (isSucc1) {
+            println("PINPAD "+"getKapMode success[0 - LPTK_MODE; 1 - WORK_MODE]: " + kapMode.data)
+        } else {
+            println("getKapMode fail")
+
+        }
+
+        var isSucc = pinpadLimited!!.format()
+        if (isSucc) {
+            println("PINPAD "+"format success")
+        } else {
+            println("PINPAD "+"format fail")
+
+        }
+
+
+        AppPreference.saveString("dpk", "d417d20909ab523550236d91ec1fc4fa")
+        println("dpk value is"+"d417d2090923dgfjhddcvdsajanaXBA1")
+
+        // var pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(0, 0), 0, DeviceName.IPP)
 
         var result = true
         try {
@@ -294,23 +329,86 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
             val x = "TMK=${decriptedTmk.byteArr2HexStr()}\nPPK=${ppk.byteArr2HexStr()} KCV=${ppkKcv.byteArr2HexStr()}\nDPK=${dpk.byteArr2HexStr()} KCV=${dpkKcv.byteArr2HexStr()}"
             Utility().logger(KeyExchanger.TAG, x)
-            result = pinpadLimited.loadPlainTextKey(KeyType.MAIN_KEY, DemoConfig.KEYID_MAIN, decriptedTmk)
+            val key = "111111111111111111111111111111111111111111111111"
+            //6e54d3ecd57040a102324962d5150494
+            //+BytesUtil.hexString2Bytes("                ")
+            result = pinpadLimited!!.loadPlainTextKey(KeyType.MAIN_KEY, DemoConfig.KEYID_MAIN, decriptedTmk)
+            //  val isExist: Boolean = pinpad.isKeyExist(keyId)
             System.out.println("TMK is success "+result)
             //result = NeptuneService.Device.writeTmk(decriptedTmk, tmkKcv)
             // NeptuneService.beepNormal()
+
+            //  outputBlueText(">>> switchToWorkMode")
+            isSucc = pinpadLimited.switchToWorkMode()
+            if (isSucc) {
+                println("PINPAD "+"switchToWorkMode success")
+            } else {
+                println("PINPAD  "+"switchToWorkMode fail")
+            }
+
+
             if (result) {
-                result = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.loadEncKey(KeyType.PIN_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_PIN, ppk, ppkKcv) ?: false
+
+                //   PPK - f5da035abebd921e64f3005c1b3fb655
+                result = pinPad?.loadEncKey(KeyType.PIN_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_PIN,ppk,ppkKcv) ?: false
                 System.out.println("PPK is success "+result)
 
                 //     result = NeptuneService.Device.writeTpk(ppk, ppkKcv)
                 //   NeptuneService.beepNormal()
             }
             if (result) {
-                result = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
-                    ?.loadEncKey(KeyType.TDK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_TRACK, dpk, ppkKcv) ?: false
+                //   DPK- d417d20909ab523550236d91ec1fc4fa
+                //  result = pinPad?.loadEncKey(KeyType.TDK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_TRACK, /*BytesUtil.hexString2Bytes("BDE3888C42CE9DECBDE3888C42CE9DECBDE3888C42CE9DEC")*/BytesUtil.hexString2Bytes("d417d20909ab523550236d91ec1fc4fa"), /*BytesUtil.hexString2Bytes("4CBE91BE")*/null) ?: false
                 System.out.println("TDK is success "+result)
                 //  result = NeptuneService.Device.writeTdk(dpk, dpkKcv)
                 // NeptuneService.beepKey(EBeepMode.FREQUENCE_LEVEL_6,1000)
+
+                result = pinPad?.loadEncKey(KeyType.DEK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_DES,dpk,dpkKcv) ?: false
+                System.out.println("TDK is success1 "+result)
+
+                val isExist: Boolean = pinPad.isKeyExist(DemoConfig.KEYID_MAIN)
+                System.out.println("KYIDMAIN is success "+isExist)
+                val isExist1: Boolean = pinPad.isKeyExist(10)
+                System.out.println("KEYIDPINKEY is success "+isExist1)
+                val isExist2: Boolean = pinPad.isKeyExist(12)
+                System.out.println("KEYIDDATAKEY is success "+isExist2)
+
+
+                val mode = MagTrackEncMode.MTEM_ECBMODE
+                var encryptedbyteArrrays = pinPad?.encryptMagTrack(mode,12, BytesUtil.hexString2Bytes("12345678"))
+                if(encryptedbyteArrrays == null){
+                    outputPinpadError("encryptMagTrack fail",pinPad)
+                }
+
+                try {
+                    var desMode = DESMode(DESMode.DM_ENC, DESMode.DM_OM_TECB)
+                    val data = "02|36101010020281       "
+                    val strtohex = data.str2ByteArr().byteArr2HexStr()
+                    var  encResult = pinPad.calculateDes(11, desMode, null, BytesUtil.hexString2Bytes(strtohex))
+                    if (encResult == null) {
+                        outputPinpadError("calculateDes fail",pinPad)
+                        // return
+                    }
+                    println("TECB encrypt result = " + byte2HexStr(encResult))
+
+                    desMode = DESMode(DESMode.DM_DEC, DESMode.DM_OM_TECB)
+                    val decResult: ByteArray = pinPad.calculateDes(11, desMode, null, encResult)
+                    if (decResult == null) {
+                        outputPinpadError("calculateDes fail",pinPad)
+                        // return
+                    }
+                    println("TECB decrypt result = " + byte2HexStr(decResult))
+                }
+                catch (ex: RemoteException){
+                    ex.printStackTrace()
+                }
+
+
+
+                //
+                //   //
+
+                println("Track 2 with encyption is --->" + byte2HexStr(encryptedbyteArrrays))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -324,6 +422,16 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         }
 
         return result
+    }
+
+    //region============================createPinpad
+    fun createPinpad(kapId: KAPId?, keySystem: Int, deviceName: String?): UPinpad? {
+        return try {
+            DeviceHelper.getPinpad(kapId, keySystem, deviceName)
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+            null
+        }
     }
 
     suspend fun startInit(tid: String): Triple<String?, Boolean?, Boolean> {
@@ -422,4 +530,72 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         return stringBuilder.toString()
     }
 
+    fun outputPinpadError(message: String,pinPad: UPinpad) {
+        try {
+            println(message + " : " + getErrorDetail(pinPad.getLastError()))
+        } catch (e: RemoteException) {
+            println("RemoteException | getLastError | " + e.message)
+        }
+    }
+
+    fun getErrorMessage(error: Int): String? {
+        val message: String
+        when (error) {
+            PinpadError.ERROR_ABOLISH -> message = "ERROR_ABOLISH"
+            PinpadError.ERROR_ACCESSING_KAP_DENY -> message = "ERROR_ACCESSING_KAP_DENY"
+            PinpadError.ERROR_BAD_KEY_USAGE -> message = "ERROR_BAD_KEY_USAGE"
+            PinpadError.ERROR_BAD_MODE_OF_KEY_USE -> message = "ERROR_BAD_MODE_OF_KEY_USE"
+            PinpadError.ERROR_BAD_STATUS -> message = "ERROR_BAD_STATUS"
+            PinpadError.ERROR_BUSY -> message = "ERROR_BUSY"
+            PinpadError.ERROR_CANCELLED_BY_USER -> message = "ERROR_CANCELLED_BY_USER"
+            PinpadError.ERROR_COMM_ERR -> message = "ERROR_COMM_ERR"
+            PinpadError.ERROR_DUKPT_COUNTER_OVERFLOW -> message = "ERROR_DUKPT_COUNTER_OVERFLOW"
+            PinpadError.ERROR_DUKPT_NOT_INITED -> message = "ERROR_DUKPT_NOT_INITED"
+            PinpadError.ERROR_ENC_KEY_FMT_TOO_SIMPLE -> message = "ERROR_ENC_KEY_FMT_TOO_SIMPLE"
+            PinpadError.ERROR_ENCRYPT_MAG_TRACK_TOO_FREQUENTLY -> message =
+                "ERROR_ENCRYPT_MAG_TRACK_TOO_FREQUENTLY"
+            PinpadError.ERROR_OTHERERR -> message = "ERROR_OTHERERR"
+            PinpadError.ERROR_FAIL_TO_AUTH -> message = "ERROR_FAIL_TO_AUTH"
+            PinpadError.ERROR_INCOMPATIBLE_KEY_SYSTEM -> message = "ERROR_INCOMPATIBLE_KEY_SYSTEM"
+            PinpadError.ERROR_INVALID_ARGUMENT -> message = "ERROR_INVALID_ARGUMENT"
+            PinpadError.ERROR_INVALID_KEY_HANDLE -> message = "ERROR_INVALID_KEY_HANDLE"
+            PinpadError.ERROR_KAP_ALREADY_EXIST -> message = "ERROR_KAP_ALREADY_EXIST"
+            PinpadError.ERROR_ARGUMENT_CONFLICT -> message = "ERROR_ARGUMENT_CONFLICT"
+            PinpadError.ERROR_KEYBUNDLE_ERR -> message = "ERROR_KEYBUNDLE_ERR"
+            PinpadError.ERROR_NO_ENOUGH_SPACE -> message = "ERROR_NO_ENOUGH_SPACE"
+            PinpadError.ERROR_NO_PIN_ENTERED -> message = "ERROR_NO_PIN_ENTERED"
+            PinpadError.ERROR_NO_SUCH_KAP -> message = "ERROR_NO_SUCH_KAP"
+            PinpadError.ERROR_NO_SUCH_KEY -> message = "ERROR_NO_SUCH_KEY"
+            PinpadError.ERROR_NO_SUCH_PINPAD -> message = "ERROR_NO_SUCH_PINPAD"
+            PinpadError.ERROR_PERMISSION_DENY -> message = "ERROR_PERMISSION_DENY"
+            PinpadError.ERROR_PIN_ENTRY_TOO_FREQUENTLY -> message = "ERROR_PIN_ENTRY_TOO_FREQUENTLY"
+            PinpadError.ERROR_REFER_TO_KEY_OUTSIDE_KAP -> message = "ERROR_REFER_TO_KEY_OUTSIDE_KAP"
+            PinpadError.ERROR_REOPEN_PINPAD -> message = "ERROR_REOPEN_PINPAD"
+            PinpadError.ERROR_SAME_KEY_VALUE_DETECTED -> message = "ERROR_SAME_KEY_VALUE_DETECTED"
+            PinpadError.ERROR_SERVICE_DIED -> message = "ERROR_SERVICE_DIED"
+            PinpadError.ERROR_TIMEOUT -> message = "ERROR_TIMEOUT"
+            PinpadError.ERROR_UNSUPPORTED_FUNC -> message = "ERROR_UNSUPPORTED_FUNC"
+            PinpadError.ERROR_WRONG_KAP_MODE -> message = "ERROR_WRONG_KAP_MODE"
+            PinpadError.ERROR_KCV -> message = "ERROR_KCV"
+            PinpadError.ERROR_INPUT_TIMEOUT -> message = "ERROR_INPUT_TIMEOUT"
+            PinpadError.ERROR_INPUT_COMM_ERR -> message = "ERROR_INPUT_COMM_ERR"
+            PinpadError.ERROR_INPUT_UNKNOWN -> message = "ERROR_INPUT_UNKNOWN"
+            PinpadError.ERROR_NOT_CERT -> message = "ERROR_NOT_CERT"
+            else -> message = getErrorMessage1(error)
+        }
+        return message
+    }
+
+    fun getErrorMessage1(error: Int): String {
+        val message: String
+        message = when (error) {
+            BaseError.SERVICE_CRASH -> "SERVICE_CRASH"
+            BaseError.REQUEST_EXCEPTION -> "REQUEST_EXCEPTION"
+            BaseError.ERROR_CANNOT_EXECUTABLE -> "ERROR_CANNOT_EXECUTABLE"
+            BaseError.ERROR_INTERRUPTED -> "ERROR_INTERRUPTED"
+            BaseError.ERROR_HANDLE_INVALID -> "ERROR_HANDLE_INVALID"
+            else -> "Unknown error"
+        }
+        return message
+    }
 }

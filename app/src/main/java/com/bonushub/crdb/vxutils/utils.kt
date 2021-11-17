@@ -23,6 +23,7 @@ import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.data.BytesValue
+import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import kotlinx.coroutines.Dispatchers
@@ -33,10 +34,10 @@ import java.nio.charset.StandardCharsets
 fun getEncryptedPan(panNumber: String, algorithm: UAlgorithm?): String {
     val encryptedByteArray: ByteArray?
 
-    var dataDescription = "$panNumber"
+    var dataDescription = "02|$panNumber"
     val dataLength = dataDescription.length
     val DIGIT_8 = 8
-    if (dataLength > DIGIT_8) {
+    if (dataLength >= DIGIT_8) {
         val mod = dataLength % DIGIT_8
         if (mod != 0) {
             val padding = DIGIT_8 - mod
@@ -106,15 +107,24 @@ private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
 
        // logger(TAG, "=> TDES")
         val key: ByteArray = BytesUtil.hexString2Bytes(AppPreference.getString("dpk"))
-        val dataIn: ByteArray = BytesUtil.hexString2Bytes(dataDescription)
-        var mode = AlgMode.EM_alg_TDESENCRYPT or AlgMode.EM_alg_TDESTECBMODE
-        val encResult = BytesValue()
-        var ret = algorithm?.TDES(mode, key, dataIn, encResult)
-        if (ret != AlgError.SUCCESS) {
-           // return getErrorDetail(ret)
-        }
-       println("Encrpted Pan is"+encResult.toHexString())
-        return encResult.toHexString()
+        val strtohex = dataDescription.str2ByteArr().byteArr2HexStr()
+       var desMode = DESMode(DESMode.DM_ENC, DESMode.DM_OM_TECB)
+       var  encResult = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(11, desMode, null, BytesUtil.hexString2Bytes(strtohex))
+       if (encResult == null) {
+
+
+       }
+       println("TECB encrypt result = " + byte2HexStr(encResult))
+
+       desMode = DESMode(DESMode.DM_DEC, DESMode.DM_OM_TECB)
+       val decResult: ByteArray? = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(11, desMode, null, encResult)
+       if (decResult == null) {
+         //  outputPinpadError("calculateDes fail",pinPad)
+           // return
+       }
+       println("TECB decrypt result = " + byte2HexStr(decResult))
+
+        return byte2HexStr(encResult)
 
     } catch (ex: Exception) {
         // handleException(e)

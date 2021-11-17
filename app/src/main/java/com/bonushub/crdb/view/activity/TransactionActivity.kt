@@ -59,7 +59,7 @@ class TransactionActivity : AppCompatActivity(){
 
     private val searchCardViewModel : SearchViewModel by viewModels()
 
-  //  private lateinit var deviceService: UsdkDeviceService
+    //  private lateinit var deviceService: UsdkDeviceService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,9 +92,9 @@ class TransactionActivity : AppCompatActivity(){
     }
 
     private fun setupEMVObserver() {
-       searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
-           if(true) {
-               //cardProcessedDataModal.getPanNumberData()
+        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
+            if(true) {
+                //cardProcessedDataModal.getPanNumberData()
 /*
                 try {
                     DeviceHelper.doTerminalInitialization(
@@ -130,63 +130,72 @@ class TransactionActivity : AppCompatActivity(){
                      ex.printStackTrace()
                  }*/
 
-                  var ecrID: String
-                   try {
-                       DeviceHelper.doSaleTransaction(
-                           SaleRequest(
-                               amount = 300L ?: 0,
-                               tipAmount = 0L ?: 0,
-                               transactionType = TransactionType.SALE,
-                               tid = "30160031",
-                               transactionUuid = UUID.randomUUID().toString().also {
-                                   ecrID = it
+               /* var ecrID: String
+                try {
+                    DeviceHelper.doSaleTransaction(
+                        SaleRequest(
+                            amount = 300L ?: 0,
+                            tipAmount = 0L ?: 0,
+                            transactionType = TransactionType.SALE,
+                            tid = "30160031",
+                            transactionUuid = UUID.randomUUID().toString().also {
+                                ecrID = it
 
-                               }
-                           ),
-                           listener = object : OnPaymentListener.Stub() {
-                               override fun onCompleted(result: PaymentResult?) {
-                                   val txnResponse = result?.value as? TransactionResponse
-                                   val detailResponse = txnResponse?.receiptDetail
-                                       .toString()
-                                       .split(",")
-                                   Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                                   when (txnResponse?.responseCode) {
-                                       ResponseCode.SUCCESS.value -> {
-                                           detailResponse.forEach { println(it) }
-                                           //  uids.add(ecrID)
-                                           // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
-                                       }
-                                       ResponseCode.FAILED.value,
-                                       ResponseCode.ABORTED.value -> {
-                                           detailResponse.forEach { println(it) }
-                                       }
-                                       else -> println("Error")
-                                   }
-                               }
-                           }
-                       )
-                   }
-              catch (exc: Exception){
-                  exc.printStackTrace()
-              }
+                            }
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val detailResponse = txnResponse?.receiptDetail
+                                    .toString()
+                                    .split(",")
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        detailResponse.forEach { println(it) }
+                                    }
+                                    else -> println("Error")
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }*/
 
-               Toast.makeText(
-                   this,
-                   cardProcessedDataModal.getPanNumberData().toString(),
-                   Toast.LENGTH_LONG
-               ).show()
+                DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
+                    override fun onCompleted(p0: OperationResult?) {
+                        p0?.value?.apply {
+                            println("Status = $status")
+                            println("Response code = $responseCode")
+                        }
+                    }
+                })
 
-              /* lifecycleScope.launch(Dispatchers.IO) {
-                  // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                   serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-               }*/
-              /* val intent = Intent (this, TenureSchemeActivity::class.java)
+                Toast.makeText(
+                    this,
+                    cardProcessedDataModal.getPanNumberData().toString(),
+                    Toast.LENGTH_LONG
+                ).show()
 
-               startActivity(intent)*/
+                /* lifecycleScope.launch(Dispatchers.IO) {
+                    // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+                     serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
+                 }*/
+                /* val intent = Intent (this, TenureSchemeActivity::class.java)
 
-           }
+                 startActivity(intent)*/
 
-       })
+            }
+
+        })
     }
 
 

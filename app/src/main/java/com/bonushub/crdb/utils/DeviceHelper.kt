@@ -205,6 +205,15 @@ object DeviceHelper   {
         iRemoteService?.doSaleTransaction(request, listener)
     }
 
+    /**
+     * Show admin function screen
+     * */
+    fun showAdminFunction(listener: OnOperationListener) {
+        iRemoteService?.showAdminFunction(listener)
+    }
+
+
+
     @JvmStatic
     @Throws(IllegalStateException::class)
     fun getEMV(): UEMV? {
