@@ -623,7 +623,10 @@ data class TerminalParameterTable(
     @field:BHFieldName("Tid Name")
     var tidName: String = "",  // name of bank
 
-    var clearFBatch: String = "0" //This field is for Server Hit Status
+    var clearFBatch: String = "0" ,//This field is for Server Hit Status,
+
+    var bankEnquiryMobNumberEntry: Boolean = false
+
 )
 
 @Entity
