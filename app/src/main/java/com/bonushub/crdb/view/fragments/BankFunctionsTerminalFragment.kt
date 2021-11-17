@@ -3,23 +3,31 @@ package com.bonushub.crdb.view.fragments
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsTerminalBinding
+import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.adapter.BankFunctionsTerminalParamAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
+import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.pax.utils.BankFunctionsTerminalItem
+import com.bonushub.pax.utils.PreferenceKeyConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -31,6 +39,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     var binding:FragmentBankFunctionsTerminalBinding? = null
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
+    lateinit var batchFileViewModel: BatchFileViewModel
 
     lateinit var mAdapter : BankFunctionsTerminalParamAdapter
     lateinit var dataList: ArrayList<TableEditHelper?>
@@ -50,6 +59,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
         iBankFunctionsTerminalItemClick = this
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
+        batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
 
 //        terminalListItem.addAll(BankFunctionsTerminalItem.values())
 //        dataList = ArrayList()
@@ -124,19 +134,23 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                 {
                     dialog.dismiss()
                     //
-//                    val batchData = BatchFileDataTable.selectBatchData()
-//                    when {
-//                        AppPreference.getBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString()) ->
-//                            VFService.showToast(getString(R.string.please_clear_fbatch_before_init))
-//
-//                        !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
-//                            VFService.showToast(getString(R.string.reversal_found_please_clear_or_settle_first_before_init))
-//
-//                        batchData.size > 0 -> VFService.showToast(getString(R.string.please_settle_batch_first_before_init))
-//                        else -> {
-//                            updateTPTOptionsValue(dataPosition, dataList[dataPosition]?.titleName?:"")
-//                        }
-//                    }
+                    //val batchData = BatchFileDataTable.selectBatchData() // get BatchFileDataTable data
+                    batchFileViewModel.getBatchTableData().observe(requireActivity(),{ batchData ->
+
+                        when {
+                            AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
+                                ToastUtils.showToast(requireContext(),getString(R.string.please_clear_fbatch_before_init))
+
+                            !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
+                                ToastUtils.showToast(requireContext(), getString(R.string.reversal_found_please_clear_or_settle_first_before_init))
+
+                            batchData.size > 0 -> ToastUtils.showToast(requireContext(),getString(R.string.please_settle_batch_first_before_init))
+                            else -> {
+                                updateTPTOptionsValue(dataPosition, dataList[dataPosition]?.titleName?:"")
+                            }
+                        }
+                    })
+
                 }else{
                     ToastUtils.showToast(requireContext(),R.string.invalid_password)
 
@@ -153,11 +167,15 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     //Below code is to perform update of values in TPT Options:-
     private fun updateTPTOptionsValue(position: Int, titleName: String) {
+
+        var isTID = titleName.equals("Terminal ID", ignoreCase = true)
+
         DialogUtilsNew1.getInputDialog(
             context as Context,
             getString(R.string.update),
             dataList[position]?.titleValue?:"",
-            true
+            true,
+            isTID
         ) {
             if (titleName.equals("Terminal ID", ignoreCase = true)) {
                 when {
@@ -225,4 +243,21 @@ class TableEditHelper(
     Comparable<TableEditHelper> {
     override fun compareTo(other: TableEditHelper): Int =
         if (titleName > other.titleName) 1 else if (titleName < other.titleName) -1 else 0
+}
+
+fun getEditorActionListener(callback: (v: TextView) -> Unit): TextView.OnEditorActionListener {
+    val oal = TextView.OnEditorActionListener { v, actionId, event ->
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            callback(v)
+            true
+        } else if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
+            if (event != null) {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    callback(v)
+                    true
+                } else false
+            } else false
+        } else false
+    }
+    return oal
 }

@@ -15,7 +15,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.bonushub.crdb.R
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.view.fragments.getEditorActionListener
 
 class DialogUtilsNew1 {
 
@@ -54,6 +56,7 @@ class DialogUtilsNew1 {
             title: String,
             _text: String,
             isNumeric: Boolean = false,
+            isTID:Boolean = false,
             callback: (String) -> Unit
         ) {
             Dialog(context).apply {
@@ -75,10 +78,18 @@ class DialogUtilsNew1 {
 //                } else {
 //                    invoiceET.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(25))
 //                }
+//              this code written below
+
+                if (isTID) {
+                    invoiceET.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(8))
+                } else {
+                    invoiceET.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(25))
+                }
+
                 invoiceET.apply {
                     setText(_text)
                     inputType = if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
-                    //setOnEditorActionListener(getEditorActionListener { okbtn.performClick() })
+                    setOnEditorActionListener(getEditorActionListener { okbtn.performClick() })
                     setSelection(text.toString().length)
                 }
 
@@ -92,7 +103,7 @@ class DialogUtilsNew1 {
                         callback(invoiceET.text.toString())
                     }
                     else{
-                        //VFService.showToast("Enter Invoice Number")
+                        ToastUtils.showToast(context,"Enter Invoice Number")
                     }
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

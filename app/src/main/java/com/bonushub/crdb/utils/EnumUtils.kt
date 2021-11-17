@@ -16,7 +16,8 @@ enum class PreferenceKeyConstant(var keyName: String) {
     LAST_SUCCESS_RECEIPT_KEY("last_success_receipt_key"),
     SETTLEMENT_FAILED("settlement failed"),
     IsAutoSettleDone("isAutoSettleDone"),
-    LAST_SAVED_AUTO_SETTLE_DATE("lastSavedAutoSettleDate")
+    LAST_SAVED_AUTO_SETTLE_DATE("lastSavedAutoSettleDate"),
+    SERVER_HIT_STATUS("server_hit_status"),
 }
 //endregion
 

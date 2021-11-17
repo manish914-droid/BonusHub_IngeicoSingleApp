@@ -36,6 +36,10 @@ object AppPreference {
     const val F48IdentifierAndSuccesssTxn="f48id_txnDate"
     const val ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE = "enquiry_amount_for_emi_catalogue"
 
+
+    // kushal bank functions
+    const val GENERIC_REVERSAL_KEY = "generic_reversal_key"
+
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
         val startTs = System.currentTimeMillis()

@@ -1,20 +1,14 @@
 package com.bonushub.crdb.repository
 
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.bonushub.crdb.R
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
-import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
-import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.TableEditHelper
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
 class BankFunctionsRepository {
@@ -34,7 +28,7 @@ class BankFunctionsRepository {
         runBlocking {
             var tpt = DBModule.appDatabase?.appDao?.getSingleRowTerminalParameterTableData()
             try {
-                // Log.e("sap",""+tpt?.adminPassword)
+                // logger("sap",""+tpt?.adminPassword)
                 data.value =  tpt?.adminPassword.equals(password,true)
             }catch (ex:Exception){
                 data.value = false
@@ -51,7 +45,8 @@ class BankFunctionsRepository {
         runBlocking {
             var tpt = DBModule.appDatabase?.appDao?.getSingleRowTerminalParameterTableData()
             try {
-               // Log.e("sap",""+tpt?.superAdminPassword)
+               // logger("sap",""+tpt?.superAdminPassword)
+
             data.value =  tpt?.superAdminPassword.equals(password,true)
             }catch (ex:Exception){
                  data.value = false
@@ -61,6 +56,7 @@ class BankFunctionsRepository {
         return data
     }
 
+
     suspend fun getTerminalParameterTableData() : LiveData<ArrayList<TableEditHelper?>>{
         val dataList = MutableLiveData<ArrayList<TableEditHelper?>>()
         val dataListLocal = ArrayList<TableEditHelper?>()
@@ -69,8 +65,6 @@ class BankFunctionsRepository {
 
         var table = DBModule.appDatabase?.appDao.getTerminalParameterTableData()
 
-       // val table: Any? = getTable()
-        //val table: Any? = TerminalParameterTable
         if (table != null) {
             val props = TerminalParameterTable::class.java.declaredFields
             for (prop in props) {
@@ -97,6 +91,7 @@ class BankFunctionsRepository {
                 }
             }
 
+            // region  remaining this
 //            dataListLocal.add(
 //                TableEditHelper(
 //                    "F Batch",
@@ -106,6 +101,8 @@ class BankFunctionsRepository {
 //                        "0"
 //                )
 //            )//BB
+
+            // end region
             //In Case Of AMEX only below arrayList items options are shown to user (In TPT table)
             val requiredField = arrayListOf(
                 "TID",
@@ -167,14 +164,14 @@ class BankFunctionsRepository {
                             val value = prop.get(table)
                             if (value is String) {
                                 prop.set(table, ed.titleValue)
+
                             }
                         }
                     }
                 }
 
 
-
-
+// region remaining this region
                 /*Condition to check whether terminal id is
                 changed by user if so then we need to Navigate user to
                 MainActivity and auto perform fresh init with new terminal id:-
@@ -216,9 +213,8 @@ class BankFunctionsRepository {
                         )
                     }
                 }*/
-
-
-                Log.e("update",""+table.toString())
+// end region
+                //logger("update",""+table.toString())
                 DBModule.appDatabase?.appDao.updateTerminalParameterTable(table as TerminalParameterTable)
             } else logger("TAG", "No data to update is found")
         }
