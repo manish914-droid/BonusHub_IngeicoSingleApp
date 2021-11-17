@@ -3,25 +3,58 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.2" />
+        <entry key="app/src/main/res/drawable-v24/card_edge_inactive.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable-v24/ic_back_arrow_white.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable-v24/ic_home.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable-v24/ic_proceed_button.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable-v24/keyboard_bg.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable-xxhdpi/background_toast.xml" value="0.1935185185185185" />
+        <entry key="app/src/main/res/drawable-xxhdpi/ic_link_icon.xml" value="0.14814814814814814" />
+        <entry key="app/src/main/res/drawable-xxhdpi/ic_printer.xml" value="0.14814814814814814" />
+        <entry key="app/src/main/res/drawable/card_edge.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/catalogue_card.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/circle_with_tick_mark.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/custom_progress.xml" value="0.1962962962962963" />
         <entry key="app/src/main/res/drawable/default_dot.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/edge_button.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/edge_button_inactive.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/ic_back_arrow_white.xml" value="0.18541666666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_lock_open_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_bbg.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/ic_close_24.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/ic_home.xml" value="0.12447916666666667" />
         <entry key="app/src/main/res/drawable/ic_tid.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/keyboard_bg.xml" value="0.1638888888888889" />
         <entry key="app/src/main/res/drawable/selected_dot.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/tab_selector.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/layout/activity_navigation.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_toolbar.xml" value="0.1" />
         <entry key="app/src/main/res/layout/bank_function_right_icon.xml" value="0.18489583333333334" />
+        <entry key="app/src/main/res/layout/custom_toast.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/fragment_brand_emi.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.12" />
-        <entry key="app/src/main/res/layout/fragment_init.xml" value="0.18489583333333334" />
+        <entry key="app/src/main/res/layout/fragment_emi_catalogue.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_emi_compare.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/fragment_emi_issuer_list.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_init.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_new_input_amount.xml" value="0.14" />
         <entry key="app/src/main/res/layout/item_dashboart.xml" value="0.16" />
+        <entry key="app/src/main/res/layout/item_emi_compare_view.xml" value="0.2563176895306859" />
+        <entry key="app/src/main/res/layout/item_emi_issuer_list.xml" value="0.14" />
+        <entry key="app/src/main/res/layout/item_emi_issuer_tenure.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/item_ok_btn_dialog.xml" value="0.33" />
         <entry key="app/src/main/res/layout/main_drawer.xml" value="0.22" />
         <entry key="app/src/main/res/layout/main_list_item.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/mobile_bill_dialog_view.xml" value="0.18489583333333334" />
+        <entry key="app/src/main/res/layout/msg_dialog.xml" value="0.5" />
         <entry key="app/src/main/res/layout/navigation_footer_layout.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/new_enter_amount_keyboard.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/new_print_customer_copy.xml" value="0.17091454272863568" />
         <entry key="app/src/main/res/layout/new_tem_progress_dialog.xml" value="0.18489583333333334" />
+        <entry key="app/src/main/res/layout/select_dialog_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/select_dialog_view.xml" value="0.16" />
+        <entry key="app/src/main/res/layout/sub_header_layout.xml" value="0.2" />
         <entry key="app/src/main/res/menu/drawer_menu.xml" value="0.1" />
       </map>
     </option>
@@ -36,5 +69,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.22" />
+      </ProjectState>
+    </option>
   </component>
 </project>

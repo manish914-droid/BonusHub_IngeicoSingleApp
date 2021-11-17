@@ -8,13 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.IDialog
+
 
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentEmiCatalogueBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.pax.utils.EDashboardItem
 
 

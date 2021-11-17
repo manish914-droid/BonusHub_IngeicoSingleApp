@@ -65,7 +65,9 @@ enum class TransactionType(
     PENDING_PREAUTH(28, ProcessingCode.PENDING_PREAUTH, "PRE AUTH TXN"),
     OFFLINE_SALE(29, ProcessingCode.OFFLINE_SALE, "OFFLINE SALE"),
     VOID_OFFLINE_SALE(30, ProcessingCode.VOID_OFFLINE_SALE, "VOID OFFLINE SALE"),
-    BRAND_EMI_MASTER_DATA(31, ProcessingCode.BRAND_EMI, "BRAND EMI")
+    BRAND_EMI_MASTER_DATA(31, ProcessingCode.BRAND_EMI, "BRAND EMI"),
+    EMI_ENQUIRY(32, ProcessingCode.BANK_EMI, "EMI ENQUIRY"),
+    BRAND_EMI(33, ProcessingCode.BRAND_EMI, "EMI SALE"),
 }
 //endregion
 
@@ -469,3 +471,63 @@ enum class BankFunctionsTerminalItem(val _name: String){
     CLEAR_FBATCH("CLEAR FBATCH"),
 }
 // end region
+//Below Enum Class is used for Preference Save [String , Int and Boolean] Keys Constant:-
+enum class PrefConstant(val keyName: Any) {
+    AID_RID_INSERT_STATUS("aid_rid_status"),
+    SALE_INVOICE_INCREMENT("sale_invoice_increment"),
+    SETTLEMENT_ROC_INCREMENT("settlement_roc_increment"),
+    OFFLINE_ROC_INCREMENT("offline_roc_increment"),
+    SETTLEMENT_BATCH_INCREMENT("settlement_batch_number"),
+    SETTLEMENT_PROCESSING_CODE("settlement_processing_code"),
+    SETTLE_BATCH_SUCCESS("settle_batch_success"),
+    INIT_AFTER_SETTLE_BATCH_SUCCESS("init_after_settle_batch_success"),
+    FTP_IP_ADDRESS("ftp_ip_address"),
+    FTP_IP_PORT("ftp_ip_port"),
+    FTP_USER_NAME("ftp_user_name"),
+    FTP_PASSWORD("ftp_password"),
+    FTP_FILE_NAME("ftp_file_name"),
+    FTP_FILE_SIZE("ftp_file_size"),
+    BLOCK_MENU_OPTIONS("block_menu_options"),
+    INSERT_PPK_DPK("insert_ppk_dpk"),
+    INIT_AFTER_SETTLEMENT("init_after_settlement"),
+    VOID_ROC_INCREMENT("void_roc_increment"),
+    SERVER_HIT_STATUS("server_hit_status"),
+    APP_UPDATE_CONFIRMATION_TO_HOST("app_update_confirmation_to_host"),
+    TMK_DOWNLOAD("tmk_download"),
+    PROMO_STRING("promo_string")
+}
+
+//Below Enum Class is used for SubHeading intent extra when we transact Fragment:-
+enum class SubHeaderTitle(val title: String) {
+    VOID_SUBHEADER_VALUE("Void Sale"),
+    SALE_SUBHEADER_VALUE("Sale"),
+    SALE_WITH_CASH_SUBHEADER_VALUE("Sale with Cash"),
+    PREAUTH_SUBHEADER_VALUE("PreAuth"),
+    OFFLINE_SALE_SUBHEADER_VALUE("Offline Sale"),
+    VOID_OFFLINE_SALE_SUBHEADER_VALUE("Void Offline Sale"),
+    SETTLEMENT_SUBHEADER_VALUE("Settlement"),
+    CASH_ADVANCE("Cash Advance"),
+    PRE_AUTH_COMPLETE("Auth Complete"),
+    VOID_PRE_AUTH("Void Preauth"),
+    TIP_SALE("Tip Adjust"),
+    VOID_REFUND_SUBHEADER_VALUE("Void Refund"),
+    REFUND_SUBHEADER_VALUE("Refund"),
+    EMI_CATALOG("EMI Enquiry"),
+    BANK_EMI("Bank EMI"),
+    CROSS_SELL_SUBHEADER_VALUE("Cross Sell"),
+    Brand_EMI_Master_Category("Brand EMI Master Category"),
+    Brand_EMI_SUB_Category("Brand EMI Sub Category"),
+    Brand_EMI("Brand EMI Sale"),
+    Brand_EMI_BY_ACCESS_CODE("Brand EMI By Access Code"),
+    TEST_EMI("Test EMI TXN"),
+    Flexi_PAY("Flexi Pay"),
+    Merchent_refferal("Merchant Referral Program"),
+}
+enum class EIntentRequest(val code: Int) {
+    TRANSACTION(100),
+    EMI_ENQUIRY(101),
+    GALLERY(2000),
+    PRINTINGRECEIPT(102),
+    BankEMISchemeOffer(106),
+    FlexiPaySchemeOffer(107),
+}

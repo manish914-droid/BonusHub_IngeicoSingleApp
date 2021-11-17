@@ -1,6 +1,8 @@
 package com.bonushub.crdb.view.activity
 
 import android.app.Dialog
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +14,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -24,20 +27,17 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.utils.DemoConfig
-import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 
-import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
-import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.base.BaseActivityNew
+import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.view.fragments.BankFunctionsFragment
 import com.bonushub.crdb.view.fragments.BrandEmiSubCategoryFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
-
-import com.bonushub.pax.utils.NavControllerFragmentLabel
-import com.bonushub.pax.utils.VxEvent
+import com.bonushub.pax.utils.*
 
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -47,12 +47,13 @@ import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.lang.Runnable
+import java.util.HashMap
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
-    ActivityCompat.OnRequestPermissionsResultCallback {
+    ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
     private var navigationBinding: ActivityNavigationBinding?=null
     private var navHostFragment: NavHostFragment? = null
     private var isToExit = false
@@ -68,6 +69,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private var pinpad: UPinpad? = null
     private var pinpadLimited: PinpadLimited? = null
     private val dialog by lazy {   Dialog(this) }
+    companion object {
+        val TAG = NavigationActivity::class.java.simpleName
+        const val INPUT_SUB_HEADING = "input_amount"
+
+    }
     @Inject
     lateinit var appDatabase: AppDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -350,7 +356,162 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
 
     }
+
+    override fun onFragmentRequest(
+        action: UiAction,
+        data: Any,
+        extraPair: Triple<String, String, Boolean>?
+    ) {
+        when (action) {
+
+            UiAction.INIT_WITH_KEY_EXCHANGE -> {
+
+            }
+
+            UiAction.START_SALE -> {
+                if (checkInternetConnection()) {
+                    //  val amt = data as String
+                    val amt = (data as Pair<*, *>).first.toString()
+                    val saleWithTipAmt = data.second.toString()
+                    startActivityForResult(
+                        Intent(
+                            this,
+                            TransactionActivity::class.java
+                        ).apply {
+                            val formattedTransAmount = "%.2f".format(amt.toDouble())
+                            putExtra("amt", formattedTransAmount)
+                            putExtra("type", TransactionType.SALE.type)
+                            putExtra("proc_code", ProcessingCode.SALE.code)
+                            putExtra("mobileNumber", extraPair?.first)
+                            putExtra("billNumber", extraPair?.second)
+                            putExtra("saleWithTipAmt", saleWithTipAmt)
+                            putExtra("uiAction", action)
+                        }, EIntentRequest.TRANSACTION.code
+                    )
+                } else {
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
+            }
+
+            UiAction.BANK_EMI, UiAction.TEST_EMI -> {
+
+            }
+
+            UiAction.BRAND_EMI -> {
+
+
+            }
+
+            UiAction.CASH_AT_POS -> {
+
+            }
+
+            UiAction.SALE_WITH_CASH -> {
+
+            }
+
+            UiAction.PRE_AUTH -> {
+
+            }
+
+            UiAction.REFUND -> {
+
+            }
+
+            UiAction.EMI_ENQUIRY -> {
+            }
+            UiAction.BRAND_EMI_CATALOGUE, UiAction.BANK_EMI_CATALOGUE -> {
+                val amt = (data as Pair<*, *>).first.toString()
+                val emiCatalogueImageList =
+                    runBlocking(Dispatchers.IO) {
+                        /// readEMICatalogueAndBannerImages()
+                    }
+               transactFragment(EMIIssuerList().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("type", action)
+                        putString("proc_code", ProcessingCode.PRE_AUTH.code)
+                        putString("mobileNumber", extraPair?.first)
+                        putString("enquiryAmt", amt)
+                      //  putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
+
+
+                    }
+                })
+            }
+
+            else -> {
+
+            }
+        }
+    }
+
+    override fun onDashBoardItemClick(action: EDashboardItem) {
+        when (action) {
+            EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH -> {
+                if (checkInternetConnection()) {
+                    inflateInputFragment(
+                        NewInputAmountFragment(),
+                        SubHeaderTitle.SALE_SUBHEADER_VALUE.title,
+                        action
+                    )
+                } else {
+                    ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+                }
+
+
+            }
+
+            EDashboardItem.EMI_ENQUIRY -> {
+                if (Field48ResponseTimestamp.checkInternetConnection()) {
+                   transactFragment(EMICatalogue().apply {
+                        arguments = Bundle().apply {
+                            putSerializable("type", EDashboardItem.EMI_CATALOGUE)
+                            //  putString(INPUT_SUB_HEADING, "")
+                        }
+                    })
+
+                } else {
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
+            }
+
+            EDashboardItem.BRAND_EMI->{
+            transactFragment(BrandEmiMasterCategoryFragment())
+
+            }
+            else->{
+                val intent = Intent (this, TransactionActivity::class.java)
+               startActivity(intent)
+
+            }
+
+        }
+    }
 // endregion
+//Below Method is to Handle the Input Fragment Inflate with the Sub Heading it belongs to:-
+fun inflateInputFragment(
+    fragment: Fragment,
+    subHeading: String,
+    action: EDashboardItem, testEmiOption: String = "0"
+) {
+    if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+        !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
+        !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
+    ) {
+        transactFragment(fragment.apply {
+            arguments = Bundle().apply {
+                putSerializable("type", action)
+                putString(INPUT_SUB_HEADING, subHeading)
+                putString("TestEmiOption", testEmiOption)
+            }
+        }, false)
+    } else {
+        if (checkInternetConnection())
+          ///  checkAndPerformOperation()
+        else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+    }
+}
+
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
 interface ShowLessOnBackPress {
@@ -359,4 +520,14 @@ interface ShowLessOnBackPress {
 //endregion
 
 
+interface IFragmentRequest {
+    fun onFragmentRequest(
+        action: UiAction,
+        data: Any,
+        extraPair: Triple<String, String, Boolean>? = Triple("", "", third = true)
+    )
 
+    fun onDashBoardItemClick(action: EDashboardItem)
+
+
+}
