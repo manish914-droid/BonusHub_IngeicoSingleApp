@@ -213,6 +213,7 @@ object DeviceHelper   {
     }
 
 
+
     @JvmStatic
     @Throws(IllegalStateException::class)
     fun getEMV(): UEMV? {
