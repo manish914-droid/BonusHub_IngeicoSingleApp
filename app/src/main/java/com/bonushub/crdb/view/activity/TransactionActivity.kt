@@ -117,14 +117,14 @@ class TransactionActivity : AppCompatActivity(){
                      ex.printStackTrace()
                  }*/
 
-                  var ecrID: String
-               /*    try {
+           /*       var ecrID: String
+                   try {
                        DeviceHelper.doSaleTransaction(
                            SaleRequest(
                                amount = 300L ?: 0,
                                tipAmount = 0L ?: 0,
                                transactionType = TransactionType.SALE,
-                               tid = "41501370",
+                               tid = "30160039",
                                transactionUuid = UUID.randomUUID().toString().also {
                                    ecrID = it
 
@@ -162,6 +162,17 @@ class TransactionActivity : AppCompatActivity(){
                    cardProcessedDataModal.getPanNumberData().toString(),
                    Toast.LENGTH_LONG
                ).show()
+
+
+//This function will used for Admin Payment and will use Kushal
+         /*      DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
+                   override fun onCompleted(p0: OperationResult?) {
+                       p0?.value?.apply {
+                           println("Status = $status")
+                           println("Response code = $responseCode")
+                       }
+                   }
+               })*/
 
               /* lifecycleScope.launch(Dispatchers.IO) {
                   // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
