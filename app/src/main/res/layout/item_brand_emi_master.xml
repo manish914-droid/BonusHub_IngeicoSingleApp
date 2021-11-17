@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="@dimen/pad_12"
+
         android:layout_margin="@dimen/pad_8">
         <TextView
             android:id="@+id/tv_brand_master_name"
