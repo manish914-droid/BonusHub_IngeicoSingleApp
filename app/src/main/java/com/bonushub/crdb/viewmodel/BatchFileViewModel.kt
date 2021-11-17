@@ -9,7 +9,7 @@ class BatchFileViewModel:ViewModel() {
 
 
     private var batchTableData : LiveData<MutableList<BatchFileDataTable?>>? = null
-    fun getBatchTableData() : LiveData<MutableList<BatchFileDataTable?>>
+    suspend fun getBatchTableData() : LiveData<MutableList<BatchFileDataTable?>>
     {
         batchTableData = BatchFilesRepository.getInstance().getBatchTableData()
         return batchTableData as LiveData<MutableList<BatchFileDataTable?>>

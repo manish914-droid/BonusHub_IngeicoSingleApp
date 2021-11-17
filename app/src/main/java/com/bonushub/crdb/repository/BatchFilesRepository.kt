@@ -17,10 +17,9 @@ class BatchFilesRepository {
     }
 
 
-    fun getBatchTableData() : LiveData<MutableList<BatchFileDataTable?>>{
+    suspend fun getBatchTableData() : LiveData<MutableList<BatchFileDataTable?>>{
         val dataList = MutableLiveData<MutableList<BatchFileDataTable?>>()
 
-        runBlocking {
             val table = DBModule.appDatabase?.appDao.getBatchTableData()
 
             if (table != null) {
@@ -31,8 +30,8 @@ class BatchFilesRepository {
             }
 
 
-            dataList.value = table
-        }
+            dataList.postValue(table)
+
         return dataList
     }
 

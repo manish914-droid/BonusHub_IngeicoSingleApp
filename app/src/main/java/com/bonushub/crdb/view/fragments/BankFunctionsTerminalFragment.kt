@@ -23,6 +23,7 @@ import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.adapter.BankFunctionsTerminalParamAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
@@ -67,16 +68,16 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 //        setupRecyclerview()
 
         lifecycleScope.launch(Dispatchers.Main) {
-            bankFunctionsViewModel.getTerminalParamField()?.observe(requireActivity(),{
+            bankFunctionsViewModel.getTerminalParamField()?.observe(viewLifecycleOwner,{
 
-                Log.e("menuList",""+it)
+                //logger("menuList",""+it)
                 setupRecyclerview(it)
             })
 
         }
 
         lifecycleScope.launch(Dispatchers.Main) {
-            bankFunctionsViewModel.getTerminalParameterTable()?.observe(requireActivity(),{
+            bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
 
                 terminalParameterTable = it
             })
@@ -128,14 +129,16 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
         override fun onClickOk(dialog: Dialog, password:String) {
 
-            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(requireActivity(),{ success ->
+            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{ success ->
 
                 if(success)
                 {
                     dialog.dismiss()
                     //
                     //val batchData = BatchFileDataTable.selectBatchData() // get BatchFileDataTable data
-                    batchFileViewModel.getBatchTableData().observe(requireActivity(),{ batchData ->
+                    lifecycleScope.launch(Dispatchers.Main){
+
+                    batchFileViewModel.getBatchTableData().observe(viewLifecycleOwner,{ batchData ->
 
                         when {
                             AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
@@ -151,6 +154,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                         }
                     })
 
+                    }
                 }else{
                     ToastUtils.showToast(requireContext(),R.string.invalid_password)
 
@@ -189,7 +193,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                         dataList[position]?.titleValue = it
                         dataList[position]?.isUpdated = true
                         mAdapter.notifyItemChanged(position)
-                        GlobalScope.launch {
+                        lifecycleScope.launch {
                             updateTable() // BB
                         }
 
@@ -200,7 +204,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                 dataList[position]?.titleValue = it
                 dataList[position]?.isUpdated = true
                 mAdapter.notifyItemChanged(position)
-                GlobalScope.launch {
+                lifecycleScope.launch {
                     updateTable() // BB
                 }
             }

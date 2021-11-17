@@ -9,7 +9,10 @@ import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.TableEditHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class BankFunctionsRepository {
 
@@ -120,27 +123,27 @@ class BankFunctionsRepository {
 
         }
 
-        Log.e("dataList",""+dataListLocal?.size)
+        logger("dataList",""+dataListLocal?.size)
 
-        dataList.value = dataListLocal
+        dataList.postValue(dataListLocal)
         return dataList
     }
 
-    fun getTerminalParameterTable():LiveData<TerminalParameterTable>{
+    suspend fun getTerminalParameterTable():LiveData<TerminalParameterTable>{
 
-        var tpt  = MutableLiveData<TerminalParameterTable>()
+        val tpt  = MutableLiveData<TerminalParameterTable>()
 
-        runBlocking {
-            var table = DBModule.appDatabase?.appDao.getTerminalParameterTableData()
+
+        withContext(Dispatchers.IO) {
+            val table = DBModule.appDatabase?.appDao.getTerminalParameterTableData()
             try {
-                tpt.value = table.get(0)
-            }catch (ex:Exception)
-            {
-                tpt.value = null
+                tpt.postValue(table.get(0))
+            } catch (ex: Exception) {
+                tpt.postValue(null)
                 ex.printStackTrace()
             }
-
         }
+
         return tpt
     }
 
