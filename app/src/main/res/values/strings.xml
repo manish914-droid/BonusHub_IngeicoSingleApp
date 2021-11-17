@@ -159,6 +159,7 @@
     <string name="printing_str">Printing.......</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="positive_button_ok">OK</string>
     <string name="do_you_to_print_summary_reports">Do you want to print summary reports?</string>
     <string name="transaction_type">Txn Type</string>
     <string name="do_you_want_to_print_customer_copy">Do You Want To Print Customer Copy?</string>
@@ -169,7 +170,9 @@
     <string name="print_customer_copy">Print Customer Copy</string>
     <string name="print_merchant_copy">Print Merchant Copy</string>
     <string name="sms_upi_pay">SMS/UPI Pay</string>
-
-
-
+    <string name="enter_tip_amount">Enter TIP amount</string>
+    <string name="please_enter_cash_amount">Please enter cash amount</string>
+    <string name="enter_valid_mobile_number">Enter Valid Mobile Number</string>
+    <string name="enter_bill_number">Enter Bill Number</string>
+    <string name="enter_valid_bill_number">Enter Valid Bill Number</string>
 </resources>

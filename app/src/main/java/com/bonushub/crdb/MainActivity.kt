@@ -133,28 +133,4 @@ class MainActivity : AppCompatActivity(),DeviceHelper.ServiceReadyListener {
 
 
 }
-interface IDialog {
 
-    fun getMsgDialog(
-        title: String,
-        msg: String,
-        positiveTxt: String,
-        negativeTxt: String,
-        positiveAction: () -> Unit,
-        negativeAction: () -> Unit,
-        isCancellable: Boolean = false
-    )
-
-    fun setProgressTitle(title: String)
-    //fun onEvents(event: VxEvent)
-
-    fun showToast(msg: String)
-    fun showProgress(progressMsg: String = "Please Wait....")
-    fun hideProgress()
-    fun getInfoDialog(title: String, msg: String, acceptCb: () -> Unit)
-    fun getInfoDialogdoubletap(title: String, msg: String, acceptCb: (Boolean, Dialog) -> Unit)
-
-    fun updatePercentProgress(percent:Int)
-    fun showPercentDialog(progressMsg: String = "Please Wait....")
-
-}

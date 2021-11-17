@@ -10,32 +10,51 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.HDFCApplication
 
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
+
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.convertValue2BCD
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getHDFCTptData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.maxAmountLimitDialog
 import com.bonushub.crdb.utils.KeyboardModel
+import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.showMobileBillDialog
+import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
+import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.crdb.viewmodel.DashboardViewModel
+import com.bonushub.crdb.viewmodel.NewInputAmountViewModel
 import com.bonushub.pax.utils.EDashboardItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
+import com.bonushub.pax.utils.TransactionType
+import com.bonushub.pax.utils.UiAction
+import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_new_input_amount.*
+import kotlinx.coroutines.*
+@AndroidEntryPoint
 class NewInputAmountFragment : Fragment() {
 
     /** need to use Hilt for instance initializing here..*/
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-
-
+    private lateinit var transactionType: EDashboardItem
+    var tpt : TerminalParameterTable? =null
+    private var iDialog: IDialog? = null
     var brandEntryValidationModel: BrandEmiBillSerialMobileValidationModel? = null
 
     private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
@@ -58,13 +77,15 @@ class NewInputAmountFragment : Fragment() {
     private var iFrReq: IFragmentRequest? = null
     private var animShow: Animation? = null
     private var animHide: Animation? = null
-
+    private val newInputAmountViewModel : NewInputAmountViewModel by viewModels()
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is IFragmentRequest) {
             iFrReq = context
         }
+        if (context is IDialog) iDialog = context
     }
+
 
 
     override fun onCreateView(
@@ -80,7 +101,7 @@ class NewInputAmountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        transactionType = (arguments?.getSerializable("type")) as EDashboardItem
         brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
         brandEmiProductData = arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
@@ -89,6 +110,48 @@ class NewInputAmountFragment : Fragment() {
             parentFragmentManager.popBackStackImmediate()
         }
         initAnimation()
+        newInputAmountViewModel.fetchtptData()
+        observeNewInpuAmountViewModel()
+        if (transactionType == EDashboardItem.SALE) {
+            isMobileNumberEntryOnsale { isMobileNeeded, isMobilenumberMandatory ->
+                if (isMobileNeeded) {
+                    binding?.mobNoCrdView?.visibility = View.VISIBLE
+                } else {
+                    binding?.mobNoCrdView?.visibility = View.GONE
+                }
+            }
+        }
+
+        when (transactionType) {
+            EDashboardItem.SALE_WITH_CASH -> {
+                //  binding?.enterCashAmountTv?.visibility = View.VISIBLE
+                binding?.cashAmtCrdView?.visibility = View.VISIBLE
+                cashAmount?.hint = HDFCApplication.appContext.getString(R.string.cash_amount)
+                //   binding?.enterCashAmountTv?.text = VerifoneApp.appContext.getString(R.string.cash_amount)
+
+            }
+            EDashboardItem.SALE -> {
+                if (checkHDFCTPTFieldsBitOnOff(TransactionType.TIP_SALE)) {
+                    //   binding?.enterCashAmountTv?.visibility = View.VISIBLE
+                    binding?.cashAmtCrdView?.visibility = View.VISIBLE
+                    cashAmount?.hint = HDFCApplication.appContext.getString(R.string.enter_tip_amount)
+                    //    binding?.enterCashAmountTv?.text = VerifoneApp.appContext.getString(R.string.enter_tip_amount)
+
+                } else {
+                    cashAmount?.visibility = View.GONE
+                    binding?.cashAmtCrdView?.visibility = View.GONE
+                    //  binding?.enterCashAmountTv?.visibility = View.GONE
+
+                }
+            }
+
+
+            else -> {
+                cashAmount?.visibility = View.GONE
+                binding?.cashAmtCrdView?.visibility = View.GONE
+                //   binding?.enterCashAmountTv?.visibility = View.GONE
+            }
+        }
 
         isMobileNumBillEntryAndSerialNumRequiredOnBrandEmi {
             if (it != null) {
@@ -111,6 +174,13 @@ class NewInputAmountFragment : Fragment() {
         inputInCashAmount = false
         inputInMobilenumber = false
         setOnClickListeners()
+    }
+
+    private fun observeNewInpuAmountViewModel() {
+        newInputAmountViewModel.mutableLiveData.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            tpt=it
+            Log.d("tpt===>:- ", Gson().toJson(it))
+        })
     }
 
     private fun setOnClickListeners() {
@@ -344,12 +414,8 @@ class NewInputAmountFragment : Fragment() {
         }
 
     }
-    private fun onOKClicked(saleAmountStr: String) {
-        val saleAmountStr = binding?.saleAmount?.text.toString()
-        var saleAmount = 0.toDouble()
-        if (saleAmountStr != "") {
-            saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
-        }
+    private fun onOKClicked(amt: String) {
+
        /* (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
             arguments = Bundle().apply {
               //  putSerializable("type", action)
@@ -364,10 +430,163 @@ class NewInputAmountFragment : Fragment() {
 lifecycleScope.launch(Dispatchers.IO) {
     serverRepository.getEMITenureData()
 }
-        /*iFrReq?.onFragmentRequest(
-            UiAction.EMI_ENQUIRY,
-            Pair(saleAmount.toString().trim(), "0")
-        )*/
+        Log.e("SALE", "OK CLICKED  ${binding?.saleAmount?.text.toString()}")
+        Log.e("CASh", "OK CLICKED  ${cashAmount?.text}")
+        Log.e("AMT", "OK CLICKED  $amt")
+        val maxTxnLimit= 20000.0///"%.2f".format(getTransactionLimitForHDFCIssuer()).toDouble()
+        Log.e("TXN LIMIT", "Txn type = $transactionType  Txn maxLimit = $maxTxnLimit")
+
+        try {
+            (binding?.saleAmount?.text.toString()).toDouble()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            ToastUtils.showToast(activity,"Please enter amount")
+            return
+        }
+
+        val cashAmtStr = (cashAmount?.text.toString())
+        var cashAmt = 0.toDouble()
+        if (cashAmtStr != "") {
+            cashAmt = (cashAmount?.text.toString()).toDouble()
+        }  else if (transactionType == EDashboardItem.SALE_WITH_CASH ) {
+            ToastUtils.showToast(activity,R.string.please_enter_cash_amount)
+            return
+        }
+        val saleAmountStr = binding?.saleAmount?.text.toString()
+        var saleAmount = 0.toDouble()
+        if (saleAmountStr != "") {
+            saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
+        }
+        when (transactionType) {
+            EDashboardItem.SALE -> {
+                val saleAmt = saleAmount.toString().trim().toDouble()
+                val saleTipAmt = cashAmt.toString().trim().toDouble()
+                val trnsAmt = saleAmt + saleTipAmt
+                if(trnsAmt > maxTxnLimit){
+                    maxAmountLimitDialog(iDialog,maxTxnLimit)
+                    return
+                }
+                if (saleTipAmt > 0) {
+                    when {
+                        !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length in 10..13) {
+                            val extraPairData = Triple(binding?.mobNumbr?.text.toString(), "", third = true)
+                            validateTIP(trnsAmt, saleAmt, extraPairData)
+                        } else
+                            context?.getString(R.string.enter_valid_mobile_number)
+                                ?.let { ToastUtils.showToast(activity,it) }
+
+                        TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
+                            val extraPairData = Triple("", "", third = true)
+                            validateTIP(trnsAmt, saleAmt, extraPairData)
+                        }
+                    }
+
+
+                }
+                else {
+                    isMobileNumberEntryOnsale { isMobileNeeded, _ ->
+                        if (isMobileNeeded) {
+                            when {
+                                !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length in 10..13) {
+                                    val extraPairData = Triple(
+                                        binding?.mobNumbr?.text.toString(),
+                                        "",
+                                        third = true
+                                    )
+                                    iFrReq?.onFragmentRequest(
+                                        UiAction.START_SALE,
+                                        Pair(
+                                            trnsAmt.toString().trim(),
+                                            cashAmt.toString().trim()
+                                        ),
+                                        extraPairData
+                                    )
+                                } else
+                                    context?.getString(R.string.enter_valid_mobile_number)
+                                        ?.let { ToastUtils.showToast(activity,it) }
+
+                                TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
+                                    iFrReq?.onFragmentRequest(
+                                        UiAction.START_SALE,
+                                        Pair(
+                                            trnsAmt.toString().trim(),
+                                            cashAmt.toString().trim()
+                                        )
+                                    )
+
+                                }
+                            }
+                        } else {
+                            iFrReq?.onFragmentRequest(
+                                UiAction.START_SALE,
+                                Pair(trnsAmt.toString().trim(), cashAmt.toString().trim())
+                            )
+                        }
+                    }
+                }
+            }
+
+            EDashboardItem.BRAND_EMI -> {
+
+            }
+
+            EDashboardItem.CASH_ADVANCE -> {
+
+            }
+            EDashboardItem.SALE_WITH_CASH -> {
+
+            }
+            EDashboardItem.REFUND -> {
+
+            }
+            EDashboardItem.PREAUTH -> {
+
+            }
+
+            EDashboardItem.EMI_ENQUIRY -> {
+                if (tpt?.bankEnquiryMobNumberEntry == true) {
+                    showMobileBillDialog(activity, TransactionType.EMI_ENQUIRY.type) {
+                        //  sendStartSale(inputAmountEditText?.text.toString(), extraPairData)
+                        iFrReq?.onFragmentRequest(
+                            UiAction.EMI_ENQUIRY,
+                            Pair(saleAmount.toString().trim(), "0"), it
+                        )
+                    }
+                } else {
+                    iFrReq?.onFragmentRequest(
+                        UiAction.EMI_ENQUIRY,
+                        Pair(saleAmount.toString().trim(), "0")
+                    )
+                }
+            }
+
+
+
+            EDashboardItem.BRAND_EMI_CATALOGUE -> {
+
+            }
+
+            EDashboardItem.BANK_EMI_CATALOGUE -> {
+
+                when {
+                    TextUtils.isEmpty(
+                        saleAmount.toString().trim()
+                    ) ->  ToastUtils.showToast(activity,"Enter Sale Amount")
+                    //  TextUtils.isEmpty(binding?.mobNumbr?.text?.toString()?.trim()) -> VFService.showToast("Enter Mobile Number")
+                    else -> iFrReq?.onFragmentRequest(
+                        UiAction.BANK_EMI_CATALOGUE,
+                        Pair(saleAmount.toString().trim(), cashAmt.toString().trim())
+                    )
+                }
+            }
+
+
+
+            else -> {
+            }
+        }
+
+
     }
     private fun initAnimation() {
         animShow = AnimationUtils.loadAnimation(activity, R.anim.view_show)
@@ -426,4 +645,144 @@ lifecycleScope.launch(Dispatchers.IO) {
     //endregion
 
 
+    private fun isMobileNumberEntryOnsale(cb: (Boolean, Boolean) -> Unit) {
+        when (transactionType) {
+            EDashboardItem.SALE -> {
+                if (tpt?.reservedValues?.substring(0, 1) == "1")
+                    cb(true, false)
+                else
+                    cb(false, false)
+            }
+            else -> {
+                cb(false, false)
+            }
+        }
+    }
+    //region=========================Below method to check HDFC TPT Fields Check:-
+    private fun checkHDFCTPTFieldsBitOnOff(transactionType: TransactionType): Boolean {
+        val hdfcTPTData = runBlocking(Dispatchers.IO) {
+            getHDFCTptData() }
+        Log.d("HDFC TPT:- ", hdfcTPTData.toString())
+        var data: String? = null
+        if (hdfcTPTData != null) {
+            when (transactionType) {
+                TransactionType.VOID -> {
+                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    return data[1] == '1' // checking second position of data for on/off case
+                }
+                TransactionType.REFUND -> {
+                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    return data[2] == '1' // checking third position of data for on/off case
+                }
+                TransactionType.TIP_ADJUSTMENT -> {
+                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    return data[3] == '1' // checking fourth position of data for on/off case
+                }
+                TransactionType.TIP_SALE -> {
+                    data = convertValue2BCD(hdfcTPTData.option1)
+                    return data[2] == '1' // checking third position of data for on/off case
+                }
+                else -> {
+                }
+            }
+        }
+
+        return false
+    }
+//endregion
+//region=========================Below method to check HDFC Transaction Limit Check:-
+private fun getTransactionLimitForHDFCIssuer():Double{
+        return try {
+            runBlocking(Dispatchers.IO) {
+                val maxAmt =  dbObj.appDao.getIssuerTableDataByIssuerID(AppPreference.WALLET_ISSUER_ID)?.transactionAmountLimit?.toDouble()?.div(100)
+                ("%.2f".format((maxAmt).toString().toDouble())).toDouble()
+            }
+
+        }catch(ex:Exception){
+            0.00
+        }
+
+    }
+    //endregion
+
+    private fun validateTIP(
+        totalTransAmount: Double,
+        saleAmt: Double,
+        extraPair: Triple<String, String, Boolean>
+    ) {
+        val tpt = getTptData()
+        if (tpt != null) {
+            val tipAmount = try {
+                cashAmount?.text.toString().toFloat()
+            } catch (ex: Exception) {
+                0f
+            }
+            val maxTipPercent =
+                if (tpt.maxTipPercent.isEmpty()) 0f else (tpt.maxTipPercent.toFloat()).div(
+                    100
+                )
+            val maxTipLimit =
+                if (tpt.maxTipLimit.isEmpty()) 0f else (tpt.maxTipLimit.toFloat()).div(
+                    100
+                )
+            if (maxTipLimit != 0f) { // flat tip check is applied
+                if (tipAmount <= maxTipLimit) {
+                    // iDialog?.showProgress()
+                    GlobalScope.launch {
+
+                        iFrReq?.onFragmentRequest(
+                            UiAction.START_SALE,
+                            Pair(
+                                totalTransAmount.toString().trim(),
+                                cashAmount?.text.toString().trim()
+                            ), extraPair
+                        )
+                    }
+                } else {
+                    val msg =
+                        "Maximum tip allowed on this terminal is \u20B9 ${
+                            "%.2f".format(
+                                maxTipLimit
+                            )
+                        }."
+                    GlobalScope.launch(Dispatchers.Main) {
+                        iDialog?.getInfoDialog("Tip Sale Error", msg) {}
+                    }
+                }
+            } else { // percent tip check is applied
+                val maxAmountTip = (maxTipPercent / 100) * saleAmt
+                val formatMaxTipAmount = "%.2f".format(maxAmountTip)
+                if (tipAmount <= maxAmountTip.toFloat()) {
+                    //   iDialog?.showProgress()
+                    GlobalScope.launch {
+
+                        iFrReq?.onFragmentRequest(
+                            UiAction.START_SALE,
+                            Pair(
+                                totalTransAmount.toString().trim(),
+                                cashAmount?.text.toString().trim()
+                            ), extraPair
+                        )
+                    }
+                } else {
+                    //    val tipAmt = saleAmt * per / 100
+                    val msg = "Tip limit for this transaction is \n \u20B9 ${
+                        "%.2f".format(
+                            formatMaxTipAmount.toDouble()
+                        )
+                    }"
+                    /* "Maximum ${"%.2f".format(
+                         maxTipPercent.toDouble()
+                     )}% tip allowed on this terminal.\nTip limit for this transaction is \u20B9 ${"%.2f".format(
+                         formatMaxTipAmount.toDouble()
+                     )}"*/
+                    GlobalScope.launch(Dispatchers.Main) {
+                        iDialog?.getInfoDialog("Tip Sale Error", msg) {}
+                    }
+                }
+            }
+        } else {
+            ToastUtils.showToast(activity,"TPT not fount")
+        }
+    }
 }

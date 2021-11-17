@@ -14,10 +14,11 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.bonushub.crdb.IDialog
+
 import com.bonushub.crdb.R
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.utils.Result
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.MainViewModel
 import com.mindorks.example.coroutines.utils.Status
 
