@@ -324,6 +324,12 @@ interface AppDao{
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateTerminalParameterTable(terminalParameterTable: TerminalParameterTable)
 
+
+    @Query("SELECT * FROM TerminalCommunicationTable WHERE recordType = :redordType")
+    suspend fun getTerminalCommunicationTableByRecordType(redordType:String): MutableList<TerminalCommunicationTable?>
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateTerminalCommunicationTable(terminalCommunicationTable: TerminalCommunicationTable)
     // end region
 
 }

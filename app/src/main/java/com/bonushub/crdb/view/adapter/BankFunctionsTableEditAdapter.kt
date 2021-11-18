@@ -1,33 +1,25 @@
 package com.bonushub.crdb.view.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ItemBankFunctionsTerminalParamBinding
-import com.bonushub.crdb.view.fragments.IBankFunctionsTerminalItemClick
+import com.bonushub.crdb.view.fragments.IBankFunctionsTableEditItemClick
 import com.bonushub.crdb.view.fragments.TableEditHelper
-import com.bonushub.pax.utils.BankFunctionsTerminalItem
 
-class BankFunctionsTerminalParamAdapter(private var dataList:ArrayList<TableEditHelper?>, private var iBankFunctionsTerminalItemClick: IBankFunctionsTerminalItemClick?) : RecyclerView.Adapter<BankFunctionsTerminalParamAdapter.BankFunctionsTerminalParamViewHolder>() {
+class BankFunctionsTableEditAdapter(private var dataList:ArrayList<TableEditHelper?>, private var iBankFunctionsTableEditItemClick: IBankFunctionsTableEditItemClick?) : RecyclerView.Adapter<BankFunctionsTableEditAdapter.BankFunctionsTableEditViewHolder>() {
 
-
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsTerminalParamViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsTableEditViewHolder {
         val itemBinding = ItemBankFunctionsTerminalParamBinding.inflate(LayoutInflater.from(parent.context),
             parent,
             false)
-        return BankFunctionsTerminalParamViewHolder(itemBinding)
+        return BankFunctionsTableEditViewHolder(itemBinding)
     }
 
     override fun getItemCount(): Int = dataList.size
 
 
-    override fun onBindViewHolder(holder: BankFunctionsTerminalParamViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BankFunctionsTableEditViewHolder, position: Int) {
 
         val model = dataList[position]
 
@@ -36,7 +28,7 @@ class BankFunctionsTerminalParamAdapter(private var dataList:ArrayList<TableEdit
         holder.viewBinding.textViewValue.text = model?.titleValue
 
         holder.viewBinding.imgViewEdit.setOnClickListener {
-            iBankFunctionsTerminalItemClick?.bankFunctionsTerminalItemClick(position)
+            iBankFunctionsTableEditItemClick?.bankFunctionsTableEditItemClick(position)
         }
 
 
@@ -45,7 +37,7 @@ class BankFunctionsTerminalParamAdapter(private var dataList:ArrayList<TableEdit
 
 
 
-    inner class BankFunctionsTerminalParamViewHolder(val viewBinding: ItemBankFunctionsTerminalParamBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+    inner class BankFunctionsTableEditViewHolder(val viewBinding: ItemBankFunctionsTerminalParamBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 //        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
 //        val textViewValue: TextView = view.findViewById(R.id.textViewValue)
 //        val relLayParent: RelativeLayout = view.findViewById(R.id.relLayParent)

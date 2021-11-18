@@ -66,6 +66,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
             BankFunctionsAdminVasItem.COMM_PARAM ->{
                 // COMM PARAM
+                (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
             }
 
             BankFunctionsAdminVasItem.ENV_PARAM ->{

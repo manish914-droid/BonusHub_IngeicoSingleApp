@@ -181,24 +181,31 @@ data class TerminalCommunicationTable(
     var dialTimeOut: String = "",
 
     @field:BHFieldParseIndex(14)
+    @field:BHFieldName("APN")
     var apn: String = "",
 
     @field:BHFieldParseIndex(15)
+    @field:BHFieldName("APN User Name")
     var apnUserName: String = "",
 
     @field:BHFieldParseIndex(16)
+    @field:BHFieldName("APN Password")
     var apnPassword: String = "",
 
     @field:BHFieldParseIndex(17)
+    @field:BHFieldName("Host Primary IP")
     var hostPrimaryIp: String = "",
 
     @field:BHFieldParseIndex(18)
+    @field:BHFieldName("Host Primary Port")
     var hostPrimaryPortNo: String = "",
 
     @field:BHFieldParseIndex(19)
+    @field:BHFieldName("Host Secondary IP")
     var hostSecIp: String = "",
 
     @field:BHFieldParseIndex(20)
+    @field:BHFieldName("Host Secondary Port")
     var hostSecPortNo: String = "",
 
     @field:BHFieldParseIndex(21)
@@ -232,39 +239,50 @@ data class TerminalCommunicationTable(
     var hostSecondaryEthPort: String = "",
 
     @field:BHFieldParseIndex(31)
+    @field:BHFieldName("Connection Timeout")
     var connectTimeOut: String = "",
 
     @field:BHFieldParseIndex(32)
+    @field:BHFieldName("Response Timeout")
     var responseTimeOut: String = "",
 
     @field:BHFieldParseIndex(33)
     var reserveValue: String = "",
 
     @field:BHFieldParseIndex(34)
+    //   @field:BHFieldName("APN 2")
     var apn2: String = "",
 
     @field:BHFieldParseIndex(35)
+    //  @field:BHFieldName("GPRS User 2")
     var gprsUser2: String = "",
 
     @field:BHFieldParseIndex(36)
+    //   @field:BHFieldName("GPRS Password 2")
     var gprsPassword2: String = "",
 
     @field:BHFieldParseIndex(37)
+    //   @field:BHFieldName("Host Primary IP 2")
     var hostPrimaryIp2: String = "",
 
     @field:BHFieldParseIndex(38)
+    //   @field:BHFieldName("Host Primary Port 2")
     var hostPrimaryPort2: String = "",
 
     @field:BHFieldParseIndex(39)
+    //   @field:BHFieldName("Host Secondary IP 2")
     var hostSecondaryIp2: String = "",
 
     @field:BHFieldParseIndex(40)
+    //   @field:BHFieldName("Host Secondary Port 2")
     var hostSecondaryPort2: String = "",
 
     @field:BHFieldParseIndex(41)
+    //   @field:BHFieldName("Bank Code")
     var bankCode: String = "",
 
     @field:BHFieldParseIndex(42)
+    // @field:BHFieldName("TID")
     var tid: String = ""
 
 )

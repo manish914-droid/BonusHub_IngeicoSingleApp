@@ -113,6 +113,9 @@
     <string name="admin_vas_header">ADMIN VAS</string>
     <string name="terminal_param_header">TERMINAL PARAM</string>
     <string name="init_payment_app_header">INIT PAYMENT APP</string>
+    <string name="communication_param_header">COMMUNICATION PARAM</string>
+    <string name="txn_param_header">TXN PARAM</string>
+    <string name="app_update_param_header">APP UPDATE PARAM</string>
     <string name="admin_password">ADMIN PASSWORD</string>
     <string name="hint_enter_admin_password">**** ENTER ADMIN PASSWORD</string>
     <string name="super_admin_password">SUPER ADMIN PASSWORD</string>
@@ -123,6 +126,7 @@
     <string name="reversal_found_please_clear_or_settle_first_before_init">Reversal is found  , Please clear or settle it first before init</string>
     <string name="please_settle_batch_first_before_init">Please Settle Batch first and then Proceed with init</string>
     <string name="enter_terminal_id_must_be_valid_8digit">Entered Terminal ID must be a valid 8 character length</string>
+    <string name="recoard_not_found">Recoard not found</string>
 
 
     <string name="test_emi">Test EMI TXN</string>
@@ -132,7 +136,6 @@
     <string name="enter_imei_number">Enter IMEI Number</string>
     <string name="enter_serial_number">Enter Serial Number</string>
     <string name="proceed">Proceed</string>
-
 
 
     <string name="default_amount">0.00</string>

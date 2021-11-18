@@ -44,4 +44,17 @@ class BankFunctionsViewModel:ViewModel() {
     suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>){
         BankFunctionsRepository.getInstance().updateTerminalParameterTable(dataList)
     }
+
+    //TerminalCommunicationTable
+    private var terminalCommunicationTable:LiveData<ArrayList<TableEditHelper?>>? = null
+
+    suspend fun getTerminalCommunicationTableByRecordType(recordType:String):LiveData<ArrayList<TableEditHelper?>>? {
+
+        terminalCommunicationTable = BankFunctionsRepository.getInstance().getTerminalCommunicationTableByRecordType(recordType)
+        return terminalCommunicationTable
+    }
+
+    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String){
+        BankFunctionsRepository.getInstance().updateTerminalCommunicationTable(dataList, recordType)
+    }
 }

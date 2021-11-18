@@ -462,6 +462,25 @@ enum class BankFunctionsAdminVasItem(val _name: String){
 }
 // end region
 
+// region for bank functions communication param
+enum class CommunicationParamItem(val _name: String,val value:Int){
+    TXN_PARAM("TXN PARAM",1),
+    APP_UPDATE_PARAM("APP UPDATE PARAM",2),
+
+}
+// end region
+
+// region for bank functions admin vas
+enum class BankFunctions(val _name: String){
+    INIT("INIT"),
+    TEST_EMI("TEST EMI"),
+    TERMINAL_PARAM("TERMINAL PARAM"),
+    COMM_PARAM("COMM PARAM"),
+    ENV_PARAM("ENV PARAM"),
+    INIT_PAYMENT_APP("INIT PAYMENT APP"),
+}
+// end region
+
 // region for bank functions terminal param
 enum class BankFunctionsTerminalItem(val _name: String){
     BATCH_NUMBER("BATCH NUMBER"),
