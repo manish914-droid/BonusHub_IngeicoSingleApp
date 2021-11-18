@@ -1,14 +1,21 @@
 package com.bonushub.crdb.repository
 
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.bonushub.crdb.HDFCApplication.Companion.appContext
+import com.bonushub.crdb.MainActivity
+import com.bonushub.crdb.R
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.TableEditHelper
+import com.bonushub.pax.utils.PrefConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
@@ -95,15 +102,15 @@ class BankFunctionsRepository {
             }
 
             // region  remaining this
-//            dataListLocal.add(
-//                TableEditHelper(
-//                    "F Batch",
-//                    if (AppPreference.getBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString()))
-//                        "1"
-//                    else
-//                        "0"
-//                )
-//            )//BB
+            dataListLocal.add(
+                TableEditHelper(
+                    "F Batch",
+                    if (AppPreference.getBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString()))
+                        "1"
+                    else
+                        "0"
+                )
+            )//BB
 
             // end region
             //In Case Of AMEX only below arrayList items options are shown to user (In TPT table)
@@ -181,25 +188,31 @@ class BankFunctionsRepository {
                  */
 
                 //Below conditional code will only execute in case of Change TID:- // BB
-                /*if (data[0]?.titleName.equals("TID", ignoreCase = true)) {
+                if (data[0]?.titleName.equals("TID", ignoreCase = true)) {
                     if (data[0]?.titleValue != DBModule.appDatabase?.appDao.getTerminalParameterTableData().get(0)?.terminalId
                         && data[0]?.titleName.equals("TID", ignoreCase = true)
                     ) {
                         if (data[0]?.titleValue?.length == 8) {
-                            TerminalParameterTable.updateTerminalID(data[0]?.titleValue)
-                            startActivity(Intent(context, MainActivity::class.java).apply {
+                            //TerminalParameterTable.updateTerminalID(data[0]?.titleValue)
+                            DBModule.appDatabase?.appDao.updateTerminalParameterTable(table as TerminalParameterTable)
+
+                            withContext(Dispatchers.Main) {
+                            appContext.startActivity(Intent(appContext, MainActivity::class.java).apply {
                                 putExtra("changeTID", true)
                                 flags =
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
+                        }
                         } else {
-                            ToastUtils.showToast(getString(R.string.enter_terminal_id_must_be_valid_8digit))
+                            withContext(Dispatchers.Main){
+                                ToastUtils.showToast(appContext, appContext.getString(R.string.enter_terminal_id_must_be_valid_8digit))
+                            }
                         }
                     }
-                }*/
+                }
 
                 //Below conditional code will only execute in case of cLEAR FBATCH :- // BB
-                /*if (data[0]?.titleName.equals("F BATCH", ignoreCase = true)) {
+                if (data[0]?.titleName.equals("F BATCH", ignoreCase = true)) {
                     if (data[0]?.titleValue == "0" && data[0]?.titleName.equals(
                             "F BATCH",
                             ignoreCase = true
@@ -215,7 +228,7 @@ class BankFunctionsRepository {
                             true
                         )
                     }
-                }*/
+                }
 // end region
                 //logger("update",""+table.toString())
                 DBModule.appDatabase?.appDao.updateTerminalParameterTable(table as TerminalParameterTable)
