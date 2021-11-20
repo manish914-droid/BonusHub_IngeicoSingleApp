@@ -2,6 +2,7 @@ package com.bonushub.pax.utils
 
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.R
+import java.io.Serializable
 
 
 //region=================Preference Keys==============
@@ -463,7 +464,7 @@ enum class BankFunctionsAdminVasItem(val _name: String){
 // end region
 
 // region for bank functions communication param
-enum class CommunicationParamItem(val _name: String,val value:Int){
+enum class CommunicationParamItem(val _name: String,val value:Int):Serializable{
     TXN_PARAM("TXN PARAM",1),
     APP_UPDATE_PARAM("APP UPDATE PARAM",2),
 

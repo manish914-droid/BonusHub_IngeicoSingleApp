@@ -44,6 +44,7 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
         super.onViewCreated(view, savedInstanceState)
 
         iBankFunctionItemClick = this
+        bankFunctionsItem.clear()
         bankFunctionsItem.addAll(BankFunctionsItem.values())
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
 
