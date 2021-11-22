@@ -26,9 +26,11 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.view.adapter.BrandEmiProductAdapter
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.BrandEmiProductViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
+import com.bonushub.pax.utils.EDashboardItem
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,6 +69,7 @@ class BrandEmiProductFragment : Fragment() {
         brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
+        (activity as IDialog).showProgress()
         brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
             BrandEmiProductViewModel::class.java
         )
@@ -81,6 +84,7 @@ class BrandEmiProductFragment : Fragment() {
         brandEmiProductViewModel.brandEMIProductLivedata.observe(
             viewLifecycleOwner,
             {
+                (activity as IDialog).hideProgress()
                 when (val genericResp = it) {
                     is GenericResponse.Success -> {
                         println(Gson().toJson(genericResp.data))
@@ -116,6 +120,7 @@ class BrandEmiProductFragment : Fragment() {
                 putSerializable("brandEmiProductData", productData)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
                 putSerializable("brandDataMaster", brandDataMaster)
+                putSerializable("type", EDashboardItem.BRAND_EMI)
             }
         })
 

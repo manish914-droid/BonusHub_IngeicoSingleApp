@@ -6,12 +6,12 @@ import java.io.Serializable
 
 
 //region=============================Brand EMI Master Category Data Modal==========================
-@Parcelize
+
 data class BrandEMIMasterDataModal(
     var brandID: String,
     var brandName: String,
     var mobileNumberBillNumberFlag: String
-) : Parcelable,Serializable
+) : Serializable
 //endregion
 
 
@@ -27,7 +27,7 @@ data class BrandEMIMasterSubCategoryDataModal(
 
 
 //region=============================Brand EMI Master Category Data Modal==========================
-@Parcelize
+
 data class BrandEMIProductDataModal(
     var productID: String,
     var productName: String,
@@ -42,7 +42,7 @@ data class BrandEMIProductDataModal(
     var maxLength: String,
     var productCategoryName: String,
     var producatDesc:String,
-) : Parcelable,Serializable
+) : Serializable
 //endregion
 
 

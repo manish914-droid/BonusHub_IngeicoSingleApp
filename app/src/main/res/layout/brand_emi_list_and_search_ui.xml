@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".view.fragments.BrandEmiMasterCategoryFragment">
 
@@ -12,20 +13,41 @@
         android:visibility="visible"
        />
 
+    <TextView
+        android:id="@+id/empty_txt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:text="Category is empty"
+        android:textSize="@dimen/text_size_large"
+        android:gravity="center"
+        />
+    <LinearLayout
+        android:id="@+id/data_search_Ui"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible"
+        >
+    <androidx.cardview.widget.CardView
+        android:id="@+id/searchView"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_margin="@dimen/pad_10"
+        app:cardCornerRadius="@dimen/pad_12"
+
+        >
 
     <LinearLayout
         android:id="@+id/searchViewLV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/card_edge"
       >
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/searchView"
 
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_weight="1"
-       >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -35,7 +57,7 @@
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/brandSearchET"
                     android:layout_width="0dp"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight=".8"
                     android:layout_gravity="center"
                     android:background="@null"
@@ -50,22 +72,22 @@
                 <ImageView
                     android:id="@+id/searchButton"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/pad_60"
+                    android:layout_height="@dimen/pad_50"
                     android:layout_gravity="end|center_vertical"
                     android:layout_weight=".2"
-                    android:paddingTop="16dp"
+                    android:paddingTop="8dp"
                     android:src="@drawable/ic_search_24"
                     />
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
 
+    </LinearLayout>
+    </androidx.cardview.widget.CardView>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/brandEmiMasterRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_brand_emi_master"
         />
-
+</LinearLayout>
 </LinearLayout>

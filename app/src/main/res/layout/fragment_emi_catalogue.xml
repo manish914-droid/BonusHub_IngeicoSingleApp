@@ -57,7 +57,9 @@
                     android:layout_height="@dimen/pad_20"
                     android:layout_weight=".1"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_right_direction_168"></ImageView>
+                    android:src="@drawable/ic_right_direction_168">
+
+                </ImageView>
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </com.google.android.material.card.MaterialCardView>

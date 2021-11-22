@@ -60,7 +60,7 @@ class TenureSchemeActivity : AppCompatActivity() {
                 isTransactionContinue = false
             )
         }*/
-       // tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
+      //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
         tenureSchemeViewModel.emiTenureLiveData.observe(
             this,
             {

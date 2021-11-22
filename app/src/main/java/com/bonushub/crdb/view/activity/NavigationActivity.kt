@@ -27,6 +27,7 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 
@@ -432,6 +433,21 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
+fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",imeiOrSerialNum:String="",brandEmiSubCatData: BrandEMISubCategoryTable,
+       brandEmiProductData: BrandEMIProductDataModal,
+        brandDataMaster: BrandEMIMasterDataModal){
+    val intent = Intent (this, TransactionActivity::class.java)
+    intent.putExtra("mobileNumber", mobileNum)
+    intent.putExtra("billNumber", billNum)
+    intent.putExtra("saleAmt", amt)
+    intent.putExtra("imeiOrSerialNum", imeiOrSerialNum)
+    intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
+    intent.putExtra("brandEmiProductData", brandEmiProductData)
+    intent.putExtra("brandDataMaster", brandDataMaster)
+    startActivity(intent)
+
+}
+
     override fun onDashBoardItemClick(action: EDashboardItem) {
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH -> {
@@ -444,7 +460,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
-
+//startActivity(Intent())
 
             }
 

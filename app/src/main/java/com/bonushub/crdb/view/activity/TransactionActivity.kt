@@ -11,7 +11,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
+import com.bonushub.crdb.databinding.ActivityEmvBinding
+import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
@@ -41,7 +46,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionActivity : AppCompatActivity(){
-
+    private var emvBinding: ActivityEmvBinding? = null
     private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
 
     //used for other cash amount
@@ -49,7 +54,12 @@ class TransactionActivity : AppCompatActivity(){
 
     private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
 
-    //used in case of sale with cash
+  private val brandEmiSubCatData by lazy { intent.getSerializableExtra("brandEmiSubCatData") as BrandEMISubCategoryTable } //: BrandEMISubCategoryTable? = null
+    private val brandEmiProductData by lazy { intent.getSerializableExtra("brandEmiProductData") as BrandEMIProductDataModal }
+    private val brandDataMaster by lazy { intent.getSerializableExtra("brandDataMaster") as BrandEMIMasterDataModal }
+    private val imeiOrSerialNum by lazy { intent.getStringExtra("imeiOrSerialNum") ?: "" }
+
+
     private val saleAmt by lazy { intent.getStringExtra("saleAmt") ?: "0" }
     private val mobileNumber by lazy { intent.getStringExtra("mobileNumber") ?: "" }
 
@@ -66,7 +76,9 @@ class TransactionActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_emv)
+        emvBinding = ActivityEmvBinding.inflate(layoutInflater)
+        setContentView(emvBinding?.root)
+
         setupFlow()
         searchCardViewModel.fetchCardTypeData()
         setupObserver()
@@ -89,59 +101,26 @@ class TransactionActivity : AppCompatActivity(){
                     searchCardViewModel.fetchCardPanData()
                     setupEMVObserver()
                 }
+                else -> {
+
+                }
             }
         })
-
-
     }
 
     private fun setupEMVObserver() {
        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
            if(cardProcessedDataModal.getPanNumberData() !=null) {
                cardProcessedDataModal.getPanNumberData()
-/*
-                try {
-                    DeviceHelper.doTerminalInitialization(
-                        request = TerminalInitializationRequest(
-                            1,
-                            "41501370".split(",")
-                        ),
-                        listener = object : OnOperationListener.Stub() {
-                            override fun onCompleted(p0: OperationResult?) {
-                                Log.d(TAG, "OnTerminalInitializationListener.onCompleted")
-                                val response = p0?.value as? TerminalInitializationResponse
-                                val initResult =
-                                    """
-                                   Response_Code = ${response?.responseCode}
-                                   API_Response_Status = ${response?.status}
-                                   Response_Code = ${response?.responseCode}
-                                   TIDStatusList = [${response?.tidStatusList?.joinToString()}]
-                                   TIDs = [${response?.tidList?.joinToString()}]
-                                   INITDATAList = [${response?.initDataList?.firstOrNull().toString()}]
-                                """.trimIndent()
 
-                                when (response?.status) {
-                                    RequestStatus.SUCCESS -> println(initResult)
-                                    RequestStatus.ABORTED,
-                                    RequestStatus.FAILED -> println(initResult)
-                                    else -> println(initResult)
-                                }
-                            }
-                        }
-                    )
-                }
-                 catch (ex: Exception){
-                     ex.printStackTrace()
-                 }*/
-
-               /* var ecrID: String
+                var ecrID: String
                 try {
                     DeviceHelper.doSaleTransaction(
                         SaleRequest(
                             amount = 300L ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
-                            tid = "30160031",
+                            tid = "30160035",
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
@@ -172,16 +151,16 @@ class TransactionActivity : AppCompatActivity(){
                 }
                 catch (exc: Exception){
                     exc.printStackTrace()
-                }*/
+                }
 
-                DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
+              /*  DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
                     override fun onCompleted(p0: OperationResult?) {
                         p0?.value?.apply {
                             println("Status = $status")
                             println("Response code = $responseCode")
                         }
                     }
-                })
+                })*/
 
                 Toast.makeText(
                     this,
@@ -189,13 +168,14 @@ class TransactionActivity : AppCompatActivity(){
                     Toast.LENGTH_LONG
                 ).show()
 
-                /* lifecycleScope.launch(Dispatchers.IO) {
+
+               /*  lifecycleScope.launch(Dispatchers.IO) {
                     // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
                      serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
                  }*/
-                /* val intent = Intent (this, TenureSchemeActivity::class.java)
+                 val intent = Intent (this, TenureSchemeActivity::class.java)
 
-                 startActivity(intent)*/
+                 startActivity(intent)
 
             }
 
@@ -203,9 +183,10 @@ class TransactionActivity : AppCompatActivity(){
     }
 
     private  fun setupFlow(){
-        when(transactionTypeEDashboardItem){
+       /* when(transactionTypeEDashboardItem){
 
-        }
+        }*/
+        emvBinding?.baseAmtTv?.text=saleAmt
     }
 
 

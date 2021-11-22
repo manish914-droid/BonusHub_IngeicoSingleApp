@@ -21,6 +21,7 @@ import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
 import com.google.gson.Gson
@@ -66,11 +67,13 @@ class BrandEmiMasterCategoryFragment : Fragment() {
 
         }
 
-        brandEmiMasterCategoryViewModel =
-            ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
+        (activity as IDialog).showProgress()
+        brandEmiMasterCategoryViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
+
         brandEmiMasterCategoryViewModel.brandEMIMasterSubCategoryLivedata.observe(
             viewLifecycleOwner,
             {
+                (activity as IDialog).hideProgress()
                 when (val genericResp = it) {
                     is GenericResponse.Success -> {
                         println(Gson().toJson(genericResp.data))
@@ -106,17 +109,17 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val brandSubCatList: ArrayList<BrandEMISubCategoryTable> =
                 dbObj.appDao.getBrandEMISubCategoryData() as ArrayList<BrandEMISubCategoryTable>
+            val  filteredSubCat =
+                brandSubCatList.filter {
+                    it.brandID == brandDataMaster.brandID && it.parentCategoryID == "0"
+                } as ArrayList<BrandEMISubCategoryTable>
             if (brandSubCatList.isNotEmpty()) {
                 (activity as NavigationActivity).transactFragment(BrandEmiSubCategoryFragment().apply {
                     arguments = Bundle().apply {
                         putSerializable("brandDataMaster", brandDataMaster)
                         putSerializable("brandSubCatList", brandSubCatList)
-
-                      val  filteredSubCat =
-                            brandSubCatList.filter {
-                                it.brandID == brandDataMaster.brandID && it.parentCategoryID == "0"
-                            } as ArrayList<BrandEMISubCategoryTable>
                         putSerializable("filteredSubCat", filteredSubCat)
+                        putSerializable("fromBranddata", true)
 
                       //  putBoolean("navigateFromMaster",true)
                         // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))

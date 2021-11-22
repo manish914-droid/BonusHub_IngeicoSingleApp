@@ -418,8 +418,10 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     BANK_EMI_CATALOGUE("Bank EMI Catalogue", R.drawable.ic_sale, 19),
     MERCHANT_REFERRAL("MRP", R.drawable.ic_merchant_referal_program, 20),
     LESS("View Less", R.drawable.ic_digi_pos, 888),
+
+    TEST_EMI("Test Emi TXN", R.drawable.ic_digi_pos, 777),
     // just for handling the test emi not used in dashboard items
- /*   TEST_EMI("Test Emi TXN", R.drawable.ic_brand_emi_catalogue, 777),
+ /*
     FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_advance, 666),
     LESS("View Less", R.drawable.ic_arrow_up, 888),
 

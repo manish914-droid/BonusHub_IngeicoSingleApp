@@ -182,12 +182,12 @@
 
     <string name="emi_transaction">Emi Transaction</string>
     <string name="manual_entry">Manual Entry</string>
-    <string name="please_insert_swipe_card">Please Insert/Swipe/Tap Card</string>
+    <string name="please_insert_swipe_card">Please Insert/Swipe Card</string>
     <string name="please_insert_swipe">Please Insert/Swipe Card</string>
     <string name="please_swipe">Please Swipe Card</string>
     <string name="printing_roll_error">Printing Roll Error</string>
 
-    <string name="trans_amount">Transaction Amount :</string>
+    <string name="trans_amount">Transaction Amount</string>
     <string name="card_number">Card Number</string>
 
     <string name="enter_tip_amount">Enter TIP amount</string>

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.BrandEmiListAndSearchUiBinding
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
@@ -22,6 +23,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
     private var brandDataMaster: BrandEMIMasterDataModal? = null
     private var brandSubCatList: ArrayList<BrandEMISubCategoryTable>? = null
     private var filteredSubCat: ArrayList<BrandEMISubCategoryTable> = arrayListOf()
+    private var openedFragmentFromBrandData=false
     private val brandEMISubCategoryAdapter by lazy {
         BrandEMISubCategoryAdapter(::onCategoryItemClick)
     }
@@ -43,22 +45,22 @@ class BrandEmiSubCategoryFragment : Fragment() {
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
         brandSubCatList = arguments?.getSerializable("brandSubCatList") as? ArrayList<BrandEMISubCategoryTable>
 filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandEMISubCategoryTable>
-
+        openedFragmentFromBrandData= arguments?.getBoolean("fromBranddata",false) == true
         brandSubCatBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
-        //  brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
-
+          brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
         brandSubCatBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
 
-
-    /*    filteredSubCat =
-            brandSubCatList?.filter {
-                it.brandID == brandDataMaster?.brandID && it.parentCategoryID == "0"
-            } as ArrayList<BrandEMISubCategoryTable>*/
-        setUpRecyclerView()
-        brandEMISubCategoryAdapter.submitList(filteredSubCat)
-
+        if(openedFragmentFromBrandData && filteredSubCat.isEmpty()){
+            brandSubCatBinding?.emptyTxt?.visibility=View.VISIBLE
+            brandSubCatBinding?.dataSearchUi?.visibility=View.GONE
+        }else {
+            brandSubCatBinding?.emptyTxt?.visibility=View.GONE
+            brandSubCatBinding?.dataSearchUi?.visibility=View.VISIBLE
+            setUpRecyclerView()
+            brandEMISubCategoryAdapter.submitList(filteredSubCat)
+        }
 
     }
 
@@ -79,16 +81,7 @@ filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandE
         Log.e("FILTEREDLIST", filteredSubCat.toString() + "  Filter List Size --->  ${filteredSubCat.size}")
         if (filteredSubCat.isNotEmpty()) {
         //    FRAGMENT_COUNTER += 1
-        /*    (activity as NavigationActivity).transactFragment(BrandEmiSubCategoryFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable("brandDataMaster", brandDataMaster)
-                    putSerializable("brandSubCatList", brandSubCatList)
-                    putSerializable("filteredSubCat", filteredSubCat)
 
-                    //  putBoolean("navigateFromMaster",true)
-                    // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
-                }
-            },name =FRAGMENT_COUNTER.toString())*/
             (activity as NavigationActivity).transactSubCatFragment(false,brandDataMaster,brandSubCatList,filteredSubCat)
 
           //  brandEMISubCategoryAdapter.submitList(filteredSubCat)
