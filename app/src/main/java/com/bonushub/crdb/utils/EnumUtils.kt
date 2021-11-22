@@ -458,7 +458,7 @@ enum class BankFunctionsAdminVasItem(val _name: String){
     TEST_EMI("TEST EMI"),
     TERMINAL_PARAM("TERMINAL PARAM"),
     COMM_PARAM("COMM PARAM"),
-    ENV_PARAM("ENV PARAM"),
+    //ENV_PARAM("ENV PARAM"),
     INIT_PAYMENT_APP("INIT PAYMENT APP"),
 }
 // end region

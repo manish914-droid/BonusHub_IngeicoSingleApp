@@ -125,9 +125,9 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
             }
 
-            BankFunctionsAdminVasItem.ENV_PARAM ->{
-                // ENV PARAM
-            }
+//            BankFunctionsAdminVasItem.ENV_PARAM ->{
+//                // ENV PARAM
+//            }
 
             BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
                 // INIT PAYMENT APP
