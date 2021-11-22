@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -23,6 +24,7 @@ import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
+import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.pax.utils.EDashboardItem
 
@@ -40,14 +42,14 @@ import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
 
 
-@AndroidEntryPoint
+
 class DashboardFragment : androidx.fragment.app.Fragment() {
     companion object {
         var toRefresh = true
         val TAG = DashboardFragment::class.java.simpleName
     }
     private var defaultScope = CoroutineScope(Dispatchers.IO)
-    private val dashboardViewModel : DashboardViewModel by viewModels()
+    lateinit var dashboardViewModel : DashboardViewModel
    private var iFragmentRequest: IFragmentRequest? = null
     private val itemList = mutableListOf<EDashboardItem>()
     private val list1 = arrayListOf<EDashboardItem>()
@@ -71,7 +73,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("Dashboard:- ", "onViewCreated")
-        dashboardViewModel.fetchtptData()
+        dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()
     }
     override fun onAttach(context: Context) {
@@ -82,108 +84,17 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     }
 
     private fun observeDashboardViewModel(){
-        dashboardViewModel.mutableLiveData.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            defaultScope.launch {
-                Log.d("tpt===>:- ", Gson().toJson(it))
-                val tpt = it
-                if (toRefresh || itemList.isEmpty()) {
-                    itemList.clear()
-                    list1.clear()
-                    list2.clear()
 
-                    if (tpt != null) {
-                        val tableClass =
-                            tpt::class.java //Class Name (class com.bonushub.pax.utilss.TerminalParameterTable)
-                        for (e in tableClass.declaredFields) {
-                            val ann = e.getAnnotation(BHDashboardItem::class.java)
-                            //If table's field  having the particular annotation as @BHDasboardItem then it returns the value ,If not then return null
-                            if (ann != null) {
-                                e.isAccessible = true
-                                val t = e.get(tpt) as String
-                                if (t == "1") {
-                                    itemList.add(ann.item)
-                                    if (ann.childItem != EDashboardItem.NONE) {
-                                        itemList.add(ann.childItem)
-                                    }
-                                }
-                            }
-                        }
+        lifecycleScope.launch(Dispatchers.Main) {
+            dashboardViewModel.eDashboardItem()?.observe(viewLifecycleOwner,{
+                setupRecyclerview(it)
+                setUpInitializtion()
 
-                    } else {
-                        itemList.add(EDashboardItem.NONE)
-                    }
-                    Log.d("itemList===>:- ", Gson().toJson(itemList))
-                    itemList.add(EDashboardItem.MERCHANT_REFERRAL)
-                    itemList.add(EDashboardItem.CROSS_SELL)
-                    Log.d("itemList===>:- ", Gson().toJson(itemList))
-                    // This list is a list where all types of preath available which was enable by backend
-                    val totalPreAuthItem = mutableListOf<EDashboardItem>()
-                    totalPreAuthItem.addAll(itemList)
+            })
 
-                    //After converting we are getting the total preauth trans type available(by retainAll fun)
-                    //It returns true if any praauth item is available and return false if no preauth item found
-                    val isAnyPreAuthItemAvailable = totalPreAuthItem.retainAll { item ->
-                        item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
-                                || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
-                    }
-
-                    if (isAnyPreAuthItemAvailable) {
-                        itemList.removeAll { item ->
-                            item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
-                                    || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
-                        }
-                        if (totalPreAuthItem.size > 0) {
-                            val preAuth = EDashboardItem.PRE_AUTH_CATAGORY
-                            preAuth.childList = totalPreAuthItem
-                            itemList.add(preAuth)
-                        }
-                    }
-
-                    itemList.sortWith(compareBy { it.rank })
-                    // Below code is used for dashboard items divided into view less and view more functionality
-                    for (lst in itemList.indices) {
-                        if (data?.isNotEmpty() == true) {
-                            if (lst <= 5) {
-                                list1.add(itemList[lst])
-                            } else {
-                                list1[5] = EDashboardItem.MORE
-                                list2.addAll(itemList)
-                                list2.add(EDashboardItem.LESS)
-                                break
-                            }
-                        } else {
-                            list1.addAll(itemList)
-                            break
-
-                        }
-
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        val result = async { setupRecyclerview() }.await()
-                        val result1 = async {
-                            delay(2000)
-                            setUpInitializtion()
-                        }.await()
-                    }
-
-                    // Setting up recyclerview of DashBoard Items
-
-                } else {
-                    binding?.dashboardRV?.apply {
-                        layoutManager = GridLayoutManager(activity, 3)
-                        itemAnimator = DefaultItemAnimator()
-                        adapter = dashBoardAdapter
-                        if (isExpanded) dashBoardAdapter.onUpdatedItem(list2) else dashBoardAdapter.onUpdatedItem(
-                            list1
-                        )
-                        scheduleLayoutAnimation()
-                    }
-                }
-            }
+        }
 
 
-        })
 
 
     }
@@ -224,13 +135,13 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         }
     }
     // Setting up recyclerview of DashBoard Items
-    private fun setupRecyclerview(){
+    private fun setupRecyclerview(list:ArrayList<EDashboardItem>){
         lifecycleScope.launch(Dispatchers.Main) {
             dashboard_RV.layoutManager = GridLayoutManager(activity, 3)
             dashboard_RV.itemAnimator = DefaultItemAnimator()
             dashboard_RV.adapter = dashBoardAdapter
-            if (isExpanded) dashBoardAdapter.onUpdatedItem(list2) else dashBoardAdapter.onUpdatedItem(
-                list1
+            if (isExpanded) dashBoardAdapter.onUpdatedItem(list) else dashBoardAdapter.onUpdatedItem(
+                list
             )
             dashboard_RV.scheduleLayoutAnimation()
         }

@@ -1012,7 +1012,6 @@ data class BrandEMIAccessDataModalTable(
 )
 //endregion
 
-/*
 // region ====== OnpaymentListner response from ingenico data table ======
 @Entity
 data class IngenicoPaymentResponseTable( var	authCode   :String?,
@@ -1038,5 +1037,5 @@ data class IngenicoPaymentResponseTable( var	authCode   :String?,
                                     var	txnAmount :String?,
                                     var cvmResult : CvmAction?,
                                     var cvmRequiredLimit:Long?):Serializable
-// endregion*/
+// endregion
 

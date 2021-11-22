@@ -36,7 +36,6 @@ class BankFunctionsViewModel:ViewModel() {
     private var terminalParameterTable:LiveData<TerminalParameterTable>? = null
 
     suspend fun getTerminalParameterTable():LiveData<TerminalParameterTable>? {
-
         terminalParameterTable = BankFunctionsRepository.getInstance().getTerminalParameterTable()
         return terminalParameterTable
     }

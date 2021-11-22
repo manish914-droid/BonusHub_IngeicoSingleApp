@@ -10,10 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.MainActivity
 
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
@@ -21,6 +20,7 @@ import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.local.HDFCTpt
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
@@ -28,8 +28,6 @@ import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.convertValue2BCD
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.getHDFCTptData
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.maxAmountLimitDialog
 import com.bonushub.crdb.utils.KeyboardModel
 import com.bonushub.crdb.utils.ToastUtils
@@ -37,7 +35,6 @@ import com.bonushub.crdb.utils.showMobileBillDialog
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
-import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.NewInputAmountViewModel
 import com.bonushub.pax.utils.EDashboardItem
 
@@ -62,7 +59,9 @@ class NewInputAmountFragment : Fragment() {
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
     private lateinit var transactionType: EDashboardItem
     var tpt: TerminalParameterTable? = null
+    public var hdfctpt: HDFCTpt? = null
     private var iDialog: IDialog? = null
+    var status: Boolean? = null
     var brandEntryValidationModel: BrandEmiBillSerialMobileValidationModel? = null
 
     private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
@@ -86,7 +85,7 @@ class NewInputAmountFragment : Fragment() {
     private var animShow: Animation? = null
     private var animHide: Animation? = null
     private var isMobilNumUiNeed = false
-    private val newInputAmountViewModel: NewInputAmountViewModel by viewModels()
+    lateinit var newInputAmountViewModel: NewInputAmountViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -110,7 +109,7 @@ class NewInputAmountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         transactionType = (arguments?.getSerializable("type")) as EDashboardItem
-
+        newInputAmountViewModel = ViewModelProvider(this).get(NewInputAmountViewModel::class.java)
         brandEmiSubCatData =
             arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
         brandEmiProductData =
@@ -121,8 +120,8 @@ class NewInputAmountFragment : Fragment() {
             parentFragmentManager.popBackStackImmediate()
         }
         initAnimation()
-        newInputAmountViewModel.fetchtptData()
-        observeNewInpuAmountViewModel()
+
+       // newInputAmountViewModel.fetchtptData()
         if (transactionType == EDashboardItem.SALE) {
             isMobileNumberEntryOnsale { isMobileNeeded, isMobilenumberMandatory ->
                 if (isMobileNeeded) {
@@ -134,6 +133,7 @@ class NewInputAmountFragment : Fragment() {
         }
 
         when (transactionType) {
+
             EDashboardItem.SALE_WITH_CASH -> {
                 //  binding?.enterCashAmountTv?.visibility = View.VISIBLE
                 binding?.cashAmtCrdView?.visibility = View.VISIBLE
@@ -142,31 +142,11 @@ class NewInputAmountFragment : Fragment() {
 
             }
             EDashboardItem.SALE -> {
-                if (checkHDFCTPTFieldsBitOnOff(TransactionType.TIP_SALE)) {
-                    //   binding?.enterCashAmountTv?.visibility = View.VISIBLE
-                    binding?.cashAmtCrdView?.visibility = View.VISIBLE
-                    cashAmount?.hint =
-                        HDFCApplication.appContext.getString(R.string.enter_tip_amount)
-                    //    binding?.enterCashAmountTv?.text = VerifoneApp.appContext.getString(R.string.enter_tip_amount)
-
-                } else {
-                    cashAmount?.visibility = View.GONE
-                    binding?.cashAmtCrdView?.visibility = View.GONE
-                    //  binding?.enterCashAmountTv?.visibility = View.GONE
-
-                }
-            }
-
-
-            else -> {
-                cashAmount?.visibility = View.GONE
-                binding?.cashAmtCrdView?.visibility = View.GONE
-                //   binding?.enterCashAmountTv?.visibility = View.GONE
+                observeNewInpuAmountViewModelForHdfcTpt(TransactionType.TIP_SALE)
             }
         }
 
         isMobileNumBillEntryAndSerialNumRequiredOnBrandEmi {
-
             if (it != null) {
                 //  brandEmiValidationModel = it
                 if (it.isMobileNumReq || it.isMobileNumMandatory) {
@@ -179,24 +159,41 @@ class NewInputAmountFragment : Fragment() {
 
         // keyModelMobNumber.isInutSimpleDigit = true
         binding?.mainKeyBoard?.root?.visibility = View.VISIBLE
-        binding?.mainKeyBoard?.root?.startAnimation(animShow)
+       binding?.mainKeyBoard?.root?.startAnimation(animShow)
         keyModelSaleAmount.view = binding?.saleAmount
         keyModelSaleAmount.callback = ::onOKClicked
-
         inputInSaleAmount = true
         inputInCashAmount = false
         inputInMobilenumber = false
         setOnClickListeners()
     }
 
-    private fun observeNewInpuAmountViewModel() {
-        newInputAmountViewModel.mutableLiveData.observe(
-            viewLifecycleOwner,
-            androidx.lifecycle.Observer {
+    private fun observeNewInpuAmountViewModelForTpt():TerminalParameterTable? {
+        lifecycleScope.launch(Dispatchers.Main) {
+            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner,{
                 tpt = it
-                Log.d("tpt===>:- ", Gson().toJson(it))
+                Log.d("tptllll===>:- ", Gson().toJson(it))
             })
+
+        }
+        Log.d("tpt===>:- ", Gson().toJson(tpt))
+        return tpt
     }
+    private fun observeNewInpuAmountViewModelForHdfcTpt(transactionType: TransactionType)  {
+      lifecycleScope.launch(Dispatchers.Main) {
+            newInputAmountViewModel.fetchHdfcTptData()?.observe(viewLifecycleOwner,{
+                hdfctpt = it
+            checkHDFCTPTFieldsBitOnOff(transactionType,it)
+                Log.d("Hdfctpt===>:- ", Gson().toJson(it))
+                Log.d("Hdfctpt===>:- ", Gson().toJson(status))
+            })
+
+        }
+        Log.d("Hdfctpt===>:- ", Gson().toJson(status))
+
+    }
+
+
 
     private fun setOnClickListeners() {
 
@@ -565,7 +562,7 @@ class NewInputAmountFragment : Fragment() {
             }
 
             EDashboardItem.EMI_ENQUIRY -> {
-                if (tpt?.bankEnquiryMobNumberEntry == true) {
+                if (observeNewInpuAmountViewModelForTpt()?.bankEnquiryMobNumberEntry == true) {
                     showMobileBillDialog(activity, TransactionType.EMI_ENQUIRY.type) {
                         //  sendStartSale(inputAmountEditText?.text.toString(), extraPairData)
                         iFrReq?.onFragmentRequest(
@@ -700,43 +697,56 @@ class NewInputAmountFragment : Fragment() {
 
 
     private fun isMobileNumberEntryOnsale(cb: (Boolean, Boolean) -> Unit) {
-        when (transactionType) {
-            EDashboardItem.SALE -> {
-                if (tpt?.reservedValues?.substring(0, 1) == "1")
-                    cb(true, false)
-                else
-                    cb(false, false)
-            }
-            else -> {
-                cb(false, false)
-            }
-        }
+
+            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner, {
+                tpt = it
+                Log.d("tptllll===>:- ", Gson().toJson(it))
+                when (transactionType) {
+                    EDashboardItem.SALE -> {
+
+                        Log.d("reservedValues===>:- ", Gson().toJson(tpt?.reservedValues))
+                        if (tpt?.reservedValues?.substring(0, 1) == "1")
+                            cb(true, false)
+                        else
+                            cb(false, false)
+                    }
+                    else -> {
+                        cb(false, false)
+                    }
+                }
+            })
+
     }
 
     //region=========================Below method to check HDFC TPT Fields Check:-
-    private fun checkHDFCTPTFieldsBitOnOff(transactionType: TransactionType): Boolean {
-        val hdfcTPTData = runBlocking(Dispatchers.IO) {
-            getHDFCTptData()
-        }
-        Log.d("HDFC TPT:- ", hdfcTPTData.toString())
+    private fun checkHDFCTPTFieldsBitOnOff(transactionType: TransactionType,hdfcTpt:HDFCTpt): Boolean {
+        Log.d("HDFC TPT:- ", hdfcTpt.toString())
         var data: String? = null
-        if (hdfcTPTData != null) {
+        if (hdfcTpt != null) {
             when (transactionType) {
                 TransactionType.VOID -> {
-                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    data = convertValue2BCD(hdfcTpt.localTerminalOption)
                     return data[1] == '1' // checking second position of data for on/off case
                 }
                 TransactionType.REFUND -> {
-                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    data = convertValue2BCD(hdfcTpt.localTerminalOption)
                     return data[2] == '1' // checking third position of data for on/off case
                 }
                 TransactionType.TIP_ADJUSTMENT -> {
-                    data = convertValue2BCD(hdfcTPTData.localTerminalOption)
+                    data = convertValue2BCD(hdfcTpt.localTerminalOption)
                     return data[3] == '1' // checking fourth position of data for on/off case
                 }
                 TransactionType.TIP_SALE -> {
-                    data = convertValue2BCD(hdfcTPTData.option1)
-                    return data[2] == '1' // checking third position of data for on/off case
+                    data = convertValue2BCD(hdfcTpt.option1)
+                   if(data[2] == '1'){ // checking third position of data for on/off case
+                       binding?.cashAmtCrdView?.visibility = View.VISIBLE
+                       cashAmount?.hint =
+                           HDFCApplication.appContext.getString(R.string.enter_tip_amount)
+                   }else{
+                       cashAmount?.visibility = View.GONE
+                       binding?.cashAmtCrdView?.visibility = View.GONE
+                       //  binding?.enterCashAmountTv?.visibility = View.GONE
+                   }
                 }
                 else -> {
                 }
@@ -769,7 +779,7 @@ class NewInputAmountFragment : Fragment() {
         saleAmt: Double,
         extraPair: Triple<String, String, Boolean>
     ) {
-        val tpt = getTptData()
+        val tpt = observeNewInpuAmountViewModelForTpt()
         if (tpt != null) {
             val tipAmount = try {
                 cashAmount?.text.toString().toFloat()

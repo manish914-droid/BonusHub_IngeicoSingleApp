@@ -20,6 +20,7 @@ import com.usdk.apiservice.aidl.device.UDeviceManager
 import com.usdk.apiservice.aidl.emv.UEMV
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
+import com.usdk.apiservice.aidl.printer.UPrinter
 import com.usdk.apiservice.limited.DeviceServiceLimited
 
 object DeviceHelper   {
@@ -27,21 +28,15 @@ object DeviceHelper   {
 
     @JvmStatic
     private  val PACKAGE_ID = "com.ingenico.ingp.standalone"
-
     @JvmStatic
     private  val ACTION = "com.ingenico.hdfcpayment.PaymentService.BIND"
-
     @JvmStatic
     private  val PACKAGE_ID_USDK = "com.usdk.apiservice"
-
     @JvmStatic
     private  val ACTIONUSDKSERVICE = "com.usdk.apiservice"
-
     private  val TAG = DeviceHelper::class.java.simpleName
-
     // 最大重绑定次数
-    private const val MAX_RETRY_COUNT = 3
-
+   private const val MAX_RETRY_COUNT = 3
     // 重绑定间隔时间
     private const val RETRY_INTERVALS: Long = 3000
 
@@ -260,6 +255,18 @@ object DeviceHelper   {
         //   System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.mode)
         return getDeviceManager()!!.deviceInfo?.model
     }
+
+    @Throws(java.lang.IllegalStateException::class)
+    fun getPrinter(): UPrinter? {
+        val iBinder = object : IBinderCreator() {
+            @Throws(RemoteException::class)
+            override fun create(): IBinder {
+                return vfDeviceService?.printer!!
+            }
+        }.start()
+        return UPrinter.Stub.asInterface(iBinder)
+    }
+
 
     @JvmStatic
     @Throws(IllegalStateException::class)

@@ -31,6 +31,8 @@ class RoomDBRepository @Inject constructor(private val appDao: AppDao,
     suspend fun  fetcDashboarddata() = appDao.getAllTerminalParameterTableData()?.get(0)
     //endregion
 
+
+
     //  suspend fun  insertTid(tid: String, backToCalled: ApiCallback) = keyexchangeDataSource.startExchange(tid)
 
     suspend fun fetchInitData(tid: String): Flow<Result<ResponseHandler>> = flow{
