@@ -350,17 +350,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
 
     override fun onFragmentRequest(
-        action: UiAction,
+        action: EDashboardItem,
         data: Any,
         extraPair: Triple<String, String, Boolean>?
     ) {
         when (action) {
-
-            UiAction.INIT_WITH_KEY_EXCHANGE -> {
-
-            }
-
-            UiAction.START_SALE -> {
+            EDashboardItem.SALE -> {
                 if (checkInternetConnection()) {
                     //  val amt = data as String
                     val amt = (data as Pair<*, *>).first.toString()
@@ -377,7 +372,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             putExtra("mobileNumber", extraPair?.first)
                             putExtra("billNumber", extraPair?.second)
                             putExtra("saleWithTipAmt", saleWithTipAmt)
-                            putExtra("uiAction", action)
+                            putExtra("edashboardItem",  EDashboardItem.SALE)
                         }, EIntentRequest.TRANSACTION.code
                     )
                 } else {
@@ -385,34 +380,34 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
             }
 
-            UiAction.BANK_EMI, UiAction.TEST_EMI -> {
+            EDashboardItem.BANK_EMI -> {
 
             }
 
-            UiAction.BRAND_EMI -> {
+            EDashboardItem.BRAND_EMI -> {
 
 
             }
 
-            UiAction.CASH_AT_POS -> {
+            EDashboardItem.CASH_ADVANCE -> {
 
             }
 
-            UiAction.SALE_WITH_CASH -> {
+            EDashboardItem.SALE_WITH_CASH -> {
 
             }
 
-            UiAction.PRE_AUTH -> {
+            EDashboardItem.PREAUTH -> {
 
             }
 
-            UiAction.REFUND -> {
+            EDashboardItem.REFUND -> {
 
             }
 
-            UiAction.EMI_ENQUIRY -> {
+            EDashboardItem.EMI_ENQUIRY -> {
             }
-            UiAction.BRAND_EMI_CATALOGUE, UiAction.BANK_EMI_CATALOGUE -> {
+            EDashboardItem.BRAND_EMI_CATALOGUE, EDashboardItem.BANK_EMI_CATALOGUE -> {
                 val amt = (data as Pair<*, *>).first.toString()
                 val emiCatalogueImageList =
                     runBlocking(Dispatchers.IO) {
@@ -514,7 +509,7 @@ interface ShowLessOnBackPress {
 
 interface IFragmentRequest {
     fun onFragmentRequest(
-        action: UiAction,
+        action: EDashboardItem,
         data: Any,
         extraPair: Triple<String, String, Boolean>? = Triple("", "", third = true)
     )

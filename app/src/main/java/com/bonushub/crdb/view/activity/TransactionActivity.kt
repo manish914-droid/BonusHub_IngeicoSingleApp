@@ -15,9 +15,11 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.fragments.TenureBankModal
 import com.bonushub.crdb.view.fragments.TenureSchemeActivity
 import com.bonushub.crdb.viewmodel.SearchViewModel
+import com.bonushub.pax.utils.EDashboardItem
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.request.SaleRequest
@@ -54,7 +56,8 @@ class TransactionActivity : AppCompatActivity(){
     private val billNumber by lazy { intent.getStringExtra("billNumber") ?: "0" }
     private val saleWithTipAmt by lazy { intent.getStringExtra("saleWithTipAmt") ?: "0" }
     private val title by lazy { intent.getStringExtra("title") }
-
+    private val transactionType by lazy { intent.getIntExtra("type", -1947) }
+    private val  transactionTypeEDashboardItem by lazy{ (intent.getSerializableExtra("edashboardItem") ?: EDashboardItem.NONE) as EDashboardItem}
     val TAG = TransactionActivity::class.java.simpleName
 
     private val searchCardViewModel : SearchViewModel by viewModels()
@@ -64,6 +67,7 @@ class TransactionActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emv)
+        setupFlow()
         searchCardViewModel.fetchCardTypeData()
         setupObserver()
 
@@ -196,6 +200,12 @@ class TransactionActivity : AppCompatActivity(){
             }
 
         })
+    }
+
+    private  fun setupFlow(){
+        when(transactionTypeEDashboardItem){
+
+        }
     }
 
 

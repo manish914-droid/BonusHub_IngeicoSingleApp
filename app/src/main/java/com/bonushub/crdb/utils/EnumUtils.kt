@@ -384,7 +384,7 @@ enum class CrossSellRequestType(val requestTypeCode: Int,val requestName:String=
 }
 
 
-enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, var childList:MutableList<EDashboardItem>?=null) {
+enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, var childList:MutableList<EDashboardItem>?=null,) {
     NONE("No Option Found", R.drawable.ic_sale),
     SALE("Sale", R.drawable.ic_sale, 1),
     DIGI_POS("Digi POS", R.drawable.ic_digi_pos, 2),

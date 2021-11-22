@@ -512,7 +512,7 @@ class NewInputAmountFragment : Fragment() {
                                         third = true
                                     )
                                     iFrReq?.onFragmentRequest(
-                                        UiAction.START_SALE,
+                                        EDashboardItem.SALE,
                                         Pair(
                                             trnsAmt.toString().trim(),
                                             cashAmt.toString().trim()
@@ -525,7 +525,7 @@ class NewInputAmountFragment : Fragment() {
 
                                 TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                                     iFrReq?.onFragmentRequest(
-                                        UiAction.START_SALE,
+                                        EDashboardItem.SALE,
                                         Pair(
                                             trnsAmt.toString().trim(),
                                             cashAmt.toString().trim()
@@ -536,7 +536,7 @@ class NewInputAmountFragment : Fragment() {
                             }
                         } else {
                             iFrReq?.onFragmentRequest(
-                                UiAction.START_SALE,
+                                EDashboardItem.SALE,
                                 Pair(trnsAmt.toString().trim(), cashAmt.toString().trim())
                             )
                         }
@@ -566,13 +566,13 @@ class NewInputAmountFragment : Fragment() {
                     showMobileBillDialog(activity, TransactionType.EMI_ENQUIRY.type) {
                         //  sendStartSale(inputAmountEditText?.text.toString(), extraPairData)
                         iFrReq?.onFragmentRequest(
-                            UiAction.EMI_ENQUIRY,
+                            EDashboardItem.EMI_ENQUIRY,
                             Pair(saleAmount.toString().trim(), "0"), it
                         )
                     }
                 } else {
                     iFrReq?.onFragmentRequest(
-                        UiAction.EMI_ENQUIRY,
+                        EDashboardItem.EMI_ENQUIRY,
                         Pair(saleAmount.toString().trim(), "0")
                     )
                 }
@@ -591,7 +591,7 @@ class NewInputAmountFragment : Fragment() {
                     ) -> ToastUtils.showToast(activity, "Enter Sale Amount")
                     //  TextUtils.isEmpty(binding?.mobNumbr?.text?.toString()?.trim()) -> VFService.showToast("Enter Mobile Number")
                     else -> iFrReq?.onFragmentRequest(
-                        UiAction.BANK_EMI_CATALOGUE,
+                        EDashboardItem.BANK_EMI_CATALOGUE,
                         Pair(saleAmount.toString().trim(), cashAmt.toString().trim())
                     )
                 }
@@ -697,7 +697,7 @@ class NewInputAmountFragment : Fragment() {
 
 
     private fun isMobileNumberEntryOnsale(cb: (Boolean, Boolean) -> Unit) {
-
+        lifecycleScope.launch(Dispatchers.Main) {
             newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner, {
                 tpt = it
                 Log.d("tptllll===>:- ", Gson().toJson(it))
@@ -715,6 +715,7 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             })
+        }
 
     }
 
@@ -779,80 +780,88 @@ class NewInputAmountFragment : Fragment() {
         saleAmt: Double,
         extraPair: Triple<String, String, Boolean>
     ) {
-        val tpt = observeNewInpuAmountViewModelForTpt()
-        if (tpt != null) {
-            val tipAmount = try {
-                cashAmount?.text.toString().toFloat()
-            } catch (ex: Exception) {
-                0f
-            }
-            val maxTipPercent =
-                if (tpt.maxTipPercent.isEmpty()) 0f else (tpt.maxTipPercent.toFloat()).div(
-                    100
-                )
-            val maxTipLimit =
-                if (tpt.maxTipLimit.isEmpty()) 0f else (tpt.maxTipLimit.toFloat()).div(
-                    100
-                )
-            if (maxTipLimit != 0f) { // flat tip check is applied
-                if (tipAmount <= maxTipLimit) {
-                    // iDialog?.showProgress()
-                    GlobalScope.launch {
-
-                        iFrReq?.onFragmentRequest(
-                            UiAction.START_SALE,
-                            Pair(
-                                totalTransAmount.toString().trim(),
-                                cashAmount?.text.toString().trim()
-                            ), extraPair
+        lifecycleScope.launch(Dispatchers.Main) {
+            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner,{
+                tpt = it
+                if (tpt != null) {
+                    val tipAmount = try {
+                        cashAmount?.text.toString().toFloat()
+                    } catch (ex: Exception) {
+                        0f
+                    }
+                    val maxTipPercent =
+                        if (tpt?.maxTipPercent?.isEmpty() == true) 0f else (tpt?.maxTipPercent?.toFloat())?.div(
+                            100
                         )
+                    val maxTipLimit =
+                        if (tpt?.maxTipLimit?.isEmpty() == true) 0f else (tpt?.maxTipLimit?.toFloat())?.div(
+                            100
+                        )
+                    if (maxTipLimit != 0f) { // flat tip check is applied
+                        if (tipAmount <= maxTipLimit!!) {
+                            // iDialog?.showProgress()
+                            GlobalScope.launch {
+
+                                iFrReq?.onFragmentRequest(
+                                    EDashboardItem.SALE,
+                                    Pair(
+                                        totalTransAmount.toString().trim(),
+                                        cashAmount?.text.toString().trim()
+                                    ), extraPair
+                                )
+                            }
+                        } else {
+                            val msg =
+                                "Maximum tip allowed on this terminal is \u20B9 ${
+                                    "%.2f".format(
+                                        maxTipLimit
+                                    )
+                                }."
+                            GlobalScope.launch(Dispatchers.Main) {
+                                iDialog?.getInfoDialog("Tip Sale Error", msg) {}
+                            }
+                        }
+                    } else { // percent tip check is applied
+                        val maxAmountTip = (maxTipPercent?.div(100))?.times(saleAmt)
+                        val formatMaxTipAmount = "%.2f".format(maxAmountTip)
+                        if (maxAmountTip != null) {
+                            if (tipAmount <= maxAmountTip.toFloat()) {
+                                //   iDialog?.showProgress()
+                                GlobalScope.launch {
+
+                                    iFrReq?.onFragmentRequest(
+                                        EDashboardItem.SALE,
+                                        Pair(
+                                            totalTransAmount.toString().trim(),
+                                            cashAmount?.text.toString().trim()
+                                        ), extraPair
+                                    )
+                                }
+                            } else {
+                                //    val tipAmt = saleAmt * per / 100
+                                val msg = "Tip limit for this transaction is \n \u20B9 ${
+                                    "%.2f".format(
+                                        formatMaxTipAmount.toDouble()
+                                    )
+                                }"
+                                /* "Maximum ${"%.2f".format(
+                                                 maxTipPercent.toDouble()
+                                             )}% tip allowed on this terminal.\nTip limit for this transaction is \u20B9 ${"%.2f".format(
+                                                 formatMaxTipAmount.toDouble()
+                                             )}"*/
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    iDialog?.getInfoDialog("Tip Sale Error", msg) {}
+                                }
+                            }
+                        }
                     }
                 } else {
-                    val msg =
-                        "Maximum tip allowed on this terminal is \u20B9 ${
-                            "%.2f".format(
-                                maxTipLimit
-                            )
-                        }."
-                    GlobalScope.launch(Dispatchers.Main) {
-                        iDialog?.getInfoDialog("Tip Sale Error", msg) {}
-                    }
+                    ToastUtils.showToast(activity, "TPT not fount")
                 }
-            } else { // percent tip check is applied
-                val maxAmountTip = (maxTipPercent / 100) * saleAmt
-                val formatMaxTipAmount = "%.2f".format(maxAmountTip)
-                if (tipAmount <= maxAmountTip.toFloat()) {
-                    //   iDialog?.showProgress()
-                    GlobalScope.launch {
+            })
 
-                        iFrReq?.onFragmentRequest(
-                            UiAction.START_SALE,
-                            Pair(
-                                totalTransAmount.toString().trim(),
-                                cashAmount?.text.toString().trim()
-                            ), extraPair
-                        )
-                    }
-                } else {
-                    //    val tipAmt = saleAmt * per / 100
-                    val msg = "Tip limit for this transaction is \n \u20B9 ${
-                        "%.2f".format(
-                            formatMaxTipAmount.toDouble()
-                        )
-                    }"
-                    /* "Maximum ${"%.2f".format(
-                     maxTipPercent.toDouble()
-                 )}% tip allowed on this terminal.\nTip limit for this transaction is \u20B9 ${"%.2f".format(
-                     formatMaxTipAmount.toDouble()
-                 )}"*/
-                    GlobalScope.launch(Dispatchers.Main) {
-                        iDialog?.getInfoDialog("Tip Sale Error", msg) {}
-                    }
-                }
-            }
-        } else {
-            ToastUtils.showToast(activity, "TPT not fount")
         }
+
     }
 
 }
