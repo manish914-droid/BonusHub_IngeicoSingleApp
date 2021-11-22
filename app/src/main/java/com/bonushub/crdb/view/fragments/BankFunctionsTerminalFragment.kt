@@ -58,6 +58,8 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.terminal_param_header)
+
         iBankFunctionsTerminalItemClick = this
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
         batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
@@ -81,6 +83,10 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
                 terminalParameterTable = it
             })
+        }
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
         }
 
     }

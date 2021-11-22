@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsInitPaymentAppBinding
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
 import com.bonushub.crdb.view.adapter.BankFunctionsInitPaymentAppAdapter
@@ -30,7 +31,13 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.init_payment_app_header)
+
         setupRecyclerview()
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
     }
 
     private fun setupRecyclerview(){

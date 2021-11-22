@@ -42,7 +42,7 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
     private lateinit var type :CommunicationParamItem
     lateinit var terminalParameterTable: TerminalParameterTable
 
-    lateinit var binding: FragmentCommunicationOptionBinding
+    var binding: FragmentCommunicationOptionBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,6 +57,8 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.communication_param_header)
+
         iCommunicationOptionFragmentItemClick = this
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
 
@@ -64,6 +66,10 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
         cptListItem.addAll(CommunicationParamItem.values())
         setupRecyclerview()
 
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
 
     }
 

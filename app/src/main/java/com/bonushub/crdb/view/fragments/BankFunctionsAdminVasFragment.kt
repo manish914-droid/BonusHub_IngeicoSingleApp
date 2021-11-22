@@ -55,6 +55,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.admin_vas_header)
+
         //if(context is IDialog) iDialog = context
 
         iBankFunctionsAdminVasItemClick = this
@@ -72,6 +74,10 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 terminalParameterTable = it
 
             })
+        }
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
         }
     }
 

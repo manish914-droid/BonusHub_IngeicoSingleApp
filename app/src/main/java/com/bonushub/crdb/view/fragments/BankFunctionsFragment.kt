@@ -43,12 +43,18 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
+
         iBankFunctionItemClick = this
         bankFunctionsItem.clear()
         bankFunctionsItem.addAll(BankFunctionsItem.values())
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
 
         setupRecyclerview()
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
     }
 
 

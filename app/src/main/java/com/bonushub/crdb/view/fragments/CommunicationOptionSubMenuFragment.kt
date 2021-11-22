@@ -69,6 +69,10 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                 terminalParameterTable = it
             })
         }
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
     }
 
     var dataPosition:Int = 0
@@ -112,7 +116,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
             CommunicationParamItem.TXN_PARAM -> {
 
-                binding?.textViewHeader?.text = getString(R.string.txn_param_header)
+                binding?.subHeaderView?.subHeaderText?.text = getString(R.string.txn_param_header)
 
                 lifecycleScope.launch(Dispatchers.Main) {
                     bankFunctionsViewModel.getTerminalCommunicationTableByRecordType(type.value.toString())?.observe(viewLifecycleOwner,{
@@ -128,7 +132,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
             CommunicationParamItem.APP_UPDATE_PARAM -> {
 
-                binding?.textViewHeader?.text = getString(R.string.app_update_param_header)
+                binding?.subHeaderView?.subHeaderText?.text = getString(R.string.app_update_param_header)
 
                 lifecycleScope.launch(Dispatchers.Main) {
                     bankFunctionsViewModel.getTerminalCommunicationTableByRecordType(type.value.toString())?.observe(viewLifecycleOwner,{
