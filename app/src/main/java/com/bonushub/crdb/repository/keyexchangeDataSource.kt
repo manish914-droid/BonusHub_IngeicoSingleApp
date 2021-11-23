@@ -53,7 +53,10 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             val appName =
                 addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
 
+
             val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
+
+          //  val deviceModel = addPad(DeviceHelper.getDeviceModel() ?: "", "*", 6, false)
 
             val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
             //   val version1 = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
@@ -105,7 +108,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
 
         //region=========adding field 61=============
-        var f61 = KeyExchanger.getF61()
+        var f61 = getF61()
 
         //append 1 in case of hdfc bank
         if (isHdfc) {
@@ -157,7 +160,10 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
         val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
 
-        val buildDate: String = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
+      // val deviceModel = addPad(DeviceHelper.getDeviceModel() ?: "", "*", 6, true)
+
+        val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
+        // val buildDate: String = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
         val version = "${BuildConfig.VERSION_NAME}.$buildDate"
         val connectionType = ConnectionType.GPRS.code
         val pccNo =

@@ -4,13 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.bonushub.crdb.model.local.*
 
 @Database(entities = [TerminalCommunicationTable::class, IssuerParameterTable::class,
     TerminalParameterTable::class, CardDataTable::class,
     HDFCTpt::class, HDFCCdt::class, BatchFileDataTable::class,
     BrandEMIMasterCategoryTable::class, BrandEMIMasterSubCategoryTable::class,
-    IssuerTAndCTable::class, BrandTAndCTable::class, BrandEMIMasterTimeStamps::class,BrandEMISubCategoryTable::class], version = 1, exportSchema = false)
+    IssuerTAndCTable::class, BrandTAndCTable::class, BrandEMIMasterTimeStamps::class,
+    BrandEMISubCategoryTable::class,
+    IngenicoInitialization::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     /**
      * Connects the database to the DAO.

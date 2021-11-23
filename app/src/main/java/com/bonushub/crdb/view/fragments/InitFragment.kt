@@ -91,6 +91,7 @@ class InitFragment : Fragment() {
             when (result.status) {
                 Status.SUCCESS -> {
                     iDialog?.hideProgress()
+                    Thread.sleep(5000)
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 }
                 Status.ERROR -> {

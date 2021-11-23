@@ -8,8 +8,14 @@ import kotlinx.coroutines.runBlocking
 @Dao
 interface AppDao{
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIngenicoIntializationData(initialization: IngenicoInitialization)
+
+    @Query("SELECT * FROM IngenicoInitialization")
+     suspend fun getIngenicoInitialization(): MutableList<IngenicoInitialization?>?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend  fun insert(student: TerminalCommunicationTable) : Long
+    suspend  fun insertTerminalCommunicationData(student: TerminalCommunicationTable) : Long
 
     @Query("select * From TerminalCommunicationTable")
     fun  fetch() : MutableList<TerminalCommunicationTable>

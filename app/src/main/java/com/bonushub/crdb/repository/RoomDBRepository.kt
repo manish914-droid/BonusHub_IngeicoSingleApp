@@ -4,7 +4,6 @@ import com.bonushub.crdb.db.AppDao
 
 import com.bonushub.crdb.di.IoDispatcher
 import com.bonushub.crdb.di.MainCoroutineScope
-import com.bonushub.crdb.model.*
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.utils.ResponseHandler
 import com.bonushub.crdb.utils.Result
@@ -25,7 +24,7 @@ class RoomDBRepository @Inject constructor(private val appDao: AppDao,
 
 
 
-    suspend fun  insertdata(student: TerminalCommunicationTable) = appDao.insert(student)
+    suspend fun  insertdata(student: TerminalCommunicationTable) = appDao.insertTerminalCommunicationData(student)
     suspend fun  fetchdata() =appDao.fetch()
     //region======================Get TPT Data:-
     suspend fun  fetcDashboarddata() = appDao.getAllTerminalParameterTableData()?.get(0)

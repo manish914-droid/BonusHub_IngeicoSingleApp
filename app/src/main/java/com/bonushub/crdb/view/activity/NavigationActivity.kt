@@ -54,6 +54,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
+
+    @Inject
+    lateinit var appDao: AppDao
     private var navigationBinding: ActivityNavigationBinding?=null
     private var navHostFragment: NavHostFragment? = null
     private var isToExit = false
@@ -432,15 +435,23 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
-    override fun onDashBoardItemClick(action: EDashboardItem) {
+    override  fun onDashBoardItemClick(action: EDashboardItem) {
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH -> {
                 if (checkInternetConnection()) {
-                    inflateInputFragment(
-                        NewInputAmountFragment(),
-                        SubHeaderTitle.SALE_SUBHEADER_VALUE.title,
-                        action
-                    )
+                    CoroutineScope(Dispatchers.IO).launch{
+                        val checkInitializestatus = withContext(Dispatchers.IO) { checkInitializtionStatus(appDao) }
+                        if(!checkInitializestatus) {
+                            val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                            val resultTwo =  withContext(Dispatchers.IO) { doInitializtion(appDao, listofTids) }
+                        }
+                        else{
+                            withContext(Dispatchers.Main){
+                                inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, action)
+                            }
+                        }
+                    }
+
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
@@ -449,7 +460,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             EDashboardItem.EMI_ENQUIRY -> {
-                if (Field48ResponseTimestamp.checkInternetConnection()) {
+                if (checkInternetConnection()) {
                    transactFragment(EMICatalogue().apply {
                         arguments = Bundle().apply {
                             putSerializable("type", EDashboardItem.EMI_CATALOGUE)

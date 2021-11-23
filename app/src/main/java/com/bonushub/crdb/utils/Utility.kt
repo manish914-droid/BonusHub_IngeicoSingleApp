@@ -44,8 +44,8 @@ import javax.inject.Inject
 
 val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
-val NEW_IP_ADDRESS = /*"203.112.151.169"*/"192.168.250.10"
-var PORT = /*8109*/4124
+val NEW_IP_ADDRESS = /*"192.168.250.10"*/"203.112.151.169"
+var PORT = /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 
@@ -66,7 +66,8 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     constructor() : this(appDatabase){
 
     }
-
+    var list   = ArrayList<String>()
+    var listTidType   = ArrayList<String>()
 
     //region======================Read Local Init File======================
     suspend fun readLocalInitFile(callback: suspend (Boolean, String) -> Unit) {
@@ -320,7 +321,33 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     val index = ann.index
                     if (dataList.size > index) {
                         e.isAccessible = true
-                        e.set(tableName, dataList[index])
+                        if(dataList[2]== "106" && index == 4){
+                            var string = String()
+                            for(i in dataList[index]){
+                                println("Index for TID "+i)
+                                string = string+i
+                            }
+                            println("Index for TID1 "+string)
+                            list.add(string)
+                            println("Index for TID2 "+list)
+                            e.set(tableName, list)
+                        }
+
+                        else if(dataList[2]== "106" && index == 60){
+                            var string = String()
+                            for(i in dataList[index]){
+                                println("Index for TID Type "+i)
+                                string = string+i
+                            }
+                            println("Index for TID Type1 "+string)
+                            listTidType.add(string)
+                            println("Index for TID Type2 "+listTidType)
+                            e.set(tableName, listTidType)
+                        }
+                        else {
+                            e.set(tableName, dataList[index])
+
+                        }
                     }
                 }
             }

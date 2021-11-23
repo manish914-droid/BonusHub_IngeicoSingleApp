@@ -2,6 +2,7 @@ package com.bonushub.crdb.model.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
@@ -387,9 +388,10 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(3)
     var isActive: String = "",
 
+    @TypeConverters(Converters::class)
     @field:BHFieldParseIndex(4)
     @field: BHFieldName("TID")
-    var terminalId: String = "",
+    var terminalId: List<String>? = listOf(),
 
     @field:BHFieldParseIndex(5)
     @field:BHFieldName("MID")
@@ -626,9 +628,10 @@ data class TerminalParameterTable(
     var fPushTimeStamp: String = "",
 
     //region=========New Fields for HDFC===========
+    @TypeConverters(Converters::class)
     @field:BHFieldParseIndex(60)
     @field:BHFieldName("Tid Type")
-    var tidType: String = "",  // if type is 1 main else child tid
+    var tidType: List<String>? = listOf(),  // if type is 1 main else child tid
 
     @field:BHFieldParseIndex(61)
     @field:BHFieldName("Tid Index")
@@ -1039,3 +1042,40 @@ data class IngenicoPaymentResponseTable( var	authCode   :String?,
                                     var cvmRequiredLimit:Long?):Serializable
 // endregion
 
+@Entity
+data class IngenicoInitialization(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null,
+
+    var responseCode: String? = null,
+
+    var apiresponseCode: String? = null,
+
+
+    @TypeConverters(Converters::class)
+    var tidList: List<String>? = null,
+
+    @TypeConverters(Converters::class)
+    var tidStatusList: List<String>? = null,
+
+    @TypeConverters(Converters::class)
+    var initdataList: List<InitDataListList>? = null
+)
+
+data class InitDataListList(
+    var adminPassword: String? = null,
+    var helpDeskNumber: String? = null,
+    var merAddHeader1: String? = null,
+    var merAddHeader2: String? = null,
+    var merchantName: String? = null,
+    var isRefundPasswordEnable: Boolean? = null,
+    var isReportPasswordEnable: Boolean? = null,
+    var isVoidPasswordEnable: Boolean? = null,
+    var isTipEnable: Boolean? = null,
+
+    ) // same
+
+data class TIDSStatusList(
+    val name: String? = null,
+
+    )

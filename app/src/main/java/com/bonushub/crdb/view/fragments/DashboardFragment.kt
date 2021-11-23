@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 
 import androidx.lifecycle.lifecycleScope
@@ -18,39 +17,36 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
-import com.bonushub.crdb.di.scope.BHDashboardItem
-import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.utils.checkBaseTid
+import com.bonushub.crdb.utils.doInitializtion
+
 
 import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
-import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.pax.utils.EDashboardItem
 
-import com.bonushub.pax.utils.UiAction
-
-import com.google.gson.Gson
-import com.ingenico.hdfcpayment.listener.OnOperationListener
-import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
-import com.ingenico.hdfcpayment.response.OperationResult
-import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
-import com.ingenico.hdfcpayment.type.RequestStatus
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 
-
+@AndroidEntryPoint
 class DashboardFragment : androidx.fragment.app.Fragment() {
     companion object {
         var toRefresh = true
         val TAG = DashboardFragment::class.java.simpleName
     }
-    private var defaultScope = CoroutineScope(Dispatchers.IO)
+    @Inject
+    lateinit var appDao: AppDao
+    private var ioSope = CoroutineScope(Dispatchers.IO)
+    private var defaultSope = CoroutineScope(Dispatchers.Default)
     lateinit var dashboardViewModel : DashboardViewModel
-   private var iFragmentRequest: IFragmentRequest? = null
+    private var iFragmentRequest: IFragmentRequest? = null
     private val itemList = mutableListOf<EDashboardItem>()
     private val list1 = arrayListOf<EDashboardItem>()
     private val list2 = arrayListOf<EDashboardItem>()
@@ -83,57 +79,25 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         }
     }
 
-    private fun observeDashboardViewModel(){
 
+    private fun observeDashboardViewModel(){
         lifecycleScope.launch(Dispatchers.Main) {
             dashboardViewModel.eDashboardItem()?.observe(viewLifecycleOwner,{
-                setupRecyclerview(it)
-                setUpInitializtion()
+                ioSope.launch(Dispatchers.Main) {
+                    val result = async {  setupRecyclerview(it) }.await()
+                    val result1 = async {
+                        var listofTids = checkBaseTid(appDao)
+                        delay(1000)
+                        doInitializtion(appDao,listofTids)
+                    }.await()
 
+                }
             })
 
         }
 
-
-
-
     }
 
-    private fun setUpInitializtion() {
-        try {
-            DeviceHelper.doTerminalInitialization(
-                request = TerminalInitializationRequest(
-                    1,
-                    listOf("30160035")
-                ),
-                listener = object : OnOperationListener.Stub() {
-                    override fun onCompleted(p0: OperationResult?) {
-                        Log.d(TAG, "OnTerminalInitializationListener.onCompleted")
-                        val response = p0?.value as? TerminalInitializationResponse
-                        val initResult =
-                            """
-                                   Response_Code = ${response?.responseCode}
-                                   API_Response_Status = ${response?.status}
-                                   Response_Code = ${response?.responseCode}
-                                   TIDStatusList = [${response?.tidStatusList?.joinToString()}]
-                                   TIDs = [${response?.tidList?.joinToString()}]
-                                   INITDATAList = [${response?.initDataList?.firstOrNull().toString()}]
-                                """.trimIndent()
-
-                        when (response?.status) {
-                            RequestStatus.SUCCESS -> println(initResult)
-                            RequestStatus.ABORTED,
-                            RequestStatus.FAILED -> println(initResult)
-                            else -> println(initResult)
-                        }
-                    }
-                }
-            )
-        }
-        catch (ex: Exception){
-            ex.printStackTrace()
-        }
-    }
     // Setting up recyclerview of DashBoard Items
     private fun setupRecyclerview(list:ArrayList<EDashboardItem>){
         lifecycleScope.launch(Dispatchers.Main) {

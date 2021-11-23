@@ -3,21 +3,31 @@ package com.bonushub.crdb.utils
 import android.app.Dialog
 import android.content.Context
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
 import com.bonushub.crdb.R
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.IngenicoInitialization
+import com.bonushub.crdb.model.local.InitDataListList
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.view.fragments.DashboardFragment
 import com.bonushub.crdb.vxutils.Utility.*
 import com.bonushub.pax.utils.TransactionType
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
+import com.ingenico.hdfcpayment.response.OperationResult
+import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
+import com.ingenico.hdfcpayment.type.RequestStatus
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode
@@ -26,9 +36,13 @@ import com.usdk.apiservice.aidl.data.BytesValue
 import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
 import com.usdk.apiservice.aidl.pinpad.UPinpad
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.nio.charset.StandardCharsets
+
+private var listofTids= ArrayList<String>()
 
 //Below method is used to encrypt Pannumber data:-
 fun getEncryptedPan(panNumber: String, algorithm: UAlgorithm?): String {
@@ -408,6 +422,200 @@ fun showMobileBillDialog(
         dialog?.show()
 
     }
+}
+
+//To check Initiaization Status
+suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
+    listofTids.clear()
+    var tpt = appDao?.getAllTerminalParameterTableData()
+    tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+        if(tidType.equals("1")){
+            tpt[0]?.terminalId?.get(index)
+            listofTids.add(0,tpt[0]?.terminalId?.get(index) ?: "")
+        }
+        else{
+            listofTids.add(tpt[0]?.terminalId?.get(index) ?: "")
+        }
+    }
+    return listofTids
+}
+
+
+//To check Initiaization Status
+ suspend fun checkInitializtionStatus(appDao: AppDao): Boolean {
+    var initializationstatus: Boolean = false
+    var result = appDao.getIngenicoInitialization()
+    var rseultsize = result?.size
+    if (rseultsize != null) {
+        if(rseultsize > 0){
+            result?.forEach { IngenicoInitialization ->
+                val responsecode = IngenicoInitialization?.responseCode
+                val apirespnsecode = IngenicoInitialization?.apiresponseCode
+                if(responsecode.equals("00") && apirespnsecode.equals("SUCCESS")){
+                    initializationstatus = true
+                    return initializationstatus
+                }
+                else{
+                    initializationstatus = false
+                    return initializationstatus
+                }
+            }
+        }
+
+    }
+    return initializationstatus
+}
+
+//Do initiaization
+ suspend fun doInitializtion(appDao: AppDao,listofTids: ArrayList<String>) {
+    var checkinitststus = checkInitializtionStatus(appDao)
+    if(!checkinitststus){
+        try {
+            DeviceHelper.doTerminalInitialization(
+                request = TerminalInitializationRequest(
+                    listofTids.size,
+                    listofTids,
+                ),
+                listener = object : OnOperationListener.Stub() {
+                    override fun onCompleted(p0: OperationResult?) {
+                        Log.d(DashboardFragment.TAG, "OnTerminalInitializationListener.onCompleted")
+                        val response = p0?.value as? TerminalInitializationResponse
+                        val initResult =
+                            """
+                                   Response_Code = ${response?.responseCode}
+                                   API_Response_Status = ${response?.status}
+                                   Response_Code = ${response?.responseCode}
+                                   TIDStatusList = [${response?.tidStatusList?.joinToString()}]
+                                   TIDs = [${response?.tidList?.joinToString()}]
+                                   INITDATAList = [${response?.initDataList?.firstOrNull().toString()}]
+                                """.trimIndent()
+
+                        when (response?.status) {
+                            RequestStatus.SUCCESS -> {
+                                println(initResult)
+                                val model = IngenicoInitialization()
+                                var initDataListList = InitDataListList()
+                                var tidarrayList = ArrayList<String>()
+                                var tidstatusList = ArrayList<String>()
+                                CoroutineScope(Dispatchers.IO).launch{
+                                    model.id = 0
+                                    model.responseCode = response?.responseCode
+                                    model.apiresponseCode = response?.status.name
+                                    response?.tidList?.forEach {
+                                        tidarrayList.add(it)
+                                    }
+                                    response?.tidStatusList?.forEach {
+                                        tidstatusList.add(it)
+                                    }
+                                    model.tidList = tidarrayList
+                                    model.tidStatusList = tidstatusList
+                                    var list = response?.initDataList
+
+                                    list.forEach { it->
+                                        initDataListList.adminPassword = it.adminPassword
+                                        initDataListList.helpDeskNumber = it.helpDeskNumber
+                                        initDataListList.merAddHeader1 = it.merAddHeader1
+                                        initDataListList.merAddHeader2 = it.merAddHeader2
+                                        initDataListList.merchantName  = it.merchantName
+                                        initDataListList.isRefundPasswordEnable = it.isRefundPasswordEnable
+                                        initDataListList.isReportPasswordEnable = it.isReportPasswordEnable
+                                        initDataListList.isVoidPasswordEnable = it.isVoidPasswordEnable
+                                        initDataListList.isTipEnable = it.isTipEnable
+
+                                        model.initdataList = listOf(initDataListList)
+                                    }
+                                    saveInitializtionData(appDao,model)
+                                }
+
+                            }
+                            RequestStatus.ABORTED,
+                            RequestStatus.FAILED -> {
+                                println(initResult)
+                                val model = IngenicoInitialization()
+                                var initDataListList = InitDataListList()
+                                var tidarrayList = ArrayList<String>()
+                                var tidstatusList = ArrayList<String>()
+                                CoroutineScope(Dispatchers.IO).launch{
+                                    model.id = 0
+                                    model.responseCode = response?.responseCode
+                                    model.apiresponseCode = response?.status.name
+                                    response?.tidList?.forEach {
+                                        tidarrayList.add(it)
+                                    }
+                                    response?.tidStatusList?.forEach {
+                                        tidstatusList.add(it)
+                                    }
+                                    model.tidList = tidarrayList
+                                    model.tidStatusList = tidstatusList
+                                    var list = response?.initDataList
+
+                                    list.forEach { it->
+                                        initDataListList.adminPassword = it.adminPassword
+                                        initDataListList.helpDeskNumber = it.helpDeskNumber
+                                        initDataListList.merAddHeader1 = it.merAddHeader1
+                                        initDataListList.merAddHeader2 = it.merAddHeader2
+                                        initDataListList.merchantName  = it.merchantName
+                                        initDataListList.isRefundPasswordEnable = it.isRefundPasswordEnable
+                                        initDataListList.isReportPasswordEnable = it.isReportPasswordEnable
+                                        initDataListList.isVoidPasswordEnable = it.isVoidPasswordEnable
+                                        initDataListList.isTipEnable = it.isTipEnable
+
+                                        model.initdataList = listOf(initDataListList)
+                                    }
+                                    saveInitializtionData(appDao,model)
+                                }
+                            }
+                            else -> {
+                                println(initResult)
+                                val model = IngenicoInitialization()
+                                var initDataListList = InitDataListList()
+                                var tidarrayList = ArrayList<String>()
+                                var tidstatusList = ArrayList<String>()
+                                CoroutineScope(Dispatchers.IO).launch{
+                                    model.id = 0
+                                    model.responseCode = response?.responseCode
+                                    model.apiresponseCode = response?.status?.name
+                                    response?.tidList?.forEach {
+                                        tidarrayList.add(it)
+                                    }
+                                    response?.tidStatusList?.forEach {
+                                        tidstatusList.add(it)
+                                    }
+                                    model.tidList = tidarrayList
+                                    model.tidStatusList = tidstatusList
+                                    var list = response?.initDataList
+
+                                    list?.forEach { it->
+                                        initDataListList.adminPassword = it.adminPassword
+                                        initDataListList.helpDeskNumber = it.helpDeskNumber
+                                        initDataListList.merAddHeader1 = it.merAddHeader1
+                                        initDataListList.merAddHeader2 = it.merAddHeader2
+                                        initDataListList.merchantName  = it.merchantName
+                                        initDataListList.isRefundPasswordEnable = it.isRefundPasswordEnable
+                                        initDataListList.isReportPasswordEnable = it.isReportPasswordEnable
+                                        initDataListList.isVoidPasswordEnable = it.isVoidPasswordEnable
+                                        initDataListList.isTipEnable = it.isTipEnable
+
+                                        model.initdataList = listOf(initDataListList)
+                                    }
+                                    saveInitializtionData(appDao,model)
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+        catch (ex: Exception){
+            ex.printStackTrace()
+        }
+    }
+
+}
+
+//To save Initiaization Data
+ suspend fun saveInitializtionData(appDao: AppDao,model: IngenicoInitialization) {
+    appDao.insertIngenicoIntializationData(model)
 }
 
 

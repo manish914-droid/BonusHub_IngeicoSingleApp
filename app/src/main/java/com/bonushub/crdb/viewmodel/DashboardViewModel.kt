@@ -17,10 +17,10 @@ import com.bonushub.pax.utils.EDashboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class DashboardViewModel  :
-ViewModel() {
+class DashboardViewModel  : ViewModel() {
 
     var eDashboardItemLiveData:LiveData<ArrayList<EDashboardItem>>? = null
+
     suspend fun eDashboardItem() : LiveData<ArrayList<EDashboardItem>> {
         eDashboardItemLiveData = DashboardRepository.getInstance().getEDashboardItem()
         return eDashboardItemLiveData as LiveData<ArrayList<EDashboardItem>>

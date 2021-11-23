@@ -402,7 +402,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                 paddingInvoiceRoc(appDatabase?.appDao?.getRoc())?.let { addField(11, it) }
                 addField(24, Nii.DEFAULT.nii)
 
-                addFieldByHex(41, tpt.terminalId)
+              //  addFieldByHex(41, tpt.terminalId)
 
                 addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
 
