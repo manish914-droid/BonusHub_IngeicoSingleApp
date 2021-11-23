@@ -7,6 +7,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.utils.addPad
+import com.bonushub.crdb.utils.logger
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -39,6 +40,9 @@ object AppPreference {
 
     // kushal bank functions
     const val GENERIC_REVERSAL_KEY = "generic_reversal_key"
+
+    const val LAST_SUCCESS_RECEIPT_KEY = "Last_Success_Receipt"
+
 
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
@@ -128,5 +132,27 @@ object AppPreference {
     }
     //endregion
 
+    //region kushal
+    @JvmStatic
+    fun getLastSuccessReceipt(): BatchFileDataTable? {
+        logger(TAG, "========getLastSuccessReceipt=========", "e")
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        return if (v != null) {
+            try {
+                val str = v.getString(LAST_SUCCESS_RECEIPT_KEY, "")
+                if (!str.isNullOrEmpty()) {
+                    Gson().fromJson<BatchFileDataTable>(
+                        str,
+                        object : TypeToken<BatchFileDataTable>() {}.type
+                    )
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Last Success Receipt Error!!!")
+            }
+        } else
+            null
+    }
+
+    // end region
 
 }

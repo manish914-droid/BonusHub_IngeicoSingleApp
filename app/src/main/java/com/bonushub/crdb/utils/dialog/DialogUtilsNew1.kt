@@ -21,11 +21,16 @@ import com.bonushub.crdb.view.fragments.getEditorActionListener
 
 class DialogUtilsNew1 {
 
-    companion object
-    {
-        fun showDialog(activity: Activity?, header:String?, hint:String?, onClick:OnClickDialogOkCancel, setCancelable:Boolean = true) {
+    companion object {
+        fun showDialog(
+            activity: Activity?,
+            header: String?,
+            hint: String?,
+            onClick: OnClickDialogOkCancel,
+            setCancelable: Boolean = true
+        ) {
             val dialog = Dialog(activity!!)
-            dialog.getWindow()?.setBackgroundDrawable( ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setCancelable(setCancelable)
             dialog.setContentView(com.bonushub.crdb.R.layout.dialog_admin)
@@ -56,11 +61,11 @@ class DialogUtilsNew1 {
             title: String,
             _text: String,
             isNumeric: Boolean = false,
-            isTID:Boolean = false,
+            isTID: Boolean = false,
             callback: (String) -> Unit
         ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable( ColorDrawable(Color.TRANSPARENT));
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_admin)
                 setCancelable(false)
@@ -88,7 +93,8 @@ class DialogUtilsNew1 {
 
                 invoiceET.apply {
                     setText(_text)
-                    inputType = if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
+                    inputType =
+                        if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
                     setOnEditorActionListener(getEditorActionListener { okbtn.performClick() })
                     setSelection(text.toString().length)
                 }
@@ -98,15 +104,47 @@ class DialogUtilsNew1 {
                     dismiss()
                 }
                 okbtn.setOnClickListener {
-                    if(!invoiceET.text.toString().isNullOrEmpty()) {
+                    if (!invoiceET.text.toString().isNullOrEmpty()) {
                         dismiss()
                         callback(invoiceET.text.toString())
-                    }
-                    else{
-                        ToastUtils.showToast(context,"Enter Invoice Number")
+                    } else {
+                        ToastUtils.showToast(context, "Enter Invoice Number")
                     }
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+        }
+
+        fun showMsgOkDialog(
+            activity: Activity?,
+            header: String?,
+            msg: String?,
+            setCancelable: Boolean = true
+        ) {
+            Dialog(activity!!).apply {
+
+                val window = window
+                window?.setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setCancelable(setCancelable)
+
+                setContentView(R.layout.dialog_msg)
+                val textViewHeader = findViewById<View>(R.id.textViewHeader) as TextView
+                val textViewMsg = findViewById<View>(R.id.textViewMsg) as TextView
+                val txtViewOk = findViewById<View>(R.id.txtViewOk) as TextView
+
+                textViewHeader.text = header
+                textViewMsg.text = msg
+
+                txtViewOk.setOnClickListener {
+
+                    dismiss()
+                }
+
             }.show()
         }
 

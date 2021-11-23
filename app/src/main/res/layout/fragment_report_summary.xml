@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".view.fragments.ReportSummaryFragment">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sub_header_view"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:layout_below="@id/recyclerView">
+
+        <TextView
+            android:id="@+id/textViewEmailReport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/muli_regular"
+            android:text="EMAIL REPORT"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:background="@drawable/edge_bg_red"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textViewPrint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/muli_regular"
+            android:text="PRINT"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:background="@drawable/edge_bg_red"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:gravity="center"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

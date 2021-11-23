@@ -70,6 +70,12 @@ enum class TransactionType(
     BRAND_EMI_MASTER_DATA(31, ProcessingCode.BRAND_EMI, "BRAND EMI"),
     EMI_ENQUIRY(32, ProcessingCode.BANK_EMI, "EMI ENQUIRY"),
     BRAND_EMI(33, ProcessingCode.BRAND_EMI, "EMI SALE"),
+
+    // requirement in reports print so added
+    TEST_EMI(34, ProcessingCode.BRAND_EMI, "TEST EMI TXN"),
+    BRAND_EMI_BY_ACCESS_CODE(35, ProcessingCode.BRAND_EMI, "EMI SALE"),
+    VOID_EMI(37, ProcessingCode.VOID, "VOID EMI"),
+
 }
 //endregion
 
@@ -554,3 +560,18 @@ enum class EIntentRequest(val code: Int) {
     BankEMISchemeOffer(106),
     FlexiPaySchemeOffer(107),
 }
+
+// region reports option
+enum class ReportsItem(val _name: String){
+    LAST_RECEIPT("Last Receipt"),
+    LAST_CANCEL_RECEIPT("Last Cancel Receipt"),
+    ANY_RECEIPT("Any Receipt"),
+    DETAIL_REPORT("Detail Report"),
+    SUMMERY_REPORT("Summary Report"),
+    LAST_SUMMERY_REPORT("Last Summary Report")
+}
+
+enum class EPrintCopyType(val pName: String) {
+    MERCHANT("**MERCHANT COPY**"), CUSTOMER("**CUSTOMER COPY**"), DUPLICATE("**DUPLICATE COPY**");
+}
+// end region

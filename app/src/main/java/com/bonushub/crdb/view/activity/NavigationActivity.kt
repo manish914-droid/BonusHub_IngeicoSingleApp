@@ -124,6 +124,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             R.id.reportFunction -> {
 
+                closeDrawer()
+                transactFragment(ReportsFragment())
+
             }
 
             R.id.settlement -> {

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/edge_blue">
+
+    <TextView
+        android:id="@+id/textViewHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/muli_regular"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_regular"
+        android:textAllCaps="true"/>
+
+    <TextView
+        android:id="@+id/textViewMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewHeader"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:fontFamily="@font/muli_light"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small" />
+
+    <TextView
+        android:id="@+id/txtViewOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewMsg"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/edge_white_bg_blue"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
+        android:paddingStart="36dp"
+        android:paddingTop="7dp"
+        android:paddingEnd="36dp"
+        android:paddingBottom="7dp"
+        android:text="@string/ok"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_xsmall" />
+
+
+</RelativeLayout>
