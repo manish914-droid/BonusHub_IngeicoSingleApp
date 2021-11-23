@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
+    <!--<androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="@dimen/pad_12"
@@ -29,4 +29,55 @@
 
             android:textSize="@dimen/text_size_regular" />
     </androidx.cardview.widget.CardView>
+-->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bank_emi_cv"
+        android:theme="@style/Theme.MaterialComponents.Light"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_50"
+        android:background="@drawable/card_edge"
+        app:cardElevation="@dimen/pad_15"
+
+        app:strokeWidth="2dp"
+        app:cardCornerRadius="@dimen/pad_12"
+
+        android:layout_margin="@dimen/pad_8"
+        app:strokeColor="@color/rippleColor"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
+        >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/tv_brand_master_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight=".9"
+
+                android:gravity="center"
+
+                android:layout_marginStart="@dimen/pad_2"
+                android:background="@color/white"
+                android:text="@string/bankEmi"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black"
+                android:textSize="@dimen/text_size_regular" />
+            <ImageView
+
+                android:layout_width="@dimen/pad_20"
+                android:layout_height="@dimen/pad_20"
+                android:layout_weight=".1"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_right_direction_168">
+
+            </ImageView>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
 </LinearLayout>

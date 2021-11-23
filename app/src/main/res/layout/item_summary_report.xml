@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/edge_blue_2"
+    android:layout_marginBottom="18dp">
+
+    <TextView
+        android:id="@+id/textViewHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/muli_bold"
+        android:layout_centerHorizontal="true"
+        android:text="TOTAL TRANSACTION"
+        android:textColor="@color/txt_color"
+        android:textSize="15sp"
+        android:layout_marginTop="@dimen/pad_10"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewHeader"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginTop="@dimen/pad_10"/>
+
+</RelativeLayout>

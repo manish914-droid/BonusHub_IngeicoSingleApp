@@ -70,6 +70,12 @@ enum class TransactionType(
     BRAND_EMI_MASTER_DATA(31, ProcessingCode.BRAND_EMI, "BRAND EMI"),
     EMI_ENQUIRY(32, ProcessingCode.BANK_EMI, "EMI ENQUIRY"),
     BRAND_EMI(33, ProcessingCode.BRAND_EMI, "EMI SALE"),
+
+    // requirement in reports print so added
+    TEST_EMI(34, ProcessingCode.BRAND_EMI, "TEST EMI TXN"),
+    BRAND_EMI_BY_ACCESS_CODE(35, ProcessingCode.BRAND_EMI, "EMI SALE"),
+    VOID_EMI(37, ProcessingCode.VOID, "VOID EMI"),
+
 }
 //endregion
 
@@ -418,8 +424,10 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     BANK_EMI_CATALOGUE("Bank EMI Catalogue", R.drawable.ic_sale, 19),
     MERCHANT_REFERRAL("MRP", R.drawable.ic_merchant_referal_program, 20),
     LESS("View Less", R.drawable.ic_digi_pos, 888),
+
+    TEST_EMI("Test Emi TXN", R.drawable.ic_digi_pos, 777),
     // just for handling the test emi not used in dashboard items
- /*   TEST_EMI("Test Emi TXN", R.drawable.ic_brand_emi_catalogue, 777),
+ /*
     FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_advance, 666),
     LESS("View Less", R.drawable.ic_arrow_up, 888),
 
@@ -552,3 +560,18 @@ enum class EIntentRequest(val code: Int) {
     BankEMISchemeOffer(106),
     FlexiPaySchemeOffer(107),
 }
+
+// region reports option
+enum class ReportsItem(val _name: String){
+    LAST_RECEIPT("Last Receipt"),
+    LAST_CANCEL_RECEIPT("Last Cancel Receipt"),
+    ANY_RECEIPT("Any Receipt"),
+    DETAIL_REPORT("Detail Report"),
+    SUMMERY_REPORT("Summary Report"),
+    LAST_SUMMERY_REPORT("Last Summary Report")
+}
+
+enum class EPrintCopyType(val pName: String) {
+    MERCHANT("**MERCHANT COPY**"), CUSTOMER("**CUSTOMER COPY**"), DUPLICATE("**DUPLICATE COPY**");
+}
+// end region

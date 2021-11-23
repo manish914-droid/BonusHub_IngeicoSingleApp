@@ -19,10 +19,7 @@ class BrandEmiProductViewModel(private val serverRepository: ServerRepository,pr
     init {
         viewModelScope.launch(Dispatchers.IO) {
             logger("Get DATA","----START----------","e")
-
             serverRepository.getBrandEmiProductData("0",brandId,subCatId)
-
-
         }
     }
 }

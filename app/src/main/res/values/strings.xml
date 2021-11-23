@@ -182,17 +182,25 @@
 
     <string name="emi_transaction">Emi Transaction</string>
     <string name="manual_entry">Manual Entry</string>
-    <string name="please_insert_swipe_card">Please Insert/Swipe/Tap Card</string>
+    <string name="please_insert_swipe_card">Please Insert/Swipe Card</string>
     <string name="please_insert_swipe">Please Insert/Swipe Card</string>
     <string name="please_swipe">Please Swipe Card</string>
     <string name="printing_roll_error">Printing Roll Error</string>
 
-    <string name="trans_amount">Transaction Amount :</string>
+    <string name="trans_amount">Transaction Amount</string>
     <string name="card_number">Card Number</string>
 
     <string name="enter_tip_amount">Enter TIP amount</string>
     <string name="please_enter_cash_amount">Please enter cash amount</string>
     <string name="enter_valid_mobile_number">Enter Valid Mobile Number</string>
     <string name="enter_bill_number">Enter Bill Number</string>
+
+    <!--reports-->
+    <string name="reports_header">REPORTS</string>
+    <string name="summary_report">SUMMARY REPORT</string>
+
+    <string name="empty_batch">Batch is empty</string>
+    <string name="last_receipt_not_available">Last Receipt Not Available.</string>
+    <string name="printing_last_receipt">Printing Last Receipt</string>
 
 </resources>

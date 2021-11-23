@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="3"
+    android:layout_marginBottom="@dimen/pad_5">
+
+
+    <TextView
+        android:id="@+id/txtViewHeading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".9"
+        android:fontFamily="@font/muli_bold"
+        android:gravity="end"
+        android:text="Card Issuer:"
+        android:textColor="@color/txt_color"
+        android:textSize="15sp"
+        android:layout_marginEnd="@dimen/pad_2"/>
+
+    <TextView
+        android:id="@+id/txtViewCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.2"
+        android:fontFamily="@font/muli_light"
+        android:gravity="center_horizontal"
+        android:text="Rupay Prepaid"
+        android:textColor="@color/txt_color"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/txtViewTotal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".9"
+        android:fontFamily="@font/muli_light"
+        android:gravity="end"
+        android:text="Total"
+        android:textColor="@color/txt_color"
+        android:textSize="15sp"/>
+
+
+</LinearLayout>

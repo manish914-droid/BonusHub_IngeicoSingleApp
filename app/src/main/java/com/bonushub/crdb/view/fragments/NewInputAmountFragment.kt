@@ -1,6 +1,6 @@
 package com.bonushub.crdb.view.fragments
 
-import android.content.Context
+import  android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -41,10 +41,8 @@ import com.bonushub.pax.utils.EDashboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 import com.bonushub.pax.utils.TransactionType
-import com.bonushub.pax.utils.UiAction
 
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,7 +55,7 @@ class NewInputAmountFragment : Fragment() {
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-    private lateinit var transactionType: EDashboardItem
+    private lateinit var eDashBoardItem: EDashboardItem
     var tpt: TerminalParameterTable? = null
     public var hdfctpt: HDFCTpt? = null
     private var iDialog: IDialog? = null
@@ -108,7 +106,7 @@ class NewInputAmountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        transactionType = (arguments?.getSerializable("type")) as EDashboardItem
+        eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         newInputAmountViewModel = ViewModelProvider(this).get(NewInputAmountViewModel::class.java)
         brandEmiSubCatData =
             arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
@@ -120,20 +118,7 @@ class NewInputAmountFragment : Fragment() {
             parentFragmentManager.popBackStackImmediate()
         }
         initAnimation()
-
-       // newInputAmountViewModel.fetchtptData()
-        if (transactionType == EDashboardItem.SALE) {
-            isMobileNumberEntryOnsale { isMobileNeeded, isMobilenumberMandatory ->
-                if (isMobileNeeded) {
-                    binding?.mobNoCrdView?.visibility = View.VISIBLE
-                } else {
-                    binding?.mobNoCrdView?.visibility = View.GONE
-                }
-            }
-        }
-
-        when (transactionType) {
-
+        when (eDashBoardItem) {
             EDashboardItem.SALE_WITH_CASH -> {
                 //  binding?.enterCashAmountTv?.visibility = View.VISIBLE
                 binding?.cashAmtCrdView?.visibility = View.VISIBLE
@@ -142,21 +127,50 @@ class NewInputAmountFragment : Fragment() {
 
             }
             EDashboardItem.SALE -> {
-                observeNewInpuAmountViewModelForHdfcTpt(TransactionType.TIP_SALE)
-            }
-        }
+               /* if (checkHDFCTPTFieldsBitOnOff(TransactionType.TIP_SALE)) {
+                    //   binding?.enterCashAmountTv?.visibility = View.VISIBLE
+                    binding?.cashAmtCrdView?.visibility = View.VISIBLE
+                    cashAmount?.hint =
+                        HDFCApplication.appContext.getString(R.string.enter_tip_amount)
+                    //    binding?.enterCashAmountTv?.text = VerifoneApp.appContext.getString(R.string.enter_tip_amount)
 
-        isMobileNumBillEntryAndSerialNumRequiredOnBrandEmi {
-            if (it != null) {
-                //  brandEmiValidationModel = it
-                if (it.isMobileNumReq || it.isMobileNumMandatory) {
-                    binding?.mobNoCrdView?.visibility = View.VISIBLE
                 } else {
-                    binding?.mobNoCrdView?.visibility = View.GONE
+                    cashAmount?.visibility = View.GONE
+                    binding?.cashAmtCrdView?.visibility = View.GONE
+                    //  binding?.enterCashAmountTv?.visibility = View.GONE
+
+                }*/
+                isMobileNumberEntryOnsale { isMobileNeeded, isMobilenumberMandatory ->
+                    if (isMobileNeeded) {
+                        binding?.mobNoCrdView?.visibility = View.VISIBLE
+                    } else {
+                        binding?.mobNoCrdView?.visibility = View.GONE
+                    }
                 }
+
+                observeNewInpuAmountViewModelForHdfcTpt(TransactionType.TIP_SALE)
+
+            }
+            EDashboardItem.BRAND_EMI->{
+                isMobileNumBillEntryAndSerialNumRequiredOnBrandEmi {
+                    if (it != null) {
+                        //  brandEmiValidationModel = it
+                        if (it.isMobileNumReq || it.isMobileNumMandatory) {
+                            binding?.mobNoCrdView?.visibility = View.VISIBLE
+                        } else {
+                            binding?.mobNoCrdView?.visibility = View.GONE
+                        }
+                    }
+                }
+
+            }
+
+            else -> {
+                cashAmount?.visibility = View.GONE
+                binding?.cashAmtCrdView?.visibility = View.GONE
+                //   binding?.enterCashAmountTv?.visibility = View.GONE
             }
         }
-
         // keyModelMobNumber.isInutSimpleDigit = true
         binding?.mainKeyBoard?.root?.visibility = View.VISIBLE
        binding?.mainKeyBoard?.root?.startAnimation(animShow)
@@ -428,10 +442,7 @@ class NewInputAmountFragment : Fragment() {
 
     }
 
-
-
     private fun onOKClicked(amt: String) {
-
         /* (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
         arguments = Bundle().apply {
           //  putSerializable("type", action)
@@ -452,13 +463,13 @@ class NewInputAmountFragment : Fragment() {
         Log.e("CASh", "OK CLICKED  ${cashAmount?.text}")
         Log.e("AMT", "OK CLICKED  $amt")
         val maxTxnLimit = 20000.0///"%.2f".format(getTransactionLimitForHDFCIssuer()).toDouble()
-        Log.e("TXN LIMIT", "Txn type = $transactionType  Txn maxLimit = $maxTxnLimit")
+        Log.e("TXN LIMIT", "Txn type = $eDashBoardItem  Txn maxLimit = $maxTxnLimit")
 
         try {
             (binding?.saleAmount?.text.toString()).toDouble()
         } catch (ex: Exception) {
             ex.printStackTrace()
-            ToastUtils.showToast(activity, "Please enter amount")
+            showToast( "Please enter amount")
             return
         }
 
@@ -466,8 +477,8 @@ class NewInputAmountFragment : Fragment() {
         var cashAmt = 0.toDouble()
         if (cashAmtStr != "") {
             cashAmt = (cashAmount?.text.toString()).toDouble()
-        } else if (transactionType == EDashboardItem.SALE_WITH_CASH) {
-            ToastUtils.showToast(activity, R.string.please_enter_cash_amount)
+        } else if (eDashBoardItem == EDashboardItem.SALE_WITH_CASH) {
+           showToast(getString(R.string.please_enter_cash_amount))
             return
         }
         val saleAmountStr = binding?.saleAmount?.text.toString()
@@ -475,7 +486,7 @@ class NewInputAmountFragment : Fragment() {
         if (saleAmountStr != "") {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
-        when (transactionType) {
+        when (eDashBoardItem) {
             EDashboardItem.SALE -> {
                 val saleAmt = saleAmount.toString().trim().toDouble()
                 val saleTipAmt = cashAmt.toString().trim().toDouble()
@@ -492,7 +503,7 @@ class NewInputAmountFragment : Fragment() {
                             validateTIP(trnsAmt, saleAmt, extraPairData)
                         } else
                             context?.getString(R.string.enter_valid_mobile_number)
-                                ?.let { ToastUtils.showToast(activity, it) }
+                                ?.let { showToast( it) }
 
                         TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                             val extraPairData = Triple("", "", third = true)
@@ -521,7 +532,7 @@ class NewInputAmountFragment : Fragment() {
                                     )
                                 } else
                                     context?.getString(R.string.enter_valid_mobile_number)
-                                        ?.let { ToastUtils.showToast(activity, it) }
+                                        ?.let { showToast( it) }
 
                                 TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                                     iFrReq?.onFragmentRequest(
@@ -545,7 +556,36 @@ class NewInputAmountFragment : Fragment() {
             }
 
             EDashboardItem.BRAND_EMI -> {
+                when {
+                    // mobile entry  optional handling
+                    brandEntryValidationModel?.isMobileNumReq == true -> {
+                        when {
+                            !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length == 10) {
+                                navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                            } else
+                                context?.getString(R.string.enter_valid_mobile_number)
+                                    ?.let {showToast(it) }
 
+                            TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
+                                navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                            }
+                        }
+                    }
+                    // mobile entry mandatory handling
+                    brandEntryValidationModel?.isMobileNumMandatory == true -> {
+                        if (!TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) && (binding?.mobNumbr?.text.toString().length in 10..13)) {
+                            navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+
+                        } else {
+                            context?.getString(R.string.enter_valid_mobile_number)
+                                ?.let { showToast(it) }
+                        }
+                    }
+                    else -> {
+                        // no mobile number require
+                        navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                    }
+                }
             }
 
             EDashboardItem.CASH_ADVANCE -> {
@@ -588,7 +628,7 @@ class NewInputAmountFragment : Fragment() {
                 when {
                     TextUtils.isEmpty(
                         saleAmount.toString().trim()
-                    ) -> ToastUtils.showToast(activity, "Enter Sale Amount")
+                    ) -> showToast( "Enter Sale Amount")
                     //  TextUtils.isEmpty(binding?.mobNumbr?.text?.toString()?.trim()) -> VFService.showToast("Enter Mobile Number")
                     else -> iFrReq?.onFragmentRequest(
                         EDashboardItem.BANK_EMI_CATALOGUE,
@@ -604,6 +644,8 @@ class NewInputAmountFragment : Fragment() {
 
 
     }
+
+
 
     private fun initAnimation() {
         animShow = AnimationUtils.loadAnimation(activity, R.anim.view_show)
@@ -661,36 +703,37 @@ class NewInputAmountFragment : Fragment() {
     }
     //endregion
 
-    private fun navigateToEmiNextProcess() {
+    private fun navigateToEmiNextProcess(amt:String,mobileNum:String) {
 
         if (brandEntryValidationModel?.isBillNumReq == true || brandEntryValidationModel?.isBillNumMandatory == true || brandEntryValidationModel?.isIemeiOrSerialNumReq == true) {
+       val bun=     Bundle().apply {
+                putSerializable("eDashBoardItem", eDashBoardItem)
+
+                putSerializable("brandValidation", brandEntryValidationModel)
+                putSerializable("brandEmiSubCat", brandEmiSubCatData)
+                putSerializable("brandEmiProductData", brandEmiProductData)
+                putSerializable("brandDataMaster", brandDataMaster)
+                putSerializable("amt", amt)
+                putSerializable("mobileNum", binding?.mobNumbr?.text.toString())
+
+                //   putSerializable("transType", transactionType)
+
+            }
+
             (activity as NavigationActivity).transactFragment(BillNumSerialNumEntryFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable("uiAction", uiAction)
-                    //      putString("mobileNum", mobNumber)
-                    //     putString("amt", amt)
-                    //   val isBillReq = brandEntryValidationModel?.isBillNumReq == true || brandEntryValidationModel?.isBillNumMandatory == true
-                    /*  //  putString("testEmiType", testEmiType ?: "")
-                putBoolean("isBillRequire", isBillReq)
-                val isSerialEmeiNumReq =
-                    brandEntryValidationModel?.isIemeiOrSerialNumReq
-                putBoolean("isSerialImeiNumRequired", isSerialEmeiNumReq)*/
-                    putSerializable("brandValidation", brandEntryValidationModel)
-                    putSerializable("brandEmiSubCat", brandEmiSubCatData)
-                    putSerializable("brandEmiProductData", brandEmiProductData)
-                    putSerializable("brandDataMaster", brandDataMaster)
-
-                    //   putSerializable("transType", transactionType)
-
-                }
+                arguments =bun
             })
         } else {
-            lifecycleScope.launch(Dispatchers.IO) {
-                //  saveBrandEMIDataToDB("", "", brandEMIDataModal, transactionType)
-                withContext(Dispatchers.Main) {
-                    //  iFrReq?.onFragmentRequest(uiAction, Pair(amt, "0"), Triple(mobNumber, "", true),brandEMIDataModal)
-                }
-            }
+                  brandEmiSubCatData?.let {
+                        brandEmiProductData?.let { it1 ->
+                            brandDataMaster?.let { it2 ->
+                                (activity as NavigationActivity).startTransactionActivity(amt=saleAmount.toString(),mobileNum = mobileNum,brandDataMaster = it2,
+                                    brandEmiSubCatData = it,brandEmiProductData = it1
+                                )
+                            }
+                        }
+                    }
+
         }
 
     }
@@ -701,7 +744,7 @@ class NewInputAmountFragment : Fragment() {
             newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner, {
                 tpt = it
                 Log.d("tptllll===>:- ", Gson().toJson(it))
-                when (transactionType) {
+                when (eDashBoardItem) {
                     EDashboardItem.SALE -> {
 
                         Log.d("reservedValues===>:- ", Gson().toJson(tpt?.reservedValues))
@@ -856,12 +899,18 @@ class NewInputAmountFragment : Fragment() {
                         }
                     }
                 } else {
-                    ToastUtils.showToast(activity, "TPT not fount")
+                    showToast("TPT not fount")
                 }
             })
 
         }
 
+    }
+
+    private fun showToast(str:String){
+        lifecycleScope.launch(Dispatchers.Main) {
+            ToastUtils.showToast(activity, str)
+        }
     }
 
 }

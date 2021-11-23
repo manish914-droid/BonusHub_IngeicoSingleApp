@@ -435,6 +435,22 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
+fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",imeiOrSerialNum:String="",brandEmiSubCatData: BrandEMISubCategoryTable,
+       brandEmiProductData: BrandEMIProductDataModal,
+        brandDataMaster: BrandEMIMasterDataModal){
+    val intent = Intent (this, TransactionActivity::class.java)
+    intent.putExtra("mobileNumber", mobileNum)
+    intent.putExtra("billNumber", billNum)
+    intent.putExtra("saleAmt", amt)
+    intent.putExtra("imeiOrSerialNum", imeiOrSerialNum)
+    intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
+    intent.putExtra("brandEmiProductData", brandEmiProductData)
+    intent.putExtra("brandDataMaster", brandDataMaster)
+    startActivity(intent)
+
+}
+
+
     override  fun onDashBoardItemClick(action: EDashboardItem) {
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH -> {

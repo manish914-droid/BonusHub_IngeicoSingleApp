@@ -21,8 +21,10 @@ import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.UiAction
+
+import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,8 +35,8 @@ class BillNumSerialNumEntryFragment : Fragment() {
 
     private var binding: FragmentBillNumSerialNumEntryBinding? = null
 
-    val uiAction: UiAction by lazy {
-        arguments?.getSerializable("uiAction") as UiAction
+    val eDashBoardItem: EDashboardItem by lazy {
+        arguments?.getSerializable("eDashBoardItem") as EDashboardItem
     }
 
     val mobileNumber: String by lazy {
@@ -46,9 +48,9 @@ class BillNumSerialNumEntryFragment : Fragment() {
     val testEmiType: String by lazy {
         arguments?.getString("testEmiType") as String
     }
-    val isBillRequire: Boolean by lazy {
+   /* val isBillRequire: Boolean by lazy {
         arguments?.getBoolean("isBillRequire") as Boolean
-    }
+    }*/
     val isSerialIEMIRequire: Boolean by lazy {
         arguments?.getBoolean("isSerialImeiNumRequired") as Boolean
     }
@@ -83,7 +85,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.subHeaderView?.subHeaderText?.text = uiAction.title
+        binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
@@ -95,7 +97,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
 
         binding?.serialNumEt?.setMaxLength(brandEmiProductData?.maxLength?.toInt() ?: 20)
         binding?.billNumEt?.setMaxLength( 16)
-        if (isBillRequire) {
+        if (brandValidation.isBillNumReq || brandValidation.isBillNumMandatory) {
             binding?.billnoCrdView?.visibility = View.VISIBLE
         } else {
             binding?.billnoCrdView?.visibility = View.GONE
@@ -127,12 +129,12 @@ class BillNumSerialNumEntryFragment : Fragment() {
             }
         }
         binding?.proceedBtn?.setOnClickListener {
-            if (uiAction == UiAction.BANK_EMI || uiAction == UiAction.TEST_EMI) {
+            if (eDashBoardItem == EDashboardItem.BANK_EMI || eDashBoardItem == EDashboardItem.TEST_EMI) {
                 val pair = Pair(txnAmount, testEmiType)
                 val triple = Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true)
-             //   (activity as MainActivity).onFragmentRequest(uiAction, pair, triple)
+             //   (activity as MainActivity).onFragmentRequest(eDashBoardItem, pair, triple)
 
-            } else if (uiAction == UiAction.BRAND_EMI) {
+            } else if (eDashBoardItem == EDashboardItem.BRAND_EMI) {
                 navigateToTransaction()
 
             }
@@ -199,11 +201,20 @@ class BillNumSerialNumEntryFragment : Fragment() {
           /* brandEMIDataModal.imeiORserailNum=binding?.serialNumEt?.text.toString().trim()
             withContext(Dispatchers.Main) {
                 (activity as MainActivity).onFragmentRequest(
-                    uiAction,
+                    eDashBoardItem,
                     Pair(txnAmount, "0"),
                     Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true),brandEMIDataModal
                 )
             }*/
+            brandEmiSubCatData?.let {
+                brandEmiProductData?.let { it1 ->
+                    brandDataMaster?.let { it2 ->
+                        (activity as NavigationActivity).startTransactionActivity(amt= txnAmount,mobileNum = mobileNumber,brandDataMaster = it2,
+                            brandEmiSubCatData = it,brandEmiProductData = it1
+                        )
+                    }
+                }
+            }
         }
 
     }
