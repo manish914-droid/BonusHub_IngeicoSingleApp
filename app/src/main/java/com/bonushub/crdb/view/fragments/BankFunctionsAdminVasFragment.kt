@@ -98,11 +98,11 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 // INIT
                // iDialog?.showProgress(getString(R.string.please_wait_host))
 
-                if(this::terminalParameterTable.isInitialized && !terminalParameterTable.terminalId.isEmpty()){
+                if(this::terminalParameterTable.isInitialized && !terminalParameterTable.terminalId?.isEmpty()!!){
 
                     logger("get tid","by table")
                     // get tid from table and init
-                    initViewModel.insertInfo1(terminalParameterTable.terminalId)
+                    initViewModel.insertInfo1((terminalParameterTable.terminalId ?: "") as String)
                     observeMainViewModel()
 
 

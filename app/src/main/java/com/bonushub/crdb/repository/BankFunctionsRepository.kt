@@ -190,7 +190,7 @@ class BankFunctionsRepository {
 
                 //Below conditional code will only execute in case of Change TID:- // BB
                 if (data[0]?.titleName.equals("TID", ignoreCase = true)) {
-                    if (data[0]?.titleValue != DBModule.appDatabase?.appDao.getTerminalParameterTableData().get(0)?.terminalId
+                    if (data[0]?.titleValue !="" /*DBModule.appDatabase?.appDao.getTerminalParameterTableData().get(0)?.terminalId*/
                         && data[0]?.titleName.equals("TID", ignoreCase = true)
                     ) {
                         if (data[0]?.titleValue?.length == 8) {
@@ -316,7 +316,7 @@ class BankFunctionsRepository {
 
                 //Below conditional code will only execute in case of Change TID:- // BB
                 if (data[0]?.titleName.equals("TID", ignoreCase = true)) {
-                    if (data[0]?.titleValue != DBModule.appDatabase?.appDao.getTerminalParameterTableData().get(0)?.terminalId
+                    if (data[0]?.titleValue != ""/*DBModule.appDatabase?.appDao.getTerminalParameterTableData().get(0)?.terminalId*/
                         && data[0]?.titleName.equals("TID", ignoreCase = true)
                     ) {
                         if (data[0]?.titleValue?.length == 8) {
