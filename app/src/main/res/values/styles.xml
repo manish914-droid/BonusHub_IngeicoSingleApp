@@ -39,7 +39,7 @@
     <!-- Using in Keyboard. -->
     <style name="Keyboard_Btn_Neumorphic" parent="Widget.AppCompat.Button">
     <item name="android:layout_width">0dp</item>
-    <item name="android:layout_height">60dp</item>
+    <item name="android:layout_height">57dp</item>
     <item name="android:layout_margin">1dp</item>
     <item name="android:textColor">@color/black</item>
         <item name="android:layout_weight">1</item></style>

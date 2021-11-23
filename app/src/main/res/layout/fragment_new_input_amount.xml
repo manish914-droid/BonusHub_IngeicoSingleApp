@@ -10,8 +10,7 @@
         android:id="@+id/parent_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginBottom="@dimen/pad_4">
+        android:orientation="vertical">
 
         <include
             android:id="@+id/sub_header_view"
@@ -30,7 +29,6 @@
             app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
             android:layout_marginRight="@dimen/pad_20"
             android:layout_marginLeft="@dimen/pad_20"
-            android:layout_marginTop="@dimen/pad_10"
 
            >
 
@@ -180,13 +178,11 @@
             layout="@layout/new_enter_amount_keyboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/pad_40"
-            android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginTop="@dimen/pad_5"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descr_crd_view"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

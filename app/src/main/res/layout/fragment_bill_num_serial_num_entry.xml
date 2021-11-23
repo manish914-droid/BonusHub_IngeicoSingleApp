@@ -21,7 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/pad_8"
         android:visibility="visible"
-
+android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
 
 
         >
@@ -30,8 +31,6 @@
             android:id="@+id/billNum_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/pad_8"
-            android:layout_marginBottom="@dimen/pad_16"
             android:background="@drawable/card_edge"
             android:padding="@dimen/pad_16"
 
@@ -60,17 +59,17 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/pad_8"
+        android:layout_marginTop="@dimen/pad_20"
         android:visibility="visible"
 
-
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
         >
 
         <EditText
             android:id="@+id/serialNum_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/pad_4"
             android:background="@drawable/card_edge"
 
            android:ems="10"
@@ -90,19 +89,20 @@ android:padding="@dimen/pad_16"
 
     </com.google.android.material.card.MaterialCardView>
 
+
     <Button
         android:id="@+id/proceed_btn"
-
-        android:layout_width="match_parent"
-        android:layout_marginStart="@dimen/pad_40"
-        android:layout_height="wrap_content"
-        android:background="@drawable/card_edge"
-        android:padding="@dimen/pad_16"
-        android:textColor="@color/black"
-        android:textSize="@dimen/text_size_regular"
-
+        style="@style/Widget.Neumorph.Button"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/pad_8"
+        android:layout_marginTop="@dimen/pad_40"
+        android:padding="@dimen/pad_2"
         android:text="@string/proceed"
- />
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_small"
+        android:background="@drawable/edge_button" />
 
 
 </LinearLayout>
