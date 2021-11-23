@@ -27,6 +27,7 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 
@@ -54,7 +55,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
-
     @Inject
     lateinit var appDao: AppDao
     private var navigationBinding: ActivityNavigationBinding?=null
@@ -106,7 +106,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         headerView = navigationBinding?.navView?.getHeaderView(0)
         mainDrawerBinding = headerView?.let { MainDrawerBinding.bind(it) }
         // endregion
-      decideDashBoard()
+        decideDashBoard()
     }
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
@@ -125,6 +125,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             R.id.reportFunction -> {
+
+                closeDrawer()
+                transactFragment(ReportsFragment())
 
             }
 
@@ -156,7 +159,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //region  Checked that the terminal is initialized or not.
     private fun decideDashBoard() {
         if (AppPreference.getLogin()) {
-         //   refreshDrawer()
+            //   refreshDrawer()
             navHostFragment?.navController?.popBackStack()
             Log.e("NAV", "DECIDE HOME")
             navHostFragment?.navController?.navigate(R.id.dashBoardFragment)
@@ -166,7 +169,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())
                     Log.d("Message ", msg)
-                       // refreshDrawer()
+                    // refreshDrawer()
                 }
             }
             navHostFragment?.navController?.popBackStack()
@@ -264,21 +267,21 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //endregion
 
 
-//region==========Setting for sidebar details==========
-   private fun refreshDrawer() {
-         val appDao: AppDao?=null
-      runBlocking(Dispatchers.IO) {
-        val tpt = appDao?.getAllTerminalParameterTableData()?.get(0)
-          val merchantName = tpt?.receiptHeaderOne
-           tid = getString(R.string.terminal_id) + "   : " + tpt?.terminalId
-           mid = getString(R.string.merchant_id) + "  : " + tpt?.merchantId
+    //region==========Setting for sidebar details==========
+    private fun refreshDrawer() {
+        val appDao: AppDao?=null
+        runBlocking(Dispatchers.IO) {
+            val tpt = appDao?.getAllTerminalParameterTableData()?.get(0)
+            val merchantName = tpt?.receiptHeaderOne
+            tid = getString(R.string.terminal_id) + "   : " + tpt?.terminalId
+            mid = getString(R.string.merchant_id) + "  : " + tpt?.merchantId
 
-      }
+        }
 
-    runBlocking(Dispatchers.Main)  {
-        mainDrawerBinding?.mdTidTv?.text = tid
-        mainDrawerBinding?.mdMidTv?.text = mid
-    }
+        runBlocking(Dispatchers.Main)  {
+            mainDrawerBinding?.mdTidTv?.text = tid
+            mainDrawerBinding?.mdMidTv?.text = mid
+        }
 
     }
 
@@ -416,13 +419,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     runBlocking(Dispatchers.IO) {
                         /// readEMICatalogueAndBannerImages()
                     }
-               transactFragment(EMIIssuerList().apply {
+                transactFragment(EMIIssuerList().apply {
                     arguments = Bundle().apply {
                         putSerializable("type", action)
                         putString("proc_code", ProcessingCode.PRE_AUTH.code)
                         putString("mobileNumber", extraPair?.first)
                         putString("enquiryAmt", amt)
-                      //  putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
+                        //  putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
 
 
                     }
@@ -435,39 +438,31 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
-fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",imeiOrSerialNum:String="",brandEmiSubCatData: BrandEMISubCategoryTable,
-       brandEmiProductData: BrandEMIProductDataModal,
-        brandDataMaster: BrandEMIMasterDataModal){
-    val intent = Intent (this, TransactionActivity::class.java)
-    intent.putExtra("mobileNumber", mobileNum)
-    intent.putExtra("billNumber", billNum)
-    intent.putExtra("saleAmt", amt)
-    intent.putExtra("imeiOrSerialNum", imeiOrSerialNum)
-    intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
-    intent.putExtra("brandEmiProductData", brandEmiProductData)
-    intent.putExtra("brandDataMaster", brandDataMaster)
-    startActivity(intent)
+    fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",imeiOrSerialNum:String="",brandEmiSubCatData: BrandEMISubCategoryTable,
+                                 brandEmiProductData: BrandEMIProductDataModal,
+                                 brandDataMaster: BrandEMIMasterDataModal){
+        val intent = Intent (this, TransactionActivity::class.java)
+        intent.putExtra("mobileNumber", mobileNum)
+        intent.putExtra("billNumber", billNum)
+        intent.putExtra("saleAmt", amt)
+        intent.putExtra("imeiOrSerialNum", imeiOrSerialNum)
+        intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
+        intent.putExtra("brandEmiProductData", brandEmiProductData)
+        intent.putExtra("brandDataMaster", brandDataMaster)
+        startActivity(intent)
 
-}
-
+    }
 
     override  fun onDashBoardItemClick(action: EDashboardItem) {
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH -> {
                 if (checkInternetConnection()) {
                     CoroutineScope(Dispatchers.IO).launch{
-                        val checkInitializestatus = withContext(Dispatchers.IO) { checkInitializtionStatus(appDao) }
-                        if(!checkInitializestatus) {
-                            val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
-                            val resultTwo =  withContext(Dispatchers.IO) { doInitializtion(appDao, listofTids) }
-                        }
-                        else{
-                            withContext(Dispatchers.Main){
-                                inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, action)
-                            }
-                        }
+                        val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
                     }
 
+                    inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, action)
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
@@ -476,8 +471,8 @@ fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",im
             }
 
             EDashboardItem.EMI_ENQUIRY -> {
-                if (checkInternetConnection()) {
-                   transactFragment(EMICatalogue().apply {
+                if (Field48ResponseTimestamp.checkInternetConnection()) {
+                    transactFragment(EMICatalogue().apply {
                         arguments = Bundle().apply {
                             putSerializable("type", EDashboardItem.EMI_CATALOGUE)
                             //  putString(INPUT_SUB_HEADING, "")
@@ -490,41 +485,41 @@ fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",im
             }
 
             EDashboardItem.BRAND_EMI->{
-            transactFragment(BrandEmiMasterCategoryFragment())
+                transactFragment(BrandEmiMasterCategoryFragment())
 
             }
             else->{
                 val intent = Intent (this, TransactionActivity::class.java)
-               startActivity(intent)
+                startActivity(intent)
 
             }
 
         }
     }
-// endregion
+    // endregion
 //Below Method is to Handle the Input Fragment Inflate with the Sub Heading it belongs to:-
-fun inflateInputFragment(
-    fragment: Fragment,
-    subHeading: String,
-    action: EDashboardItem, testEmiOption: String = "0"
-) {
-    if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
-        !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
-        !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
+    fun inflateInputFragment(
+        fragment: Fragment,
+        subHeading: String,
+        action: EDashboardItem, testEmiOption: String = "0"
     ) {
-        transactFragment(fragment.apply {
-            arguments = Bundle().apply {
-                putSerializable("type", action)
-                putString(INPUT_SUB_HEADING, subHeading)
-                putString("TestEmiOption", testEmiOption)
-            }
-        }, false)
-    } else {
-        if (checkInternetConnection())
-          ///  checkAndPerformOperation()
-        else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+        if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+            !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
+            !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
+        ) {
+            transactFragment(fragment.apply {
+                arguments = Bundle().apply {
+                    putSerializable("type", action)
+                    putString(INPUT_SUB_HEADING, subHeading)
+                    putString("TestEmiOption", testEmiOption)
+                }
+            }, false)
+        } else {
+            if (checkInternetConnection())
+            ///  checkAndPerformOperation()
+            else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+        }
     }
-}
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
