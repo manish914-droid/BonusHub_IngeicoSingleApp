@@ -63,6 +63,9 @@
         <activity
             android:name=".view.activity.TransactionActivity"
             android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".utils.PrintingTesting"
+            android:windowSoftInputMode="adjustNothing" />
     </application>
 
 </manifest>
