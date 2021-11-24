@@ -427,9 +427,9 @@ fun showMobileBillDialog(
 //To check Initiaization Status
 suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
     listofTids.clear()
-    var tpt = appDao?.getAllTerminalParameterTableData()
+    val tpt = appDao.getAllTerminalParameterTableData()
     tpt[0]?.tidType?.forEachIndexed { index, tidType ->
-        if(tidType.equals("1")){
+        if(tidType == "1"){
             tpt[0]?.terminalId?.get(index)
             listofTids.add(0,tpt[0]?.terminalId?.get(index) ?: "")
         }
@@ -444,18 +444,17 @@ suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
 //To check Initiaization Status
  suspend fun checkInitializtionStatus(appDao: AppDao): Boolean {
     var initializationstatus: Boolean = false
-    var result = appDao.getIngenicoInitialization()
-    var rseultsize = result?.size
+    val result = appDao.getIngenicoInitialization()
+    val rseultsize = result?.size
     if (rseultsize != null) {
         if(rseultsize > 0){
-            result?.forEach { IngenicoInitialization ->
+            result.forEach { IngenicoInitialization ->
                 val responsecode = IngenicoInitialization?.responseCode
                 val apirespnsecode = IngenicoInitialization?.apiresponseCode
                 if(responsecode.equals("00") && apirespnsecode.equals("SUCCESS")){
                     initializationstatus = true
                     return initializationstatus
-                }
-                else{
+                } else{
                     initializationstatus = false
                     return initializationstatus
                 }

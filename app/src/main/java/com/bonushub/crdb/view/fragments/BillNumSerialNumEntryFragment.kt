@@ -94,7 +94,6 @@ class BillNumSerialNumEntryFragment : Fragment() {
         brandEmiProductData = arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
-
         binding?.serialNumEt?.setMaxLength(brandEmiProductData?.maxLength?.toInt() ?: 20)
         binding?.billNumEt?.setMaxLength( 16)
         if (brandValidation.isBillNumReq || brandValidation.isBillNumMandatory) {

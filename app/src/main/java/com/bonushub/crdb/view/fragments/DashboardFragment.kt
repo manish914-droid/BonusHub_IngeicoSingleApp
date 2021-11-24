@@ -82,7 +82,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
     private fun observeDashboardViewModel(){
         lifecycleScope.launch(Dispatchers.Main) {
-            dashboardViewModel.eDashboardItem()?.observe(viewLifecycleOwner,{
+            dashboardViewModel.eDashboardItem().observe(viewLifecycleOwner,{
                 ioSope.launch(Dispatchers.Main) {
                     val result = async {  setupRecyclerview(it) }.await()
                     val result1 = async {

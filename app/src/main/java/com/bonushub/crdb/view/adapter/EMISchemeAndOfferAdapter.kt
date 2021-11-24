@@ -57,23 +57,24 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
                 holder.binding.discountLL.visibility = View.GONE
             }
 
-            /*if(transactionType != TransactionType.TEST_EMI.type) {
+           // if(transactionType != TransactionType.TEST_EMI.type) {
+            if(true) {
                 holder.binding.toatalemipayLL.visibility = View.VISIBLE//tenureInterestRate
                 holder.binding.tvTotalInterestPay.text = "\u20B9 " +  "%.2f".format((((modelData.totalInterestPay).toDouble()).div(100)).toString().toDouble())
                 val roi=  "%.2f".format((((modelData.tenureInterestRate).toDouble()).div(100)).toString().toDouble())
                 //totalinterestpay
                 holder.binding.tvRoi.text = "$roi %"
                 holder.binding.tvTotalEmiPay.text = "\u20B9 " + "%.2f".format((((modelData.netPay).toDouble()).div(100)).toString().toDouble())
-            }*/
-          //  else {
-                holder.binding.toatalemipayLL.visibility = View.GONE
+            }
+            else {
+              /*  holder.binding.toatalemipayLL.visibility = View.GONE
                 holder.binding.tvInterestRate.text =  ""+divideAmountBy100(modelData.tenureInterestRate.toInt()).toString() +" %"
                 holder.binding.tvTotalInterestPay.text = "\u20B9 " + "%.2f".format((((modelData.totalInterestPay).toDouble()).div(100)).toString().toDouble())
 
                 val roi=  "%.2f".format((((modelData.tenureInterestRate).toDouble()).div(100)).toString().toDouble())
                 holder.binding.tvRoi.text = "$roi %"
-
-          //  }
+*/
+            }
         }
 
         holder.binding.parentEmiViewLl.setOnClickListener {

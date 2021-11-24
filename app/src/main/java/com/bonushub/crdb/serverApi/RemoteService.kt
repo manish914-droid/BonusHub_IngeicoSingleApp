@@ -106,7 +106,7 @@ object IsoPacketCreator{
             addField(24, Nii.BRAND_EMI_MASTER.nii)
 
             //TID Field 41
-            addFieldByHex(41, /*terminalData.terminalId*/"41501379")
+            addFieldByHex(41, /*terminalData.terminalId*/"41501370")
 
             //This is for bankemi/insta emi/brand emi
             //New field 56 added by Manish Kumar for getting tenure
@@ -120,7 +120,7 @@ object IsoPacketCreator{
 
             //adding Field 57
           //  addFieldByHex(57, field57Request ?: "")
-            addFieldByHex(57, "4^0^11^2367^^^500000" ?: "")
+            addFieldByHex(57, "4^0^7^2696^h^^589000" ?: "")
 
             //adding Field 61
             addFieldByHex(61,  KeyExchanger.getF61())

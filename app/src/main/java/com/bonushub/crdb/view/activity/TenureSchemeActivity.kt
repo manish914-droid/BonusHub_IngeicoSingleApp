@@ -1,13 +1,7 @@
-package com.bonushub.crdb.view.fragments
+package com.bonushub.crdb.view.activity
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +9,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
 import com.bonushub.crdb.databinding.FragmentTenureSchemeBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
@@ -28,13 +21,18 @@ import com.bonushub.crdb.view.adapter.EMISchemeAndOfferAdapter
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.TenureSchemeViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
+import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TenureSchemeActivity : AppCompatActivity() {
+    /** need to use Hilt for instance initializing here..*/
+    private val remoteService: RemoteService = RemoteService()
+    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
 
-    private  val tenureSchemeViewModel: TenureSchemeViewModel by viewModels()
+    private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
     var binding: FragmentTenureSchemeBinding? = null
     private var selectedSchemeUpdatedPosition = -1
     private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal>? = mutableListOf()
@@ -53,6 +51,9 @@ class TenureSchemeActivity : AppCompatActivity() {
         binding = FragmentTenureSchemeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
       //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository)).get(
+            TenureSchemeViewModel::class.java)
+
         binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)
 
        /* binding?.toolbarTxn?.mainToolbarStart?.setOnClickListener {

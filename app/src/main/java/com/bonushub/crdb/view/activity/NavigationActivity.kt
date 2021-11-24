@@ -372,7 +372,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             TransactionActivity::class.java
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
-                            putExtra("amt", formattedTransAmount)
+                            putExtra("saleAmt", formattedTransAmount)
                             putExtra("type", TransactionType.SALE.type)
                             putExtra("proc_code", ProcessingCode.SALE.code)
                             putExtra("mobileNumber", extraPair?.first)
@@ -449,6 +449,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
+        intent.putExtra("edashboardItem", EDashboardItem.BRAND_EMI)
+        startActivity(intent)
+
+    }
+    fun startTenure(){
+        val intent = Intent (this, TenureSchemeActivity::class.java)
+
         startActivity(intent)
 
     }

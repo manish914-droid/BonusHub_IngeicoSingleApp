@@ -44,7 +44,7 @@ android:layout_marginStart="@dimen/pad_24"
 
             android:paddingStart="@dimen/pad_8"
             android:paddingEnd="@dimen/pad_8"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textColorHint="@color/hint_color"
             android:textSize="@dimen/text_size_regular"
             />
@@ -81,7 +81,7 @@ android:padding="@dimen/pad_16"
             android:lines="1"
             android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
             android:hint="@string/enter_serial_number"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textColorHint="@color/hint_color"
             android:textSize="@dimen/text_size_regular"
           />

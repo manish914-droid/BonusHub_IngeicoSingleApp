@@ -51,18 +51,18 @@ class InitFragment : Fragment() {
         // for screen awake
         (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // it's handling for init button is enable or disable ----> it will be enable when Tid length is equal to 8
-        fragmentInitBinding?.ifProceedBtn?.isEnabled = false
-        fragmentInitBinding?.ifProceedBtn?.isClickable = false
-        fragmentInitBinding?.ifEt?.addTextChangedListener(textWatcher)
-        fragmentInitBinding?.ifEt?.transformationMethod = null
-        fragmentInitBinding?.ifEt?.addTextChangedListener(Utility.OnTextChange {
-            fragmentInitBinding?.ifProceedBtn?.isEnabled = it.length == 8
-            if (fragmentInitBinding?.ifProceedBtn?.isEnabled)
-                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button);
+        fragmentInitBinding.ifProceedBtn.isEnabled = false
+        fragmentInitBinding.ifProceedBtn.isClickable = false
+        fragmentInitBinding.ifEt.addTextChangedListener(textWatcher)
+        fragmentInitBinding.ifEt.transformationMethod = null
+        fragmentInitBinding.ifEt.addTextChangedListener(Utility.OnTextChange {
+            fragmentInitBinding.ifProceedBtn.isEnabled = it.length == 8
+            if (fragmentInitBinding.ifProceedBtn.isEnabled)
+                fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button);
 
         })
 
-        fragmentInitBinding?.ifProceedBtn.setOnClickListener {
+        fragmentInitBinding.ifProceedBtn.setOnClickListener {
        iDialog?.showProgress(getString(R.string.please_wait_host))
             initViewModel.insertInfo1(fragmentInitBinding.ifEt.text.toString())
         }
