@@ -67,17 +67,11 @@ class PrintingTesting: BaseActivityNew(){
             format.putInt(PrinterData.ASC_SCALE, ASCScale.SC1x1)
             format.putInt(PrinterData.ASC_SIZE, ASCSize.DOT24x8)
             val formattertime = receiptDetail.dateTime
-            fmtAddTextInLine.putString(PrinterData.TEXT, "DATE:${receiptDetail.dateTime?.let {
-                dateFormater(
-                    it.toLong())
-            }}")
+            fmtAddTextInLine.putString(PrinterData.TEXT, "DATE:${"24/11/2021"}")
             fmtAddTextInLine.putInt(PrinterData.ALIGN_MODE, AlignMode.LEFT)
             textBlockList.add(fmtAddTextInLine)
             try {
-                fmtAddTextInLine.putString(PrinterData.TEXT, "TIME:${receiptDetail.dateTime?.let {
-                    timeFormater(
-                        it.toLong())
-                }}")
+                fmtAddTextInLine.putString(PrinterData.TEXT, "TIME:${"14:49:00"}")
                 format.putInt(PrinterData.ALIGN_MODE, AlignMode.RIGHT)
                 textBlockList.add(format)
                 printer!!.addMixStyleText(textBlockList)
@@ -108,9 +102,14 @@ class PrintingTesting: BaseActivityNew(){
             format.putInt(PrinterData.ALIGN_MODE, AlignMode.RIGHT)
             textBlockList.add(format)
             printer!!.addMixStyleText(textBlockList)
-            printer!!.setHzScale(HZScale.SC1x1)
-            printer!!.setHzSize(HZSize.DOT24x24)
-            printer!!.addText(AlignMode.LEFT, "INVOICE:${receiptDetail.invoice}")
+            textBlockList.clear()
+            fmtAddTextInLine.putInt(PrinterData.ASC_SCALE, ASCScale.SC1x1)
+            fmtAddTextInLine.putInt(PrinterData.ASC_SIZE, ASCSize.DOT24x8)
+            format.putInt(PrinterData.ASC_SCALE, ASCScale.SC1x1)
+            format.putInt(PrinterData.ASC_SIZE, ASCSize.DOT24x8)
+            format.putString(PrinterData.TEXT, "INVOICE:${receiptDetail.invoice}")
+            textBlockList.add(format)
+            printer!!.addMixStyleText(textBlockList)
             printer!!.setHzScale(HZScale.SC1x2)
             printer!!.setHzSize(HZSize.DOT24x24)
             printer!!.addText(AlignMode.CENTER, receiptDetail.txnName)
