@@ -123,7 +123,7 @@ private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
         val key: ByteArray = BytesUtil.hexString2Bytes(AppPreference.getString("dpk"))
         val strtohex = dataDescription.str2ByteArr().byteArr2HexStr()
        var desMode = DESMode(DESMode.DM_ENC, DESMode.DM_OM_TECB)
-       var  encResult = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(11, desMode, null, BytesUtil.hexString2Bytes(strtohex))
+       var  encResult = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(DemoConfig.KEYID_DES, desMode, null, BytesUtil.hexString2Bytes(strtohex))
        if (encResult == null) {
 
 
@@ -131,7 +131,7 @@ private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
        println("TECB encrypt result = " + byte2HexStr(encResult))
 
        desMode = DESMode(DESMode.DM_DEC, DESMode.DM_OM_TECB)
-       val decResult: ByteArray? = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(11, desMode, null, encResult)
+       val decResult: ByteArray? = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(DemoConfig.KEYID_DES, desMode, null, encResult)
        if (decResult == null) {
          //  outputPinpadError("calculateDes fail",pinPad)
            // return

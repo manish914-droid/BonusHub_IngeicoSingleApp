@@ -7,10 +7,15 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.databinding.ActivityEmvBinding
+import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.repository.ServerRepository
+import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.bonushub.pax.utils.EDashboardItem
@@ -25,6 +30,8 @@ import com.ingenico.hdfcpayment.type.TransactionType
 
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 @AndroidEntryPoint
@@ -54,6 +61,9 @@ class TransactionActivity : AppCompatActivity(){
     val TAG = TransactionActivity::class.java.simpleName
 
     private val searchCardViewModel : SearchViewModel by viewModels()
+    private val remoteService: RemoteService = RemoteService()
+    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
 
     //  private lateinit var deviceService: UsdkDeviceService
 
@@ -61,9 +71,10 @@ class TransactionActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
         setContentView(emvBinding?.root)
+     //   setupFlow()
+        searchCardViewModel.fetchCardTypeData()
+        setupObserver()
 
-        setupFlow()
-        //searchCardViewModel.fetchCardTypeData()
 
 
     }
@@ -102,7 +113,7 @@ class TransactionActivity : AppCompatActivity(){
                             amount = 300L ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
-                            tid = "30160035",
+                            tid = "30160039",
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
@@ -151,10 +162,10 @@ class TransactionActivity : AppCompatActivity(){
                 ).show()
 
 
-               /*  lifecycleScope.launch(Dispatchers.IO) {
-                    // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                     serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-                 }*/
+                 lifecycleScope.launch(Dispatchers.IO) {
+                    serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+                    // serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
+                 }
 
             }
 
@@ -180,7 +191,7 @@ class TransactionActivity : AppCompatActivity(){
                             amount = amt ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
-                            tid = "30160035",
+                            tid = "30160039",
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
