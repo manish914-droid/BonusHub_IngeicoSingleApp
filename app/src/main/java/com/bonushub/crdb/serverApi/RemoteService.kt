@@ -70,7 +70,7 @@ object IsoPacketCreator{
                 addField(24, Nii.BRAND_EMI_MASTER.nii)
 
                 //TID Field 41
-                addFieldByHex(41,  terminalData.terminalId.toString())
+                terminalData.terminalId?.get(0)?.let { addFieldByHex(41,  it.toString()) }
                 Log.d("terminalId:- ", terminalData.terminalId.toString())
 
                 //adding field 57

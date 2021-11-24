@@ -19,9 +19,9 @@ class BrandEmiViewModelFactory
 }
 
 class TenureSchemeActivityVMFactory
-    (private val serverRepository: ServerRepository):ViewModelProvider.Factory {
+    (private val serverRepository: ServerRepository, private val field56Pan:String, private val field57Data:String):ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
-          return  TenureSchemeViewModel(serverRepository) as T
+          return  TenureSchemeViewModel(serverRepository,field56Pan,field57Data) as T
     }
 }

@@ -11,7 +11,7 @@ import com.bonushub.crdb.utils.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TenureSchemeViewModel (private val serverRepository: ServerRepository) : ViewModel() {
+class TenureSchemeViewModel (private val serverRepository: ServerRepository,val field56Pan:String,val field57Data:String) : ViewModel() {
 
     val emiTenureLiveData: LiveData<GenericResponse<TenuresWithIssuerTncs?>>
     get() = serverRepository.emiTenureLiveData
@@ -19,7 +19,7 @@ class TenureSchemeViewModel (private val serverRepository: ServerRepository) : V
     init {
         viewModelScope.launch(Dispatchers.IO) {
             logger("Get DATA","----START----------","e")
-            serverRepository.getEMITenureData("C79DCA8553E1825A3001A9A2E6B528031C2429680F549A46")
+            serverRepository.getEMITenureData(field56Pan,field57Data)
         /*    logger("Brand Tnc",serverRepository.appDB.appDao.getAllBrandTAndCData().toString(),"e")
             logger("Issuer Tnc",serverRepository.appDB.appDao.getAllIssuerTAndCData().toString(),"e")
             logger("Brand SubCat",serverRepository.appDB.appDao.getBrandEMISubCategoryData().toString(),"e")

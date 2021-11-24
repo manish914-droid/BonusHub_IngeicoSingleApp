@@ -51,7 +51,7 @@ class TenureSchemeActivity : AppCompatActivity() {
         binding = FragmentTenureSchemeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
       //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository)).get(
+        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,"Dummy56","Dummy57")).get(
             TenureSchemeViewModel::class.java)
 
         binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)

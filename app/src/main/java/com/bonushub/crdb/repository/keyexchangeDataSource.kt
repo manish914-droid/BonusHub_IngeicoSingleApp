@@ -14,6 +14,7 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.vxutils.Utility.*
+
 import com.bonushub.pax.utils.*
 import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.BaseError
@@ -21,7 +22,6 @@ import com.usdk.apiservice.aidl.data.IntValue
 import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import kotlinx.coroutines.*
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList

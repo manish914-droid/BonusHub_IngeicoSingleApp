@@ -22,6 +22,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 
 import android.graphics.drawable.BitmapDrawable
+import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
 
 
@@ -33,10 +34,12 @@ class PrintingTesting: BaseActivityNew(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initDeviceInstance()
-        startPrinting(ReceiptDetail())
+        val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
+        val obj= Gson().fromJson(jsonstr,ReceiptDetail::class.java)
+        startPrinting(obj)
     }
     // Printing Sale Charge slip....
-    fun startPrinting(receiptDetail: ReceiptDetail) {
+    private fun startPrinting(receiptDetail: ReceiptDetail) {
         //  printer=null
         try {
             //  logger("PS_START", (printer?.status).toString(), "e")
@@ -261,7 +264,6 @@ class PrintingTesting: BaseActivityNew(){
 
         } catch (ex: DeadObjectException) {
             ex.printStackTrace()
-
         }
     }
     override fun onEvents(event: VxEvent) {
@@ -310,9 +312,9 @@ class PrintingTesting: BaseActivityNew(){
         bundal.putInt(PrinterData.ASC_SIZE, ASCSize.DOT24x8)
     }
 
-    fun dateFormater(date: Long): String =
+    private fun dateFormater(date: Long): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
 
-    fun timeFormater(date: Long): String =
+    private fun timeFormater(date: Long): String =
         SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(date)
 }

@@ -6,14 +6,11 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.databinding.ItemBrandEmiMasterBinding
 import com.bonushub.crdb.databinding.ItemEmiSchemeOfferBinding
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
-import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.divideAmountBy100
-import com.bonushub.crdb.vxutils.Utility
+
 
 internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private val emiSchemeDataList: MutableList<BankEMITenureDataModal>?, private var schemeSelectCB: (Int) -> Unit) : RecyclerView.Adapter<EMISchemeAndOfferAdapter.EMISchemeOfferHolder>()
 {
