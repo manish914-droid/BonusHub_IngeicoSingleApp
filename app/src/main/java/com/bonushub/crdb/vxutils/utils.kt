@@ -440,6 +440,22 @@ suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
     return listofTids
 }
 
+//To check Initiaization Status
+suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> {
+    listofTids.clear()
+    var tpt = appDao?.getAllTerminalParameterTableData()
+    tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+        if(tidType.equals("1")){
+            tpt[0]?.terminalId?.get(index)
+            listofTids.add(updatedTid)
+        }
+        else{
+            listofTids.add(tpt[0]?.terminalId?.get(index) ?: "")
+        }
+    }
+    return listofTids
+}
+
 
 //To check Initiaization Status
  suspend fun checkInitializtionStatus(appDao: AppDao): Boolean {

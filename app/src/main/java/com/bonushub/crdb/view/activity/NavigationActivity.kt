@@ -2,7 +2,6 @@ package com.bonushub.crdb.view.activity
 
 import android.app.Dialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,10 +11,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -24,31 +25,28 @@ import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
-
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
-import com.bonushub.crdb.view.fragments.BankFunctionsFragment
-import com.bonushub.crdb.view.fragments.BrandEmiSubCategoryFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.pax.utils.*
-
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
-import java.util.HashMap
 import javax.inject.Inject
 
 
@@ -107,7 +105,30 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         mainDrawerBinding = headerView?.let { MainDrawerBinding.bind(it) }
         // endregion
         decideDashBoard()
+
+
+        // refresh drawer tid and mid
+        val mDrawerToggle: ActionBarDrawerToggle = object : ActionBarDrawerToggle(
+            this, navigationBinding?.mainDl,
+            R.drawable.ic_menu, R.string.merchant_name
+        ) {
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+                // Do whatever you want here
+                logger("drawer","close")
+
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+                // Do whatever you want here
+                logger("drawer","open")
+                    refreshDrawer()
+            }
+        }
+        navigationBinding?.mainDl?.addDrawerListener(mDrawerToggle)
     }
+
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
 
@@ -159,7 +180,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //region  Checked that the terminal is initialized or not.
     private fun decideDashBoard() {
         if (AppPreference.getLogin()) {
-            //   refreshDrawer()
+               //refreshDrawer()
             navHostFragment?.navController?.popBackStack()
             Log.e("NAV", "DECIDE HOME")
             navHostFragment?.navController?.navigate(R.id.dashBoardFragment)
@@ -169,7 +190,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())
                     Log.d("Message ", msg)
-                    // refreshDrawer()
+                 //    refreshDrawer()
                 }
             }
             navHostFragment?.navController?.popBackStack()
@@ -269,19 +290,29 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     //region==========Setting for sidebar details==========
     private fun refreshDrawer() {
-        val appDao: AppDao?=null
-        runBlocking(Dispatchers.IO) {
-            val tpt = appDao?.getAllTerminalParameterTableData()?.get(0)
-            val merchantName = tpt?.receiptHeaderOne
-            tid = getString(R.string.terminal_id) + "   : " + tpt?.terminalId
+        lifecycleScope.launch{
+            val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0)
+
+            var listofTids = ArrayList<String>()
+            tpt?.tidType?.forEachIndexed { index, tidType ->
+                if(tidType.equals("1")){
+                    tpt?.terminalId?.get(index)
+                    listofTids.add(0,tpt?.terminalId?.get(index) ?: "")
+                }
+                else{
+                    listofTids.add(tpt?.terminalId?.get(index) ?: "")
+                }
+            }
+
+            tid = getString(R.string.terminal_id) + "   : " + listofTids[0]
             mid = getString(R.string.merchant_id) + "  : " + tpt?.merchantId
 
+            withContext(Dispatchers.Main){
+                mainDrawerBinding?.mdTidTv?.text = tid
+                mainDrawerBinding?.mdMidTv?.text = mid
+            }
         }
 
-        runBlocking(Dispatchers.Main)  {
-            mainDrawerBinding?.mdTidTv?.text = tid
-            mainDrawerBinding?.mdMidTv?.text = mid
-        }
 
     }
 
@@ -527,6 +558,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
         }
     }
+
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-

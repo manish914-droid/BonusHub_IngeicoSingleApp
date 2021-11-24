@@ -13,7 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
@@ -25,6 +28,7 @@ import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemClick{
@@ -37,7 +41,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
    private val initViewModel : InitViewModel by viewModels()
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
-    lateinit var terminalParameterTable: TerminalParameterTable
+    //lateinit var terminalParameterTable: TerminalParameterTable
 
     // for init
     //private var iDialog: IDialog? = null
@@ -68,13 +72,14 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         adminVasListItem.addAll(BankFunctionsAdminVasItem.values())
         setupRecyclerview()
 
-        lifecycleScope.launch(Dispatchers.Main) {
+       /* lifecycleScope.launch(Dispatchers.Main) {
+
             bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
 
                 terminalParameterTable = it
 
             })
-        }
+        }*/
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
@@ -98,20 +103,22 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 // INIT
                // iDialog?.showProgress(getString(R.string.please_wait_host))
 
-                if(this::terminalParameterTable.isInitialized && !terminalParameterTable.terminalId?.isEmpty()!!){
+                runBlocking {
+                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
 
-                    logger("get tid","by table")
-                    // get tid from table and init
-                    initViewModel.insertInfo1((terminalParameterTable.terminalId ?: "") as String)
-                    observeMainViewModel()
+                    if(!tids.get(0).isEmpty()!!) {
 
+                        logger("get tid", "by table")
+                        // get tid from table and init
 
-                }else{
-                    // get tid by user
-                    logger("get tid","by user")
-                    //navHostFragment?.navController?.popBackStack()
-                    (activity as NavigationActivity).transactFragment(InitFragment())
-
+                        initViewModel.insertInfo1(tids[0] ?:"")
+                        observeMainViewModel()
+                    }else{
+// get tid by user
+                        logger("get tid","by user")
+                        //navHostFragment?.navController?.popBackStack()
+                        (activity as NavigationActivity).transactFragment(InitFragment())
+                    }
                 }
 
             }
@@ -153,7 +160,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 }
                 Status.ERROR -> {
                     //iDialog?.hideProgress()
-                    Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                    ToastUtils.showToast(activity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
                     //iDialog?.showProgress("Sending/Receiving From Host")

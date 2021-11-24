@@ -17,10 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsTerminalBinding
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.logger
@@ -32,10 +34,10 @@ import com.bonushub.pax.utils.PreferenceKeyConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClick {
 
-    private val terminalListItem: MutableList<BankFunctionsTerminalItem> by lazy { mutableListOf<BankFunctionsTerminalItem>() }
     private var iBankFunctionsTerminalItemClick:IBankFunctionsTerminalItemClick? = null
     var binding:FragmentBankFunctionsTerminalBinding? = null
 
@@ -44,7 +46,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     lateinit var mAdapter : BankFunctionsTerminalParamAdapter
     lateinit var dataList: ArrayList<TableEditHelper?>
-    lateinit var terminalParameterTable: TerminalParameterTable
+   // lateinit var terminalParameterTable: TerminalParameterTable
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +66,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
         batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
 
-//        terminalListItem.addAll(BankFunctionsTerminalItem.values())
-//        dataList = ArrayList()
-//
-//        setupRecyclerview()
+
 
         lifecycleScope.launch(Dispatchers.Main) {
             bankFunctionsViewModel.getTerminalParamField()?.observe(viewLifecycleOwner,{
@@ -78,12 +77,12 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
         }
 
-        lifecycleScope.launch(Dispatchers.Main) {
+       /* lifecycleScope.launch(Dispatchers.Main) {
             bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
 
                 terminalParameterTable = it
             })
-        }
+        }*/
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
@@ -117,12 +116,17 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         2.Server Hit Status should be false
         3.Reversal should be cleared or synced to host successfully.
         */
-        if (this::terminalParameterTable.isInitialized && dataList[position]?.titleValue == terminalParameterTable.terminalId.toString()) {
 
-            verifySuperAdminPasswordAndUpdate()
+        runBlocking{
+            val tids = checkBaseTid(DBModule.appDatabase.appDao)
 
-        } else {
-            updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
+            if(dataList[position]?.titleValue.equals(tids[0])) {
+
+                verifySuperAdminPasswordAndUpdate()
+            }else{
+                updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
+
+            }
         }
     }
 
@@ -219,7 +223,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     suspend fun updateTable()
     {
-        bankFunctionsViewModel.updateTerminalTable(dataList)
+        bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())
     }
 
 
