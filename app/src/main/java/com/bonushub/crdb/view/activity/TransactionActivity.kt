@@ -180,7 +180,7 @@ class TransactionActivity : AppCompatActivity(){
                             amount = amt ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
-                            tid = "30160035",
+                            tid = "30160031",
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
