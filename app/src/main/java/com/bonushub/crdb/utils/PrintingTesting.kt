@@ -294,7 +294,7 @@ class PrintingTesting: BaseActivityNew(){
         try {
             val status = printer!!.status
             if (status != PrinterError.SUCCESS) {
-                ToastUtils.showToast(this,getErrorDetail(status))
+              //  ToastUtils.showToast(this,getErrorDetail(status))
                 return
             }
             ToastUtils.showToast(this,"The printer status is normal!")
