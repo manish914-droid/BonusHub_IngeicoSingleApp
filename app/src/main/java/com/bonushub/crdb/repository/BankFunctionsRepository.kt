@@ -1,5 +1,6 @@
 package com.bonushub.crdb.repository
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -14,7 +15,9 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.utils.updateBaseTid
 import com.bonushub.crdb.view.fragments.TableEditHelper
 import com.bonushub.pax.utils.PrefConstant
 import kotlinx.coroutines.Dispatchers
@@ -84,7 +87,7 @@ class BankFunctionsRepository {
 
                 if (ann != null && ann2 !=null && ann.isToShow) {
                // if (ann2 !=null) {
-                    Log.e("ann.name",""+ann.name)
+                    logger("ann.name",""+ann.name)
                     prop.isAccessible = true
                     //val fieldName = prop.name
                     try{
@@ -92,15 +95,22 @@ class BankFunctionsRepository {
                         if (value is String) {
                             dataListLocal?.add(TableEditHelper(ann.name, value,ann2.index))
                             //dataList.value?.add(TableEditHelper(fieldName, value,ann2.index))
+                        }else if(ann.name.equals("TID")){
+                            val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+                            dataListLocal?.add(TableEditHelper(ann.name, tids.get(0),ann2.index))
+
+                            logger("TID case",value.toString(),"e")
                         }
                     }catch (ex:Exception){
                         ex.printStackTrace()
                     }
 
-                    dataListLocal.sortBy { it?.index }
-                    dataListLocal.forEach {  println(it?.titleName) }
+
                 }
             }
+
+            dataListLocal.sortBy { it?.index }
+            dataListLocal.forEach {  println(it?.titleName) }
 
             // region  remaining this
             dataListLocal.add(
@@ -155,7 +165,8 @@ class BankFunctionsRepository {
         return tpt
     }
 
-    suspend fun updateTerminalParameterTable(dataList: ArrayList<TableEditHelper?>)
+    // remaining for update tid
+    suspend fun updateTerminalParameterTable(dataList: ArrayList<TableEditHelper?>, context:Context)
     {
         val data = dataList.filter { it?.isUpdated?:false }
         //val table: Any? = getTable()
@@ -170,11 +181,25 @@ class BankFunctionsRepository {
                     val props = table::class.java.declaredFields
                     for (prop in props) {
                         val ann = prop.getAnnotation(BHFieldName::class.java)
-                        if (ann != null && ann.name == ed?.titleName) {
+                        if (ann != null && ann.name.equals(ed?.titleName)) {
                             prop.isAccessible = true
                             val value = prop.get(table)
+logger("ann.name",""+ann.name)
                             if (value is String) {
-                                prop.set(table, ed.titleValue)
+                                prop.set(table, ed?.titleValue)
+
+                            }else if(ann.name.equals("TID")){
+
+                               // logger("TID case update",value.toString(),"e")
+                               // logger("TID case update",ed?.titleValue?:"")
+
+                                val tids = updateBaseTid(DBModule.appDatabase?.appDao, ed?.titleValue?:"")
+
+                               // logger("TID case update",tids.toString(),"e")
+
+                                prop.set(table, tids)
+
+
 
                             }
                         }
@@ -198,7 +223,7 @@ class BankFunctionsRepository {
                             DBModule.appDatabase?.appDao.updateTerminalParameterTable(table as TerminalParameterTable)
 
                             withContext(Dispatchers.Main) {
-                            appContext.startActivity(Intent(appContext, MainActivity::class.java).apply {
+                            context.startActivity(Intent(context, MainActivity::class.java).apply {
                                 putExtra("changeTID", true)
                                 flags =
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -281,7 +306,7 @@ class BankFunctionsRepository {
         return dataList
     }
 
-    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String)
+    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context: Context)
     {
         val data = dataList.filter { it?.isUpdated?:false }
         //val table: Any? = getTable()
@@ -324,7 +349,7 @@ class BankFunctionsRepository {
                             DBModule.appDatabase?.appDao.updateTerminalCommunicationTable(table as TerminalCommunicationTable)
 
                             withContext(Dispatchers.Main) {
-                                appContext.startActivity(Intent(appContext, MainActivity::class.java).apply {
+                                context.startActivity(Intent(context, MainActivity::class.java).apply {
                                     putExtra("changeTID", true)
                                     flags =
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK

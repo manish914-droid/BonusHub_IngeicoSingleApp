@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
 import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -80,7 +81,7 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
                     dialog.dismiss()
                     (activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment())
                 }else{
-                    Toast.makeText(requireContext(),R.string.invalid_password, Toast.LENGTH_LONG).show()
+                    ToastUtils.showToast(requireContext(),R.string.invalid_password)
                 }
             })
 

@@ -19,7 +19,7 @@
     <item
         android:id="@+id/settlement"
         android:icon="@drawable/ic_settlement"
-        android:title="@string/reports"
+        android:title="@string/settlement"
         android:iconTint="@color/colorPrimary"
         app:showAsAction="ifRoom" />
 

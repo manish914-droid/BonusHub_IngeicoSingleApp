@@ -1,5 +1,6 @@
 package com.bonushub.crdb.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.bonushub.crdb.model.local.TerminalParameterTable
@@ -40,8 +41,8 @@ class BankFunctionsViewModel:ViewModel() {
         return terminalParameterTable
     }
 
-    suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>){
-        BankFunctionsRepository.getInstance().updateTerminalParameterTable(dataList)
+    suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>, context:Context){
+        BankFunctionsRepository.getInstance().updateTerminalParameterTable(dataList, context)
     }
 
     //TerminalCommunicationTable
@@ -53,7 +54,7 @@ class BankFunctionsViewModel:ViewModel() {
         return terminalCommunicationTable
     }
 
-    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String){
-        BankFunctionsRepository.getInstance().updateTerminalCommunicationTable(dataList, recordType)
+    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context:Context){
+        BankFunctionsRepository.getInstance().updateTerminalCommunicationTable(dataList, recordType, context)
     }
 }
