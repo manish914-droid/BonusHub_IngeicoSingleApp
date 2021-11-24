@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentCommunicationOptionBinding
 import com.bonushub.crdb.databinding.FragmentCommunicationOptionSubMenuBinding
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.logger
@@ -27,13 +29,14 @@ import com.bonushub.pax.utils.CommunicationParamItem
 import com.bonushub.pax.utils.PreferenceKeyConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditItemClick {
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
     lateinit var batchFileViewModel: BatchFileViewModel
-    lateinit var terminalParameterTable: TerminalParameterTable
+    //lateinit var terminalParameterTable: TerminalParameterTable
     private var iBankFunctionsTableEditItemClick:IBankFunctionsTableEditItemClick? = null
     private lateinit var type :CommunicationParamItem
     lateinit var dataList: ArrayList<TableEditHelper?>
@@ -45,7 +48,6 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         // Inflate the layout for this fragment
         binding = FragmentCommunicationOptionSubMenuBinding.inflate(inflater, container, false)
         return binding?.root
@@ -63,12 +65,12 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
         setUiForEdit()
 
         // for check terminal id is going to edit
-        lifecycleScope.launch(Dispatchers.Main) {
+       /* lifecycleScope.launch(Dispatchers.Main) {
             bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
 
                 terminalParameterTable = it
             })
-        }
+        }*/
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
@@ -94,13 +96,17 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                 2.Server Hit Status should be false
                 3.Reversal should be cleared or synced to host successfully.
                 */
-                if (this::terminalParameterTable.isInitialized && dataList[position]?.titleValue == terminalParameterTable.terminalId.toString()) {
 
-                    verifySuperAdminPasswordAndUpdate()
+                runBlocking {
+                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
 
-                } else {
-                    updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
+                    if (dataList[position]?.titleValue.equals(tids[0])){
+                        verifySuperAdminPasswordAndUpdate()
+                    }else {
+                        updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
+                    }
                 }
+
             }
 
             CommunicationParamItem.APP_UPDATE_PARAM -> {
@@ -273,7 +279,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
     suspend fun updateTable()
     {
         logger("type",type.value.toString())
-        bankFunctionsViewModel.updateTerminalCommunicationTable(dataList, type.value.toString())
+        bankFunctionsViewModel.updateTerminalCommunicationTable(dataList, type.value.toString(), requireContext())
     }
 }
 
