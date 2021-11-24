@@ -87,6 +87,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     val result = async {  setupRecyclerview(it) }.await()
                     val result1 = async {
                         var listofTids = checkBaseTid(appDao)
+                        println("List of tids are"+listofTids)
                         delay(1000)
                         doInitializtion(appDao,listofTids)
                     }.await()

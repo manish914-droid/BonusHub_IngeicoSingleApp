@@ -24,6 +24,7 @@ import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 interface IKeyExchangeInit{
     suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter
@@ -247,9 +248,9 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
                                 if (keWithInit) {
-                                    val (strResult,strSucess,_) = startInit(tid)
+                                    val (strResult,strSucess,initList) = startInit(tid)
                                     if(strSucess == true){
-                                        return Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,false))
+                                        return Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,initList))
                                     }
                                     else{
                                         return Result.error(ResponseHandler(Status.ERROR,strResult ?: "",false,false),strResult ?: "")
@@ -440,36 +441,33 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         }
     }
 
-    suspend fun startInit(tid: String): Triple<String?, Boolean?, Boolean> {
+    suspend fun startInit(tid: String): Triple<String?, Boolean?, ArrayList<ByteArray>> {
+        var datasaved = false
         var strResult: String? = null
         var strSucess: Boolean? = null
+        var initListdata = ArrayList<ByteArray>()
 
-        HitServer.apply {
-            reversalToBeSaved = null
-        }.hitInitServer({ result, success ->
+        HitServer.apply { reversalToBeSaved = null }.hitInitServer({ result, success,initList ->
             System.out.println("Init Suceesuffly msg2 " + result)
             if (success) {
                 strResult = result
                 strSucess = success
-                Toast.makeText(
-                    HDFCApplication.appContext, "Init Suceesuffly msg " + strSucess, Toast.LENGTH_LONG
-                ).show()
-                // System.out.println("Init Suceesuffly msg "+strSucess)
+                initListdata  = initList
+
             } else {
                 strResult = result
                 strSucess = success
             }
         }, {
             strResult = it
-            strSucess  = true
-
-        }, this@keyexchangeDataSource,tid)
+            strSucess = true
+        },this@keyexchangeDataSource,tid)
 
 
         System.out.println("Init Suceesuffly msg1 "+strResult)
 
 
-        return Triple(strResult,strSucess,false)
+        return Triple(strResult,strSucess,initListdata)
     }
 
 

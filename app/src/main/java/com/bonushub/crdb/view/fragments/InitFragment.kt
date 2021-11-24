@@ -22,6 +22,11 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.ArrayList
 
 @AndroidEntryPoint
 class InitFragment : Fragment() {
@@ -90,9 +95,14 @@ class InitFragment : Fragment() {
 
             when (result.status) {
                 Status.SUCCESS -> {
-                    iDialog?.hideProgress()
-                    Thread.sleep(5000)
-                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                    CoroutineScope(Dispatchers.IO).launch{
+                        Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
+                            iDialog?.hideProgress()
+                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                        }
+                    }
+
+
                 }
                 Status.ERROR -> {
                     iDialog?.hideProgress()

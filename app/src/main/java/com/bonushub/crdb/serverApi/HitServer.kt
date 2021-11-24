@@ -22,6 +22,7 @@ object HitServer  {
     val TAG = HitServer::class.java.simpleName
     private var tct: TerminalCommunicationTable?= null
     private var callback: ServerMessageCallback? = null
+    private var callbackInit: ServerMessageCallbackInit? = null
     private var callbackSale: ServerMessageCallbackSale? = null
     var reversalToBeSaved:IsoDataWriter?=null
 
@@ -77,8 +78,8 @@ object HitServer  {
     }
 
     @Synchronized
-    suspend fun hitInitServer(callback: ServerMessageCallback, progressMsg: ProgressCallback, keInit: keyexchangeDataSource, tid: String) {
-        this@HitServer.callback = callback
+    suspend fun hitInitServer(callback: ServerMessageCallbackInit,progressMsg: ProgressCallback,keInit: keyexchangeDataSource, tid: String) {
+        this@HitServer.callbackInit = callback
         val FILE_NAME = "init_packet_request_logs.txt"
         val fos : FileOutputStream = HDFCApplication.appContext.openFileOutput(FILE_NAME, MODE_PRIVATE)
         try {
@@ -92,6 +93,7 @@ object HitServer  {
 
                     Utility().logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
 
+                    var initSuccess = false
                     var nextCounter = ""
 
                     var isFirstCall = true
@@ -159,13 +161,14 @@ object HitServer  {
                             val pCode = reader.isoMap[3]?.rawData ?: ""
                             Utility().logger(TAG, "Processing code $pCode")
                             if (pCode != ProcessingCode.INIT_MORE.code) {
-                                Utility().readInitServer(initList) { result, message ->
-                                    callback(message, result)
-                                }
+                                initSuccess = true
+                              /*  Utility().readInitServer(initList) { result, message ->
+                                    callback(message, result, ArrayList())
+                                }*/
                                break
                             }
                         } else {
-                            callback(reader.isoMap[58]?.parseRaw2String() ?: "", false)
+                            callback(reader.isoMap[58]?.parseRaw2String() ?: "", false, ArrayList())
                             break
                         }
 
@@ -174,16 +177,17 @@ object HitServer  {
                     fos.close()
                     Utility().resetRoc()
                     // ROCProviderV2.resetRoc(AppPreference.getBankCode())
-                    this@HitServer.callback = null
+                    callback("Init Succesful", initSuccess, initList)
+                    //this@HitServer.callback = null
                 }
 
             } else {
-                callback("Offline, No Internet available", false)
+                callback("Offline, No Internet available", false, ArrayList())
                 this@HitServer.callback = null
             }
 
         } catch (ex: Exception) {
-            callback(ex.message ?: "Connection Error", false)
+            callback(ex.message ?: "Connection Error", false, ArrayList())
             this@HitServer.callback = null
         }
     }
@@ -379,6 +383,8 @@ class ServerCommunicator {
 typealias ServerMessageCallbackSale = (String, Boolean,String) -> Unit
 
 typealias ServerMessageCallback = (String, Boolean) -> Unit
+
+typealias ServerMessageCallbackInit = (String, Boolean,ArrayList<ByteArray>) -> Unit
 
 typealias ProgressCallback = (String) -> Unit
 
