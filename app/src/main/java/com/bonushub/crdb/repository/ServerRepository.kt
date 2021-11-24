@@ -190,7 +190,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
        /* val field57=  "$bankEMIRequestCode^0^${brandEmiData?.brandID}^${brandEmiData?.productID}^${brandEmiData?.imeiORserailNum}" +
                 "^${*//*cardBinValue.substring(0, 8)*//*""}^$transactionAmount"
         */
-        val field57="4^0^25^2453^^^500000"
+        val field57="4^0^25^2454^^^5800000"
         when(val genericResp = remoteService.getEMITenureService(pan,field57)){
             is GenericResponse.Success->{
                 val isoDataReader=genericResp.data

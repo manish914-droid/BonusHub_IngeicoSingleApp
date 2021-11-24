@@ -33,5 +33,10 @@
         android:name="com.bonushub.crdb.view.fragments.BankFunctionsFragment"
         android:label="fragment_bank_functions"
         tools:layout="@layout/fragment_bank_functions" />
+    <fragment
+        android:id="@+id/billNumSerialNumEntryFragment"
+        android:name="com.bonushub.crdb.view.fragments.BillNumSerialNumEntryFragment"
+        android:label="fragment_bank_functions"
+        tools:layout="@layout/fragment_bank_functions" />
 
 </navigation>

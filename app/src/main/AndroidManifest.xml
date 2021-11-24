@@ -49,7 +49,7 @@
             android:name=".MainActivity"
             android:exported="true" />
         <activity
-            android:name=".view.fragments.TenureSchemeActivity"
+            android:name=".view.activity.TenureSchemeActivity"
             />
         <activity
             android:name=".view.activity.NavigationActivity"

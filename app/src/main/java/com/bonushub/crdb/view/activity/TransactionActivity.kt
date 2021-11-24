@@ -2,47 +2,30 @@ package com.bonushub.crdb.view.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.RemoteException
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
-import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
-import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.repository.ServerRepository
-import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.view.fragments.TenureBankModal
-import com.bonushub.crdb.view.fragments.TenureSchemeActivity
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.bonushub.pax.utils.EDashboardItem
-import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.SaleRequest
-import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
-import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.PaymentResult
-import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.response.TransactionResponse
-import com.ingenico.hdfcpayment.type.RequestStatus
 import com.ingenico.hdfcpayment.type.ResponseCode
 import com.ingenico.hdfcpayment.type.TransactionType
 
 
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionActivity : AppCompatActivity(){
@@ -80,8 +63,8 @@ class TransactionActivity : AppCompatActivity(){
         setContentView(emvBinding?.root)
 
         setupFlow()
-        searchCardViewModel.fetchCardTypeData()
-        setupObserver()
+        //searchCardViewModel.fetchCardTypeData()
+
 
     }
 
@@ -112,9 +95,8 @@ class TransactionActivity : AppCompatActivity(){
        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
            if(cardProcessedDataModal.getPanNumberData() !=null) {
                cardProcessedDataModal.getPanNumberData()
-
                 var ecrID: String
-                try {
+             /*   try {
                     DeviceHelper.doSaleTransaction(
                         SaleRequest(
                             amount = 300L ?: 0,
@@ -151,7 +133,7 @@ class TransactionActivity : AppCompatActivity(){
                 }
                 catch (exc: Exception){
                     exc.printStackTrace()
-                }
+                }*/
 
               /*  DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
                     override fun onCompleted(p0: OperationResult?) {
@@ -173,9 +155,6 @@ class TransactionActivity : AppCompatActivity(){
                     // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
                      serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
                  }*/
-                 val intent = Intent (this, TenureSchemeActivity::class.java)
-
-                 startActivity(intent)
 
             }
 
@@ -183,12 +162,68 @@ class TransactionActivity : AppCompatActivity(){
     }
 
     private  fun setupFlow(){
-       /* when(transactionTypeEDashboardItem){
-
-        }*/
         emvBinding?.baseAmtTv?.text=saleAmt
-    }
 
+        when(transactionTypeEDashboardItem){
+
+            EDashboardItem.BRAND_EMI->{
+                //setupObserver()
+                val intent = Intent (this, TenureSchemeActivity::class.java)
+                startActivity(intent)
+            }
+            EDashboardItem.SALE->{
+                val amt=(saleAmt.toFloat() * 100).toLong()
+                var ecrID: String
+                try {
+                    DeviceHelper.doSaleTransaction(
+                        SaleRequest(
+                            amount = amt ?: 0,
+                            tipAmount = 0L ?: 0,
+                            transactionType = TransactionType.SALE,
+                            tid = "30160035",
+                            transactionUuid = UUID.randomUUID().toString().also {
+                                ecrID = it
+
+                            }
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val receiptDetail = txnResponse?.receiptDetail
+                                   /* .toString()
+                                    .split(",")*/
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        val jsonResp=Gson().toJson(receiptDetail)
+                                        println(jsonResp)
+                                     //   detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                      //  detailResponse.forEach { println(it) }
+                                    }
+                                    else -> {
+                                        val intent = Intent (this@TransactionActivity, NavigationActivity::class.java)
+                                          startActivity(intent)
+
+                                        println("Error")}
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }
+            }
+            else -> {
+
+            }
+        }
+    }
 
     //Below Enum Class is used to detect different card Types:-
     enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {

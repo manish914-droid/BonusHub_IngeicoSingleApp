@@ -19,7 +19,7 @@ class TenureSchemeViewModel (private val serverRepository: ServerRepository) : V
     init {
         viewModelScope.launch(Dispatchers.IO) {
             logger("Get DATA","----START----------","e")
-            serverRepository.getEMITenureData("CB583507E9316C4BCFF0C2DEDE54AAB8E42DFE687C45E257")
+            serverRepository.getEMITenureData("C79DCA8553E1825A3001A9A2E6B528031C2429680F549A46")
         /*    logger("Brand Tnc",serverRepository.appDB.appDao.getAllBrandTAndCData().toString(),"e")
             logger("Issuer Tnc",serverRepository.appDB.appDao.getAllIssuerTAndCData().toString(),"e")
             logger("Brand SubCat",serverRepository.appDB.appDao.getBrandEMISubCategoryData().toString(),"e")

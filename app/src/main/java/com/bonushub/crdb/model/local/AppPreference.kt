@@ -28,6 +28,7 @@ object AppPreference {
 
     const val REVERSAL_DATA = "reversal_data"
     const val BANK_CODE_KEY = "bank_code_key"
+
     const val BANKCODE = "10" //For testing
     const val F48_STAMP = "f48timestamp"
     const val ACC_SEL_KEY = "acc_sel_key"
