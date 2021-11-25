@@ -438,9 +438,7 @@ class TransactionActivity : AppCompatActivity(){
             printer!!.addText(AlignMode.CENTER, "SIGNATURE NOT REQUIRED")
 
 
-          /*  printer!!.setHzScale(HZScale.SC1x1)
-            printer!!.setHzSize(HZSize.DOT24x24)
-            printer!!.addText(AlignMode.CENTER, receiptDetail.cardHolderName)*/
+
 
 
             printer!!.setHzScale(HZScale.SC1x1)
