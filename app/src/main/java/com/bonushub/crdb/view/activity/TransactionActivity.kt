@@ -192,7 +192,7 @@ class TransactionActivity : AppCompatActivity(){
                             amount = amt ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
-                            tid = "30160031",
+                            tid = "30160035",
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
@@ -213,7 +213,7 @@ class TransactionActivity : AppCompatActivity(){
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
-                                          //  startPrinting(receiptDetail)
+                                            startPrinting(receiptDetail)
                                         }
 
 
@@ -221,14 +221,14 @@ class TransactionActivity : AppCompatActivity(){
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
                                       //  detailResponse.forEach { println(it) }
-                                        if (receiptDetail != null) {
+                                       /* if (receiptDetail != null) {
                                             val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
                                            val obj=Gson().fromJson(jsonstr,ReceiptDetail::class.java)
                                            startPrinting(obj)
-                                           /* val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
-                                            startActivity(intent)*/
+                                           *//* val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
+                                            startActivity(intent)*//*
 
-                                        }
+                                        }*/
                                     }
                                     else -> {
                                         val intent = Intent (this@TransactionActivity, NavigationActivity::class.java)
