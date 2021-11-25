@@ -648,7 +648,7 @@ data class TerminalParameterTable(
 
     @field:BHFieldParseIndex(64)
     @field:BHFieldName("LinkTidType")
-    var LinkTidType: String = "",  // name of bank
+    var LinkTidType: List<String> = listOf(),  // LinkTidType : for Amex  - 0,DC type - 1 ,offus Tid - 2, 3 months onus - 3,6 months onus - 6, 9 months onus - 9,12 months onus- 12
 
     @field:BHFieldParseIndex(67)
     @field:BHFieldName("STAN")
