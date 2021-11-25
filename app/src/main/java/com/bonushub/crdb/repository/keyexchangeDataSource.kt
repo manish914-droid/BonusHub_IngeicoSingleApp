@@ -313,7 +313,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
         }
 
-        var isSucc = pinpadLimited!!.format()
+        var isSucc = true /*pinpadLimited!!.format()*/
         if (isSucc) {
             println("PINPAD "+"format success")
         } else {
