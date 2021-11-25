@@ -37,6 +37,7 @@ import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
+
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -523,6 +524,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             EDashboardItem.BRAND_EMI->{
+                transactFragment(BrandEmiMasterCategoryFragment())
+
+            }
+            EDashboardItem.VOID_SALE->{
                 transactFragment(BrandEmiMasterCategoryFragment())
 
             }

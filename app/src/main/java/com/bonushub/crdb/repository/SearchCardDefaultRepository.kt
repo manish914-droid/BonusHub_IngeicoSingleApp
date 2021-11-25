@@ -12,6 +12,7 @@ import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.utils.BytesUtil
 import com.bonushub.crdb.utils.getEncryptedPan
 import com.bonushub.crdb.utils.getEncryptedTrackData
+
 import com.bonushub.crdb.utils.ingenico.DemoConfig
 import com.bonushub.crdb.utils.ingenico.DialogUtil
 import com.bonushub.crdb.utils.ingenico.EMVInfoUtil
@@ -96,7 +97,8 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                     }
 
                     cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
-                    var encryptTrack2data =getEncryptedTrackData(track.getString(EMVData.TRACK2) ?: "",pinpad)
+                    var encryptTrack2data =
+                        getEncryptedTrackData(track.getString(EMVData.TRACK2) ?: "",pinpad)
                     println("Track data is"+track.getString(EMVData.TRACK2))
                     cardProcessedDataModal.setTrack2Data(encryptTrack2data ?: "")
                     _insertCardStatus.postValue(cardProcessedDataModal)

@@ -186,17 +186,17 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
     }
 
-    suspend fun getEMITenureData(pan:String="0",counter:String="0"){
+    suspend fun getEMITenureData(field56Pan:String="0",field57:String,counter:String="0"){
        /* val field57=  "$bankEMIRequestCode^0^${brandEmiData?.brandID}^${brandEmiData?.productID}^${brandEmiData?.imeiORserailNum}" +
                 "^${*//*cardBinValue.substring(0, 8)*//*""}^$transactionAmount"
         */
         val field57="4^0^25^2454^^^5800000"
-        when(val genericResp = remoteService.getEMITenureService(pan,field57)){
+        when(val genericResp = remoteService.getEMITenureService(field56Pan,field57)){
             is GenericResponse.Success->{
                 val isoDataReader=genericResp.data
                 val tenureTnc = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
                 Log.e("Tenure",tenureTnc)
-                stubbingEMITenureDataToList(tenureTnc)
+                stubbingEMITenureDataToList(tenureTnc,field56Pan,field57)
             }
             is GenericResponse.Error->{
                 emiTenureMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
@@ -601,7 +601,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
     //region=================Parse and Stubbing BankEMI Data To List:-
     private suspend fun stubbingEMITenureDataToList(
-        bankEMITenureResponseData: String) {
+        bankEMITenureResponseData: String,field56Pan:String="0",field57:String) {
             if (!TextUtils.isEmpty(bankEMITenureResponseData)) {
                 val parsingDataWithCurlyBrace =
                     Utility().parseDataListWithSplitter("}", bankEMITenureResponseData)
@@ -698,7 +698,8 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                     )
                                 }^$transactionAmount"
                             }*/
-                        getEMITenureData(counter = totalRecord)
+                        getEMITenureData(field56Pan,field57,counter = totalRecord)
+
                     } else {
                         Log.d("Total BankEMI Data:- ", bankEMISchemesDataList.toString())
                         Log.d("Total BankEMI TAndC:- ", parsingDataWithCurlyBrace[1])
