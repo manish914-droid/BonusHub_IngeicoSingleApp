@@ -46,8 +46,8 @@ val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 
 
-val NEW_IP_ADDRESS = "192.168.250.10"/*"203.112.151.169"*/
-var PORT =4124// /*9101*//*4124*/8109
+val NEW_IP_ADDRESS = /*"192.168.250.10"*/"203.112.151.169"
+var PORT =8109// /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 
@@ -70,6 +70,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
     var list   = ArrayList<String>()
     var listTidType   = ArrayList<String>()
+    var listLinkTidType   = ArrayList<String>()
 
     //region======================Read Local Init File======================
     suspend fun readLocalInitFile(callback: suspend (Boolean, String) -> Unit) {
@@ -345,6 +346,17 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                             listTidType.add(string)
                             println("Index for TID Type2 "+listTidType)
                             e.set(tableName, listTidType)
+                        }
+                        else if(dataList[2]== "106" && index == 64){
+                            var string = String()
+                            for(i in dataList[index]){
+                                println("Index for LinkTID Type "+i)
+                                string = string+i
+                            }
+                            println("Index for TID LinkTIDType1 "+string)
+                            listLinkTidType.add(string)
+                            println("Index for TID LinkTIDType2 "+listLinkTidType)
+                            e.set(tableName, listLinkTidType)
                         }
                         else {
                             e.set(tableName, dataList[index])
