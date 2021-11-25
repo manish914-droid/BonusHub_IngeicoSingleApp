@@ -244,7 +244,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
                             //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
 
-                            var insertkeys = true//insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
+                            var insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
                                 if (keWithInit) {
@@ -381,17 +381,12 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                 System.out.println("KEYIDDATAKEY is success "+isExist2)
 
 
-                val mode = MagTrackEncMode.MTEM_ECBMODE
-                var encryptedbyteArrrays = pinPad?.encryptMagTrack(mode,12, BytesUtil.hexString2Bytes("12345678"))
-                if(encryptedbyteArrrays == null){
-                    outputPinpadError("encryptMagTrack fail",pinPad)
-                }
 
                 try {
                     var desMode = DESMode(DESMode.DM_ENC, DESMode.DM_OM_TECB)
                     val data = "02|36101010020281       "
                     val strtohex = data.str2ByteArr().byteArr2HexStr()
-                    var  encResult = pinPad.calculateDes(11, desMode, null, BytesUtil.hexString2Bytes(strtohex))
+                    var  encResult = pinPad.calculateDes(DemoConfig.KEYID_DES, desMode, null, BytesUtil.hexString2Bytes(strtohex))
                     if (encResult == null) {
                         outputPinpadError("calculateDes fail",pinPad)
                         // return
@@ -399,7 +394,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                     println("TECB encrypt result = " + byte2HexStr(encResult))
 
                     desMode = DESMode(DESMode.DM_DEC, DESMode.DM_OM_TECB)
-                    val decResult: ByteArray = pinPad.calculateDes(11, desMode, null, encResult)
+                    val decResult: ByteArray = pinPad.calculateDes(DemoConfig.KEYID_DES, desMode, null, encResult)
                     if (decResult == null) {
                         outputPinpadError("calculateDes fail",pinPad)
                         // return
@@ -410,12 +405,6 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                     ex.printStackTrace()
                 }
 
-
-
-                //
-                //   //
-
-                println("Track 2 with encyption is --->" + byte2HexStr(encryptedbyteArrrays))
             }
         } catch (e: Exception) {
             e.printStackTrace()

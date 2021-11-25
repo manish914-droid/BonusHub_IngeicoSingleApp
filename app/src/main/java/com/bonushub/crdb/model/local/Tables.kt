@@ -633,6 +633,7 @@ data class TerminalParameterTable(
     @field:BHFieldName("Tid Type")
     var tidType: List<String>? = listOf(),  // if type is 1 main else child tid
 
+
     @field:BHFieldParseIndex(61)
     @field:BHFieldName("Tid Index")
     var tidIndex: String = "",   // sorting order of child tid
@@ -645,7 +646,24 @@ data class TerminalParameterTable(
     @field:BHFieldName("Tid Name")
     var tidName: String = "",  // name of bank
 
-    var clearFBatch: String = "0" ,//This field is for Server Hit Status,
+    @field:BHFieldParseIndex(64)
+    @field:BHFieldName("LinkTidType")
+    var LinkTidType: String = "",  // name of bank
+
+    @field:BHFieldParseIndex(67)
+    @field:BHFieldName("STAN")
+    var roc: String = "",
+
+    @field:BHFieldParseIndex(68)
+    var ctlsCaption: String = "",
+
+    @field:BHFieldParseIndex(69)
+     var flexiPayMinAmountLimit: String = "",
+
+    @field:BHFieldParseIndex(70)
+    var flexiPayMaxAmountLimit: String = "",
+
+    var clearFBatch: String = "0",//This field is for Server Hit Status,
 
     var bankEnquiryMobNumberEntry: Boolean = false
 
