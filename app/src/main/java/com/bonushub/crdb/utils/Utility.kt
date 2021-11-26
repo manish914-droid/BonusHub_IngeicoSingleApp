@@ -20,6 +20,7 @@ import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.local.*
@@ -46,8 +47,8 @@ val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 
 
-val NEW_IP_ADDRESS = /*"192.168.250.10"*/"203.112.151.169"
-var PORT =8109// /*9101*//*4124*/8109
+val NEW_IP_ADDRESS = "192.168.250.10"
+var PORT =4124// /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 
@@ -1119,7 +1120,9 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData =  dbObj.appDao.getAllTerminalParameterTableData()?.get(0)
+            tptData =  DBModule.appDatabase?.appDao?.getAllTerminalParameterTableData()?.get(0)
+            val jsonResp=Gson().toJson(tptData)
+            println(jsonResp)
         }
         return tptData
     }

@@ -175,8 +175,9 @@
     <string name="print_merchant_copy">Print Merchant Copy</string>
     <string name="sms_upi_pay">SMS/UPI Pay</string>
     <string name="enter_valid_bill_number">Enter Valid Bill Number</string>
-
-
+    <string name="printing">Printing....</string>
+    <string name="printer_error">Printer Error</string>
+    <string name="positive_button_yes">Yes</string>
     <string name="enterValid_serial">Enter valid serial number</string>
     <string name="enterValid_iemei_no">Enter valid IMEI number</string>
 
