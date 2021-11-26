@@ -39,6 +39,9 @@ interface AppDao{
     @Query("SELECT * FROM BatchFileDataTable WHERE invoiceNumber = :invoice AND transactionType = :transType")
     fun getSale2VoidUpdatedData(invoice: String?, transType: Int): BatchFileDataTable?
 
+    @Query("SELECT * FROM BatchFileDataTable WHERE invoiceNumber = :invoice")
+    suspend fun getBatchTableDataByInvoice(invoice: String?): MutableList<BatchFileDataTable?>?
+
     //endregion
 
     //region================================Terminal Communication Table Manipulation:-
@@ -338,4 +341,9 @@ interface AppDao{
     suspend fun updateTerminalCommunicationTable(terminalCommunicationTable: TerminalCommunicationTable)
     // end region
 
+    // brand emi region
+
+    /*@Query("SELECT * FROM BrandEMIDataTable WHERE hostInvoice = :hostInvoice AND hostTid = :hostTid")
+    fun getBrandEMIDataTable(hostInvoice: String?, hostTid: String): BrandEMIDataTable?*/
+    // end region
 }

@@ -1,64 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relLayParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/edge_blue_2"
-    android:layout_marginBottom="13dp"
-    android:id="@+id/relLayParent">
+    android:orientation="vertical"
+    android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ALL TIDS"
-        android:textAllCaps="true"
-        android:textSize="@dimen/text_size_small"
-        android:fontFamily="@font/muli_extra_light"
-        android:textColor="@color/txt_color"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
-
-    <TextView
-        android:id="@+id/textViewValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewTitle"
-        android:layout_marginStart="20dp"
+        android:orientation="horizontal"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="20dp"
-        android:text="BASE 41501377"
-        android:textAllCaps="true"
-        android:textColor="@color/txt_color"
-        android:textSize="@dimen/text_size_xregular"
-        android:fontFamily="@font/muli_regular" />
+        android:layout_marginBottom="5dp">
 
-    <ImageView
-        android:id="@+id/imgViewTick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="5dp"
-        android:layout_toStartOf="@+id/textViewStatus"
-        android:src="@drawable/ic_init_payment_pass" />
 
-    <TextView
-        android:id="@+id/textViewStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fail"
-        android:textSize="@dimen/text_size_xregular"
-        android:fontFamily="@font/muli_light"
-        android:textColor="@color/txt_color"
-        android:layout_toStartOf="@+id/imgViewArrow"
-        android:layout_centerVertical="true" />
+        <TextView
+            android:id="@+id/textViewTid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/muli_regular"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_small"
+            android:text="40135075"/>
 
-    <ImageView
-        android:id="@+id/imgViewArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_margin="10dp"
-        android:src="@drawable/ic_arrow_blue"
-        android:layout_centerVertical="true"/>
-</RelativeLayout>
+        <TextView
+            android:id="@+id/textViewDes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/muli_regular"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_small"
+            android:text="Base Tid"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgViewStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_init_payment_success"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/textViewStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/text_size_xregular"
+                android:text="Success"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/viewLine"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#26013480"
+        android:visibility="gone"/>
+
+</LinearLayout>

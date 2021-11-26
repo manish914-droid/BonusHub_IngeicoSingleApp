@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,16 +24,21 @@ import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsTableEditAdapter
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
+import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.CommunicationParamItem
 import com.bonushub.pax.utils.PreferenceKeyConstant
+import com.mindorks.example.coroutines.utils.Status
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-
+@AndroidEntryPoint
 class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditItemClick {
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
@@ -41,6 +48,9 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
     private lateinit var type :CommunicationParamItem
     lateinit var dataList: ArrayList<TableEditHelper?>
     lateinit var mAdapter : BankFunctionsTableEditAdapter
+
+    private val initViewModel : InitViewModel by viewModels()
+    private var iDialog: IDialog? = null
 
     var binding:FragmentCommunicationOptionSubMenuBinding? = null
 
@@ -61,6 +71,9 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
         batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
         iBankFunctionsTableEditItemClick = this
+
+        iDialog = (activity as NavigationActivity)
+
 
         setUiForEdit()
 
@@ -111,6 +124,15 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
             CommunicationParamItem.APP_UPDATE_PARAM -> {
                 logger("sub","menu2")
+                runBlocking {
+                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+
+                    if (dataList[position]?.titleValue.equals(tids[0])){
+                        verifySuperAdminPasswordAndUpdate()
+                    }else {
+                        updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
+                    }
+                }
 
             }
         }
@@ -279,7 +301,47 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
     suspend fun updateTable()
     {
         logger("type",type.value.toString())
-        bankFunctionsViewModel.updateTerminalCommunicationTable(dataList, type.value.toString(), requireContext())
+        bankFunctionsViewModel.updateTerminalCommunicationTable(dataList, type.value.toString(), requireContext()).observe(viewLifecycleOwner,{ isUpdateTid ->
+
+            if(isUpdateTid){
+                // call init process
+                iDialog?.showProgress(getString(R.string.please_wait_host))
+
+                runBlocking {
+                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+                    if(!tids.get(0).isEmpty()!!) {
+
+                        initViewModel.insertInfo1(tids[0] ?:"")
+                        observeMainViewModel()
+                    }
+                }
+
+            }
+        })
+    }
+
+    private fun observeMainViewModel(){
+
+        initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
+
+            when (result.status) {
+                Status.SUCCESS -> {
+                    iDialog?.hideProgress()
+                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                }
+                Status.ERROR -> {
+                    iDialog?.hideProgress()
+                    ToastUtils.showToast(activity,"Error called  ${result.error}")
+                }
+                Status.LOADING -> {
+                    iDialog?.showProgress("Sending/Receiving From Host")
+
+                }
+            }
+
+        })
+
+
     }
 }
 

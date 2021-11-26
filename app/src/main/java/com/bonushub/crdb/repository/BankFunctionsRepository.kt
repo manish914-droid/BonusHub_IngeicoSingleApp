@@ -18,7 +18,9 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.updateBaseTid
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.TableEditHelper
+import com.bonushub.crdb.view.fragments.TidsListModel
 import com.bonushub.pax.utils.PrefConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -165,9 +167,12 @@ class BankFunctionsRepository {
         return tpt
     }
 
-    // remaining for update tid
-    suspend fun updateTerminalParameterTable(dataList: ArrayList<TableEditHelper?>, context:Context)
+
+    suspend fun updateTerminalParameterTable(dataList: ArrayList<TableEditHelper?>, context:Context):LiveData<Boolean>
     {
+        val dataReturn = MutableLiveData<Boolean>()
+        dataReturn.value = false
+
         val data = dataList.filter { it?.isUpdated?:false }
         //val table: Any? = getTable()
 
@@ -222,13 +227,14 @@ logger("ann.name",""+ann.name)
                             //TerminalParameterTable.updateTerminalID(data[0]?.titleValue)
                             DBModule.appDatabase?.appDao.updateTerminalParameterTable(table as TerminalParameterTable)
 
-                            withContext(Dispatchers.Main) {
-                            context.startActivity(Intent(context, MainActivity::class.java).apply {
+                            dataReturn.value = true
+                            /*withContext(Dispatchers.Main) {
+                            context.startActivity(Intent(context, NavigationActivity::class.java).apply {
                                 putExtra("changeTID", true)
                                 flags =
                                     Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
-                        }
+                        }*/
                         } else {
                             withContext(Dispatchers.Main){
                                 ToastUtils.showToast(appContext, appContext.getString(R.string.enter_terminal_id_must_be_valid_8digit))
@@ -260,11 +266,15 @@ logger("ann.name",""+ann.name)
                 DBModule.appDatabase?.appDao.updateTerminalParameterTable(table as TerminalParameterTable)
             } else logger("TAG", "No data to update is found")
         }
+
+        return dataReturn
     }
 
 
     // comm param
     suspend fun getTerminalCommunicationTableByRecordType(redordType:String) : LiveData<ArrayList<TableEditHelper?>>{
+
+
         val dataList = MutableLiveData<ArrayList<TableEditHelper?>>()
         val dataListLocal = ArrayList<TableEditHelper?>()
 
@@ -306,8 +316,11 @@ logger("ann.name",""+ann.name)
         return dataList
     }
 
-    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context: Context)
+    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context: Context):LiveData<Boolean>
     {
+        val dataReturn = MutableLiveData<Boolean>()
+        dataReturn.value = false
+
         val data = dataList.filter { it?.isUpdated?:false }
         //val table: Any? = getTable()
 
@@ -348,13 +361,14 @@ logger("ann.name",""+ann.name)
                             //TerminalParameterTable.updateTerminalID(data[0]?.titleValue)
                             DBModule.appDatabase?.appDao.updateTerminalCommunicationTable(table as TerminalCommunicationTable)
 
-                            withContext(Dispatchers.Main) {
-                                context.startActivity(Intent(context, MainActivity::class.java).apply {
+                            dataReturn.value = true
+                            /*withContext(Dispatchers.Main) {
+                                context.startActivity(Intent(context, NavigationActivity::class.java).apply {
                                     putExtra("changeTID", true)
                                     flags =
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 })
-                            }
+                            }*/
                         } else {
                             withContext(Dispatchers.Main){
                                 ToastUtils.showToast(appContext, appContext.getString(R.string.enter_terminal_id_must_be_valid_8digit))
@@ -386,5 +400,73 @@ logger("ann.name",""+ann.name)
                 DBModule.appDatabase?.appDao.updateTerminalCommunicationTable(table as TerminalCommunicationTable)
             } else logger("TAG", "No data to update is found")
         }
+
+        return dataReturn
+    }
+
+    suspend fun getAllTidsWithStatus():LiveData<ArrayList<TidsListModel>>{
+        val dataList = MutableLiveData<ArrayList<TidsListModel>>()
+        val tidsWithStatusList = ArrayList<TidsListModel>()
+
+        val tpt = DBModule.appDatabase?.appDao.getTerminalParameterTableData()
+
+        val IngenicoInitializationTable = DBModule.appDatabase?.appDao.getIngenicoInitialization()
+
+        val rseultsize = IngenicoInitializationTable?.size
+
+        var tidType = tpt.get(0)?.tidType
+        var linkTidType = tpt.get(0)?.LinkTidType
+        var tids = tpt.get(0)?.terminalId
+        var status = ArrayList<String>()
+
+        if (rseultsize != null) {
+            logger("IngenicoInitializationTable",""+rseultsize)
+            var statusList = IngenicoInitializationTable.get(0)?.tidStatusList
+            var tidsStatusList = IngenicoInitializationTable.get(0)?.tidList
+
+            tids?.forEachIndexed { index, value ->
+                tidsStatusList?.forEachIndexed{ index2, value2 ->
+
+                    if(value.equals(value2,true)){
+                        status.add(statusList?.get(index2)?:"")
+                    }
+
+                }
+            }
+        }else{
+            logger("IngenicoInitializationTable",""+rseultsize)
+        }
+
+        if(tidType?.size == linkTidType?.size){
+            for (i in 0 until tidType?.size!!){
+
+                if(tidType[i].equals("1")) {
+                    tidsWithStatusList.add(TidsListModel(tids?.get(i)?:"", "Base Tid", status.get(i)))
+                }else{
+                    when(linkTidType?.get(0)){
+
+                        "0" ->{
+                            tidsWithStatusList.add(TidsListModel(tids?.get(i)?:"", "for Amex", status.get(i)))
+                        }
+
+                        "1" ->{
+                            tidsWithStatusList.add(TidsListModel(tids?.get(i)?:"", "DC type", status.get(i)))
+                        }
+
+                        "2" ->{
+                            tidsWithStatusList.add(TidsListModel(tids?.get(i)?:"", "offus Tid", status.get(i)))
+                        }
+
+                        else ->{
+                            tidsWithStatusList.add(TidsListModel(tids?.get(i)?:"", "${linkTidType?.get(i)} months onus", status.get(i)))
+                        }
+
+                    }
+                }
+            }
+        }
+
+        dataList.value = tidsWithStatusList
+        return dataList
     }
 }

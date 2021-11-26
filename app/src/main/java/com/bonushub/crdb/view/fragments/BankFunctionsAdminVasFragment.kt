@@ -1,11 +1,10 @@
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,12 +13,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
 import com.bonushub.crdb.di.DBModule
-import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
+import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
@@ -43,8 +42,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
     //lateinit var terminalParameterTable: TerminalParameterTable
 
-    // for init
-    //private var iDialog: IDialog? = null
+    // for init`
+    private var iDialog: IDialog? = null
 
 
     override fun onCreateView(
@@ -61,7 +60,13 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.admin_vas_header)
 
-        //if(context is IDialog) iDialog = context
+        try {
+            iDialog = (activity as NavigationActivity)
+logger("iDialog",""+iDialog.toString())
+        }catch (ex:Exception)
+        {
+            ex.printStackTrace()
+        }
 
         iBankFunctionsAdminVasItemClick = this
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
@@ -101,7 +106,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         when(bankFunctionsAdminVasItem){
             BankFunctionsAdminVasItem.INIT ->{
                 // INIT
-               // iDialog?.showProgress(getString(R.string.please_wait_host))
+                iDialog?.showProgress(getString(R.string.please_wait_host))
 
                 runBlocking {
                     val tids = checkBaseTid(DBModule.appDatabase?.appDao)
@@ -155,15 +160,15 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
             when (result.status) {
                 Status.SUCCESS -> {
-                   // iDialog?.hideProgress()
+                    iDialog?.hideProgress()
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 }
                 Status.ERROR -> {
-                    //iDialog?.hideProgress()
+                    iDialog?.hideProgress()
                     ToastUtils.showToast(activity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
-                    //iDialog?.showProgress("Sending/Receiving From Host")
+                    iDialog?.showProgress("Sending/Receiving From Host")
 
                 }
             }

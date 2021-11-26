@@ -20,15 +20,106 @@
     <include
         android:id="@+id/sub_header_view"
         layout="@layout/sub_header_layout"
-        android:visibility="visible"/>
+        android:visibility="visible" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/sub_header_view"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"/>
+        android:fillViewport="true">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <LinearLayout
+                android:id="@+id/linLayTidTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/edge_blue_2"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textViewTid"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/muli_bold"
+                        android:text="TIDS"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_xregular" />
+
+                    <TextView
+                        android:id="@+id/textViewDes"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/muli_bold"
+                        android:text="DESC"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_xregular" />
+
+                    <TextView
+                        android:id="@+id/textViewStatus"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/muli_bold"
+                        android:text="STATUS"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_xregular" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="#47013480" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="5dp" />
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/textViewInitAllTids"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/linLayTidTable"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/edge_bg_red"
+                android:drawableStart="@drawable/ic_arrow_with_border"
+                android:drawablePadding="10dp"
+                android:fontFamily="@font/muli_regular"
+                android:gravity="center"
+                android:paddingStart="30dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="30dp"
+                android:paddingBottom="9dp"
+                android:text="INIT ALL TIDs"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small" />
+        </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
 </RelativeLayout>

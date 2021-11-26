@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -26,16 +28,22 @@ import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsTerminalParamAdapter
+import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
+import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.BankFunctionsTerminalItem
 import com.bonushub.pax.utils.PreferenceKeyConstant
+import com.mindorks.example.coroutines.utils.Status
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+@AndroidEntryPoint
 class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClick {
 
     private var iBankFunctionsTerminalItemClick:IBankFunctionsTerminalItemClick? = null
@@ -43,6 +51,9 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
     lateinit var batchFileViewModel: BatchFileViewModel
+
+    private val initViewModel : InitViewModel by viewModels()
+    private var iDialog: IDialog? = null
 
     lateinit var mAdapter : BankFunctionsTerminalParamAdapter
     lateinit var dataList: ArrayList<TableEditHelper?>
@@ -66,6 +77,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
         batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
 
+        iDialog = (activity as NavigationActivity)
 
 
         lifecycleScope.launch(Dispatchers.Main) {
@@ -204,7 +216,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                         dataList[position]?.isUpdated = true
                         mAdapter.notifyItemChanged(position)
                         lifecycleScope.launch {
-                            updateTable() // BB
+                            updateTable()
                         }
 
                     }
@@ -215,7 +227,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                 dataList[position]?.isUpdated = true
                 mAdapter.notifyItemChanged(position)
                 lifecycleScope.launch {
-                    updateTable() // BB
+                    updateTable()
                 }
             }
         }
@@ -223,10 +235,49 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     suspend fun updateTable()
     {
-        bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())
+        bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())?.observe(viewLifecycleOwner,{ isUpdateTid ->
+
+            if(isUpdateTid){
+                // call init process
+                iDialog?.showProgress(getString(R.string.please_wait_host))
+
+                runBlocking {
+                        val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+                        if(!tids.get(0).isEmpty()!!) {
+
+                            initViewModel.insertInfo1(tids[0] ?:"")
+                            observeMainViewModel()
+                        }
+                    }
+
+            }
+        })
     }
 
 
+    private fun observeMainViewModel(){
+
+        initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
+
+            when (result.status) {
+                Status.SUCCESS -> {
+                    iDialog?.hideProgress()
+                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                }
+                Status.ERROR -> {
+                    iDialog?.hideProgress()
+                    ToastUtils.showToast(activity,"Error called  ${result.error}")
+                }
+                Status.LOADING -> {
+                    iDialog?.showProgress("Sending/Receiving From Host")
+
+                }
+            }
+
+        })
+
+
+    }
    // private fun getTable(): Any? = when (type) {
     private fun getTable() {
 

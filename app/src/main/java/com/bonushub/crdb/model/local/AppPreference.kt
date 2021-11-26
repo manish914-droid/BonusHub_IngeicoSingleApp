@@ -8,6 +8,7 @@ import androidx.security.crypto.MasterKey
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.utils.addPad
 import com.bonushub.crdb.utils.logger
+import com.bonushub.pax.utils.IsoDataWriter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -43,6 +44,7 @@ object AppPreference {
     const val GENERIC_REVERSAL_KEY = "generic_reversal_key"
 
     const val LAST_SUCCESS_RECEIPT_KEY = "Last_Success_Receipt"
+    const val LAST_BATCH = "last_batch"
 
 
     @JvmStatic
@@ -156,4 +158,23 @@ object AppPreference {
 
     // end region
 
+    // region need in report
+    @JvmStatic
+    fun getReversal(): IsoDataWriter? {
+        logger(TAG, "========getReversal=========", "e")
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        return if (v != null) {
+            try {
+                val str = v.getString(GENERIC_REVERSAL_KEY, "")
+                if (!str.isNullOrEmpty()) {
+                    Gson().fromJson<IsoDataWriter>(str, object : TypeToken<IsoDataWriter>() {}.type)
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Reversal error!!!")
+            }
+        } else
+            null
+    }
+
+    // end region
 }

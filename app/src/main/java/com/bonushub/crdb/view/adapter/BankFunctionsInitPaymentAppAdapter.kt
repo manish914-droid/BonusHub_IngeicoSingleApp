@@ -7,33 +7,60 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
+import com.bonushub.crdb.databinding.ItemBankFunctionsInitPaymentBinding
 import com.bonushub.crdb.view.fragments.BankFunctionsAdminVasFragment
 import com.bonushub.crdb.view.fragments.BankFunctionsFragment
+import com.bonushub.crdb.view.fragments.TidsListModel
 import com.bonushub.pax.utils.EDashboardItem
 import java.util.*
 
-class BankFunctionsInitPaymentAppAdapter() : RecyclerView.Adapter<BankFunctionsInitPaymentAppAdapter.BankFunctionsViewHolder>() {
+class BankFunctionsInitPaymentAppAdapter(var tidsList:ArrayList<TidsListModel>) : RecyclerView.Adapter<BankFunctionsInitPaymentAppAdapter.BankFunctionsInitPaymentViewHolder>() {
 
-    var mList: ArrayList<EDashboardItem> = arrayListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsViewHolder {
-        return BankFunctionsViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_bank_functions_init_payment, parent, false)
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsInitPaymentViewHolder {
+
+        var itemBinding = ItemBankFunctionsInitPaymentBinding.inflate(LayoutInflater.from(parent.context),
+            parent,
+            false)
+
+        return BankFunctionsInitPaymentViewHolder(itemBinding)
     }
 
-    //override fun getItemCount(): Int = mList.size
-    override fun getItemCount(): Int = 6
+    override fun getItemCount(): Int = tidsList.size
 
-    override fun onBindViewHolder(holder: BankFunctionsViewHolder, position: Int) {
 
+    override fun onBindViewHolder(holder: BankFunctionsInitPaymentViewHolder, position: Int) {
+
+        var model = tidsList[position]
+
+        if(position+1 == itemCount) {
+            holder.viewBinding.viewLine.visibility = View.GONE
+        }else{
+            holder.viewBinding.viewLine.visibility = View.VISIBLE
+
+        }
+
+        holder.viewBinding.textViewTid.text = model.tids
+        holder.viewBinding.textViewDes.text = model.des
+        holder.viewBinding.textViewStatus.text = model.status
+
+        if(model.status.equals("Success", true))
+        {
+            holder.viewBinding.imgViewStatus.setImageResource(R.drawable.ic_init_payment_success)
+            holder.viewBinding.textViewStatus.text = model.status
+
+
+        }else{
+            holder.viewBinding.imgViewStatus.setImageResource(R.drawable.ic_init_payment_fail)
+            holder.viewBinding.textViewStatus.text = model.status
+
+        }
 
     }
 
 
 
-    inner class BankFunctionsViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-       // val textView: TextView = view.findViewById(R.id.textView)
+    inner class BankFunctionsInitPaymentViewHolder(val viewBinding: ItemBankFunctionsInitPaymentBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
     }
 }

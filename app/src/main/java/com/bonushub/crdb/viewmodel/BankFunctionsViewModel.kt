@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.repository.BankFunctionsRepository
 import com.bonushub.crdb.view.fragments.TableEditHelper
+import com.bonushub.crdb.view.fragments.TidsListModel
 
 class BankFunctionsViewModel:ViewModel() {
 
@@ -41,8 +42,10 @@ class BankFunctionsViewModel:ViewModel() {
         return terminalParameterTable
     }
 
-    suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>, context:Context){
-        BankFunctionsRepository.getInstance().updateTerminalParameterTable(dataList, context)
+    private var isUpdateTid:LiveData<Boolean>? = null
+    suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>, context:Context):LiveData<Boolean>?{
+        isUpdateTid = BankFunctionsRepository.getInstance().updateTerminalParameterTable(dataList, context)
+        return isUpdateTid
     }
 
     //TerminalCommunicationTable
@@ -54,7 +57,17 @@ class BankFunctionsViewModel:ViewModel() {
         return terminalCommunicationTable
     }
 
-    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context:Context){
-        BankFunctionsRepository.getInstance().updateTerminalCommunicationTable(dataList, recordType, context)
+    private var isUpdateTid2:LiveData<Boolean>? = null
+    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context:Context):LiveData<Boolean>{
+        isUpdateTid2 = BankFunctionsRepository.getInstance().updateTerminalCommunicationTable(dataList, recordType, context)
+        return isUpdateTid2 as LiveData<Boolean>
+    }
+
+    private var allTidsWithStatus:LiveData<ArrayList<TidsListModel>>? = null
+
+    suspend fun getAllTidsWithStatus():LiveData<ArrayList<TidsListModel>>? {
+
+        allTidsWithStatus = BankFunctionsRepository.getInstance().getAllTidsWithStatus()
+        return allTidsWithStatus
     }
 }
