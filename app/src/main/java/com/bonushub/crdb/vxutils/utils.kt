@@ -11,11 +11,9 @@ import android.view.WindowManager
 import android.widget.Button
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.IngenicoInitialization
 import com.bonushub.crdb.model.local.InitDataListList
-import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.view.fragments.DashboardFragment
@@ -29,10 +27,7 @@ import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
 import com.usdk.apiservice.aidl.BaseError
-import com.usdk.apiservice.aidl.algorithm.AlgError
-import com.usdk.apiservice.aidl.algorithm.AlgMode
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
-import com.usdk.apiservice.aidl.data.BytesValue
 import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
 import com.usdk.apiservice.aidl.pinpad.UPinpad
@@ -45,10 +40,15 @@ import java.nio.charset.StandardCharsets
 private var listofTids= ArrayList<String>()
 
 //Below method is used to encrypt Pannumber data:-
-fun getEncryptedPan(panNumber: String, algorithm: UAlgorithm?): String {
+fun getEncryptedPanorTrackData(panNumber: String,isTrackData: Boolean): String {
     val encryptedByteArray: ByteArray?
-
-    var dataDescription = "02|$panNumber"
+    var dataDescription: String? = null
+    if(isTrackData){
+       dataDescription = panNumber
+    }
+    else{
+       dataDescription = "02|$panNumber"
+    }
     val dataLength = dataDescription.length
     val DIGIT_8 = 8
     if (dataLength >= DIGIT_8) {
@@ -60,62 +60,15 @@ fun getEncryptedPan(panNumber: String, algorithm: UAlgorithm?): String {
         }
         logger("Field 56", " -->$dataDescription", "e")
         val byteArray = dataDescription.toByteArray(StandardCharsets.ISO_8859_1)
-        val result = TDES(algorithm,dataDescription)
+        val result = calculateDes(dataDescription)
 
         return result
     } else return "TRACK57_LENGTH<8"
 
 }
 
-//Below method is used to encrypt track2 data:-
-fun getEncryptedTrackData(track2Data: String?,pinpad: UPinpad?): String? {
-    var encryptedbyteArrrays: ByteArray? = null
-    if (null != track2Data) {
-          var track21 = "35|" + track2Data.replace("D", "=").replace("F", "")
-        println("Track 2 data is$track21")
-        val DIGIT_8 = 8
 
-        val mod = track21.length % DIGIT_8
-        if (mod != 0) {
-            track21 = getEncryptedField57DataForVisa(track21.length, track21)
-        }
-
-        val byteArray = track21.toByteArray(StandardCharsets.ISO_8859_1)
-        val mode = MagTrackEncMode.MTEM_ECBMODE
-        try {
-            encryptedbyteArrrays = pinpad?.encryptMagTrack(mode, 0, byteArray)
-            if (encryptedbyteArrrays == null) {
-                // outputPinpadError("encryptMagTrack fail")
-                return ""
-            }
-        }
-        catch (ex: Exception){
-            ex.printStackTrace()
-        }
-
-
-        println("Track 2 with encyption is --->" + byte2HexStr(encryptedbyteArrrays))
-    }
-
-    return byte2HexStr(encryptedbyteArrrays)
-}
-
-fun getEncryptedField57DataForVisa(dataLength: Int, dataDescription: String): String {
-    var dataDescription = dataDescription
-    val encryptedByteArray: ByteArray?
-    val DIGIT_8 = 8
-    if (dataLength > DIGIT_8) {
-        val mod = dataLength % DIGIT_8
-        if (mod != 0) {
-            val padding = DIGIT_8 - mod
-            val totalLength = dataLength + padding
-            dataDescription = addPad(dataDescription, " ", totalLength, false)
-        }
-        return dataDescription
-    } else return "TRACK57_LENGTH<8"
-}
-
-private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
+private fun calculateDes(dataDescription: String): String {
 
    return try {
 
@@ -125,7 +78,7 @@ private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
        var desMode = DESMode(DESMode.DM_ENC, DESMode.DM_OM_TECB)
        var  encResult = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(DemoConfig.KEYID_DES, desMode, null, BytesUtil.hexString2Bytes(strtohex))
        if (encResult == null) {
-
+          println("Calculate encrypt fail"+encResult)
 
        }
        println("TECB encrypt result = " + byte2HexStr(encResult))
@@ -133,8 +86,8 @@ private fun TDES(algorithm: UAlgorithm?, dataDescription: String): String {
        desMode = DESMode(DESMode.DM_DEC, DESMode.DM_OM_TECB)
        val decResult: ByteArray? = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(DemoConfig.KEYID_DES, desMode, null, encResult)
        if (decResult == null) {
-         //  outputPinpadError("calculateDes fail",pinPad)
-           // return
+           println("")
+           println("Calculate decrypt fail"+encResult)
        }
        println("TECB decrypt result = " + byte2HexStr(decResult))
 
