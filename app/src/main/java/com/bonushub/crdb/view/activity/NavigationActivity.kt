@@ -11,10 +11,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
@@ -37,6 +39,7 @@ import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
+import com.bonushub.crdb.viewmodel.InitViewModel
 
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
@@ -78,6 +81,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
     @Inject
     lateinit var appDatabase: AppDatabase
+
+    private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
+    private var dialogAdminPassword:Dialog? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navigationBinding = ActivityNavigationBinding.inflate(layoutInflater)
@@ -128,10 +136,24 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
         }
         navigationBinding?.mainDl?.addDrawerListener(mDrawerToggle)
+
+
+        bankFunctionsViewModel.adminPassword.observe(this@NavigationActivity,{
+
+            if(it.value?:false)
+            {
+                logger("isAdminPassword", (""+it.value?:false) as String)
+                dialogAdminPassword?.dismiss()
+                closeDrawer()
+                transactFragment(BankFunctionsFragment())
+            }else{
+                Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
 
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
+
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
@@ -141,7 +163,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         {
             R.id.bankFunction -> {
 
-                bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
+                //bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java) // not need
 
                 DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel, false)
             }
@@ -367,7 +389,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
         override fun onClickOk(dialog: Dialog, password:String) {
 
-            bankFunctionsViewModel.isAdminPassword(password)?.observe(this@NavigationActivity,{
+            dialogAdminPassword = dialog
+            bankFunctionsViewModel.isAdminPassword(password)
+
+        // convert in above
+        /* bankFunctionsViewModel.isAdminPassword(password)?.observe(this@NavigationActivity,{
 
                 if(it)
                 {
@@ -377,8 +403,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }else{
                     Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
                 }
-            })
-            //transactFragment(BankFunctionsFragment())
+            })*/
         }
 
         override fun onClickCancel() {

@@ -35,8 +35,8 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         val data = MutableLiveData<Boolean>()
 
         // write logic whether password is correct or not
-        runBlocking {
-            var tpt = appDao.getSingleRowTerminalParameterTableData()
+        withContext(Dispatchers.IO){
+            val tpt = appDao.getSingleRowTerminalParameterTableData()
             try {
                 // logger("sap",""+tpt?.adminPassword)
                 data.value =  tpt?.adminPassword.equals(password,true)
