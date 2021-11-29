@@ -553,7 +553,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.VOID_SALE->{
-                transactFragment(BrandEmiMasterCategoryFragment())
+                transactFragment(VoidMainFragment())
 
             }
             else->{

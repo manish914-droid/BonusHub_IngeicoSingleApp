@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".view.fragments.VoidDetailFragment">
+
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sub_header_view"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/edge_blue_bg_blue_transparent"
+        android:padding="15dp">
+
+        <TextView
+            android:id="@+id/txtViewVoidSale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/edge_blue_bg_white"
+            android:fontFamily="@font/muli_regular"
+            android:paddingStart="40dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="40dp"
+            android:paddingBottom="5dp"
+            android:text="@string/void_sale"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_small" />
+
+        <View
+            android:id="@+id/viewCenterHorizontal"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/txtViewDateTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/date_colon"
+            android:textSize="@dimen/text_size_small"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="15dp"
+            android:layout_below="@+id/txtViewVoidSale"
+            android:layout_alignEnd="@+id/viewCenterHorizontal"/>
+
+        <TextView
+            android:id="@+id/txtViewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtViewVoidSale"
+            android:layout_marginStart="@dimen/pad_20"
+            android:layout_marginTop="15dp"
+            android:layout_toEndOf="@+id/txtViewDateTitle"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular" />
+
+        <TextView
+            android:id="@+id/txtViewTimeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_colon"
+            android:textSize="@dimen/text_size_small"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewDateTitle"
+            android:layout_alignEnd="@+id/viewCenterHorizontal"/>
+
+        <TextView
+            android:id="@+id/txtViewTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtViewDateTitle"
+            android:layout_marginStart="@dimen/pad_20"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/txtViewDateTitle"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular" />
+
+        <TextView
+            android:id="@+id/txtViewTidTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tid_colon"
+            android:textSize="@dimen/text_size_small"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewTimeTitle"
+            android:layout_alignEnd="@+id/viewCenterHorizontal"/>
+
+        <TextView
+            android:id="@+id/txtViewTid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewTimeTitle"
+            android:layout_toEndOf="@+id/txtViewDateTitle"
+            android:layout_marginStart="@dimen/pad_20"/>
+
+        <TextView
+            android:id="@+id/txtViewInvoiceNumberTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/invoice_number_colon"
+            android:textSize="@dimen/text_size_small"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewTidTitle"
+            android:layout_alignEnd="@+id/viewCenterHorizontal"/>
+
+        <TextView
+            android:id="@+id/txtViewInvoiceNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewTidTitle"
+            android:layout_toEndOf="@+id/txtViewDateTitle"
+            android:layout_marginStart="@dimen/pad_20"/>
+
+        <TextView
+            android:id="@+id/txtViewTotalAmountTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/total_amount_colon"
+            android:textSize="@dimen/text_size_small"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewInvoiceNumberTitle"
+            android:layout_alignEnd="@+id/viewCenterHorizontal"/>
+
+        <TextView
+            android:id="@+id/txtViewTotalAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_light"
+            android:textColor="@color/txt_color"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/txtViewInvoiceNumberTitle"
+            android:layout_toEndOf="@+id/txtViewDateTitle"
+            android:layout_marginStart="@dimen/pad_20"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
