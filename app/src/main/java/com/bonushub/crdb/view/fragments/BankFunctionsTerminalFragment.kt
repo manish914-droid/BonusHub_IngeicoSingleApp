@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -14,32 +13,26 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsTerminalBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.BatchFileDataTable
-import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
-import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsTerminalParamAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
-import com.bonushub.pax.utils.BankFunctionsTerminalItem
 import com.bonushub.pax.utils.PreferenceKeyConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -49,9 +42,10 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     private var iBankFunctionsTerminalItemClick:IBankFunctionsTerminalItemClick? = null
     var binding:FragmentBankFunctionsTerminalBinding? = null
 
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
-    lateinit var batchFileViewModel: BatchFileViewModel
+    private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
+    private var dialogSuperAdminPassword:Dialog? = null
 
+    private val batchFileViewModel: BatchFileViewModel by viewModels()
     private val initViewModel : InitViewModel by viewModels()
     private var iDialog: IDialog? = null
 
@@ -74,8 +68,6 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.terminal_param_header)
 
         iBankFunctionsTerminalItemClick = this
-        bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
-        batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
 
         iDialog = (activity as NavigationActivity)
 
@@ -89,16 +81,11 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
         }
 
-       /* lifecycleScope.launch(Dispatchers.Main) {
-            bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
-
-                terminalParameterTable = it
-            })
-        }*/
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+
 
     }
 
@@ -151,36 +138,39 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
         override fun onClickOk(dialog: Dialog, password:String) {
 
-            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{ success ->
+            dialogSuperAdminPassword = dialog
+            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner, {success ->
 
                 if(success)
                 {
-                    dialog.dismiss()
+                    dialogSuperAdminPassword?.dismiss()
                     //
                     //val batchData = BatchFileDataTable.selectBatchData() // get BatchFileDataTable data
                     lifecycleScope.launch(Dispatchers.Main){
 
-                    batchFileViewModel.getBatchTableData().observe(viewLifecycleOwner,{ batchData ->
+                        batchFileViewModel.getBatchTableData().observe(viewLifecycleOwner,{ batchData ->
 
-                        when {
-                            AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
-                                ToastUtils.showToast(requireContext(),getString(R.string.please_clear_fbatch_before_init))
+                            when {
+                                AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
+                                    ToastUtils.showToast(requireContext(),getString(R.string.please_clear_fbatch_before_init))
 
-                            !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
-                                ToastUtils.showToast(requireContext(), getString(R.string.reversal_found_please_clear_or_settle_first_before_init))
+                                !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
+                                    ToastUtils.showToast(requireContext(), getString(R.string.reversal_found_please_clear_or_settle_first_before_init))
 
-                            batchData.size > 0 -> ToastUtils.showToast(requireContext(),getString(R.string.please_settle_batch_first_before_init))
-                            else -> {
-                                updateTPTOptionsValue(dataPosition, dataList[dataPosition]?.titleName?:"")
+                                batchData.size > 0 -> ToastUtils.showToast(requireContext(),getString(R.string.please_settle_batch_first_before_init))
+                                else -> {
+                                    updateTPTOptionsValue(dataPosition, dataList[dataPosition]?.titleName?:"")
+                                }
                             }
-                        }
-                    })
+                        })
 
                     }
                 }else{
                     ToastUtils.showToast(requireContext(),R.string.invalid_password)
 
                 }
+
+
             })
 
         }
@@ -278,19 +268,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
 
     }
-   // private fun getTable(): Any? = when (type) {
-    private fun getTable() {
 
-    /*when (type) {
-        BankOptions.TPT.ordinal -> {TerminalParameterTable.selectFromSchemeTable()
-        }
-        BankOptions.CPT.ordinal -> TerminalCommunicationTable.selectFromSchemeTable()
-        BankOptions.TXN_COMM_PARAM_TABLE.ordinal -> TerminalCommunicationTable.selectCommTableByRecordType("1")
-        BankOptions.APP_UPDATE_COMM_PARAM_TABLE.ordinal -> TerminalCommunicationTable.selectCommTableByRecordType("2")
-
-        else -> null
-    }*/
-    }
 
 }
 

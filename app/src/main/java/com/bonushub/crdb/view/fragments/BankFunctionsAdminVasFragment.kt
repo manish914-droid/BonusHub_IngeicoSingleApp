@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
@@ -18,9 +17,7 @@ import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
-import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.base.IDialog
-import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.BankFunctionsAdminVasItem
 import com.mindorks.example.coroutines.utils.Status
@@ -36,12 +33,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     private var iBankFunctionsAdminVasItemClick:IBankFunctionsAdminVasItemClick? = null
     var binding:FragmentBankFunctionsAdminVasBinding? = null
 
-   // private lateinit var initViewModel : InitViewModel
-   private val initViewModel : InitViewModel by viewModels()
-
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
-    //lateinit var terminalParameterTable: TerminalParameterTable
-
+    private val initViewModel : InitViewModel by viewModels()
     // for init`
     private var iDialog: IDialog? = null
 
@@ -69,22 +61,10 @@ logger("iDialog",""+iDialog.toString())
         }
 
         iBankFunctionsAdminVasItemClick = this
-        bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
-//        initViewModel = ViewModelProvider(this).get(InitViewModel::class.java)
-
 
         adminVasListItem.clear()
         adminVasListItem.addAll(BankFunctionsAdminVasItem.values())
         setupRecyclerview()
-
-       /* lifecycleScope.launch(Dispatchers.Main) {
-
-            bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
-
-                terminalParameterTable = it
-
-            })
-        }*/
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()

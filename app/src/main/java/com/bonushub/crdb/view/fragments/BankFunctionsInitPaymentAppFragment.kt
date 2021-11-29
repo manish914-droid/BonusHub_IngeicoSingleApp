@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
@@ -17,7 +16,6 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
 import com.bonushub.crdb.view.adapter.BankFunctionsInitPaymentAppAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
@@ -27,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class BankFunctionsInitPaymentAppFragment : Fragment() {
@@ -35,11 +32,8 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
     private var iDialog: IDialog? = null
     private val initViewModel : InitViewModel by viewModels()
 
-
     var binding: FragmentBankFunctionsInitPaymentAppBinding? = null
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
-
-    //lateinit var tidsWithStatusList:ArrayList<TidsListModel>
+    private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,10 +49,8 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.init_payment_app_header)
 
-        bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
         iDialog = (activity as NavigationActivity)
 
-        //tidsList = ArrayList()
         lifecycleScope.launch {
 
             bankFunctionsViewModel.getAllTidsWithStatus()?.observe(viewLifecycleOwner,{
@@ -91,35 +83,6 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
                 12 months onus       - 12
                 and so on*/
 
-
-                /*if(tidType?.size == linkTidType.size){
-                    for (i in 0 until tidType.size){
-
-                        if(tidType[i].equals("1")) {
-                            tidsList.add(TidsListModel(tids?.get(i)?:"", "Base Tid", "1"))
-                        }else{
-                            when(linkTidType[i]){
-
-                                "0" ->{
-                                    tidsList.add(TidsListModel(tids?.get(i)?:"", "for Amex", "0"))
-                                }
-
-                                "1" ->{
-                                    tidsList.add(TidsListModel(tids?.get(i)?:"", "DC type", "1"))
-                                }
-
-                                "2" ->{
-                                    tidsList.add(TidsListModel(tids?.get(i)?:"", "offus Tid", "0"))
-                                }
-
-                                else ->{
-                                    tidsList.add(TidsListModel(tids?.get(i)?:"", "${linkTidType.get(i)} months onus", ""))
-                                }
-
-                            }
-                        }
-                    }
-                }*/
 
 
             })

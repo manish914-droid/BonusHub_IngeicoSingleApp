@@ -5,9 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
@@ -35,9 +34,12 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
     lateinit var appDao: AppDao
     private val bankFunctionsItem: MutableList<BankFunctionsItem> by lazy { mutableListOf<BankFunctionsItem>() }
     private var iBankFunctionItemClick:IBankFunctionItemClick? = null
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
 
     var binding : FragmentBankFunctionsBinding? = null
+
+    private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
+    private var dialogSuperAdminPassword:Dialog? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,13 +57,15 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
         iBankFunctionItemClick = this
         bankFunctionsItem.clear()
         bankFunctionsItem.addAll(BankFunctionsItem.values())
-        bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
 
         setupRecyclerview()
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+
+
+
     }
 
 
@@ -80,17 +84,17 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
 
         override fun onClickOk(dialog: Dialog, password:String) {
 
-            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(requireActivity(),{
+            dialogSuperAdminPassword = dialog
+            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{
 
                 if(it)
                 {
-                    dialog.dismiss()
+                    dialogSuperAdminPassword?.dismiss()
                     (activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment())
                 }else{
                     ToastUtils.showToast(requireContext(),R.string.invalid_password)
                 }
             })
-
         }
 
         override fun onClickCancel() {

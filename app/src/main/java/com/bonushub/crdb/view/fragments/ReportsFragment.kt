@@ -1,40 +1,34 @@
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bonushub.crdb.HDFCApplication.Companion.appContext
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentReportsBinding
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchFileDataTable
-import com.bonushub.crdb.model.local.BrandEMIDataTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
-import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.ReportsAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
-import com.bonushub.pax.utils.EPrintCopyType
 import com.bonushub.pax.utils.ReportsItem
 import com.bonushub.pax.utils.TransactionType
-import com.bonushub.pax.utils.VxEvent
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-
+@AndroidEntryPoint
 class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
     private val reportsItemList: MutableList<ReportsItem> by lazy { mutableListOf<ReportsItem>() }
@@ -44,7 +38,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
     private var iDiag: IDialog? = null
 
-    private var batchFileViewModel:BatchFileViewModel? = null
+    private val batchFileViewModel:BatchFileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,8 +57,6 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.reports_header)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_reports)
-
-        batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
 
         iReportsFragmentItemClick = this
 

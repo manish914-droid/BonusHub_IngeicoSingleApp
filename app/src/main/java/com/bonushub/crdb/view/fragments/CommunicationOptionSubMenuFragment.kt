@@ -4,21 +4,18 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.FragmentCommunicationOptionBinding
 import com.bonushub.crdb.databinding.FragmentCommunicationOptionSubMenuBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
@@ -41,9 +38,10 @@ import kotlinx.coroutines.runBlocking
 @AndroidEntryPoint
 class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditItemClick {
 
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
-    lateinit var batchFileViewModel: BatchFileViewModel
-    //lateinit var terminalParameterTable: TerminalParameterTable
+    private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
+    private var dialogSuperAdminPassword:Dialog? = null
+
+    private val batchFileViewModel: BatchFileViewModel by viewModels()
     private var iBankFunctionsTableEditItemClick:IBankFunctionsTableEditItemClick? = null
     private lateinit var type :CommunicationParamItem
     lateinit var dataList: ArrayList<TableEditHelper?>
@@ -68,26 +66,16 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
         type = arguments?.getSerializable("type") as CommunicationParamItem
 
-        bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
-        batchFileViewModel = ViewModelProvider(this).get(BatchFileViewModel::class.java)
         iBankFunctionsTableEditItemClick = this
 
         iDialog = (activity as NavigationActivity)
 
-
         setUiForEdit()
-
-        // for check terminal id is going to edit
-       /* lifecycleScope.launch(Dispatchers.Main) {
-            bankFunctionsViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner,{
-
-                terminalParameterTable = it
-            })
-        }*/
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+
     }
 
     var dataPosition:Int = 0
@@ -182,19 +170,6 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
         if(dataList?.size?:0 == 0){
             ToastUtils.showToast(requireContext(),R.string.recoard_not_found)
         }else{
-           /* when(type)
-            {
-                CommunicationParamItem.TXN_PARAM ->{
-                    binding?.textViewHeader?.text = getString(R.string.txn_param_header)
-
-                }
-
-                CommunicationParamItem.APP_UPDATE_PARAM ->{
-                    binding?.textViewHeader?.text = getString(R.string.app_update_param_header)
-
-                }
-            }*/
-
 
             lifecycleScope.launch(Dispatchers.Main) {
                 binding?.let {
@@ -216,13 +191,14 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
         override fun onClickOk(dialog: Dialog, password:String) {
 
+            dialogSuperAdminPassword = dialog
             bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{ success ->
 
                 if(success)
                 {
-                    dialog.dismiss()
-                    //
-                    //val batchData = BatchFileDataTable.selectBatchData() // get BatchFileDataTable data
+                    dialogSuperAdminPassword?.dismiss()
+
+
                     lifecycleScope.launch(Dispatchers.Main){
 
                         batchFileViewModel.getBatchTableData().observe(viewLifecycleOwner,{ batchData ->
@@ -281,7 +257,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                         dataList[position]?.isUpdated = true
                         mAdapter.notifyItemChanged(position)
                         lifecycleScope.launch {
-                            updateTable() // BB
+                            updateTable()
                         }
 
                     }
@@ -292,7 +268,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                 dataList[position]?.isUpdated = true
                 mAdapter.notifyItemChanged(position)
                 lifecycleScope.launch {
-                    updateTable() // BB
+                    updateTable()
                 }
             }
         }

@@ -16,8 +16,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -39,8 +37,6 @@ import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
-import com.bonushub.crdb.viewmodel.InitViewModel
-
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -162,8 +158,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         when(item.itemId)
         {
             R.id.bankFunction -> {
-
-                //bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java) // not need
 
                 DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel, false)
             }

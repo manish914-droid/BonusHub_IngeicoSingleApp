@@ -1,43 +1,31 @@
 package com.bonushub.crdb.view.fragments
 
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentCommunicationOptionBinding
-import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.TerminalParameterTable
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
-import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
 import com.bonushub.crdb.view.adapter.BankFunctionsCommParamAdapter
-import com.bonushub.crdb.view.adapter.BankFunctionsTableEditAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
-import com.bonushub.crdb.viewmodel.BatchFileViewModel
-import com.bonushub.pax.utils.BankFunctionsAdminVasItem
 import com.bonushub.pax.utils.CommunicationParamItem
-import com.bonushub.pax.utils.PreferenceKeyConstant
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItemClick {
 
     private val cptListItem: MutableList<CommunicationParamItem> by lazy { mutableListOf<CommunicationParamItem>() }
     private var iCommunicationOptionFragmentItemClick:ICommunicationOptionFragmentItemClick? = null
 
-    lateinit var bankFunctionsViewModel: BankFunctionsViewModel
+    private val bankFunctionsViewModel: BankFunctionsViewModel by viewModels()
 
     private lateinit var type :CommunicationParamItem
     lateinit var terminalParameterTable: TerminalParameterTable
@@ -60,7 +48,6 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.communication_param_header)
 
         iCommunicationOptionFragmentItemClick = this
-        bankFunctionsViewModel = ViewModelProvider(this).get(BankFunctionsViewModel::class.java)
 
         cptListItem.clear()
         cptListItem.addAll(CommunicationParamItem.values())

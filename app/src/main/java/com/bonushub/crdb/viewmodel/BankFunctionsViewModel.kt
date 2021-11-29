@@ -36,11 +36,18 @@ class BankFunctionsViewModel @ViewModelInject constructor(private val bankFuncti
 
 
     private var isSuperAdminPassword:LiveData<Boolean>? = null
-    val superAdminPassword = MutableLiveData<LiveData<Boolean>>()
     fun isSuperAdminPassword(password:String):LiveData<Boolean>? {
 
-        isSuperAdminPassword = bankFunctionsRepository.isSuperAdminPassword(password)
+        viewModelScope.launch {
+            try {
+                isSuperAdminPassword = bankFunctionsRepository.isSuperAdminPassword(password)
+            }catch (ex: Exception){
+                ex.printStackTrace()
+            }
+        }
+
         return isSuperAdminPassword
+
     }
 
 
@@ -49,42 +56,51 @@ class BankFunctionsViewModel @ViewModelInject constructor(private val bankFuncti
     suspend fun getTerminalParamField():LiveData<ArrayList<TableEditHelper?>>? {
 
         terminalParamField = bankFunctionsRepository.getTerminalParameterTableData()
+
         return terminalParamField
     }
 
     private var terminalParameterTable:LiveData<TerminalParameterTable>? = null
-
     suspend fun getTerminalParameterTable():LiveData<TerminalParameterTable>? {
+
         terminalParameterTable = bankFunctionsRepository.getTerminalParameterTable()
+
         return terminalParameterTable
     }
 
     private var isUpdateTid:LiveData<Boolean>? = null
     suspend fun updateTerminalTable(dataList: ArrayList<TableEditHelper?>, context:Context):LiveData<Boolean>?{
+
         isUpdateTid = bankFunctionsRepository.updateTerminalParameterTable(dataList, context)
         return isUpdateTid
     }
 
     //TerminalCommunicationTable
     private var terminalCommunicationTable:LiveData<ArrayList<TableEditHelper?>>? = null
-
     suspend fun getTerminalCommunicationTableByRecordType(recordType:String):LiveData<ArrayList<TableEditHelper?>>? {
 
-        terminalCommunicationTable = bankFunctionsRepository.getTerminalCommunicationTableByRecordType(recordType)
+            terminalCommunicationTable =
+                bankFunctionsRepository.getTerminalCommunicationTableByRecordType(recordType)
         return terminalCommunicationTable
     }
 
     private var isUpdateTid2:LiveData<Boolean>? = null
     suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context:Context):LiveData<Boolean>{
-        isUpdateTid2 = bankFunctionsRepository.updateTerminalCommunicationTable(dataList, recordType, context)
+
+            isUpdateTid2 = bankFunctionsRepository.updateTerminalCommunicationTable(
+                dataList,
+                recordType,
+                context
+            )
+
         return isUpdateTid2 as LiveData<Boolean>
     }
 
     private var allTidsWithStatus:LiveData<ArrayList<TidsListModel>>? = null
-
     suspend fun getAllTidsWithStatus():LiveData<ArrayList<TidsListModel>>? {
 
-        allTidsWithStatus = bankFunctionsRepository.getAllTidsWithStatus()
+            allTidsWithStatus = bankFunctionsRepository.getAllTidsWithStatus()
+
         return allTidsWithStatus
     }
 }
