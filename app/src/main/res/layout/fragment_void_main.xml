@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".view.fragments.VoidMainFragment">
+
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible" />
+
+    <EditText
+        android:id="@+id/edtTextSearchTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sub_header_view"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/edge_blue_bg_white_off"
+        android:cursorVisible="false"
+        android:fontFamily="@font/muli_regular"
+        android:inputType="text"
+        android:lines="1"
+        android:hint="@string/search_transaction"
+        android:padding="14dp"
+        android:textColor="@color/txt_color"
+        android:textColorHint="@color/hint_color"
+        android:textSize="@dimen/text_size_small" />
+
+    <TextView
+        android:id="@+id/txtViewSearchTransaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtTextSearchTransaction"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/edge_blue"
+        android:fontFamily="@font/muli_regular"
+        android:paddingStart="33dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="33dp"
+        android:paddingBottom="10dp"
+        android:text="@string/search_transaction"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small" />
+
+</RelativeLayout>

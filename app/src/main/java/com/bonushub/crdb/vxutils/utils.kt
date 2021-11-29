@@ -2,6 +2,9 @@ package com.bonushub.crdb.utils
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.AppPreference
@@ -16,6 +20,7 @@ import com.bonushub.crdb.model.local.IngenicoInitialization
 import com.bonushub.crdb.model.local.InitDataListList
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.DashboardFragment
 import com.bonushub.crdb.vxutils.Utility.*
 import com.bonushub.pax.utils.TransactionType
@@ -31,10 +36,8 @@ import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
 import com.usdk.apiservice.aidl.pinpad.UPinpad
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import java.lang.Runnable
 import java.nio.charset.StandardCharsets
 
 private var listofTids= ArrayList<String>()
@@ -586,6 +589,57 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
     appDao.insertIngenicoIntializationData(model)
 }
 
+
+
+fun failureImpl(
+    context: Context,
+    servicemsg: String,
+    msg: String,
+    exception: Exception = Exception()
+) {
+    val builder = AlertDialog.Builder(context)
+    object : Thread() {
+        override fun run() {
+            Looper.prepare()
+            builder.setTitle("Alert...!!")
+            builder.setCancelable(false)
+            builder.setMessage("Something went wrong.\n" + "Your data is safe")
+                .setCancelable(false)
+                /* .setPositiveButton("Start") { _, _ ->
+                     forceStart(context)
+                 }*/
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                    context.startActivity(Intent(context, NavigationActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                    //  (context as Activity).finishAffinity()
+                }
+            val alert: AlertDialog = builder.create()
+            try {
+                if (!alert.isShowing) {
+                    alert.show()
+                    Looper.loop()
+                }
+            } catch (ex: WindowManager.BadTokenException) {
+                ex.printStackTrace()
+                Handler(Looper.getMainLooper()).postDelayed(Runnable {
+                    GlobalScope.launch {
+                       // VFService.connectToVFService(VerifoneApp.appContext)
+                    }
+                }, 200)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                Handler(Looper.getMainLooper()).postDelayed(Runnable {
+                    GlobalScope.launch {
+                       // VFService.connectToVFService(VerifoneApp.appContext)
+                    }
+                }, 200)
+            }
+
+        }
+    }.start()
+}
 
 
 

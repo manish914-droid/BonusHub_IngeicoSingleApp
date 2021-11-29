@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class BankFunctionsViewModel @ViewModelInject constructor(private val bankFunctionsRepository: BankFunctionsRepository):ViewModel() {
 
     private var isAdminPassword:LiveData<Boolean>? = null
-    private val adminPassword = MutableLiveData<LiveData<Boolean>>()
+    val adminPassword = MutableLiveData<LiveData<Boolean>>()
 
     fun isAdminPassword(password:String) {
         viewModelScope.launch {
@@ -36,7 +36,7 @@ class BankFunctionsViewModel @ViewModelInject constructor(private val bankFuncti
 
 
     private var isSuperAdminPassword:LiveData<Boolean>? = null
-
+    val superAdminPassword = MutableLiveData<LiveData<Boolean>>()
     fun isSuperAdminPassword(password:String):LiveData<Boolean>? {
 
         isSuperAdminPassword = bankFunctionsRepository.isSuperAdminPassword(password)
