@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.HDFCApplication.Companion.appContext
 import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
@@ -26,23 +27,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class BankFunctionsRepository {
+class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
 
-    companion object{
-
-        @Synchronized
-        fun getInstance():BankFunctionsRepository{
-            return BankFunctionsRepository()
-        }
-    }
-
-    fun isAdminPassword(password:String):LiveData<Boolean>{
+    suspend fun isAdminPassword(password:String):LiveData<Boolean>{
         val data = MutableLiveData<Boolean>()
 
         // write logic whether password is correct or not
         runBlocking {
-            var tpt = DBModule.appDatabase?.appDao?.getSingleRowTerminalParameterTableData()
+            var tpt = appDao.getSingleRowTerminalParameterTableData()
             try {
                 // logger("sap",""+tpt?.adminPassword)
                 data.value =  tpt?.adminPassword.equals(password,true)
@@ -59,7 +53,7 @@ class BankFunctionsRepository {
 
         // write logic whether super password is correct or not
         runBlocking {
-            var tpt = DBModule.appDatabase?.appDao?.getSingleRowTerminalParameterTableData()
+            var tpt = appDao.getSingleRowTerminalParameterTableData()
             try {
                // logger("sap",""+tpt?.superAdminPassword)
 

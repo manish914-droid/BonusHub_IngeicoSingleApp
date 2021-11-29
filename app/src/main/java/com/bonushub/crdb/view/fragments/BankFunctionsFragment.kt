@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
@@ -22,11 +23,16 @@ import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.pax.utils.BankFunctionsItem
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.response.OperationResult
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
 
+    @Inject
+    lateinit var appDao: AppDao
     private val bankFunctionsItem: MutableList<BankFunctionsItem> by lazy { mutableListOf<BankFunctionsItem>() }
     private var iBankFunctionItemClick:IBankFunctionItemClick? = null
     lateinit var bankFunctionsViewModel: BankFunctionsViewModel
