@@ -605,7 +605,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         println("RESULT TWO --->  $resultTwo")
                     }
 
-                    inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.SALE)
+                    inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.REFUND)
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
@@ -647,8 +647,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             else->{
-                val intent = Intent (this, TransactionActivity::class.java)
-                startActivity(intent)
+
 
             }
 
