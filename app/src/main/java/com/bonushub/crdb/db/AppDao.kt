@@ -33,9 +33,9 @@ interface AppDao{
     @Query("DELETE From BatchFileDataTable")
     suspend fun deleteBatchFileTable()
 
-    @Query("SELECT * FROM BatchFileDataTable WHERE invoiceNumber = :invoice AND transactionType != :transType")
+  /*  @Query("SELECT * FROM BatchFileDataTable WHERE invoiceNumber = :invoice AND transactionType != :transType")
     fun getBatchDataFromInvoice(invoice: String?, transType: Int): BatchFileDataTable?
-
+*/
     @Query("SELECT * FROM BatchFileDataTable WHERE invoiceNumber = :invoice AND transactionType = :transType")
     fun getSale2VoidUpdatedData(invoice: String?, transType: Int): BatchFileDataTable?
 
@@ -296,6 +296,9 @@ interface AppDao{
         list[0]
     }
 
+
+
+
 }
 
     @Query("SELECT * FROM IssuerParameterTable WHERE issuerId = :issuerId ")
@@ -346,4 +349,17 @@ interface AppDao{
     /*@Query("SELECT * FROM BrandEMIDataTable WHERE hostInvoice = :hostInvoice AND hostTid = :hostTid")
     fun getBrandEMIDataTable(hostInvoice: String?, hostTid: String): BrandEMIDataTable?*/
     // end region
+
+    // region ========== BatchTable dao ======
+    @Query("SELECT * FROM BatchTable")
+    suspend fun getBatchData(): MutableList<BatchTable?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBatchData(brandSubCat: BatchTable): Long?
+
+    @Query("SELECT * FROM BatchTable WHERE invoice = :invoice")// AND transactionType != :transType")
+    fun getBatchDataFromInvoice(invoice: String?): BatchTable?
+
+    // endregion ================
+
 }

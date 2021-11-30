@@ -7,8 +7,14 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
+import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.di.DBModule.appDatabase
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
@@ -23,7 +29,8 @@ import com.bonushub.pax.utils.VxEvent
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
-import com.ingenico.hdfcpayment.request.SaleRequest
+import com.ingenico.hdfcpayment.request.*
+
 import com.ingenico.hdfcpayment.response.PaymentResult
 import com.ingenico.hdfcpayment.response.TransactionResponse
 import com.ingenico.hdfcpayment.type.ResponseCode
@@ -32,10 +39,12 @@ import com.usdk.apiservice.aidl.printer.*
 
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew(){
@@ -54,6 +63,8 @@ class TransactionActivity : BaseActivityNew(){
 
 
     private val saleAmt by lazy { intent.getStringExtra("saleAmt") ?: "0" }
+    private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
+
     private val mobileNumber by lazy { intent.getStringExtra("mobileNumber") ?: "" }
 
     private val billNumber by lazy { intent.getStringExtra("billNumber") ?: "0" }
@@ -65,8 +76,14 @@ class TransactionActivity : BaseActivityNew(){
 
     private val searchCardViewModel : SearchViewModel by viewModels()
 
-    //  private lateinit var deviceService: UsdkDeviceService
+    private val tid by lazy {
+"30160035"
 
+    }
+    //  private lateinit var deviceService: UsdkDeviceService
+   /* @Inject
+    lateinit var appDao: AppDao*/
+    private val appDao: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
@@ -181,7 +198,6 @@ class TransactionActivity : BaseActivityNew(){
         emvBinding?.baseAmtTv?.text=saleAmt
 
         when(transactionTypeEDashboardItem){
-
             EDashboardItem.BRAND_EMI->{
                 searchCardViewModel.fetchCardTypeData()
                 setupObserver()
@@ -197,7 +213,7 @@ class TransactionActivity : BaseActivityNew(){
                             amount = amt ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
-                            tid = "30160031",
+                            tid = tid,
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
@@ -218,6 +234,12 @@ class TransactionActivity : BaseActivityNew(){
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
+                                            val batchData=BatchTable(receiptDetail)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                DBModule.appDatabase.appDao.insertBatchData(batchData)
+                                            }
                                             printingSaleData(receiptDetail)
                                         }
 
@@ -249,6 +271,271 @@ class TransactionActivity : BaseActivityNew(){
                     exc.printStackTrace()
                 }
             }
+
+            EDashboardItem.CASH_ADVANCE->{
+                val amt=(saleAmt.toFloat() * 100).toLong()
+                var ecrID: String
+                try {
+                    DeviceHelper.doCashAdvanceTxn(
+                        CashOnlyRequest(
+                            cashAmount = amt,
+                            tid = tid,
+                            transactionUuid = UUID.randomUUID().toString().also {
+                                ecrID = it
+
+                            }
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val receiptDetail = txnResponse?.receiptDetail
+
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        val jsonResp=Gson().toJson(receiptDetail)
+                                        println(jsonResp)
+                                        //   detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                        if (receiptDetail != null) {
+                                            val batchData=BatchTable(receiptDetail)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                DBModule.appDatabase.appDao.insertBatchData(batchData)
+                                            }
+                                            printingSaleData(receiptDetail)
+                                        }
+
+
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        //  detailResponse.forEach { println(it) }
+                                        /* if (receiptDetail != null) {
+                                             val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
+                                            val obj=Gson().fromJson(jsonstr,ReceiptDetail::class.java)
+                                            startPrinting(obj)
+                                             val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
+                                            startActivity(intent)
+
+                                        }*/
+                                    }
+                                    else -> {
+                                        val intent = Intent (this@TransactionActivity, NavigationActivity::class.java)
+                                        startActivity(intent)
+
+                                        println("Error")}
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }
+            }
+            EDashboardItem.SALE_WITH_CASH->{
+                try {
+                    val amt=(saleAmt.toFloat() * 100).toLong()
+                    val cashBackAmount=(cashBackAmt.toFloat() * 100).toLong()
+                    var ecrID: String
+
+                    DeviceHelper.doSaleWithCashTxn(
+                        SaleCashBackRequest(
+                            amount = amt,
+                            cashAmount=cashBackAmount,
+                            tid = tid,
+                            transactionUuid = "12345"/*UUID.randomUUID().toString().also {
+                                ecrID = it
+
+                            }*/
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val receiptDetail = txnResponse?.receiptDetail
+
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        val jsonResp=Gson().toJson(receiptDetail)
+                                        println(jsonResp)
+                                        //   detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                        if (receiptDetail != null) {
+                                            val batchData=BatchTable(receiptDetail)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                DBModule.appDatabase.appDao.insertBatchData(batchData)
+                                            }
+                                            printingSaleData(receiptDetail)
+                                        }
+
+
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        //  detailResponse.forEach { println(it) }
+                                        /* if (receiptDetail != null) {
+                                             val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
+                                            val obj=Gson().fromJson(jsonstr,ReceiptDetail::class.java)
+                                            startPrinting(obj)
+                                             val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
+                                            startActivity(intent)
+
+                                        }*/
+                                    }
+                                    else -> {
+                                        val intent = Intent (this@TransactionActivity, NavigationActivity::class.java)
+                                        startActivity(intent)
+
+                                        println("Error")}
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }
+            }
+
+            EDashboardItem.REFUND->{
+                try {
+                    val amt=(saleAmt.toFloat() * 100).toLong()
+                  //  val cashBackAmount=(cashBackAmt.toFloat() * 100).toLong()
+                    var ecrID: String
+
+                    DeviceHelper.doRefundTxn(
+                        RefundRequest(
+                            amount = amt,
+                            tid = tid,
+                            transactionUuid = UUID.randomUUID().toString().also {
+                                ecrID = it
+
+                            }
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val receiptDetail = txnResponse?.receiptDetail
+
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        val jsonResp=Gson().toJson(receiptDetail)
+                                        println(jsonResp)
+                                        //   detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                        if (receiptDetail != null) {
+                                            val batchData=BatchTable(receiptDetail)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                DBModule.appDatabase.appDao.insertBatchData(batchData)
+                                            }
+                                            printingSaleData(receiptDetail)
+                                        }
+
+
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        //  detailResponse.forEach { println(it) }
+                                        /* if (receiptDetail != null) {
+                                             val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
+                                            val obj=Gson().fromJson(jsonstr,ReceiptDetail::class.java)
+                                            startPrinting(obj)
+                                             val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
+                                            startActivity(intent)
+
+                                        }*/
+                                    }
+                                    else -> {
+                                        val intent = Intent (this@TransactionActivity, NavigationActivity::class.java)
+                                        startActivity(intent)
+
+                                        println("Error")}
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }
+            }
+            EDashboardItem.PREAUTH->{
+                try {
+                    val amt=(saleAmt.toFloat() * 100).toLong()
+
+                    var ecrID: String
+
+                    DeviceHelper.doPreAuthTxn(
+                        PreAuthRequest(
+                            amount = amt,
+                            tid = tid,
+                            transactionUuid = UUID.randomUUID().toString().also {
+                                ecrID = it
+
+                            }
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val receiptDetail = txnResponse?.receiptDetail
+
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        val jsonResp=Gson().toJson(receiptDetail)
+                                        println(jsonResp)
+                                        //   detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                        if (receiptDetail != null) {
+                                            val batchData=BatchTable(receiptDetail)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                DBModule.appDatabase.appDao.insertBatchData(batchData)
+                                            }
+                                            printingSaleData(receiptDetail)
+                                        }
+
+
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        //  detailResponse.forEach { println(it) }
+                                        /* if (receiptDetail != null) {
+                                             val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
+                                            val obj=Gson().fromJson(jsonstr,ReceiptDetail::class.java)
+                                            startPrinting(obj)
+                                             val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
+                                            startActivity(intent)
+
+                                        }*/
+                                    }
+                                    else -> {
+                                        val intent = Intent (this@TransactionActivity, NavigationActivity::class.java)
+                                        startActivity(intent)
+
+                                        println("Error")}
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }
+            }
             else -> {
 
             }
@@ -268,7 +555,7 @@ class TransactionActivity : BaseActivityNew(){
            (this@TransactionActivity as BaseActivityNew).hideProgress()
             if (printCB) {
                 printsts = printCB
-                GlobalScope.launch(Dispatchers.Main) {
+                lifecycleScope.launch(Dispatchers.Main) {
                     showMerchantAlertBox(receiptDetail)
                 }
 

@@ -10,8 +10,7 @@ import com.bonushub.crdb.HDFCApplication.Companion.appContext
 import com.ingenico.hdfcpayment.IPaymentService
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
-import com.ingenico.hdfcpayment.request.SaleRequest
-import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
+import com.ingenico.hdfcpayment.request.*
 import com.usdk.apiservice.aidl.DeviceServiceData
 import com.usdk.apiservice.aidl.UDeviceService
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
@@ -199,6 +198,31 @@ object DeviceHelper   {
     fun doSaleTransaction(request: SaleRequest, listener: OnPaymentListener?) {
         iRemoteService?.doSaleTransaction(request, listener)
     }
+    /**
+     * Execute Cash Advance transaction
+     * */
+    fun doCashAdvanceTxn(cashOnly:CashOnlyRequest,listener: OnPaymentListener?){
+        iRemoteService?.doCashOnlyTransaction(cashOnly,listener)
+    }
+    /**
+     * Execute Sale with Cash transaction
+     * */
+    fun doSaleWithCashTxn(saleCashBackRequest: SaleCashBackRequest, listener: OnPaymentListener?){
+        iRemoteService?.doSaleCashBackTransaction(saleCashBackRequest,listener)
+    }
+    /**
+     * Execute PreAuth transaction
+     * */
+    fun doPreAuthTxn(preAuthRequest: PreAuthRequest, listener: OnPaymentListener?){
+        iRemoteService?.doPreAuthTransaction(preAuthRequest,listener)
+    }
+    /**
+     * Execute Refund transaction
+     * */
+    fun doRefundTxn(refundRequest: RefundRequest, listener: OnPaymentListener?){
+        iRemoteService?.doRefundTransaction(refundRequest,listener)
+    }
+
 
     /**
      * Show admin function screen

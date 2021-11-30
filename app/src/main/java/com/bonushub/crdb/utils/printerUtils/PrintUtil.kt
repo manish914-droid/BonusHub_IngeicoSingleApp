@@ -10,6 +10,7 @@ import android.util.Log
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.failureImpl
+
 import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.EPrintCopyType
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -87,10 +88,10 @@ class PrintUtil(context: Context?) {
                 val date = receiptDetail.dateTime
                 val parts = date?.split(" ")
                 println("Date: " + parts!![0])
-                println("Time: " + (parts?.get(1)) )
+                println("Time: " + (parts[1]) )
 
-                textBlockList.add( sigleLineformat( "DATE:${parts?.get(0)}",AlignMode.LEFT))
-              textBlockList.add(sigleLineformat( "TIME:${(parts?.get(1))}",AlignMode.RIGHT))
+                textBlockList.add( sigleLineformat( "DATE:${parts[0]}",AlignMode.LEFT))
+              textBlockList.add(sigleLineformat( "TIME:${(parts[1])}",AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 

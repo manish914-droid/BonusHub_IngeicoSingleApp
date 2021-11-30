@@ -44,6 +44,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 import com.bonushub.pax.utils.TransactionType
+import com.bonushub.pax.utils.UiAction
 
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -488,7 +489,7 @@ class NewInputAmountFragment : Fragment() {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
         when (eDashBoardItem) {
-            EDashboardItem.SALE -> {
+          EDashboardItem.SALE -> {
                 val saleAmt = saleAmount.toString().trim().toDouble()
                 val saleTipAmt = cashAmt.toString().trim().toDouble()
                 val trnsAmt = saleAmt + saleTipAmt
@@ -555,7 +556,6 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             }
-
             EDashboardItem.BRAND_EMI -> {
                 when {
                     // mobile entry  optional handling
@@ -588,18 +588,47 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             }
-
             EDashboardItem.CASH_ADVANCE -> {
-
+                iFrReq?.onFragmentRequest(
+                    EDashboardItem.CASH_ADVANCE,
+                    Pair(
+                        saleAmount,
+                        cashAmt.toString().trim()
+                    )
+                )
             }
             EDashboardItem.SALE_WITH_CASH -> {
-
+                if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
+                    maxAmountLimitDialog(iDialog,maxTxnLimit)
+                    return
+                }
+                iFrReq?.onFragmentRequest(
+                    EDashboardItem.SALE_WITH_CASH,
+                    Pair(
+                        saleAmount.toString().trim(),
+                        cashAmt.toString().trim()
+                    )
+                )
             }
             EDashboardItem.REFUND -> {
-
+                if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
+                    maxAmountLimitDialog(iDialog,maxTxnLimit)
+                    return
+                }
+                iFrReq?.onFragmentRequest(
+                    EDashboardItem.REFUND,
+                    Pair(saleAmount.toString().trim(), "0")
+                )
             }
             EDashboardItem.PREAUTH -> {
-
+                if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
+                    maxAmountLimitDialog(iDialog,maxTxnLimit)
+                    return
+                }
+                iFrReq?.onFragmentRequest(
+                    EDashboardItem.PREAUTH,
+                    Pair(saleAmount.toString().trim(), "0")
+                )
             }
 
             EDashboardItem.EMI_ENQUIRY -> {

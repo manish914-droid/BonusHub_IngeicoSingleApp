@@ -7,6 +7,7 @@ import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.pax.utils.EDashboardItem
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.type.CvmAction
 import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
@@ -1035,29 +1036,11 @@ data class BrandEMIAccessDataModalTable(
 
 // region ====== OnpaymentListner response from ingenico data table ======
 @Entity
-data class IngenicoPaymentResponseTable( var	authCode   :String?,
-                                    var	aid:String?,
-                                    var	batchNumber:String?,
-                                    var	cardHolderName:String?,
-                                    var	cardType:String?,
-                                    var	appName:String?,
-                                    var	dateTime:String?,
-                                    var	invoice:String?,
-                                    var	mid:String?,
-                                    var	merAddHeader1:String?,
-                                    var	merAddHeader2:String?,
-                                    var	rrn:String?,
-                                    var	stan:String?,
-                                    var	tc:String?,
-                                    var	tid:String?,
-                                    var	tsi:String?,
-                                    var tvr:String?,
-                                    var	entryMode:String?,
-                                    var	txnName:String?,
-                                    var	txnResponseCode:String?,
-                                    var	txnAmount :String?,
-                                    var cvmResult : CvmAction?,
-                                    var cvmRequiredLimit:Long?):Serializable
+data class BatchTable( var receiptData:ReceiptDetail?=null){
+    @PrimaryKey(autoGenerate = false)
+    var invoice: String=""
+
+}
 // endregion
 
 @Entity
