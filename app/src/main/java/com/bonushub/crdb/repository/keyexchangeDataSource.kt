@@ -49,26 +49,14 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
     companion object {
         private val TAG = KeyExchanger::class.java.simpleName
-
         fun getF61(): String {
-            val appName =
-                addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
-
-
-            val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
-
-          //  val deviceModel = addPad(DeviceHelper.getDeviceModel() ?: "", "*", 6, false)
-
-            val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
-            //   val version1 = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-            val version = "${BuildConfig.VERSION_NAME}.$buildDate"
+            val appName = addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
+            val deviceModel = addPad(deviceModel(), "*", 6, false)
+            val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val connectionType = ConnectionType.GPRS.code
-            val pccNo =
-                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
-            val pcNo2 =
-                addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
-
-            return "$connectionType$deviceModel$appName$version$pccNo${""}"
+            val pccNo = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+            val pcNo2 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
+            return "$connectionType$deviceModel$appName$version$pccNo$pcNo2"
         }
 
     }
@@ -156,16 +144,10 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
 
         //region=========adding field 61=============
-        val appName =
-            addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
+        val appName = addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
 
-        val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
-
-      // val deviceModel = addPad(DeviceHelper.getDeviceModel() ?: "", "*", 6, true)
-
-        val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
-        // val buildDate: String = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
-        val version = "${BuildConfig.VERSION_NAME}.$buildDate"
+        val deviceModel = addPad(deviceModel(), "*", 6, true)
+        val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
         val connectionType = ConnectionType.GPRS.code
         val pccNo =
             addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)

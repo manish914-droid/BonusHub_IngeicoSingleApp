@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
+import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.AppPreference
@@ -589,7 +590,24 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
     appDao.insertIngenicoIntializationData(model)
 }
 
+fun deviceModel(): String{
+    return try {
+        var strdeviceModel = DeviceHelper.getDeviceModel() ?: ""
 
+        return strdeviceModel.subSequence(0,6).toString()
+       }
+    catch (ex: Exception){
+        ex.printStackTrace()
+        return ""
+    }
+
+}
+
+//region================================AppVersionName + AppRevisionID returning method:-
+fun getAppVersionNameAndRevisionID(): String {
+    return "${BuildConfig.VERSION_NAME}.${BuildConfig.REVISION_ID}"
+}
+//endregion
 
 fun failureImpl(
     context: Context,
