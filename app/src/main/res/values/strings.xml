@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">BonusHub</string>
 
+    <!--TODO: Settlement-->
+    <string name="_1245678">123456789</string>
+    <string name="_06_07_2020">02/12/2020</string>
+    <string name="do_you_want_to_settle_batch">Do You Want To Settle Batch?</string>
+
     <!--TODO: Init-->
     <string name="enter_tid_colon">Enter TID :</string>
     <string name="proceed_to_init">Proceed To Init</string>

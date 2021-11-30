@@ -170,7 +170,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             R.id.settlement -> {
-
+                closeDrawer()
+                transactFragment(SettlementFragment())
             }
         }
         return true

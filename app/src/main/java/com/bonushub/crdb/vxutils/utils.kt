@@ -659,7 +659,32 @@ fun failureImpl(
     }.start()
 }
 
+//region===============================Below method is used to show Invoice with Padding:-
+fun invoiceWithPadding(invoiceNo: String) =
+    addPad(input = invoiceNo, padChar = "0", totalLen = 6, toLeft = true)
+//endregion
 
+//region=====================================GET Transaction Type Name:-
+fun getTransactionTypeName(type: Int): String? {
+    var name: String? = null
+    name = when (type) {
+        TransactionType.SALE.type -> TransactionType.SALE.txnTitle
+        TransactionType.SALE_WITH_CASH.type -> TransactionType.SALE_WITH_CASH.txnTitle
+        TransactionType.CASH_AT_POS.type -> TransactionType.CASH_AT_POS.txnTitle
+        TransactionType.PRE_AUTH.type -> TransactionType.PRE_AUTH.txnTitle
+        TransactionType.PRE_AUTH_COMPLETE.type -> TransactionType.PRE_AUTH_COMPLETE.txnTitle
+        TransactionType.PENDING_PREAUTH.type -> TransactionType.PENDING_PREAUTH.txnTitle
+        TransactionType.VOID.type -> TransactionType.VOID.txnTitle
+        TransactionType.REFUND.type -> TransactionType.REFUND.txnTitle
+        TransactionType.VOID_REFUND.type -> TransactionType.VOID_REFUND.txnTitle
+        TransactionType.EMI.type -> TransactionType.EMI.txnTitle
+        TransactionType.EMI_SALE.type -> TransactionType.EMI_SALE.txnTitle
+        TransactionType.TIP_SALE.type -> TransactionType.TIP_SALE.txnTitle
+        else -> "NONE"
+    }
+    return name
+}
+//endregion
 
 
 
