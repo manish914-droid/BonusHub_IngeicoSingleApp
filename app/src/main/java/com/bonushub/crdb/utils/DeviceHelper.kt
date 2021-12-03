@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.*
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication.Companion.appContext
+import com.bonushub.crdb.model.local.IngenicoSettlementResponse
 import com.ingenico.hdfcpayment.IPaymentService
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -221,6 +222,13 @@ object DeviceHelper   {
      * */
     fun doRefundTxn(refundRequest: RefundRequest, listener: OnPaymentListener?){
         iRemoteService?.doRefundTransaction(refundRequest,listener)
+    }
+
+    /**
+     * Execute Settlement transaction
+     * */
+    fun doSettlement(request: SettlementRequest, listener: OnOperationListener?){
+        iRemoteService?.doSettlement(request, listener)
     }
 
 

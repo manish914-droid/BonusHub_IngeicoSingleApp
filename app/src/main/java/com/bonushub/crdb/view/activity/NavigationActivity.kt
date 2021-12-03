@@ -88,7 +88,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         setContentView(navigationBinding?.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment?
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
 

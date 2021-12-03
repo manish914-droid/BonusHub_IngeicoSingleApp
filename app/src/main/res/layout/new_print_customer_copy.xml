@@ -63,10 +63,10 @@
                 android:layout_marginEnd="@dimen/pad_8"
                 android:padding="@dimen/pad_2"
                 android:text="@string/no"
-                android:textColor="@color/themeBackground"
-                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small">
 
- />
+            </Button>
 
             <Button
                 android:id="@+id/yesBtn"
@@ -76,7 +76,7 @@
                 android:layout_marginStart="@dimen/pad_8"
                 android:padding="@dimen/pad_2"
                 android:text="@string/yes"
-                android:textColor="@color/txt_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_small"
                  />
         </LinearLayout>

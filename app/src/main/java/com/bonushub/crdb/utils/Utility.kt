@@ -47,8 +47,8 @@ val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 
 
-val NEW_IP_ADDRESS = "192.168.250.10"//"203.112.151.169"
-var PORT =4124//8109// /*9101*//*4124*/8109
+val NEW_IP_ADDRESS = /*"192.168.250.10"*/"203.112.151.169"
+var PORT =8109//8109// /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 

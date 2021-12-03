@@ -9,6 +9,9 @@ import kotlinx.coroutines.runBlocking
 interface AppDao{
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
+     suspend fun insertIngenicoSettlement(ingenicoSettlementResponse: IngenicoSettlementResponse)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIngenicoIntializationData(initialization: IngenicoInitialization)
 
     @Query("SELECT * FROM IngenicoInitialization")

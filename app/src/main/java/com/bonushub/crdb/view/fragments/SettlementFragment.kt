@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,18 +20,19 @@ import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.databinding.ItemSettlementBinding
 import com.bonushub.crdb.model.local.BatchFileDataTable
-import com.bonushub.crdb.utils.getTransactionTypeName
-import com.bonushub.crdb.utils.invoiceWithPadding
-import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
+import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.request.SettlementRequest
+import com.ingenico.hdfcpayment.response.OperationResult
+import com.ingenico.hdfcpayment.response.SettlementResponse
+import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import java.util.ArrayList
 
 @AndroidEntryPoint
 class SettlementFragment : Fragment() {
@@ -96,6 +98,25 @@ class SettlementFragment : Fragment() {
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
             (activity as NavigationActivity).alertBoxWithAction(
                 getString(R.string.settlement), getString(R.string.do_you_want_to_settle_batch), true, getString(R.string.yes), {
+                    settlementViewModel.settlementResponse()
+                    settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
+
+                        when (result.status) {
+                            Status.SUCCESS -> {
+                                Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                            }
+                            Status.ERROR -> {
+
+                                Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                            }
+                            Status.LOADING -> {
+                                Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                            }
+                        }
+
+                    }
 
                 },
                 {})
@@ -103,7 +124,6 @@ class SettlementFragment : Fragment() {
         //endregion
 
     }
-
     //region====================================SetUp RecyclerView:-
     private fun setUpRecyclerView() {
         if (dataList.size > 0) {

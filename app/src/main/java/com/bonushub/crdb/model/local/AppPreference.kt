@@ -33,7 +33,7 @@ object AppPreference {
     const val BANKCODE = "10" //For testing
     const val F48_STAMP = "f48timestamp"
     const val ACC_SEL_KEY = "acc_sel_key"
-  /*  const val PC_NUMBER_KEY = "pc_number_key"
+ /*   const val PC_NUMBER_KEY = "pc_number_key"
     const val PC_NUMBER_KEY_2 = "pc_number_key_2"*/
     const val LOGIN_KEY="login_key"
     const val F48IdentifierAndSuccesssTxn="f48id_txnDate"

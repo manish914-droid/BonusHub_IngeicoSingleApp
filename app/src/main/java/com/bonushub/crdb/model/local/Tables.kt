@@ -1076,7 +1076,23 @@ data class InitDataListList(
 
     ) // same
 
-data class TIDSStatusList(
-    val name: String? = null,
+@Entity
+data class IngenicoSettlementResponse(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null,
+    var status: String? = null,
+    var responseCode: String? = null,
+    var batchNumber: String? = null,
+    var appVersion: String? = null,
+    var releaseDate: String? = null,
+
+    @TypeConverters(Converters::class)
+    var tidList: List<String>? = null,
+
+    @TypeConverters(Converters::class)
+    var tidStatusList: List<String>? = null,
+
+    @TypeConverters(Converters::class)
+    var tids: List<String>? = null,
 
     )
