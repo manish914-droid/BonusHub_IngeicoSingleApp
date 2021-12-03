@@ -22,9 +22,11 @@ import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.addPad
 import com.bonushub.crdb.utils.getBaseTID
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
+import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.bonushub.pax.utils.DetectCardType
 import com.bonushub.pax.utils.EDashboardItem
@@ -70,6 +72,7 @@ class TransactionActivity : BaseActivityNew(){
 
     private val saleAmt by lazy { intent.getStringExtra("saleAmt") ?: "0" }
     private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
+    private val authCompletionData by lazy { intent.getSerializableExtra("authCompletionData") as AuthCompletionData }
 
     private val mobileNumber by lazy { intent.getStringExtra("mobileNumber") ?: "" }
 
@@ -474,8 +477,13 @@ class TransactionActivity : BaseActivityNew(){
                     DeviceHelper.doPreAuthCompleteTxn(
                         PreAuthCompleteRequest(
                             amount = amt,
-                            tid = tid,
-                            invoice = "000020",
+                            tid = authCompletionData.authTid,
+                            invoice =
+                            addPad(
+                                authCompletionData.authInvoice ?: "",
+                                "0",
+                                6
+                            ),
                             transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
                             }

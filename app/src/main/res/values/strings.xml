@@ -236,4 +236,6 @@
     <string name="tid_colon">TID:</string>
     <string name="invoice_number_colon">Invoice Number:</string>
     <string name="total_amount_colon">Total Amount:</string>
+    <string name="complete_pre_auth">Complete Preauth</string>
+    <string name="enter_invoice">Enter Invoice</string>
 </resources>
