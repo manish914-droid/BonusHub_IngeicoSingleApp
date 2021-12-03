@@ -34,7 +34,7 @@
 
             <EditText
                 android:id="@+id/saleAmount"
-                android:background="@drawable/card_edge"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:cursorVisible="false"
@@ -52,6 +52,7 @@
                 android:textSize="@dimen/key_text_size"
                 android:textColorHint="@color/colorGrey"
                 android:textColor="@color/txt_color"
+                android:background="@drawable/card_edge"
                />
 
         </com.google.android.material.card.MaterialCardView>

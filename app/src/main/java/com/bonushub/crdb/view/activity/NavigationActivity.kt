@@ -489,9 +489,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             putExtra("cashBackAmt", cashBackAmount)
                             putExtra("type", TransactionType.SALE_WITH_CASH.type)
                             putExtra("proc_code", ProcessingCode.SALE_WITH_CASH.code)
-                            /*      putExtra("mobileNumber", extraPair?.first)
-                                  putExtra("billNumber", extraPair?.second)
-                                  putExtra("saleWithTipAmt", saleWithTipAmt)*/
                             putExtra("edashboardItem",  EDashboardItem.SALE_WITH_CASH)
                         }, EIntentRequest.TRANSACTION.code
                     )
@@ -551,19 +548,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             EDashboardItem.PREAUTH_COMPLETE->{
                 if (checkInternetConnection()) {
                     //  val amt = data as String
-                    val amt = (data as Pair<*, *>).first.toString()
+                    val authCompletionData = (data as Pair<*, *>).first as AuthCompletionData
+                    val amt= authCompletionData.authAmt
                     startActivityForResult(
                         Intent(
                             this,
                             TransactionActivity::class.java
                         ).apply {
-                            val formattedTransAmount = "%.2f".format(amt.toDouble())
+                            val formattedTransAmount = "%.2f".format(amt?.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
+                            putExtra("authCompletionData",authCompletionData)
                             putExtra("type", TransactionType.PRE_AUTH_COMPLETE.type)
                             putExtra("proc_code", ProcessingCode.PRE_SALE_COMPLETE.code)
-                            /*      putExtra("mobileNumber", extraPair?.first)
-                                  putExtra("billNumber", extraPair?.second)
-                                  putExtra("saleWithTipAmt", saleWithTipAmt)*/
                             putExtra("edashboardItem",  EDashboardItem.PREAUTH_COMPLETE)
                         }, EIntentRequest.TRANSACTION.code
                     )
@@ -632,7 +628,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
                         println("RESULT TWO --->  $resultTwo")
                     }
-
+                //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
                     inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.SALE)
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
@@ -640,7 +636,17 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
             }
-
+            EDashboardItem.PREAUTH_COMPLETE->{  if (checkInternetConnection()) {
+                CoroutineScope(Dispatchers.IO).launch{
+                    val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                    println("TID LIST --->  $listofTids")
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    println("RESULT TWO --->  $resultTwo")
+                }
+                inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+            } else {
+                ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+            }}
             EDashboardItem.EMI_ENQUIRY -> {
                 if (Field48ResponseTimestamp.checkInternetConnection()) {
                     transactFragment(EMICatalogue().apply {
@@ -654,7 +660,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                 }
             }
-
             EDashboardItem.BRAND_EMI->{
                 transactFragment(BrandEmiMasterCategoryFragment())
              //   DBModule.appDatabase.appDao.insertBatchData(batchData)
@@ -677,8 +682,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     println(dd.toString())
                 }
                 transactFragment(VoidMainFragment())
+             //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+
 
             }
+
             else->{
 
 
