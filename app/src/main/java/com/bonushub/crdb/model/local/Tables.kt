@@ -56,7 +56,7 @@ data class BatchFileDataTable(
     var appVersion: String = "",
     var pcNumber: String = "",
     var posEntryValue: String = "",
-    var transactionalAmount: String = "",
+    var transactionalAmount: String = "200",
     var mti: String = "",
     var serialNumber: String = "",
     var sourceNII: String = "",
@@ -1039,6 +1039,7 @@ data class BrandEMIAccessDataModalTable(
 data class BatchTable( var receiptData:ReceiptDetail?=null){
     @PrimaryKey(autoGenerate = false)
     var invoice: String=""
+    var transactionType: Int = 0
 
 }
 // endregion

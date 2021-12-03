@@ -62,7 +62,7 @@ class TransactionActivity : BaseActivityNew(){
 
     private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
 
-  private val brandEmiSubCatData by lazy { intent.getSerializableExtra("brandEmiSubCatData") as BrandEMISubCategoryTable } //: BrandEMISubCategoryTable? = null
+    private val brandEmiSubCatData by lazy { intent.getSerializableExtra("brandEmiSubCatData") as BrandEMISubCategoryTable } //: BrandEMISubCategoryTable? = null
     private val brandEmiProductData by lazy { intent.getSerializableExtra("brandEmiProductData") as BrandEMIProductDataModal }
     private val brandDataMaster by lazy { intent.getSerializableExtra("brandDataMaster") as BrandEMIMasterDataModal }
     private val imeiOrSerialNum by lazy { intent.getStringExtra("imeiOrSerialNum") ?: "" }
@@ -84,8 +84,8 @@ class TransactionActivity : BaseActivityNew(){
 
 
     //  private lateinit var deviceService: UsdkDeviceService
-   /* @Inject
-    lateinit var appDao: AppDao*/
+    /* @Inject
+     lateinit var appDao: AppDao*/
 
     private var tid ="000000"
 
@@ -93,17 +93,18 @@ class TransactionActivity : BaseActivityNew(){
         super.onCreate(savedInstanceState)
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
         setContentView(emvBinding?.root)
-emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.title
+        emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.title
 
         if(transactionTypeEDashboardItem!= EDashboardItem.BRAND_EMI) {
-                emvBinding?.cardDetectImg?.visibility = View.GONE
-                emvBinding?.tvInsertCard?.visibility = View.GONE
-                emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
+            emvBinding?.cardDetectImg?.visibility = View.GONE
+            emvBinding?.tvInsertCard?.visibility = View.GONE
+            emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
         }
         lifecycleScope.launch(Dispatchers.IO) {
-          tid=  getBaseTID(appDatabase.appDao)
+            tid=  getBaseTID(appDatabase.appDao)
+            setupFlow()
         }
-        setupFlow()
+
         //searchCardViewModel.fetchCardTypeData()
 
 
@@ -137,9 +138,9 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
     }
 
     private fun setupEMVObserver() {
-       searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
-           if(cardProcessedDataModal.getPanNumberData() !=null) {
-               cardProcessedDataModal.getPanNumberData()
+        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
+            if(cardProcessedDataModal.getPanNumberData() !=null) {
+                cardProcessedDataModal.getPanNumberData()
                 var ecrID: String
 
                 Toast.makeText(
@@ -148,13 +149,13 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
                     Toast.LENGTH_LONG
                 ).show()
 
-               val intent = Intent (this, TenureSchemeActivity::class.java)
-               startActivity(intent)
+                val intent = Intent (this, TenureSchemeActivity::class.java)
+                startActivity(intent)
 
-               /*  lifecycleScope.launch(Dispatchers.IO) {
-                    // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                     serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-                 }*/
+                /*  lifecycleScope.launch(Dispatchers.IO) {
+                     // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
+                      serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
+                  }*/
 
             }
 
@@ -167,22 +168,22 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
             EDashboardItem.BRAND_EMI->{
                 searchCardViewModel.fetchCardTypeData()
                 setupObserver()
-              /*  val intent = Intent (this, TenureSchemeActivity::class.java)
-                startActivity(intent)*/
+                /*  val intent = Intent (this, TenureSchemeActivity::class.java)
+                  startActivity(intent)*/
             }
             EDashboardItem.SALE->{
-               /* DeviceHelper.doSettlementtxn(
-                    SettlementRequest(
-                      numberOfTids =  1,
-                        tid = listOf(tid),
-                    ),object: OnOperationListener.Stub(){
-                    override fun onCompleted(p0: OperationResult?) {
-                        p0?.value?.apply {
-                            println("Status = $status")
-                            println("Response code = $responseCode")
-                        }
-                    }
-                })*/
+                /* DeviceHelper.doSettlementtxn(
+                     SettlementRequest(
+                       numberOfTids =  1,
+                         tid = listOf(tid),
+                     ),object: OnOperationListener.Stub(){
+                     override fun onCompleted(p0: OperationResult?) {
+                         p0?.value?.apply {
+                             println("Status = $status")
+                             println("Response code = $responseCode")
+                         }
+                     }
+                 })*/
 
                 val amt=(saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
@@ -208,14 +209,15 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
-                                     //   detailResponse.forEach { println(it) }
+                                        //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData=BatchTable(receiptDetail)
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                            //    appDao.insertBatchData(batchData)
+                                                //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.SALE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -354,7 +356,7 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
             EDashboardItem.REFUND->{
                 try {
                     val amt=(saleAmt.toFloat() * 100).toLong()
-                  //  val cashBackAmount=(cashBackAmt.toFloat() * 100).toLong()
+                    //  val cashBackAmount=(cashBackAmt.toFloat() * 100).toLong()
                     var ecrID: String
 
                     DeviceHelper.doRefundTxn(
@@ -504,7 +506,7 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
                                     }
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
-                                       errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
+                                        errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
                                     }
                                     "03"->{
                                         errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
@@ -531,24 +533,24 @@ emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.ti
     fun printingSaleData(receiptDetail: ReceiptDetail) {
         lifecycleScope.launch(Dispatchers.Main) {
             showProgress(getString(R.string.printing))
-        var printsts = false
-        PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
-            receiptDetail,
-            EPrintCopyType.MERCHANT,
-            this@TransactionActivity as BaseActivityNew
-        ) { printCB, printingFail ->
+            var printsts = false
+            PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                receiptDetail,
+                EPrintCopyType.MERCHANT,
+                this@TransactionActivity as BaseActivityNew
+            ) { printCB, printingFail ->
 
-           (this@TransactionActivity as BaseActivityNew).hideProgress()
-            if (printCB) {
-                printsts = printCB
-                lifecycleScope.launch(Dispatchers.Main) {
-                    showMerchantAlertBox(receiptDetail)
+                (this@TransactionActivity as BaseActivityNew).hideProgress()
+                if (printCB) {
+                    printsts = printCB
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        showMerchantAlertBox(receiptDetail)
+                    }
+
+                } else {
+                    ToastUtils.showToast(this@TransactionActivity as BaseActivityNew,getString(R.string.printer_error))
                 }
-
-            } else {
-                ToastUtils.showToast(this@TransactionActivity as BaseActivityNew,getString(R.string.printer_error))
             }
-        }
         }
     }
     private fun showMerchantAlertBox(

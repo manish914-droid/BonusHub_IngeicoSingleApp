@@ -19,6 +19,8 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.databinding.ItemSettlementBinding
+import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -33,6 +35,7 @@ import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.ArrayList
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettlementFragment : Fragment() {
@@ -40,9 +43,12 @@ class SettlementFragment : Fragment() {
     private val fragmensettlementBinding : FragmentSettlementBinding by lazy {
         FragmentSettlementBinding.inflate(layoutInflater)
     }
+    @Inject
+    lateinit var appDao: AppDao
     private val settlementViewModel : SettlementViewModel by viewModels()
     private val dataList: MutableList<BatchFileDataTable> by lazy { mutableListOf<BatchFileDataTable>() }
     private val settlementAdapter by lazy { SettlementAdapter(dataList) }
+    private var settlementByteArray: ByteArray? = null
     private var navController: NavController? = null
     private var iDialog: IDialog? = null
 
@@ -103,6 +109,17 @@ class SettlementFragment : Fragment() {
 
                         when (result.status) {
                             Status.SUCCESS -> {
+                                CoroutineScope(Dispatchers.IO).launch{
+                                    val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                    settlementByteArray = data.generateIsoByteRequest()
+                                    try {
+                                        (activity as NavigationActivity).settleBatch(settlementByteArray) {
+                                        }
+                                    } catch (ex: Exception) {
+                                        (activity as NavigationActivity).hideProgress()
+                                        ex.printStackTrace()
+                                    }
+                                }
                                 Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
                             Status.ERROR -> {

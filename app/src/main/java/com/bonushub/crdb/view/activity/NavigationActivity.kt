@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.RemoteException
+import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -30,6 +31,7 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
@@ -59,10 +61,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private var navHostFragment: NavHostFragment? = null
     private var isToExit = false
     private var tempSettlementByteArray: ByteArray? = null
+   // private var isoPacketByteArray: ByteArray? = null
     private var headerView: View? = null
     private var mainDrawerBinding: MainDrawerBinding? = null
     private var showLessOnBackPress: ShowLessOnBackPress? = null
-    private var isoPacketByteArray: ByteArray? = null
     private var deviceserialno: String? = null
     private var devicemodelno: String? = null
     private var tid: String? = null
@@ -708,7 +710,64 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
         }
     }
+    //region================================================Settlement Server Hit:-
+    suspend fun settleBatch(settlementByteArray: ByteArray?,
+                            settlementCallFrom: String = SettlementComingFrom.SETTLEMENT.screenType,
+                            settlementCB: ((Boolean) -> Unit)? = null) {
+        runOnUiThread {
+            showProgress()
+        }
+        if (settlementByteArray != null) {
+            HitServer.apply { reversalToBeSaved = null }
+                .hitServer(settlementByteArray, { result, success ->
+                    if (success && !TextUtils.isEmpty(result)) {
+                        hideProgress()
+                        tempSettlementByteArray = settlementByteArray
+                        val responseIsoData: IsoDataReader = readIso(result, false)
+                        logger("Transaction RESPONSE ", "---", "e")
+                        logger("Transaction RESPONSE --->>", responseIsoData.isoMap, "e")
+                        Log.e("Success 39-->  ", responseIsoData.isoMap[39]?.parseRaw2String().toString() + "---->" + responseIsoData.isoMap[58]?.parseRaw2String().toString())
 
+                        val responseCode = responseIsoData.isoMap[39]?.parseRaw2String().toString()
+                        val hostMsg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                        val isAppUpdateAvailableData = responseIsoData.isoMap[63]?.parseRaw2String()
+
+                        if (responseCode == "00" || responseCode == "95") {
+                            //Change status of autoSettle File Based Variable after Settlement Success to avoid
+                            //regular auto settle check on dashboard:-
+                            when (settlementCallFrom) {
+                                SettlementComingFrom.SETTLEMENT.screenType -> AppPreference.saveBoolean(
+                                    PreferenceKeyConstant.IsAutoSettleDone.keyName,
+                                    false
+                                )
+
+                                SettlementComingFrom.DASHBOARD.screenType -> {
+                                    AppPreference.saveBoolean(
+                                        PreferenceKeyConstant.IsAutoSettleDone.keyName,
+                                        true
+                                    )
+
+                                }
+
+                            }
+
+                        } else {
+                            AppPreference.saveBoolean(
+                                PreferenceKeyConstant.SETTLEMENT_FAILED.keyName,
+                                true
+                            )
+                            hideProgress()
+
+                        }
+                    } else {
+                        hideProgress()
+                    }
+                }, {
+                    //backToCalled(it, false, true)
+                })
+        }
+    }
+    //endregion
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-

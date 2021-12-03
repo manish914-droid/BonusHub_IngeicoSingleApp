@@ -4,9 +4,11 @@ import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.RemoteException
+import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.DemoConfig
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.replaceFragmentWithNoHistory
@@ -19,6 +21,7 @@ import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -97,3 +97,12 @@ fun logger(tag: String, msg: String, type: String = "d") {
     }
 }
 
+// For logging
+fun logger(tag: String, msg: HashMap<Byte, IsoField>, type: String = "d") {
+    if (BuildConfig.DEBUG) {
+        for ((k, v) in msg) {
+            logger(v.fieldName + "---->>", "$k = ${v.rawData}", type)
+        }
+    }
+}
+
