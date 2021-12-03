@@ -83,8 +83,6 @@ class TenureSchemeActivity : AppCompatActivity() {
                 }
             })
 
-
-
         //region======================Proceed TXN Floating Button OnClick Event:-
         binding?.emiSchemeFloatingButton?.setOnClickListener {
             if (selectedSchemeUpdatedPosition != -1) {

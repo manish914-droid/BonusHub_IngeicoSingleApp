@@ -397,6 +397,18 @@ suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
     return listofTids
 }
 
+suspend fun getBaseTID(appDao: AppDao):String{
+    val tpt = appDao.getAllTerminalParameterTableData()
+    var tid=""
+    tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+        if (tidType == "1") {
+            tid = tpt[0]?.terminalId?.get(index).toString()
+        }
+    }
+    return tid
+
+}
+
 //To check Initiaization Status
 suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> {
     listofTids.clear()

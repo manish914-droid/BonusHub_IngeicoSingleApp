@@ -223,6 +223,18 @@ object DeviceHelper   {
     fun doRefundTxn(refundRequest: RefundRequest, listener: OnPaymentListener?){
         iRemoteService?.doRefundTransaction(refundRequest,listener)
     }
+    /**
+     * Execute PreAuth complete transaction
+     * */
+    fun doPreAuthCompleteTxn(preAuthCompleteRequest: PreAuthCompleteRequest, listener: OnPaymentListener?){
+        iRemoteService?.doPreAuthCompleteTransaction(preAuthCompleteRequest,listener)
+    }
+    /**
+     * Execute EMI transaction
+     * */
+    fun doEMITxn(emiSaleRequest: EMISaleRequest, listener: OnPaymentListener?){
+        iRemoteService?.doEMITransaction(emiSaleRequest,listener)
+    }
 
     /**
      * Execute Settlement transaction
@@ -244,6 +256,10 @@ object DeviceHelper   {
      * */
     fun showAdminFunction(listener: OnOperationListener) {
         iRemoteService?.showAdminFunction(listener)
+    }
+
+    fun doSettlementtxn(request: SettlementRequest, listener:OnOperationListener ){
+        iRemoteService?.doSettlement(request,listener)
     }
 
 

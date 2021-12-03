@@ -57,7 +57,7 @@
 
             <Button
                 android:id="@+id/noBtn"
-                style="@style/Widget.Neumorph.Button"
+
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:layout_marginEnd="@dimen/pad_8"
@@ -70,7 +70,7 @@
 
             <Button
                 android:id="@+id/yesBtn"
-                style="@style/Widget.Neumorph.Button"
+
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:layout_marginStart="@dimen/pad_8"

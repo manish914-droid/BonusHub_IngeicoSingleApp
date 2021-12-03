@@ -106,7 +106,7 @@ object IsoPacketCreator{
             addField(24, Nii.BRAND_EMI_MASTER.nii)
 
             //TID Field 41
-            addFieldByHex(41, /*terminalData.terminalId*/"41501370")
+            addFieldByHex(41, getBaseTID(DBModule.appDatabase.appDao))
 
             //This is for bankemi/insta emi/brand emi
             //New field 56 added by Manish Kumar for getting tenure
@@ -138,8 +138,6 @@ object IsoPacketCreator{
         }
     }
     //endregion
-
-
 }
 
 

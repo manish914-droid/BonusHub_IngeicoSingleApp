@@ -63,7 +63,7 @@
 
             <Button
                 android:id="@+id/msg_dialog_cancel"
-                style="@style/Widget.Neumorph.Button"
+
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:background="@drawable/card_edge"
@@ -71,7 +71,7 @@
                 android:layout_marginStart="24dp"
                 android:padding="@dimen/pad_2"
                 android:text="@string/cancel"
-                android:textColor="@color/txt_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_xsmall"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -80,14 +80,14 @@
 
             <Button
                 android:id="@+id/msg_dialog_ok"
-                style="@style/Widget.Neumorph.Button"
+
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:background="@drawable/card_edge"
                 android:layout_marginEnd="24dp"
                 android:padding="@dimen/pad_2"
                 android:text="@string/key_ok"
-                android:textColor="@color/txt_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_xsmall"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

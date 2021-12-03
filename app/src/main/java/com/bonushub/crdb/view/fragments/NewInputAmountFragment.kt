@@ -119,6 +119,7 @@ class NewInputAmountFragment : Fragment() {
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+        binding?.subHeaderView?.subHeaderText?.text=eDashBoardItem.title
         initAnimation()
         when (eDashBoardItem) {
             EDashboardItem.SALE_WITH_CASH -> {
@@ -630,7 +631,18 @@ class NewInputAmountFragment : Fragment() {
                     Pair(saleAmount.toString().trim(), "0")
                 )
             }
+            // todo change the calling
+EDashboardItem.PREAUTH_COMPLETE->{
+    if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
+        maxAmountLimitDialog(iDialog,maxTxnLimit)
+        return
+    }
+    iFrReq?.onFragmentRequest(
+        EDashboardItem.PREAUTH_COMPLETE,
+        Pair(saleAmount.toString().trim(), "0")
+    )
 
+}
             EDashboardItem.EMI_ENQUIRY -> {
                 if (observeNewInpuAmountViewModelForTpt()?.bankEnquiryMobNumberEntry == true) {
                     showMobileBillDialog(activity, TransactionType.EMI_ENQUIRY.type) {

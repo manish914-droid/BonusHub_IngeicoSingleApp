@@ -223,7 +223,8 @@ class PrintUtil(context: Context?) {
 
     private fun saleTransaction(receiptDetail: ReceiptDetail){
         textBlockList.add( sigleLineformat(  "SALE AMOUNT:",AlignMode.LEFT))
-        textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        val amt=(((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
+        textBlockList.add(sigleLineformat( "INR:${amt}",AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
@@ -240,7 +241,7 @@ class PrintUtil(context: Context?) {
         textBlockList.clear()
 
         textBlockList.add( sigleLineformat(  "TOTAL AMOUNT:",AlignMode.LEFT))
-        textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat( "INR:${amt}",AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
     }
