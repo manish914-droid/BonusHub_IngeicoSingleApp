@@ -735,6 +735,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         if (responseCode == "00" || responseCode == "95") {
                             //Change status of autoSettle File Based Variable after Settlement Success to avoid
                             //regular auto settle check on dashboard:-
+                            runBlocking(Dispatchers.IO) {
+                                appDao.deleteBatchTable()
+                            }
+
                             when (settlementCallFrom) {
                                 SettlementComingFrom.SETTLEMENT.screenType -> AppPreference.saveBoolean(
                                     PreferenceKeyConstant.IsAutoSettleDone.keyName,

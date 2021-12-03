@@ -25,14 +25,8 @@ class SettlementViewModel @ViewModelInject constructor(private val settlementRep
      fun getBatchData() = settlementRepository.getBatchDataList()
     //endregion
 
-     fun insertdata(){
-        viewModelScope.launch {
-            settlementRepository.insertBatchData()
-        }
 
-     }
-
-     fun settlementResponse() {
+    fun settlementResponse() {
         viewModelScope.launch {
             val settlementRequest = SettlementRequest(1, listOf("30160039"))
             settlementRepository.fetchSettlementResponseData(settlementRequest).collect { result ->

@@ -22,6 +22,7 @@ import com.bonushub.crdb.databinding.ItemSettlementBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.BatchFileDataTable
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
@@ -46,7 +47,7 @@ class SettlementFragment : Fragment() {
     @Inject
     lateinit var appDao: AppDao
     private val settlementViewModel : SettlementViewModel by viewModels()
-    private val dataList: MutableList<BatchFileDataTable> by lazy { mutableListOf<BatchFileDataTable>() }
+    private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }
     private val settlementAdapter by lazy { SettlementAdapter(dataList) }
     private var settlementByteArray: ByteArray? = null
     private var navController: NavController? = null
@@ -71,15 +72,14 @@ class SettlementFragment : Fragment() {
         navController = Navigation.findNavController(view)
        // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
         fragmensettlementBinding.subHeaderView?.subHeaderText?.text = getString(R.string.settlement)
-        fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { navController?.popBackStack() }
+        fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager?.popBackStack() }
 
-       settlementViewModel.insertdata()
 
         //region===============Get Batch Data from HDFCViewModal:-
         settlementViewModel.getBatchData()?.observe(requireActivity()) { batchData ->
                 Log.d("TPT Data:- ", batchData.toString())
                 dataList.clear()
-                dataList.addAll(batchData as MutableList<BatchFileDataTable>)
+                dataList.addAll(batchData as MutableList<BatchTable>)
                 setUpRecyclerView()
             }
         //endregion
@@ -163,7 +163,7 @@ class SettlementFragment : Fragment() {
     //endregion
 }
 
-internal class SettlementAdapter(private val list: List<BatchFileDataTable>) :
+internal class SettlementAdapter(private val list: List<BatchTable>) :
     RecyclerView.Adapter<SettlementAdapter.SettlementHolder>() {
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): SettlementHolder {
@@ -179,11 +179,11 @@ internal class SettlementAdapter(private val list: List<BatchFileDataTable>) :
     }
 
     override fun onBindViewHolder(holder: SettlementHolder, p1: Int) {
-        holder.binding.tvInvoiceNumber.text = invoiceWithPadding(list[p1].invoiceNumber)
-        val amount = "%.2f".format(list[p1].totalAmount.toDouble())
+        holder.binding.tvInvoiceNumber.text = invoiceWithPadding(list[p1].receiptData?.invoice ?: "")
+        val amount = "%.2f".format(list[p1].receiptData?.txnAmount?.toDouble()?.div(100))
         holder.binding.tvBaseAmount.text = amount
         holder.binding.tvTransactionType.text = getTransactionTypeName(list[p1].transactionType)
-        holder.binding.tvTransactionDate.text = list[p1].date
+        holder.binding.tvTransactionDate.text = list[p1].receiptData?.dateTime
     }
 
     inner class SettlementHolder(val binding: ItemSettlementBinding) :

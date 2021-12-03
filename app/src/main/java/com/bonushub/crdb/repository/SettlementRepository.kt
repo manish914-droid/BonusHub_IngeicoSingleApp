@@ -30,18 +30,8 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
     //endregion
 
     // region===============Get Data For Batch:-
-    fun getBatchDataList() = appDao.getAllBatchTableData()
+    fun getBatchDataList() = appDao.getBatchData()
     //endregion
-
-    suspend fun insertBatchData() {
-        val batchFileDataTable = BatchFileDataTable()
-        batchFileDataTable.invoiceNumber = "000001"
-        batchFileDataTable.totalAmount   = "20000"
-        batchFileDataTable.transactionType = TransactionType.SALE.type
-        batchFileDataTable.date            = ""
-
-        appDao.insertBatchDataInTable(batchFileDataTable)
-    }
 
     suspend fun fetchSettlementResponse(): Flow<Result<IngenicoSettlementResponse>> {
         return flow {
@@ -180,16 +170,14 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
             }
 
             DeviceHelper.doSettlement(settlementRequest,callback)
-
-            awaitClose {
-
-            }
         }
         catch (ex: Exception){
             ex.printStackTrace()
             trySend(Result.error(IngenicoSettlementResponse(),ex.message)).isSuccess
         }
+        awaitClose {
 
+        }
     }
 
 

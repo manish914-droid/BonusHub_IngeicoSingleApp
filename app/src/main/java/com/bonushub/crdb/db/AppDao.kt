@@ -355,10 +355,16 @@ interface AppDao{
 
     // region ========== BatchTable dao ======
     @Query("SELECT * FROM BatchTable")
-    suspend fun getBatchData(): MutableList<BatchTable?>
+    fun getBatchData(): LiveData<MutableList<BatchTable?>>?
+
+    @Query("SELECT * FROM BatchTable")
+    suspend fun getAllBatchData(): MutableList<BatchTable?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBatchData(brandSubCat: BatchTable): Long?
+
+    @Query("DELETE From BatchTable")
+    suspend fun deleteBatchTable()
 
     @Query("SELECT * FROM BatchTable WHERE invoice = :invoice")// AND transactionType != :transType")
     fun getBatchDataFromInvoice(invoice: String?): BatchTable?

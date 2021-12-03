@@ -18,7 +18,7 @@ import javax.inject.Inject
 class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : ISettlementPacketExchange {
 
     override fun createSettlementISOPacket(): IWriter = IsoDataWriter().apply {
-        val batchListData = runBlocking(Dispatchers.IO) { appDao?.getBatchData() }
+        val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
         val tpt = runBlocking(Dispatchers.IO) { getTptData() }
         val tid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
         if (batchListData?.isNotEmpty() == true) {
