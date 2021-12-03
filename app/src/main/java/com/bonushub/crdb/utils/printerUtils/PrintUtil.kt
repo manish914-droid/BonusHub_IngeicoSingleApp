@@ -27,7 +27,7 @@ class PrintUtil(context: Context?) {
     private var isTipAllowed = false
     private var context: Context? = null
     private var footerText = arrayOf("*Thank You Visit Again*", "POWERED BY")
-
+    private val textBlockList: ArrayList<Bundle> = ArrayList()
     init {
         this.context = context
         try {
@@ -81,7 +81,7 @@ class PrintUtil(context: Context?) {
         try {
             val image: ByteArray? = context?.let { printLogo(it, "hdfc_print_logo.bmp") }
             printer?.addBmpImage(0, FactorMode.BMP1X1, image)
-            val textBlockList: ArrayList<Bundle> = ArrayList()
+
             try {
                 receiptDetail.merAddHeader1?.let { sigleLineText(it,AlignMode.CENTER) }
                 receiptDetail.merAddHeader2?.let { sigleLineText(it,AlignMode.CENTER) }
@@ -138,23 +138,15 @@ class PrintUtil(context: Context?) {
                 textBlockList.clear()
 
                 sigleLineText("-----------------------------------------",AlignMode.CENTER)
+                 when(receiptDetail.txnName){
+                     "SALE","SALE-CASH"->{
+                         saleTransaction(receiptDetail)
+                     }
+                     else->{
+                         voidTransaction(receiptDetail)
+                     }
+                 }
 
-                textBlockList.add( sigleLineformat(  "SALE AMOUNT:${receiptDetail.authCode}",AlignMode.LEFT))
-                textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
-                printer?.addMixStyleText(textBlockList)
-
-                textBlockList.clear()
-
-
-                textBlockList.add( sigleLineformat(  "TIP AMOUNT    :    .............",AlignMode.LEFT))
-               // textBlockList.add(sigleLineformat( "00",AlignMode.RIGHT))
-                printer?.addMixStyleText(textBlockList)
-                textBlockList.clear()
-
-                textBlockList.add( sigleLineformat(  "TOTAL AMOUNT:",AlignMode.LEFT))
-                textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
-                printer?.addMixStyleText(textBlockList)
-                textBlockList.clear()
                 sigleLineText("-----------------------------------------",AlignMode.CENTER)
                 if(receiptDetail.isSignRequired == true)
                     sigleLineText("PIN VERIFIDE OK",AlignMode.CENTER)
@@ -229,5 +221,38 @@ class PrintUtil(context: Context?) {
         printer?.addText(alignMode, text)
     }
 
+    private fun saleTransaction(receiptDetail: ReceiptDetail){
+        textBlockList.add( sigleLineformat(  "SALE AMOUNT:",AlignMode.LEFT))
+        textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
 
+        if(receiptDetail.txnName.equals("SALE")) {
+            textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
+            textBlockList.add(sigleLineformat(".............", AlignMode.RIGHT))
+        }
+        else {
+            textBlockList.add(sigleLineformat("CASE AMOUNT: ", AlignMode.LEFT))
+            textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        }
+        // textBlockList.add(sigleLineformat( "00",AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
+
+        textBlockList.add( sigleLineformat(  "TOTAL AMOUNT:",AlignMode.LEFT))
+        textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
+    }
+    private fun voidTransaction(receiptDetail:ReceiptDetail){
+        textBlockList.add( sigleLineformat(  "BASE AMOUNT:",AlignMode.LEFT))
+        textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
+
+        textBlockList.add( sigleLineformat(  "TOTAL AMOUNT:",AlignMode.LEFT))
+        textBlockList.add(sigleLineformat( "INR:${receiptDetail.txnAmount}",AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
+    }
 }

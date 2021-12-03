@@ -202,7 +202,7 @@ object DeviceHelper   {
     /**
      * Execute Cash Advance transaction
      * */
-    fun doCashAdvanceTxn(cashOnly:CashOnlyRequest,listener: OnPaymentListener?){
+    fun doCashAdvanceTxn(cashOnly: CashOnlyRequest, listener: OnPaymentListener?){
         iRemoteService?.doCashOnlyTransaction(cashOnly,listener)
     }
     /**
@@ -231,6 +231,13 @@ object DeviceHelper   {
         iRemoteService?.doSettlement(request, listener)
     }
 
+
+    /**
+     * Execute void transaction
+     * */
+    fun doVoidTransaction(request: VoidRequest, listener:OnPaymentListener ){
+        iRemoteService?.doVoidTransaction(request,listener)
+    }
 
     /**
      * Show admin function screen
