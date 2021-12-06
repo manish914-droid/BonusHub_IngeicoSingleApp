@@ -1,43 +1,45 @@
 package com.bonushub.crdb.view.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.NavigationActivity.Companion.TAG
-import com.bonushub.crdb.view.base.BaseActivityNew
+import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.pax.utils.EPrintCopyType
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
-import com.ingenico.hdfcpayment.request.SaleRequest
 import com.ingenico.hdfcpayment.request.VoidRequest
 import com.ingenico.hdfcpayment.response.PaymentResult
 import com.ingenico.hdfcpayment.response.TransactionResponse
 import com.ingenico.hdfcpayment.type.ResponseCode
-import com.ingenico.hdfcpayment.type.TransactionType
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
-
+@AndroidEntryPoint
 class VoidMainFragment : Fragment() {
 
 
     var binding:FragmentVoidMainBinding? = null
+    private val batchFileViewModel: BatchFileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,8 +65,10 @@ class VoidMainFragment : Fragment() {
 
         binding?.txtViewSearchTransaction?.setOnClickListener {
             logger("txtViewSearchTransaction","click")
-            doVoidTransaction()
-           // (activity as NavigationActivity).transactFragment(VoidDetailFragment())
+            //doVoidTransaction()
+            searchTransaction()
+
+            // (activity as NavigationActivity).transactFragment(VoidDetailFragment())
         }
     }
 
@@ -147,6 +151,7 @@ class VoidMainFragment : Fragment() {
             }
         }
     }
+
     private fun showMerchantAlertBox(
         receiptDetail: ReceiptDetail
     ) {
@@ -171,5 +176,30 @@ class VoidMainFragment : Fragment() {
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 })
         }
+    }
+
+    private fun searchTransaction()
+    {
+        var invoice = binding?.edtTextSearchTransaction?.text.toString()
+        lifecycleScope.launch {
+            batchFileViewModel.getBatchTableDataByInvoice(invoice).observe(viewLifecycleOwner, { batchFileTable ->
+
+                if(batchFileTable.size > 0) {
+                    DialogUtilsNew1.showVoidSaleDetailsDialog(
+                        requireContext(),
+                        batchFileTable.get(0)?.date ?: "",
+                        batchFileTable.get(0)?.time ?: "",
+                        batchFileTable.get(0)?.tid ?: "",
+                        batchFileTable.get(0)?.invoiceNumber ?: "",
+                        batchFileTable.get(0)?.totalAmount ?: ""
+                    ) {
+                        doVoidTransaction()
+                    }
+                }else{
+                    ToastUtils.showToast(requireContext(),"Data not found.")
+                }
+            })
+        }
+
     }
 }
