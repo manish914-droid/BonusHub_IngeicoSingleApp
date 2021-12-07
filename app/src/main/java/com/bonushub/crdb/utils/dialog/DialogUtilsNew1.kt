@@ -148,6 +148,51 @@ class DialogUtilsNew1 {
             }.show()
         }
 
+        fun showVoidSaleDetailsDialog(
+            context: Context,
+            date: String,
+            time: String,
+            tid: String,
+            invoiceNumber: String,
+            totalAmount: String,
+            callback: () -> Unit
+        ) {
+            Dialog(context).apply {
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.dialog_void_details)
+                setCancelable(false)
+                val window = window
+//                window?.setLayout(
+//                    ViewGroup.LayoutParams.MATCH_PARENT,
+//                    WindowManager.LayoutParams.WRAP_CONTENT
+//                )
+                val txtViewDate = findViewById<TextView>(R.id.txtViewDate)
+                val txtViewTime = findViewById<TextView>(R.id.txtViewTime)
+                val txtViewTid = findViewById<TextView>(R.id.txtViewTid)
+                val txtViewInvoiceNumber = findViewById<TextView>(R.id.txtViewInvoiceNumber)
+                val txtViewTotalAmount = findViewById<TextView>(R.id.txtViewTotalAmount)
+                val txtViewCancel = findViewById<TextView>(R.id.txtViewCancel)
+                val okbtn = findViewById<TextView>(R.id.txtViewOk)
+
+                txtViewDate.text = date
+                txtViewTime.text = time
+                txtViewTid.text = tid
+                txtViewInvoiceNumber.text = invoiceNumber
+                txtViewTotalAmount.text = totalAmount
+
+                txtViewCancel.setOnClickListener {
+                    dismiss()
+                }
+
+                okbtn.setOnClickListener {
+                    dismiss()
+                    callback()
+                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+        }
+
     }
 
 }

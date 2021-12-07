@@ -16,6 +16,7 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
@@ -145,6 +146,53 @@ class TransactionActivity : BaseActivityNew(){
             if(cardProcessedDataModal.getPanNumberData() !=null) {
                 cardProcessedDataModal.getPanNumberData()
                 var ecrID: String
+             /*   try {
+                    DeviceHelper.doSaleTransaction(
+                        SaleRequest(
+                            amount = 300L ?: 0,
+                            tipAmount = 0L ?: 0,
+                            transactionType = TransactionType.SALE,
+                            tid = "30160033",
+                            transactionUuid = UUID.randomUUID().toString().also {
+                                ecrID = it
+
+                            }
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val detailResponse = txnResponse?.receiptDetail
+                                    .toString()
+                                    .split(",")
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        detailResponse.forEach { println(it) }
+                                        //  uids.add(ecrID)
+                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        detailResponse.forEach { println(it) }
+                                    }
+                                    else -> println("Error")
+                                }
+                            }
+                        }
+                    )
+                }
+                catch (exc: Exception){
+                    exc.printStackTrace()
+                }*/
+
+              /*  DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
+                    override fun onCompleted(p0: OperationResult?) {
+                        p0?.value?.apply {
+                            println("Status = $status")
+                            println("Response code = $responseCode")
+                        }
+                    }
+                })*/
 
                 Toast.makeText(
                     this,
@@ -212,6 +260,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }

@@ -15,11 +15,11 @@ import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.adapter.ReportsAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
-import com.bonushub.pax.utils.ReportsItem
-import com.bonushub.pax.utils.TransactionType
+import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +53,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //   iDiag?.onEvents(VxEvent.ChangeTitle(option.name))
+        //iDiag?.onEvents(VxEvent.ChangeTitle(option.name))
+        iDiag?.onEvents(VxEvent.ChangeTitle("Report"))
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.reports_header)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_reports)
@@ -87,72 +88,74 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
             ReportsItem.LAST_RECEIPT -> {
 
-
                 val lastReceiptData = AppPreference.getLastSuccessReceipt()
                 if (lastReceiptData != null) {
-                    GlobalScope.launch(Dispatchers.Main) {
+                    lifecycleScope.launch(Dispatchers.Main) {
                         iDiag?.showProgress(getString(R.string.printing_last_receipt))
                     }
-                    when (lastReceiptData.transactionType) {
-                        TransactionType.SALE.type, TransactionType.TIP_SALE.type, TransactionType.REFUND.type, TransactionType.VOID.type, TransactionType.SALE_WITH_CASH.type, TransactionType.CASH_AT_POS.type, TransactionType.VOID_EMI.type -> {
-                        //BB
-                            logger("print","util")
-                        /*PrintUtil(activity).startPrinting(lastReceiptData,
-                                EPrintCopyType.DUPLICATE,
-                                activity
-                            ) { printCB, printingFail ->
-                                if (printCB) {
-                                    iDiag?.hideProgress()
-                                    Log.e("PRINTING", "LAST_RECEIPT")
-                                } else {
-                                    iDiag?.hideProgress()
-                                }
-                            }*/
-                        }
-                        TransactionType.EMI_SALE.type, TransactionType.TEST_EMI.type -> {
+
+
+                    when (lastReceiptData.txnName) {
+                        //TransactionType.SALE.type, TransactionType.TIP_SALE.type, TransactionType.REFUND.type, TransactionType.VOID.type, TransactionType.SALE_WITH_CASH.type, TransactionType.CASH_AT_POS.type, TransactionType.VOID_EMI.type ->
+                        EDashboardItem.SALE.title.uppercase(), EDashboardItem.REFUND.title.uppercase(), EDashboardItem.VOID_SALE.title.uppercase() -> {
                             //BB
                             logger("print","util")
-                        /*PrintUtil(activity).printEMISale(
-                                lastReceiptData,
-                                EPrintCopyType.DUPLICATE,
-                                activity
-                            ) { printCB, printingFail ->
-                                if (printCB) {
-                                    iDiag?.hideProgress()
-                                    Log.e("PRINTING", "LAST_RECEIPT")
-                                } else {
-                                    iDiag?.hideProgress()
+                            PrintUtil(activity).startPrinting(lastReceiptData,
+                                    EPrintCopyType.DUPLICATE,
+                                    activity
+                                ) { printCB, printingFail ->
+                                    if (printCB) {
+                                        iDiag?.hideProgress()
+                                        logger("PRINTING", "LAST_RECEIPT")
+                                    } else {
+                                        iDiag?.hideProgress()
+                                    }
                                 }
-                            }*/
                         }
-                        TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
-
-                            runBlocking(Dispatchers.IO){
+                        //TransactionType.EMI_SALE.type, TransactionType.TEST_EMI.type -> {
+                        EDashboardItem.BANK_EMI.title.uppercase() -> {
+                            //BB
+                            logger("print","util")
+                            /*PrintUtil(activity).printEMISale(
+                                    lastReceiptData,
+                                    EPrintCopyType.DUPLICATE,
+                                    activity
+                                ) { printCB, printingFail ->
+                                    if (printCB) {
+                                        iDiag?.hideProgress()
+                                        Log.e("PRINTING", "LAST_RECEIPT")
+                                    } else {
+                                        iDiag?.hideProgress()
+                                    }
+                                }*/
+                        }
+//                        TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
+//
+//                            runBlocking(Dispatchers.IO){
                                 //batchFileViewModel?.getBrandEMIDataTable(lastReceiptData.hostInvoice, lastReceiptData.hostTID?:"")?.observe(viewLifecycleOwner,{ brandEmiData ->
 
-                                    // BB
-                                    /*PrintUtil(activity).printEMISale(
-                                        lastReceiptData,
-                                        EPrintCopyType.DUPLICATE,
-                                        activity,
-                                        brandEmiData
-                                    ) { printCB, printingFail ->
-                                        if (printCB) {
-                                            iDiag?.hideProgress()
-                                            Log.e("PRINTING", "LAST_RECEIPT")
-                                        } else {
-                                            iDiag?.hideProgress()
-                                        }
-                                    }*/
+                                // BB
+                                /*PrintUtil(activity).printEMISale(
+                                    lastReceiptData,
+                                    EPrintCopyType.DUPLICATE,
+                                    activity,
+                                    brandEmiData
+                                ) { printCB, printingFail ->
+                                    if (printCB) {
+                                        iDiag?.hideProgress()
+                                        Log.e("PRINTING", "LAST_RECEIPT")
+                                    } else {
+                                        iDiag?.hideProgress()
+                                    }
+                                }*/
 
-                              //  })
-                            }
+                                //  })
+                            /*}
 
 
-                        }
-                        TransactionType.PRE_AUTH_COMPLETE.type -> {
+                        }*/
+                       // TransactionType.PRE_AUTH_COMPLETE.type -> {
                             //BB
-                            logger("print","util")
                             /*PrintUtil(activity).printAuthCompleteChargeSlip(
                                 lastReceiptData,
                                 EPrintCopyType.DUPLICATE,
@@ -165,50 +168,49 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     iDiag?.hideProgress()
                                 }
                             }*/
-                        }
-                        TransactionType.VOID_PREAUTH.type -> {
+                      //  }
+                        //TransactionType.VOID_PREAUTH.type -> {
                             //BB
-                            logger("print","util")
-                           /* PrintUtil(activity).printAuthCompleteChargeSlip(
-                                lastReceiptData,
-                                EPrintCopyType.DUPLICATE,
-                                activity
-                            ) {
-                                if (it) {
-                                    iDiag?.hideProgress()
-                                    Log.e("PRINTING", "LAST_RECEIPT")
-                                } else {
-                                    iDiag?.hideProgress()
-                                }
-                            }*/
-                        }
-                        TransactionType.OFFLINE_SALE.type -> {
-                            activity?.let {
+                            /* PrintUtil(activity).printAuthCompleteChargeSlip(
+                                 lastReceiptData,
+                                 EPrintCopyType.DUPLICATE,
+                                 activity
+                             ) {
+                                 if (it) {
+                                     iDiag?.hideProgress()
+                                     Log.e("PRINTING", "LAST_RECEIPT")
+                                 } else {
+                                     iDiag?.hideProgress()
+                                 }
+                             }*/
+                       // }
+                       // TransactionType.OFFLINE_SALE.type -> {
+                           // activity?.let {
+                                //BB
+                                /* OfflineSalePrintReceipt().offlineSalePrint(
+                                        lastReceiptData, EPrintCopyType.DUPLICATE,
+                                        it
+                                    ) { printCB, printingFail ->
+                                        if (printCB) {
+                                            iDiag?.hideProgress()
+                                            Log.e("PRINTING", "LAST_RECEIPT")
+                                        } else {
+                                            iDiag?.hideProgress()
+                                        }
+                                    }*/
+                           // }
+                       // }
+                        //TransactionType.VOID_REFUND.type -> {
                             //BB
-                            /* OfflineSalePrintReceipt().offlineSalePrint(
-                                    lastReceiptData, EPrintCopyType.DUPLICATE,
-                                    it
-                                ) { printCB, printingFail ->
-                                    if (printCB) {
-                                        iDiag?.hideProgress()
-                                        Log.e("PRINTING", "LAST_RECEIPT")
-                                    } else {
-                                        iDiag?.hideProgress()
-                                    }
+                            /* VoidRefundSalePrintReceipt().startPrintingVoidRefund(
+                                    lastReceiptData,
+                                    TransactionType.VOID_REFUND.type,
+                                    EPrintCopyType.DUPLICATE,
+                                    activity
+                                ) { _, _ ->
+                                    iDiag?.hideProgress()
                                 }*/
-                            }
-                        }
-                        TransactionType.VOID_REFUND.type -> {
-                        //BB
-                        /* VoidRefundSalePrintReceipt().startPrintingVoidRefund(
-                                lastReceiptData,
-                                TransactionType.VOID_REFUND.type,
-                                EPrintCopyType.DUPLICATE,
-                                activity
-                            ) { _, _ ->
-                                iDiag?.hideProgress()
-                            }*/
-                        }
+                       // }
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.hideProgress()
@@ -216,25 +218,14 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             }
                         }
                     }
+
                 } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        //    iDiag?.hideProgress()
-                        //    iDiag?.showToast(getString(R.string.empty_batch))
-                        //-
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            iDiag?.alertBoxWithAction(
-                                getString(R.string.empty_batch),
-                                getString(R.string.last_receipt_not_available),
-                                false,
-                                getString(R.string.positive_button_ok),
-                                {},
-                                {})
-                        }
-                    }
+
+                    DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.empty_batch),getString(R.string.last_receipt_not_available), false)
+
                 }
 
                 logger("repost", ReportsItem.LAST_RECEIPT._name)
-                // DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.empty_batch),getString(R.string.last_receipt_not_available), false)
 
             }
 // End of Last Receipt case
