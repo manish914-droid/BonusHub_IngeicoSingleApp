@@ -192,10 +192,16 @@ class VoidMainFragment : Fragment() {
             batchFileViewModel.getBatchTableDataByInvoice(invoice).observe(viewLifecycleOwner, { batchTable ->
 
                 if(batchTable?.receiptData != null) {
+
+                    val date = batchTable.receiptData?.dateTime ?: ""
+                    val parts = date?.split(" ")
+                    println("Date: " + parts!![0])
+                    println("Time: " + (parts[1]) )
+
                     DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
-                        batchTable.receiptData?.dateTime ?: "",
-                        batchTable.receiptData?.dateTime ?: "",
+                        parts!![0],
+                        parts!![1],
                         batchTable.receiptData?.tid ?: "",
                         batchTable.receiptData?.invoice ?: "",
                         batchTable.receiptData?.txnAmount ?: ""
