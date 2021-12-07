@@ -11,6 +11,7 @@ import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.IsoDataWriter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 
 //region========EMV=======
 
@@ -135,9 +136,42 @@ object AppPreference {
     }
     //endregion
 
+    // region
+    fun saveLastReceiptDetails(receiptDetail:String?){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(LAST_SUCCESS_RECEIPT_KEY, receiptDetail?:"")?.apply()
+    }
+
+    fun saveLastReceiptDetails(receiptDetail:ReceiptDetail?){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val jsonResp=Gson().toJson(receiptDetail)
+        v?.edit()?.putString(LAST_SUCCESS_RECEIPT_KEY, jsonResp?:"")?.apply()
+    }
+    // end region
+
     //region kushal
     @JvmStatic
-    fun getLastSuccessReceipt(): BatchFileDataTable? {
+    fun getLastSuccessReceipt(): ReceiptDetail? {
+        logger(TAG, "========getLastSuccessReceipt=========", "e")
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+
+        return if (v != null) {
+            try {
+                val str = v.getString(LAST_SUCCESS_RECEIPT_KEY, "")
+                if (!str.isNullOrEmpty()) {
+                    Gson().fromJson<ReceiptDetail>(
+                        str,
+                        object : TypeToken<ReceiptDetail>() {}.type
+                    )
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Last Success Receipt Error!!!")
+            }
+        } else
+            null
+    }
+
+    /*fun getLastSuccessReceipt(): BatchFileDataTable? {
         logger(TAG, "========getLastSuccessReceipt=========", "e")
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         return if (v != null) {
@@ -154,7 +188,7 @@ object AppPreference {
             }
         } else
             null
-    }
+    }*/
 
     // end region
 
