@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.bonushub.crdb.model.local.BatchFileDataTable
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMIDataTable
 import com.bonushub.crdb.repository.BankFunctionsRepository
 import com.bonushub.crdb.repository.BatchFilesRepository
@@ -19,11 +20,11 @@ class BatchFileViewModel@ViewModelInject constructor(private val batchFilesRepos
 
     }
 
-    private var batchTableDataByInvoice : LiveData<MutableList<BatchFileDataTable?>>? = null
-    suspend fun getBatchTableDataByInvoice(invoice: String?) : LiveData<MutableList<BatchFileDataTable?>>
+    private var batchTableDataByInvoice : LiveData<BatchTable?>? = null
+    suspend fun getBatchTableDataByInvoice(invoice: String?) : LiveData<BatchTable?>
     {
         batchTableDataByInvoice = batchFilesRepository.getBatchTableDataByInVoice(invoice)
-        return batchTableDataByInvoice as LiveData<MutableList<BatchFileDataTable?>>
+        return batchTableDataByInvoice as LiveData<BatchTable?>
 
     }
 

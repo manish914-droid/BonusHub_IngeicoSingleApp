@@ -182,16 +182,16 @@ class VoidMainFragment : Fragment() {
     {
         var invoice = binding?.edtTextSearchTransaction?.text.toString()
         lifecycleScope.launch {
-            batchFileViewModel.getBatchTableDataByInvoice(invoice).observe(viewLifecycleOwner, { batchFileTable ->
+            batchFileViewModel.getBatchTableDataByInvoice(invoice).observe(viewLifecycleOwner, { batchTable ->
 
-                if(batchFileTable.size > 0) {
+                if(batchTable?.receiptData != null) {
                     DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
-                        batchFileTable.get(0)?.date ?: "",
-                        batchFileTable.get(0)?.time ?: "",
-                        batchFileTable.get(0)?.tid ?: "",
-                        batchFileTable.get(0)?.invoiceNumber ?: "",
-                        batchFileTable.get(0)?.totalAmount ?: ""
+                        batchTable.receiptData?.dateTime ?: "",
+                        batchTable.receiptData?.dateTime ?: "",
+                        batchTable.receiptData?.tid ?: "",
+                        batchTable.receiptData?.invoice ?: "",
+                        batchTable.receiptData?.txnAmount ?: ""
                     ) {
                         doVoidTransaction()
                     }
