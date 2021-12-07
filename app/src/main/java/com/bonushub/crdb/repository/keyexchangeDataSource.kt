@@ -213,14 +213,14 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
                             var ppkKcv = byteArrayOf()
                             var dpkKcv = byteArrayOf()
+
                             val dpk = ppkDpk.substring(0, 32)
                             val ppk = ppkDpk.substring(32, 64)
 
-                            if (ppkDpk.length == 76)
-                                ppkDpk.substring(32)
-                            else {
-                                ppkKcv = ppkDpk.substring(64, 70).hexStr2ByteArr()
-                                dpkKcv = ppkDpk.substring(70).hexStr2ByteArr()
+                            if (ppkDpk.length == 76) {
+                               // ppkDpk.substring(32)
+                                dpkKcv = ppkDpk.substring(64, 70).hexStr2ByteArr()
+                                ppkKcv = ppkDpk.substring(70).hexStr2ByteArr()
                             }
 
                             //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
@@ -302,56 +302,28 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             println("PINPAD "+"format failvar isSucc = pinpadLimited!!.format()")
 
         }
-
-
-        AppPreference.saveString("dpk", "d417d20909ab523550236d91ec1fc4fa")
-        println("dpk value is"+"d417d2090923dgfjhddcvdsajanaXBA1")
-
-        // var pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(0, 0), 0, DeviceName.IPP)
-
         var result = true
         try {
             val dTmkArr = RSAProvider.decriptTMK(tmk.hexStr2ByteArr(), rsa)
-            // val decriptedTmk = dTmkArr[0].hexStr2ByteArr()
-
             val decriptedTmk = BytesUtil.hexString2Bytes(dTmkArr[0])
 
             val x = "TMK=${decriptedTmk.byteArr2HexStr()}\nPPK=${ppk.byteArr2HexStr()} KCV=${ppkKcv.byteArr2HexStr()}\nDPK=${dpk.byteArr2HexStr()} KCV=${dpkKcv.byteArr2HexStr()}"
             Utility().logger(KeyExchanger.TAG, x)
-            val key = "111111111111111111111111111111111111111111111111"
-            //6e54d3ecd57040a102324962d5150494
-            //+BytesUtil.hexString2Bytes("                ")
             result = pinpadLimited!!.loadPlainTextKey(KeyType.MAIN_KEY, DemoConfig.KEYID_MAIN, decriptedTmk)
-            //  val isExist: Boolean = pinpad.isKeyExist(keyId)
             System.out.println("TMK is success "+result)
-            //result = NeptuneService.Device.writeTmk(decriptedTmk, tmkKcv)
-            // NeptuneService.beepNormal()
 
-            //  outputBlueText(">>> switchToWorkMode")
             isSucc = pinpadLimited.switchToWorkMode()
             if (isSucc) {
                 println("PINPAD "+"switchToWorkMode success")
             } else {
                 println("PINPAD  "+"switchToWorkMode fail")
             }
-
-
             if (result) {
-
-                //   PPK - f5da035abebd921e64f3005c1b3fb655
                 result = pinPad?.loadEncKey(KeyType.PIN_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_PIN,ppk,ppkKcv) ?: false
                 System.out.println("PPK is success "+result)
-
-                //     result = NeptuneService.Device.writeTpk(ppk, ppkKcv)
-                //   NeptuneService.beepNormal()
             }
             if (result) {
-                //   DPK- d417d20909ab523550236d91ec1fc4fa
-                //  result = pinPad?.loadEncKey(KeyType.TDK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_TRACK, /*BytesUtil.hexString2Bytes("BDE3888C42CE9DECBDE3888C42CE9DECBDE3888C42CE9DEC")*/BytesUtil.hexString2Bytes("d417d20909ab523550236d91ec1fc4fa"), /*BytesUtil.hexString2Bytes("4CBE91BE")*/null) ?: false
                 System.out.println("TDK is success "+result)
-                //  result = NeptuneService.Device.writeTdk(dpk, dpkKcv)
-                // NeptuneService.beepKey(EBeepMode.FREQUENCE_LEVEL_6,1000)
-
                 result = pinPad?.loadEncKey(KeyType.DEK_KEY, DemoConfig.KEYID_MAIN, DemoConfig.KEYID_DES,dpk,dpkKcv) ?: false
                 System.out.println("TDK is success1 "+result)
 
