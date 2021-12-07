@@ -85,6 +85,31 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
 
+                            TransactionType.CASH_AT_POS.type -> {
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                            }
+
+                            TransactionType.PRE_AUTH_COMPLETE.type -> {
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                            }
+                            TransactionType.TIP_SALE.type -> {
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                            }
+
+                            TransactionType.TIP_SALE.type -> {
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                            }
+
+                            TransactionType.REFUND.type -> {
+                                refundCount = refundCount.plus(1)
+                                refundAmount =
+                                    refundAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                            }
+
                           /*  TransactionType.SALE_WITH_CASH.type -> {
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmount?.toLong() ?: 0L)
@@ -105,7 +130,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(100.toLong())
                             }
-                            TransactionType.REFUND.type -> {
+                            TransactionType.REFUNDREFUND.type -> {
                                 refundCount = refundCount.plus(1)
                                 refundAmount =
                                     refundAmount.plus(batchListData[i]?.transactionalAmount?.toLong() ?: 0L)

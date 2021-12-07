@@ -1,5 +1,6 @@
 package com.bonushub.crdb.utils
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -7,22 +8,20 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.IngenicoInitialization
-import com.bonushub.crdb.model.local.InitDataListList
+import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.DashboardFragment
+import com.bonushub.crdb.vxutils.BHTextView
 import com.bonushub.crdb.vxutils.Utility.*
 import com.bonushub.pax.utils.TransactionType
 import com.google.android.material.textfield.TextInputEditText
@@ -33,12 +32,10 @@ import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
 import com.usdk.apiservice.aidl.BaseError
-import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.pinpad.*
-import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
-import com.usdk.apiservice.aidl.pinpad.UPinpad
 import kotlinx.coroutines.*
 import java.lang.Runnable
+import java.lang.StringBuilder
 import java.nio.charset.StandardCharsets
 
 private var listofTids= ArrayList<String>()
@@ -381,6 +378,8 @@ fun showMobileBillDialog(
     }
 }
 
+
+
 //To check Initiaization Status
 suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
     listofTids.clear()
@@ -425,6 +424,69 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
     return listofTids
 }
 
+//To check Initiaization Status
+suspend fun checkTidUpdate(appDao: AppDao): Boolean {
+    var isdiffTid: Boolean = false
+    val result = appDao.getIngenicoInitialization()
+    var tpt = appDao?.getAllTerminalParameterTableData()
+    val rseultsize = result?.size
+    if (rseultsize != null) {
+        if(rseultsize > 0){
+            result.forEach { IngenicoInitialization ->
+                val tidList = IngenicoInitialization?.tidList
+                if(tidList?.size == tpt[0]?.terminalId?.size){
+
+                    isdiffTid = true
+                    return isdiffTid
+                }
+                else if(tidList?.size.isGreaterThan(tpt[0]?.terminalId?.size)){
+                    val difference = tidList?.filter { !(tpt[0]?.terminalId?.contains(it) == true)
+                    }
+
+                    var strstatus = ArrayList<String>()
+                    tpt[0]?.terminalId?.forEach {
+                        strstatus.add("Success")
+                    }
+
+                    var ingenicoInitialization = IngenicoInitialization()
+                    ingenicoInitialization.id = 0
+                    ingenicoInitialization.responseCode    = IngenicoInitialization?.responseCode
+                    ingenicoInitialization.apiresponseCode = IngenicoInitialization?.apiresponseCode
+                    ingenicoInitialization.tidList         = tpt[0]?.terminalId
+                    ingenicoInitialization.tidStatusList   = strstatus
+                    ingenicoInitialization.initdataList    = IngenicoInitialization?.initdataList
+
+                    val returnvalue =updateIngenicoInitialization(appDao, ingenicoInitialization)
+                    println("Diff value is"+returnvalue)
+                    val result = appDao.getIngenicoInitialization()
+                    println("Tid value is"+result?.forEach { it->
+                        val tidList = it?.tidList
+                        println("TID list are "+tidList?.forEach {
+                            println("TIDS are "+it)
+                        })
+                    })
+
+                    isdiffTid = true
+                    return isdiffTid
+                }
+                else{
+                    isdiffTid = false
+                    return isdiffTid
+                }
+            }
+        }
+    }
+
+    return false
+}
+
+fun Int?.isGreaterThan(other: Int?) = this != null && other != null && this > other
+
+fun Int?.isLessThan(other: Int?) = this != null && other != null && this < other
+
+
+
+
 
 //To check Initiaization Status
  suspend fun checkInitializtionStatus(appDao: AppDao): Boolean {
@@ -452,6 +514,10 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
 
 //Do initiaization
  suspend fun doInitializtion(appDao: AppDao,listofTids: ArrayList<String>) {
+   val checkdiffTid = checkTidUpdate(appDao)
+    if(!checkdiffTid){
+        deletInitializtionData(appDao)
+    }
     var checkinitststus = checkInitializtionStatus(appDao)
     if(!checkinitststus){
         try {
@@ -487,6 +553,8 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
                                     model.apiresponseCode = response?.status.name
                                     response?.tidList?.forEach {
                                         tidarrayList.add(it)
+
+
                                     }
                                     response?.tidStatusList?.forEach {
                                         tidstatusList.add(it)
@@ -587,6 +655,8 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
                             }
                         }
                     }
+
+
                 }
             )
         }
@@ -600,6 +670,16 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
 //To save Initiaization Data
  suspend fun saveInitializtionData(appDao: AppDao,model: IngenicoInitialization) {
     appDao.insertIngenicoIntializationData(model)
+}
+
+//To delete Initiaization Data in case of new Tid
+suspend fun deletInitializtionData(appDao: AppDao) {
+    appDao.deleteIngenicoInitiaization()
+}
+
+//To delete Initiaization Data in case of new Tid
+suspend fun updateIngenicoInitialization(appDao: AppDao, initialization: IngenicoInitialization){
+    return appDao.updateAll(initialization)
 }
 
 fun deviceModel(): String{
@@ -697,6 +777,29 @@ fun getTransactionTypeName(type: Int): String? {
     return name
 }
 //endregion
+
+fun txnSuccessToast(context: Context, msg: String = "Transaction Approved") {
+    try {
+        GlobalScope.launch(Dispatchers.Main) {
+           // VFService.vfBeeper?.startBeep(200)
+            val layout = (context as Activity).layoutInflater.inflate(
+                R.layout.new_success_toast,
+                context.findViewById<LinearLayout>(R.id.custom_toast_layout)
+            )
+            layout.findViewById<BHTextView>(R.id.txtvw)?.text = msg
+            val myToast = Toast(context)
+            myToast.duration = Toast.LENGTH_LONG
+            myToast.setGravity(Gravity.CENTER_VERTICAL, 0, 0)
+            myToast.view = layout//setting the view of custom toast layout
+            myToast.show()
+        }
+
+
+    } catch (ex: java.lang.Exception) {
+      //  VFService.showToast(context.getString(R.string.transaction_approved_successfully))
+      //  VFService.connectToVFService(context)
+    }
+}
 
 
 

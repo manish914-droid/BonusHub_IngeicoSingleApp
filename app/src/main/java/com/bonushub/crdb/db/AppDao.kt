@@ -11,11 +11,19 @@ interface AppDao{
     @Insert(onConflict = OnConflictStrategy.IGNORE)
      suspend fun insertIngenicoSettlement(ingenicoSettlementResponse: IngenicoSettlementResponse)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIngenicoIntializationData(initialization: IngenicoInitialization)
 
     @Query("SELECT * FROM IngenicoInitialization")
      suspend fun getIngenicoInitialization(): MutableList<IngenicoInitialization?>?
+
+    @Query("DELETE From IngenicoInitialization")
+    suspend fun deleteIngenicoInitiaization()
+
+    //  @Query("UPDATE TerminalParameterTable SET invoiceNumber = :updateInvoice WHERE tableId = :tableID")
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateAll(initialization: IngenicoInitialization)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend  fun insertTerminalCommunicationData(student: TerminalCommunicationTable) : Long

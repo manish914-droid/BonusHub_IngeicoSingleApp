@@ -100,6 +100,7 @@ class InitFragment : Fragment() {
                             iDialog?.hideProgress()
                             (activity as NavigationActivity).transactFragment(DashboardFragment())
                         }
+                      //  (activity as NavigationActivity).transactFragment(DashboardFragment())
                     }
 
 

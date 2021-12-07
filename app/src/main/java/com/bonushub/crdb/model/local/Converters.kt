@@ -7,6 +7,7 @@ import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.type.CvmAction
 
 class Converters {
+
     @TypeConverter
     fun fromTIDSList(tidList: List<String?>?): String? {
         val type = object : TypeToken<List<String?>?>() {}.type

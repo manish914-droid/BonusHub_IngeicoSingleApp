@@ -747,6 +747,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                 appDao.deleteBatchTable()
                             }
 
+                            GlobalScope.launch(Dispatchers.Main) {
+                                txnSuccessToast(
+                                    this@NavigationActivity,
+                                    getString(R.string.settlement_success)
+                                )
+                            }
+
                             when (settlementCallFrom) {
                                 SettlementComingFrom.SETTLEMENT.screenType -> AppPreference.saveBoolean(
                                     PreferenceKeyConstant.IsAutoSettleDone.keyName,

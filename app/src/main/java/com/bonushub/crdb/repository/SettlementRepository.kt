@@ -1,7 +1,9 @@
 package com.bonushub.crdb.repository
 
 import android.os.DeadObjectException
+import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.IngenicoSettlementResponse
 import com.bonushub.crdb.utils.DeviceHelper
@@ -20,6 +22,8 @@ import javax.inject.Inject
 
 class SettlementRepository @Inject constructor(private val appDao: AppDao){
 
+    private val _insertCardStatus = MutableLiveData<Result<IngenicoSettlementResponse>>()
+
     //region===============Get Data For Terminal Parameter Data List:-
     fun getTerminalParameterDataList() = appDao.getAllTerminalParameterLiveData()
     //endregion
@@ -33,10 +37,11 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
     fun getBatchDataList() = appDao.getBatchData()
     //endregion
 
-    suspend fun fetchSettlementResponse(): Flow<Result<IngenicoSettlementResponse>> {
-        return flow {
-            emit(Result.loading())
+/*    suspend fun fetchSettlementResponse(){
+         flow {
+           // emit(Result.loading())
             val result = doSettlement()
+             _insertCardStatus
             if (result.data?.status.equals("SUCCESS")) {
                 result.data?.let { it ->
                    // appDao.insertIngenicoSettlement(it)
@@ -48,13 +53,14 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
                 emit(Result.error(IngenicoSettlementResponse(),it.message))
             }
             .flowOn(Dispatchers.IO)
-    }
+    }*/
 
 
 
 
-    private fun doSettlement() : Result<IngenicoSettlementResponse> {
+ /*   private fun doSettlement()  {
         var ingencioresponse          = IngenicoSettlementResponse()
+
         return try {
             val settlementRequest = SettlementRequest(1, listOf("30160039"))
             DeviceHelper.doSettlement(
@@ -64,7 +70,9 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
                         val response = p0?.value
                         val settlementResponse = p0?.value as? SettlementResponse
 
-                      /*  if (response is SettlementResponse) {
+                        _insertCardStatus.postValue(Result.success(ingencioresponse))
+
+                      *//*  if (response is SettlementResponse) {
                             response.apply {
                                 println("Status = $status")
                                 println("Response code = $responseCode")
@@ -74,7 +82,7 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
                             }
                         } else {
                             println("Error")
-                        }*/
+                        }*//*
 
                         when (settlementResponse?.responseCode) {
                             ResponseCode.SUCCESS.value -> {
@@ -110,23 +118,20 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
 
                     }
                 })
-
-            if(true)
-                return Result.success(ingencioresponse)
-            else
-                return return Result.success(ingencioresponse)
+            return Result.success(ingencioresponse)
         }
         catch (ex: DeadObjectException){
             ex.printStackTrace()
             return Result.error(ingencioresponse,"")
         }
-    }
+    }*/
 
-
-    fun fetchSettlementResponseData(settlementRequest: SettlementRequest) = callbackFlow {
+    lateinit var callback: OnOperationListener
+    fun fetchSettlementResponseData(
+        settlementRequest: SettlementRequest) = callbackFlow {
         try {
 
-            val callback = object : OnOperationListener.Stub() {
+            callback = object : OnOperationListener.Stub() {
                 override fun onCompleted(p0: OperationResult?) {
                     val response = p0?.value
                     val settlementResponse = p0?.value as? SettlementResponse
@@ -176,7 +181,7 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
             trySend(Result.error(IngenicoSettlementResponse(),ex.message)).isSuccess
         }
         awaitClose {
-
+           callback
         }
     }
 

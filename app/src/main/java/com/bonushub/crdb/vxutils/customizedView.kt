@@ -5,7 +5,10 @@ import android.graphics.Typeface
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
 import android.widget.EditText
+import androidx.appcompat.widget.AppCompatTextView
 import com.bonushub.crdb.R
 
 class AmountEditText : androidx.appcompat.widget.AppCompatEditText {
@@ -104,6 +107,52 @@ class AmountEditText : androidx.appcompat.widget.AppCompatEditText {
         }
 
     }
+
+}
+
+class BHTextView : AppCompatTextView, View.OnTouchListener {
+    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+        if (hasOnClickListeners()) {
+            when (p1?.action) {
+                MotionEvent.ACTION_DOWN -> isSelected = true
+                MotionEvent.ACTION_CANCEL -> isSelected = false
+            }
+        }
+        return false
+    }
+
+
+    constructor(context: Context, attributeSet: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attributeSet,
+        defStyleAttr
+    ) {
+        init(attributeSet)
+    }
+
+    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet) {
+        init(attributeSet)
+    }
+
+    constructor(context: Context) : super(context)
+
+    private fun init(attributeSet: AttributeSet) {
+        val a = context.obtainStyledAttributes(attributeSet, R.styleable.BH_Font, 0, 0)
+        val fontType = a.getString(R.styleable.BH_Font_fname)
+        if (fontType != null) {
+            val font = if (fontType == "1") {
+                Typeface.createFromAsset(context.assets, "fonts/Muli-SemiBold.ttf")
+            } else {
+                Typeface.createFromAsset(context.assets, "fonts/Muli-Regular.ttf")
+            }
+            super.setTypeface(font)
+        }
+        a.recycle()
+
+        setOnTouchListener(this)
+
+    }
+
 
 }
 

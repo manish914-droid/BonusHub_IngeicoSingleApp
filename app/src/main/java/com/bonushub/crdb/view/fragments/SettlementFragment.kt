@@ -120,14 +120,14 @@ class SettlementFragment : Fragment() {
                                         ex.printStackTrace()
                                     }
                                 }
-                                Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                              //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
                             Status.ERROR -> {
 
-                                Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                               // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
                             }
                             Status.LOADING -> {
-                                Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+                               // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
 
 
                             }

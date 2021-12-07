@@ -13,6 +13,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -22,9 +23,11 @@ import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.BankFunctionsAdminVasItem
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.ArrayList
 
 @AndroidEntryPoint
 class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemClick{
@@ -140,8 +143,13 @@ logger("iDialog",""+iDialog.toString())
 
             when (result.status) {
                 Status.SUCCESS -> {
-                    iDialog?.hideProgress()
-                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                    CoroutineScope(Dispatchers.IO).launch{
+                        Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
+                            iDialog?.hideProgress()
+                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                        }
+
+                    }
                 }
                 Status.ERROR -> {
                     iDialog?.hideProgress()
