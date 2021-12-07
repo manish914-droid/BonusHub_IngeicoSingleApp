@@ -157,7 +157,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
 
     suspend fun updateTerminalParameterTable(dataList: ArrayList<TableEditHelper?>, context:Context):LiveData<Boolean> {
         val dataReturn = MutableLiveData<Boolean>()
-        dataReturn.value = false
+        dataReturn.postValue(false)
 
         val data = dataList.filter { it?.isUpdated ?: false }
         //val table: Any? = getTable()
@@ -212,7 +212,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
                             //TerminalParameterTable.updateTerminalID(data[0]?.titleValue)
                             appDao.updateTerminalParameterTable(table as TerminalParameterTable)
 
-                            dataReturn.value = true
+                            dataReturn.postValue(true)
 
                         } else {
                             withContext(Dispatchers.Main) {

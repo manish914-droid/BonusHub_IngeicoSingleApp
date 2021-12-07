@@ -16,12 +16,14 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.ReportsAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -53,8 +55,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        iDiag = (activity as NavigationActivity)
         //iDiag?.onEvents(VxEvent.ChangeTitle(option.name))
-        iDiag?.onEvents(VxEvent.ChangeTitle("Report"))
+       // iDiag?.onEvents(VxEvent.ChangeTitle("Report"))
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.reports_header)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_reports)
@@ -283,38 +286,35 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 logger("repost", ReportsItem.ANY_RECEIPT._name)
 
                 DialogUtilsNew1.getInputDialog(requireContext(), "Enter Invoice Number", "", true) { invoice ->
-                        //   iDiag?.showProgress()
+
                         iDiag?.showProgress(getString(R.string.printing_receipt))
                         lifecycleScope.launch {
                             try {
-                                //val bat= BatchFileDataTable.selectAnyReceipts(invoice) // converted
+
                                 batchFileViewModel?.getBatchTableDataByInvoice(invoice)?.observe(viewLifecycleOwner, { bat ->
 
-                                    when (bat?.size) {
-                                        0 -> {
-                                            launch(Dispatchers.Main) {
+                                    if(bat?.receiptData != null)
+                                    {
+                                        PrintUtil(activity).startPrinting(
+                                            bat.receiptData ?: ReceiptDetail(),
+                                            EPrintCopyType.DUPLICATE,
+                                            activity
+                                        ) { printCB, printingFail ->
+                                            if (printCB) {
                                                 iDiag?.hideProgress()
-                                                lifecycleScope.launch(Dispatchers.Main) {
-                                                    iDiag?.alertBoxWithAction(
-                                                        getString(R.string.invalid_invoice),
-                                                        getString(R.string.invoice_is_invalid),
-                                                        false,
-                                                        getString(R.string.positive_button_ok),
-                                                        {},
-                                                        {})
-                                                }
+                                                logger("PRINTING", "LAST_RECEIPT")
+                                            } else {
+                                                iDiag?.hideProgress()
                                             }
                                         }
-                                        1 -> {
-                                            //printAnyReceipt(bat[0]) //BB
-                                        }
-                                        else -> {
-                                            lifecycleScope.launch(Dispatchers.Main) {
-                                                iDiag?.hideProgress()
-                                               // printAnyreceiptTransInvoicesDialog(bat as java.util.ArrayList<BatchFileDataTable>) //BB
-                                            }
+                                    }else{
+                                        launch(Dispatchers.Main) {
+                                            iDiag?.hideProgress()
+                                            DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
+
                                         }
                                     }
+
                                 })
 
 
@@ -323,16 +323,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 ex.printStackTrace()
                                 launch(Dispatchers.Main) {
                                     iDiag?.hideProgress()
-                                    lifecycleScope.launch(Dispatchers.Main) {
-                                        iDiag?.alertBoxWithAction(
-                                            getString(R.string.error),
-                                            "something Wrong",
-                                            false,
-                                            getString(R.string.positive_button_ok),
-                                            {},
-                                            {})
-                                    }
-
+                                    DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.error),"something Wrong", false)
 
                                 }
                             }
