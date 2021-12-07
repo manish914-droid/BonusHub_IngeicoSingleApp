@@ -14,6 +14,7 @@ import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.getBaseTID
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -41,6 +42,8 @@ class VoidMainFragment : Fragment() {
     var binding:FragmentVoidMainBinding? = null
     private val batchFileViewModel: BatchFileViewModel by viewModels()
 
+    private var tid ="000000"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,6 +61,10 @@ class VoidMainFragment : Fragment() {
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.void_sale)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_void)
 
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            tid=  getBaseTID(DBModule.appDatabase.appDao)
+        }
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
@@ -77,7 +84,7 @@ class VoidMainFragment : Fragment() {
         try {
             DeviceHelper.doVoidTransaction(
                 VoidRequest(
-                    tid = "30160033",
+                    tid = tid,
                     invoice =  binding?.edtTextSearchTransaction?.text.toString(),
                     transactionUuid = UUID.randomUUID().toString().also {
                         ecrID = it
