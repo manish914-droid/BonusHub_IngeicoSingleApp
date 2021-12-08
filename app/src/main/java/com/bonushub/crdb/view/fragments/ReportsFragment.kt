@@ -103,8 +103,10 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
 
                     when (lastReceiptData.txnName) {
-                        //TransactionType.SALE.type, TransactionType.TIP_SALE.type, TransactionType.REFUND.type, TransactionType.VOID.type, TransactionType.SALE_WITH_CASH.type, TransactionType.CASH_AT_POS.type, TransactionType.VOID_EMI.type ->
-                        EDashboardItem.SALE.title.uppercase(), EDashboardItem.REFUND.title.uppercase(), EDashboardItem.VOID_SALE.title.uppercase() -> {
+                        EDashboardItem.SALE.title.uppercase(), EDashboardItem.CASH_ADVANCE.title.uppercase(),
+                        EDashboardItem.SALE_WITH_CASH.title.uppercase(), EDashboardItem.REFUND.title.uppercase(),
+                        EDashboardItem.PREAUTH.title.uppercase(),EDashboardItem.PREAUTH_COMPLETE.title.uppercase(),
+                        EDashboardItem.VOID_SALE.title.uppercase() -> {
                             //BB
                             logger("print","util")
                             PrintUtil(activity).startPrinting(lastReceiptData,
@@ -119,7 +121,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     }
                                 }
                         }
-                        //TransactionType.EMI_SALE.type, TransactionType.TEST_EMI.type -> {
+
                         EDashboardItem.BANK_EMI.title.uppercase() -> {
                             //BB
                             logger("print","util")
@@ -207,17 +209,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     }*/
                            // }
                        // }
-                        //TransactionType.VOID_REFUND.type -> {
-                            //BB
-                            /* VoidRefundSalePrintReceipt().startPrintingVoidRefund(
-                                    lastReceiptData,
-                                    TransactionType.VOID_REFUND.type,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity
-                                ) { _, _ ->
-                                    iDiag?.hideProgress()
-                                }*/
-                       // }
+
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.hideProgress()
@@ -418,7 +410,6 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 logger("repost", ReportsItem.SUMMERY_REPORT._name)
                // (activity as NavigationActivity).transactFragment(ReportSummaryFragment(), true)
 
-             //   val batList = BatchFileDataTable.selectBatchData()
                 lifecycleScope.launch{
 
                         settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batList ->
