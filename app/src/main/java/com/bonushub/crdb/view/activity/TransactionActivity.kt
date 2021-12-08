@@ -261,7 +261,7 @@ class TransactionActivity : BaseActivityNew(){
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
 
-                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
 
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
@@ -319,6 +319,8 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -376,6 +378,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -432,6 +437,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -489,6 +497,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -548,6 +559,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }

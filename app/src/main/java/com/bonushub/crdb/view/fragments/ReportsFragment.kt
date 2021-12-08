@@ -1,6 +1,7 @@
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentReportsBinding
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchFileDataTable
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
@@ -20,6 +22,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.ReportsAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
+import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -41,6 +44,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     private var iDiag: IDialog? = null
 
     private val batchFileViewModel:BatchFileViewModel by viewModels()
+    private val settlementViewModel : SettlementViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -336,7 +340,17 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 logger("repost", ReportsItem.DETAIL_REPORT._name)
                 //val batchData = BatchFileDataTable.selectBatchData()
                 lifecycleScope.launch{
-                    batchFileViewModel?.getBatchTableData()?.observe(viewLifecycleOwner,{ batchData ->
+
+                    /*//region===============Get Batch Data from HDFCViewModal:-
+                    settlementViewModel.getBatchData()?.observe(requireActivity()) { batchData ->
+                        Log.d("TPT Data:- ", batchData.toString())
+                        dataList.clear()
+                        dataList.addAll(batchData as MutableList<BatchTable>)
+                        setUpRecyclerView()
+                    }
+                    //endregion*/
+
+                    settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batchData ->
 
                         if (batchData.isNotEmpty()) {
                             iDiag?.getMsgDialog(
@@ -406,7 +420,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
              //   val batList = BatchFileDataTable.selectBatchData()
                 lifecycleScope.launch{
-                    batchFileViewModel?.getBatchTableData()?.observe(viewLifecycleOwner,{ batList ->
+
+                        settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batList ->
 
                         if (batList.isNotEmpty()) {
                             iDiag?.getMsgDialog(
@@ -481,11 +496,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.LAST_SUMMERY_REPORT -> {
                 logger("repost", ReportsItem.LAST_SUMMERY_REPORT._name)
 
-                val str = AppPreference.getString(AppPreference.LAST_BATCH)
-                val batList = Gson().fromJson<List<BatchFileDataTable>>(
-                    str,
-                    object : TypeToken<List<BatchFileDataTable>>() {}.type
-                )
+                val batList = AppPreference.getLastBatch()
+
                 if (batList != null) {
                     iDiag?.getMsgDialog(
                         getString(R.string.confirmation),
@@ -502,11 +514,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             }
 
                             lifecycleScope.launch {
-                                val str1 = AppPreference.getString(AppPreference.LAST_BATCH)
-                                val batList1 = Gson().fromJson<List<BatchFileDataTable>>(
-                                    str1,
-                                    object : TypeToken<List<BatchFileDataTable>>() {}.type
-                                )
+                                val batList1 = AppPreference.getLastBatch()
 
                                 if (batList1 != null) {
                                     try {

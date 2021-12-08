@@ -9,6 +9,7 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.utils.addPad
 import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.IsoDataWriter
+import com.bonushub.pax.utils.PreferenceKeyConstant
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -127,14 +128,39 @@ object AppPreference {
 
 
     //region Below method is used to Save Batch File Data in App Preference:-
-    fun saveBatchInPreference(batchList: MutableList<BatchFileDataTable?>?) {
+    fun saveBatchInPreference(batchList: MutableList<BatchTable?>?) {
         val tempBatchDataList = Gson().toJson(
             batchList,
-            object : TypeToken<List<BatchFileDataTable>>() {}.type
+            object : TypeToken<List<BatchTable>>() {}.type
         ) ?: ""
-      //  saveString(PreferenceKeyConstant.LAST_BATCH.keyName, tempBatchDataList)
+        saveString(LAST_BATCH, tempBatchDataList)
     }
     //endregion
+
+    // region
+    fun getLastBatch(): List<BatchTable>? {
+        logger(TAG, "========getLastSuccessReceipt=========", "e")
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+
+        return if (v != null) {
+            try {
+                val str = v.getString(LAST_BATCH, "")
+                if (!str.isNullOrEmpty()) {
+                    val batList = Gson().fromJson<List<BatchTable>>(
+                        str,
+                        object : TypeToken<List<BatchTable>>() {}.type
+                    )
+                    return batList
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Last Success Receipt Error!!!")
+            }
+        } else
+            null
+    }
+
+    // end reegion
+
 
     // region
     fun saveLastReceiptDetails(receiptDetail:String?){
@@ -170,25 +196,6 @@ object AppPreference {
         } else
             null
     }
-
-    /*fun getLastSuccessReceipt(): BatchFileDataTable? {
-        logger(TAG, "========getLastSuccessReceipt=========", "e")
-        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-        return if (v != null) {
-            try {
-                val str = v.getString(LAST_SUCCESS_RECEIPT_KEY, "")
-                if (!str.isNullOrEmpty()) {
-                    Gson().fromJson<BatchFileDataTable>(
-                        str,
-                        object : TypeToken<BatchFileDataTable>() {}.type
-                    )
-                } else null
-            } catch (ex: Exception) {
-                throw Exception("Last Success Receipt Error!!!")
-            }
-        } else
-            null
-    }*/
 
     // end region
 
