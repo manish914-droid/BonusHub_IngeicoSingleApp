@@ -23,9 +23,11 @@ import com.bonushub.crdb.databinding.FragmentEmiIssuerListBinding
 import com.bonushub.crdb.databinding.ItemEmiIssuerListBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
+import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -33,6 +35,7 @@ import com.bonushub.crdb.view.adapter.IssuerTenureListAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.EmiissuerListViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.IssuerListEmiViewModelFactory
+import com.bonushub.pax.utils.UiAction
 import com.google.gson.Gson
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +64,8 @@ class EMIIssuerList : Fragment() {
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
     private val enquiryAmount by lazy { ((enquiryAmtStr.toFloat()) * 100).toLong() }
 
-   // private val brandEMIData by lazy { arguments?.getSerializable("brandEMIDataModal") as BrandEMIDataModal? }
+  private val brandEMIData by lazy { arguments?.getSerializable("brandEMIDataModal") as BrandEMIProductDataModal
+  ? }
 
     private val issuerListAdapter by lazy {
         IssuerListAdapter(
@@ -119,7 +123,32 @@ class EMIIssuerList : Fragment() {
         emiissuerListViewModel = ViewModelProvider(this, IssuerListEmiViewModelFactory(serverRepository)).get(
             EmiissuerListViewModel::class.java
         )
+        (activity as IDialog).showProgress()
+        Log.d("enquiryAmtStr:- ", enquiryAmtStr)
+        if (action == UiAction.BRAND_EMI_CATALOGUE) {
+            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+            binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+            //  brandEMISelectedData = runBlocking(Dispatchers.IO) { BrandEMIDataTable.getAllEMIData() }
+         /*   field57RequestData =
+                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^${brandEMIData?.brandID}" +
+                        "^${brandEMIData?.productID}^^^$enquiryAmount"*/
+        } else {
+            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bankEmiCatalogue)
+            //  binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
+            field57RequestData =
+                if (AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE) != 0L)
+                    "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^${
+                        AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE)
+                    }"
+                else
+                    "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^$enquiryAmount"
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            emiissuerListViewModel.getIssuerListData(field57RequestData)
+        }
         emiissuerListViewModel.emiIssuerListLivedata.observe(viewLifecycleOwner, {
+            (activity as IDialog).hideProgress()
             when (val genericResp = it) {
                 is GenericResponse.Success -> {
                     println(Gson().toJson(genericResp.data))
@@ -130,8 +159,15 @@ class EMIIssuerList : Fragment() {
                   //  brandEMIMasterCategoryAdapter.submitList(genericResp.data)
                 }
                 is GenericResponse.Error -> {
-                    ToastUtils.showToast(activity, genericResp.errorMessage)
-                    println(genericResp.errorMessage.toString())
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        iDialog?.hideProgress()
+                        iDialog?.alertBoxWithAction( getString(R.string.info),  "No record found",
+                          false
+                            , getString(R.string.positive_button_ok),
+                            {
+                                parentFragmentManager.popBackStackImmediate()
+                            }, {})
+                    }
                 }
                 is GenericResponse.Loading -> {
 
@@ -150,6 +186,7 @@ class EMIIssuerList : Fragment() {
                         lifecycleScope.launch(Dispatchers.IO) {
                             AppPreference.setLongData(
                                 AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE,
+
                                 enquiryAmount
                             )
                             temporaryAllIssuerList =
@@ -172,8 +209,7 @@ class EMIIssuerList : Fragment() {
                     }
                 }
                 is GenericResponse.Error -> {
-                    ToastUtils.showToast(activity, genericResp.errorMessage)
-                    println(genericResp.errorMessage.toString())
+
                 }
                 is GenericResponse.Loading -> {
 

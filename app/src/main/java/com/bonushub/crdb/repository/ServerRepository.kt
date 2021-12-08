@@ -207,15 +207,11 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
         }
     }
 
-    suspend fun getIssuerList(enquiryAmount:String) {
+    suspend fun getIssuerList(field57RequestData:String) {
         totalRecord="0"
-        val  field57RequestData =
-            if (AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE) != 0L)
-                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^${
-                    AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE)
-                }"
-            else
-                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^$enquiryAmount"
+
+
+        Log.d("field57:- ", field57RequestData)
         when (val genericResp = remoteService.field57GenericService(field57RequestData)) {
             is GenericResponse.Success -> {
                 val isoDataReader = genericResp.data
@@ -223,7 +219,9 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                 parseAndStubbingBankEMICatalogueDataToList(issuerListData)
             }
             is GenericResponse.Error -> {
-                brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+                Log.d("error:- ", "in error")
+                allIssuerTenureListMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+                issuerListMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
             }
             is GenericResponse.Loading -> {
 

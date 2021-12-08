@@ -15,13 +15,12 @@ import kotlinx.coroutines.launch
 class EmiissuerListViewModel(private val serverRepository: ServerRepository) : ViewModel() {
 
     val emiIssuerListLivedata: LiveData<GenericResponse<List<IssuerBankModal?>>>
-        get() = serverRepository.brandLiveEMIProductData  as LiveData<GenericResponse<List<IssuerBankModal?>>>
+        get() = serverRepository.allIssuerBankListLiveData  as LiveData<GenericResponse<List<IssuerBankModal?>>>
     val emiIssuerTenureListLiveData:LiveData<GenericResponse<List<TenureBankModal?>>>
-        get() = serverRepository.brandLiveEMIProductData as LiveData<GenericResponse<List<TenureBankModal?>>>
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            logger("Get DATA","----START----------","e")
-            serverRepository.getIssuerList("50000")
-        }
+        get() = serverRepository.allIssuerTenureLisLiveData as LiveData<GenericResponse<List<TenureBankModal?>>>
+
+
+     suspend fun getIssuerListData(field57RequestData:String){
+        serverRepository.getIssuerList(field57RequestData)
     }
 }

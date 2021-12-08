@@ -24,6 +24,7 @@ import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.InitViewModel
@@ -102,6 +103,17 @@ class SettlementFragment : Fragment() {
 
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
+
+            PrintUtil(activity).printDetailReportupdate(
+                dataList,
+                activity
+            ) { detailPrintStatus ->
+
+                }
+            PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
+
+            }
+
             (activity as NavigationActivity).alertBoxWithAction(
                 getString(R.string.settlement), getString(R.string.do_you_want_to_settle_batch), true, getString(R.string.yes), {
                     settlementViewModel.settlementResponse()

@@ -205,7 +205,7 @@
     <!--reports-->
     <string name="reports_header">REPORTS</string>
     <string name="summary_report">SUMMARY REPORT</string>
-
+    <string name="info">Info</string>
     <string name="empty_batch">Batch is empty</string>
     <string name="last_receipt_not_available">Last Receipt Not Available.</string>
     <string name="printing_last_receipt">Printing Last Receipt</string>

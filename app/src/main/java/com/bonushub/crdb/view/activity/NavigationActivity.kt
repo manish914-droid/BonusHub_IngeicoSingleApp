@@ -620,7 +620,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     override  fun onDashBoardItemClick(action: EDashboardItem) {
         when (action) {
-            EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH -> {
+            EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
                     CoroutineScope(Dispatchers.IO).launch{
                         val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
@@ -629,7 +629,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         println("RESULT TWO --->  $resultTwo")
                     }
                 //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
-                    inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.SALE)
+                    inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
@@ -661,13 +661,16 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
             }
             EDashboardItem.BRAND_EMI->{
-                transactFragment(BrandEmiMasterCategoryFragment())
-             //   DBModule.appDatabase.appDao.insertBatchData(batchData)
-               /* lifecycleScope.launch(Dispatchers.IO) {
-                    //    appDao.insertBatchData(batchData)
-                val dd=    DBModule.appDatabase.appDao.getBatchDataFromInvoice("000018")
-                    println(dd.toString())
-                }*/
+                transactFragment(BrandEmiMasterCategoryFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("type", action)
+                        putString(
+                            INPUT_SUB_HEADING,
+                            SubHeaderTitle.Brand_EMI_Master_Category.title
+                        )
+                    }
+                })
+
 
             }
             EDashboardItem.VOID_SALE->{
