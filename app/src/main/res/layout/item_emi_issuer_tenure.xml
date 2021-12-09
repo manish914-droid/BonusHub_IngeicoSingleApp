@@ -14,5 +14,6 @@
         android:text="@string/tenure"
         android:textAllCaps="true"
         android:textColor="@color/txt_color"
-        android:textSize="@dimen/text_size_xsmall" />
+        android:textSize="@dimen/text_size_xsmall"
+        android:fontFamily="@font/muli_regular"/>
 </LinearLayout>

@@ -32,52 +32,50 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/compareByTenureCV"
-                    android:theme="@style/Theme.MaterialComponents.Light"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/pad_50"
+                    android:layout_margin="@dimen/pad_10"
                     android:layout_weight="1"
                     android:padding="@dimen/pad_16"
-                    android:layout_margin="@dimen/pad_10"
-                    app:cardElevation="@dimen/pad_15"
+                    android:theme="@style/Theme.MaterialComponents.Light"
                     app:cardCornerRadius="10dp"
-                    app:strokeWidth="1dp"
+                    app:cardElevation="@dimen/pad_15"
                     app:strokeColor="@color/rippleColor"
-                 >
+                    app:strokeWidth="1dp">
 
                     <EditText
                         android:id="@+id/compareByTenure"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-
+                        android:layout_marginTop="12dp"
                         android:background="@null"
                         android:cursorVisible="false"
                         android:focusable="false"
                         android:gravity="center"
                         android:lines="1"
                         android:text="@string/compare_by_tenure"
-                        android:layout_marginTop="12dp"
                         android:textColor="@color/txt_color"
                         android:textColorHint="@color/hint_color"
                         android:textSize="@dimen/text_size_regular"
-                    
+
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/compareByBankCV"
-                    android:theme="@style/Theme.MaterialComponents.Light"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/pad_50"
+                    android:layout_margin="@dimen/pad_10"
 
                     android:layout_weight="1"
+                    android:background="@drawable/card_edge"
                     android:padding="@dimen/pad_16"
-                    android:layout_margin="@dimen/pad_10"
-                    app:cardElevation="@dimen/pad_15"
+                    android:theme="@style/Theme.MaterialComponents.Light"
                     app:cardCornerRadius="10dp"
-                    app:strokeWidth="1dp"
+                    app:cardElevation="@dimen/pad_15"
                     app:strokeColor="@color/rippleColor"
-                    android:background="@drawable/card_edge">
+                    app:strokeWidth="1dp">
 
                     <EditText
                         android:id="@+id/compareByBank"
@@ -93,7 +91,6 @@
                         android:textColor="@color/txt_color"
                         android:textColorHint="@color/hint_color"
                         android:textSize="@dimen/text_size_regular"
-                    
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/title_tv" />
@@ -120,9 +117,9 @@
                         android:id="@+id/issuerBankIcon"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
+                        android:layout_marginTop="@dimen/pad_10"
                         android:contentDescription="@string/issuer_icon"
                         android:scaleType="centerCrop"
-                        android:layout_marginTop="@dimen/pad_10"
                         android:visibility="gone"
                         app:srcCompat="@drawable/hdfc_dc_issuer_icon" />
 
@@ -132,118 +129,123 @@
                         android:layout_height="@dimen/pad_60"
                         android:gravity="center"
                         android:hint="@string/tenure_hint"
-                          android:textColor="@color/txt_color"
+                        android:textColor="@color/txt_color"
                         android:textColorHint="@color/white"
                         android:textSize="@dimen/text_size_medium"
                         android:visibility="gone" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/transactionAmountBT"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="Transaction Amount"
+                        android:textColor="@color/txt_color" />
 
-                        android:textColor="@color/txt_color"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
-                        android:gravity="center_vertical|center_horizontal"
-                       />
-
-                    <Button
+                    <TextView
                         android:id="@+id/discountAmountBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/discountAmountNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/loanBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/loanNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/roiBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/roiNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/emiBT"
-
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/emiNew"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/totalWithInterestBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/totalWithInterestNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/cashbackBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/cashbackNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/netCostBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/netCostNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/additionalOfferBT"
-                        android:background="@drawable/card_edge"
-                        android:layout_margin="@dimen/pad_2"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/pad_60"
                         android:layout_gravity="start"
+                        android:layout_margin="@dimen/pad_2"
+                        android:background="@drawable/edge_gray_bg_white"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
                         android:text="@string/additionalOfferNew"
-                          android:textColor="@color/txt_color"
-                       />
+                        android:textColor="@color/txt_color" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/compareRV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:layout_marginTop="@dimen/pad_30"
                     android:layout_weight="1" />
             </androidx.appcompat.widget.LinearLayoutCompat>

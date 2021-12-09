@@ -11,10 +11,11 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
             <include
                 android:id="@+id/sub_header_view"
                 layout="@layout/sub_header_layout"
@@ -32,6 +33,7 @@
                 android:textColor="@color/txt_color"
                 android:textSize="@dimen/text_size_regular"
                 android:textStyle="normal"
+                android:layout_below="@+id/sub_header_view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sub_header_view" />
@@ -44,21 +46,22 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:layout_below="@+id/headingText"
                 app:layout_constraintTop_toBottomOf="@+id/headingText">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/compareByTenureCV"
-                     android:theme="@style/Theme.MaterialComponents.Light"
-                    android:layout_margin="@dimen/pad_10"
-                    app:cardElevation="@dimen/pad_15"
-                    app:cardCornerRadius="10dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/rippleColor"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/pad_50"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/pad_10"
                     android:layout_weight="1"
                     android:padding="@dimen/pad_16"
-                    android:layout_gravity="center"
+                    android:theme="@style/Theme.MaterialComponents.Light"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="@dimen/pad_15"
+                    app:strokeColor="@color/rippleColor"
+                    app:strokeWidth="1dp"
 
                     >
 
@@ -66,8 +69,8 @@
                         android:id="@+id/compareByTenure"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:layout_marginTop="12dp"
+                        android:gravity="center"
                         android:lines="1"
                         android:text="@string/compare_by_tenure"
                         android:textColor="@color/black"
@@ -78,29 +81,28 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/compareByBankCV"
-                     android:theme="@style/Theme.MaterialComponents.Light"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/pad_50"
-                    android:layout_weight="1"
                     android:layout_margin="@dimen/pad_10"
-                    android:padding="@dimen/pad_16"
-                    app:cardElevation="@dimen/pad_15"
-                    app:cardCornerRadius="10dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/rippleColor"
+                    android:layout_weight="1"
                     android:background="@drawable/card_edge"
-          >
+                    android:padding="@dimen/pad_16"
+                    android:theme="@style/Theme.MaterialComponents.Light"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="@dimen/pad_15"
+                    app:strokeColor="@color/rippleColor"
+                    app:strokeWidth="1dp">
 
                     <TextView
                         android:id="@+id/compareByBank"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
                         android:background="@null"
                         android:gravity="center"
                         android:lines="1"
                         android:text="@string/compare_by_bank"
                         android:textColor="@color/black"
-                        android:layout_marginTop="12dp"
                         android:textSize="@dimen/text_size_regular"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -108,103 +110,136 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tenureHeadingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:fontFamily="sans-serif"
-                android:gravity="start"
-                android:text="@string/select_tenure"
-                android:textAllCaps="true"
-                android:textColor="@color/txt_color"
-                android:textSize="@dimen/text_size_regular"
-                android:textStyle="normal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/compare_buttons_ll" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tenure_RV"
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginTop="@dimen/pad_4"
-                android:layout_marginEnd="@dimen/pad_16"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:layout_below="@+id/compare_buttons_ll"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tenureHeadingText" />
+                app:layout_constraintTop_toBottomOf="@+id/compare_buttons_ll">
 
-            <TextView
-                android:id="@+id/selectBankHeadingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginTop="@dimen/pad_4"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:visibility="gone"
-                android:fontFamily="sans-serif"
-                android:gravity="start"
-                android:text="@string/select_banks_to_compare"
-                android:textAllCaps="true"
-                android:textColor="@color/txt_color"
-                android:textSize="@dimen/text_size_regular"
-                android:textStyle="normal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tenure_RV" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <CheckBox
-                android:id="@+id/selectAllBankCheckButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginTop="@dimen/pad_2"
-                android:buttonTint="@color/txt_color"
-                android:text="@string/select_all_banks"
-                android:textAllCaps="true"
-                android:textColor="@color/txt_color"
-                android:textSize="@dimen/text_size_small"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/selectBankHeadingText" />
+                    <TextView
+                        android:id="@+id/tenureHeadingText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/pad_16"
+                        android:layout_marginEnd="@dimen/pad_16"
+                        android:fontFamily="sans-serif"
+                        android:gravity="start"
+                        android:text="@string/select_tenure"
+                        android:textAllCaps="true"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_regular"
+                        android:textStyle="normal" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/issuer_RV"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginTop="@dimen/pad_4"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:visibility="gone"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/selectAllBankCheckButton" />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/tenure_RV"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tenureHeadingText"
+                        android:layout_marginStart="@dimen/pad_16"
+                        android:layout_marginTop="@dimen/pad_4"
+                        android:layout_marginEnd="@dimen/pad_16"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tenureHeadingText" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/proceedEMICatalogue"
-            android:theme="@style/MAppTheme"
-            android:layout_width="180dp"
-            android:layout_height="@dimen/pad_50"
-            android:layout_gravity="end|bottom"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="@dimen/pad_60"
-            android:gravity="center"
-            android:text="@string/Proceed"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_xregular"
-            app:backgroundTint="@color/hdfc_red_color"
-            app:elevation="@dimen/pad_0"
+                    <TextView
+                        android:id="@+id/selectBankHeadingText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tenure_RV"
+                        android:layout_marginStart="@dimen/pad_16"
+                        android:layout_marginTop="@dimen/pad_4"
+                        android:layout_marginEnd="@dimen/pad_16"
+                        android:fontFamily="sans-serif"
+                        android:gravity="start"
+                        android:text="@string/select_banks_to_compare"
+                        android:textAllCaps="true"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_regular"
+                        android:textStyle="normal"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tenure_RV" />
 
-            app:iconPadding="@dimen/pad_5"
-            app:iconTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:rippleColor="@color/colorAccent" />
+                    <CheckBox
+                        android:id="@+id/selectAllBankCheckButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/selectBankHeadingText"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/pad_16"
+                        android:layout_marginTop="@dimen/pad_2"
+                        android:buttonTint="@color/txt_color"
+                        android:text="@string/select_all_banks"
+                        android:textAllCaps="true"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_small"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/selectBankHeadingText" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/issuer_RV"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/selectAllBankCheckButton"
+                        android:layout_marginStart="@dimen/pad_16"
+                        android:layout_marginTop="@dimen/pad_4"
+                        android:layout_marginEnd="@dimen/pad_16"
+                        android:visibility="gone"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/selectAllBankCheckButton" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/issuer_RV"
+                        android:orientation="vertical"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:gravity="bottom">
+
+                        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                            android:id="@+id/proceedEMICatalogue"
+                            android:layout_width="180dp"
+                            android:layout_height="@dimen/pad_50"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/Proceed"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_xregular"
+                            android:theme="@style/MAppTheme"
+                            app:backgroundTint="@color/hdfc_red_color"
+                            app:elevation="@dimen/pad_0"
+                            app:iconPadding="@dimen/pad_5"
+                            app:iconTint="@color/white"
+                            app:rippleColor="@color/colorAccent"
+                            android:layout_above="@+id/viewBottom"/>
+
+                        <View
+                            android:id="@+id/viewBottom"
+                            android:layout_width="1dp"
+                            android:layout_height="10dp"
+                            android:layout_alignParentBottom="true"
+                            />
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </androidx.core.widget.NestedScrollView>
+
+
+        </RelativeLayout>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.core.widget.NestedScrollView>
