@@ -20,6 +20,7 @@ import com.bonushub.crdb.databinding.FragmentBankFunctionsTerminalBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
@@ -32,6 +33,7 @@ import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.PreferenceKeyConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -51,7 +53,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     lateinit var mAdapter : BankFunctionsTerminalParamAdapter
     lateinit var dataList: ArrayList<TableEditHelper?>
-   // lateinit var terminalParameterTable: TerminalParameterTable
+    lateinit var lastTid: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,8 +131,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         }
     }
 
-    fun verifySuperAdminPasswordAndUpdate()
-    {
+    fun verifySuperAdminPasswordAndUpdate() {
         DialogUtilsNew1.showDialog(activity,getString(R.string.super_admin_password),getString(R.string.hint_enter_super_admin_password), onClickDialogOkCancel, false)
     }
 
@@ -141,8 +142,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
             dialogSuperAdminPassword = dialog
             bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner, {success ->
 
-                if(success)
-                {
+                if(success) {
                     dialogSuperAdminPassword?.dismiss()
                     //
                     //val batchData = BatchFileDataTable.selectBatchData() // get BatchFileDataTable data
@@ -183,17 +183,11 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     //Below code is to perform update of values in TPT Options:-
     private fun updateTPTOptionsValue(position: Int, titleName: String) {
+        lastTid = dataList[position]?.titleValue?:""
+        var isTID = titleName.equals("TID", ignoreCase = true)
 
-        var isTID = titleName.equals("Terminal ID", ignoreCase = true)
-
-        DialogUtilsNew1.getInputDialog(
-            context as Context,
-            getString(R.string.update),
-            dataList[position]?.titleValue?:"",
-            true,
-            isTID
-        ) {
-            if (titleName.equals("Terminal ID", ignoreCase = true)) {
+        DialogUtilsNew1.getInputDialog(context as Context, getString(R.string.update), dataList[position]?.titleValue?:"", true, isTID) {
+            if (titleName.equals("TID", ignoreCase = true)) {
                 when {
                     it == dataList[position]?.titleValue -> {
                         ToastUtils.showToast(requireContext(),"TID Unchanged")
@@ -202,11 +196,11 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                         ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
                     }
                     else -> {
-                        dataList[position]?.titleValue = it
-                        dataList[position]?.isUpdated = true
-                        mAdapter.notifyItemChanged(position)
                         lifecycleScope.launch {
-                            updateTable()
+                            dataList[position]?.titleValue = it
+                            dataList[position]?.isUpdated = true
+                            mAdapter.notifyItemChanged(position)
+                            updateTable(position,lastTid,it)
                         }
 
                     }
@@ -217,14 +211,13 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                 dataList[position]?.isUpdated = true
                 mAdapter.notifyItemChanged(position)
                 lifecycleScope.launch {
-                    updateTable()
+                    updateTable(position, it, it)
                 }
             }
         }
     }
 
-    suspend fun updateTable()
-    {
+    suspend fun updateTable(position: Int, lastTidValue: String, updatedTid: String) {
         bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())?.observe(viewLifecycleOwner,{ isUpdateTid ->
 
             if(isUpdateTid){
@@ -233,11 +226,13 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
                 runBlocking {
                         val tids = checkBaseTid(DBModule.appDatabase?.appDao)
-                        if(!tids.get(0).isEmpty()!!) {
 
-                            initViewModel.insertInfo1(tids[0] ?:"")
-                            observeMainViewModel()
-                        }
+                            AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName, "0")
+                            AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName, "0")
+                            initViewModel.insertInfo1(updatedTid)
+                            observeMainViewModel(position,lastTidValue)
+
+
                     }
 
             }
@@ -245,17 +240,29 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     }
 
 
-    private fun observeMainViewModel(){
+    private fun observeMainViewModel(position: Int, lastTidValue: String) {
 
         initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
 
             when (result.status) {
                 Status.SUCCESS -> {
-                    iDialog?.hideProgress()
-                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                    CoroutineScope(Dispatchers.IO).launch{
+                        Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
+                            iDialog?.hideProgress()
+                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                        }
+                    }
                 }
                 Status.ERROR -> {
+                    dataList[position]?.titleValue = lastTidValue
+                    dataList[position]?.isUpdated = true
+                    mAdapter.notifyItemChanged(position)
                     iDialog?.hideProgress()
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        reupdateTable(dataList[position]?.titleValue)
+                    }
+
                     ToastUtils.showToast(activity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
@@ -268,6 +275,13 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
 
     }
+
+     suspend fun reupdateTable(titleValue: String?) {
+         bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())
+             ?.observe(viewLifecycleOwner, { isUpdateTid ->
+
+             })
+     }
 
 
 }

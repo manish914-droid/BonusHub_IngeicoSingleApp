@@ -126,12 +126,12 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
         }
     }*/
 
-    lateinit var callback: OnOperationListener
+     var listner : OnOperationListener? = null
     fun fetchSettlementResponseData(
         settlementRequest: SettlementRequest) = callbackFlow {
         try {
 
-            callback = object : OnOperationListener.Stub() {
+            listner = object : OnOperationListener.Stub() {
                 override fun onCompleted(p0: OperationResult?) {
                     val response = p0?.value
                     val settlementResponse = p0?.value as? SettlementResponse
@@ -174,14 +174,14 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
 
             }
 
-            DeviceHelper.doSettlement(settlementRequest,callback)
+            DeviceHelper.doSettlement(settlementRequest,listner)
         }
         catch (ex: Exception){
             ex.printStackTrace()
             trySend(Result.error(IngenicoSettlementResponse(),ex.message)).isSuccess
         }
         awaitClose {
-           callback
+            listner = null
         }
     }
 

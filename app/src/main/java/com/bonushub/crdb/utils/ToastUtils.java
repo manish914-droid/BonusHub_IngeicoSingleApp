@@ -21,6 +21,7 @@ import android.widget.Toast;
 import kotlinx.coroutines.GlobalScope;
 
 public class ToastUtils {
+
     public static void showToast(Context context, String msg) {
         Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }

@@ -149,10 +149,10 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         val deviceModel = addPad(deviceModel(), "*", 6, true)
         val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
         val connectionType = ConnectionType.GPRS.code
-        val pccNo =
-            addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
-        val pcNo2 =
-            addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
+        val pccNo = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+        val pcNo2 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
+        println("PC No is -> "+pccNo)
+        println("PC2 No is -> "+pcNo2)
         val f61 = "$connectionType$deviceModel$appName$version$pccNo$pcNo2"
         addFieldByHex(61, f61)
         //endregion
