@@ -28,7 +28,7 @@ class SettlementViewModel @ViewModelInject constructor(private val settlementRep
 
     fun settlementResponse() {
         viewModelScope.launch {
-            val settlementRequest = SettlementRequest(1, listOf("30160039"))
+            val settlementRequest = SettlementRequest(1, listOf("30160031"))
             settlementRepository.fetchSettlementResponseData(settlementRequest).collect { result ->
                 withContext(Dispatchers.IO){
                     result.data?.let { it ->

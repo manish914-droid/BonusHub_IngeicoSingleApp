@@ -104,21 +104,19 @@ class SettlementFragment : Fragment() {
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
 
-            PrintUtil(activity).printDetailReportupdate(
-                dataList,
-                activity
-            ) { detailPrintStatus ->
 
-                }
-            PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
-
-            }
 
             (activity as NavigationActivity).alertBoxWithAction(
                 getString(R.string.settlement), getString(R.string.do_you_want_to_settle_batch), true, getString(R.string.yes), {
                     settlementViewModel.settlementResponse()
                     settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
 
+                        PrintUtil(activity).printDetailReportupdate(
+                            dataList,
+                            activity
+                        ) { detailPrintStatus ->
+
+                        }
                         when (result.status) {
                             Status.SUCCESS -> {
                                 CoroutineScope(Dispatchers.IO).launch{
@@ -131,6 +129,9 @@ class SettlementFragment : Fragment() {
                                         (activity as NavigationActivity).hideProgress()
                                         ex.printStackTrace()
                                     }
+                                }
+                                PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
+
                                 }
                               //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }

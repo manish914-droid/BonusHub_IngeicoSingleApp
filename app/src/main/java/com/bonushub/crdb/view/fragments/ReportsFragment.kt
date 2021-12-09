@@ -38,7 +38,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
     private val reportsItemList: MutableList<ReportsItem> by lazy { mutableListOf<ReportsItem>() }
     private var iReportsFragmentItemClick: IReportsFragmentItemClick? = null
-
+    private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }
     var binding: FragmentReportsBinding? = null
 
     private var iDiag: IDialog? = null
@@ -358,6 +358,15 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 lifecycleScope.launch(Dispatchers.Main) {
                                                     iDiag?.showProgress(getString(R.string.printing_detail))
                                                 }
+                                                Log.d("TPT Data:- ", batchData.toString())
+                                                dataList.clear()
+                                                dataList.addAll(batchData as MutableList<BatchTable>)
+                                                PrintUtil(activity).printDetailReportupdate(
+                                                    dataList,
+                                                    activity
+                                                ) { detailPrintStatus ->
+
+                                                }
                                                 //BB
 //                                                PrintUtil(activity).printDetailReportupdate(batchData, activity) {
 //                                                    iDiag?.hideProgress()
@@ -429,7 +438,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                     getString(R.string.printing_summary_report)
                                                 )
                                             }
+                                            Log.d("TPT Data:- ", batList.toString())
+                                            dataList.clear()
+                                            dataList.addAll(batList as MutableList<BatchTable>)
                                             try {
+                                                PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
+
+                                                }
                                             // region BB
                                             /*PrintUtil(context).printSettlementReportupdate( context, batList) {
                                                     iDiag?.hideProgress()
