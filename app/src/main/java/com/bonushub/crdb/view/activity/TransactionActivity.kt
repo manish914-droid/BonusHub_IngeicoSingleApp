@@ -261,7 +261,7 @@ class TransactionActivity : BaseActivityNew(){
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
 
-                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
 
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
@@ -319,6 +319,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -327,6 +330,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -376,6 +380,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -384,6 +391,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -432,6 +440,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -440,6 +451,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -489,6 +501,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -497,6 +512,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -548,6 +564,9 @@ class TransactionActivity : BaseActivityNew(){
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
                                         println(jsonResp)
+
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -556,6 +575,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)

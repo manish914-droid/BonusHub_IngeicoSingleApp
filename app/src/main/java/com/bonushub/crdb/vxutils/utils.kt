@@ -756,6 +756,8 @@ fun invoiceWithPadding(invoiceNo: String) =
     addPad(input = invoiceNo, padChar = "0", totalLen = 6, toLeft = true)
 //endregion
 
+
+
 //region=====================================GET Transaction Type Name:-
 fun getTransactionTypeName(type: Int): String? {
     var name: String? = null

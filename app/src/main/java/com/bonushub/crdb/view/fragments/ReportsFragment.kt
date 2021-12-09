@@ -1,6 +1,7 @@
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentReportsBinding
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchFileDataTable
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
@@ -20,6 +22,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.ReportsAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
+import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -41,6 +44,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     private var iDiag: IDialog? = null
 
     private val batchFileViewModel:BatchFileViewModel by viewModels()
+    private val settlementViewModel : SettlementViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,8 +103,10 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
 
                     when (lastReceiptData.txnName) {
-                        //TransactionType.SALE.type, TransactionType.TIP_SALE.type, TransactionType.REFUND.type, TransactionType.VOID.type, TransactionType.SALE_WITH_CASH.type, TransactionType.CASH_AT_POS.type, TransactionType.VOID_EMI.type ->
-                        EDashboardItem.SALE.title.uppercase(), EDashboardItem.REFUND.title.uppercase(), EDashboardItem.VOID_SALE.title.uppercase() -> {
+                        EDashboardItem.SALE.title.uppercase(), EDashboardItem.CASH_ADVANCE.title.uppercase(),
+                        EDashboardItem.SALE_WITH_CASH.title.uppercase(), EDashboardItem.REFUND.title.uppercase(),
+                        EDashboardItem.PREAUTH.title.uppercase(),EDashboardItem.PREAUTH_COMPLETE.title.uppercase(),
+                        EDashboardItem.VOID_SALE.title.uppercase() -> {
                             //BB
                             logger("print","util")
                             PrintUtil(activity).startPrinting(lastReceiptData,
@@ -115,7 +121,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     }
                                 }
                         }
-                        //TransactionType.EMI_SALE.type, TransactionType.TEST_EMI.type -> {
+
                         EDashboardItem.BANK_EMI.title.uppercase() -> {
                             //BB
                             logger("print","util")
@@ -203,17 +209,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     }*/
                            // }
                        // }
-                        //TransactionType.VOID_REFUND.type -> {
-                            //BB
-                            /* VoidRefundSalePrintReceipt().startPrintingVoidRefund(
-                                    lastReceiptData,
-                                    TransactionType.VOID_REFUND.type,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity
-                                ) { _, _ ->
-                                    iDiag?.hideProgress()
-                                }*/
-                       // }
+
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.hideProgress()
@@ -336,7 +332,17 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 logger("repost", ReportsItem.DETAIL_REPORT._name)
                 //val batchData = BatchFileDataTable.selectBatchData()
                 lifecycleScope.launch{
-                    batchFileViewModel?.getBatchTableData()?.observe(viewLifecycleOwner,{ batchData ->
+
+                    /*//region===============Get Batch Data from HDFCViewModal:-
+                    settlementViewModel.getBatchData()?.observe(requireActivity()) { batchData ->
+                        Log.d("TPT Data:- ", batchData.toString())
+                        dataList.clear()
+                        dataList.addAll(batchData as MutableList<BatchTable>)
+                        setUpRecyclerView()
+                    }
+                    //endregion*/
+
+                    settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batchData ->
 
                         if (batchData.isNotEmpty()) {
                             iDiag?.getMsgDialog(
@@ -404,9 +410,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 logger("repost", ReportsItem.SUMMERY_REPORT._name)
                // (activity as NavigationActivity).transactFragment(ReportSummaryFragment(), true)
 
-             //   val batList = BatchFileDataTable.selectBatchData()
                 lifecycleScope.launch{
-                    batchFileViewModel?.getBatchTableData()?.observe(viewLifecycleOwner,{ batList ->
+
+                        settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batList ->
 
                         if (batList.isNotEmpty()) {
                             iDiag?.getMsgDialog(
@@ -481,11 +487,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.LAST_SUMMERY_REPORT -> {
                 logger("repost", ReportsItem.LAST_SUMMERY_REPORT._name)
 
-                val str = AppPreference.getString(AppPreference.LAST_BATCH)
-                val batList = Gson().fromJson<List<BatchFileDataTable>>(
-                    str,
-                    object : TypeToken<List<BatchFileDataTable>>() {}.type
-                )
+                val batList = AppPreference.getLastBatch()
+
                 if (batList != null) {
                     iDiag?.getMsgDialog(
                         getString(R.string.confirmation),
@@ -502,11 +505,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             }
 
                             lifecycleScope.launch {
-                                val str1 = AppPreference.getString(AppPreference.LAST_BATCH)
-                                val batList1 = Gson().fromJson<List<BatchFileDataTable>>(
-                                    str1,
-                                    object : TypeToken<List<BatchFileDataTable>>() {}.type
-                                )
+                                val batList1 = AppPreference.getLastBatch()
 
                                 if (batList1 != null) {
                                     try {

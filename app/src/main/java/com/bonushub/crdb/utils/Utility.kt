@@ -44,8 +44,8 @@ val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 
 
-val NEW_IP_ADDRESS = /*"192.168.250.10"*/"203.112.151.169"
-var PORT =8109//8109// /*9101*//*4124*/8109
+val NEW_IP_ADDRESS ="192.168.250.10"/*"192.168.250.10"*/
+var PORT =4124//8109// /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 
@@ -1139,5 +1139,82 @@ object Field48ResponseTimestamp {
     // region bank functions
 
     // end region
+
+    fun transactionType2Name(code: Int): String {
+        return when (code) {
+            TransactionType.SALE.type -> "Sale"
+            TransactionType.VOID.type -> "Void"
+            TransactionType.VOID_REFUND.type -> "Void Refund"
+            TransactionType.REFUND.type -> "Refund"
+            TransactionType.PRE_AUTH.type -> "Pre-Auth"
+            TransactionType.PRE_AUTH_COMPLETE.type -> "Auth Complete"
+            TransactionType.VOID_PREAUTH.type -> "Void Pre-Auth"
+            TransactionType.OFFLINE_SALE.type -> "Offline Sale"
+            TransactionType.TIP_SALE.type -> "Tip Sale"
+            TransactionType.SALE_WITH_CASH.type -> "Sale Cash"
+            TransactionType.TIP_ADJUSTMENT.type -> "Tip Adjust"
+            TransactionType.VOID_OFFLINE_SALE.type -> "Void Offline Sale"
+            TransactionType.TEST_EMI.type -> "Test EMI Txn"
+            TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type , TransactionType.EMI_SALE.type -> "EMI Sale"
+            TransactionType.CASH_AT_POS.type -> "Cash only"
+            TransactionType.VOID_EMI.type -> "Void EMI"
+            else -> "Unknown"
+        }
+    }
+
+    fun panMasking(input: String, maskFormat: String): String {
+        if (input.isNotEmpty()) {
+            var mskF=""
+            mskF = if(maskFormat.first()=='*'){
+                "*****0000"
+            }else{
+                maskFormat
+            }
+            val maskCharArr = mskF.toCharArray()
+            val inputArr = input.toCharArray()
+
+            //  maskCharArr= charArrayOf('*','*','*','*','0','0','0','0',)
+            // get all stars index
+            val li = arrayListOf<Int>()
+            for (e in maskCharArr.indices) {
+                if (mskF[e] == '*') {
+                    li.add(e)
+                }
+            }
+            when {
+                inputArr.size == maskCharArr.size -> for (e in li) {
+                    inputArr[e] = '*'
+                }
+                inputArr.size > maskCharArr.size -> {
+                    for (e in li.first()..(inputArr.lastIndex - li.last())) {
+                        inputArr[e] = '*'
+                    }
+                }
+                else -> for (e in 4..(inputArr.lastIndex - 4)) {
+                    inputArr[e] = '*'
+                }
+            }
+            val sb = StringBuilder()
+
+            var index = 0
+            /* while (index < inputArr.size) {
+                 var endIndex = index + 3
+                 if (endIndex > inputArr.lastIndex) {
+                     endIndex = inputArr.lastIndex
+                 }
+                 val tempCh = inputArr.slice(index..endIndex)
+                 sb.append(tempCh.toCharArray())
+                 sb.append(" ")
+                 index += 4
+             }*/
+
+            for(i in inputArr){
+                sb.append(i)
+            }
+
+            //  return sb.toString().substring(0, sb.lastIndex)
+            return sb.toString()
+        } else return ""
+    }
 
 }
