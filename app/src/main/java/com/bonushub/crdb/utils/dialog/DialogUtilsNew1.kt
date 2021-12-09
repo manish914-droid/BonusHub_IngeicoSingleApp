@@ -33,7 +33,7 @@ class DialogUtilsNew1 {
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setCancelable(setCancelable)
-            dialog.setContentView(com.bonushub.crdb.R.layout.dialog_admin)
+            dialog.setContentView(R.layout.dialog_admin)
             val textViewHeader = dialog.findViewById<View>(R.id.textViewHeader) as TextView
             val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as EditText
             val txtViewCancel = dialog.findViewById<View>(R.id.txtViewCancel) as TextView
@@ -56,14 +56,7 @@ class DialogUtilsNew1 {
             dialog.show()
         }
 
-        fun getInputDialog(
-            context: Context,
-            title: String,
-            _text: String,
-            isNumeric: Boolean = false,
-            isTID: Boolean = false,
-            callback: (String) -> Unit
-        ) {
+        fun getInputDialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false, callback: (String) -> Unit) {
             Dialog(context).apply {
                 getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
                 requestWindowFeature(Window.FEATURE_NO_TITLE)

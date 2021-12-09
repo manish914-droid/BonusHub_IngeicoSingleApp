@@ -285,15 +285,13 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         try {
             val tn = table.toInt()
             if (tn in pc2Tables) {
-                val ppc =
-                    AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName).toInt()
+                val ppc = AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName).toInt()
                 if (pcNum.toInt() > ppc) {
                     AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName, pcNum)
                 }
             }
             if (tn in pc1Tables) {
-                val ppc =
-                    AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName).toInt()
+                val ppc = AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName).toInt()
                 if (pcNum.toInt() > ppc) {
                     AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName, pcNum)
                 }

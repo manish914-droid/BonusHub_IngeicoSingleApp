@@ -17,6 +17,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -31,16 +32,21 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.repository.keyexchangeDataSource
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
+import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
+import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
@@ -83,6 +89,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
     private var dialogAdminPassword:Dialog? = null
 
+    private val initViewModel : InitViewModel by viewModels()
+    // for init`
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -741,7 +749,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                         val responseCode = responseIsoData.isoMap[39]?.parseRaw2String().toString()
                         val hostMsg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
+
+                        val terminalParameterTable = getTptData()
                         val isAppUpdateAvailableData = responseIsoData.isoMap[63]?.parseRaw2String()
+
+                        Log.d("Success Data:- ", result)
+                        Log.d("isAppUpdate:- ", isAppUpdateAvailableData.toString())
+                        //Below we are placing values in preference for the use to know whether batch is settled or not:-
 
                         if (responseCode == "00" || responseCode == "95") {
                             //Change status of autoSettle File Based Variable after Settlement Success to avoid
@@ -755,6 +769,23 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     this@NavigationActivity,
                                     getString(R.string.settlement_success)
                                 )
+                                if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
+                                    val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
+                                } else {
+                                    onBackPressed()
+                                    when (isAppUpdateAvailableData) {
+                                        "00" -> {
+                                            if (terminalParameterTable != null) {
+                                                val tid = getBaseTID(appDao)
+                                                showProgress()
+                                                initViewModel.insertInfo1(tid)
+                                                observeMainViewModel()
+                                            }
+                                        }
+
+
+                                    }
+                                }
                             }
 
                             when (settlementCallFrom) {
@@ -789,7 +820,245 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 })
         }
     }
+
+    private fun observeMainViewModel(){
+
+        initViewModel.initData.observe(this@NavigationActivity, Observer { result ->
+
+            when (result.status) {
+                Status.SUCCESS -> {
+                    CoroutineScope(Dispatchers.IO).launch{
+                        Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
+                            hideProgress()
+                           transactFragment(DashboardFragment())
+                        }
+
+                    }
+                }
+                Status.ERROR -> {
+                    hideProgress()
+                    ToastUtils.showToast(this@NavigationActivity,"Error called  ${result.error}")
+                }
+                Status.LOADING -> {
+                   showProgress("Sending/Receiving From Host")
+
+                }
+            }
+
+        })
+
+
+    }
     //endregion
+
+
+    //Settle Batch and Do the Init:-
+    suspend fun settleBatch1(settlementByteArray: ByteArray?, settlementFrom: String? = null, settlementCB: ((Boolean) -> Unit)? = null) {
+        runOnUiThread {
+            showProgress()
+        }
+        if (settlementByteArray != null) {
+            HitServer.hitServer(settlementByteArray, { result, success ->
+                if (success && !TextUtils.isEmpty(result)) {
+                    hideProgress()
+                    tempSettlementByteArray = settlementByteArray
+                    /* Note:- If responseCode is "00" then delete Batch File Data Table happens and Navigate to MainActivity
+                              else responseCode is "95" then Batch Upload will Happens and then delete Batch File Data Table happens
+                              and Navigate to MainActivity */
+                    val responseIsoData: IsoDataReader = readIso(result, false)
+                    logger("Transaction RESPONSE ", "---", "e")
+                    logger("Transaction RESPONSE --->>", responseIsoData.isoMap, "e")
+                    Log.e("Success 39-->  ", responseIsoData.isoMap[39]?.parseRaw2String()
+                        .toString() + "---->" + responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                    )
+                    val responseCode = responseIsoData.isoMap[39]?.parseRaw2String().toString()
+                    val hostFailureValidationMsg =
+                        responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                    /* Note:- If responseCode is "00" then delete Batch File Data Table happens and Navigate to MainActivity
+                             else responseCode is "95" then Batch Upload will Happens and then delete Batch File Data Table happens
+                             and Navigate to MainActivity */
+
+                    if (responseCode == "00") {
+                        //  settlementServerHitCount = 0
+                        AppPreference.saveBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString(), false)
+                        AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                        val terminalParameterTable = getTptData()
+                        val isAppUpdateAvailableData = responseIsoData.isoMap[63]?.parseRaw2String()
+                        Log.d("Success Data:- ", result)
+                        Log.d("isAppUpdate:- ", isAppUpdateAvailableData.toString())
+                        //Below we are placing values in preference for the use to know whether batch is settled or not:-
+                        AppPreference.saveString(PrefConstant.SETTLEMENT_PROCESSING_CODE.keyName.toString(), ProcessingCode.SETTLEMENT.code)
+                        AppPreference.saveBoolean(PrefConstant.SETTLE_BATCH_SUCCESS.keyName.toString(), false)
+                        Log.d("Success Data:- ", result)
+                        //Below we are placing values in preference for the use to know whether batch is settled or not:-
+                        AppPreference.saveString(
+                            PrefConstant.SETTLEMENT_PROCESSING_CODE.keyName.toString(),
+                            ProcessingCode.SETTLEMENT.code
+                        )
+                        AppPreference.saveBoolean(
+                            PrefConstant.SETTLE_BATCH_SUCCESS.keyName.toString(),
+                            false
+                        )
+                        val batchList = runBlocking(Dispatchers.IO) {
+                                appDao?.getBatchTableData()
+                            }
+
+                        //Batch and Roc Increment for Settlement:-
+                        val settlement_roc = AppPreference.getIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString()) + 1
+                        AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc)
+                        //region Setting AutoSettle Status and Last Settlement DateTime:-
+
+                            //Here printing will be there
+                            if (true) {
+
+                                //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
+                                runBlocking(Dispatchers.IO) {
+                                    AppPreference.saveBatchInPreference(batchList)
+                                    //Delete All BatchFile Data from Table after Settlement:-
+                                    appDao.deleteBatchFileTable()
+
+
+                                  //  resetRoc()
+
+                                    //Here we are updating invoice by 1
+                                   appDao.updateTPTInvoiceNumber("1".padStart(6, '0'), TableType.TERMINAL_PARAMETER_TABLE.code)
+
+                                    //Here we are incrementing sale batch number also for next sale:-
+                                    val updatedBatchNumber = getTptData()?.batchNumber?.toInt()?.plus(1)
+                                    appDao?.updateBatchNumber(updatedBatchNumber.toString(), TableType.TERMINAL_PARAMETER_TABLE.code)
+                                }
+                                //endregion
+
+                                //Added by Lucky Singh.
+                                //Delete Last Success Receipt From App Preference.
+                                AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, "")
+
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    txnSuccessToast(
+                                        this@NavigationActivity,
+                                        getString(R.string.settlement_success)
+                                    )
+                                    delay(2000)
+                                    if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
+                                        val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
+
+                                    } else {
+                                        onBackPressed()
+                                        when (isAppUpdateAvailableData) {
+                                            "00" -> {
+                                                if (terminalParameterTable != null) {
+
+                                                }
+                                            }
+
+                                            "01" -> {
+                                                if (terminalParameterTable != null) {
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    hideProgress()
+                                    //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
+                                    runBlocking(Dispatchers.IO) {
+                                        AppPreference.saveBatchInPreference(batchList)
+                                        //Delete All BatchFile Data from Table after Settlement:-
+                                        appDao.deleteBatchFileTable()
+
+
+                                        //  resetRoc()
+
+                                        //Here we are updating invoice by 1
+                                        appDao.updateTPTInvoiceNumber(
+                                            "1".padStart(6, '0'),
+                                            TableType.TERMINAL_PARAMETER_TABLE.code
+                                        )
+
+                                        //Here we are incrementing sale batch number also for next sale:-
+                                        val updatedBatchNumber =
+                                            getTptData()?.batchNumber?.toInt()?.plus(1)
+                                        appDao?.updateBatchNumber(
+                                            updatedBatchNumber.toString(),
+                                            TableType.TERMINAL_PARAMETER_TABLE.code
+                                        )
+                                    }
+                                    //endregion
+
+                                    //Added by Lucky Singh.
+                                    //Delete Last Success Receipt From App Preference.
+                                    AppPreference.saveString(
+                                        AppPreference.LAST_SUCCESS_RECEIPT_KEY,
+                                        ""
+                                    )
+
+
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        txnSuccessToast(
+                                            this@NavigationActivity,
+                                            getString(R.string.settlement_success)
+                                        )
+                                        delay(2000)
+                                        if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
+                                            val dataList =
+                                                isAppUpdateAvailableData?.split("|") as MutableList<String>
+
+                                        } else {
+                                            onBackPressed()
+                                            when (isAppUpdateAvailableData) {
+                                                "00" -> {
+                                                    if (terminalParameterTable != null) {
+
+                                                    }
+                                                }
+
+                                                "01" -> {
+                                                    if (terminalParameterTable != null) {
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                ToastUtils.showToast(this@NavigationActivity,"Printing error")
+                            }
+
+                    } else {
+                        runOnUiThread {
+                            ToastUtils.showToast(this@NavigationActivity,hostFailureValidationMsg)
+                            AppPreference.saveBoolean(
+                                PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                        }
+                        settlementCB?.invoke(false)
+                    }
+
+                } else {
+                    hideProgress()
+                    runOnUiThread {
+                        AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                    }
+
+                    ToastUtils.showToast(this@NavigationActivity,"Settlement Failure")
+                    Log.d("Failure Data:- ", result)
+                    AppPreference.saveString(PrefConstant.SETTLEMENT_PROCESSING_CODE.keyName.toString(), ProcessingCode.FORCE_SETTLEMENT.code)
+
+                    //Added by Manish Kumar
+                    val settlement_roc = AppPreference.getIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString()) + 1
+                    AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc)
+
+                    AppPreference.saveString(PrefConstant.SETTLEMENT_PROCESSING_CODE.keyName.toString(), ProcessingCode.FORCE_SETTLEMENT.code)
+
+                    AppPreference.saveBoolean(PrefConstant.SETTLE_BATCH_SUCCESS.keyName.toString(), true)
+                    settlementCB?.invoke(false)
+                }
+            }, {
+                //backToCalled(it, false, true)
+            })
+        }
+    }
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-

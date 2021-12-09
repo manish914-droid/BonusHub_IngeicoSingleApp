@@ -120,6 +120,19 @@ object AppPreference {
         edit?.apply()
     }
 
+    @JvmStatic
+    fun getIntData(key: String): Int {
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        return v?.getInt(key, 0) ?: 0
+    }
+
+    @JvmStatic
+    fun setIntData(key: String, value: Int) {
+        val p = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val edit = p?.edit()
+        edit?.putInt(key, value)
+        edit?.apply()
+    }
 
     fun clearReversal() {
        // logger(TAG, "========CLEAR Reversal=========", "e")

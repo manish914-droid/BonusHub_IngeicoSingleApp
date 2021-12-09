@@ -52,6 +52,7 @@ import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -118,27 +119,30 @@ class TransactionActivity : BaseActivityNew(){
         TODO("Not yet implemented")
     }
 
-    private fun setupObserver() {
-        searchCardViewModel.allcadType.observe(this, Observer { cardProcessdatamodel  ->
-            when(cardProcessdatamodel.getReadCardType()){
-                DetectCardType.EMV_CARD_TYPE -> {
-                    Toast.makeText(this,"EMV mode detected",Toast.LENGTH_LONG).show()
-                    searchCardViewModel.fetchCardPanData()
-                    setupEMVObserver()
-                }
-                DetectCardType.CONTACT_LESS_CARD_TYPE -> {
-                    Toast.makeText(this,"Contactless mode detected",Toast.LENGTH_LONG).show()
-                }
-                DetectCardType.MAG_CARD_TYPE -> {
-                    Toast.makeText(this,"Swipe mode detected",Toast.LENGTH_LONG).show()
-                    searchCardViewModel.fetchCardPanData()
-                    setupEMVObserver()
-                }
-                else -> {
+    private suspend fun setupObserver() {
+        withContext(Dispatchers.Main){
+            searchCardViewModel.allcadType.observe(this@TransactionActivity, Observer { cardProcessdatamodel  ->
+                when(cardProcessdatamodel.getReadCardType()){
+                    DetectCardType.EMV_CARD_TYPE -> {
+                        Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
+                        searchCardViewModel.fetchCardPanData()
+                        setupEMVObserver()
+                    }
+                    DetectCardType.CONTACT_LESS_CARD_TYPE -> {
+                        Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
+                    }
+                    DetectCardType.MAG_CARD_TYPE -> {
+                        Toast.makeText(this@TransactionActivity,"Swipe mode detected",Toast.LENGTH_LONG).show()
+                        searchCardViewModel.fetchCardPanData()
+                        setupEMVObserver()
+                    }
+                    else -> {
 
+                    }
                 }
-            }
-        })
+            })
+
+        }
     }
 
     private fun setupEMVObserver() {
@@ -213,7 +217,7 @@ class TransactionActivity : BaseActivityNew(){
         })
     }
 
-    private  fun setupFlow(){
+    private suspend fun setupFlow(){
         emvBinding?.baseAmtTv?.text=saleAmt
         when(transactionTypeEDashboardItem){
             EDashboardItem.BRAND_EMI->{
