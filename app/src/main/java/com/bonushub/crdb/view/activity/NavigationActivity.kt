@@ -900,7 +900,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             false
                         )
                         val batchList = runBlocking(Dispatchers.IO) {
-                                appDao?.getBatchData()
+                                appDao?.getAllBatchData()
                             }
 
                         //Batch and Roc Increment for Settlement:-
