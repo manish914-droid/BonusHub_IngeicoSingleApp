@@ -28,50 +28,57 @@
                     android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
+                    app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
+                    android:layout_marginStart="@dimen/pad_5"
+                    android:layout_marginEnd="@dimen/pad_5"
+                    android:background="@drawable/edge_bg_gray">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
+                        android:layout_weight=".7"
                         android:gravity="center"
-                        android:padding="@dimen/pad_10"
+                        android:padding="@dimen/pad_5"
                         android:text="@string/invoice"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_regular" />
+                        android:textSize="@dimen/text_size_small"
+                        android:fontFamily="@font/muli_semi_bold"/>
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:gravity="start"
-                        android:padding="@dimen/pad_10"
+                        android:layout_weight=".9"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
                         android:text="@string/amount"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_regular" />
+                        android:textSize="@dimen/text_size_small"
+                        android:fontFamily="@font/muli_semi_bold"/>
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:gravity="start"
-                        android:padding="@dimen/pad_10"
+                        android:layout_weight="1.5"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
                         android:text="@string/transaction_type"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_regular" />
+                        android:textSize="@dimen/text_size_small"
+                        android:fontFamily="@font/muli_semi_bold"/>
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="start"
-                        android:padding="@dimen/pad_10"
+                        android:layout_weight=".9"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
                         android:text="@string/date"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_regular" />
+                        android:textSize="@dimen/text_size_small"
+                        android:fontFamily="@font/muli_semi_bold"/>
 
 
                 </LinearLayout>
