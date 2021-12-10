@@ -1,63 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/pad_5"
+    android:layout_marginEnd="@dimen/pad_5"
+    android:background="@color/white"
+    android:orientation="vertical"
+    app:cardCornerRadius="@dimen/pad_5">
+
+    <LinearLayout
+        android:id="@+id/void_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/pad_5"
-        android:background="@color/white"
-        android:elevation="@dimen/pad_5"
-        app:cardCornerRadius="@dimen/pad_5">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/void_parent"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_invoice_number"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_weight=".7"
+            android:fontFamily="@font/muli_extra_light"
+            android:gravity="center"
+            android:hint="@string/_1245678"
+            android:textColor="@color/text_gray"
+            android:textSize="@dimen/text_size_small" />
 
-            <TextView
-                android:id="@+id/tv_invoice_number"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:hint="@string/_1245678"
-                android:padding="@dimen/pad_10"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_regular" />
+        <TextView
+            android:id="@+id/tv_base_amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".9"
+            android:fontFamily="@font/muli_extra_light"
+            android:gravity="center"
+            android:hint="@string/_500"
+            android:textColor="@color/text_gray"
+            android:textSize="@dimen/text_size_small" />
 
-            <TextView
-                android:id="@+id/tv_base_amount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:hint="@string/_500"
-                android:padding="@dimen/pad_10"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_regular" />
+        <TextView
+            android:id="@+id/tv_transaction_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:fontFamily="@font/muli_extra_light"
+            android:gravity="center"
+            android:hint="@string/_500"
+            android:textColor="@color/text_gray"
+            android:textSize="@dimen/text_size_small" />
 
-            <TextView
-                android:id="@+id/tv_transaction_type"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:hint="@string/_500"
-                android:padding="@dimen/pad_10"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_regular" />
+        <TextView
+            android:id="@+id/tv_transaction_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".9"
+            android:fontFamily="@font/muli_extra_light"
+            android:gravity="center"
+            android:hint="@string/_06_07_2020"
+            android:textColor="@color/text_gray"
+            android:textSize="@dimen/text_size_small" />
 
-            <TextView
-                android:id="@+id/tv_transaction_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:gravity="center"
-                android:hint="@string/_06_07_2020"
-                android:padding="@dimen/pad_10"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_regular" />
+    </LinearLayout>
 
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#9F9F9F"
+        android:layout_marginTop="5dp"/>
+</LinearLayout>

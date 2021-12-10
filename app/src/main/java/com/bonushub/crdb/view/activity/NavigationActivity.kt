@@ -900,7 +900,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             false
                         )
                         val batchList = runBlocking(Dispatchers.IO) {
-                                appDao?.getBatchTableData()
+                                appDao?.getBatchData()
                             }
 
                         //Batch and Roc Increment for Settlement:-
@@ -913,7 +913,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                 //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                 runBlocking(Dispatchers.IO) {
-                                    AppPreference.saveBatchInPreference(batchList)
+                                    AppPreference.saveBatchInPreference(batchList?.value)
                                     //Delete All BatchFile Data from Table after Settlement:-
                                     appDao.deleteBatchFileTable()
 
@@ -964,7 +964,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     hideProgress()
                                     //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                     runBlocking(Dispatchers.IO) {
-                                        AppPreference.saveBatchInPreference(batchList)
+                                        AppPreference.saveBatchInPreference(batchList?.value)
                                         //Delete All BatchFile Data from Table after Settlement:-
                                         appDao.deleteBatchFileTable()
 

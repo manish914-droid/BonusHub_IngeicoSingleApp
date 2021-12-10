@@ -72,6 +72,7 @@ class SettlementFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
        // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
+        fragmensettlementBinding.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_settlement)
         fragmensettlementBinding.subHeaderView?.subHeaderText?.text = getString(R.string.settlement)
         fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager?.popBackStack() }
 
@@ -171,6 +172,8 @@ class SettlementFragment : Fragment() {
             fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
         }
+
+
     }
     //endregion
 }
@@ -196,6 +199,7 @@ internal class SettlementAdapter(private val list: List<BatchTable>) :
         holder.binding.tvBaseAmount.text = amount
         holder.binding.tvTransactionType.text = getTransactionTypeName(list[p1].transactionType)
         holder.binding.tvTransactionDate.text = list[p1].receiptData?.dateTime
+
     }
 
     inner class SettlementHolder(val binding: ItemSettlementBinding) :
