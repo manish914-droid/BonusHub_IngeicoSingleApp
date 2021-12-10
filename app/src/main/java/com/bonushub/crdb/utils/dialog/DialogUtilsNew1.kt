@@ -186,6 +186,58 @@ class DialogUtilsNew1 {
             }.show()
         }
 
+
+        fun showBrandEmiByCodeDetailsDialog(
+            context: Context,
+            bank: String,
+            productName: String,
+            categoryName: String,
+            tenure: String,
+            transactionAmount: String,
+            emiAmount: String,
+            netPayAmount: String,
+            callback: () -> Unit
+        ) {
+            Dialog(context).apply {
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.dialog_brand_emi_by_code_details)
+                setCancelable(false)
+                val window = window
+//                window?.setLayout(
+//                    ViewGroup.LayoutParams.MATCH_PARENT,
+//                    WindowManager.LayoutParams.WRAP_CONTENT
+//                )
+                val txtViewBank = findViewById<TextView>(R.id.txtViewBank)
+                val txtViewProductName = findViewById<TextView>(R.id.txtViewProductName)
+                val txtViewCategoryName = findViewById<TextView>(R.id.txtViewCategoryName)
+                val txtViewTenure = findViewById<TextView>(R.id.txtViewTenure)
+                val txtViewTransactionAmount = findViewById<TextView>(R.id.txtViewTransactionAmount)
+                val txtViewEmiAmount = findViewById<TextView>(R.id.txtViewEmiAmount)
+                val txtViewNetPayAmount = findViewById<TextView>(R.id.txtViewNetPayAmount)
+                val txtViewCancel = findViewById<TextView>(R.id.txtViewCancel)
+                val txtViewConfirm = findViewById<TextView>(R.id.txtViewConfirm)
+
+                txtViewBank.text = bank
+                txtViewProductName.text = productName
+                txtViewCategoryName.text = categoryName
+                txtViewTenure.text = tenure
+                txtViewTransactionAmount.text = transactionAmount
+                txtViewEmiAmount.text = emiAmount
+                txtViewNetPayAmount.text = netPayAmount
+
+                txtViewCancel.setOnClickListener {
+                    dismiss()
+                }
+
+                txtViewConfirm.setOnClickListener {
+                    dismiss()
+                    callback()
+                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+        }
+
     }
 
 }
