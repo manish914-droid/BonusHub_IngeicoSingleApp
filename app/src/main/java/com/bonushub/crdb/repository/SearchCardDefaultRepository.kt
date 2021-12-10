@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.RemoteException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.bonushub.crdb.R
 import com.bonushub.crdb.di.USDKScope
 import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.entity.EMVOption
@@ -16,8 +17,10 @@ import com.bonushub.crdb.utils.ingenico.DialogUtil
 import com.bonushub.crdb.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.utils.ingenico.TLV
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.TransactionActivity
-import com.bonushub.crdb.view.activity.TransactionActivity.DetectCardType
+import com.bonushub.crdb.view.activity.TransactionActivity.*
+import com.bonushub.pax.utils.EFallbackCode
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode
@@ -76,8 +79,9 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                 override fun onCardInsert() {
                     logger(TAG, "=> onCardInsert")
                       cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
-                     _insertCardStatus.postValue(cardProcessedDataModal)
-                    emv?.stopSearch()
+                   //  _insertCardStatus.postValue(cardProcessedDataModal)
+                    startemv(EMVOption.create(), cardProcessedDataModal)
+                   // emv?.stopSearch()
                 }
 
                 override fun onCardSwiped(track: Bundle) {
@@ -91,15 +95,46 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
 
                     val trackStates = track.getIntArray(EMVData.TRACK_STATES)
                     for (i in trackStates!!.indices) {
-                        logger(TAG, "=> onCardSwiped"+String.format("==> Track %s state: %d", i + 1, trackStates!![i]))
+                        logger(
+                            TAG,
+                            "=> onCardSwiped" + String.format(
+                                "==> Track %s state: %d",
+                                i + 1,
+                                trackStates!![i]
+                            )
+                        )
                     }
 
-                    cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
-                    var encryptTrack2data = getEncryptedPanorTrackData(track.getString(EMVData.TRACK2) ?: "",true)
-                    println("Track data is"+track.getString(EMVData.TRACK2))
-                    cardProcessedDataModal.setTrack2Data(encryptTrack2data ?: "")
-                    _insertCardStatus.postValue(cardProcessedDataModal)
-                    emv?.stopSearch()
+                    var serviceCode = track.getString(EMVData.SERVICE_CODE)
+
+                    if (serviceCode != null) {
+                        cardProcessedDataModal.setServiceCodeData(serviceCode)
+                    }
+                    val sc = cardProcessedDataModal.getServiceCodeData()
+                    // val sc: String? = ""
+                    var scFirstByte: Char? = null
+                    var scLastbyte: Char? = null
+                    if (null != sc) {
+                        scFirstByte = sc.first()
+                        scLastbyte = sc.last()
+
+                    }
+                    if (cardProcessedDataModal.getFallbackType() != EFallbackCode.EMV_fallback.fallBackCode){
+                             //Checking Fallback
+                        if (scFirstByte == '2' || scFirstByte == '6') {
+                            doEndProcess(EFallbackCode.Swipe_fallback.fallBackCode, cardProcessedDataModal)
+                        }
+                     }
+                    else {
+
+                        cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
+                        var encryptTrack2data =
+                            getEncryptedPanorTrackData(track.getString(EMVData.TRACK2) ?: "", true)
+                        println("Track data is" + track.getString(EMVData.TRACK2))
+                        cardProcessedDataModal.setTrack2Data(encryptTrack2data ?: "")
+                        _insertCardStatus.postValue(cardProcessedDataModal)
+                        emv?.stopSearch()
+                    }
                 }
 
                 override fun onTimeout() {
@@ -172,7 +207,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
 
             @Throws(RemoteException::class)
             override fun onEndProcess(result: Int, transData: TransData) {
-
+                doEndProcess(result,cardProcessedDataModal)
             }
 
             @Throws(RemoteException::class)
@@ -199,6 +234,60 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
 
 
     }
+
+    /**
+     * Inform the application that the EMV transaction is completed and the kernel exits.
+     */
+    fun doEndProcess(result: Int,cardProcessedDataModal: CardProcessedDataModal) {
+        println("Fallbackcode is "+result)
+        when (result) {
+            //Swipe fallabck case when cip and swipe card used
+            EFallbackCode.Swipe_fallback.fallBackCode -> {
+                cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
+                //_insertCardStatus.postValue(cardProcessedDataModal)
+                (context as? TransactionActivity)?.handleEMVFallbackFromError(context.getString(R.string.fallback),
+                    context.getString(R.string.please_use_another_option), false) {
+                    cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
+                    detectCard(cardProcessedDataModal, CardOption.create().apply {
+                        supportICCard(true)
+                        supportMagCard(false)
+                        supportRFCard(false)
+                    })
+                }
+            }
+
+            CardErrorCode.EMV_FALLBACK_ERROR_CODE.errorCode -> {
+                //EMV Fallback case when we insert card from other side then chip side:-
+                cardProcessedDataModal.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
+                cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
+
+
+                (context as? TransactionActivity)?.handleEMVFallbackFromError(context.getString(R.string.fallback), context.getString(R.string.please_use_another_option), false) {
+                    cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
+                    detectCard(cardProcessedDataModal, CardOption.create().apply {
+                        supportICCard(false)
+                        supportMagCard(true)
+                        supportRFCard(false)
+                    })
+                }
+            // _insertCardStatus.postValue(cardProcessedDataModal)
+            }
+
+            else -> {
+
+            }
+
+        }
+
+
+        /*    if (result != EMVError.SUCCESS) {
+                println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
+            } else {
+                println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
+            }
+            println("\n")*/
+    }
+
 
     @Throws(RemoteException::class)
     fun doInitEMV() {

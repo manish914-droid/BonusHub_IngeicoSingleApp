@@ -900,7 +900,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             false
                         )
                         val batchList = runBlocking(Dispatchers.IO) {
-                                appDao?.getBatchTableData()
+                                appDao?.getAllBatchData()
                             }
 
                         //Batch and Roc Increment for Settlement:-
@@ -1059,6 +1059,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             })
         }
     }
+
+
+
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
