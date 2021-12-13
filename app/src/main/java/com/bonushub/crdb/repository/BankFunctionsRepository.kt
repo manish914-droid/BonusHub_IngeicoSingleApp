@@ -33,7 +33,8 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
             val tpt = appDao.getSingleRowTerminalParameterTableData()
             try {
                 // logger("sap",""+tpt?.adminPassword)
-                data.postValue(tpt?.adminPassword.equals(password,true))
+                var adminPassword = tpt?.adminPassword?.substring(0,4)
+                data.postValue(adminPassword.equals(password,true))
             }catch (ex:Exception){
                 data.postValue(false)
             }

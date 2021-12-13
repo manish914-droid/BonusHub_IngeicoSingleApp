@@ -23,9 +23,9 @@ class SearchViewModel @ViewModelInject constructor(
         super.onCleared()
     }
 
-    fun fetchCardTypeData(){
+    fun fetchCardTypeData(cardProcessedDataModal: CardProcessedDataModal, cardOption: CardOption) {
         viewModelScope.launch {
-            allcadType = repository.observeCardType(CardProcessedDataModal(), CardOption.create()) as MutableLiveData<CardProcessedDataModal>
+            allcadType = repository.observeCardType(cardProcessedDataModal, cardOption) as MutableLiveData<CardProcessedDataModal>
 
         }
     }

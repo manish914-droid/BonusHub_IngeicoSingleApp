@@ -12,10 +12,9 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
-import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.db.AppDatabase
-import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
+import com.bonushub.crdb.entity.CardOption
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
@@ -26,13 +25,11 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.addPad
 import com.bonushub.crdb.utils.getBaseTID
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.view.activity.TransactionActivity.EFallbackCode.*
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.SearchViewModel
-import com.bonushub.pax.utils.DetectCardType
-import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.EPrintCopyType
-import com.bonushub.pax.utils.VxEvent
+import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -49,10 +46,7 @@ import com.usdk.apiservice.aidl.printer.*
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
@@ -86,6 +80,7 @@ class TransactionActivity : BaseActivityNew(){
     val TAG = TransactionActivity::class.java.simpleName
 
     private val searchCardViewModel : SearchViewModel by viewModels()
+    private var globalCardProcessedModel = CardProcessedDataModal()
 
 
     //  private lateinit var deviceService: UsdkDeviceService
@@ -110,8 +105,14 @@ class TransactionActivity : BaseActivityNew(){
             setupFlow()
         }
 
-        //searchCardViewModel.fetchCardTypeData()
-
+        searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
+            supportICCard(true)
+            supportMagCard(true)
+            supportRFCard(false)
+        })
+        CoroutineScope(Dispatchers.Main).launch {
+            setupObserver()
+        }
 
     }
 
@@ -125,23 +126,55 @@ class TransactionActivity : BaseActivityNew(){
                 when(cardProcessdatamodel.getReadCardType()){
                     DetectCardType.EMV_CARD_TYPE -> {
                         Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
-                        searchCardViewModel.fetchCardPanData()
-                        setupEMVObserver()
                     }
                     DetectCardType.CONTACT_LESS_CARD_TYPE -> {
                         Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
                     }
                     DetectCardType.MAG_CARD_TYPE -> {
                         Toast.makeText(this@TransactionActivity,"Swipe mode detected",Toast.LENGTH_LONG).show()
-                        searchCardViewModel.fetchCardPanData()
-                        setupEMVObserver()
                     }
                     else -> {
 
                     }
                 }
+              /*  when(cardProcessdatamodel.getFallbackType()){
+                    EMV_fallback.fallBackCode -> {
+                        handleEMVFallbackFromError(this@TransactionActivity.getString(R.string.fallback), this@TransactionActivity.getString(R.string.please_use_another_option), false) {
+                            searchCardViewModel.fetchCardTypeData(
+                                cardProcessdatamodel,
+                                CardOption.create().apply {
+                                    supportICCard(true)
+                                    supportMagCard(true)
+                                    supportRFCard(false)
+                                })
+                            CoroutineScope(Dispatchers.Main).launch {
+                                setupObserver()
+                            }
+                            Toast.makeText(this@TransactionActivity,"EMV Fallback",Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    Swipe_fallback.fallBackCode ->{
+                        Toast.makeText(this@TransactionActivity,"Swipe Fallback",Toast.LENGTH_LONG).show()
+
+                    }
+                    else -> {
+
+                    }
+                }*/
             })
 
+        }
+    }
+
+    //Below function is used to deal with EMV Card Fallback when we insert EMV Card from other side then chip side:-
+   fun handleEMVFallbackFromError(title: String, msg: String, showCancelButton: Boolean, emvFromError: (Boolean) -> Unit) {
+        GlobalScope.launch(Dispatchers.Main) {
+            alertBoxWithAction(title,
+                msg, showCancelButton, getString(R.string.positive_button_ok), { alertCallback ->
+                    if (alertCallback) {
+                        emvFromError(true)
+                    }
+                }, {})
         }
     }
 
@@ -221,7 +254,11 @@ class TransactionActivity : BaseActivityNew(){
         emvBinding?.baseAmtTv?.text=saleAmt
         when(transactionTypeEDashboardItem){
             EDashboardItem.BRAND_EMI->{
-                searchCardViewModel.fetchCardTypeData()
+                searchCardViewModel.fetchCardTypeData(globalCardProcessedModel, CardOption.create().apply {
+                    supportICCard(true)
+                    supportMagCard(true)
+                    supportRFCard(false)
+                })
                 setupObserver()
                 /*  val intent = Intent (this, TenureSchemeActivity::class.java)
                   startActivity(intent)*/
@@ -668,12 +705,26 @@ class TransactionActivity : BaseActivityNew(){
         }
     }
     enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {
+        EMV_Fallback_TYPE(-1, "Chip Fallabck"),
         CARD_ERROR_TYPE(0),
         MAG_CARD_TYPE(1, "Mag"),
         EMV_CARD_TYPE(2, "Chip"),
         CONTACT_LESS_CARD_TYPE(3, "CTLS"),
         CONTACT_LESS_CARD_WITH_MAG_TYPE(4, "CTLS"),
         MANUAL_ENTRY_TYPE(5, "MAN")
+    }
+
+    enum class CardErrorCode(var errorCode: Int) {
+        EMV_FALLBACK_ERROR_CODE(40961),
+        CTLS_ERROR_CODE(6)
+    }
+
+    enum class EFallbackCode(var fallBackCode: Int) {
+        Swipe_fallback(111),
+        EMV_fallback(8),
+        NO_fallback(0),
+        EMV_fallbackNew(12),
+        CTLS_fallback(333)
     }
 
     fun errorFromIngenico(responseCode:String?,msg:String?){

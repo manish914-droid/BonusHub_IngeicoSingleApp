@@ -24,6 +24,7 @@ import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
@@ -72,6 +73,7 @@ class SettlementFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
        // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
+        fragmensettlementBinding.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_settlement)
         fragmensettlementBinding.subHeaderView?.subHeaderText?.text = getString(R.string.settlement)
         fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager?.popBackStack() }
 
@@ -104,52 +106,51 @@ class SettlementFragment : Fragment() {
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
 
+            PrintUtil(activity).printDetailReportupdate(
+                dataList,
+                activity
+            ) { detailPrintStatus ->
 
+                }
+            PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
 
-            (activity as NavigationActivity).alertBoxWithAction(
-                getString(R.string.settlement), getString(R.string.do_you_want_to_settle_batch), true, getString(R.string.yes), {
-                    settlementViewModel.settlementResponse()
-                    settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
+            }
 
-                        PrintUtil(activity).printDetailReportupdate(
-                            dataList,
-                            activity
-                        ) { detailPrintStatus ->
+            DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info,{
 
-                        }
-                        when (result.status) {
-                            Status.SUCCESS -> {
-                                CoroutineScope(Dispatchers.IO).launch{
-                                    val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                    settlementByteArray = data.generateIsoByteRequest()
-                                    try {
-                                        (activity as NavigationActivity).settleBatch(settlementByteArray) {
-                                        }
-                                    } catch (ex: Exception) {
-                                        (activity as NavigationActivity).hideProgress()
-                                        ex.printStackTrace()
+                settlementViewModel.settlementResponse()
+                settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
+
+                    when (result.status) {
+                        Status.SUCCESS -> {
+                            CoroutineScope(Dispatchers.IO).launch{
+                                val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                settlementByteArray = data.generateIsoByteRequest()
+                                try {
+                                    (activity as NavigationActivity).settleBatch(settlementByteArray) {
                                     }
+                                } catch (ex: Exception) {
+                                    (activity as NavigationActivity).hideProgress()
+                                    ex.printStackTrace()
                                 }
-                                PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
-
-                                }
-                              //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
-                            Status.ERROR -> {
-
-                               // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                            }
-                            Status.LOADING -> {
-                               // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
-
-
-                            }
+                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                         }
+                        Status.ERROR -> {
 
+                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                        }
+                        Status.LOADING -> {
+                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                        }
                     }
 
-                },
-                {})
+                }
+
+
+            },{})
         }
         //endregion
 
@@ -172,6 +173,8 @@ class SettlementFragment : Fragment() {
             fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
         }
+
+
     }
     //endregion
 }
@@ -192,11 +195,13 @@ internal class SettlementAdapter(private val list: List<BatchTable>) :
     }
 
     override fun onBindViewHolder(holder: SettlementHolder, p1: Int) {
+
         holder.binding.tvInvoiceNumber.text = invoiceWithPadding(list[p1].receiptData?.invoice ?: "")
         val amount = "%.2f".format(list[p1].receiptData?.txnAmount?.toDouble()?.div(100))
         holder.binding.tvBaseAmount.text = amount
         holder.binding.tvTransactionType.text = getTransactionTypeName(list[p1].transactionType)
         holder.binding.tvTransactionDate.text = list[p1].receiptData?.dateTime
+
     }
 
     inner class SettlementHolder(val binding: ItemSettlementBinding) :

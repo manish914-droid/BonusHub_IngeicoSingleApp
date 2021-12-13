@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentCommunicationOptionBinding
 import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsCommParamAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
@@ -95,15 +96,28 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
             CommunicationParamItem.APP_UPDATE_PARAM -> {
                 type = CommunicationParamItem.APP_UPDATE_PARAM
 
-                val bundle = Bundle()
-                (activity as NavigationActivity).transactFragment(CommunicationOptionSubMenuFragment().apply {
-                    arguments = bundle.apply {
-                        putSerializable(
-                            "type",
-                            CommunicationParamItem.APP_UPDATE_PARAM
-                        )
-                    }
-                }, true)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    bankFunctionsViewModel.getTerminalCommunicationTableByRecordType(type.value.toString())?.observe(viewLifecycleOwner,{
+
+                        if(it.size == 0 ){
+                            ToastUtils.showToast(requireContext(),"No App update param available")
+                        }else{
+
+                            val bundle = Bundle()
+                            (activity as NavigationActivity).transactFragment(CommunicationOptionSubMenuFragment().apply {
+                                arguments = bundle.apply {
+                                    putSerializable(
+                                        "type",
+                                        CommunicationParamItem.APP_UPDATE_PARAM
+                                    )
+                                }
+                            }, true)
+                        }
+                    })
+
+                }
+
+
             }
         }
 

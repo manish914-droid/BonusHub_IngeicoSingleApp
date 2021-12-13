@@ -7,6 +7,10 @@
     <string name="do_you_want_to_settle_batch">Do You Want To Settle Batch?</string>
     <string name="settlement_success">Settlement Success</string>
 
+    <!--TODO: Fallback-->
+    <string name="fallback">Fallback</string>
+    <string name="please_use_another_option">Please use another option for Transaction</string>
+
     <!--TODO: Init-->
     <string name="enter_tid_colon">Enter TID :</string>
     <string name="proceed_to_init">Proceed To Init</string>
@@ -239,4 +243,6 @@
     <string name="total_amount_colon">Total Amount:</string>
     <string name="complete_pre_auth">Complete Preauth</string>
     <string name="enter_invoice">Enter Invoice</string>
+
+    <string name="confirm">CONFIRM</string>
 </resources>
