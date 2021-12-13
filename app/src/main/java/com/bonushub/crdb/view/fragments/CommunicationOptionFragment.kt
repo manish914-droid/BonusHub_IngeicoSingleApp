@@ -112,7 +112,6 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
                                     )
                                 }
                             }, true)
-
                         }
                     })
 
