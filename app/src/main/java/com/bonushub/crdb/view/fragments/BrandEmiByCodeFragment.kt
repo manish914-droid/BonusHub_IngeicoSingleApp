@@ -30,6 +30,11 @@ class BrandEmiByCodeFragment : Fragment() {
         binding?.subHeaderView?.subHeaderText?.text = "BRAND EMI BYCODE"
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_code)
 
+
+        binding?.subHeaderView?.backImageButton?.setOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
+
         binding?.txtViewSubmit?.setOnClickListener {
 
             // temp

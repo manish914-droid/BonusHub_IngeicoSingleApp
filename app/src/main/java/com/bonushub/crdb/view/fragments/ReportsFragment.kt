@@ -60,6 +60,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
         super.onViewCreated(view, savedInstanceState)
 
         iDiag = (activity as NavigationActivity)
+
         //iDiag?.onEvents(VxEvent.ChangeTitle(option.name))
        // iDiag?.onEvents(VxEvent.ChangeTitle("Report"))
 
