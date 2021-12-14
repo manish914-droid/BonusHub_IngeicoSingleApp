@@ -119,6 +119,7 @@ class TransactionActivity : BaseActivityNew(){
             searchCardViewModel.allcadType.observe(this@TransactionActivity, Observer { cardProcessdatamodel  ->
                 when(cardProcessdatamodel.getReadCardType()){
                     DetectCardType.EMV_CARD_TYPE -> {
+                        Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
                         when(cardProcessdatamodel.getTransType()){
                             BhTransactionType.SALE.type -> {
                                 // Checking Insta Emi Available or not
@@ -153,14 +154,24 @@ class TransactionActivity : BaseActivityNew(){
 
                                 }
                             }
+
 BhTransactionType.BRAND_EMI.type->{
-    setupEMVObserver()
+    val intent = Intent (this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+        val field57=  "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
+                "^${/*cardBinValue.substring(0, 8)*/""}^$saleAmt"
+
+        putExtra("cardProcessedData",cardProcessdatamodel)
+        putExtra("brandID",brandDataMaster.brandID)
+        putExtra("productID",brandEmiProductData.productID)
+        putExtra("imeiOrSerialNum",imeiOrSerialNum)
+        putExtra("transactionType", cardProcessdatamodel.getTransType())
+    }
+    startActivityForResult(intent,1)
 }
 
                         }
 
-                        Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
-                    }
+                   }
                     DetectCardType.CONTACT_LESS_CARD_TYPE -> {
                       //  Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
                     }
@@ -178,7 +189,7 @@ BhTransactionType.BRAND_EMI.type->{
 
     //Below function is used to deal with EMV Card Fallback when we insert EMV Card from other side then chip side:-
    fun handleEMVFallbackFromError(title: String, msg: String, showCancelButton: Boolean, emvFromError: (Boolean) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Main) {
             alertBoxWithAction(title,
                 msg, showCancelButton, getString(R.string.positive_button_ok), { alertCallback ->
                     if (alertCallback) {
@@ -187,39 +198,8 @@ BhTransactionType.BRAND_EMI.type->{
                 }, {})
         }
     }
-var field56=""
-    private fun setupEMVObserver() {
-        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
-            if(cardProcessedDataModal.getPanNumberData() !=null) {
-                cardProcessedDataModal.getPanNumberData()
-                field56=cardProcessedDataModal.getEncryptedPan().toString()
-                var ecrID: String
 
-                Toast.makeText(
-                    this,
-                    cardProcessedDataModal.getPanNumberData().toString(),
-                    Toast.LENGTH_LONG
-                ).show()
-                startTenureActivity()
-                /*  lifecycleScope.launch(Dispatchers.IO) {
-                     // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                      serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-                  }*/
 
-            }
-
-        })
-    }
-
-private fun startTenureActivity(){
-    val intent = Intent (this, TenureSchemeActivity::class.java).apply {
-        putExtra("field56",field56)
-      val field57=  "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
-                "^${/*cardBinValue.substring(0, 8)*/""}^$saleAmt"
-        putExtra("field57",field57)
-    }
-    startActivityForResult(intent,1)
-}
     private suspend fun setupFlow(){
         emvBinding?.baseAmtTv?.text=saleAmt
         when(transactionTypeEDashboardItem){
@@ -229,6 +209,7 @@ private fun startTenureActivity(){
                     supportMagCard(true)
                     supportRFCard(false)
                 })
+
                 setupObserver()
 
             }

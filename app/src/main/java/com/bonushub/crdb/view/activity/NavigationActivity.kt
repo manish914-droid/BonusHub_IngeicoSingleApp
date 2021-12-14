@@ -435,7 +435,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.SALE.type)
+                            putExtra("type", BhTransactionType.SALE.type)
                             putExtra("proc_code", ProcessingCode.SALE.code)
                             putExtra("mobileNumber", extraPair?.first)
                             putExtra("billNumber", extraPair?.second)
@@ -469,7 +469,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.CASH_AT_POS.type)
+                            putExtra("type", BhTransactionType.CASH_AT_POS.type)
                             putExtra("proc_code", ProcessingCode.CASH_AT_POS.code)
                       /*      putExtra("mobileNumber", extraPair?.first)
                             putExtra("billNumber", extraPair?.second)
@@ -495,7 +495,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
                             putExtra("cashBackAmt", cashBackAmount)
-                            putExtra("type", TransactionType.SALE_WITH_CASH.type)
+                            putExtra("type", BhTransactionType.SALE_WITH_CASH.type)
                             putExtra("proc_code", ProcessingCode.SALE_WITH_CASH.code)
                             putExtra("edashboardItem",  EDashboardItem.SALE_WITH_CASH)
                         }, EIntentRequest.TRANSACTION.code
@@ -516,7 +516,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.PRE_AUTH.type)
+                            putExtra("type", BhTransactionType.PRE_AUTH.type)
                             putExtra("proc_code", ProcessingCode.PRE_AUTH.code)
                             /*      putExtra("mobileNumber", extraPair?.first)
                                   putExtra("billNumber", extraPair?.second)
@@ -540,7 +540,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.REFUND.type)
+                            putExtra("type", BhTransactionType.REFUND.type)
                             putExtra("proc_code", ProcessingCode.REFUND.code)
                             /*      putExtra("mobileNumber", extraPair?.first)
                                   putExtra("billNumber", extraPair?.second)
@@ -566,7 +566,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             val formattedTransAmount = "%.2f".format(amt?.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
                             putExtra("authCompletionData",authCompletionData)
-                            putExtra("type", TransactionType.PRE_AUTH_COMPLETE.type)
+                            putExtra("type", BhTransactionType.PRE_AUTH_COMPLETE.type)
                             putExtra("proc_code", ProcessingCode.PRE_SALE_COMPLETE.code)
                             putExtra("edashboardItem",  EDashboardItem.PREAUTH_COMPLETE)
                         }, EIntentRequest.TRANSACTION.code
@@ -616,6 +616,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
         intent.putExtra("edashboardItem", EDashboardItem.BRAND_EMI)
+        intent.putExtra("type", BhTransactionType.BRAND_EMI.type)
         startActivity(intent)
 
     }
@@ -720,6 +721,19 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     return
                 }
 
+
+            }
+
+            EDashboardItem.MERCHANT_REFERRAL->{
+                transactFragment(BrandEmiMasterCategoryFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("type", action)
+                        putString(
+                            INPUT_SUB_HEADING,
+                            SubHeaderTitle.Brand_EMI_Master_Category.title
+                        )
+                    }
+                })
 
             }
             else->{

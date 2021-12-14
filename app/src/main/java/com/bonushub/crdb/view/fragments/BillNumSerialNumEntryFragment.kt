@@ -211,7 +211,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
             brandEmiSubCatData?.let {
                 brandEmiProductData?.let { it1 ->
                     brandDataMaster?.let { it2 ->
-                        (activity as NavigationActivity).startTransactionActivity(amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.serialNumEt?.text.toString(), brandDataMaster = it2,
+                        (activity as NavigationActivity).startTransactionActivity(amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(),imeiOrSerialNum=binding?.serialNumEt?.text.toString() ,brandDataMaster = it2,
                             brandEmiSubCatData = it,brandEmiProductData = it1
                         )
                     }

@@ -41,6 +41,15 @@ class TenureSchemeActivity : AppCompatActivity() {
     private var transactionType = -1
     private var bankEMIRequestCode = "4"
     private var transactionAmount = "20000"
+    private val brandID by lazy {
+        intent.getStringExtra("brandID")
+    }
+    private val productID by lazy {
+        intent.getStringExtra("productID")
+    }
+    private val imeiOrSerialNum by lazy {
+        intent.getStringExtra("imeiOrSerialNum")
+    }
 
     private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal>? = mutableListOf()
     private val emiSchemeAndOfferAdapter: EMISchemeAndOfferAdapter by lazy {
@@ -62,11 +71,17 @@ class TenureSchemeActivity : AppCompatActivity() {
         transactionType        = intent?.getIntExtra("transactionType",-1) ?: -1
 
       //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,
+     /*   tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,
             cardProcessedDataModal?.getPanNumberData() ?: "",
             "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount")).get(TenureSchemeViewModel::class.java)
 
+     */
+        val field57=  "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
+                "^${/*cardBinValue.substring(0, 8)*/""}^$transactionAmount"
 
+        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,
+            cardProcessedDataModal?.getPanNumberData() ?: "",
+            field57)).get(TenureSchemeViewModel::class.java)
 
         binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)
 
