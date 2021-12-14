@@ -8,8 +8,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
 import com.bonushub.crdb.di.DBModule.appDatabase
@@ -22,17 +20,14 @@ import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
-import com.bonushub.crdb.view.activity.TransactionActivity.EFallbackCode.*
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
-import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.*
-import com.ingenico.hdfcpayment.response.OperationResult
 
 import com.ingenico.hdfcpayment.response.PaymentResult
 import com.ingenico.hdfcpayment.response.TransactionResponse
@@ -45,7 +40,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
-import javax.inject.Inject
+
+private var bankEMIRequestCode = "4"
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew(){
@@ -100,17 +96,17 @@ class TransactionActivity : BaseActivityNew(){
         }
         lifecycleScope.launch(Dispatchers.IO) {
             tid=  getBaseTID(appDatabase.appDao)
-            //setupFlow()
+            setupFlow()
         }
 
-        searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
+     /*   searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
             supportICCard(true)
             supportMagCard(true)
             supportRFCard(false)
         })
         CoroutineScope(Dispatchers.Main).launch {
             setupObserver()
-        }
+        }*/
 
     }
 
@@ -124,7 +120,7 @@ class TransactionActivity : BaseActivityNew(){
                 when(cardProcessdatamodel.getReadCardType()){
                     DetectCardType.EMV_CARD_TYPE -> {
                         when(cardProcessdatamodel.getTransType()){
-                            com.bonushub.pax.utils.TransactionType.SALE.type -> {
+                            BhTransactionType.SALE.type -> {
                                 // Checking Insta Emi Available or not
                                 var hasInstaEmi = false
                                 val tpt = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
@@ -157,6 +153,10 @@ class TransactionActivity : BaseActivityNew(){
 
                                 }
                             }
+BhTransactionType.BRAND_EMI.type->{
+    setupEMVObserver()
+}
+
                         }
 
                         Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
@@ -173,7 +173,6 @@ class TransactionActivity : BaseActivityNew(){
                 }
 
             })
-
         }
     }
 
@@ -188,11 +187,12 @@ class TransactionActivity : BaseActivityNew(){
                 }, {})
         }
     }
-
+var field56=""
     private fun setupEMVObserver() {
         searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
             if(cardProcessedDataModal.getPanNumberData() !=null) {
                 cardProcessedDataModal.getPanNumberData()
+                field56=cardProcessedDataModal.getEncryptedPan().toString()
                 var ecrID: String
 
                 Toast.makeText(
@@ -200,10 +200,7 @@ class TransactionActivity : BaseActivityNew(){
                     cardProcessedDataModal.getPanNumberData().toString(),
                     Toast.LENGTH_LONG
                 ).show()
-
-                val intent = Intent (this, TenureSchemeActivity::class.java)
-                startActivity(intent)
-
+                startTenureActivity()
                 /*  lifecycleScope.launch(Dispatchers.IO) {
                      // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
                       serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
@@ -214,6 +211,15 @@ class TransactionActivity : BaseActivityNew(){
         })
     }
 
+private fun startTenureActivity(){
+    val intent = Intent (this, TenureSchemeActivity::class.java).apply {
+        putExtra("field56",field56)
+      val field57=  "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
+                "^${/*cardBinValue.substring(0, 8)*/""}^$saleAmt"
+        putExtra("field57",field57)
+    }
+    startActivityForResult(intent,1)
+}
     private suspend fun setupFlow(){
         emvBinding?.baseAmtTv?.text=saleAmt
         when(transactionTypeEDashboardItem){
@@ -224,12 +230,9 @@ class TransactionActivity : BaseActivityNew(){
                     supportRFCard(false)
                 })
                 setupObserver()
-                /*  val intent = Intent (this, TenureSchemeActivity::class.java)
-                  startActivity(intent)*/
+
             }
             EDashboardItem.SALE->{
-
-
                 val amt=(saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
                 try {
@@ -265,7 +268,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.SALE.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -324,7 +327,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.CASH_AT_POS.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -385,7 +388,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.SALE_WITH_CASH.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -445,7 +448,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.REFUND.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -506,7 +509,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.PRE_AUTH.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -569,7 +572,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.PRE_AUTH_COMPLETE.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -690,7 +693,7 @@ class TransactionActivity : BaseActivityNew(){
 
     }
 
-    fun goToDashBoard(){
+    private fun goToDashBoard(){
         startActivity(Intent(this@TransactionActivity, NavigationActivity::class.java).apply {
             flags =
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK

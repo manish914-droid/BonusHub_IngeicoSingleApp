@@ -9,24 +9,21 @@ import android.os.RemoteException
 import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.BuildConfig
-import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.panMasking
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
 import com.bonushub.crdb.utils.failureImpl
 import com.bonushub.crdb.utils.invoiceWithPadding
 
 import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.EPrintCopyType
-import com.bonushub.pax.utils.TransactionType
+import com.bonushub.pax.utils.BhTransactionType
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.usdk.apiservice.aidl.printer.*
 import java.io.IOException
 import java.io.InputStream
-import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -399,14 +396,14 @@ class PrintUtil(context: Context?) {
 
                     for (b in batch) {
                         //  || b.transactionType == TransactionType.VOID_PREAUTH.type
-                        if (b.transactionType == TransactionType.PRE_AUTH.type) continue  // Do not add pre auth transactions
+                        if (b.transactionType == BhTransactionType.PRE_AUTH.type) continue  // Do not add pre auth transactions
 
-                        if (b.transactionType == TransactionType.EMI_SALE.type || b.transactionType == TransactionType.BRAND_EMI.type || b.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
-                            b.transactionType = TransactionType.EMI_SALE.type
+                        if (b.transactionType == BhTransactionType.EMI_SALE.type || b.transactionType == BhTransactionType.BRAND_EMI.type || b.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+                            b.transactionType = BhTransactionType.EMI_SALE.type
                         }
 
-                        if (b.transactionType == TransactionType.TEST_EMI.type) {
-                            b.transactionType = TransactionType.SALE.type
+                        if (b.transactionType == BhTransactionType.TEST_EMI.type) {
+                            b.transactionType = BhTransactionType.SALE.type
                         }
 
                         count++
@@ -437,7 +434,7 @@ class PrintUtil(context: Context?) {
                         textBlockList.add(sigleLineformat(transAmount, AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
-                        if (b.transactionType == TransactionType.VOID_PREAUTH.type) {
+                        if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
                             textBlockList.add(
                                 sigleLineformat(
                                     "${b.receiptData?.appName}",
@@ -468,7 +465,7 @@ class PrintUtil(context: Context?) {
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
                         }
-                        if (b.transactionType == TransactionType.OFFLINE_SALE.type || b.transactionType == TransactionType.VOID_OFFLINE_SALE.type) {
+                        if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
                             try {
 
                                 val dat = "${b.receiptData?.dateTime}"
@@ -771,20 +768,20 @@ class PrintUtil(context: Context?) {
 
                 for (it in batch) {  // Do not count preauth transaction
 // || it.transactionType == TransactionType.VOID_PREAUTH.type
-                    if (it.transactionType == TransactionType.PRE_AUTH.type) continue
+                    if (it.transactionType == BhTransactionType.PRE_AUTH.type) continue
 
-                    if (it.transactionType == TransactionType.EMI_SALE.type || it.transactionType == TransactionType.BRAND_EMI.type || it.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type ) {
+                    if (it.transactionType == BhTransactionType.EMI_SALE.type || it.transactionType == BhTransactionType.BRAND_EMI.type || it.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type ) {
                         it.receiptData?.cardType = it.receiptData?.appName
-                        it.transactionType = TransactionType.EMI_SALE.type
+                        it.transactionType = BhTransactionType.EMI_SALE.type
                     }
-                    if (it.transactionType == TransactionType.VOID_EMI.type){
+                    if (it.transactionType == BhTransactionType.VOID_EMI.type){
                         it.receiptData?.cardType = it.receiptData?.appName
                     }
 
-                    if (it.transactionType == TransactionType.TEST_EMI.type) {
+                    if (it.transactionType == BhTransactionType.TEST_EMI.type) {
                         it.receiptData?.appName = "Test Issuer"
                         it.receiptData?.cardType  = "Test Issuer"
-                        it.transactionType = TransactionType.SALE.type
+                        it.transactionType = BhTransactionType.SALE.type
 
                     }
 
@@ -942,7 +939,7 @@ class PrintUtil(context: Context?) {
                     for ((k, m) in _map) {
 
                         val amt = "%.2f".format((((m.total)?.toDouble())?.div(100)).toString().toDouble())
-                        if (k == TransactionType.PRE_AUTH_COMPLETE.type || k == TransactionType.VOID_PREAUTH.type) {
+                        if (k == BhTransactionType.PRE_AUTH_COMPLETE.type || k == BhTransactionType.VOID_PREAUTH.type) {
                             // need Not to show
                         } else {
 

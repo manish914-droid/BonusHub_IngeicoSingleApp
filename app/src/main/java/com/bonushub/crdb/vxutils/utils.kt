@@ -23,7 +23,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.DashboardFragment
 import com.bonushub.crdb.vxutils.BHTextView
 import com.bonushub.crdb.vxutils.Utility.*
-import com.bonushub.pax.utils.TransactionType
+import com.bonushub.pax.utils.BhTransactionType
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ingenico.hdfcpayment.listener.OnOperationListener
@@ -35,7 +35,6 @@ import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.pinpad.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
-import java.lang.StringBuilder
 import java.nio.charset.StandardCharsets
 
 private var listofTids= ArrayList<String>()
@@ -157,7 +156,7 @@ fun showMobileBillDialog(
         val tpt = getTptData()
 
         when (transactionType) {
-            TransactionType.BRAND_EMI.type -> {
+            BhTransactionType.BRAND_EMI.type -> {
                 //Hide Mobile Number Field:-
                 if (brandEMIDataModal?.validationTypeName?.substring(0, 1) == "0") {
                     mobileNumberET?.visibility = View.GONE
@@ -173,7 +172,7 @@ fun showMobileBillDialog(
                 if ((tpt?.reservedValues?.substring(
                         2,
                         3
-                    ) == "1" && transactionType == TransactionType.EMI_SALE.type)
+                    ) == "1" && transactionType == BhTransactionType.EMI_SALE.type)
                 )
                     billNumberTil?.visibility = View.VISIBLE
                 else
@@ -192,7 +191,7 @@ fun showMobileBillDialog(
         okButton?.setOnClickListener {
             when (transactionType) {
                 //region=====================Brand EMI Validation:-
-                TransactionType.BRAND_EMI.type -> {
+                BhTransactionType.BRAND_EMI.type -> {
                     if (brandEMIDataModal?.validationTypeName
                             ?.substring(0, 1) == "1" && brandEMIDataModal.validationTypeName
                             ?.substring(2, 3) == "1"
@@ -269,7 +268,7 @@ fun showMobileBillDialog(
 
                 //region Other Transaction Validation:-
                 else -> {
-                    if (transactionType == TransactionType.SALE.type && tpt?.reservedValues?.substring(
+                    if (transactionType == BhTransactionType.SALE.type && tpt?.reservedValues?.substring(
                             0,
                             1
                         ) == "1"
@@ -286,7 +285,7 @@ fun showMobileBillDialog(
                                 dialogCB(Triple("", "", third = true))
                             }
                         }
-                    } else if (transactionType == TransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
+                    } else if (transactionType == BhTransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
                             1,
                             2
                         ) == "1" && tpt.reservedValues.substring(2, 3) == "1"
@@ -324,7 +323,7 @@ fun showMobileBillDialog(
                                 dialogCB(Triple("", "", third = true))
                             }
                         }
-                    } else if (transactionType == TransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
+                    } else if (transactionType == BhTransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
                             1,
                             2
                         ) == "1"
@@ -340,7 +339,7 @@ fun showMobileBillDialog(
                                 dialogCB(Triple("", "", third = true))
                             }
                         }
-                    } else if (transactionType == TransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
+                    } else if (transactionType == BhTransactionType.EMI_SALE.type && tpt?.reservedValues?.substring(
                             2,
                             3
                         ) == "1"
@@ -355,7 +354,7 @@ fun showMobileBillDialog(
                                 dialogCB(Triple("", "", third = true))
                             }
                         }
-                    } else if (transactionType == TransactionType.EMI_ENQUIRY.type) {
+                    } else if (transactionType == BhTransactionType.EMI_ENQUIRY.type) {
                         when {
                             !TextUtils.isEmpty(mobileNumberET?.text.toString()) -> if (mobileNumberET?.text.toString().length in 10..13) {
                                 dialog.dismiss()
@@ -762,18 +761,18 @@ fun invoiceWithPadding(invoiceNo: String) =
 fun getTransactionTypeName(type: Int): String? {
     var name: String? = null
     name = when (type) {
-        TransactionType.SALE.type -> TransactionType.SALE.txnTitle
-        TransactionType.SALE_WITH_CASH.type -> TransactionType.SALE_WITH_CASH.txnTitle
-        TransactionType.CASH_AT_POS.type -> TransactionType.CASH_AT_POS.txnTitle
-        TransactionType.PRE_AUTH.type -> TransactionType.PRE_AUTH.txnTitle
-        TransactionType.PRE_AUTH_COMPLETE.type -> TransactionType.PRE_AUTH_COMPLETE.txnTitle
-        TransactionType.PENDING_PREAUTH.type -> TransactionType.PENDING_PREAUTH.txnTitle
-        TransactionType.VOID.type -> TransactionType.VOID.txnTitle
-        TransactionType.REFUND.type -> TransactionType.REFUND.txnTitle
-        TransactionType.VOID_REFUND.type -> TransactionType.VOID_REFUND.txnTitle
-        TransactionType.EMI.type -> TransactionType.EMI.txnTitle
-        TransactionType.EMI_SALE.type -> TransactionType.EMI_SALE.txnTitle
-        TransactionType.TIP_SALE.type -> TransactionType.TIP_SALE.txnTitle
+        BhTransactionType.SALE.type -> BhTransactionType.SALE.txnTitle
+        BhTransactionType.SALE_WITH_CASH.type -> BhTransactionType.SALE_WITH_CASH.txnTitle
+        BhTransactionType.CASH_AT_POS.type -> BhTransactionType.CASH_AT_POS.txnTitle
+        BhTransactionType.PRE_AUTH.type -> BhTransactionType.PRE_AUTH.txnTitle
+        BhTransactionType.PRE_AUTH_COMPLETE.type -> BhTransactionType.PRE_AUTH_COMPLETE.txnTitle
+        BhTransactionType.PENDING_PREAUTH.type -> BhTransactionType.PENDING_PREAUTH.txnTitle
+        BhTransactionType.VOID.type -> BhTransactionType.VOID.txnTitle
+        BhTransactionType.REFUND.type -> BhTransactionType.REFUND.txnTitle
+        BhTransactionType.VOID_REFUND.type -> BhTransactionType.VOID_REFUND.txnTitle
+        BhTransactionType.EMI.type -> BhTransactionType.EMI.txnTitle
+        BhTransactionType.EMI_SALE.type -> BhTransactionType.EMI_SALE.txnTitle
+        BhTransactionType.TIP_SALE.type -> BhTransactionType.TIP_SALE.txnTitle
         else -> "NONE"
     }
     return name

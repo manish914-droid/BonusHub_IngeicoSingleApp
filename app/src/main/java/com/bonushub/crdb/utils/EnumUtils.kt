@@ -31,7 +31,7 @@ enum class EAccountType(val code: String) {
 //endregion
 
 //region==================Transaction Type================
-enum class TransactionType(
+enum class BhTransactionType(
     val type: Int,
     val processingCode: ProcessingCode = ProcessingCode.NONE,
     val txnTitle: String = "Not Defined"

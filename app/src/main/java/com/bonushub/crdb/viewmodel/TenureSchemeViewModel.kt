@@ -20,11 +20,6 @@ class TenureSchemeViewModel (private val serverRepository: ServerRepository,val 
         viewModelScope.launch(Dispatchers.IO) {
             logger("Get DATA","----START----------","e")
             serverRepository.getEMITenureData(field56Pan,field57Data)
-        /*    logger("Brand Tnc",serverRepository.appDB.appDao.getAllBrandTAndCData().toString(),"e")
-            logger("Issuer Tnc",serverRepository.appDB.appDao.getAllIssuerTAndCData().toString(),"e")
-            logger("Brand SubCat",serverRepository.appDB.appDao.getBrandEMISubCategoryData().toString(),"e")
-*/
-
         }
     }
 }

@@ -1,9 +1,5 @@
 package com.bonushub.crdb.view.base
 
-
-
-
-
 import android.app.Activity
 import android.app.Dialog
 import android.app.NativeActivity
@@ -25,7 +21,6 @@ import com.bonushub.crdb.databinding.ItemOkBtnDialogBinding
 import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.pax.utils.VxEvent
-
 
 abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 

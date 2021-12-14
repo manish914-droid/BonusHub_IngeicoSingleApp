@@ -32,14 +32,12 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.repository.keyexchangeDataSource
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
-import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
@@ -435,7 +433,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.SALE.type)
+                            putExtra("type", BhTransactionType.SALE.type)
                             putExtra("proc_code", ProcessingCode.SALE.code)
                             putExtra("mobileNumber", extraPair?.first)
                             putExtra("billNumber", extraPair?.second)
@@ -469,7 +467,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.CASH_AT_POS.type)
+                            putExtra("type", BhTransactionType.CASH_AT_POS.type)
                             putExtra("proc_code", ProcessingCode.CASH_AT_POS.code)
                       /*      putExtra("mobileNumber", extraPair?.first)
                             putExtra("billNumber", extraPair?.second)
@@ -495,7 +493,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
                             putExtra("cashBackAmt", cashBackAmount)
-                            putExtra("type", TransactionType.SALE_WITH_CASH.type)
+                            putExtra("type", BhTransactionType.SALE_WITH_CASH.type)
                             putExtra("proc_code", ProcessingCode.SALE_WITH_CASH.code)
                             putExtra("edashboardItem",  EDashboardItem.SALE_WITH_CASH)
                         }, EIntentRequest.TRANSACTION.code
@@ -516,7 +514,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.PRE_AUTH.type)
+                            putExtra("type", BhTransactionType.PRE_AUTH.type)
                             putExtra("proc_code", ProcessingCode.PRE_AUTH.code)
                             /*      putExtra("mobileNumber", extraPair?.first)
                                   putExtra("billNumber", extraPair?.second)
@@ -540,7 +538,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         ).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
-                            putExtra("type", TransactionType.REFUND.type)
+                            putExtra("type", BhTransactionType.REFUND.type)
                             putExtra("proc_code", ProcessingCode.REFUND.code)
                             /*      putExtra("mobileNumber", extraPair?.first)
                                   putExtra("billNumber", extraPair?.second)
@@ -566,7 +564,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             val formattedTransAmount = "%.2f".format(amt?.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
                             putExtra("authCompletionData",authCompletionData)
-                            putExtra("type", TransactionType.PRE_AUTH_COMPLETE.type)
+                            putExtra("type", BhTransactionType.PRE_AUTH_COMPLETE.type)
                             putExtra("proc_code", ProcessingCode.PRE_SALE_COMPLETE.code)
                             putExtra("edashboardItem",  EDashboardItem.PREAUTH_COMPLETE)
                         }, EIntentRequest.TRANSACTION.code
@@ -697,7 +695,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
             }
-
+EDashboardItem.MERCHANT_REFERRAL->{
+    transactFragment(BrandEmiMasterCategoryFragment())
+}
             else->{
 
 
@@ -846,13 +846,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
         })
-
-
     }
     //endregion
 
 
-    //Settle Batch and Do the Init:-
+  /*  //Settle Batch and Do the Init:-
     suspend fun settleBatch1(settlementByteArray: ByteArray?, settlementFrom: String? = null, settlementCB: ((Boolean) -> Unit)? = null) {
         runOnUiThread {
             showProgress()
@@ -862,9 +860,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 if (success && !TextUtils.isEmpty(result)) {
                     hideProgress()
                     tempSettlementByteArray = settlementByteArray
-                    /* Note:- If responseCode is "00" then delete Batch File Data Table happens and Navigate to MainActivity
+                    *//* Note:- If responseCode is "00" then delete Batch File Data Table happens and Navigate to MainActivity
                               else responseCode is "95" then Batch Upload will Happens and then delete Batch File Data Table happens
-                              and Navigate to MainActivity */
+                              and Navigate to MainActivity *//*
                     val responseIsoData: IsoDataReader = readIso(result, false)
                     logger("Transaction RESPONSE ", "---", "e")
                     logger("Transaction RESPONSE --->>", responseIsoData.isoMap, "e")
@@ -874,9 +872,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     val responseCode = responseIsoData.isoMap[39]?.parseRaw2String().toString()
                     val hostFailureValidationMsg =
                         responseIsoData.isoMap[58]?.parseRaw2String().toString()
-                    /* Note:- If responseCode is "00" then delete Batch File Data Table happens and Navigate to MainActivity
+                    *//* Note:- If responseCode is "00" then delete Batch File Data Table happens and Navigate to MainActivity
                              else responseCode is "95" then Batch Upload will Happens and then delete Batch File Data Table happens
-                             and Navigate to MainActivity */
+                             and Navigate to MainActivity *//*
 
                     if (responseCode == "00") {
                         //  settlementServerHitCount = 0
@@ -1059,7 +1057,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             })
         }
     }
-
+*/
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-
 interface ShowLessOnBackPress {

@@ -42,7 +42,12 @@ data class BrandEMIProductDataModal(
     var maxLength: String,
     var productCategoryName: String,
     var producatDesc:String,
-) : Serializable
+
+
+) : Serializable{
+    var imeiOrSerialNum:String=""
+    var billNum:String=""
+}
 //endregion
 
 

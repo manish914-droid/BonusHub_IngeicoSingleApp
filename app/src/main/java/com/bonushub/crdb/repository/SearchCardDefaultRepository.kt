@@ -11,18 +11,15 @@ import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.entity.EMVOption
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.utils.BytesUtil
-import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.utils.getEncryptedPanorTrackData
 import com.bonushub.crdb.utils.ingenico.DemoConfig
 import com.bonushub.crdb.utils.ingenico.DialogUtil
 import com.bonushub.crdb.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.utils.ingenico.TLV
 import com.bonushub.crdb.utils.logger
-import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.activity.TransactionActivity.*
 import com.bonushub.pax.utils.EFallbackCode
-import com.bonushub.pax.utils.TransactionType
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode
@@ -32,8 +29,6 @@ import com.usdk.apiservice.aidl.emv.*
 import com.usdk.apiservice.aidl.pinpad.MagTrackEncMode
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import dagger.hilt.android.qualifiers.ActivityContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 

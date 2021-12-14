@@ -3,10 +3,7 @@ package com.bonushub.crdb.disputetransaction
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.BatchFileDataTable
-import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
@@ -74,37 +71,37 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 if (batchListData?.size > 0) {
                     for (i in 0 until batchListData.size) {
                         when (batchListData[i]?.transactionType) {
-                            TransactionType.SALE.type -> {
+                            BhTransactionType.SALE.type -> {
                                 saletid = batchListData[i]?.receiptData?.tid
                                 salebatchNumber = batchListData[i]?.receiptData?.batchNumber
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
-                            TransactionType.SALE_WITH_CASH.type -> {
+                            BhTransactionType.SALE_WITH_CASH.type -> {
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
 
-                            TransactionType.CASH_AT_POS.type -> {
+                            BhTransactionType.CASH_AT_POS.type -> {
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
 
-                            TransactionType.PRE_AUTH_COMPLETE.type -> {
+                            BhTransactionType.PRE_AUTH_COMPLETE.type -> {
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
-                            TransactionType.TIP_SALE.type -> {
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
-                            }
-
-                            TransactionType.TIP_SALE.type -> {
+                            BhTransactionType.TIP_SALE.type -> {
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
 
-                            TransactionType.REFUND.type -> {
+                            BhTransactionType.TIP_SALE.type -> {
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                            }
+
+                            BhTransactionType.REFUND.type -> {
                                 refundCount = refundCount.plus(1)
                                 refundAmount =
                                     refundAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
