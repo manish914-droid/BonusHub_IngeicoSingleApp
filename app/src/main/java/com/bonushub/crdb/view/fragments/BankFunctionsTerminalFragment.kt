@@ -249,7 +249,10 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                     CoroutineScope(Dispatchers.IO).launch{
                         Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
                             iDialog?.hideProgress()
-                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                            CoroutineScope(Dispatchers.Main).launch {
+                                (activity as? NavigationActivity)?.alertBoxWithAction("", requireContext().getString(R.string.successfull_init),
+                                    false, "", {}, {})
+                            }
                         }
                     }
                 }
@@ -263,7 +266,11 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                         reupdateTable(dataList[position]?.titleValue)
                     }
 
-                    ToastUtils.showToast(activity,"Error called  ${result.error}")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        (activity as? NavigationActivity)?.getInfoDialog("Error", result.error ?: "") {}
+                    }
+
+                 //   ToastUtils.showToast(activity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
                     iDialog?.showProgress("Sending/Receiving From Host")

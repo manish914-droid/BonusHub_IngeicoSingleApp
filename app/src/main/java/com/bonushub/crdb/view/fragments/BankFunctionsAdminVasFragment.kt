@@ -102,7 +102,7 @@ logger("iDialog",""+iDialog.toString())
                         initViewModel.insertInfo1(tids[0] ?:"")
                         observeMainViewModel()
                     }else{
-// get tid by user
+                       // get tid by user
                         logger("get tid","by user")
                         //navHostFragment?.navController?.popBackStack()
                         (activity as NavigationActivity).transactFragment(InitFragment())
@@ -146,14 +146,20 @@ logger("iDialog",""+iDialog.toString())
                     CoroutineScope(Dispatchers.IO).launch{
                         Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
                             iDialog?.hideProgress()
-                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                            CoroutineScope(Dispatchers.Main).launch {
+                                (activity as? NavigationActivity)?.alertBoxWithAction("", requireContext().getString(R.string.successfull_init),
+                                    false, "", {}, {})
+                            }
                         }
 
                     }
                 }
                 Status.ERROR -> {
                     iDialog?.hideProgress()
-                    ToastUtils.showToast(activity,"Error called  ${result.error}")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        (activity as? NavigationActivity)?.getInfoDialog("Error", result.error ?: "") {}
+                    }
+                   // ToastUtils.showToast(activity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
                     iDialog?.showProgress("Sending/Receiving From Host")

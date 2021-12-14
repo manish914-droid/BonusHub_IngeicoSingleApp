@@ -226,7 +226,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
                             //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
 
-                            var insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
+                            var insertkeys = false/*insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)*/
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
                                 if (keWithInit) {
