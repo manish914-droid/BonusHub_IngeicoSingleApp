@@ -112,6 +112,7 @@
                     android:text="Batch Empty"
                     android:fontFamily="@font/muli_regular"
                     android:textSize="@dimen/text_size_regular"
+                    android:textColor="@color/txt_color"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
