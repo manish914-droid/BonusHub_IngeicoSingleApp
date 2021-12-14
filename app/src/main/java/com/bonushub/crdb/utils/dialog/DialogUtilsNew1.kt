@@ -13,10 +13,12 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.TextUtils
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
@@ -54,6 +56,7 @@ class DialogUtilsNew1 {
 
             txtViewOk.setOnClickListener {
 
+                hideKeyboardIfOpen(activity)
                 onClick.onClickOk(dialog = dialog, password = edtTextPassword.text.toString())
                 //dialog.dismiss()
             }
@@ -300,6 +303,14 @@ class DialogUtilsNew1 {
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }.show()
 
+        }
+
+        fun hideKeyboardIfOpen(activity: Activity) {
+            val view = activity.currentFocus
+            if (view != null) {
+                val imm = activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
         }
 
     }
