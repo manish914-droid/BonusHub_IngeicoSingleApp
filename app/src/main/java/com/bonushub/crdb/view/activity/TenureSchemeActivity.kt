@@ -23,6 +23,7 @@ import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.TenureSchemeViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
 import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
+import com.bonushub.pax.utils.BhTransactionType
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -76,12 +77,23 @@ class TenureSchemeActivity : AppCompatActivity() {
             "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount")).get(TenureSchemeViewModel::class.java)
 
      */
-        val field57=  "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
-                "^${/*cardBinValue.substring(0, 8)*/""}^$transactionAmount"
+        var field57=""
+        if(transactionType==BhTransactionType.BRAND_EMI.type) {
+           field57 = "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
+                    "^${/*cardBinValue.substring(0, 8)*/""}^$transactionAmount"
+        }else{
+            field57 =  "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount"
+        }
 
-        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,
-            cardProcessedDataModal?.getPanNumberData() ?: "",
-            field57)).get(TenureSchemeViewModel::class.java)
+
+        tenureSchemeViewModel = ViewModelProvider(
+            this, TenureSchemeActivityVMFactory(
+                serverRepository,
+                cardProcessedDataModal?.getPanNumberData() ?: "",
+                field57
+            )
+        ).get(TenureSchemeViewModel::class.java)
+
 
         binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)
 
