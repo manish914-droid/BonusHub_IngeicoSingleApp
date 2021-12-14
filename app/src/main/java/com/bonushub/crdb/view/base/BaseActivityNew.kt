@@ -268,7 +268,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             Handler(Looper.getMainLooper()).postDelayed({
                 dialogBuilder.dismiss()
                 dialogBuilder.cancel()
-                startActivity(Intent(this, NativeActivity::class.java).apply {
+                startActivity(Intent(this, NavigationActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })
             }, 2000)

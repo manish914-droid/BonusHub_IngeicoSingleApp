@@ -830,14 +830,21 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     CoroutineScope(Dispatchers.IO).launch{
                         Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
                             hideProgress()
-                           transactFragment(DashboardFragment())
+                            CoroutineScope(Dispatchers.Main).launch {
+                                alertBoxWithAction("",this@NavigationActivity.getString(R.string.successfull_init),
+                                    false, "", {}, {})
+                            }
+
                         }
 
                     }
                 }
                 Status.ERROR -> {
                     hideProgress()
-                    ToastUtils.showToast(this@NavigationActivity,"Error called  ${result.error}")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        getInfoDialog("Error", result.error ?: "") {}
+                    }
+                  //  ToastUtils.showToast(this@NavigationActivity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
                    showProgress("Sending/Receiving From Host")
