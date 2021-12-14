@@ -607,14 +607,16 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
 // region ============getIpPort===========
 
-    fun getIpPort(): InetSocketAddress? {
+/*    fun getIpPort(): InetSocketAddress? {
         val tct = getTptData()
         return if (tct != null) {
             InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
         } else {
             InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
         }
-    }/*    fun checkInternetConnection(): Boolean {
+    }*/
+
+    /*    fun checkInternetConnection(): Boolean {
         val cm =
             VerifoneApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
@@ -623,7 +625,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
 
 //region=====================================Get IP Port:-
-/*fun getIpPort(): InetSocketAddress {
+fun getIpPort(): InetSocketAddress {
 
     val cdt: TerminalCommunicationTable? = getCDTData()
     return if (cdt != null) {
@@ -631,7 +633,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     } else {
         InetSocketAddress(InetAddress.getByName(LYRA_IP_ADDRESS), PORT2)
     }
-}*/
+}
 //endregion
 
     open class OnTextChange(private val cb: (String) -> Unit) : TextWatcher {
