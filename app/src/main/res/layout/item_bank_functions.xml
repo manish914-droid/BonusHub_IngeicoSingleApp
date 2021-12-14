@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/edge_gray"
-    android:layout_marginBottom="13dp"
+    android:layout_marginBottom="17dp"
     android:id="@+id/relLayParent">
 
     <TextView
@@ -15,12 +15,14 @@
         android:textAllCaps="true"
         android:textSize="@dimen/text_size_regular"
         android:fontFamily="@font/muli_semi_bold"
-        android:textColor="@color/text_gray"/>
+        android:textColor="@color/text_gray"
+        android:padding="@dimen/pad_10"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:src="@drawable/ic_arrow" />
+        android:src="@drawable/ic_arrow"
+        android:layout_centerVertical="true"/>
 </RelativeLayout>

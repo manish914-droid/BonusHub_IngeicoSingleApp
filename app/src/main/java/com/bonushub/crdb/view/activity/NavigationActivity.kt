@@ -698,6 +698,30 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
 
+            EDashboardItem.PRE_AUTH_CATAGORY -> {
+                if (!action.childList.isNullOrEmpty()) {
+                    // dashBoardCatagoryDialog(action.childList!!)
+                    if (checkInternetConnection()) {
+                        (transactFragment(PreAuthFragment()
+                            .apply {
+                                arguments = Bundle().apply {
+                                    putSerializable(
+                                        "preAuthOptionList",
+                                        (action.childList) as java.util.ArrayList
+                                    )
+                                    putSerializable("type", EDashboardItem.PRE_AUTH_CATAGORY)
+                                }
+                            }))
+                    } else {
+                        ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                    }
+                } else {
+                    showToast("PreAuth Not Found")
+                    return
+                }
+
+
+            }
             else->{
 
 
