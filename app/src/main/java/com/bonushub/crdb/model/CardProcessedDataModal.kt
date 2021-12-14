@@ -158,6 +158,8 @@ class CardProcessedDataModal : Serializable {
         this.transactionAmount = transactionAmount
     }
 
+
+
     fun getEmiTransactionAmount(): Long? {
         return emiTransactionAmount
     }

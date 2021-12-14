@@ -11,6 +11,7 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentTenureSchemeBinding
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.TenuresWithIssuerTncs
 import com.bonushub.crdb.repository.GenericResponse
@@ -35,6 +36,12 @@ class TenureSchemeActivity : AppCompatActivity() {
     private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
     var binding: FragmentTenureSchemeBinding? = null
     private var selectedSchemeUpdatedPosition = -1
+
+    private var cardProcessedDataModal: CardProcessedDataModal? = null
+    private var transactionType = -1
+    private var bankEMIRequestCode = "4"
+    private var transactionAmount = "20000"
+
     private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal>? = mutableListOf()
     private val emiSchemeAndOfferAdapter: EMISchemeAndOfferAdapter by lazy {
         EMISchemeAndOfferAdapter(
@@ -50,11 +57,19 @@ class TenureSchemeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = FragmentTenureSchemeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+
+        cardProcessedDataModal = intent?.getSerializableExtra("cardProcessedData") as? CardProcessedDataModal?
+        transactionType        = intent?.getIntExtra("transactionType",-1) ?: -1
+
       //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,"Dummy56","Dummy57")).get(
-            TenureSchemeViewModel::class.java)
+        tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,
+            cardProcessedDataModal?.getPanNumberData() ?: "",
+            "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount")).get(TenureSchemeViewModel::class.java)
+
+
 
         binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)
+
 
        /* binding?.toolbarTxn?.mainToolbarStart?.setOnClickListener {
             navigateControlBackToTransaction(

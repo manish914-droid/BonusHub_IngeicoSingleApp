@@ -20,10 +20,7 @@ import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.utils.DeviceHelper
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.addPad
-import com.bonushub.crdb.utils.getBaseTID
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.TransactionActivity.EFallbackCode.*
 import com.bonushub.crdb.view.base.BaseActivityNew
@@ -94,6 +91,7 @@ class TransactionActivity : BaseActivityNew(){
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
         setContentView(emvBinding?.root)
         emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.title
+        globalCardProcessedModel.setTransType(transactionType)
 
         if(transactionTypeEDashboardItem!= EDashboardItem.BRAND_EMI) {
             emvBinding?.cardDetectImg?.visibility = View.GONE
@@ -102,7 +100,7 @@ class TransactionActivity : BaseActivityNew(){
         }
         lifecycleScope.launch(Dispatchers.IO) {
             tid=  getBaseTID(appDatabase.appDao)
-            setupFlow()
+            //setupFlow()
         }
 
         searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
@@ -125,10 +123,46 @@ class TransactionActivity : BaseActivityNew(){
             searchCardViewModel.allcadType.observe(this@TransactionActivity, Observer { cardProcessdatamodel  ->
                 when(cardProcessdatamodel.getReadCardType()){
                     DetectCardType.EMV_CARD_TYPE -> {
+                        when(cardProcessdatamodel.getTransType()){
+                            com.bonushub.pax.utils.TransactionType.SALE.type -> {
+                                // Checking Insta Emi Available or not
+                                var hasInstaEmi = false
+                                val tpt = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
+                                var limitAmt = 0f
+                                if (tpt?.surChargeValue?.isNotEmpty()!!) {
+                                    limitAmt = try {
+                                        tpt.surChargeValue.toFloat() / 100
+                                    } catch (ex: Exception) {
+                                        0f
+                                    }
+                                }
+                                if (tpt.surcharge.isNotEmpty()) {
+                                    hasInstaEmi = try {
+                                        tpt.surcharge == "1"
+                                    } catch (ex: Exception) {
+                                        false
+                                    }
+                                }
+
+                                // Condition executes, If insta EMI is Available on card
+                                if (limitAmt <= "2000".toLong() && hasInstaEmi) {
+                                    val intent = Intent (this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                        putExtra("cardProcessedData", cardProcessdatamodel)
+                                        putExtra("transactionType", cardProcessdatamodel.getTransType())
+                                    }
+                                    startActivity(intent)
+
+                                }
+                                else {
+
+                                }
+                            }
+                        }
+
                         Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
                     }
                     DetectCardType.CONTACT_LESS_CARD_TYPE -> {
-                        Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
+                      //  Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
                     }
                     DetectCardType.MAG_CARD_TYPE -> {
                         Toast.makeText(this@TransactionActivity,"Swipe mode detected",Toast.LENGTH_LONG).show()
@@ -137,30 +171,7 @@ class TransactionActivity : BaseActivityNew(){
 
                     }
                 }
-              /*  when(cardProcessdatamodel.getFallbackType()){
-                    EMV_fallback.fallBackCode -> {
-                        handleEMVFallbackFromError(this@TransactionActivity.getString(R.string.fallback), this@TransactionActivity.getString(R.string.please_use_another_option), false) {
-                            searchCardViewModel.fetchCardTypeData(
-                                cardProcessdatamodel,
-                                CardOption.create().apply {
-                                    supportICCard(true)
-                                    supportMagCard(true)
-                                    supportRFCard(false)
-                                })
-                            CoroutineScope(Dispatchers.Main).launch {
-                                setupObserver()
-                            }
-                            Toast.makeText(this@TransactionActivity,"EMV Fallback",Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    Swipe_fallback.fallBackCode ->{
-                        Toast.makeText(this@TransactionActivity,"Swipe Fallback",Toast.LENGTH_LONG).show()
 
-                    }
-                    else -> {
-
-                    }
-                }*/
             })
 
         }
@@ -183,53 +194,6 @@ class TransactionActivity : BaseActivityNew(){
             if(cardProcessedDataModal.getPanNumberData() !=null) {
                 cardProcessedDataModal.getPanNumberData()
                 var ecrID: String
-             /*   try {
-                    DeviceHelper.doSaleTransaction(
-                        SaleRequest(
-                            amount = 300L ?: 0,
-                            tipAmount = 0L ?: 0,
-                            transactionType = TransactionType.SALE,
-                            tid = "30160033",
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
-                        ),
-                        listener = object : OnPaymentListener.Stub() {
-                            override fun onCompleted(result: PaymentResult?) {
-                                val txnResponse = result?.value as? TransactionResponse
-                                val detailResponse = txnResponse?.receiptDetail
-                                    .toString()
-                                    .split(",")
-                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                                when (txnResponse?.responseCode) {
-                                    ResponseCode.SUCCESS.value -> {
-                                        detailResponse.forEach { println(it) }
-                                        //  uids.add(ecrID)
-                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
-                                    }
-                                    ResponseCode.FAILED.value,
-                                    ResponseCode.ABORTED.value -> {
-                                        detailResponse.forEach { println(it) }
-                                    }
-                                    else -> println("Error")
-                                }
-                            }
-                        }
-                    )
-                }
-                catch (exc: Exception){
-                    exc.printStackTrace()
-                }*/
-
-              /*  DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
-                    override fun onCompleted(p0: OperationResult?) {
-                        p0?.value?.apply {
-                            println("Status = $status")
-                            println("Response code = $responseCode")
-                        }
-                    }
-                })*/
 
                 Toast.makeText(
                     this,
@@ -264,18 +228,7 @@ class TransactionActivity : BaseActivityNew(){
                   startActivity(intent)*/
             }
             EDashboardItem.SALE->{
-                /* DeviceHelper.doSettlementtxn(
-                     SettlementRequest(
-                       numberOfTids =  1,
-                         tid = listOf(tid),
-                     ),object: OnOperationListener.Stub(){
-                     override fun onCompleted(p0: OperationResult?) {
-                         p0?.value?.apply {
-                             println("Status = $status")
-                             println("Response code = $responseCode")
-                         }
-                     }
-                 })*/
+
 
                 val amt=(saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
