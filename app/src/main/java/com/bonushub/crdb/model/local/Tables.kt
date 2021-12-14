@@ -150,7 +150,6 @@ data class TerminalCommunicationTable(
     var actionId: String = "",
 
     @field:BHFieldParseIndex(2)
-    @PrimaryKey
     var tableId: String = "",
 
     @field:BHFieldParseIndex(3)
@@ -160,6 +159,7 @@ data class TerminalCommunicationTable(
     var recordId: String = "",
 
     @field:BHFieldParseIndex(5)
+    @PrimaryKey
     var recordType: String = "",
 
     @field:BHFieldParseIndex(7)

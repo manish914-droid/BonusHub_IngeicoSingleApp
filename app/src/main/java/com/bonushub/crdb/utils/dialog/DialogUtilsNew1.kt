@@ -2,22 +2,32 @@ package com.bonushub.crdb.utils.dialog
 
 import android.app.Activity
 import android.app.Dialog
+import android.app.NativeActivity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Handler
+import android.os.Looper
 import android.text.InputFilter
 import android.text.InputType
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
+import android.text.TextUtils
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import com.bonushub.crdb.R
+import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
+import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.getEditorActionListener
+import com.mindorks.example.coroutines.utils.Status
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DialogUtilsNew1 {
 
@@ -236,6 +246,60 @@ class DialogUtilsNew1 {
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }.show()
+        }
+
+
+        fun alertBoxWithAction(context: Context,
+                               heading: String, msg: String,
+            positiveButtonText: String, negativeButtonText: String, imgHeaader:Int, callback: () -> Unit,
+            cancelButtonCallback: () -> Unit
+        ) {
+
+            Dialog(context).apply {
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.dialog_alert_message_with_icon)
+                setCancelable(false)
+                val window = window
+//                window?.setLayout(
+//                    ViewGroup.LayoutParams.MATCH_PARENT,
+//                    WindowManager.LayoutParams.WRAP_CONTENT
+//                )
+                val dialog_heading = findViewById<TextView>(R.id.dialog_heading)
+                val dialog_msg = findViewById<TextView>(R.id.dialog_msg)
+                val noBtn = findViewById<TextView>(R.id.noBtn)
+                val yesBtn = findViewById<TextView>(R.id.yesBtn)
+                val img_header = findViewById<ImageView>(R.id.img_header)
+
+                dialog_heading.text = heading
+                dialog_msg.text = msg
+                noBtn.text = negativeButtonText
+                yesBtn.text = positiveButtonText
+
+                if(imgHeaader == 0){
+                    img_header.visibility = View.GONE
+                }else{
+                    img_header.visibility = View.VISIBLE
+                    img_header.setImageResource(imgHeaader)
+                }
+
+                if(msg.isEmpty()){
+                    dialog_msg.visibility = View.GONE
+                }else{
+                    dialog_msg.visibility = View.VISIBLE
+                }
+                noBtn.setOnClickListener {
+                    dismiss()
+                    cancelButtonCallback()
+                }
+
+                yesBtn.setOnClickListener {
+                    dismiss()
+                    callback()
+                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+
         }
 
     }

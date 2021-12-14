@@ -24,6 +24,7 @@ import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
@@ -115,41 +116,41 @@ class SettlementFragment : Fragment() {
 
             }
 
-            (activity as NavigationActivity).alertBoxWithAction(
-                getString(R.string.settlement), getString(R.string.do_you_want_to_settle_batch), true, getString(R.string.yes), {
-                    settlementViewModel.settlementResponse()
-                    settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
+            DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info,{
 
-                        when (result.status) {
-                            Status.SUCCESS -> {
-                                CoroutineScope(Dispatchers.IO).launch{
-                                    val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                    settlementByteArray = data.generateIsoByteRequest()
-                                    try {
-                                        (activity as NavigationActivity).settleBatch(settlementByteArray) {
-                                        }
-                                    } catch (ex: Exception) {
-                                        (activity as NavigationActivity).hideProgress()
-                                        ex.printStackTrace()
+                settlementViewModel.settlementResponse()
+                settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
+
+                    when (result.status) {
+                        Status.SUCCESS -> {
+                            CoroutineScope(Dispatchers.IO).launch{
+                                val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                settlementByteArray = data.generateIsoByteRequest()
+                                try {
+                                    (activity as NavigationActivity).settleBatch(settlementByteArray) {
                                     }
+                                } catch (ex: Exception) {
+                                    (activity as NavigationActivity).hideProgress()
+                                    ex.printStackTrace()
                                 }
-                              //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
-                            Status.ERROR -> {
-
-                               // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                            }
-                            Status.LOADING -> {
-                               // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
-
-
-                            }
+                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                         }
+                        Status.ERROR -> {
 
+                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                        }
+                        Status.LOADING -> {
+                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                        }
                     }
 
-                },
-                {})
+                }
+
+
+            },{})
         }
         //endregion
 
@@ -194,6 +195,7 @@ internal class SettlementAdapter(private val list: List<BatchTable>) :
     }
 
     override fun onBindViewHolder(holder: SettlementHolder, p1: Int) {
+
         holder.binding.tvInvoiceNumber.text = invoiceWithPadding(list[p1].receiptData?.invoice ?: "")
         val amount = "%.2f".format(list[p1].receiptData?.txnAmount?.toDouble()?.div(100))
         holder.binding.tvBaseAmount.text = amount
