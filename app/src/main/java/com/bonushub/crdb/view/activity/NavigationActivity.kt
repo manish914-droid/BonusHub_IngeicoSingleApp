@@ -29,6 +29,7 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
@@ -50,6 +51,8 @@ import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
+import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.response.OperationResult
 import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -585,6 +588,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
             EDashboardItem.BRAND_EMI_CATALOGUE, EDashboardItem.BANK_EMI_CATALOGUE -> {
                 val amt = (data as Pair<*, *>).first.toString()
+                val brandId=(data as Pair<*, *>).second.toString()
                 val emiCatalogueImageList =
                     runBlocking(Dispatchers.IO) {
                         /// readEMICatalogueAndBannerImages()
@@ -595,6 +599,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         putString("proc_code", ProcessingCode.PRE_AUTH.code)
                         putString("mobileNumber", extraPair?.first)
                         putString("enquiryAmt", amt)
+                        putString("brandId", brandId)
                         //  putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
 
 
@@ -651,7 +656,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
             EDashboardItem.PREAUTH_COMPLETE->{
 
-                transactFragment(PreAuthCompleteFragment(),true)
+                transactFragment(PreAuthCompleteInputDetailFragment(),true)
 
                /* if (checkInternetConnection()) {
                 CoroutineScope(Dispatchers.IO).launch{
@@ -735,9 +740,16 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
 
-            EDashboardItem.VOID_PREAUTH ->{
+            EDashboardItem.PREAUTH_VIEW ->{
 
-                transactFragment(PreAuthVoidFragment(),true)
+                DeviceHelper.doPreAuthViewTxn(object: OnOperationListener.Stub(){
+                    override fun onCompleted(p0: OperationResult?) {
+                        p0?.value?.apply {
+                            println("Status = $status")
+                            println("Response code = $responseCode")
+                        }
+                    }
+                })
             }
 
             EDashboardItem.PENDING_PREAUTH ->{
@@ -980,7 +992,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                 //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                 runBlocking(Dispatchers.IO) {
-                                    AppPreference.saveBatchInPreference(batchList)
+                                    AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable>)
                                     //Delete All BatchFile Data from Table after Settlement:-
                                     appDao.deleteBatchTable()
 
@@ -1034,7 +1046,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     hideProgress()
                                     //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                     runBlocking(Dispatchers.IO) {
-                                        AppPreference.saveBatchInPreference(batchList)
+                                        AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable>)
                                         //Delete All BatchFile Data from Table after Settlement:-
                                         appDao.deleteBatchTable()
 

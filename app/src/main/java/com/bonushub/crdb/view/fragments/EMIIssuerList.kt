@@ -129,6 +129,7 @@ class EMIIssuerList : Fragment() {
         (activity as IDialog).showProgress()
         Log.d("enquiryAmtStr:- ", enquiryAmtStr)
         Log.d("enquiryAmount:- ", enquiryAmount.toString())
+        Log.d("action:- ", action.toString())
         if (action == UiAction.BRAND_EMI_CATALOGUE) {
             binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)

@@ -57,6 +57,7 @@ class InitFragment : Fragment() {
         fragmentInitBinding.ifProceedBtn.isClickable = false
         fragmentInitBinding.ifEt.addTextChangedListener(textWatcher)
         fragmentInitBinding.ifEt.transformationMethod = null
+        fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_inactive);
         fragmentInitBinding.ifEt.addTextChangedListener(Utility.OnTextChange {
             fragmentInitBinding.ifProceedBtn.isEnabled = it.length == 8
             if (fragmentInitBinding.ifProceedBtn.isEnabled)

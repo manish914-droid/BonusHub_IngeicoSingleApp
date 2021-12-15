@@ -11,12 +11,13 @@ import com.bonushub.crdb.databinding.FragmentPreAuthCompleteDetailBinding
 import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.pax.utils.EDashboardItem
 
 
 class PreAuthCompleteFragment : Fragment() {
 
-
+    private val authData: AuthCompletionData by lazy { AuthCompletionData() }
     var binding:FragmentPreAuthCompleteBinding? = null
     private var iDiag: IDialog? = null
 
@@ -42,11 +43,10 @@ class PreAuthCompleteFragment : Fragment() {
 
         binding?.authCompleteBtn?.setOnClickListener {
 
-                iDiag?.alertBoxWithAction("","Do you want to PreAuth Complete this transaction?",true,"YES",{
 
-                },{})
 
 
         }
     }
+
 }

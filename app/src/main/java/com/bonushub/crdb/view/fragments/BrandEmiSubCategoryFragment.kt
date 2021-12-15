@@ -14,6 +14,7 @@ import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BrandEMISubCategoryAdapter
+import com.bonushub.pax.utils.EDashboardItem
 import dagger.hilt.android.AndroidEntryPoint
 
 // var FRAGMENT_COUNTER=0
@@ -23,6 +24,8 @@ class BrandEmiSubCategoryFragment : Fragment() {
     private var brandDataMaster: BrandEMIMasterDataModal? = null
     private var brandSubCatList: ArrayList<BrandEMISubCategoryTable>? = null
     private var filteredSubCat: ArrayList<BrandEMISubCategoryTable> = arrayListOf()
+    private val action by lazy { arguments?.getSerializable("type") ?: "" }
+
     private var openedFragmentFromBrandData=false
     private val brandEMISubCategoryAdapter by lazy {
         BrandEMISubCategoryAdapter(::onCategoryItemClick)
@@ -44,10 +47,16 @@ class BrandEmiSubCategoryFragment : Fragment() {
         Log.e("OPEN FRAG", "TOUCHED")
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
         brandSubCatList = arguments?.getSerializable("brandSubCatList") as? ArrayList<BrandEMISubCategoryTable>
-filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandEMISubCategoryTable>
+        filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandEMISubCategoryTable>
         openedFragmentFromBrandData= arguments?.getBoolean("fromBranddata",false) == true
-        brandSubCatBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
-          brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+        if (action  == EDashboardItem.BRAND_EMI_CATALOGUE) {
+            brandSubCatBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+            brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+
+        }else {
+            brandSubCatBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+            brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+        }
         brandSubCatBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
@@ -91,6 +100,7 @@ filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandE
                 arguments = Bundle().apply {
                     putSerializable("brandEmiSubCat", brandEMISubCategoryTable)
                     putSerializable("brandDataMaster", brandDataMaster)
+                    putSerializable("type", EDashboardItem.BRAND_EMI_CATALOGUE)
                 }
             })
 

@@ -230,6 +230,12 @@ object DeviceHelper   {
         iRemoteService?.doPreAuthCompleteTransaction(preAuthCompleteRequest,listener)
     }
     /**
+     * Execute PreAuth View transaction
+     * */
+    fun doPreAuthViewTxn(listener: OnOperationListener){
+        iRemoteService?.showPreAuthView(listener)
+    }
+    /**
      * Execute EMI transaction
      * */
     fun doEMITxn(emiSaleRequest: EMISaleRequest, listener: OnPaymentListener?){

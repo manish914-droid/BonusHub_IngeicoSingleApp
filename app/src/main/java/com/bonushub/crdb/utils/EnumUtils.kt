@@ -401,6 +401,7 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     PREAUTH("Pre-Auth", R.drawable.ic_preauth, 7),
 
    PREAUTH_COMPLETE("Pre-Auth Complete", R.drawable.ic_preauth, 5),
+    PREAUTH_VIEW("Pre-Auth View", R.drawable.ic_preauth, 65),
     PENDING_PREAUTH("Pending Preauth", R.drawable.ic_preauth, 6),
     OFFLINE_SALE("Offline Sale", R.drawable.ic_sale, 7),
     VOID_OFFLINE_SALE("Void Offline Sale", R.drawable.ic_void, 8),

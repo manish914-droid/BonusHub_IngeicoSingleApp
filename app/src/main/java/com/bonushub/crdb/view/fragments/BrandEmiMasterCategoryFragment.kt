@@ -24,6 +24,7 @@ import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
+import com.bonushub.pax.utils.EDashboardItem
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-
+    private val action by lazy { arguments?.getSerializable("type") ?: "" }
 
     private lateinit var brandEmiMasterCategoryViewModel: BrandEmiMasterCategoryViewModel
     private var brandMasterBinding: BrandEmiListAndSearchUiBinding? = null
@@ -58,10 +59,15 @@ class BrandEmiMasterCategoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (action as EDashboardItem == EDashboardItem.BRAND_EMI_CATALOGUE) {
+            brandMasterBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+            brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
 
-        brandMasterBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
-      //  brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
+        }else {
+            brandMasterBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+            brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
 
+        }
         brandMasterBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
 
@@ -104,7 +110,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
     //endregion
     private fun onItemClick(brandDataMaster: BrandEMIMasterDataModal) {
         println("On Brand Clicked " + Gson().toJson(brandDataMaster))
-        ToastUtils.showToast(activity, Gson().toJson(brandDataMaster))
+      //  ToastUtils.showToast(activity, Gson().toJson(brandDataMaster))
 
         lifecycleScope.launch(Dispatchers.IO) {
             val brandSubCatList: ArrayList<BrandEMISubCategoryTable> =
@@ -120,6 +126,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                         putSerializable("brandSubCatList", brandSubCatList)
                         putSerializable("filteredSubCat", filteredSubCat)
                         putSerializable("fromBranddata", true)
+                        putSerializable("type", action)
 
                       //  putBoolean("navigateFromMaster",true)
                         // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
@@ -130,6 +137,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                 (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
                     arguments = Bundle().apply {
                         putSerializable("brandDataMaster", brandDataMaster)
+                        putSerializable("type", action)
                     }
                 })
             }

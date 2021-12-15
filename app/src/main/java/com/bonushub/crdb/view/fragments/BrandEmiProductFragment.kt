@@ -41,7 +41,7 @@ class BrandEmiProductFragment : Fragment() {
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-
+    private val action by lazy { arguments?.getSerializable("type") ?: "" }
     private lateinit var brandEmiProductViewModel: BrandEmiProductViewModel
     private var brandEmiProductBinding: BrandEmiListAndSearchUiBinding? = null
     private var brandDataMaster: BrandEMIMasterDataModal? = null
@@ -73,12 +73,20 @@ class BrandEmiProductFragment : Fragment() {
         brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
             BrandEmiProductViewModel::class.java
         )
-        brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = "EMI Product"//uiAction.title
+        if (action  == EDashboardItem.BRAND_EMI_CATALOGUE) {
+            brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+            brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+
+        }else{
+            brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+        brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+    }
         //  brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
 
         brandEmiProductBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+
 
 
         brandEmiProductViewModel.brandEMIProductLivedata.observe(
@@ -114,13 +122,13 @@ class BrandEmiProductFragment : Fragment() {
     //endregion
     private fun onItemClick(productData: BrandEMIProductDataModal) {
         println("On Product Clicked " + Gson().toJson(productData))
-        ToastUtils.showToast(activity, Gson().toJson(productData))
+    ///    ToastUtils.showToast(activity, Gson().toJson(productData))
         (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
             arguments = Bundle().apply {
                 putSerializable("brandEmiProductData", productData)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
                 putSerializable("brandDataMaster", brandDataMaster)
-                putSerializable("type", EDashboardItem.BRAND_EMI)
+                putSerializable("type", action)
             }
         })
 
