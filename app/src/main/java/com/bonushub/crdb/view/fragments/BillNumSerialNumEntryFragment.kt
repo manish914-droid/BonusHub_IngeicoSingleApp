@@ -205,10 +205,13 @@ class BillNumSerialNumEntryFragment : Fragment() {
                     Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true),brandEMIDataModal
                 )
             }*/
+            brandEmiProductData?.imeiOrSerialNum=binding?.serialNumEt?.text.toString()
+            brandEmiProductData?.billNum=binding?.billNumEt?.text.toString().trim()
+
             brandEmiSubCatData?.let {
                 brandEmiProductData?.let { it1 ->
                     brandDataMaster?.let { it2 ->
-                        (activity as NavigationActivity).startTransactionActivity(amt= txnAmount,mobileNum = mobileNumber,brandDataMaster = it2,
+                        (activity as NavigationActivity).startTransactionActivity(amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(),imeiOrSerialNum=binding?.serialNumEt?.text.toString() ,brandDataMaster = it2,
                             brandEmiSubCatData = it,brandEmiProductData = it1
                         )
                     }

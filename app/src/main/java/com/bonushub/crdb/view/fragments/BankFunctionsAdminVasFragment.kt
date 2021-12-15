@@ -1,6 +1,7 @@
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,22 +13,27 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
 import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.checkBaseTid
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
 import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.BankFunctionsAdminVasItem
+import com.bonushub.pax.utils.PreferenceKeyConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.ArrayList
+import java.util.*
 
 @AndroidEntryPoint
 class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemClick{
@@ -39,6 +45,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     private val initViewModel : InitViewModel by viewModels()
     // for init`
     private var iDialog: IDialog? = null
+
+    private val batchFileViewModel: BatchFileViewModel by viewModels()
 
 
     override fun onCreateView(
@@ -57,7 +65,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
         try {
             iDialog = (activity as NavigationActivity)
-logger("iDialog",""+iDialog.toString())
+         logger("iDialog",""+iDialog.toString())
         }catch (ex:Exception)
         {
             ex.printStackTrace()
@@ -70,8 +78,15 @@ logger("iDialog",""+iDialog.toString())
         setupRecyclerview()
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
-            parentFragmentManager.popBackStackImmediate()
+            try {
+                parentFragmentManager.popBackStackImmediate()
+            }catch (ex:Exception)
+            {
+                ex.printStackTrace()
+            }
         }
+
+        observeMainViewModel()
     }
 
     private fun setupRecyclerview(){
@@ -88,26 +103,60 @@ logger("iDialog",""+iDialog.toString())
     override fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem) {
         when(bankFunctionsAdminVasItem){
             BankFunctionsAdminVasItem.INIT ->{
-                // INIT
-                iDialog?.showProgress(getString(R.string.please_wait_host))
 
-                runBlocking {
-                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+                if (checkInternetConnection()) {
 
-                    if(!tids.get(0).isEmpty()!!) {
+                    if(!AppPreference.getBoolean(AppPreference.LOGIN_KEY)){
+                        //showEnterTIDPopUp
+                        DialogUtilsNew1.getInputDialog(requireContext(),"ENTER TID","",true,true) {
 
-                        logger("get tid", "by table")
-                        // get tid from table and init
+                            if(it.length < 8){
+                            ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
+                            }else {
+                                initViewModel.insertInfo1(it)
+                                //observeMainViewModel()
+                            }
+                        }
 
-                        initViewModel.insertInfo1(tids[0] ?:"")
-                        observeMainViewModel()
                     }else{
-// get tid by user
-                        logger("get tid","by user")
-                        //navHostFragment?.navController?.popBackStack()
-                        (activity as NavigationActivity).transactFragment(InitFragment())
+                        // check batch open or not
+
+                        lifecycleScope.launch(Dispatchers.Main) {
+
+                            batchFileViewModel.getBatchTableData()
+                                .observe(viewLifecycleOwner, { batchData ->
+
+                                    when {
+                                        AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
+                                            ToastUtils.showToast(
+                                                requireContext(),
+                                                getString(R.string.please_clear_fbatch_before_init)
+                                            )
+
+                                        !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
+                                            ToastUtils.showToast(
+                                                requireContext(),
+                                                getString(R.string.reversal_found_please_clear_or_settle_first_before_init)
+                                            )
+
+                                        batchData.size > 0 -> ToastUtils.showToast(
+                                            requireContext(),
+                                            getString(R.string.please_settle_batch_first_before_init)
+                                        )
+                                        else -> {
+                                            startFullInitProcess()
+                                        }
+                                    }
+                                })
+
+                        }
                     }
+
+                } else {
+                    ToastUtils.showToast(requireContext(),getString(R.string.no_internet_available_please_check_your_internet))
                 }
+
+
 
             }
 
@@ -137,33 +186,85 @@ logger("iDialog",""+iDialog.toString())
         }
     }
 
+    private fun startFullInitProcess() {
+
+        // INIT
+        // iDialog?.showProgress(getString(R.string.please_wait_host))
+
+        runBlocking {
+            val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+
+            if(!tids.get(0).isEmpty()!!) {
+
+                logger("get tid", "by table")
+                // get tid from table and init
+
+                initViewModel.insertInfo1(tids[0] ?:"")
+                //observeMainViewModel()
+            }else{
+               // get tid by user
+                logger("get tid","by user")
+
+                DialogUtilsNew1.getInputDialog(requireContext(),"ENTER TID","",true,true) {
+
+                    if(it.length < 8){
+                        ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
+                    }else {
+                        initViewModel.insertInfo1(it)
+                    }
+                }
+                //(activity as NavigationActivity).transactFragment(InitFragment())
+            }
+        }
+    }
+
     private fun observeMainViewModel(){
 
-        initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
+        initViewModel.initData.observe(viewLifecycleOwner, { result ->
 
-            when (result.status) {
-                Status.SUCCESS -> {
-                    CoroutineScope(Dispatchers.IO).launch{
-                        Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
-                            iDialog?.hideProgress()
-                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+            if(!isFromStop) {
+                when (result.status) {
+                    Status.SUCCESS -> {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
+                                iDialog?.hideProgress()
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                        requireContext().getString(R.string.successfull_init))
+                                }
+                            }
+
                         }
+                    }
+                    Status.ERROR -> {
+                        iDialog?.hideProgress()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            (activity as? NavigationActivity)?.getInfoDialog(
+                                "Error",
+                                result.error ?: ""
+                            ) {}
+                        }
+                        // ToastUtils.showToast(activity,"Error called  ${result.error}")
+                    }
+                    Status.LOADING -> {
+                        iDialog?.showProgress(getString(R.string.sending_receiving_host))
 
                     }
                 }
-                Status.ERROR -> {
-                    iDialog?.hideProgress()
-                    ToastUtils.showToast(activity,"Error called  ${result.error}")
-                }
-                Status.LOADING -> {
-                    iDialog?.showProgress("Sending/Receiving From Host")
-
-                }
+            }else{
+                isFromStop = false
             }
-
         })
 
 
+    }
+
+    var isFromStop = false
+
+    override fun onStop() {
+        super.onStop()
+        logger("kush","rem")
+        isFromStop = true
     }
 }
 

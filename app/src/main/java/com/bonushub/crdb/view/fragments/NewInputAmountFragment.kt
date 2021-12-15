@@ -43,8 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-import com.bonushub.pax.utils.TransactionType
-import com.bonushub.pax.utils.UiAction
+import com.bonushub.pax.utils.BhTransactionType
 
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -151,7 +150,7 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
 
-                observeNewInpuAmountViewModelForHdfcTpt(TransactionType.TIP_SALE)
+                observeNewInpuAmountViewModelForHdfcTpt(BhTransactionType.TIP_SALE)
 
             }
             EDashboardItem.BRAND_EMI->{
@@ -196,11 +195,11 @@ class NewInputAmountFragment : Fragment() {
         Log.d("tpt===>:- ", Gson().toJson(tpt))
         return tpt
     }
-    private fun observeNewInpuAmountViewModelForHdfcTpt(transactionType: TransactionType)  {
+    private fun observeNewInpuAmountViewModelForHdfcTpt(bhTransactionType: BhTransactionType)  {
       lifecycleScope.launch(Dispatchers.Main) {
             newInputAmountViewModel.fetchHdfcTptData()?.observe(viewLifecycleOwner,{
                 hdfctpt = it
-            checkHDFCTPTFieldsBitOnOff(transactionType,it)
+            checkHDFCTPTFieldsBitOnOff(bhTransactionType,it)
                 Log.d("Hdfctpt===>:- ", Gson().toJson(it))
                 Log.d("Hdfctpt===>:- ", Gson().toJson(status))
             })
@@ -645,7 +644,7 @@ EDashboardItem.PREAUTH_COMPLETE->{
 }
             EDashboardItem.EMI_ENQUIRY -> {
                 if (observeNewInpuAmountViewModelForTpt()?.bankEnquiryMobNumberEntry == true) {
-                    showMobileBillDialog(activity, TransactionType.EMI_ENQUIRY.type) {
+                    showMobileBillDialog(activity, BhTransactionType.EMI_ENQUIRY.type) {
                         //  sendStartSale(inputAmountEditText?.text.toString(), extraPairData)
                         iFrReq?.onFragmentRequest(
                             EDashboardItem.EMI_ENQUIRY,
@@ -805,24 +804,24 @@ EDashboardItem.PREAUTH_COMPLETE->{
     }
 
     //region=========================Below method to check HDFC TPT Fields Check:-
-    private fun checkHDFCTPTFieldsBitOnOff(transactionType: TransactionType,hdfcTpt:HDFCTpt): Boolean {
+    private fun checkHDFCTPTFieldsBitOnOff(bhTransactionType: BhTransactionType, hdfcTpt:HDFCTpt): Boolean {
         Log.d("HDFC TPT:- ", hdfcTpt.toString())
         var data: String? = null
         if (hdfcTpt != null) {
-            when (transactionType) {
-                TransactionType.VOID -> {
+            when (bhTransactionType) {
+                BhTransactionType.VOID -> {
                     data = convertValue2BCD(hdfcTpt.localTerminalOption)
                     return data[1] == '1' // checking second position of data for on/off case
                 }
-                TransactionType.REFUND -> {
+                BhTransactionType.REFUND -> {
                     data = convertValue2BCD(hdfcTpt.localTerminalOption)
                     return data[2] == '1' // checking third position of data for on/off case
                 }
-                TransactionType.TIP_ADJUSTMENT -> {
+                BhTransactionType.TIP_ADJUSTMENT -> {
                     data = convertValue2BCD(hdfcTpt.localTerminalOption)
                     return data[3] == '1' // checking fourth position of data for on/off case
                 }
-                TransactionType.TIP_SALE -> {
+                BhTransactionType.TIP_SALE -> {
                     data = convertValue2BCD(hdfcTpt.option1)
                    if(data[2] == '1'){ // checking third position of data for on/off case
                        binding?.cashAmtCrdView?.visibility = View.VISIBLE

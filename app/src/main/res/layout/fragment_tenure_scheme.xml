@@ -71,14 +71,7 @@
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_xregular"
         app:backgroundTint="@color/hdfc_red_color"
-        app:elevation="@dimen/pad_0"
-        app:icon="@drawable/ic_proceed_button"
-        app:iconPadding="@dimen/pad_5"
-        app:iconTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:rippleColor="@color/colorAccent"
-        android:padding="@dimen/pad_10"
+
 
         />
 

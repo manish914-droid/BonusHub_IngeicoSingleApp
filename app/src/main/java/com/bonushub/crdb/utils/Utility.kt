@@ -42,9 +42,9 @@ import javax.inject.Inject
 
 val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
+//203.112.151.169, port = 8109
 
-
-val NEW_IP_ADDRESS ="192.168.250.10"/*"192.168.250.10"*/
+val NEW_IP_ADDRESS ="192.168.250.10"/*"192.168.250.10"*/ //"203.112.151.169"//
 var PORT =4124//8109// /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
@@ -607,14 +607,16 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
 // region ============getIpPort===========
 
-    fun getIpPort(): InetSocketAddress? {
+/*    fun getIpPort(): InetSocketAddress? {
         val tct = getTptData()
         return if (tct != null) {
             InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
         } else {
             InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
         }
-    }/*    fun checkInternetConnection(): Boolean {
+    }*/
+
+    /*    fun checkInternetConnection(): Boolean {
         val cm =
             VerifoneApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
@@ -623,7 +625,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
 
 //region=====================================Get IP Port:-
-/*fun getIpPort(): InetSocketAddress {
+fun getIpPort(): InetSocketAddress {
 
     val cdt: TerminalCommunicationTable? = getCDTData()
     return if (cdt != null) {
@@ -631,7 +633,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     } else {
         InetSocketAddress(InetAddress.getByName(LYRA_IP_ADDRESS), PORT2)
     }
-}*/
+}
 //endregion
 
     open class OnTextChange(private val cb: (String) -> Unit) : TextWatcher {
@@ -691,18 +693,18 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     fun getTransactionTypeName(type: Int): String? {
         var name: String? = null
         name = when (type) {
-            TransactionType.SALE.type -> TransactionType.SALE.txnTitle
-            TransactionType.SALE_WITH_CASH.type -> TransactionType.SALE_WITH_CASH.txnTitle
-            TransactionType.CASH_AT_POS.type -> TransactionType.CASH_AT_POS.txnTitle
-            TransactionType.PRE_AUTH.type -> TransactionType.PRE_AUTH.txnTitle
-            TransactionType.PRE_AUTH_COMPLETE.type -> TransactionType.PRE_AUTH_COMPLETE.txnTitle
-            TransactionType.PENDING_PREAUTH.type -> TransactionType.PENDING_PREAUTH.txnTitle
-            TransactionType.VOID.type -> TransactionType.VOID.txnTitle
-            TransactionType.REFUND.type -> TransactionType.REFUND.txnTitle
-            TransactionType.VOID_REFUND.type -> TransactionType.VOID_REFUND.txnTitle
-            TransactionType.EMI.type -> TransactionType.EMI.txnTitle
-            TransactionType.EMI_SALE.type -> TransactionType.EMI_SALE.txnTitle
-            TransactionType.TIP_SALE.type -> TransactionType.TIP_SALE.txnTitle
+            BhTransactionType.SALE.type -> BhTransactionType.SALE.txnTitle
+            BhTransactionType.SALE_WITH_CASH.type -> BhTransactionType.SALE_WITH_CASH.txnTitle
+            BhTransactionType.CASH_AT_POS.type -> BhTransactionType.CASH_AT_POS.txnTitle
+            BhTransactionType.PRE_AUTH.type -> BhTransactionType.PRE_AUTH.txnTitle
+            BhTransactionType.PRE_AUTH_COMPLETE.type -> BhTransactionType.PRE_AUTH_COMPLETE.txnTitle
+            BhTransactionType.PENDING_PREAUTH.type -> BhTransactionType.PENDING_PREAUTH.txnTitle
+            BhTransactionType.VOID.type -> BhTransactionType.VOID.txnTitle
+            BhTransactionType.REFUND.type -> BhTransactionType.REFUND.txnTitle
+            BhTransactionType.VOID_REFUND.type -> BhTransactionType.VOID_REFUND.txnTitle
+            BhTransactionType.EMI.type -> BhTransactionType.EMI.txnTitle
+            BhTransactionType.EMI_SALE.type -> BhTransactionType.EMI_SALE.txnTitle
+            BhTransactionType.TIP_SALE.type -> BhTransactionType.TIP_SALE.txnTitle
             else -> "NONE"
         }
         return name
@@ -753,25 +755,25 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 //endregion
 
     //region=========================Below method to check HDFC TPT Fields Check:-
-    fun checkHDFCTPTFieldsBitOnOff(transactionType: TransactionType): Boolean {
+    fun checkHDFCTPTFieldsBitOnOff(bhTransactionType: BhTransactionType): Boolean {
         val hdfcTPTData = runBlocking(Dispatchers.IO) { getHDFCTptData() }
         Log.d("HDFC TPT:- ", hdfcTPTData.toString())
         var data: String? = null
         if (hdfcTPTData != null) {
-            when (transactionType) {
-                TransactionType.VOID -> {
+            when (bhTransactionType) {
+                BhTransactionType.VOID -> {
                     data = convertValue2BCD(hdfcTPTData.localTerminalOption)
                     return data[1] == '1' // checking second position of data for on/off case
                 }
-                TransactionType.REFUND -> {
+                BhTransactionType.REFUND -> {
                     data = convertValue2BCD(hdfcTPTData.localTerminalOption)
                     return data[2] == '1' // checking third position of data for on/off case
                 }
-                TransactionType.TIP_ADJUSTMENT -> {
+                BhTransactionType.TIP_ADJUSTMENT -> {
                     data = convertValue2BCD(hdfcTPTData.localTerminalOption)
                     return data[3] == '1' // checking fourth position of data for on/off case
                 }
-                TransactionType.TIP_SALE -> {
+                BhTransactionType.TIP_SALE -> {
                     data = convertValue2BCD(hdfcTPTData.option1)
                     return data[2] == '1' // checking third position of data for on/off case
                 }
@@ -801,30 +803,30 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 //region=========================Below method to check HDFC CDT Fields Check:-
     fun checkForTransactionAllowedOrNot(
         panNumber: String,
-        transactionType: TransactionType
+        bhTransactionType: BhTransactionType
     ): Boolean {
         val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
         Log.d("HDFC TPT:- ", hdfcCDTData.toString())
         var data: String? = null
         return if (hdfcCDTData != null) {
-            when (transactionType) {
-                TransactionType.TIP_ADJUSTMENT -> {
+            when (bhTransactionType) {
+                BhTransactionType.TIP_ADJUSTMENT -> {
                     data = convertValue2BCD(hdfcCDTData.option1)
                     data[7] == '1' // checking eight position of data for on/off case
                 }
-                TransactionType.PRE_AUTH -> {
+                BhTransactionType.PRE_AUTH -> {
                     data = convertValue2BCD(hdfcCDTData.option2)
                     data[7] == '1' // checking eight position of data for on/off case
                 }
-                TransactionType.REFUND -> {
+                BhTransactionType.REFUND -> {
                     data = convertValue2BCD(hdfcCDTData.option2)
                     data[6] == '1' // checking seventh position of data for on/off case
                 }
-                TransactionType.SALE_WITH_CASH -> {
+                BhTransactionType.SALE_WITH_CASH -> {
                     data = convertValue2BCD(hdfcCDTData.option3)
                     data[1] == '1' // checking second position of data for on/off case
                 }
-                TransactionType.CASH_AT_POS -> {
+                BhTransactionType.CASH_AT_POS -> {
                     data = convertValue2BCD(hdfcCDTData.option3)
                     data[6] == '1' // checking seventh position of data for on/off case
                 }
@@ -1142,22 +1144,22 @@ object Field48ResponseTimestamp {
 
     fun transactionType2Name(code: Int): String {
         return when (code) {
-            TransactionType.SALE.type -> "Sale"
-            TransactionType.VOID.type -> "Void"
-            TransactionType.VOID_REFUND.type -> "Void Refund"
-            TransactionType.REFUND.type -> "Refund"
-            TransactionType.PRE_AUTH.type -> "Pre-Auth"
-            TransactionType.PRE_AUTH_COMPLETE.type -> "Auth Complete"
-            TransactionType.VOID_PREAUTH.type -> "Void Pre-Auth"
-            TransactionType.OFFLINE_SALE.type -> "Offline Sale"
-            TransactionType.TIP_SALE.type -> "Tip Sale"
-            TransactionType.SALE_WITH_CASH.type -> "Sale Cash"
-            TransactionType.TIP_ADJUSTMENT.type -> "Tip Adjust"
-            TransactionType.VOID_OFFLINE_SALE.type -> "Void Offline Sale"
-            TransactionType.TEST_EMI.type -> "Test EMI Txn"
-            TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type , TransactionType.EMI_SALE.type -> "EMI Sale"
-            TransactionType.CASH_AT_POS.type -> "Cash only"
-            TransactionType.VOID_EMI.type -> "Void EMI"
+            BhTransactionType.SALE.type -> "Sale"
+            BhTransactionType.VOID.type -> "Void"
+            BhTransactionType.VOID_REFUND.type -> "Void Refund"
+            BhTransactionType.REFUND.type -> "Refund"
+            BhTransactionType.PRE_AUTH.type -> "Pre-Auth"
+            BhTransactionType.PRE_AUTH_COMPLETE.type -> "Auth Complete"
+            BhTransactionType.VOID_PREAUTH.type -> "Void Pre-Auth"
+            BhTransactionType.OFFLINE_SALE.type -> "Offline Sale"
+            BhTransactionType.TIP_SALE.type -> "Tip Sale"
+            BhTransactionType.SALE_WITH_CASH.type -> "Sale Cash"
+            BhTransactionType.TIP_ADJUSTMENT.type -> "Tip Adjust"
+            BhTransactionType.VOID_OFFLINE_SALE.type -> "Void Offline Sale"
+            BhTransactionType.TEST_EMI.type -> "Test EMI Txn"
+            BhTransactionType.BRAND_EMI.type, BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type , BhTransactionType.EMI_SALE.type -> "EMI Sale"
+            BhTransactionType.CASH_AT_POS.type -> "Cash only"
+            BhTransactionType.VOID_EMI.type -> "Void EMI"
             else -> "Unknown"
         }
     }

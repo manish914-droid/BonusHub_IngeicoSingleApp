@@ -126,7 +126,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
         }
     }
 
-    fun setUiForEdit()
+    private fun setUiForEdit()
     {
         when(type){
 

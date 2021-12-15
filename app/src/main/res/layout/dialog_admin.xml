@@ -10,9 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
+        android:fontFamily="@font/muli_regular"
         android:textColor="@color/white"
-        android:textSize="@dimen/text_size_xsmall"
-        android:fontFamily="@font/muli_regular"/>
+        android:textSize="@dimen/text_size_xsmall" />
 
     <EditText
         android:id="@+id/edtTextPassword"
@@ -25,8 +25,11 @@
         android:background="@drawable/edge_gray_bg_white"
         android:cursorVisible="true"
         android:fontFamily="@font/muli_regular"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
         android:inputType="numberPassword"
         android:lines="1"
+        android:maxLength="15"
         android:padding="10dp"
         android:textColor="@color/txt_color"
         android:textColorHint="@color/txt_color_transparent"
@@ -49,12 +52,12 @@
             android:layout_marginEnd="15dp"
             android:layout_weight="1"
             android:background="@drawable/edge_bg_white"
+            android:fontFamily="@font/muli_regular"
             android:gravity="center"
             android:padding="7dp"
             android:text="@string/cancel"
             android:textAllCaps="true"
             android:textColor="@color/txt_color"
-            android:fontFamily="@font/muli_regular"
             android:textSize="@dimen/text_size_xsmall" />
 
 
@@ -65,13 +68,13 @@
             android:layout_marginStart="15dp"
             android:layout_weight="1"
             android:background="@drawable/edge_white_bg_blue"
+            android:fontFamily="@font/muli_regular"
             android:gravity="center"
             android:padding="7dp"
             android:text="@string/ok"
             android:textAllCaps="true"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_xsmall"
-            android:fontFamily="@font/muli_regular"/>
+            android:textSize="@dimen/text_size_xsmall" />
 
     </LinearLayout>
 

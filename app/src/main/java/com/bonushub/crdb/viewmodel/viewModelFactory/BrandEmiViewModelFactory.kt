@@ -3,7 +3,6 @@ package com.bonushub.crdb.viewmodel.viewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bonushub.crdb.repository.ServerRepository
-import com.bonushub.crdb.view.activity.TenureSchemeActivity
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.BrandEmiProductViewModel
 import com.bonushub.crdb.viewmodel.TenureSchemeViewModel

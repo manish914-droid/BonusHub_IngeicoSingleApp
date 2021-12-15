@@ -1,14 +1,10 @@
 package com.bonushub.crdb.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.HDFCTpt
 import com.bonushub.crdb.model.local.TerminalParameterTable
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.convertValue2BCD
-import com.bonushub.pax.utils.TransactionType
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 class NewInputAmountRepository {

@@ -112,7 +112,7 @@ object IsoPacketCreator{
             //New field 56 added by Manish Kumar for getting tenure
             //adding Field 56
 
-            addField56(56, pan)
+            addField56(56, getEncryptedPanorTrackData(pan,false))
        //    addField56(56, getEncryptedPan(cardBinValue))
 
             //adding Field 56
@@ -120,7 +120,7 @@ object IsoPacketCreator{
 
             //adding Field 57
           //  addFieldByHex(57, field57Request ?: "")
-            addFieldByHex(57, "4^0^7^2696^h^^589000" ?: "")
+            addFieldByHex(57, field57RequestData)
 
             //adding Field 61
             addFieldByHex(61,  KeyExchanger.getF61())

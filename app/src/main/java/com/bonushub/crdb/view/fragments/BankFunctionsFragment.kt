@@ -14,6 +14,7 @@ import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -52,6 +53,7 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
 
         iBankFunctionItemClick = this

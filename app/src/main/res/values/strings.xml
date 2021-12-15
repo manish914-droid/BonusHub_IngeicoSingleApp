@@ -16,6 +16,8 @@
     <string name="proceed_to_init">Proceed To Init</string>
     <string name="please_wait">Please Wait....</string>
     <string name="please_wait_host">Please Wait init Process Start....</string>
+    <string name="successfull_init">INIT Successful</string>
+    <string name="sending_receiving_host">Sending/Receiving From Host</string>
 
     <!--TODO: navigation drawer strings-->
     <string name="merchant_name">ME Name  : </string>

@@ -17,7 +17,6 @@ import com.bonushub.crdb.utils.ingenico.DialogUtil
 import com.bonushub.crdb.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.utils.ingenico.TLV
 import com.bonushub.crdb.utils.logger
-import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.activity.TransactionActivity.*
 import com.bonushub.pax.utils.EFallbackCode
@@ -82,6 +81,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                    //  _insertCardStatus.postValue(cardProcessedDataModal)
                     startemv(EMVOption.create(), cardProcessedDataModal)
                    // emv?.stopSearch()
+
                 }
 
                 override fun onCardSwiped(track: Bundle) {
@@ -380,7 +380,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
         cardProcessedDataModal.setEncryptedPan(encrptedPan)
         println("Pannumber is"+EMVInfoUtil.getRecordDataDesc(record))
         TDES(EMVInfoUtil.getRecordDataDesc(record))
-        return _insertCardStatus.postValue(cardProcessedDataModal)
+        _insertCardStatus.postValue(cardProcessedDataModal)
         // outputText("=> onReadRecord | " + EMVInfoUtil.getRecordDataDesc(record))
         // outputResult(emv.respondEvent(null), "...onReadRecord: respondEvent")
     }

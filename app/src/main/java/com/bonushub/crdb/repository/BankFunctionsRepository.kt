@@ -388,98 +388,102 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         val dataList = MutableLiveData<ArrayList<TidsListModel>>()
         val tidsWithStatusList = ArrayList<TidsListModel>()
 
-        withContext(Dispatchers.IO) {
-            val tpt = appDao.getTerminalParameterTableData()
+        try {
+            withContext(Dispatchers.IO) {
+                val tpt = appDao.getTerminalParameterTableData()
 
-            val IngenicoInitializationTable = appDao.getIngenicoInitialization()
+                val IngenicoInitializationTable = appDao.getIngenicoInitialization()
 
-            val rseultsize = IngenicoInitializationTable?.size
+                val rseultsize = IngenicoInitializationTable?.size
 
-            var tidType = tpt.get(0)?.tidType
-            var linkTidType = tpt.get(0)?.LinkTidType
-            var tids = tpt.get(0)?.terminalId
-            var status = ArrayList<String>()
+                var tidType = tpt.get(0)?.tidType
+                var linkTidType = tpt.get(0)?.LinkTidType
+                var tids = tpt.get(0)?.terminalId
+                var status = ArrayList<String>()
 
-            if (rseultsize != null) {
-                logger("IngenicoInitializationTable", "" + rseultsize)
-                var statusList = IngenicoInitializationTable.get(0)?.tidStatusList
-                var tidsStatusList = IngenicoInitializationTable.get(0)?.tidList
+                if (rseultsize != null) {
+                    logger("IngenicoInitializationTable", "" + rseultsize)
+                    var statusList = IngenicoInitializationTable.get(0)?.tidStatusList
+                    var tidsStatusList = IngenicoInitializationTable.get(0)?.tidList
 
-                tids?.forEachIndexed { index, value ->
-                    tidsStatusList?.forEachIndexed { index2, value2 ->
+                    tids?.forEachIndexed { index, value ->
+                        tidsStatusList?.forEachIndexed { index2, value2 ->
 
-                        if (value.equals(value2, true)) {
-                            status.add(statusList?.get(index2) ?: "")
+                            if (value.equals(value2, true)) {
+                                status.add(statusList?.get(index2) ?: "")
+                            }
+
                         }
-
                     }
+                } else {
+                    logger("IngenicoInitializationTable", "" + rseultsize)
                 }
-            } else {
-                logger("IngenicoInitializationTable", "" + rseultsize)
-            }
 
-            if (tidType?.size == linkTidType?.size) {
-                for (i in 0 until tidType?.size!!) {
+                if (tidType?.size == linkTidType?.size) {
+                    for (i in 0 until tidType?.size!!) {
 
-                    if (tidType[i].equals("1")) {
-                        tidsWithStatusList.add(
-                            TidsListModel(
-                                tids?.get(i) ?: "",
-                                "Base Tid",
-                                status.get(i)
+                        if (tidType[i].equals("1")) {
+                            tidsWithStatusList.add(
+                                TidsListModel(
+                                    tids?.get(i) ?: "",
+                                    "Base Tid",
+                                    status.get(i)
+                                )
                             )
-                        )
-                    } else {
-                        when (linkTidType?.get(0)) {
+                        } else {
+                            when (linkTidType?.get(0)) {
 
-                            "0" -> {
-                                tidsWithStatusList.add(
-                                    TidsListModel(
-                                        tids?.get(i) ?: "",
-                                        "for Amex",
-                                        status.get(i)
+                                "0" -> {
+                                    tidsWithStatusList.add(
+                                        TidsListModel(
+                                            tids?.get(i) ?: "",
+                                            "for Amex",
+                                            status.get(i)
+                                        )
                                     )
-                                )
-                            }
+                                }
 
-                            "1" -> {
-                                tidsWithStatusList.add(
-                                    TidsListModel(
-                                        tids?.get(i) ?: "",
-                                        "DC type",
-                                        status.get(i)
+                                "1" -> {
+                                    tidsWithStatusList.add(
+                                        TidsListModel(
+                                            tids?.get(i) ?: "",
+                                            "DC type",
+                                            status.get(i)
+                                        )
                                     )
-                                )
-                            }
+                                }
 
-                            "2" -> {
-                                tidsWithStatusList.add(
-                                    TidsListModel(
-                                        tids?.get(i) ?: "",
-                                        "offus Tid",
-                                        status.get(i)
+                                "2" -> {
+                                    tidsWithStatusList.add(
+                                        TidsListModel(
+                                            tids?.get(i) ?: "",
+                                            "offus Tid",
+                                            status.get(i)
+                                        )
                                     )
-                                )
-                            }
+                                }
 
-                            else -> {
-                                tidsWithStatusList.add(
-                                    TidsListModel(
-                                        tids?.get(i) ?: "",
-                                        "${linkTidType?.get(i)} months onus",
-                                        status.get(i)
+                                else -> {
+                                    tidsWithStatusList.add(
+                                        TidsListModel(
+                                            tids?.get(i) ?: "",
+                                            "${linkTidType?.get(i)} months onus",
+                                            status.get(i)
+                                        )
                                     )
-                                )
-                            }
+                                }
 
+                            }
                         }
                     }
                 }
+
+                dataList.postValue(tidsWithStatusList)
             }
-
-            dataList.postValue(tidsWithStatusList)
+        }catch (ex:Exception)
+        {
+            ex.printStackTrace()
         }
-
         return dataList
     }
 }

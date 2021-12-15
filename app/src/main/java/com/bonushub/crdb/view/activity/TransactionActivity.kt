@@ -8,8 +8,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
 import com.bonushub.crdb.di.DBModule.appDatabase
@@ -20,22 +18,16 @@ import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.utils.DeviceHelper
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.addPad
-import com.bonushub.crdb.utils.getBaseTID
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
-import com.bonushub.crdb.view.activity.TransactionActivity.EFallbackCode.*
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
-import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.*
-import com.ingenico.hdfcpayment.response.OperationResult
 
 import com.ingenico.hdfcpayment.response.PaymentResult
 import com.ingenico.hdfcpayment.response.TransactionResponse
@@ -48,7 +40,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
-import javax.inject.Inject
+
+private var bankEMIRequestCode = "4"
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew(){
@@ -94,6 +87,7 @@ class TransactionActivity : BaseActivityNew(){
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
         setContentView(emvBinding?.root)
         emvBinding?.subHeaderView?.subHeaderText?.text =transactionTypeEDashboardItem.title
+        globalCardProcessedModel.setTransType(transactionType)
 
         if(transactionTypeEDashboardItem!= EDashboardItem.BRAND_EMI) {
             emvBinding?.cardDetectImg?.visibility = View.GONE
@@ -105,14 +99,14 @@ class TransactionActivity : BaseActivityNew(){
             setupFlow()
         }
 
-        searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
+     /*   searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
             supportICCard(true)
             supportMagCard(true)
             supportRFCard(false)
         })
         CoroutineScope(Dispatchers.Main).launch {
             setupObserver()
-        }
+        }*/
 
     }
 
@@ -126,9 +120,60 @@ class TransactionActivity : BaseActivityNew(){
                 when(cardProcessdatamodel.getReadCardType()){
                     DetectCardType.EMV_CARD_TYPE -> {
                         Toast.makeText(this@TransactionActivity,"EMV mode detected",Toast.LENGTH_LONG).show()
-                    }
+                        when(cardProcessdatamodel.getTransType()){
+                            BhTransactionType.SALE.type -> {
+                                // Checking Insta Emi Available or not
+                                var hasInstaEmi = false
+                                val tpt = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
+                                var limitAmt = 0f
+                                if (tpt?.surChargeValue?.isNotEmpty()!!) {
+                                    limitAmt = try {
+                                        tpt.surChargeValue.toFloat() / 100
+                                    } catch (ex: Exception) {
+                                        0f
+                                    }
+                                }
+                                if (tpt.surcharge.isNotEmpty()) {
+                                    hasInstaEmi = try {
+                                        tpt.surcharge == "1"
+                                    } catch (ex: Exception) {
+                                        false
+                                    }
+                                }
+
+                                // Condition executes, If insta EMI is Available on card
+                                if (limitAmt <= "2000".toLong() && hasInstaEmi) {
+                                    val intent = Intent (this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                        putExtra("cardProcessedData", cardProcessdatamodel)
+                                        putExtra("transactionType", cardProcessdatamodel.getTransType())
+                                    }
+                                    startActivity(intent)
+
+                                }
+                                else {
+
+                                }
+                            }
+
+BhTransactionType.BRAND_EMI.type->{
+    val intent = Intent (this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+        val field57=  "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
+                "^${/*cardBinValue.substring(0, 8)*/""}^$saleAmt"
+
+        putExtra("cardProcessedData",cardProcessdatamodel)
+        putExtra("brandID",brandDataMaster.brandID)
+        putExtra("productID",brandEmiProductData.productID)
+        putExtra("imeiOrSerialNum",imeiOrSerialNum)
+        putExtra("transactionType", cardProcessdatamodel.getTransType())
+    }
+    startActivityForResult(intent,1)
+}
+
+                        }
+
+                   }
                     DetectCardType.CONTACT_LESS_CARD_TYPE -> {
-                        Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
+                      //  Toast.makeText(this@TransactionActivity,"Contactless mode detected",Toast.LENGTH_LONG).show()
                     }
                     DetectCardType.MAG_CARD_TYPE -> {
                         Toast.makeText(this@TransactionActivity,"Swipe mode detected",Toast.LENGTH_LONG).show()
@@ -137,38 +182,14 @@ class TransactionActivity : BaseActivityNew(){
 
                     }
                 }
-              /*  when(cardProcessdatamodel.getFallbackType()){
-                    EMV_fallback.fallBackCode -> {
-                        handleEMVFallbackFromError(this@TransactionActivity.getString(R.string.fallback), this@TransactionActivity.getString(R.string.please_use_another_option), false) {
-                            searchCardViewModel.fetchCardTypeData(
-                                cardProcessdatamodel,
-                                CardOption.create().apply {
-                                    supportICCard(true)
-                                    supportMagCard(true)
-                                    supportRFCard(false)
-                                })
-                            CoroutineScope(Dispatchers.Main).launch {
-                                setupObserver()
-                            }
-                            Toast.makeText(this@TransactionActivity,"EMV Fallback",Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    Swipe_fallback.fallBackCode ->{
-                        Toast.makeText(this@TransactionActivity,"Swipe Fallback",Toast.LENGTH_LONG).show()
 
-                    }
-                    else -> {
-
-                    }
-                }*/
             })
-
         }
     }
 
     //Below function is used to deal with EMV Card Fallback when we insert EMV Card from other side then chip side:-
    fun handleEMVFallbackFromError(title: String, msg: String, showCancelButton: Boolean, emvFromError: (Boolean) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Main) {
             alertBoxWithAction(title,
                 msg, showCancelButton, getString(R.string.positive_button_ok), { alertCallback ->
                     if (alertCallback) {
@@ -178,77 +199,6 @@ class TransactionActivity : BaseActivityNew(){
         }
     }
 
-    private fun setupEMVObserver() {
-        searchCardViewModel.cardTpeData.observe(this, Observer { cardProcessedDataModal ->
-            if(cardProcessedDataModal.getPanNumberData() !=null) {
-                cardProcessedDataModal.getPanNumberData()
-                var ecrID: String
-             /*   try {
-                    DeviceHelper.doSaleTransaction(
-                        SaleRequest(
-                            amount = 300L ?: 0,
-                            tipAmount = 0L ?: 0,
-                            transactionType = TransactionType.SALE,
-                            tid = "30160033",
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
-                        ),
-                        listener = object : OnPaymentListener.Stub() {
-                            override fun onCompleted(result: PaymentResult?) {
-                                val txnResponse = result?.value as? TransactionResponse
-                                val detailResponse = txnResponse?.receiptDetail
-                                    .toString()
-                                    .split(",")
-                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                                when (txnResponse?.responseCode) {
-                                    ResponseCode.SUCCESS.value -> {
-                                        detailResponse.forEach { println(it) }
-                                        //  uids.add(ecrID)
-                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
-                                    }
-                                    ResponseCode.FAILED.value,
-                                    ResponseCode.ABORTED.value -> {
-                                        detailResponse.forEach { println(it) }
-                                    }
-                                    else -> println("Error")
-                                }
-                            }
-                        }
-                    )
-                }
-                catch (exc: Exception){
-                    exc.printStackTrace()
-                }*/
-
-              /*  DeviceHelper.showAdminFunction(object: OnOperationListener.Stub(){
-                    override fun onCompleted(p0: OperationResult?) {
-                        p0?.value?.apply {
-                            println("Status = $status")
-                            println("Response code = $responseCode")
-                        }
-                    }
-                })*/
-
-                Toast.makeText(
-                    this,
-                    cardProcessedDataModal.getPanNumberData().toString(),
-                    Toast.LENGTH_LONG
-                ).show()
-
-                val intent = Intent (this, TenureSchemeActivity::class.java)
-                startActivity(intent)
-
-                /*  lifecycleScope.launch(Dispatchers.IO) {
-                     // serverRepository.getEMITenureData(cardProcessedDataModal.getEncryptedPan().toString())
-                      serverRepository.getEMITenureData("B1DFEFE944EE27E9B78136F34C3EB5EE2B891275D5942360")
-                  }*/
-
-            }
-
-        })
-    }
 
     private suspend fun setupFlow(){
         emvBinding?.baseAmtTv?.text=saleAmt
@@ -259,24 +209,11 @@ class TransactionActivity : BaseActivityNew(){
                     supportMagCard(true)
                     supportRFCard(false)
                 })
+
                 setupObserver()
-                /*  val intent = Intent (this, TenureSchemeActivity::class.java)
-                  startActivity(intent)*/
+
             }
             EDashboardItem.SALE->{
-                /* DeviceHelper.doSettlementtxn(
-                     SettlementRequest(
-                       numberOfTids =  1,
-                         tid = listOf(tid),
-                     ),object: OnOperationListener.Stub(){
-                     override fun onCompleted(p0: OperationResult?) {
-                         p0?.value?.apply {
-                             println("Status = $status")
-                             println("Response code = $responseCode")
-                         }
-                     }
-                 })*/
-
                 val amt=(saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
                 try {
@@ -312,7 +249,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.SALE.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -371,7 +308,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.CASH_AT_POS.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -406,10 +343,10 @@ class TransactionActivity : BaseActivityNew(){
                             amount = amt,
                             cashAmount=cashBackAmount,
                             tid = tid,
-                            transactionUuid = "12345"/*UUID.randomUUID().toString().also {
+                            transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
-                            }*/
+                            }
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -432,7 +369,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.SALE_WITH_CASH.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -492,7 +429,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.REFUND.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -553,7 +490,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.PRE_AUTH.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -616,7 +553,7 @@ class TransactionActivity : BaseActivityNew(){
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.TransactionType.PRE_AUTH_COMPLETE.type
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)
@@ -737,7 +674,7 @@ class TransactionActivity : BaseActivityNew(){
 
     }
 
-    fun goToDashBoard(){
+    private fun goToDashBoard(){
         startActivity(Intent(this@TransactionActivity, NavigationActivity::class.java).apply {
             flags =
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK

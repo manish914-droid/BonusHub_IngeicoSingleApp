@@ -13,10 +13,12 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.TextUtils
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
@@ -52,14 +54,25 @@ class DialogUtilsNew1 {
             textViewHeader.text = header
             edtTextPassword.hint = hint
 
+            if(header?.equals("ADMIN PASSWORD")?:false){
+
+                edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
+
+            }else if(header?.equals("SUPER ADMIN PASSWORD")?:false)
+            {
+                edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(6))
+            }
+
             txtViewOk.setOnClickListener {
 
+                hideKeyboardIfOpen(activity)
                 onClick.onClickOk(dialog = dialog, password = edtTextPassword.text.toString())
                 //dialog.dismiss()
             }
 
             txtViewCancel.setOnClickListener {
 
+                hideKeyboardIfOpen(activity)
                 onClick.onClickCancel()
                 dialog.dismiss()
             }
@@ -300,6 +313,14 @@ class DialogUtilsNew1 {
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }.show()
 
+        }
+
+        fun hideKeyboardIfOpen(activity: Activity) {
+            val view = activity.currentFocus
+            if (view != null) {
+                val imm = activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
         }
 
     }

@@ -1,20 +1,15 @@
 package com.bonushub.crdb.repository
 
-import android.os.DeadObjectException
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.model.CardProcessedDataModal
-import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.IngenicoSettlementResponse
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.Result
-import com.bonushub.pax.utils.TransactionType
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.request.SettlementRequest
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.SettlementResponse
 import com.ingenico.hdfcpayment.type.ResponseCode
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
