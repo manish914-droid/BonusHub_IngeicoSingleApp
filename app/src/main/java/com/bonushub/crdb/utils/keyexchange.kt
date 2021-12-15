@@ -21,6 +21,9 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+interface ITransactionPacketExchange {
+    fun createTransactionPacket(): IWriter
+}
 
 interface IKeyExchangeInit {
     suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter

@@ -14,6 +14,7 @@ import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
+import com.ingenico.hdfcpayment.type.BhTransactionType
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -35,14 +36,14 @@ class CreateTransactionPacket(
     }
 
     override fun createTransactionPacket(): IsoDataWriter = IsoDataWriter().apply {
-        //Condition To Check TransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
-        /*if (cardProcessedData.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+        //Condition To Check BhTransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
+        /*if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
             brandEMIByAccessCodeData =
                 runBlocking(Dispatchers.IO) { BrandEMIAccessDataModalTable.getBrandEMIByAccessCodeData() }
         }*/
 
 
-        /* if (cardProcessedData.getTransType() == TransactionType.BRAND_EMI.type) {
+        /* if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI.type) {
            // todo same
           //  brandEMIData = runBlocking(Dispatchers.IO) { brandEMIData.getAllEMIData() }
         }*/
@@ -54,7 +55,7 @@ class CreateTransactionPacket(
                     Mti.REVERSAL.mti
                 } else {
                     when (cardProcessedData.getTransType()) {
-                        TransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
+                       BhTransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
                         else -> Mti.DEFAULT_MTI.mti
                     }
                 }
@@ -64,7 +65,7 @@ class CreateTransactionPacket(
 
             //Transaction Amount Field
             //val formattedTransAmount = "%.2f".format(cardProcessedData.getTransactionAmount()?.toDouble()).replace(".", "")
-            if (cardProcessedData.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+            if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
 
             } else {
                 addField(
@@ -125,7 +126,7 @@ class CreateTransactionPacket(
 
             //Field 54 in case od sale with cash AND Cash at POS.
             when (cardProcessedData.getTransType()) {
-                TransactionType.CASH_AT_POS.type, TransactionType.SALE_WITH_CASH.type ->
+                BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type ->
                     addFieldByHex(
                         54,
                         addPad(cardProcessedData.getOtherAmount().toString(), "0", 12, true)
@@ -164,24 +165,24 @@ class CreateTransactionPacket(
 
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
             when (cardProcessedData.getTransType()) {
-                TransactionType.EMI_SALE.type -> {
+                BhTransactionType.EMI_SALE.type -> {
 
 
                 }
 *//*0|46|1|00,460133,54,135,25,586,650000,0,635960,3,1300,216596,14040,635748,12,8,,8287305603,,0,0,0,0,,*//*
-                TransactionType.BRAND_EMI.type -> {
+                BhTransactionType.BRAND_EMI.type -> {
 
                 }
 *//*                0|43|1|00,438628,54,142,11,2358,1000000,0,1000000,3,1300,340581,0,1041743,,abcdxyz,,,,0,0,200.0,20000,42942319,
                   0|60|5|00,60832632,52,144,11,2356,800000,18320,781680,3,1400,266663,0,815623,,12qw3e,,,,0,0,200.0,15634,52429840,*//*
 
-                TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
+                BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
                     //cardProcessedData.getMobileBillExtraData()?.second replace with billno
 
                 }
 
                 else -> {
-                    indicator = if( cardProcessedData.getTransType()==TransactionType.TEST_EMI.type ){
+                    indicator = if( cardProcessedData.getTransType()==BhTransactionType.TEST_EMI.type ){
                             logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
                         "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
                     }else
@@ -237,10 +238,10 @@ class CreateTransactionPacket(
 
             //  val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
 
-            val walletIssuerID = if (cardProcessedData.getTransType() == TransactionType.EMI_SALE.type || cardProcessedData.getTransType() == TransactionType.BRAND_EMI.type) {
+            val walletIssuerID = if (cardProcessedData.getTransType() == BhTransactionType.EMI_SALE.type || cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI.type) {
                // bankEmiTandCData?.issuerID?.let { addPad(it, "0", 2) } ?: 0
             }
-            else if( cardProcessedData.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type){
+            else if( cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type){
               ///  brandEMIByAccessCodeDataModel?.issuerID?.let { addPad(it, "0", 2) } ?: 0
             }
             else {
