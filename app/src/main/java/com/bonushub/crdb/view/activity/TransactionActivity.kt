@@ -343,10 +343,10 @@ BhTransactionType.BRAND_EMI.type->{
                             amount = amt,
                             cashAmount=cashBackAmount,
                             tid = tid,
-                            transactionUuid = "12345"/*UUID.randomUUID().toString().also {
+                            transactionUuid = UUID.randomUUID().toString().also {
                                 ecrID = it
 
-                            }*/
+                            }
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
