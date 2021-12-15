@@ -221,15 +221,17 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         val bindingg = NewPrintCustomerCopyBinding.inflate(LayoutInflater.from(this))
 
         dialogBuilder.setContentView(bindingg.root)
-        if (title == getString(R.string.print_customer_copy)|| title == getString(R.string.sms_upi_pay)) {
+        if (title == getString(R.string.print_customer_copy)|| title == getString(R.string.sms_upi_pay)|| title == getString(R.string.no_receipt)) {
             if(title==getString(R.string.sms_upi_pay)){
                 bindingg.imgPrinter.setImageResource(R.drawable.ic_link_icon)
             } else if(title==getString(R.string.print_customer_copy)){
                 bindingg.imgPrinter.setImageResource(R.drawable.ic_printer)
+            } else if(title==getString(R.string.no_receipt)){
+                bindingg.imgPrinter.setImageResource(R.drawable.ic_info)
             }
             bindingg.imgPrinter.visibility = View.VISIBLE
         } else {
-            bindingg.imgPrinter.visibility = View.GONE
+           // bindingg.imgPrinter.visibility = View.GONE
         }
         if(positiveButtonText==""){
             bindingg.yesBtn.visibility=View.GONE
@@ -256,7 +258,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
                 cancelButtonCallback(true)
             }
         } else {
-            bindingg.imgPrinter.visibility = View.GONE
+            //bindingg.imgPrinter.visibility = View.GONE
             bindingg.noBtn.visibility = View.GONE
         }
         //     val alert: androidx.appcompat.app.AlertDialog = dialogBuilder.create()

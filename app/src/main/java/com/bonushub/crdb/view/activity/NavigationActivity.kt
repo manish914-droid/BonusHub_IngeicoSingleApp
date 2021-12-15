@@ -347,7 +347,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //region============================On Back Pressed======================
     override fun onBackPressed() {
         if (navHostFragment?.navController?.currentDestination?.label ==
-            NavControllerFragmentLabel.DASHBOARD_FRAGMENT_LABEL.destinationLabel
+            NavControllerFragmentLabel.DASHBOARD_FRAGMENT_LABEL.destinationLabel || navHostFragment?.navController?.currentDestination?.label == "fragment_init"
         ) {
             Log.d("Dashboard:- ", "Inflated")
             if (isExpanded)
@@ -869,8 +869,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
                             hideProgress()
                             CoroutineScope(Dispatchers.Main).launch {
-                                alertBoxWithAction("",this@NavigationActivity.getString(R.string.successfull_init),
-                                    false, "", {}, {})
+                                alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                    this@NavigationActivity.getString(R.string.successfull_init))
                             }
 
                         }
@@ -885,7 +885,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                   //  ToastUtils.showToast(this@NavigationActivity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
-                   showProgress("Sending/Receiving From Host")
+                   showProgress(getString(R.string.sending_receiving_host))
 
                 }
             }

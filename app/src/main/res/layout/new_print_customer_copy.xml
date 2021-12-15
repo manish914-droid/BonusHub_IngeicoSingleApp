@@ -100,7 +100,7 @@
         android:layout_height="80dp"
         android:layout_centerHorizontal="true"
         android:elevation="5dp"
-        android:src="@drawable/ic_printer"
+        android:src="@drawable/ic_info"
         android:visibility="visible" />
 
 

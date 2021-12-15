@@ -221,8 +221,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 } else {
 
-                    DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.empty_batch),getString(R.string.last_receipt_not_available), false)
-
+                   // DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.empty_batch),getString(R.string.last_receipt_not_available), false)
+                    iDiag?.getInfoDialog(getString(R.string.empty_batch),getString(R.string.last_receipt_not_available)){}
                 }
 
                 logger("repost", ReportsItem.LAST_RECEIPT._name)
@@ -307,8 +307,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     }else{
                                         launch(Dispatchers.Main) {
                                             iDiag?.hideProgress()
-                                            DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
-
+                                            //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
+                                            iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
                                         }
                                     }
 

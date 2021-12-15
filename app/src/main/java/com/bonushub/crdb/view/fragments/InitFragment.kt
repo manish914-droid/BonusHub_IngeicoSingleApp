@@ -96,8 +96,8 @@ class InitFragment : Fragment() {
                         Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
                             iDialog?.hideProgress()
                             CoroutineScope(Dispatchers.Main).launch {
-                                (activity as? NavigationActivity)?.alertBoxWithAction("", requireContext().getString(R.string.successfull_init),
-                                    false, "", {}, {})
+                                (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                    requireContext().getString(R.string.successfull_init))
                             }
 
                         }
@@ -113,7 +113,7 @@ class InitFragment : Fragment() {
                     }
                 }
                 Status.LOADING -> {
-                    iDialog?.showProgress("Sending/Receiving From Host")
+                    iDialog?.showProgress(getString(R.string.sending_receiving_host))
 
                 }
             }
