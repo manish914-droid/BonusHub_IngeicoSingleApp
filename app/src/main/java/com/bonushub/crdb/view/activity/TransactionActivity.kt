@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
@@ -18,11 +19,14 @@ import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.SearchViewModel
+import com.bonushub.crdb.viewmodel.SettlementViewModel
+import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -47,7 +51,7 @@ private var bankEMIRequestCode = "4"
 class TransactionActivity : BaseActivityNew(){
     private var emvBinding: ActivityEmvBinding? = null
     private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
-
+    private val transactionViewModel : TransactionViewModel by viewModels()
     //used for other cash amount
     private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
 
@@ -96,6 +100,7 @@ class TransactionActivity : BaseActivityNew(){
         }
         lifecycleScope.launch(Dispatchers.IO) {
             tid=  getBaseTID(appDatabase.appDao)
+            globalCardProcessedModel.setTransType(transactionType)
             setupFlow()
         }
 
@@ -246,6 +251,15 @@ BhTransactionType.BRAND_EMI.type->{
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData=BatchTable(receiptDetail)
+                                            creatCardProcessingModelData(receiptDetail)
+                                            val transactionISO =
+                                                CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+
+                                            val jsonResp=Gson().toJson(transactionISO)
+                                            println(jsonResp)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                transactionViewModel.serverCall(transactionISO)
+                                            }
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
@@ -680,4 +694,27 @@ BhTransactionType.BRAND_EMI.type->{
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
     }
+
+    fun creatCardProcessingModelData(receiptDetail: ReceiptDetail){
+        globalCardProcessedModel.setProcessingCode("920001")
+        receiptDetail.txnAmount?.let { globalCardProcessedModel.setTransactionAmount(it.toLong()) }
+        receiptDetail.txnOtherAmount?.let { globalCardProcessedModel.setOtherAmount(it.toLong()) }
+        globalCardProcessedModel.setMobileBillExtraData(Pair(mobileNumber, billNumber))
+        receiptDetail.stan?.let { globalCardProcessedModel.setAuthRoc(it) }
+        globalCardProcessedModel.setCardMode("0553- emv with pin")
+        globalCardProcessedModel.setRrn(receiptDetail?.rrn)
+        receiptDetail?.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
+        globalCardProcessedModel.setTid(receiptDetail?.tid)
+        globalCardProcessedModel.setMid(receiptDetail?.mid)
+        globalCardProcessedModel.setBatch(receiptDetail?.batchNumber)
+        globalCardProcessedModel.setInvoice(receiptDetail?.invoice)
+        val date = receiptDetail.dateTime
+        val parts = date?.split(" ")
+        globalCardProcessedModel.setDate(parts!![0])
+        globalCardProcessedModel.setTime(parts[1])
+        globalCardProcessedModel.setTimeStamp(receiptDetail.dateTime!!)
+        globalCardProcessedModel.setPosEntryMode("0553")
+    }
+
+
 }

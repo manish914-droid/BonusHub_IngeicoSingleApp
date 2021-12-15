@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.doInitializtion
 
@@ -25,9 +27,12 @@ import com.bonushub.crdb.utils.doInitializtion
 
 import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.activity.IFragmentRequest
+import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
+import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.EDashboardItem
+import com.mindorks.example.coroutines.utils.Status
 
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,6 +49,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     }
     @Inject
     lateinit var appDao: AppDao
+    private val settlementViewModel : SettlementViewModel by viewModels()
     private var ioSope = CoroutineScope(Dispatchers.IO)
     private var defaultSope = CoroutineScope(Dispatchers.Default)
     lateinit var dashboardViewModel : DashboardViewModel
@@ -90,7 +96,8 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                         var listofTids = checkBaseTid(appDao)
                         println("List of tids are"+listofTids)
                         delay(1000)
-                        doInitializtion(appDao,listofTids)
+                       // sett()
+                    doInitializtion(appDao,listofTids)
                     }.await()
 
                 }

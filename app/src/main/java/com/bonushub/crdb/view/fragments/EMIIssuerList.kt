@@ -59,6 +59,7 @@ class EMIIssuerList : Fragment() {
     private var allIssuerTenureList: MutableList<TenureBankModal> = mutableListOf()
     private val enquiryAmtStr by lazy { arguments?.getString("enquiryAmt") ?: "0" }
     private val mobileNumber by lazy { arguments?.getString("mobileNumber") ?: "" }
+    private val brandId by lazy { arguments?.getString("brandId") ?: "" }
     var emiCatalogueImageList: MutableMap<String, Uri>? = null
     private var mobileNumberOnOff: Boolean = false
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
@@ -129,9 +130,9 @@ class EMIIssuerList : Fragment() {
             binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
             //  brandEMISelectedData = runBlocking(Dispatchers.IO) { BrandEMIDataTable.getAllEMIData() }
-         /*   field57RequestData =
-                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^${brandEMIData?.brandID}" +
-                        "^${brandEMIData?.productID}^^^$enquiryAmount"*/
+            field57RequestData =
+                "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^${brandId}" +
+                        "^${brandEMIData?.productID}^^^$enquiryAmount"
         } else {
             binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bankEmiCatalogue)
             //  binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)

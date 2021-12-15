@@ -560,7 +560,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     fun getTctData(): TerminalCommunicationTable? {
         var tctData: TerminalCommunicationTable? = null
         runBlocking(Dispatchers.IO) {
-            tctData = appDatabase?.appDao?.getTerminalCommunicationTableData()?.get(0)
+            tctData = appDatabase.appDao.getTerminalCommunicationTableData()?.get(0)
         }
         return tctData
     }
@@ -1123,6 +1123,18 @@ object Field48ResponseTimestamp {
             println(jsonResp)
         }
         return tptData
+    }
+//endregion
+
+    //region======================Get TPT Data:-
+    fun getIssuerData(issuerId:String): IssuerParameterTable? {
+        var issuerData: IssuerParameterTable? = null
+        runBlocking(Dispatchers.IO) {
+            issuerData =  DBModule.appDatabase?.appDao?.getIssuerTableDataByIssuerID(issuerId)
+            val jsonResp=Gson().toJson(issuerData)
+            println(jsonResp)
+        }
+        return issuerData
     }
 //endregion
 

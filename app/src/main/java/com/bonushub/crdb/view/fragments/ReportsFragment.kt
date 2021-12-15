@@ -527,14 +527,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        /*PrintUtil(context).printSettlementReportupdate(
-                                            context,
-                                            batList1 as MutableList<BatchFileDataTable>,
-                                            isSettlementSuccess = false,
-                                            isLastSummary = true
-                                        ) {
-                                            iDiag?.hideProgress()
-                                        }*/
+                                        PrintUtil(activity).printSettlementReportupdate(activity, batList1 as MutableList<BatchTable>, true,true) {
+
+                                        }
                                     } catch (ex: java.lang.Exception) {
                                         ex.message ?: getString(R.string.error_in_printing)
                                     } finally {

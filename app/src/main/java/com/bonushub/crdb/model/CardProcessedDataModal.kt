@@ -75,8 +75,14 @@ class CardProcessedDataModal : Serializable {
 
      var testEmiOption:String="0"
     var indicatorF58=""
-
-
+/// region=====================================================Ingenico response
+    private var rrn: String? = null
+    private var tid: String? = null
+    private var mid: String? = null
+    private var batch: String? = null
+    private var invoice: String? = null
+    private var cardMode: String? = null
+    //region end
 
     fun getTrack1Data(): String? {
         return track1Data
@@ -438,6 +444,7 @@ class CardProcessedDataModal : Serializable {
         return cardlabel
     }
 
+
     fun setDoubeTap(doubleTap: Boolean) {
         this.doubleTap = doubleTap
     }
@@ -460,5 +467,52 @@ class CardProcessedDataModal : Serializable {
 
     fun setMobileBillExtraData(mobileBillExtraData: Pair<String, String>) {
         this.mobileBillExtraData = mobileBillExtraData
+    }
+
+    fun setRrn(rrn: String?) {
+        this.rrn = rrn
+    }
+
+    fun getRrn(): String? {
+        return rrn
+    }
+
+    fun setTid(tid: String?) {
+        this.tid = tid
+    }
+
+    fun getTid(): String? {
+        return tid
+    }
+
+    fun setMid(mid: String?) {
+        this.mid = mid
+    }
+
+    fun getMid(): String? {
+        return mid
+    }
+    fun setBatch(batch: String?) {
+        this.batch = batch
+    }
+
+    fun getBatch(): String? {
+        return batch
+    }
+
+    fun setInvoice(invoice: String?) {
+        this.invoice = invoice
+    }
+
+    fun getInvoice(): String? {
+        return invoice
+    }
+
+    fun setCardMode(cardMode: String?) {
+        this.cardMode = cardMode
+    }
+
+    fun getCardMode(): String? {
+        return cardMode
     }
 }

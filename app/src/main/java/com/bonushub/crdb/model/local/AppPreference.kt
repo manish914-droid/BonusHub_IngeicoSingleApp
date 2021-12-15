@@ -21,7 +21,8 @@ const val HDFCIssuerID="50"
 object AppPreference {
 
     private val TAG = AppPreference::class.java.simpleName
-
+    const val PC_NUMBER_KEY = "pc_number_key"
+    const val PC_NUMBER_KEY_2 = "pc_number_key_2"
     const val AMEX_BANK_CODE = "07"
     const val ROC_V2 = "roc_tan_v2"
     const val WALLET_ISSUER_ID = "50"
@@ -141,7 +142,7 @@ object AppPreference {
 
 
     //region Below method is used to Save Batch File Data in App Preference:-
-    fun saveBatchInPreference(batchList: MutableList<BatchTable?>?) {
+    fun saveBatchInPreference(batchList: MutableList<BatchTable>) {
         val tempBatchDataList = Gson().toJson(
             batchList,
             object : TypeToken<List<BatchTable>>() {}.type

@@ -142,7 +142,7 @@ class PrintUtil(context: Context?) {
                 textBlockList.clear()
 
 
-                textBlockList.add(sigleLineformat("CARD NO:${"00000gl3790"}", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("CARD NO:${receiptDetail.maskedPan}", AlignMode.LEFT))
                 textBlockList.add(sigleLineformat("Chip", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
 
@@ -257,35 +257,42 @@ class PrintUtil(context: Context?) {
     private fun saleTransaction(receiptDetail: ReceiptDetail) {
         textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
         val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
+        val tipAmount = ((("10000")?.toLong())?.div(100)).toString()
         textBlockList.add(sigleLineformat("INR:${amt}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
-
         if (receiptDetail.txnName.equals("SALE")) {
-            textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
-            textBlockList.add(sigleLineformat(".............", AlignMode.RIGHT))
+
+            if(tipAmount == "0") {
+                textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat(".............", AlignMode.RIGHT))
+            }else{
+                textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat(tipAmount, AlignMode.RIGHT))
+            }
         } else {
             textBlockList.add(sigleLineformat("CASE AMOUNT: ", AlignMode.LEFT))
-            textBlockList.add(sigleLineformat("INR:${receiptDetail.txnAmount}", AlignMode.RIGHT))
+            textBlockList.add(sigleLineformat("INR:${tipAmount}", AlignMode.RIGHT))
         }
         // textBlockList.add(sigleLineformat( "00",AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
-
+        val totalAmount = "%.2f".format((amt.toDouble() + tipAmount.toDouble()))
         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat("INR:${amt}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat("INR:${totalAmount}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
     }
 
     private fun voidTransaction(receiptDetail: ReceiptDetail) {
         textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat("INR:${receiptDetail.txnAmount}", AlignMode.RIGHT))
+        val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
+        textBlockList.add(sigleLineformat("INR:${amt}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat("INR:${receiptDetail.txnAmount}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat("INR:${amt}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
     }

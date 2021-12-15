@@ -648,7 +648,7 @@ EDashboardItem.PREAUTH_COMPLETE->{
                         //  sendStartSale(inputAmountEditText?.text.toString(), extraPairData)
                         iFrReq?.onFragmentRequest(
                             EDashboardItem.EMI_ENQUIRY,
-                            Pair(saleAmount.toString().trim(), "0"), it
+                            Pair(saleAmount.toString().trim(),"0"), it
                         )
                     }
                 } else {
@@ -661,7 +661,16 @@ EDashboardItem.PREAUTH_COMPLETE->{
 
 
             EDashboardItem.BRAND_EMI_CATALOGUE -> {
-
+                when {
+                    TextUtils.isEmpty(
+                        saleAmount.toString().trim()
+                    ) -> showToast( "Enter Sale Amount")
+                    //  TextUtils.isEmpty(binding?.mobNumbr?.text?.toString()?.trim()) -> VFService.showToast("Enter Mobile Number")
+                    else -> iFrReq?.onFragmentRequest(
+                        EDashboardItem.BRAND_EMI_CATALOGUE,
+                        Pair(saleAmount.toString().trim(), brandEmiSubCatData?.brandID)
+                    )
+                }
             }
 
             EDashboardItem.BANK_EMI_CATALOGUE -> {
