@@ -1,4 +1,4 @@
-package com.bonushub.crdb.view.fragments
+package com.bonushub.crdb.view.fragments.pre_auth
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,9 +10,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPreAuthBinding
-import com.bonushub.crdb.databinding.ItemDashboartBinding
+import com.bonushub.crdb.databinding.ItemReportsBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.adapter.BankFunctionsAdapter
 import com.bonushub.pax.utils.EDashboardItem
 
 
@@ -48,10 +47,8 @@ class PreAuthFragment : Fragment() {
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)
 
         binding?.rvPerAuthCategory?.apply{
-            layoutManager = GridLayoutManager(activity, 3)
-            itemAnimator = DefaultItemAnimator()
+            layoutManager = GridLayoutManager(activity, 1)
             adapter = mAdapter
-            scheduleLayoutAnimation()
         }
         /*if (isExpanded) dashBoardAdapter.onUpdatedItem(list) else dashBoardAdapter.onUpdatedItem(
                 list
@@ -73,7 +70,7 @@ class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>,var
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreAuthCategoryViewHolder {
 
-        val itemBinding = ItemDashboartBinding.inflate(LayoutInflater.from(parent.context),
+        val itemBinding = ItemReportsBinding.inflate(LayoutInflater.from(parent.context),
             parent,
             false)
         return PreAuthCategoryViewHolder(
@@ -88,10 +85,9 @@ class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>,var
 
         val model = listItem[position]
 
-        holder.viewBinding.itemLogoIv.setImageResource(model.res)
-        holder.viewBinding.itemTitleTv.text = model.title
+        holder.viewBinding.textView.text = model.title
 
-        holder.viewBinding.itemParentRv.setOnClickListener {
+        holder.viewBinding.relLayParent.setOnClickListener {
             cb(model)
         }
 
@@ -99,7 +95,7 @@ class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>,var
 
 
 
-    inner class PreAuthCategoryViewHolder(val viewBinding: ItemDashboartBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+    inner class PreAuthCategoryViewHolder(val viewBinding: ItemReportsBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
     }
 }

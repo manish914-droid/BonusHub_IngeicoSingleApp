@@ -119,6 +119,7 @@ class NewInputAmountFragment : Fragment() {
             parentFragmentManager.popBackStackImmediate()
         }
         binding?.subHeaderView?.subHeaderText?.text=eDashBoardItem.title
+        binding?.subHeaderView?.headerImage?.setImageResource(eDashBoardItem.res)
         initAnimation()
         when (eDashBoardItem) {
             EDashboardItem.SALE_WITH_CASH -> {

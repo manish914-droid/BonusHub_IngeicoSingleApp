@@ -42,6 +42,10 @@ import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
+import com.bonushub.crdb.view.fragments.pre_auth.PreAuthCompleteFragment
+import com.bonushub.crdb.view.fragments.pre_auth.PreAuthFragment
+import com.bonushub.crdb.view.fragments.pre_auth.PreAuthPendingFragment
+import com.bonushub.crdb.view.fragments.pre_auth.PreAuthVoidFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.*
@@ -645,7 +649,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
             }
-            EDashboardItem.PREAUTH_COMPLETE->{  if (checkInternetConnection()) {
+            EDashboardItem.PREAUTH_COMPLETE->{
+
+                transactFragment(PreAuthCompleteFragment(),true)
+
+               /* if (checkInternetConnection()) {
                 CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                     println("TID LIST --->  $listofTids")
@@ -655,7 +663,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
             } else {
                 ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
-            }}
+            }*/
+
+            }
             EDashboardItem.EMI_ENQUIRY -> {
                 if (Field48ResponseTimestamp.checkInternetConnection()) {
                     transactFragment(EMICatalogue().apply {
@@ -703,7 +713,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 if (!action.childList.isNullOrEmpty()) {
                     // dashBoardCatagoryDialog(action.childList!!)
                     if (checkInternetConnection()) {
-                        (transactFragment(PreAuthFragment()
+                        (transactFragment(
+                            PreAuthFragment()
                             .apply {
                                 arguments = Bundle().apply {
                                     putSerializable(
@@ -722,6 +733,16 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
 
 
+            }
+
+            EDashboardItem.VOID_PREAUTH ->{
+
+                transactFragment(PreAuthVoidFragment(),true)
+            }
+
+            EDashboardItem.PENDING_PREAUTH ->{
+
+                transactFragment(PreAuthPendingFragment(),true)
             }
 
             EDashboardItem.MERCHANT_REFERRAL->{

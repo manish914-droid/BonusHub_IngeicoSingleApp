@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".view.fragments.pre_auth.PreAuthPendingDetailsFragment">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:orientation="vertical"
+        android:background="@drawable/edge_blue_bg_white"
+        android:elevation="@dimen/pad_5"
+        android:padding="@dimen/pad_15">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="@dimen/pad_5"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="@dimen/pad_0"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2">
+
+                <TextView
+                    android:id="@+id/txtViewBatchTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/muli_light"
+                    android:text="BATCH NO:"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewBatch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_toEndOf="@+id/txtViewBatchTitle"
+                    android:fontFamily="@font/muli_light"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewPanTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewBatch"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:fontFamily="@font/muli_light"
+                    android:text="PAN:"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewPan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewBatch"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:layout_toEndOf="@+id/txtViewPanTitle"
+                    android:fontFamily="@font/muli_light"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewDateTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewPan"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:fontFamily="@font/muli_light"
+                    android:text="DATE:"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewPan"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:layout_toEndOf="@+id/txtViewDateTitle"
+                    android:fontFamily="@font/muli_light"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="@dimen/pad_0"
+                android:layout_height="wrap_content"
+                android:layout_weight=".8">
+
+                <TextView
+                    android:id="@+id/txtViewRocTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/muli_light"
+                    android:text="ROC:"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewRoc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_toEndOf="@+id/txtViewRocTitle"
+                    android:fontFamily="@font/muli_light"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewAmtTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewRoc"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:fontFamily="@font/muli_light"
+                    android:text="AMT:"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewAmt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewRoc"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:layout_toEndOf="@+id/txtViewAmtTitle"
+                    android:fontFamily="@font/muli_light"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewTimeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewAmt"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:fontFamily="@font/muli_light"
+                    android:text="TIME:"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewAmt"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:layout_toEndOf="@+id/txtViewTimeTitle"
+                    android:fontFamily="@font/muli_light"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/amount_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_edge"
+            android:layout_marginTop="@dimen/pad_15"
+            android:drawablePadding="@dimen/pad_16"
+            android:ems="10"
+            android:gravity="start|center_vertical"
+            android:hint="ENTER AMOUNT"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:lines="1"
+            android:fontFamily="@font/muli_regular"
+            android:padding="@dimen/pad_12"
+            android:textColor="@color/txt_color"
+            android:textColorHint="@color/colorGrey"
+            android:textSize="@dimen/text_size_regular" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="45dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="45dp"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtViewComplete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:layout_weight="1"
+                android:background="@drawable/edge_blue_bg_white"
+                android:gravity="center"
+                android:padding="7dp"
+                android:text="COMPLETE"
+                android:textAllCaps="true"
+                android:textColor="@color/txt_color"
+                android:fontFamily="@font/muli_regular"
+                android:textSize="@dimen/text_size_small" />
+
+
+            <TextView
+                android:id="@+id/txtViewPrint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_weight="1"
+                android:background="@drawable/edge_white_bg_blue"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="PRINT"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small"
+                android:fontFamily="@font/muli_regular"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

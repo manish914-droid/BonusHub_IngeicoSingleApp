@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".view.fragments.pre_auth.PreAuthPendingFragment">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible" />
+
+    <Button
+        android:id="@+id/btnPrint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PRINT"
+        android:layout_gravity="center_horizontal"
+        android:paddingStart="@dimen/pad_30"
+        android:paddingEnd="@dimen/pad_30"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small"
+        android:fontFamily="@font/muli_regular"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPerAuthPending"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/pad_10"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"/>
+
+</LinearLayout>
