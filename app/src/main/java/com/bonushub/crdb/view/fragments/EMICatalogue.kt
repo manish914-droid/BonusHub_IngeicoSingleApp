@@ -75,7 +75,7 @@ class EMICatalogue : Fragment() {
             (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable("type", EDashboardItem.BANK_EMI_CATALOGUE)
-                   // putString(NavigationActivity.INPUT_SUB_HEADING, "")
+                     putString(NavigationActivity.INPUT_SUB_HEADING, "")
                 }
             })
         }

@@ -190,7 +190,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             findViewById<TextView>(R.id.msg_dialog_title).text = title
             findViewById<TextView>(R.id.msg_dialog_msg).text = msg
 
-            with(findViewById<Button>(R.id.msg_dialog_ok)) {
+            with(findViewById<TextView>(R.id.msg_dialog_ok)) {
                 text = positiveTxt
                 setOnClickListener {
                     dismiss()
@@ -199,7 +199,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             }
 
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            findViewById<Button>(R.id.msg_dialog_cancel).apply {
+            findViewById<TextView>(R.id.msg_dialog_cancel).apply {
                 text = negativeTxt
                 setOnClickListener {
                     dismiss()

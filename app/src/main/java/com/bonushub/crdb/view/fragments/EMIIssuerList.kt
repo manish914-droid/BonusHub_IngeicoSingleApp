@@ -63,7 +63,7 @@ class EMIIssuerList : Fragment() {
     var emiCatalogueImageList: MutableMap<String, Uri>? = null
     private var mobileNumberOnOff: Boolean = false
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
-    private val enquiryAmount by lazy { ((enquiryAmtStr.toFloat()) * 100).toLong() }
+    private var enquiryAmount : Long? =null
 
   private val brandEMIData by lazy { arguments?.getSerializable("brandEMIDataModal") as BrandEMIProductDataModal
   ? }
@@ -111,6 +111,8 @@ class EMIIssuerList : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mobileNumberOnOff = !TextUtils.isEmpty(mobileNumber)
+        enquiryAmount=((enquiryAmtStr.toFloat()) * 100).toLong()
+
        //emiCatalogueImageList = arguments?.getSerializable("imagesData") as MutableMap<String, Uri>
         setUpRecyclerViews()
         binding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
@@ -126,6 +128,7 @@ class EMIIssuerList : Fragment() {
         )
         (activity as IDialog).showProgress()
         Log.d("enquiryAmtStr:- ", enquiryAmtStr)
+        Log.d("enquiryAmount:- ", enquiryAmount.toString())
         if (action == UiAction.BRAND_EMI_CATALOGUE) {
             binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
@@ -139,12 +142,12 @@ class EMIIssuerList : Fragment() {
             field57RequestData =
                 if (AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE) != 0L)
                     "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^${
-                        AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE)
+                        enquiryAmount
                     }"
                 else
                     "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^$enquiryAmount"
         }
-
+        Log.d("enquiryAmount:- ", field57RequestData.toString())
         lifecycleScope.launch(Dispatchers.IO) {
             emiissuerListViewModel.getIssuerListData(field57RequestData)
         }
@@ -188,7 +191,7 @@ class EMIIssuerList : Fragment() {
                             AppPreference.setLongData(
                                 AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE,
 
-                                enquiryAmount
+                                enquiryAmount!!
                             )
                             temporaryAllIssuerList =
                                 allIssuerBankList.distinctBy { it.issuerID }.toMutableList()
