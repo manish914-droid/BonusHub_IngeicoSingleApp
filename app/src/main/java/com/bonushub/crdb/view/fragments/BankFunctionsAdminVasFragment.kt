@@ -65,7 +65,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
         try {
             iDialog = (activity as NavigationActivity)
-logger("iDialog",""+iDialog.toString())
+         logger("iDialog",""+iDialog.toString())
         }catch (ex:Exception)
         {
             ex.printStackTrace()
@@ -151,25 +151,7 @@ logger("iDialog",""+iDialog.toString())
                     ToastUtils.showToast(requireContext(),getString(R.string.no_internet_available_please_check_your_internet))
                 }
 
-                // INIT
-               // iDialog?.showProgress(getString(R.string.please_wait_host))
 
-                /*runBlocking {
-                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
-
-                    if(!tids.get(0).isEmpty()!!) {
-
-                        logger("get tid", "by table")
-                        // get tid from table and init
-
-                        initViewModel.insertInfo1(tids[0] ?:"")
-                        observeMainViewModel()
-                    }else{
-                       // get tid by user
-                        logger("get tid","by user")
-                        (activity as NavigationActivity).transactFragment(InitFragment())
-                    }
-                }*/
 
             }
 

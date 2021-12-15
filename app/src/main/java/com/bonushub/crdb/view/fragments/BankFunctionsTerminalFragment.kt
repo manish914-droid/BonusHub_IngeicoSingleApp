@@ -53,7 +53,8 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
     lateinit var mAdapter : BankFunctionsTerminalParamAdapter
     lateinit var dataList: ArrayList<TableEditHelper?>
-    lateinit var lastTid: String
+    private var lastTid: String? = null
+    private var position: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,7 +88,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
-
+        observeMainViewModel()
 
     }
 
@@ -200,7 +201,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                             dataList[position]?.titleValue = it
                             dataList[position]?.isUpdated = true
                             mAdapter.notifyItemChanged(position)
-                            updateTable(position,lastTid,it)
+                            updateTable(position,lastTid ?: "",it)
                         }
 
                     }
@@ -217,7 +218,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         }
     }
 
-    suspend fun updateTable(position: Int, lastTidValue: String, updatedTid: String) {
+    suspend fun updateTable(positionValue: Int, lastTidValue: String, updatedTid: String) {
         bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())?.observe(viewLifecycleOwner,{ isUpdateTid ->
 
             if(isUpdateTid){
@@ -230,7 +231,9 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                             AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName, "0")
                             AppPreference.saveString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName, "0")
                             initViewModel.insertInfo1(updatedTid)
-                            observeMainViewModel(position,lastTidValue)
+                           // observeMainViewModel(position,lastTidValue)
+                            position = positionValue
+                            lastTid = lastTidValue
 
 
                     }
@@ -240,7 +243,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     }
 
 
-    private fun observeMainViewModel(position: Int, lastTidValue: String) {
+    private fun observeMainViewModel() {
 
         initViewModel.initData.observe(viewLifecycleOwner, Observer { result ->
 
@@ -257,7 +260,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                     }
                 }
                 Status.ERROR -> {
-                    dataList[position]?.titleValue = lastTidValue
+                    dataList[position]?.titleValue = lastTid ?: ""
                     dataList[position]?.isUpdated = true
                     mAdapter.notifyItemChanged(position)
                     iDialog?.hideProgress()
