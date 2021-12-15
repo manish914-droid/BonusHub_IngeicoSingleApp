@@ -366,7 +366,7 @@ interface AppDao{
     fun getBatchData(): LiveData<MutableList<BatchTable?>>?
 
     @Query("SELECT * FROM BatchTable")
-    suspend fun getAllBatchData(): MutableList<BatchTable?>
+    suspend fun getAllBatchData(): MutableList<BatchTable>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBatchData(brandSubCat: BatchTable): Long?

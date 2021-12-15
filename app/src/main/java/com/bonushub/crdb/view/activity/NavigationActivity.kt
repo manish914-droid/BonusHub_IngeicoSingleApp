@@ -750,7 +750,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         subHeading: String,
         action: EDashboardItem, testEmiOption: String = "0"
     ) {
-        if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+        if (
             !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
         ) {
@@ -954,19 +954,20 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         //region Setting AutoSettle Status and Last Settlement DateTime:-
 
                             //Here printing will be there
-                            if (true) {
+                        PrintUtil(this).printSettlementReportupdate(this, batchList, true) {
+                            if (it) {
 
                                 //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                 runBlocking(Dispatchers.IO) {
                                     AppPreference.saveBatchInPreference(batchList)
                                     //Delete All BatchFile Data from Table after Settlement:-
-                                    appDao.deleteBatchFileTable()
+                                    appDao.deleteBatchTable()
 
 
-                                  //  resetRoc()
+                                    //  resetRoc()
 
                                     //Here we are updating invoice by 1
-                                   appDao.updateTPTInvoiceNumber("1".padStart(6, '0'), TableType.TERMINAL_PARAMETER_TABLE.code)
+                                    appDao.updateTPTInvoiceNumber("1".padStart(6, '0'), TableType.TERMINAL_PARAMETER_TABLE.code)
 
                                     //Here we are incrementing sale batch number also for next sale:-
                                     val updatedBatchNumber = getTptData()?.batchNumber?.toInt()?.plus(1)
@@ -992,7 +993,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         when (isAppUpdateAvailableData) {
                                             "00" -> {
                                                 if (terminalParameterTable != null) {
-
+                                                    val tid = getBaseTID(appDao)
+                                                    showProgress()
+                                                    initViewModel.insertInfo1(tid)
+                                                    observeMainViewModel()
                                                 }
                                             }
 
@@ -1011,7 +1015,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     runBlocking(Dispatchers.IO) {
                                         AppPreference.saveBatchInPreference(batchList)
                                         //Delete All BatchFile Data from Table after Settlement:-
-                                        appDao.deleteBatchFileTable()
+                                        appDao.deleteBatchTable()
 
 
                                         //  resetRoc()
@@ -1068,9 +1072,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         }
                                     }
                                 }
-                                ToastUtils.showToast(this@NavigationActivity,"Printing error")
-                            }
+                                runOnUiThread {
+                                    ToastUtils.showToast(this@NavigationActivity,"Printing error")
+                                }
 
+                            }
+                        }
                     } else {
                         runOnUiThread {
                             ToastUtils.showToast(this@NavigationActivity,hostFailureValidationMsg)
@@ -1085,8 +1092,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     runOnUiThread {
                         AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
                     }
+                    runOnUiThread {
+                        Toast.makeText(this@NavigationActivity,"Settlement Failure",Toast.LENGTH_SHORT).show()
 
-                    ToastUtils.showToast(this@NavigationActivity,"Settlement Failure")
+                    }
                     Log.d("Failure Data:- ", result)
                     AppPreference.saveString(PrefConstant.SETTLEMENT_PROCESSING_CODE.keyName.toString(), ProcessingCode.FORCE_SETTLEMENT.code)
 

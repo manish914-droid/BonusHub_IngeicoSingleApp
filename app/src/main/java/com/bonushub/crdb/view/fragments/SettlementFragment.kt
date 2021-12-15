@@ -106,18 +106,10 @@ class SettlementFragment : Fragment() {
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
 
-            PrintUtil(activity).printDetailReportupdate(
-                dataList,
-                activity
-            ) { detailPrintStatus ->
-
-                }
-            PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
-
-            }
-
             DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info,{
 
+                PrintUtil(activity).printDetailReportupdate(dataList, activity) { detailPrintStatus ->
+                }
                 settlementViewModel.settlementResponse()
                 settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
 
@@ -127,7 +119,7 @@ class SettlementFragment : Fragment() {
                                 val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                 settlementByteArray = data.generateIsoByteRequest()
                                 try {
-                                    (activity as NavigationActivity).settleBatch(settlementByteArray) {
+                                    (activity as NavigationActivity).settleBatch1(settlementByteArray) {
                                     }
                                 } catch (ex: Exception) {
                                     (activity as NavigationActivity).hideProgress()
