@@ -78,7 +78,12 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         setupRecyclerview()
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
-            parentFragmentManager.popBackStackImmediate()
+            try {
+                parentFragmentManager.popBackStackImmediate()
+            }catch (ex:Exception)
+            {
+                ex.printStackTrace()
+            }
         }
 
         observeMainViewModel()
@@ -139,7 +144,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                             getString(R.string.please_settle_batch_first_before_init)
                                         )
                                         else -> {
-                                            //startFullInitProcess()
+                                            startFullInitProcess()
                                         }
                                     }
                                 })
@@ -181,6 +186,38 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         }
     }
 
+    private fun startFullInitProcess() {
+
+        // INIT
+        // iDialog?.showProgress(getString(R.string.please_wait_host))
+
+        runBlocking {
+            val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+
+            if(!tids.get(0).isEmpty()!!) {
+
+                logger("get tid", "by table")
+                // get tid from table and init
+
+                initViewModel.insertInfo1(tids[0] ?:"")
+                //observeMainViewModel()
+            }else{
+               // get tid by user
+                logger("get tid","by user")
+
+                DialogUtilsNew1.getInputDialog(requireContext(),"ENTER TID","",true,true) {
+
+                    if(it.length < 8){
+                        ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
+                    }else {
+                        initViewModel.insertInfo1(it)
+                    }
+                }
+                //(activity as NavigationActivity).transactFragment(InitFragment())
+            }
+        }
+    }
+
     private fun observeMainViewModel(){
 
         initViewModel.initData.observe(viewLifecycleOwner, { result ->
@@ -192,12 +229,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                             Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
                                 iDialog?.hideProgress()
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    (activity as? NavigationActivity)?.alertBoxWithAction("",
-                                        requireContext().getString(R.string.successfull_init),
-                                        false,
-                                        "",
-                                        {},
-                                        {})
+                                    (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                        requireContext().getString(R.string.successfull_init))
                                 }
                             }
 
@@ -214,7 +247,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                         // ToastUtils.showToast(activity,"Error called  ${result.error}")
                     }
                     Status.LOADING -> {
-                        iDialog?.showProgress("Sending/Receiving From Host")
+                        iDialog?.showProgress(getString(R.string.sending_receiving_host))
 
                     }
                 }

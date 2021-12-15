@@ -1,103 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mob_no_crdView"
-    android:theme="@style/Theme.MaterialComponents.Light"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:visibility="visible"
     android:layout_margin="@dimen/pad_16"
-    app:cardElevation="@dimen/pad_15"
-    app:cardCornerRadius="10dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="@color/rippleColor"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
-    >
+    android:theme="@style/Theme.MaterialComponents.Light"
+    android:visibility="visible"
 
-    <LinearLayout
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView">
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/pad_16"
-       android:layout_gravity="center"
-        android:orientation="vertical">
+        android:layout_marginTop="27dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="@dimen/pad_5"
+        app:strokeColor="@color/rippleColor"
+        app:strokeWidth="1dp">
 
-        <TextView
-            android:id="@+id/msg_dialog_title"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/small_btn_size"
-            android:layout_marginStart="@dimen/pad_16"
-            android:layout_marginTop="@dimen/pad_8"
-            android:layout_marginEnd="@dimen/pad_16"
-            android:gravity="start"
-    
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_regular"
-            android:textStyle="bold"
-            />
-
-
-        <TextView
-            android:id="@+id/msg_dialog_msg"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/pad_16"
-            android:layout_marginEnd="@dimen/pad_16"
-            android:layout_marginBottom="@dimen/pad_16"
+            android:orientation="vertical"
+            android:layout_marginTop="30dp">
 
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_regular"
-            />
-
-
-        <!--Buttons-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/pad_16"
-            android:orientation="horizontal"
-
-            >
-
-            <Button
-                android:id="@+id/msg_dialog_cancel"
-
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:background="@drawable/card_edge"
-
-                android:layout_marginStart="24dp"
-                android:padding="@dimen/pad_2"
-                android:text="@string/cancel"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_xsmall"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-               />
-
-            <Button
-                android:id="@+id/msg_dialog_ok"
-
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:background="@drawable/card_edge"
-                android:layout_marginEnd="24dp"
-                android:padding="@dimen/pad_2"
-                android:text="@string/key_ok"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_xsmall"
-                app:layout_constraintBottom_toBottomOf="parent"
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:gravity="bottom"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-               />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/msg_dialog_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/muli_bold"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_8"
+                    android:textColor="@color/themeBackground"
+                    android:textSize="@dimen/text_size_regular" />
 
 
+            </LinearLayout>
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#2349B5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/msg_dialog_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/muli_light"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_regular" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:layout_margin="@dimen/pad_10"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
 
-</androidx.cardview.widget.CardView>
+                    <TextView
+                        android:id="@+id/msg_dialog_cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/pad_15"
+                        android:background="@drawable/edge_bg_white"
+                        android:fontFamily="@font/muli_regular"
+                        android:paddingStart="18dp"
+                        android:paddingTop="@dimen/pad_10"
+                        android:paddingEnd="18dp"
+                        android:paddingBottom="@dimen/pad_10"
+                        android:text="@string/cancel"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_small"
+                        />
+
+
+                    <TextView
+                        android:id="@+id/msg_dialog_ok"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/pad_15"
+                        android:background="@drawable/edge_white_bg_blue"
+                        android:fontFamily="@font/muli_regular"
+                        android:paddingStart="@dimen/pad_15"
+                        android:paddingTop="@dimen/pad_10"
+                        android:paddingEnd="@dimen/pad_15"
+                        android:paddingBottom="@dimen/pad_10"
+                        android:text="@string/ok"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_small" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/img_header"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_centerHorizontal="true"
+        android:elevation="5dp"
+        android:src="@drawable/ic_info"
+        android:visibility="visible" />
+
+</RelativeLayout>

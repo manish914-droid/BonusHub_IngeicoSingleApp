@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
+import com.bonushub.crdb.databinding.DialogMsgWithIconBinding
 import com.bonushub.crdb.databinding.ItemOkBtnDialogBinding
 import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -105,7 +106,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     }
 
 
-    override fun getInfoDialog(title: String, msg: String, acceptCb: () -> Unit) {
+    override fun getInfoDialog(title: String, msg: String, icon: Int,acceptCb: () -> Unit) {
         val dialog = Dialog(this)
         dialog.apply {
             requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -117,6 +118,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
+            findViewById<ImageView>(R.id.img_header).setImageResource(icon)
             findViewById<TextView>(R.id.msg_dialog_title).text = title
             findViewById<TextView>(R.id.msg_dialog_msg).text = msg
 
@@ -282,6 +284,52 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
+    override fun alertBoxMsgWithIconOnly(
+        icon: Int, msg: String
+    ) {
+        val dialogBuilder = Dialog(this)
+        //builder.setTitle(title)
+        //  builder.setMessage(msg)
+        val bindingg = DialogMsgWithIconBinding.inflate(LayoutInflater.from(this))
+
+        dialogBuilder.setContentView(bindingg.root)
+
+        bindingg.imgHeader.setImageResource(icon)
+        bindingg.txtViewMsg.text = msg
+
+        dialogBuilder.setCancelable(false)
+        val window = dialogBuilder.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        //Below Handler will execute to auto cancel Alert Dialog Pop-Up
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                dialogBuilder.dismiss()
+                dialogBuilder.cancel()
+                if(msg.equals(getString(R.string.successfull_init))){
+                startActivity(Intent(this, NavigationActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                }
+            }, 2000)
+
+        try {
+            if (!dialogBuilder.isShowing) {
+                dialogBuilder.show()
+            }
+        } catch (ex: WindowManager.BadTokenException) {
+            ex.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+
+        dialogBuilder.show()
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
 
     override fun alertBoxWithOnlyOk(
         title: String, msg: String, showCancelButton: Boolean,
@@ -381,7 +429,7 @@ interface IDialog {
     fun showToast(msg: String)
     fun showProgress(progressMsg: String = "Please Wait....")
     fun hideProgress()
-    fun getInfoDialog(title: String, msg: String, acceptCb: () -> Unit)
+    fun getInfoDialog(title: String, msg: String,icon: Int = R.drawable.ic_info , acceptCb: () -> Unit)
     fun getInfoDialogdoubletap(title: String, msg: String, acceptCb: (Boolean, Dialog) -> Unit)
     fun alertBoxWithAction(
         title: String, msg: String, showCancelButton: Boolean, positiveButtonText: String,
@@ -395,6 +443,9 @@ interface IDialog {
     fun updatePercentProgress(percent:Int)
     fun showPercentDialog(progressMsg: String = "Please Wait....")
 
+    fun alertBoxMsgWithIconOnly(
+        icon: Int, msg: String
+    )
 }
 
 

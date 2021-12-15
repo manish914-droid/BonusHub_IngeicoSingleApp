@@ -54,6 +54,15 @@ class DialogUtilsNew1 {
             textViewHeader.text = header
             edtTextPassword.hint = hint
 
+            if(header?.equals("ADMIN PASSWORD")?:false){
+
+                edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
+
+            }else if(header?.equals("SUPER ADMIN PASSWORD")?:false)
+            {
+                edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(6))
+            }
+
             txtViewOk.setOnClickListener {
 
                 hideKeyboardIfOpen(activity)
@@ -63,6 +72,7 @@ class DialogUtilsNew1 {
 
             txtViewCancel.setOnClickListener {
 
+                hideKeyboardIfOpen(activity)
                 onClick.onClickCancel()
                 dialog.dismiss()
             }

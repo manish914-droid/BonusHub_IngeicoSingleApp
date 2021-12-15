@@ -223,7 +223,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
             if(isUpdateTid){
                 // call init process
-                iDialog?.showProgress(getString(R.string.please_wait_host))
+                iDialog?.showProgress(getString(R.string.sending_receiving_host))
 
                 runBlocking {
                         val tids = checkBaseTid(DBModule.appDatabase?.appDao)
@@ -253,8 +253,8 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                         Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
                             iDialog?.hideProgress()
                             CoroutineScope(Dispatchers.Main).launch {
-                                (activity as? NavigationActivity)?.alertBoxWithAction("", requireContext().getString(R.string.successfull_init),
-                                    false, "", {}, {})
+                                (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                    requireContext().getString(R.string.successfull_init))
                             }
                         }
                     }
@@ -276,7 +276,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                  //   ToastUtils.showToast(activity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
-                    iDialog?.showProgress("Sending/Receiving From Host")
+                    iDialog?.showProgress(getString(R.string.sending_receiving_host))
 
                 }
             }
