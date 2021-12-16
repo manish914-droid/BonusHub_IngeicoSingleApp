@@ -1011,7 +1011,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                 //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                 runBlocking(Dispatchers.IO) {
-                                    AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable>)
+                                    AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                     //Delete All BatchFile Data from Table after Settlement:-
                                     appDao.deleteBatchTable()
 
@@ -1065,7 +1065,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     hideProgress()
                                     //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                     runBlocking(Dispatchers.IO) {
-                                        AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable>)
+                                        AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                         //Delete All BatchFile Data from Table after Settlement:-
                                         appDao.deleteBatchTable()
 

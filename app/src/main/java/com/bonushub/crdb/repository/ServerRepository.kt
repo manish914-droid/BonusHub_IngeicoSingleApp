@@ -260,11 +260,21 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                     }
                     //Refresh Field57 request value for Pagination if More Record Flag is True:-
                     if (moreDataFlag == "1") {
-                        getBrandData(totalRecord!!)
+                        getBrandData(totalRecord)
                     } else {
+                        GlobalScope.launch (Dispatchers.IO){
+                            if (matchHostAndDBTimeStamp()) {
+                                brandEMIMasterCategoryMLData.postValue(
+                                    GenericResponse.Success(
+                                        brandEmiMasterDataList
+                                    )
+                                )
+                            } else {
+                                saveBrandMasterTimeStampsData()
+                                getBrandTnc()
+                            }
 
-                        getBrandTnc()
-                     //   brandEMIMasterCategoryMLData.postValue(GenericResponse.Success(brandEmiMasterDataList))
+                        }
                     }
                 } else {
                     brandEMIMasterCategoryMLData.postValue(GenericResponse.Error("Data list is empty"))

@@ -1,6 +1,8 @@
 package com.bonushub.crdb.model.local
 
 import androidx.room.TypeConverter
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -43,6 +45,41 @@ class Converters {
         val type = object : TypeToken<ReceiptDetail>() {}.type
         return Gson().fromJson<ReceiptDetail>(receiptDetail, type)
     }
+    @TypeConverter
+    fun fromEmiBrandData(emiBrandData: BrandEMIMasterDataModal?): String? {
+        val type = object : TypeToken<BrandEMIMasterDataModal?>() {}.type
+        return Gson().toJson(emiBrandData, type)
+    }
+    @TypeConverter
+    fun toEmiBrandData(emiBrandData: String?): BrandEMIMasterDataModal? {
+        val type = object : TypeToken<BrandEMIMasterDataModal>() {}.type
+        return Gson().fromJson<BrandEMIMasterDataModal>(emiBrandData, type)
+    }
+
+    @TypeConverter
+    fun fromEmiCategoryData(emiCategoryData: BrandEMISubCategoryTable?): String? {
+        val type = object : TypeToken<BrandEMISubCategoryTable?>() {}.type
+        return Gson().toJson(emiCategoryData, type)
+    }
+    @TypeConverter
+    fun toEmiCategoryData(emiCategoryData: String?): BrandEMISubCategoryTable? {
+        val type = object : TypeToken<BrandEMISubCategoryTable>() {}.type
+        return Gson().fromJson<BrandEMISubCategoryTable>(emiCategoryData, type)
+    }
+
+ @TypeConverter
+    fun fromEmiProductData(emiProductData: BrandEMIProductDataModal?): String? {
+        val type = object : TypeToken<BrandEMIProductDataModal?>() {}.type
+        return Gson().toJson(emiProductData, type)
+    }
+    @TypeConverter
+    fun toEmiProductData(emiProductData: String?): BrandEMIProductDataModal? {
+        val type = object : TypeToken<BrandEMIProductDataModal>() {}.type
+        return Gson().fromJson<BrandEMIProductDataModal>(emiProductData, type)
+    }
+
+
+
 
     @TypeConverter
     fun toCvmAction(value: Int) = enumValues<CvmAction>()[value]

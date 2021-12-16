@@ -250,6 +250,11 @@ BhTransactionType.BRAND_EMI.type->{
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.emiBrandData=brandDataMaster
+                                                batchData.emiCategoryData=brandEmiSubCatData
+                                                batchData.emiProductData=brandEmiProductData
+                                                batchData.imeiOrSerialNum=imeiOrSerialNum
+
                                                 batchData.transactionType = BhTransactionType.BRAND_EMI.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }

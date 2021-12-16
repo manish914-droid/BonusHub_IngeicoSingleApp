@@ -41,6 +41,7 @@ class BrandEmiProductFragment : Fragment() {
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
     private lateinit var brandEmiProductViewModel: BrandEmiProductViewModel
     private var brandEmiProductBinding: BrandEmiListAndSearchUiBinding? = null
