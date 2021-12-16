@@ -234,6 +234,27 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
 
     //endregion==========
+
+    // region
+    fun decideDashBoardOnBackPress() {
+        if (AppPreference.getLogin()) {
+            Log.e("NAV", "DECIDE HOME")
+            transactFragment(DashboardFragment())
+
+        } else {
+            GlobalScope.launch(Dispatchers.IO) {
+                Utility().readLocalInitFile { status, msg ->
+                    Log.d("Init File Read Status ", status.toString())
+                    Log.d("Message ", msg)
+                    //    refreshDrawer()
+                }
+            }
+
+            transactFragment(InitFragment())
+
+        }
+    }
+    // end region
     //region============================ready
     override fun onReady(version: String?) {
         register(true)

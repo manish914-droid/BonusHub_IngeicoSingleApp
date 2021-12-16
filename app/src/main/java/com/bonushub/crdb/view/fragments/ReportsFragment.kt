@@ -75,7 +75,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
-            parentFragmentManager.popBackStackImmediate()
+            //parentFragmentManager.popBackStackImmediate()
+            try {
+                (activity as NavigationActivity).decideDashBoardOnBackPress()
+            }catch (ex:Exception){
+                ex.printStackTrace()
+
+            }
         }
 
     }

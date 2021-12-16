@@ -63,7 +63,12 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
         setupRecyclerview()
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
-            parentFragmentManager.popBackStackImmediate()
+            try {
+                (activity as NavigationActivity).decideDashBoardOnBackPress()
+            }catch (ex:Exception){
+                ex.printStackTrace()
+
+            }
         }
 
 
@@ -92,7 +97,7 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
                 if(it)
                 {
                     dialogSuperAdminPassword?.dismiss()
-                    (activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment())
+                    (activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment(),true)
                 }else{
                     ToastUtils.showToast(requireContext(),R.string.invalid_password)
                 }

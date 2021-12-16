@@ -75,7 +75,14 @@ class SettlementFragment : Fragment() {
        // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
         fragmensettlementBinding.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_settlement)
         fragmensettlementBinding.subHeaderView?.subHeaderText?.text = getString(R.string.settlement)
-        fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager?.popBackStack() }
+        fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { /*parentFragmentManager?.popBackStack()*/
+            try {
+                (activity as NavigationActivity).decideDashBoardOnBackPress()
+            }catch (ex:Exception){
+                ex.printStackTrace()
+
+            }
+        }
 
 
         //region===============Get Batch Data from HDFCViewModal:-
