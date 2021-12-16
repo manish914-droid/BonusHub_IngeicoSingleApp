@@ -311,11 +311,11 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             }
                                         }
                                     }else{
-                                        launch(Dispatchers.Main) {
+                                       // launch(Dispatchers.Main) {
                                             iDiag?.hideProgress()
                                             //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
                                             iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
-                                        }
+                                     //   }
                                     }
 
                                 })
@@ -324,11 +324,11 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                             } catch (ex: Exception) {
                                 ex.printStackTrace()
-                                launch(Dispatchers.Main) {
+                                //launch(Dispatchers.Main) {
                                     iDiag?.hideProgress()
                                     DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.error),"something Wrong", false)
 
-                                }
+                              //  }
                             }
                         }
                     }
