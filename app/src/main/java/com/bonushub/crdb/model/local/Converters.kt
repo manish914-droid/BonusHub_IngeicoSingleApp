@@ -72,6 +72,7 @@ class Converters {
         val type = object : TypeToken<BrandEMIProductDataModal?>() {}.type
         return Gson().toJson(emiProductData, type)
     }
+
     @TypeConverter
     fun toEmiProductData(emiProductData: String?): BrandEMIProductDataModal? {
         val type = object : TypeToken<BrandEMIProductDataModal>() {}.type
