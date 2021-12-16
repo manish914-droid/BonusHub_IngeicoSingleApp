@@ -5,6 +5,8 @@ import androidx.room.*
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
+import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.pax.utils.EDashboardItem
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -1037,10 +1039,15 @@ data class BrandEMIAccessDataModalTable(
 
 // region ====== OnpaymentListner response from ingenico data table ======
 @Entity
-data class BatchTable( var receiptData:ReceiptDetail?=null){
+data class BatchTable(var receiptData:ReceiptDetail?=null){
     @PrimaryKey(autoGenerate = false)
     var invoice: String=""
     var transactionType: Int = 0
+    var imeiOrSerialNum: String?=null
+    var billNumber: String?=null
+    var emiBrandData: BrandEMIMasterDataModal?=null
+    var emiCategoryData: BrandEMISubCategoryTable?=null
+    var emiProductData: BrandEMIProductDataModal?=null
 
 }
 // endregion

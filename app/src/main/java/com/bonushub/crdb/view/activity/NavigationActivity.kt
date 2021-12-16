@@ -734,7 +734,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
             }
-
             EDashboardItem.PRE_AUTH_CATAGORY -> {
                 if (!action.childList.isNullOrEmpty()) {
                     // dashBoardCatagoryDialog(action.childList!!)
@@ -777,7 +776,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                 transactFragment(PreAuthPendingFragment(),true)
             }
-
             EDashboardItem.MERCHANT_REFERRAL->{
                 transactFragment(BrandEmiMasterCategoryFragment().apply {
                     arguments = Bundle().apply {
@@ -999,7 +997,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             false
                         )
                         val batchList = runBlocking(Dispatchers.IO) {
-                                appDao?.getAllBatchData()
+                                appDao.getAllBatchData()
                             }
 
                         //Batch and Roc Increment for Settlement:-

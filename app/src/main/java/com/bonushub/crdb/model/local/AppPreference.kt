@@ -142,7 +142,7 @@ object AppPreference {
 
 
     //region Below method is used to Save Batch File Data in App Preference:-
-    fun saveBatchInPreference(batchList: MutableList<BatchTable>) {
+    fun saveBatchInPreference(batchList: MutableList<BatchTable?>) {
         val tempBatchDataList = Gson().toJson(
             batchList,
             object : TypeToken<List<BatchTable>>() {}.type

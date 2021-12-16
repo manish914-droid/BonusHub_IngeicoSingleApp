@@ -20,6 +20,7 @@ import com.bonushub.crdb.utils.invoiceWithPadding
 import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.EPrintCopyType
 import com.bonushub.pax.utils.BhTransactionType
+import com.bonushub.pax.utils.EDashboardItem
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.usdk.apiservice.aidl.printer.*
 import java.io.IOException
@@ -170,6 +171,9 @@ class PrintUtil(context: Context?) {
                 when (receiptDetail.txnName) {
                     "SALE", "SALECASH" -> {
                         saleTransaction(receiptDetail)
+                    }
+                    EDashboardItem.BRAND_EMI.title->{
+                        voidTransaction(receiptDetail)
                     }
                     else -> {
                         voidTransaction(receiptDetail)

@@ -28,10 +28,11 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:padding="@dimen/pad_4"
                 android:background="@drawable/rounded_rectangle"
                 android:hint="@string/tenure"
                 android:textColor="@color/black"
-                android:textColorHint="@color/black"
+                android:textColorHint="@color/white"
                 android:textSize="@dimen/text_size_regular" />
 
             <ImageView
@@ -41,7 +42,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_marginStart="@dimen/pad_16"
                 android:layout_marginEnd="16dp"
                 android:background="@drawable/ic_check_box_selected_green"
-                />
+                android:contentDescription="@string/select_scheme" />
         </LinearLayout>
 
         <LinearLayout
@@ -54,7 +55,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/txn_amount"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -64,12 +65,13 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/tenure_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
@@ -79,7 +81,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/tenure"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -89,12 +91,13 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/loan_amt_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
@@ -104,7 +107,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/loan_amount"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -114,12 +117,13 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/emi_amt_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
@@ -129,7 +133,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/emi_amount"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -139,7 +143,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
@@ -156,7 +160,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/discount_amount"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -166,8 +170,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
-                android:text="jvjvjvjv"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
@@ -194,7 +197,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
@@ -211,7 +214,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/interest_rate"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -221,12 +224,13 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/total_int_pay_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
@@ -236,7 +240,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/total_interest_pay"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -246,7 +250,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
@@ -262,7 +266,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/roi_pa"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -272,7 +276,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
@@ -288,7 +292,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/total_emi_pay"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -298,9 +302,37 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
-                android:gravity="right"
+                android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/offerLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_4"
+            android:visibility="visible"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/cashback_offer"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_small" />
+            <TextView
+                android:id="@+id/tv_offer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="start"
+
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_small" />
+        </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

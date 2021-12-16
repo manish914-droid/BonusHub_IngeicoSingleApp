@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.activity
 
+import android.R.attr
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -44,6 +45,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
+import android.app.Activity
+
+import android.R.attr.data
+import com.bonushub.crdb.model.remote.BankEMITenureDataModal
+import com.ingenico.hdfcpayment.type.CardCaptureType
+
 
 private var bankEMIRequestCode = "4"
 
@@ -191,6 +198,94 @@ BhTransactionType.BRAND_EMI.type->{
             })
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                val result =data?.getParcelableExtra<BankEMITenureDataModal>("EMITenureDataModal")
+                emvBinding?.cardDetectImg?.visibility = View.GONE
+                emvBinding?.tvInsertCard?.visibility = View.GONE
+                emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
+                try {
+                    DeviceHelper.doEMITxn(
+                        EMISaleRequest(
+                            amount = (saleAmt.toFloat() *100).toLong(),
+                            tipAmount = 0L ?: 0,
+                            emiTxnName=transactionTypeEDashboardItem.title,
+                            tid = result?.txnTID,
+                            cardCaptureType = CardCaptureType.EMV_NO_CAPTURING,
+                            track1 = null,
+                            track2 = null,
+                            transactionUuid = UUID.randomUUID().toString(),
+                        ),
+                        listener = object : OnPaymentListener.Stub() {
+                            override fun onCompleted(result: PaymentResult?) {
+                                val txnResponse = result?.value as? TransactionResponse
+                                val receiptDetail = txnResponse?.receiptDetail
+                                receiptDetail?.txnName=transactionTypeEDashboardItem.title
+                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                when (txnResponse?.responseCode) {
+                                    ResponseCode.SUCCESS.value -> {
+                                        val jsonResp=Gson().toJson(receiptDetail)
+                                        println(jsonResp)
+                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+                                        if (receiptDetail != null) {
+                                            val batchData=BatchTable(receiptDetail)
+                                            creatCardProcessingModelData(receiptDetail)
+                                           /* val transactionISO =
+                                                CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+
+                                            val jsonResp=Gson().toJson(transactionISO)
+                                            println(jsonResp)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                transactionViewModel.serverCall(transactionISO)
+                                            }
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                            }*/
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice= receiptDetail.invoice.toString()
+                                                batchData.transactionType = BhTransactionType.BRAND_EMI.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                            }
+
+
+                                            printingSaleData(receiptDetail)
+                                        }
+
+
+                                    }
+                                    ResponseCode.FAILED.value,
+                                    ResponseCode.ABORTED.value -> {
+                                        errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
+                                    }
+                                    else -> {
+                                        errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
+                catch (ex:Exception){
+                    ex.printStackTrace()
+                }
+
+
+            }
+            if (resultCode == RESULT_CANCELED) {
+                // Write  code if there's no result
+            }
+        }
+    }
+
+
 
     //Below function is used to deal with EMV Card Fallback when we insert EMV Card from other side then chip side:-
    fun handleEMVFallbackFromError(title: String, msg: String, showCancelButton: Boolean, emvFromError: (Boolean) -> Unit) {
@@ -567,7 +662,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                batchData.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                             }
                                             printingSaleData(receiptDetail)

@@ -637,7 +637,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                     splitData[14], splitData[15],
                                     splitData[16], splitData[17],
                                     splitData[18], splitData[19],
-                                    splitData[20]
+                                    splitData[20],splitData[21],splitData[22]
                                 )
                             )
                         }

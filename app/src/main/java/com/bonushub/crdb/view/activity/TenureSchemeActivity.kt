@@ -26,6 +26,12 @@ import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactor
 import com.bonushub.pax.utils.BhTransactionType
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import android.app.Activity
+
+import android.content.Intent
+
+
+
 
 @AndroidEntryPoint
 class TenureSchemeActivity : AppCompatActivity() {
@@ -71,18 +77,12 @@ class TenureSchemeActivity : AppCompatActivity() {
         cardProcessedDataModal = intent?.getSerializableExtra("cardProcessedData") as? CardProcessedDataModal?
         transactionType        = intent?.getIntExtra("transactionType",-1) ?: -1
 
-      //  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-     /*   tenureSchemeViewModel=  ViewModelProvider(this, TenureSchemeActivityVMFactory(serverRepository,
-            cardProcessedDataModal?.getPanNumberData() ?: "",
-            "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount")).get(TenureSchemeViewModel::class.java)
-
-     */
         var field57=""
-        if(transactionType==BhTransactionType.BRAND_EMI.type) {
-           field57 = "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
+        field57 = if(transactionType==BhTransactionType.BRAND_EMI.type) {
+            "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
                     "^${/*cardBinValue.substring(0, 8)*/""}^$transactionAmount"
         }else{
-            field57 =  "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount"
+            "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount"
         }
 
 
@@ -136,7 +136,17 @@ class TenureSchemeActivity : AppCompatActivity() {
                     "SELECTED TENURE ->  ",
                     (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)).toString()
                 )
+                val returnIntent = Intent()
+                returnIntent.putExtra("EMITenureDataModal", (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)))
+                setResult(RESULT_OK, returnIntent)
+                finish()
 
+                /*
+                for cancel case
+
+                val returnIntent = Intent()
+                setResult(RESULT_CANCELED, returnIntent)
+                finish()*/
             }   else
                 ToastUtils.showToast(this,getString(R.string.please_select_scheme))
         }

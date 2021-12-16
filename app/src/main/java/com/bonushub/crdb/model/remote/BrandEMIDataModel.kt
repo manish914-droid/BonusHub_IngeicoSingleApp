@@ -104,7 +104,10 @@ data class BankEMITenureDataModal(
     var tenureTAndC: String,
     var tenureWiseDBDTAndC: String,
     var discountCalculatedValue: String,
-    var cashBackCalculatedValue: String
+    var cashBackCalculatedValue: String,
+
+    var tenureLabel:String="",
+    var txnTID :String=""
 ) : Parcelable
 //endregion
 

@@ -247,4 +247,6 @@
     <string name="enter_invoice">Enter Invoice</string>
 
     <string name="confirm">CONFIRM</string>
+
+    <string name="cashback_offer">CashBack Offer :\u0020 \u0020 </string>
 </resources>

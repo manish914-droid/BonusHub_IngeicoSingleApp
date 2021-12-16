@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.databinding.ItemEmiSchemeOfferBinding
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.utils.divideAmountBy100
+import com.bonushub.crdb.utils.makeTextViewResizable
+import com.bonushub.pax.utils.BhTransactionType
+import com.ingenico.hdfcpayment.type.TransactionType
 
 
 internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private val emiSchemeDataList: MutableList<BankEMITenureDataModal>?, private var schemeSelectCB: (Int) -> Unit) : RecyclerView.Adapter<EMISchemeAndOfferAdapter.EMISchemeOfferHolder>()
@@ -31,46 +34,91 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
     override fun onBindViewHolder(holder: EMISchemeOfferHolder, position: Int) {
         val modelData = emiSchemeDataList?.get(position)
         if (modelData != null) {
-            // (((modelData.transactionAmount).toDouble()).div(100)).toString()
-            "%.2f".format((((modelData.transactionAmount).toDouble()).div(100)).toString().toDouble())
-
-            holder.binding.tvTransactionAmount.text = "\u20B9 " +  "%.2f".format((((modelData.transactionAmount).toDouble()).div(100)).toString().toDouble())
-            holder.binding.tvLoanAmount.text = "\u20B9 " +   "%.2f".format((((modelData.loanAmount).toDouble()).div(100)).toString().toDouble())
-            holder.binding.tvEmiAmount.text = "\u20B9 " +   "%.2f".format((((modelData.emiAmount).toDouble()).div(100)).toString().toDouble())
-            val tenureDuration = "${modelData.tenure} Months"
-            val tenureHeadingDuration = "${modelData.tenure} Months Scheme"
-            holder.binding.tvTenure.text = tenureDuration
-            holder.binding.tenureHeadingTv.text = tenureHeadingDuration
-
-            //If Discount Amount Available show this else if CashBack Amount show that:-
-            if (!modelData.discountAmount.isNullOrEmpty() && modelData.discountAmount.toInt() != 0) {
-                holder.binding.tvDiscountAmount.text = "\u20B9 " + "%.2f".format((((modelData.discountAmount).toDouble()).div(100)).toString().toDouble())
-                holder.binding.discountLL.visibility = View.VISIBLE
-                holder.binding.cashBackLL.visibility = View.GONE
-            }
-            if (!modelData.cashBackAmount.isNullOrEmpty() && modelData.cashBackAmount.toInt() != 0) {
-                holder.binding.tvCashbackAmount.text = "\u20B9 " + divideAmountBy100(modelData.cashBackAmount.toInt()).toString()
-                holder.binding.cashBackLL.visibility = View.VISIBLE
+            if (modelData.tenure == "1") {
+                holder.binding.tenureHeadingTv.text = modelData.tenureLabel
+                "%.2f".format(
+                    (((modelData.transactionAmount).toDouble()).div(100)).toString().toDouble()
+                )
+                holder.binding.tvTransactionAmount.text = "\u20B9 " + "%.2f".format(
+                    (((modelData.transactionAmount).toDouble()).div(100)).toString().toDouble()
+                )
+                holder.binding.offerLL.visibility = View.VISIBLE
+                holder.binding.tenureLl.visibility = View.GONE
+                holder.binding.loanAmtLl.visibility = View.GONE
+                holder.binding.emiAmtLl.visibility = View.GONE
                 holder.binding.discountLL.visibility = View.GONE
-            }
+                holder.binding.totalIntPayLl.visibility = View.GONE
+                holder.binding.rateofInterestLL.visibility = View.GONE
+                holder.binding.toatalemipayLL.visibility = View.GONE
 
-           // if(transactionType != TransactionType.TEST_EMI.type) {
-            if(true) {
-                holder.binding.toatalemipayLL.visibility = View.VISIBLE//tenureInterestRate
-                holder.binding.tvTotalInterestPay.text = "\u20B9 " +  "%.2f".format((((modelData.totalInterestPay).toDouble()).div(100)).toString().toDouble())
-                val roi=  "%.2f".format((((modelData.tenureInterestRate).toDouble()).div(100)).toString().toDouble())
-                //totalinterestpay
-                holder.binding.tvRoi.text = "$roi %"
-                holder.binding.tvTotalEmiPay.text = "\u20B9 " + "%.2f".format((((modelData.netPay).toDouble()).div(100)).toString().toDouble())
-            }
-            else {
-              /*  holder.binding.toatalemipayLL.visibility = View.GONE
-                holder.binding.tvInterestRate.text =  ""+divideAmountBy100(modelData.tenureInterestRate.toInt()).toString() +" %"
-                holder.binding.tvTotalInterestPay.text = "\u20B9 " + "%.2f".format((((modelData.totalInterestPay).toDouble()).div(100)).toString().toDouble())
+                val tvOffer = holder.binding.tvOffer
 
-                val roi=  "%.2f".format((((modelData.tenureInterestRate).toDouble()).div(100)).toString().toDouble())
-                holder.binding.tvRoi.text = "$roi %"
-*/
+                // tvOffer.context.getString(R.string.cashBackOffer)
+                tvOffer.text = modelData.tenureTAndC
+                makeTextViewResizable(tvOffer, 8, "See More", true)
+            } else {
+                // (((modelData.transactionAmount).toDouble()).div(100)).toString()
+                holder.binding.offerLL.visibility = View.GONE
+                "%.2f".format(
+                    (((modelData.transactionAmount).toDouble()).div(100)).toString().toDouble()
+                )
+                holder.binding.tvTransactionAmount.text = "\u20B9 " + "%.2f".format(
+                    (((modelData.transactionAmount).toDouble()).div(100)).toString().toDouble()
+                )
+                holder.binding.tvLoanAmount.text = "\u20B9 " + "%.2f".format(
+                    (((modelData.loanAmount).toDouble()).div(100)).toString().toDouble()
+                )
+                holder.binding.tvEmiAmount.text = "\u20B9 " + "%.2f".format(
+                    (((modelData.emiAmount).toDouble()).div(100)).toString().toDouble()
+                )
+                //    val tenureDuration = "${modelData.tenure} Months"
+                val tenureDuration = modelData.tenureLabel
+                //   val tenureHeadingDuration = "${modelData.tenure} Months Scheme"
+                val tenureHeadingDuration = modelData.tenureLabel
+                holder.binding.tvTenure.text = tenureDuration
+                holder.binding.tenureHeadingTv.text = tenureHeadingDuration
+                //If Discount Amount Available show this else if CashBack Amount show that:-
+                if (!modelData.discountAmount.isEmpty() && modelData.discountAmount.toInt() != 0) {
+                    holder.binding.tvDiscountAmount.text = "\u20B9 " + "%.2f".format(
+                        (((modelData.discountAmount).toDouble()).div(100)).toString().toDouble()
+                    )
+                    holder.binding.discountLL.visibility = View.VISIBLE
+                    holder.binding.cashBackLL.visibility = View.GONE
+                }
+                if (!modelData.cashBackAmount.isEmpty() && modelData.cashBackAmount.toInt() != 0) {
+                    holder.binding.tvCashbackAmount.text =
+                        "\u20B9 " + divideAmountBy100(modelData.cashBackAmount.toInt()).toString()
+                    holder.binding.cashBackLL.visibility = View.VISIBLE
+                    holder.binding.discountLL.visibility = View.GONE
+                }
+                if (transactionType == BhTransactionType.TEST_EMI.type) {
+                    holder.binding.toatalemipayLL.visibility = View.GONE
+                    holder.binding.tvInterestRate.text =
+                        "" + divideAmountBy100(modelData.tenureInterestRate.toInt()).toString() + " %"
+                    holder.binding.tvTotalInterestPay.text = "\u20B9 " + "%.2f".format(
+                        (((modelData.totalInterestPay).toDouble()).div(100)).toString().toDouble()
+                    )
+
+                    val roi = "%.2f".format(
+                        (((modelData.tenureInterestRate).toDouble()).div(100)).toString().toDouble()
+                    )
+                    holder.binding.tvRoi.text = "$roi %"
+
+                } else {
+                    holder.binding.toatalemipayLL.visibility = View.VISIBLE//tenureInterestRate
+                    holder.binding.tvTotalInterestPay.text = "\u20B9 " + "%.2f".format(
+                        (((modelData.totalInterestPay).toDouble()).div(100)).toString().toDouble()
+                    )
+                    val roi = "%.2f".format(
+                        (((modelData.tenureInterestRate).toDouble()).div(100)).toString().toDouble()
+                    )
+                    //totalinterestpay
+                    holder.binding.tvRoi.text = "$roi %"
+                    holder.binding.tvTotalEmiPay.text = "\u20B9 " + "%.2f".format(
+                        (((modelData.netPay).toDouble()).div(100)).toString().toDouble()
+                    )
+                }
+
             }
         }
 

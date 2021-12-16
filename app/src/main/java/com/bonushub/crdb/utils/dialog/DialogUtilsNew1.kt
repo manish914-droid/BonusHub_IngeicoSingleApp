@@ -42,7 +42,7 @@ class DialogUtilsNew1 {
             setCancelable: Boolean = true
         ) {
             val dialog = Dialog(activity!!)
-            dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setCancelable(setCancelable)
             dialog.setContentView(R.layout.dialog_admin)
