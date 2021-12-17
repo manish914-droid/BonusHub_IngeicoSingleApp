@@ -571,6 +571,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             }
 // End of last Summery Report receipt
 
+            ReportsItem.PRINT_REVERSAL_REPORT -> {
+                ToastUtils.showToast(requireContext(), "Not implemented yet.")
+            }
         }
 
     }

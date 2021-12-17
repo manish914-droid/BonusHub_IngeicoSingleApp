@@ -118,6 +118,7 @@ class EMIIssuerList : Fragment() {
         binding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
         binding?.subHeaderView?.headerHome?.setOnClickListener {   (activity as NavigationActivity).transactFragment(DashboardFragment()) }
        // binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_catalogue)
+        binding?.subHeaderView?.headerImage?.visibility= View.GONE // now header text is show in center
 
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager.popBackStackImmediate() }

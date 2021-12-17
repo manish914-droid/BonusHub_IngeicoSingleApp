@@ -569,7 +569,8 @@ enum class ReportsItem(val _name: String){
     ANY_RECEIPT("Any Receipt"),
     DETAIL_REPORT("Detail Report"),
     SUMMERY_REPORT("Summary Report"),
-    LAST_SUMMERY_REPORT("Last Summary Report")
+    LAST_SUMMERY_REPORT("Last Summary Report"),
+    PRINT_REVERSAL_REPORT("Print Reversal Report")
 }
 
 enum class EPrintCopyType(val pName: String) {
