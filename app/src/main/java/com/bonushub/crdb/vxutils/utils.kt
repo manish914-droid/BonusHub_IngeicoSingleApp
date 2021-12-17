@@ -36,6 +36,9 @@ import com.usdk.apiservice.aidl.pinpad.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 private var listofTids= ArrayList<String>()
 
@@ -803,6 +806,23 @@ fun txnSuccessToast(context: Context, msg: String = "Transaction Approved") {
 }
 
 
+// region ============================Get System Time in 24Hour Format:-
+fun getSystemTimeIn24Hour(): String {
+    val calendar = Calendar.getInstance()
+    val dateFormatter = SimpleDateFormat("yyyMMddHH:mm:ss", Locale.getDefault())
+   // logger("date",""+dateFormatter.format(calendar.time).replaceTimeColon())
+    return dateFormatter.format(calendar.time).replaceTimeColon()
+}
+//endregion
 
+//region=================Format Date by replacing colon:-
+fun String.replaceTimeColon() = this.replace(":", "")
+//endregion
 
+//region=================Get Terminal Date according to Passed Index Value:-
+fun String.terminalDate() = this.substring(0, 8)
+//endregion
 
+//region=================Get Terminal Date according to Passed Index Value:-
+fun String.terminalTime() = this.substring(8, this.length)
+//endregion

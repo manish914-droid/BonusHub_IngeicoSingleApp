@@ -379,4 +379,18 @@ interface AppDao{
 
     // endregion ================
 
+
+    // region ================ DigiPosDataTable dao ======== kushal
+   /* @Query("SELECT * FROM DigiPosDataTable")
+    fun getDigiPosDataTable(): LiveData<MutableList<DigiPosDataTable>>?
+
+    @Query("SELECT * FROM DigiPosDataTable WHERE txnStatus = :txnStatus")
+    fun getDigiPosDataTableByTxnStatus(txnStatus: String): MutableList<DigiPosDataTable>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDigiPosData(digiPosDataTable: DigiPosDataTable): Long?
+
+    @Query("DELETE From DigiPosDataTable WHERE partnerTxnId = :partnerTxnId")
+    suspend fun deleteDigiPosData(partnerTxnId:String)*/
+    // endregion ====================
 }

@@ -4,6 +4,9 @@ package com.bonushub.crdb.view.fragments
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 
 import android.view.LayoutInflater
@@ -20,24 +23,26 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
-import com.bonushub.crdb.utils.checkBaseTid
-import com.bonushub.crdb.utils.doInitializtion
+import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 
 
-
-import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.pax.utils.PreferenceKeyConstant
+import com.bonushub.pax.utils.SettlementComingFrom
 import com.mindorks.example.coroutines.utils.Status
 
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
+import java.lang.Runnable
 import javax.inject.Inject
 
 
@@ -66,6 +71,11 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     private var animShow: Animation? = null
     private var animHide: Animation? = null
     private var binding: FragmentDashboardBinding? = null
+
+    private var runnable: Runnable? = null
+    private val handler = Handler(Looper.getMainLooper())
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,9 +86,37 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("Dashboard:- ", "onViewCreated")
+        isDashboardOpen = true
+
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()
+
+        //region======================Change isAutoSettleDone Boolean Value to False if Date is greater then :- written by kushal
+        //last saved Auto Settle Date:-
+        if (!TextUtils.isEmpty(AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName))) {
+            if (AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName).toInt() > 0) {
+                if (getSystemTimeIn24Hour().terminalDate().toInt() >
+                    AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName).toInt()
+                ) {
+                    AppPreference.saveBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName, false)
+                }
+            }
+        }
+        //endregion
+
+        logger("check",""+AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
+        //region=======================Check For AutoSettle at regular interval if App is on Dashboard:-
+        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
+            checkForAutoSettle()
+        //endregion
     }
+
+    override fun onPause() {
+        super.onPause()
+        //timer?.cancel()
+        runnable?.let { handler.removeCallbacks(it) }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is IFragmentRequest) {
@@ -145,6 +183,73 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     }
 
 
+    //region============================Auto Settle Check on Dashboard at Regular Intervals:-
+    private fun checkForAutoSettle() {
+        runnable = object : Runnable {
+            override fun run() {
+                try {
+                    logger("AutoSettle:- ", "Checking....")
+                    autoSettleBatch()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    //also call the same runnable to call it at regular interval
+                    handler.postDelayed(this, 20000)
+                }
+            }
+        }
+        handler.post(runnable as Runnable)
+    }
+    //endregion
+
+    //region=======================Check for User IDLE on Dashboard and do auto settle if conditions match:-
+    private fun autoSettleBatch() {
+        //val tptData = runBlocking(Dispatchers.IO) { TerminalParameterTable.selectFromSchemeTable() }
+        val tptData = runBlocking(Dispatchers.IO) { getTptData() }
+        //val batchData = runBlocking(Dispatchers.IO) { BatchFileDataTable.selectBatchData() }
+        val batchData = runBlocking(Dispatchers.IO) { appDao.getAllBatchData() }
+        Log.d("HostForceSettle:- ", tptData?.forceSettle ?: "")
+        Log.d("HostForceSettleTime:- ", tptData?.forceSettleTime ?: "")
+        Log.d(
+            "System Date Time:- ",
+            "${getSystemTimeIn24Hour().terminalDate()} ${getSystemTimeIn24Hour().terminalTime()}"
+        )
+        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName)) {
+
+            Log.d("Dashboard Open:- ", "Yes")
+            if (!TextUtils.isEmpty(tptData?.forceSettle)
+                && !TextUtils.isEmpty(tptData?.forceSettleTime)
+                && tptData?.forceSettle == "1"
+            ) {
+                if ((tptData.forceSettleTime.toLong() == getSystemTimeIn24Hour().terminalTime().toLong()
+                            || getSystemTimeIn24Hour().terminalTime().toLong() > tptData.forceSettleTime.toLong()
+                            ) && batchData.size > 0
+                ) {
+                    logger("Auto Settle:- ", "Auto Settle Available")
+                    val data = runBlocking(Dispatchers.IO) {
+                        /*CreateSettlementPacket(
+                            ProcessingCode.SETTLEMENT.code, batchData
+                        ).createSettlementISOPacket()*/
+                        // this code below converted
+
+                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                    }
+                    GlobalScope.launch(Dispatchers.IO) {
+                        val settlementByteArray = data.generateIsoByteRequest()
+                        (activity as NavigationActivity).settleBatch(
+                            settlementByteArray,
+                            SettlementComingFrom.DASHBOARD.screenType
+                        )
+                    }
+                } else
+                    logger("Auto Settle:- ", "Auto Settle Mismatch Time")
+            } else
+                logger("Auto Settle:- ", "Auto Settle Not Available")
+        } else {
+            Log.d("Dashboard Close:- ", "Yes")
+        }
+    }
+    //endregion
 }
 
 

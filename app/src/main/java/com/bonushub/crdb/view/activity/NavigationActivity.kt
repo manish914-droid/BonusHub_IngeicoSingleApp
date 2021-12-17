@@ -28,6 +28,7 @@ import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
@@ -41,6 +42,7 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.view.base.BaseActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthCompleteFragment
@@ -98,6 +100,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     private val initViewModel : InitViewModel by viewModels()
     // for init`
+
+    //Below Key is only we get in case of Auto Settlement == 1 after Sale:-
+    private val appUpdateFromSale by lazy { intent.getBooleanExtra("appUpdateFromSale", false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,6 +168,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
             }
         })
+
+        //Settle Batch When Auto Settle == 1 After Sale:- kushal
+//        if (appUpdateFromSale) {
+//            autoSettleBatchData()
+//        }
     }
 
 
@@ -170,7 +180,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-
+        isDashboardOpen = false
         //==============kushal ======= implemented drawer menu
         when(item.itemId)
         {
@@ -658,6 +668,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
 
     override  fun onDashBoardItemClick(action: EDashboardItem) {
+
+        isDashboardOpen = false
+
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
@@ -888,6 +901,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     AppPreference.saveBoolean(
                                         PreferenceKeyConstant.IsAutoSettleDone.keyName,
                                         true
+                                    )
+
+                                    // kushal
+                                    AppPreference.saveString(
+                                        PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName,
+                                        getSystemTimeIn24Hour().terminalDate()
                                     )
 
                                 }
@@ -1164,6 +1183,55 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 //backToCalled(it, false, true)
             })
         }
+    }
+
+    //Auto Settle Batch:- kushal
+    private fun autoSettleBatchData() {
+       // val settlementBatchData = BatchFileDataTable.selectBatchData()
+        val settlementBatchData = runBlocking(Dispatchers.IO) {
+            appDao.getAllBatchData()
+        }
+        val processingCode: String = if (appUpdateFromSale) {
+            ProcessingCode.SETTLEMENT.code
+        } else {
+            ProcessingCode.FORCE_SETTLEMENT.code
+        }
+
+        GlobalScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                //(this@MainActivity as BaseActivity).showProgress("Digi POS Txn Uploading")
+                showProgress("Digi POS Txn Uploading")
+            }
+            Log.e("UPLOAD DIGI", " ----------------------->  START")
+            uploadPendingDigiPosTxn(this@NavigationActivity as BaseActivity, appDao) {
+                Log.e("UPLOAD DIGI", " ----------------------->  BEFOR PRINT")
+                hideProgress()
+                PrintUtil(this@NavigationActivity).printDetailReportupdate(
+                    settlementBatchData,
+                    this@NavigationActivity
+                ) { detailPrintStatus ->
+                    if (detailPrintStatus) {
+                        /*val settlementPacket = CreateSettlementPacket(
+                            processingCode,
+                            settlementBatchData
+                        ).createSettlementISOPacket()*/
+                        // this code below converted
+                        val settlementPacket = CreateSettlementPacket(appDao).createSettlementISOPacket()
+
+                        val isoByteArray = settlementPacket.generateIsoByteRequest()
+                        GlobalScope.launch(Dispatchers.IO) {
+                            settleBatch(isoByteArray)
+                        }
+                    } else
+                        alertBoxWithAction(getString(R.string.printing_error),
+                            getString(R.string.failed_to_print_settlement_detail_report),
+                            false, getString(R.string.positive_button_ok),
+                            {}, {})
+                }
+            }
+        }
+
+
     }
 
 }
