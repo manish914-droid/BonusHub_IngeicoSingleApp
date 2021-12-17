@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.bonushub.crdb.HDFCApplication
+import com.bonushub.crdb.model.remote.RestartHandlingModel
 import com.bonushub.crdb.utils.addPad
 import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.IsoDataWriter
@@ -48,7 +49,7 @@ object AppPreference {
 
     const val LAST_SUCCESS_RECEIPT_KEY = "Last_Success_Receipt"
     const val LAST_BATCH = "last_batch"
-
+    const val RESTART_HANDLING = "restart_handling"
 
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
@@ -232,4 +233,35 @@ object AppPreference {
     }
 
     // end region
+
+    //region Below method is used to Save Restart Handling File Data in App Preference:-
+    fun saveRestartDataPreference(restartData:String?) {
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(RESTART_HANDLING, restartData?:"")?.apply()
+    }
+    //endregion
+
+    // region
+    @JvmStatic
+    fun getRestartDataPreference(): RestartHandlingModel? {
+        logger(TAG, "========get=========", "e")
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+
+        return if (v != null) {
+            try {
+                val str = v.getString(RESTART_HANDLING, "")
+                if (!str.isNullOrEmpty()) {
+                    Gson().fromJson<RestartHandlingModel>(
+                        str,
+                        object : TypeToken<RestartHandlingModel>() {}.type
+                    )
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Last Success Receipt Error!!!")
+            }
+        } else
+            null
+    }
+
+    // end reegion
 }
