@@ -64,6 +64,7 @@ class DashboardRepository {
                 Log.d("itemList===>:- ", Gson().toJson(itemList))
                 itemList.add(EDashboardItem.MERCHANT_REFERRAL)
                 itemList.add(EDashboardItem.CROSS_SELL)
+                itemList.add(EDashboardItem.PREAUTH_VIEW)
                 Log.d("itemList===>:- ", Gson().toJson(itemList))
                 // This list is a list where all types of preath available which was enable by backend
                 val totalPreAuthItem = mutableListOf<EDashboardItem>()
@@ -73,13 +74,13 @@ class DashboardRepository {
                 //It returns true if any praauth item is available and return false if no preauth item found
                 val isAnyPreAuthItemAvailable = totalPreAuthItem.retainAll { item ->
                     item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
-                            || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
+                            || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH||item == EDashboardItem.PREAUTH_VIEW
                 }
 
                 if (isAnyPreAuthItemAvailable) {
                     itemList.removeAll { item ->
                         item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
-                                || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
+                                || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH ||item == EDashboardItem.PREAUTH_VIEW
                     }
                     if (totalPreAuthItem.size > 0) {
                         val preAuth = EDashboardItem.PRE_AUTH_CATAGORY

@@ -41,10 +41,11 @@ class BrandEmiProductFragment : Fragment() {
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-
+    private lateinit var eDashBoardItem: EDashboardItem
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
     private lateinit var brandEmiProductViewModel: BrandEmiProductViewModel
     private var brandEmiProductBinding: BrandEmiListAndSearchUiBinding? = null
+
     private var brandDataMaster: BrandEMIMasterDataModal? = null
     private val brandEMIProductAdapter by lazy {
         BrandEmiProductAdapter(::onItemClick)
@@ -67,6 +68,7 @@ class BrandEmiProductFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
@@ -74,13 +76,15 @@ class BrandEmiProductFragment : Fragment() {
         brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
             BrandEmiProductViewModel::class.java
         )
-        if (action  == EDashboardItem.BRAND_EMI_CATALOGUE) {
+        if (eDashBoardItem  == EDashboardItem.BRAND_EMI_CATALOGUE) {
             brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+          //  eDashBoardItem= EDashboardItem.BRAND_EMI_CATALOGUE
 
         }else{
             brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
         brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+          //  eDashBoardItem= EDashboardItem.BRAND_EMI
     }
         //  brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
 
@@ -129,7 +133,7 @@ class BrandEmiProductFragment : Fragment() {
                 putSerializable("brandEmiProductData", productData)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
                 putSerializable("brandDataMaster", brandDataMaster)
-                putSerializable("type", action)
+                putSerializable("type", eDashBoardItem )
             }
         })
 

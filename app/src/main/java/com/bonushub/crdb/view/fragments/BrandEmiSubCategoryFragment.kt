@@ -24,7 +24,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
     private var brandDataMaster: BrandEMIMasterDataModal? = null
     private var brandSubCatList: ArrayList<BrandEMISubCategoryTable>? = null
     private var filteredSubCat: ArrayList<BrandEMISubCategoryTable> = arrayListOf()
-    private val action by lazy { arguments?.getSerializable("type") ?: "" }
+    private lateinit var eDashBoardItem: EDashboardItem
 
     private var openedFragmentFromBrandData=false
     private val brandEMISubCategoryAdapter by lazy {
@@ -44,12 +44,13 @@ class BrandEmiSubCategoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         Log.e("OPEN FRAG", "TOUCHED")
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
         brandSubCatList = arguments?.getSerializable("brandSubCatList") as? ArrayList<BrandEMISubCategoryTable>
         filteredSubCat= arguments?.getSerializable("filteredSubCat") as ArrayList<BrandEMISubCategoryTable>
         openedFragmentFromBrandData= arguments?.getBoolean("fromBranddata",false) == true
-        if (action  == EDashboardItem.BRAND_EMI_CATALOGUE) {
+        if (eDashBoardItem  == EDashboardItem.BRAND_EMI_CATALOGUE) {
             brandSubCatBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
 
@@ -91,7 +92,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
         if (filteredSubCat.isNotEmpty()) {
         //    FRAGMENT_COUNTER += 1
 
-            (activity as NavigationActivity).transactSubCatFragment(false,brandDataMaster,brandSubCatList,filteredSubCat)
+            (activity as NavigationActivity).transactSubCatFragment(false,brandDataMaster,brandSubCatList,filteredSubCat,eDashBoardItem)
 
           //  brandEMISubCategoryAdapter.submitList(filteredSubCat)
         } else {
@@ -100,7 +101,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
                 arguments = Bundle().apply {
                     putSerializable("brandEmiSubCat", brandEMISubCategoryTable)
                     putSerializable("brandDataMaster", brandDataMaster)
-                    putSerializable("type", EDashboardItem.BRAND_EMI_CATALOGUE)
+                    putSerializable("type", eDashBoardItem)
                 }
             })
 

@@ -20,6 +20,7 @@ import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.model.remote.RestartHandlingModel
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -61,7 +62,7 @@ class TransactionActivity : BaseActivityNew(){
     private val transactionViewModel : TransactionViewModel by viewModels()
     //used for other cash amount
     private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
-
+    private val restartHandlingList: MutableList<RestartHandlingModel> by lazy { mutableListOf<RestartHandlingModel>() }
     private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
 
     private val brandEmiSubCatData by lazy { intent.getSerializableExtra("brandEmiSubCatData") as BrandEMISubCategoryTable } //: BrandEMISubCategoryTable? = null
@@ -322,16 +323,22 @@ BhTransactionType.BRAND_EMI.type->{
                 val amt=(saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
                 try {
+                   val tranUuid = UUID.randomUUID().toString().also {
+                        ecrID = it
+
+                    }
+                    val restartHandlingModel=RestartHandlingModel(tranUuid,EDashboardItem.SALE)
+                    restartHandlingList.add(restartHandlingModel)
+                    val jsonResp=Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
                     DeviceHelper.doSaleTransaction(
                         SaleRequest(
                             amount = amt ?: 0,
                             tipAmount = 0L ?: 0,
                             transactionType = TransactionType.SALE,
                             tid = tid,
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
+                            transactionUuid=tranUuid
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -701,7 +708,7 @@ BhTransactionType.BRAND_EMI.type->{
             }
         }
     }
-    fun printingSaleData(receiptDetail: ReceiptDetail) {
+  public  fun printingSaleData(receiptDetail: ReceiptDetail) {
         lifecycleScope.launch(Dispatchers.Main) {
             showProgress(getString(R.string.printing))
             var printsts = false

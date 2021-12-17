@@ -37,8 +37,8 @@ class BrandEmiMasterCategoryFragment : Fragment() {
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-    private val action by lazy { arguments?.getSerializable("type") ?: "" }
-
+    //private val action by lazy { arguments?.getSerializable("type") ?: "" }
+    private lateinit var eDashBoardItem: EDashboardItem
     private lateinit var brandEmiMasterCategoryViewModel: BrandEmiMasterCategoryViewModel
     private var brandMasterBinding: BrandEmiListAndSearchUiBinding? = null
     private val brandEMIMasterCategoryAdapter by lazy {
@@ -59,7 +59,8 @@ class BrandEmiMasterCategoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (action as EDashboardItem == EDashboardItem.BRAND_EMI_CATALOGUE) {
+        eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
+        if (eDashBoardItem == EDashboardItem.BRAND_EMI_CATALOGUE) {
             brandMasterBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
 
@@ -126,7 +127,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                         putSerializable("brandSubCatList", brandSubCatList)
                         putSerializable("filteredSubCat", filteredSubCat)
                         putSerializable("fromBranddata", true)
-                        putSerializable("type", action)
+                        putSerializable("type", eDashBoardItem)
 
                       //  putBoolean("navigateFromMaster",true)
                         // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
@@ -137,7 +138,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                 (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
                     arguments = Bundle().apply {
                         putSerializable("brandDataMaster", brandDataMaster)
-                        putSerializable("type", action)
+                        putSerializable("type", eDashBoardItem)
                     }
                 })
             }

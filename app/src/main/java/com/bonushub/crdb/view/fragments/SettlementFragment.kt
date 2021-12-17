@@ -21,6 +21,7 @@ import com.bonushub.crdb.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.databinding.ItemSettlementBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
@@ -123,6 +124,7 @@ class SettlementFragment : Fragment() {
                     when (result.status) {
                         Status.SUCCESS -> {
                             CoroutineScope(Dispatchers.IO).launch{
+                              //  AppPreference.saveBatchInPreference(dataList as MutableList<BatchTable>)
                                 val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                 settlementByteArray = data.generateIsoByteRequest()
                                 try {

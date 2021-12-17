@@ -54,7 +54,10 @@ import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.model.ReceiptDetail
+import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
+import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -333,14 +336,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
     //region============================fragment transaction
-    fun transactSubCatFragment(isBackStackAdded: Boolean = false, brandDataMaster: BrandEMIMasterDataModal?, brandSubCatList: ArrayList<BrandEMISubCategoryTable>?, filteredSubCat: ArrayList<BrandEMISubCategoryTable>?): Boolean {
+    fun transactSubCatFragment(isBackStackAdded: Boolean = false, brandDataMaster: BrandEMIMasterDataModal?, brandSubCatList: ArrayList<BrandEMISubCategoryTable>?, filteredSubCat: ArrayList<BrandEMISubCategoryTable>?,eDashBoardItem: EDashboardItem): Boolean {
         val trans = supportFragmentManager.beginTransaction().apply {
             val fragment= BrandEmiSubCategoryFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable("brandDataMaster", brandDataMaster)
                     putSerializable("brandSubCatList", brandSubCatList)
                     putSerializable("filteredSubCat", filteredSubCat)
-
+                    putSerializable("type", eDashBoardItem)
                     //  putBoolean("navigateFromMaster",true)
                     // putParcelableArrayList("brandSubCatList",ArrayList<Parcelable>( brandSubCatList))
                 }
@@ -1233,6 +1236,46 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
     }
+
+    private fun restartHandaling() {
+        val restatDataList = AppPreference.getRestartDataPreference()
+        if (restatDataList != null) {
+            val uid=restatDataList.transactionUuid
+            println("uid = $uid")
+            DeviceHelper.getTransactionByUId(uid,object: OnOperationListener.Stub(){
+
+                override fun onCompleted(p0: OperationResult?) {
+
+
+                    p0?.value?.apply {
+                        println("Status = $status")
+                        println("Response code = $responseCode")
+                        println("Response code = $responseCode")
+                    }
+                    if(p0?.value?.status?.equals("SUCCESS") == true){
+                        val transactionDetail =
+                            ((p0?.value as? TransactionDataResponse)?.transactionDetail)
+                        println("Status = $transactionDetail")
+                    }
+                }
+            })
+        }
+    }
+    fun restartStubData(transactionDetail: TransactionDetail){
+        val cvmResult: com.ingenico.hdfcpayment.type.CvmAction?=null
+        val cvmRequiredLimit:Long?=null
+     /*   val receiptDetail= ReceiptDetail(transactionDetail.authCode, transactionDetail.aid, transactionDetail.batchNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, transactionDetail.expirationDate, transactionDetail.invoice, transactionDetail.mid, transactionDetail.merAddHeader1, merAddHeader2,  transactionDetail.rrn, transactionDetail. stan, transactionDetail.tc,
+            transactionDetail.tid, transactionDetail.tsi, transactionDetail.tvr, transactionDetail.entryMode, transactionDetail.txnName,
+            transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, transactionDetail.pan,
+            isVerifyPin = true,
+            isSignRequired = false,
+            cvmResult = cvmResult,
+            cvmRequiredLimit = cvmRequiredLimit
+        )*/
+
+    }
+   
+        
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-

@@ -263,7 +263,12 @@ object DeviceHelper   {
     fun showAdminFunction(listener: OnOperationListener) {
         iRemoteService?.showAdminFunction(listener)
     }
-
+    /**
+     * Show admin function screen
+     * */
+    fun getTransactionByUId(uid : String,listener: OnOperationListener) {
+        iRemoteService?.getTransactionByEcrUId(uid,listener)
+    }
     fun doSettlementtxn(request: SettlementRequest, listener:OnOperationListener ){
         iRemoteService?.doSettlement(request,listener)
     }

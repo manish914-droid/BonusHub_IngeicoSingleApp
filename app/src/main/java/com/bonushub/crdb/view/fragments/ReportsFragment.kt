@@ -525,15 +525,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     )
                                 )
                             }
-
                             lifecycleScope.launch {
-                                val batList1 = AppPreference.getLastBatch()
-
-                                if (batList1 != null) {
+                                if (batList != null) {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        PrintUtil(activity).printSettlementReportupdate(activity, batList1 as MutableList<BatchTable>, true,true) {
+                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, true,true) {
 
                                         }
                                     } catch (ex: java.lang.Exception) {
