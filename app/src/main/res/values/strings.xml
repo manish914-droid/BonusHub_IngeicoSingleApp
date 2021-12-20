@@ -233,6 +233,8 @@
     <string name="last_summary_not_available">Last summary not available</string>
     <string name="last_summary_confirmation">Do you want to print Last summary report</string>
     <string name="printing_last_summary_report">Printing Last Summary Report</string>
+    <string name="printing_reversal_report">Printing Reversal Report</string>
+    <string name="reversal_report_not_available">Reversal Report Not Available</string>
 
 
     <!--void sale-->

@@ -22,6 +22,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.ReportsAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
+import com.bonushub.crdb.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
@@ -45,6 +46,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
     private val batchFileViewModel:BatchFileViewModel by viewModels()
     private val settlementViewModel : SettlementViewModel by viewModels()
+    private val batchReversalViewModel : BatchReversalViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -572,7 +574,81 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 // End of last Summery Report receipt
 
             ReportsItem.PRINT_REVERSAL_REPORT -> {
-                ToastUtils.showToast(requireContext(), "Not implemented yet.")
+               // ToastUtils.showToast(requireContext(), "Not implemented yet.") // batchReversalViewModel
+                lifecycleScope.launch{
+
+                    batchReversalViewModel?.getBatchTableReversalData()?.observe(viewLifecycleOwner) { batchReversalList ->
+
+                        if (batchReversalList.isNotEmpty()) {
+                            iDiag?.getMsgDialog(
+                                getString(R.string.confirmation),
+                                "Do you want to print reversal report",
+                                "Yes",
+                                "No",
+                                {
+
+                                    GlobalScope.launch {
+                                        if (batchReversalList.isNotEmpty()) {
+                                            GlobalScope.launch(Dispatchers.Main) {
+                                                iDiag?.showProgress(
+                                                    getString(R.string.printing_reversal_report)
+                                                )
+                                            }
+                                            Log.d("batReverData", batchReversalList.toString())
+                                           // dataList.clear()
+                                           // dataList.addAll(batchReversalList as MutableList<BatchTable>)
+                                            try {
+
+                                                // please change here batchReversalList
+                                                PrintUtil(activity).printDetailReportupdate(
+                                                    batchReversalList,
+                                                    activity
+                                                ) { detailPrintStatus ->
+
+                                                }
+
+
+                                            } catch (ex: java.lang.Exception) {
+                                                //  ex.message ?: getString(R.string.error_in_printing)
+                                                ex.printStackTrace()
+                                            } finally {
+                                                launch(Dispatchers.Main) {
+                                                    iDiag?.hideProgress()
+                                                    // iDiag?.showToast(msg)
+                                                }
+                                            }
+
+                                        } else {
+                                            launch(Dispatchers.Main) {
+                                                iDiag?.hideProgress()
+                                                iDiag?.getInfoDialog(
+                                                    "Error",
+                                                    " Reversal is not available."
+                                                ) {}
+                                            }
+                                        }
+
+                                    }
+                                },
+                                {
+                                    //Cancel handle here
+
+                                })
+                        } else {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                iDiag?.alertBoxWithAction(
+                                    getString(R.string.empty_batch),
+                                    getString(R.string.reversal_report_not_available),
+                                    false,
+                                    getString(R.string.positive_button_ok),
+                                    {},
+                                    {})
+                            }
+
+                        }
+
+                    }
+                }
             }
         }
 
