@@ -1105,3 +1105,19 @@ data class IngenicoSettlementResponse(
     var tids: List<String>? = null,
 
     )
+
+// region ======
+@Entity
+data class BatchTableReversal(var receiptData:ReceiptDetail?=null){
+    @PrimaryKey(autoGenerate = false)
+    var invoice: String=""
+    var transactionType: Int = 0
+    var imeiOrSerialNum: String?=null
+    var billNumber: String?=null
+    var emiBrandData: BrandEMIMasterDataModal?=null
+    var emiCategoryData: BrandEMISubCategoryTable?=null
+    var emiProductData: BrandEMIProductDataModal?=null
+    var responseCode: String?=""
+
+}
+// endregion

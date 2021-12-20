@@ -87,6 +87,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d("Dashboard:- ", "onViewCreated")
         isDashboardOpen = true
+        Utility().hideSoftKeyboard(requireActivity())
 
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()

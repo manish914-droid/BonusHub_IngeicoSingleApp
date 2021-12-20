@@ -393,4 +393,16 @@ interface AppDao{
     @Query("DELETE From DigiPosDataTable WHERE partnerTxnId = :partnerTxnId")
     suspend fun deleteDigiPosData(partnerTxnId:String)*/
     // endregion ====================
+
+    // region ========== Batch Reversal Table dao ======
+    @Query("SELECT * FROM BatchTableReversal")
+    suspend fun getAllBatchReversalData(): MutableList<BatchTableReversal>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBatchReversalData(batchTableReversal: BatchTableReversal): Long?
+
+    @Query("DELETE From BatchTableReversal")
+    suspend fun deleteBatchReversalTable()
+
+    // endregion ================
 }

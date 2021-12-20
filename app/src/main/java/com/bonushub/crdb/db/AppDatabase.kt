@@ -14,7 +14,7 @@ import com.bonushub.crdb.model.local.*
     IssuerTAndCTable::class, BrandTAndCTable::class, BrandEMIMasterTimeStamps::class,
     BrandEMISubCategoryTable::class,
     IngenicoInitialization::class,BatchTable::class,
-    IngenicoSettlementResponse::class], version = 2, exportSchema = false)
+    IngenicoSettlementResponse::class, BatchTableReversal::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     /**
