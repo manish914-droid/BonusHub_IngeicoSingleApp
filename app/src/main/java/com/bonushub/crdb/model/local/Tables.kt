@@ -1112,6 +1112,7 @@ data class IngenicoSettlementResponse(
 @Entity
 data class BatchTableReversal(var receiptData:ReceiptDetail?=null){
     @PrimaryKey(autoGenerate = false)
+    var rrn: String=""
     var invoice: String=""
     var transactionType: Int = 0
     var imeiOrSerialNum: String?=null
