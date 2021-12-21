@@ -272,6 +272,37 @@ BhTransactionType.BRAND_EMI.type->{
                                     ResponseCode.ABORTED.value -> {
                                         errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
                                     }
+
+                                    ResponseCode.REVERSAL.value -> {
+                                        // kushal
+                                        // region
+                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                        val jsonResp=Gson().toJson(ReceiptDetail)
+                                        println(jsonResp)
+
+                                        try {
+                                            val str = jsonResp
+                                            if (!str.isNullOrEmpty()) {
+                                                Gson().fromJson<ReceiptDetail>(
+                                                    str,
+                                                    object : TypeToken<ReceiptDetail>() {}.type
+                                                )
+                                            } else null
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                        val batchReversalData=BatchTableReversal(receiptDetail)
+
+                                        lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                            batchReversalData.invoice= receiptDetail?.invoice.toString()
+                                            batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
+                                            appDatabase.appDao.insertBatchReversalData(batchReversalData)
+                                        }
+                                    }
+
                                     else -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
                                     }
@@ -411,7 +442,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             //    appDao.insertBatchData(batchData)
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
-                                            batchReversalData.responseCode = "04"
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -475,6 +506,35 @@ BhTransactionType.BRAND_EMI.type->{
                                     ResponseCode.ABORTED.value -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
                                     }
+                                    ResponseCode.REVERSAL.value -> {
+                                        // kushal
+                                        // region
+                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                        val jsonResp=Gson().toJson(ReceiptDetail)
+                                        println(jsonResp)
+
+                                        try {
+                                            val str = jsonResp
+                                            if (!str.isNullOrEmpty()) {
+                                                Gson().fromJson<ReceiptDetail>(
+                                                    str,
+                                                    object : TypeToken<ReceiptDetail>() {}.type
+                                                )
+                                            } else null
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                        val batchReversalData=BatchTableReversal(receiptDetail)
+
+                                        lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                            batchReversalData.invoice= receiptDetail?.invoice.toString()
+                                            batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
+                                            appDatabase.appDao.insertBatchReversalData(batchReversalData)
+                                        }
+                                    }
                                     else -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
                                     }
@@ -535,6 +595,35 @@ BhTransactionType.BRAND_EMI.type->{
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
+                                    }
+                                    ResponseCode.REVERSAL.value -> {
+                                        // kushal
+                                        // region
+                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                        val jsonResp=Gson().toJson(ReceiptDetail)
+                                        println(jsonResp)
+
+                                        try {
+                                            val str = jsonResp
+                                            if (!str.isNullOrEmpty()) {
+                                                Gson().fromJson<ReceiptDetail>(
+                                                    str,
+                                                    object : TypeToken<ReceiptDetail>() {}.type
+                                                )
+                                            } else null
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                        val batchReversalData=BatchTableReversal(receiptDetail)
+
+                                        lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                            batchReversalData.invoice= receiptDetail?.invoice.toString()
+                                            batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
+                                            appDatabase.appDao.insertBatchReversalData(batchReversalData)
+                                        }
                                     }
                                     else -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
@@ -597,6 +686,35 @@ BhTransactionType.BRAND_EMI.type->{
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
 
                                     }
+                                    ResponseCode.REVERSAL.value -> {
+                                        // kushal
+                                        // region
+                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                        val jsonResp=Gson().toJson(ReceiptDetail)
+                                        println(jsonResp)
+
+                                        try {
+                                            val str = jsonResp
+                                            if (!str.isNullOrEmpty()) {
+                                                Gson().fromJson<ReceiptDetail>(
+                                                    str,
+                                                    object : TypeToken<ReceiptDetail>() {}.type
+                                                )
+                                            } else null
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                        val batchReversalData=BatchTableReversal(receiptDetail)
+
+                                        lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                            batchReversalData.invoice= receiptDetail?.invoice.toString()
+                                            batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
+                                            appDatabase.appDao.insertBatchReversalData(batchReversalData)
+                                        }
+                                    }
                                     else -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
                                     }
@@ -657,6 +775,35 @@ BhTransactionType.BRAND_EMI.type->{
                                     ResponseCode.ABORTED.value -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
 
+                                    }
+                                    ResponseCode.REVERSAL.value -> {
+                                        // kushal
+                                        // region
+                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                        val jsonResp=Gson().toJson(ReceiptDetail)
+                                        println(jsonResp)
+
+                                        try {
+                                            val str = jsonResp
+                                            if (!str.isNullOrEmpty()) {
+                                                Gson().fromJson<ReceiptDetail>(
+                                                    str,
+                                                    object : TypeToken<ReceiptDetail>() {}.type
+                                                )
+                                            } else null
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                        val batchReversalData=BatchTableReversal(receiptDetail)
+
+                                        lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                            batchReversalData.invoice= receiptDetail?.invoice.toString()
+                                            batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
+                                            appDatabase.appDao.insertBatchReversalData(batchReversalData)
+                                        }
                                     }
                                     else -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())
@@ -723,6 +870,35 @@ BhTransactionType.BRAND_EMI.type->{
                                     "03"->{
                                         errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
 
+                                    }
+                                    ResponseCode.REVERSAL.value -> {
+                                        // kushal
+                                        // region
+                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                        val jsonResp=Gson().toJson(ReceiptDetail)
+                                        println(jsonResp)
+
+                                        try {
+                                            val str = jsonResp
+                                            if (!str.isNullOrEmpty()) {
+                                                Gson().fromJson<ReceiptDetail>(
+                                                    str,
+                                                    object : TypeToken<ReceiptDetail>() {}.type
+                                                )
+                                            } else null
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                        val batchReversalData=BatchTableReversal(receiptDetail)
+
+                                        lifecycleScope.launch(Dispatchers.IO) {
+                                            //    appDao.insertBatchData(batchData)
+                                            batchReversalData.invoice= receiptDetail?.invoice.toString()
+                                            batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            batchReversalData.responseCode = ResponseCode.SUCCESS.value
+                                            appDatabase.appDao.insertBatchReversalData(batchReversalData)
+                                        }
                                     }
                                     else -> {
                                         errorFromIngenico(txnResponse?.responseCode,txnResponse?.status.toString())

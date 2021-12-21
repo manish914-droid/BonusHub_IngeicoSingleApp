@@ -16,6 +16,7 @@ import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.invoiceWithPadding
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -296,7 +297,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         lifecycleScope.launch {
                             try {
 
-                                batchFileViewModel?.getBatchTableDataByInvoice(invoice)?.observe(viewLifecycleOwner, { bat ->
+                                batchFileViewModel?.getBatchTableDataByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
 
                                     if(bat?.receiptData != null)
                                     {
