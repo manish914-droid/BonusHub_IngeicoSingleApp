@@ -124,7 +124,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             logger("print","util")
 
                             // please uncomment this code to use with batch data for printing
-                            /*PrintUtil(activity).startPrinting(batchData,
+                            PrintUtil(activity).startPrinting(batchData,
                                     EPrintCopyType.DUPLICATE,
                                     activity
                                 ) { printCB, printingFail ->
@@ -134,7 +134,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     } else {
                                         iDiag?.hideProgress()
                                     }
-                                }*/
+                                }
 
                            /* PrintUtil(activity).startPrinting(lastReceiptData,
                                     EPrintCopyType.DUPLICATE,
