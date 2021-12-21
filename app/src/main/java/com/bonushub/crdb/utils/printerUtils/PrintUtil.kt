@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.model.local.BatchTable
+import com.bonushub.crdb.model.local.BatchTableReversal
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
@@ -642,6 +643,344 @@ class PrintUtil(context: Context?) {
         }
     }
 
+    fun printReversalReportupdate(
+        batch: MutableList<BatchTableReversal>,
+        context: Context?,
+        printCB: (Boolean) -> Unit
+    ) {
+        try {
+            val pp = printer?.status
+            Log.e("Printer Status", pp.toString())
+            if (pp == 0) {
+
+                val appVersion = BuildConfig.VERSION_NAME
+                val tpt = getTptData()
+                batch.sortBy { it.receiptData?.tid }
+
+                if (batch.isEmpty()) {
+                    // alignLeftRightText(textInLineFormatBundle, "MID : ${tpt?.merchantId}", "TID : ${tpt?.terminalId}")
+                } else {
+                    //-----------------------------------------------
+                    setLogoAndHeader()
+                    //  ------------------------------------------
+                    val td = System.currentTimeMillis()
+                    val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                    val formattime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+
+                    val date = formatdate.format(td)
+                    val time = formattime.format(td)
+
+
+                    textBlockList.add(sigleLineformat("DATE:${date}", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("TIME:${date}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    sigleLineText("REVERSAL REPORT", AlignMode.CENTER)
+
+
+
+                    textBlockList.add(sigleLineformat("MID:${batch[0].receiptData?.mid}", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("TID:${batch[0].receiptData?.tid}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.add(
+                        sigleLineformat(
+                            "BATCH NO:${batch[0].receiptData?.batchNumber}",
+                            AlignMode.LEFT
+                        )
+                    )
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    printSeperator()
+                }
+
+                if (batch.isEmpty()) {
+                    // alignLeftRightText(textInLineFormatBundle, "Total Transaction", "0")
+                } else {
+                    textBlockList.add(sigleLineformat("TRANS-TYPE", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("AMOUNT", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.add(sigleLineformat("ISSUER", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("PAN/CID", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.add(sigleLineformat("DATE-TIME", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("INVOICE", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    printSeperator()
+
+                    val totalMap = mutableMapOf<Int, SummeryTotalType>()
+                    val deformatter = SimpleDateFormat("yyMMdd HHmmss", Locale.ENGLISH)
+
+                    var frequency = 0
+                    var count = 0
+                    var lastfrequecny = 0
+                    var hasfrequency = false
+                    var updatedindex = 0
+                    var iteration = 0
+                    val frequencylist = mutableListOf<String>()
+                    val tidlist = mutableListOf<String>()
+
+                    for (item in batch) {
+                        item.receiptData?.tid.let {
+                            if (it != null) {
+                                tidlist.add(it)
+                            }
+                        }
+                    }
+                    for (item in tidlist.distinct()) {
+                        println(
+                            "Frequency of item" + item + ": " + Collections.frequency(
+                                tidlist,
+                                item
+                            )
+                        )
+                        frequencylist.add("" + Collections.frequency(tidlist, item))
+                    }
+
+                    iteration = tidlist.distinct().size - 1
+
+                    for (b in batch) {
+                        //  || b.transactionType == TransactionType.VOID_PREAUTH.type
+                        if (b.transactionType == BhTransactionType.PRE_AUTH.type) continue  // Do not add pre auth transactions
+
+                        if (b.transactionType == BhTransactionType.EMI_SALE.type || b.transactionType == BhTransactionType.BRAND_EMI.type || b.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+                            b.transactionType = BhTransactionType.EMI_SALE.type
+                        }
+
+                        if (b.transactionType == BhTransactionType.TEST_EMI.type) {
+                            b.transactionType = BhTransactionType.SALE.type
+                        }
+
+                        count++
+                        if (updatedindex <= frequencylist.size - 1)
+                            frequency = frequencylist[updatedindex].toInt() + lastfrequecny
+
+
+                        if (totalMap.containsKey(b.transactionType)) {
+                            val x = totalMap[b.transactionType]
+                            if (x != null) {
+                                x.count += 1
+                                x.total += b.receiptData?.txnAmount?.toLong()!!
+                            }
+                        } else {
+
+                            totalMap[b.transactionType] =
+                                b.receiptData?.txnAmount?.toLong()?.let { SummeryTotalType(1, it) }!!
+                        }
+                        val transAmount = "%.2f".format(b.receiptData?.txnAmount?.toDouble()
+                            ?.div(100))
+
+                        textBlockList.add(
+                            sigleLineformat(
+                                "${b.receiptData?.txnName}",
+                                AlignMode.LEFT
+                            )
+                        )
+                        textBlockList.add(sigleLineformat(transAmount, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+                        if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${b.receiptData?.appName}",
+                                    AlignMode.LEFT
+                                )
+                            )
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "0000*0000",
+                                    AlignMode.RIGHT
+                                )
+                            )
+                            printer?.addMixStyleText(textBlockList)
+                            textBlockList.clear()
+                        } else {
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${b.receiptData?.appName}",
+                                    AlignMode.LEFT
+                                )
+                            )
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "0000*0000",
+                                    AlignMode.RIGHT
+                                )
+                            )
+                            printer?.addMixStyleText(textBlockList)
+                            textBlockList.clear()
+                        }
+                        if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
+                            try {
+
+                                val dat = "${b.receiptData?.dateTime}"
+                                textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
+                                b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
+                                    sigleLineformat(
+                                        it, AlignMode.RIGHT
+                                    )
+                                }?.let { textBlockList.add(it) }
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+
+
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
+                            }
+
+                        } else {
+                            val date = b.receiptData?.dateTime
+                            val parts = date?.split(" ")
+                            println("Date: " + parts!![0])
+                            println("Time: " + (parts[1]))
+                            try {
+
+                                val dat = "${parts!![0]} - ${parts[1]}"
+                                textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
+                                b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
+                                    sigleLineformat(
+                                        it, AlignMode.RIGHT
+                                    )
+                                }?.let { textBlockList.add(it) }
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+                                //alignLeftRightText(textInLineFormatBundle," "," ")
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
+                            }
+                        }
+
+                        printSeperator()
+                        if (frequency == count) {
+                            lastfrequecny = frequency
+                            hasfrequency = true
+                            updatedindex++
+                        } else {
+                            hasfrequency = false
+                        }
+                        if (hasfrequency) {
+
+
+                            sigleLineText("***TOTAL TRANSACTIONS***", AlignMode.CENTER)
+                            val sortedMap = totalMap.toSortedMap(compareByDescending { it })
+
+                            for ((k, m) in sortedMap) {
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        transactionType2Name(k).toUpperCase(
+                                            Locale.ROOT
+                                        ), AlignMode.LEFT
+                                    )
+                                )
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "=" + m.count + " ${
+                                            getCurrencySymbol(
+                                                tpt
+                                            )
+                                        }", AlignMode.CENTER
+                                    )
+                                )
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "%.2f".format(
+                                            (((m.total).toDouble()).div(
+                                                100
+                                            )).toString().toDouble()
+                                        ), AlignMode.RIGHT
+                                    )
+                                )
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+                            }
+
+                            if (iteration > 0) {
+                                printSeperator()
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "MID:${batch[frequency].receiptData?.tid}",
+                                        AlignMode.LEFT
+                                    )
+                                )
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "TID:${batch[frequency].receiptData?.tid}",
+                                        AlignMode.RIGHT
+                                    )
+                                )
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "BATCH NO:${batch[frequency].receiptData?.batchNumber}",
+                                        AlignMode.LEFT
+                                    )
+                                )
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+                                printSeperator()
+                                iteration--
+                            }
+
+                            totalMap.clear()
+                        }
+                    }
+
+                }
+
+                //endregion
+                if (batch.isNotEmpty()) {
+                    printSeperator()
+                    sigleLineText("Bonushub", AlignMode.CENTER)
+                    sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
+                    printer?.feedLine(4)
+                }
+                printer?.startPrint(object : OnPrintListener.Stub() {
+                    @Throws(RemoteException::class)
+                    override fun onFinish() {
+                        Log.e("DEATIL REPORT", "SUCESS__")
+                        printCB(true)
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onError(error: Int) {
+                        Log.e("DEATIL REPORT", "FAIL__")
+                        printCB(false)
+                    }
+                })
+            }
+        } catch (ex: DeadObjectException) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take chargeslip from the Report menu."
+            )
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take chargeslip from the Report menu."
+            )
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take chargeslip from the Report menu."
+            )
+        } finally {
+            //   VFService.connectToVFService(VerifoneApp.appContext)
+        }
+    }
 
     fun printSettlementReportupdate(
         context: Context?,

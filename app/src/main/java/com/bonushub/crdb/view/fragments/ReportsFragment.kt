@@ -632,12 +632,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             try {
 
                                                 // please change here batchReversalList
-//                                                PrintUtil(activity).printDetailReportupdate(
-//                                                    batchReversalList,
-//                                                    activity
-//                                                ) { detailPrintStatus ->
-//
-//                                                }
+                                                PrintUtil(activity).printReversalReportupdate(
+                                                    batchReversalList,
+                                                    activity
+                                                ) { detailPrintStatus ->
+
+                                                }
 
 
                                             } catch (ex: java.lang.Exception) {

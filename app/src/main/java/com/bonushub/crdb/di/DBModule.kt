@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.repository.*
+import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.DeviceHelper
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
 import com.usdk.apiservice.aidl.emv.UEMV
@@ -32,6 +33,8 @@ object DBModule {
     fun provideAppDao(appDatabase: AppDatabase): AppDao {
         return appDatabase.appDao
     }
+
+
 
     @Provides
     @Singleton

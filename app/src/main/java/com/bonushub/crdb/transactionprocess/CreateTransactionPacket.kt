@@ -146,7 +146,11 @@ class CreateTransactionPacket(
             }
 */
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
-            // addField(57, cardProcessedData.getTrack2Data().toString())
+            cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
+                addField(57,
+                    it
+                )
+            }
 
             //Indicator Data Field 58
             /*  val cardIndFirst = "0"

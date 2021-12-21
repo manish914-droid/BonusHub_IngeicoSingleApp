@@ -377,8 +377,10 @@ BhTransactionType.BRAND_EMI.type->{
                             override fun onCompleted(result: PaymentResult?) {
                                 val txnResponse = result?.value as? TransactionResponse
                                 val receiptDetail = txnResponse?.receiptDetail
-
                                 Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                                val jsonResp=Gson().toJson(receiptDetail)
+                                println(jsonResp)
+                                Log.d(TAG, "receiptDetail : ${jsonResp}")
                                 when (txnResponse?.responseCode) {
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp=Gson().toJson(receiptDetail)
@@ -396,6 +398,7 @@ BhTransactionType.BRAND_EMI.type->{
                                                 CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
 
                                             val jsonResp=Gson().toJson(transactionISO)
+                                            Log.d(TAG, "jsonResp : ${jsonResp}")
                                             println(jsonResp)
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 transactionViewModel.serverCall(transactionISO)
@@ -413,8 +416,7 @@ BhTransactionType.BRAND_EMI.type->{
                                     }
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
-
-                                        errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
+                                    errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
                                     }
 
                                     ResponseCode.REVERSAL.value -> {
@@ -1031,6 +1033,7 @@ BhTransactionType.BRAND_EMI.type->{
         globalCardProcessedModel.setTime(parts[1])
         globalCardProcessedModel.setTimeStamp(receiptDetail.dateTime!!)
         globalCardProcessedModel.setPosEntryMode("0553")
+        receiptDetail.maskedPan?.let { globalCardProcessedModel.setPanNumberData(it) }
     }
 
 

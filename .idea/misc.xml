@@ -39,6 +39,7 @@
         <entry key="app/src/main/res/layout/fragment_emi_issuer_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_init.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_new_input_amount.xml" value="0.14" />
+        <entry key="app/src/main/res/layout/fragment_void_main.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/item_dashboart.xml" value="0.16" />
         <entry key="app/src/main/res/layout/item_emi_compare_view.xml" value="0.2563176895306859" />
         <entry key="app/src/main/res/layout/item_emi_issuer_list.xml" value="0.14" />
