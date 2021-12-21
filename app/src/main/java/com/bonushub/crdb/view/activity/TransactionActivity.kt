@@ -296,7 +296,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -444,7 +444,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -535,7 +535,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -627,7 +627,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -719,7 +719,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -811,7 +811,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
@@ -908,7 +908,7 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.invoice= receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
-                                            batchReversalData.rrn= receiptDetail?.rrn.toString()
+                                            batchReversalData.roc= receiptDetail?.stan.toString()
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
                                         }
                                     }
