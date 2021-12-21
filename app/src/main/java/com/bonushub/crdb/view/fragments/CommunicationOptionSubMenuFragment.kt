@@ -241,9 +241,9 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
             context as Context,
             getString(R.string.update),
             dataList[position]?.titleValue?:"",
-            true,
-            isTID
-        ) {
+            false,
+            isTID,
+            dataList[position]?.titleName?:"") {
             if (titleName.equals("Terminal ID", ignoreCase = true)) {
                 when {
                     it == dataList[position]?.titleValue -> {

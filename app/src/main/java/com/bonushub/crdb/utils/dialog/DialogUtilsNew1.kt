@@ -12,6 +12,7 @@ import android.os.Looper
 import android.text.InputFilter
 import android.text.InputType
 import android.text.TextUtils
+import android.text.method.DigitsKeyListener
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -79,7 +80,7 @@ class DialogUtilsNew1 {
             dialog.show()
         }
 
-        fun getInputDialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false, callback: (String) -> Unit) {
+        fun getInputDialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false,toastMsg:String, callback: (String) -> Unit) {
             Dialog(context).apply {
                 getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -107,10 +108,22 @@ class DialogUtilsNew1 {
                     invoiceET.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(25))
                 }
 
+                if (isNumeric||isTID) {
+                    if(isTID){
+                        invoiceET.inputType = InputType.TYPE_CLASS_NUMBER
+                    }else{
+                        invoiceET.inputType = InputType.TYPE_CLASS_NUMBER
+                        invoiceET.setKeyListener(DigitsKeyListener.getInstance("0123456789."))
+                    }
+
+                }else{
+                    invoiceET.inputType = InputType.TYPE_CLASS_TEXT
+                }
+
                 invoiceET.apply {
                     setText(_text)
-                    inputType =
-                        if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
+//                    inputType =
+//                        if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
                     setOnEditorActionListener(getEditorActionListener { okbtn.performClick() })
                     setSelection(text.toString().length)
                 }
@@ -124,7 +137,7 @@ class DialogUtilsNew1 {
                         dismiss()
                         callback(invoiceET.text.toString())
                     } else {
-                        ToastUtils.showToast(context, "Enter Invoice Number")
+                        ToastUtils.showToast(context, "Please enter $toastMsg.")
                     }
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

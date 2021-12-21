@@ -308,7 +308,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.ANY_RECEIPT -> {
                 logger("repost", ReportsItem.ANY_RECEIPT._name)
 
-                DialogUtilsNew1.getInputDialog(requireContext(), "Enter Invoice Number", "", true) { invoice ->
+                DialogUtilsNew1.getInputDialog(requireContext(), "Enter Invoice Number", "", true,false,"Invoice Number") { invoice ->
 
                         iDiag?.showProgress(getString(R.string.printing_receipt))
                         lifecycleScope.launch {
