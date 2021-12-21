@@ -106,6 +106,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.LAST_RECEIPT -> {
 
                 val lastReceiptData = AppPreference.getLastSuccessReceipt()
+
+                val batchData = BatchTable(lastReceiptData)
+
                 if (lastReceiptData != null) {
                     lifecycleScope.launch(Dispatchers.Main) {
                         iDiag?.showProgress(getString(R.string.printing_last_receipt))
@@ -119,6 +122,20 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         EDashboardItem.VOID_SALE.title.uppercase() -> {
                             //BB
                             logger("print","util")
+
+                            // please uncomment this code to use with batch data for printing
+                            /*PrintUtil(activity).startPrinting(batchData,
+                                    EPrintCopyType.DUPLICATE,
+                                    activity
+                                ) { printCB, printingFail ->
+                                    if (printCB) {
+                                        iDiag?.hideProgress()
+                                        logger("PRINTING", "LAST_RECEIPT")
+                                    } else {
+                                        iDiag?.hideProgress()
+                                    }
+                                }*/
+
                             PrintUtil(activity).startPrinting(lastReceiptData,
                                     EPrintCopyType.DUPLICATE,
                                     activity
@@ -301,6 +318,20 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                                     if(bat?.receiptData != null)
                                     {
+                                        // please uncomment this code to use with batch data for printing
+                                        /*PrintUtil(activity).startPrinting(
+                                            bat,
+                                            EPrintCopyType.DUPLICATE,
+                                            activity
+                                        ) { printCB, printingFail ->
+                                            if (printCB) {
+                                                iDiag?.hideProgress()
+                                                logger("PRINTING", "LAST_RECEIPT")
+                                            } else {
+                                                iDiag?.hideProgress()
+                                            }
+                                        }*/
+
                                         PrintUtil(activity).startPrinting(
                                             bat.receiptData ?: ReceiptDetail(),
                                             EPrintCopyType.DUPLICATE,
@@ -601,12 +632,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             try {
 
                                                 // please change here batchReversalList
-                                                PrintUtil(activity).printDetailReportupdate(
-                                                    batchReversalList,
-                                                    activity
-                                                ) { detailPrintStatus ->
-
-                                                }
+//                                                PrintUtil(activity).printDetailReportupdate(
+//                                                    batchReversalList,
+//                                                    activity
+//                                                ) { detailPrintStatus ->
+//
+//                                                }
 
 
                                             } catch (ex: java.lang.Exception) {
