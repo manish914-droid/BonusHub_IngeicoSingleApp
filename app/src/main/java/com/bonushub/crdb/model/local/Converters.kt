@@ -1,6 +1,7 @@
 package com.bonushub.crdb.model.local
 
 import androidx.room.TypeConverter
+import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.google.gson.Gson
@@ -79,8 +80,17 @@ class Converters {
         return Gson().fromJson<BrandEMIProductDataModal>(emiProductData, type)
     }
 
+    @TypeConverter
+    fun fromEmiTenureDataModal(emiTenureDataModal: BankEMITenureDataModal?): String? {
+      //  val type = object : TypeToken<BankEMITenureDataModal?>() {}.type
+        return Gson().toJson(emiTenureDataModal, BankEMITenureDataModal::class.java)
+    }
 
-
+    @TypeConverter
+    fun toEmiTenureDataModal(emiTenureDataModal: String?): BankEMITenureDataModal? {
+      //  val type = object : TypeToken<BankEMITenureDataModal>() {}.type
+        return Gson().fromJson(emiTenureDataModal, BankEMITenureDataModal::class.java)
+    }
 
     @TypeConverter
     fun toCvmAction(value: Int) = enumValues<CvmAction>()[value]

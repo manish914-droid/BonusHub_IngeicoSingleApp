@@ -86,11 +86,13 @@ class PrintUtil(context: Context?) {
 
     @SuppressLint("SimpleDateFormat")
     fun startPrinting(
-        receiptDetail: ReceiptDetail, copyType: EPrintCopyType,
+        batchTable: BatchTable, copyType: EPrintCopyType,
         context: Context?,
         printerCallback: (Boolean, Int) -> Unit
     ) {
         try {
+            val receiptDetail: ReceiptDetail =batchTable.receiptData ?: ReceiptDetail()
+
             setLogoAndHeader()
 
             try {

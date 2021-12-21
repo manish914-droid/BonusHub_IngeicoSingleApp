@@ -136,7 +136,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     }
                                 }*/
 
-                            PrintUtil(activity).startPrinting(lastReceiptData,
+                           /* PrintUtil(activity).startPrinting(lastReceiptData,
                                     EPrintCopyType.DUPLICATE,
                                     activity
                                 ) { printCB, printingFail ->
@@ -146,7 +146,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     } else {
                                         iDiag?.hideProgress()
                                     }
-                                }
+                                }*/
                         }
 
                         EDashboardItem.BANK_EMI.title.uppercase() -> {
@@ -333,7 +333,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                         }*/
 
                                         PrintUtil(activity).startPrinting(
-                                            bat.receiptData ?: ReceiptDetail(),
+                                            bat,
                                             EPrintCopyType.DUPLICATE,
                                             activity
                                         ) { printCB, printingFail ->

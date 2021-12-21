@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
@@ -101,8 +102,9 @@ class VoidMainFragment : Fragment() {
                             ResponseCode.SUCCESS.value -> {
                                 val jsonResp= Gson().toJson(receiptDetail)
                                 println(jsonResp)
+                                val batchTable =BatchTable(receiptDetail)
                                 if (receiptDetail != null) {
-                                 printingSaleData(receiptDetail)
+                                 printingSaleData(batchTable)
                                 }
 
 
@@ -134,13 +136,13 @@ class VoidMainFragment : Fragment() {
         }
     }
 
-    fun printingSaleData(receiptDetail: ReceiptDetail) {
+    fun printingSaleData(batchTable: BatchTable) {
         lifecycleScope.launch(Dispatchers.Main) {
             (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
             var printsts = false
             PrintUtil(activity as NavigationActivity).startPrinting(
-                receiptDetail,
+                batchTable,
                 EPrintCopyType.MERCHANT,
                 (activity as NavigationActivity)
             ) { printCB, printingFail ->
@@ -149,7 +151,7 @@ class VoidMainFragment : Fragment() {
                 if (printCB) {
                     printsts = printCB
                     GlobalScope.launch(Dispatchers.Main) {
-                        showMerchantAlertBox(receiptDetail)
+                        showMerchantAlertBox(batchTable)
                     }
 
                 } else {
@@ -160,7 +162,7 @@ class VoidMainFragment : Fragment() {
     }
 
     private fun showMerchantAlertBox(
-        receiptDetail: ReceiptDetail
+        batchTable: BatchTable
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
             (activity as NavigationActivity).showProgress(getString(R.string.printing))
@@ -170,7 +172,7 @@ class VoidMainFragment : Fragment() {
                 getString(R.string.print_customer_copy),
                 true, getString(R.string.positive_button_yes), { status ->
                     PrintUtil(activity as NavigationActivity).startPrinting(
-                        receiptDetail,
+                        batchTable,
                         EPrintCopyType.CUSTOMER,
                         activity as NavigationActivity
                     ) { printCB, printingFail ->

@@ -93,7 +93,6 @@ private fun calculateDes(dataDescription: String): String {
            println("Calculate decrypt fail"+encResult)
        }
        println("TECB decrypt result = " + byte2HexStr(decResult))
-
         return byte2HexStr(encResult)
 
     } catch (ex: Exception) {

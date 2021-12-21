@@ -181,7 +181,7 @@ BhTransactionType.BRAND_EMI.type->{
         putExtra("imeiOrSerialNum",imeiOrSerialNum)
         putExtra("transactionType", cardProcessdatamodel.getTransType())
     }
-    startActivityForResult(intent,1)
+    startActivityForResult(intent,BhTransactionType.BRAND_EMI.type)
 }
 
                         }
@@ -204,9 +204,9 @@ BhTransactionType.BRAND_EMI.type->{
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1) {
+        if (requestCode == BhTransactionType.BRAND_EMI.type) {
             if (resultCode == RESULT_OK) {
-                val result =data?.getParcelableExtra<BankEMITenureDataModal>("EMITenureDataModal")
+                val emiTenureData =data?.getParcelableExtra<BankEMITenureDataModal>("EMITenureDataModal")
                 emvBinding?.cardDetectImg?.visibility = View.GONE
                 emvBinding?.tvInsertCard?.visibility = View.GONE
                 emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
@@ -216,7 +216,7 @@ BhTransactionType.BRAND_EMI.type->{
                             amount = (saleAmt.toFloat() *100).toLong(),
                             tipAmount = 0L ?: 0,
                             emiTxnName=transactionTypeEDashboardItem.title,
-                            tid = result?.txnTID,
+                            tid = emiTenureData?.txnTID,
                             cardCaptureType = CardCaptureType.EMV_NO_CAPTURING,
                             track1 = null,
                             track2 = null,
@@ -236,20 +236,16 @@ BhTransactionType.BRAND_EMI.type->{
                                         if (receiptDetail != null) {
                                             val batchData=BatchTable(receiptDetail)
                                             creatCardProcessingModelData(receiptDetail)
-                                           /* val transactionISO =
+                                            val transactionISO =
                                                 CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
 
-                                            val jsonResp=Gson().toJson(transactionISO)
-                                            println(jsonResp)
+                                            val jsonResp2=Gson().toJson(transactionISO)
+                                            println(jsonResp2)
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 transactionViewModel.serverCall(transactionISO)
                                             }
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-                                                batchData.invoice= receiptDetail.invoice.toString()
-                                                batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                            }*/
+
+
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
@@ -257,13 +253,14 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.emiCategoryData=brandEmiSubCatData
                                                 batchData.emiProductData=brandEmiProductData
                                                 batchData.imeiOrSerialNum=imeiOrSerialNum
-
+                                                batchData.tenureDataModel=emiTenureData
                                                 batchData.transactionType = BhTransactionType.BRAND_EMI.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
 
 
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -408,8 +405,9 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -498,8 +496,9 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -588,8 +587,9 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -677,8 +677,9 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -767,8 +768,9 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -859,8 +861,9 @@ BhTransactionType.BRAND_EMI.type->{
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
                                             }
-                                            printingSaleData(receiptDetail)
+
                                         }
 
 
@@ -920,31 +923,34 @@ BhTransactionType.BRAND_EMI.type->{
             }
         }
     }
-  public  fun printingSaleData(receiptDetail: ReceiptDetail) {
-        lifecycleScope.launch(Dispatchers.Main) {
+  public suspend fun printingSaleData(batchTable: BatchTable) {
+     val receiptDetail=batchTable.receiptData
+       withContext(Dispatchers.Main) {
             showProgress(getString(R.string.printing))
             var printsts = false
-            PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
-                receiptDetail,
-                EPrintCopyType.MERCHANT,
-                this@TransactionActivity as BaseActivityNew
-            ) { printCB, printingFail ->
+           if (receiptDetail != null) {
+               PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                   batchTable,
+                   EPrintCopyType.MERCHANT,
+                   this@TransactionActivity as BaseActivityNew
+               ) { printCB, printingFail ->
 
-                (this@TransactionActivity as BaseActivityNew).hideProgress()
-                if (printCB) {
-                    printsts = printCB
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        showMerchantAlertBox(receiptDetail)
-                    }
+                   (this@TransactionActivity as BaseActivityNew).hideProgress()
+                   if (printCB) {
+                       printsts = printCB
+                       lifecycleScope.launch(Dispatchers.Main) {
+                           showMerchantAlertBox(batchTable)
+                       }
 
-                } else {
-                    ToastUtils.showToast(this@TransactionActivity as BaseActivityNew,getString(R.string.printer_error))
-                }
-            }
+                   } else {
+                       ToastUtils.showToast(this@TransactionActivity as BaseActivityNew,getString(R.string.printer_error))
+                   }
+               }
+           }
         }
     }
     private fun showMerchantAlertBox(
-        receiptDetail: ReceiptDetail
+        batchTable: BatchTable
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
 
@@ -955,7 +961,7 @@ BhTransactionType.BRAND_EMI.type->{
                 true, getString(R.string.positive_button_yes), { status ->
                     showProgress(getString(R.string.printing))
                     PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
-                        receiptDetail,
+                        batchTable,
                         EPrintCopyType.CUSTOMER,
                         this@TransactionActivity as BaseActivityNew
                     ) { printCB, printingFail ->
@@ -1021,12 +1027,12 @@ BhTransactionType.BRAND_EMI.type->{
         globalCardProcessedModel.setMobileBillExtraData(Pair(mobileNumber, billNumber))
         receiptDetail.stan?.let { globalCardProcessedModel.setAuthRoc(it) }
         globalCardProcessedModel.setCardMode("0553- emv with pin")
-        globalCardProcessedModel.setRrn(receiptDetail?.rrn)
-        receiptDetail?.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
-        globalCardProcessedModel.setTid(receiptDetail?.tid)
-        globalCardProcessedModel.setMid(receiptDetail?.mid)
-        globalCardProcessedModel.setBatch(receiptDetail?.batchNumber)
-        globalCardProcessedModel.setInvoice(receiptDetail?.invoice)
+        globalCardProcessedModel.setRrn(receiptDetail.rrn)
+        receiptDetail.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
+        globalCardProcessedModel.setTid(receiptDetail.tid)
+        globalCardProcessedModel.setMid(receiptDetail.mid)
+        globalCardProcessedModel.setBatch(receiptDetail.batchNumber)
+        globalCardProcessedModel.setInvoice(receiptDetail.invoice)
         val date = receiptDetail.dateTime
         val parts = date?.split(" ")
         globalCardProcessedModel.setDate(parts!![0])
