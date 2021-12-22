@@ -285,7 +285,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 //                                    }
                                     PrintUtil(activity).startPrinting(batchData,
                                         EPrintCopyType.DUPLICATE,
-                                        activity
+                                        activity,
+                                        true
                                     ) { printCB, printingFail ->
                                         if (printCB) {
                                             iDiag?.hideProgress()

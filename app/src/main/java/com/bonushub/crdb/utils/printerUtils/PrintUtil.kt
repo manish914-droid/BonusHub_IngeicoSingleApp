@@ -87,7 +87,7 @@ class PrintUtil(context: Context?) {
     @SuppressLint("SimpleDateFormat")
     fun startPrinting(
         batchTable: BatchTable, copyType: EPrintCopyType,
-        context: Context?,
+        context: Context?,isReversal:Boolean = false,
         printerCallback: (Boolean, Int) -> Unit
     ) {
         try {
@@ -132,7 +132,11 @@ class PrintUtil(context: Context?) {
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
-                receiptDetail.txnName?.let { sigleLineText(it, AlignMode.CENTER) }
+                if(isReversal){
+                    sigleLineText("TRANSACTION FAILED", AlignMode.CENTER)
+                }else {
+                    receiptDetail.txnName?.let { sigleLineText(it, AlignMode.CENTER) }
+                }
 
                 textBlockList.add(
                     sigleLineformat(
@@ -170,14 +174,38 @@ class PrintUtil(context: Context?) {
 
                 textBlockList.clear()
 
+                if(isReversal){
+                    textBlockList.add(sigleLineformat("AID:${receiptDetail.aid}", AlignMode.LEFT))
+                    printer?.addMixStyleText(textBlockList)
+
+                    textBlockList.clear()
+                }
+
                 printSeperator()
-                when (receiptDetail.txnName) {
+                var txnName = receiptDetail.txnName
+
+                if(isReversal){
+                    txnName = "REVERSAL"
+                }
+
+                when (txnName) {
                     "SALE", "SALECASH" -> {
                         saleTransaction(receiptDetail)
                     }
                     EDashboardItem.BRAND_EMI.title->{
                         voidTransaction(receiptDetail)
                     }
+
+                    "REVERSAL" -> {
+
+                        val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
+                        textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat("INR:${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+                    }
+
                     else -> {
                         voidTransaction(receiptDetail)
                     }
