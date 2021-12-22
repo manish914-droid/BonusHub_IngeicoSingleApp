@@ -289,6 +289,8 @@ BhTransactionType.BRAND_EMI.type->{
 //                                            ex.printStackTrace()
 //                                        }
 
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
+
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 
                                         lifecycleScope.launch(Dispatchers.IO) {
@@ -437,6 +439,8 @@ BhTransactionType.BRAND_EMI.type->{
                                             ex.printStackTrace()
                                         }*/
 
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
+
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 
                                         lifecycleScope.launch(Dispatchers.IO) {
@@ -527,6 +531,8 @@ BhTransactionType.BRAND_EMI.type->{
                                         } catch (ex: Exception) {
                                             ex.printStackTrace()
                                         }*/
+
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 
@@ -620,6 +626,8 @@ BhTransactionType.BRAND_EMI.type->{
                                             ex.printStackTrace()
                                         }*/
 
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
+
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 
                                         lifecycleScope.launch(Dispatchers.IO) {
@@ -712,6 +720,8 @@ BhTransactionType.BRAND_EMI.type->{
                                             ex.printStackTrace()
                                         }*/
 
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
+
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 
                                         lifecycleScope.launch(Dispatchers.IO) {
@@ -803,6 +813,8 @@ BhTransactionType.BRAND_EMI.type->{
                                         } catch (ex: Exception) {
                                             ex.printStackTrace()
                                         }*/
+
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 
@@ -900,6 +912,8 @@ BhTransactionType.BRAND_EMI.type->{
                                         } catch (ex: Exception) {
                                             ex.printStackTrace()
                                         }*/
+
+                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                         val batchReversalData=BatchTableReversal(receiptDetail)
 

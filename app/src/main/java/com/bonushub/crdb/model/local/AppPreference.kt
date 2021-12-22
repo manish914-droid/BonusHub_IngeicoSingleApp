@@ -50,6 +50,7 @@ object AppPreference {
     const val LAST_SUCCESS_RECEIPT_KEY = "Last_Success_Receipt"
     const val LAST_BATCH = "last_batch"
     const val RESTART_HANDLING = "restart_handling"
+    const val LAST_CANCEL_RECEIPT_KEY = "Last_Cancel_Receipt"
 
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
@@ -213,6 +214,44 @@ object AppPreference {
     }
 
     // end region
+
+    // region
+    fun saveLastCancelReceiptDetails(receiptDetail:String?){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(LAST_CANCEL_RECEIPT_KEY, receiptDetail?:"")?.apply()
+    }
+
+    fun saveLastCancelReceiptDetails(receiptDetail:ReceiptDetail?){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val jsonResp=Gson().toJson(receiptDetail)
+        v?.edit()?.putString(LAST_CANCEL_RECEIPT_KEY, jsonResp?:"")?.apply()
+    }
+    // end region
+
+    //region kushal
+    @JvmStatic
+    fun getLastCancelReceipt(): ReceiptDetail? {
+        logger(TAG, "========getLastSuccessReceipt=========", "e")
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+
+        return if (v != null) {
+            try {
+                val str = v.getString(LAST_CANCEL_RECEIPT_KEY, "")
+                if (!str.isNullOrEmpty()) {
+                    Gson().fromJson<ReceiptDetail>(
+                        str,
+                        object : TypeToken<ReceiptDetail>() {}.type
+                    )
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Last Cancel Receipt Error!!!")
+            }
+        } else
+            null
+    }
+
+    // end region
+
 
     // region need in report
     @JvmStatic

@@ -259,8 +259,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.LAST_CANCEL_RECEIPT -> {
                 logger("repost", ReportsItem.LAST_CANCEL_RECEIPT._name)
 
+                val lastCancelReceiptData = AppPreference.getLastCancelReceipt()
+
+                val batchData = BatchTable(lastCancelReceiptData)
+
                 val isoW = AppPreference.getReversal()
-                if (isoW != null) {
+
+                if (lastCancelReceiptData != null) {
                     iDiag?.getMsgDialog(
                         getString(R.string.confirmation),
                         getString(R.string.last_cancel_report_confirmation),
@@ -278,6 +283,17 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 //                                        //  VFService.showToast(it)
 //                                        iDiag?.hideProgress()
 //                                    }
+                                    PrintUtil(activity).startPrinting(batchData,
+                                        EPrintCopyType.DUPLICATE,
+                                        activity
+                                    ) { printCB, printingFail ->
+                                        if (printCB) {
+                                            iDiag?.hideProgress()
+                                            logger("PRINTING", "LAST_CANCEL_RECEIPT")
+                                        } else {
+                                            iDiag?.hideProgress()
+                                        }
+                                    }
                                 } catch (ex: java.lang.Exception) {
                                     ex.printStackTrace()
                                     iDiag?.hideProgress()
