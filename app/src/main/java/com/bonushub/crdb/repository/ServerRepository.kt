@@ -80,7 +80,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private val brandEmiSearchedProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
 
 // === EMI Tenure
-    private var bankEMIIssuerTAndCList: MutableList<BankEMIIssuerTAndCDataModal> = mutableListOf()
+  lateinit var  bankEMIIssuerTAndCList: BankEMIIssuerTAndCDataModal
     private var bankEMISchemesDataList: MutableList<BankEMITenureDataModal> = mutableListOf()
 
     //region====================EMIIssuerList Variables:-
@@ -668,7 +668,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                         Log.d("IssuerID", issuerTAndCData[1])
                         Log.d("IssuerName", issuerTAndCData[2])
                         if (issuerTAndCData.size > 3) {
-                            bankEMIIssuerTAndCList.add(
+                            bankEMIIssuerTAndCList=
                                 BankEMIIssuerTAndCDataModal(
                                     issuerTAndCData[0],
                                     issuerTAndCData[1],
@@ -676,9 +676,9 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                     issuerTAndCData[3],
                                     issuerRelatedData[1]
                                 )
-                            )
+
                         } else {
-                            bankEMIIssuerTAndCList.add(
+                            bankEMIIssuerTAndCList
                                 BankEMIIssuerTAndCDataModal(
                                     issuerTAndCData[0],
                                     issuerTAndCData[1],
@@ -686,7 +686,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                     "",
                                     issuerRelatedData[1]
                                 )
-                            )
+
                         }
                     }
                     //Refresh Field57 request value for Pagination if More Record Flag is True:-

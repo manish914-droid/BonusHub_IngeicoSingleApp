@@ -1,13 +1,11 @@
 package com.bonushub.crdb.view.activity
 
-import android.R.attr
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
@@ -18,16 +16,12 @@ import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
-import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.model.remote.RestartHandlingModel
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.SearchViewModel
-import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
@@ -46,11 +40,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
-import android.app.Activity
 
-import android.R.attr.data
 import com.bonushub.crdb.model.local.BatchTableReversal
-import com.bonushub.crdb.model.remote.BankEMITenureDataModal
+import com.bonushub.crdb.model.remote.*
 import com.google.gson.reflect.TypeToken
 import com.ingenico.hdfcpayment.type.CardCaptureType
 
@@ -60,10 +52,10 @@ private var bankEMIRequestCode = "4"
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew(){
     private var emvBinding: ActivityEmvBinding? = null
-    private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
+   // private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
     private val transactionViewModel : TransactionViewModel by viewModels()
     //used for other cash amount
-    private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
+  //  private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
     private val restartHandlingList: MutableList<RestartHandlingModel> by lazy { mutableListOf<RestartHandlingModel>() }
     private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
 
@@ -174,7 +166,7 @@ BhTransactionType.BRAND_EMI.type->{
     val intent = Intent (this@TransactionActivity, TenureSchemeActivity::class.java).apply {
         val field57=  "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
                 "^${/*cardBinValue.substring(0, 8)*/""}^$saleAmt"
-
+        cardProcessdatamodel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
         putExtra("cardProcessedData",cardProcessdatamodel)
         putExtra("brandID",brandDataMaster.brandID)
         putExtra("productID",brandEmiProductData.productID)
@@ -207,6 +199,8 @@ BhTransactionType.BRAND_EMI.type->{
         if (requestCode == BhTransactionType.BRAND_EMI.type) {
             if (resultCode == RESULT_OK) {
                 val emiTenureData =data?.getParcelableExtra<BankEMITenureDataModal>("EMITenureDataModal")
+                val emiIssuerData =data?.getParcelableExtra<BankEMIIssuerTAndCDataModal>("emiIssuerTAndCDataList")
+                val cardProcessedDataModal =data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
                 emvBinding?.cardDetectImg?.visibility = View.GONE
                 emvBinding?.tvInsertCard?.visibility = View.GONE
                 emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
@@ -236,34 +230,37 @@ BhTransactionType.BRAND_EMI.type->{
                                         if (receiptDetail != null) {
                                             val batchData=BatchTable(receiptDetail)
                                             creatCardProcessingModelData(receiptDetail)
-                                            val transactionISO =
-                                                CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-
-                                            val jsonResp2=Gson().toJson(transactionISO)
-                                            println(jsonResp2)
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                transactionViewModel.serverCall(transactionISO)
+                                            cardProcessedDataModal.getEncryptedPan()?.let {
+                                                globalCardProcessedModel.setEncryptedPan(
+                                                    it
+                                                )
                                             }
 
 
+
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
+                                               batchData.emiIssuerDataModel=emiIssuerData
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.emiBrandData=brandDataMaster
                                                 batchData.emiCategoryData=brandEmiSubCatData
                                                 batchData.emiProductData=brandEmiProductData
                                                 batchData.imeiOrSerialNum=imeiOrSerialNum
-                                                batchData.tenureDataModel=emiTenureData
+                                                batchData.emiTenureDataModel=emiTenureData
                                                 batchData.transactionType = BhTransactionType.BRAND_EMI.type
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                cardProcessedDataModal.getPanNumberData()?.let {
+                                                    globalCardProcessedModel.setPanNumberData(
+                                                        it
+                                                    )
+                                                }
+                                                val transactionISO =
+                                                    CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
+                                                transactionViewModel.serverCall(transactionISO)
+                                                val jsonResp2=Gson().toJson(transactionISO)
+                                                println(jsonResp2)
                                                 printingSaleData(batchData)
                                             }
-
-
-
                                         }
-
-
                                     }
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
@@ -397,29 +394,23 @@ BhTransactionType.BRAND_EMI.type->{
                                             val transactionISO =
                                                 CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
 
-                                            val jsonResp=Gson().toJson(transactionISO)
-                                            Log.d(TAG, "jsonResp : ${jsonResp}")
+                                            val jsonResp2=Gson().toJson(transactionISO)
+                                            Log.d(TAG, "jsonResp : $jsonResp2")
                                             println(jsonResp)
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                                transactionViewModel.serverCall(transactionISO)
-                                            }
-                                            lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
+                                                transactionViewModel.serverCall(transactionISO)
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 printingSaleData(batchData)
                                             }
-
                                         }
-
-
                                     }
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
                                     errorFromIngenico(txnResponse.responseCode,txnResponse.status.toString())
                                     }
-
                                     ResponseCode.REVERSAL.value -> {
                                         // kushal
                                         // region

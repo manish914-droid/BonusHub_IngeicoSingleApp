@@ -11,10 +11,10 @@ import kotlinx.coroutines.launch
 class TransactionViewModel @ViewModelInject constructor(private val transactionReprository: TransactionReprository):
     ViewModel()  {
 
-    fun serverCall(transactionISOByteArray: IsoDataWriter){
-        viewModelScope.launch(Dispatchers.IO) {
+   suspend fun serverCall(transactionISOByteArray: IsoDataWriter){
+       // viewModelScope.launch(Dispatchers.IO) {
            transactionReprository.getHostTransaction(transactionISOByteArray)
-       }
+      // }
    }
 
 }

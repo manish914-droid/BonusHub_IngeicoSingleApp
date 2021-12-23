@@ -4,25 +4,21 @@ import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.CardDataTable
-import com.bonushub.crdb.model.local.IssuerParameterTable
-import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
-import com.bonushub.crdb.repository.keyexchangeDataSource
+import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
 
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 
 class CreateTransactionPacket(
-    private var cardProcessedData: CardProcessedDataModal
+    private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?=null
     ) :
     ITransactionPacketExchange {
 
@@ -31,9 +27,7 @@ class CreateTransactionPacket(
     //  private var brandEMIByAccessCodeData: BrandEMIAccessDataModalTable? = null
 
     //Below method is used to create Transaction Packet in all cases:-
-    init {
-        createTransactionPacket()
-    }
+
 
     override fun createTransactionPacket(): IsoDataWriter = IsoDataWriter().apply {
         //Condition To Check BhTransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
@@ -75,7 +69,7 @@ class CreateTransactionPacket(
             }
 
             //STAN(ROC) Field 11
-            cardProcessedData?.getAuthRoc()?.let { addField(11, it) }
+            cardProcessedData.getAuthRoc()?.let { addField(11, it) }
 
             //Date and Time Field 12 & 13
             val date = cardProcessedData.getTimeStamp()
@@ -114,7 +108,7 @@ class CreateTransactionPacket(
             cardProcessedData.getTid()?.let { addFieldByHex(41, it) }
 
             //MID Field 42
-            terminalData.merchantId?.let { addFieldByHex(42, it) }
+            terminalData.merchantId.let { addFieldByHex(42, it) }
 
             //addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
             //Connection Time Stamps Field 48
@@ -146,54 +140,123 @@ class CreateTransactionPacket(
             }
 */
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
-            cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
-                addField(57,
-                    it
-                )
+            when (cardProcessedData.getTransType()) {
+                BhTransactionType.SALE.type -> {
+                    cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
+                        addField(57,
+                            it
+                        )
+                    }
+                }
+                BhTransactionType.BRAND_EMI.type->{
+                    cardProcessedData.getEncryptedPan()?.let { addField(57, it) }
+                }
+
             }
 
+
             //Indicator Data Field 58
-            /*  val cardIndFirst = "0"
+            val cardIndFirst = "0"
             val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
-            val cardDataTable = CardDataTable.selectFromCardDataTable(
-                cardProcessedData.getPanNumberData().toString()
-            )
+            val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
             //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
             val cdtIndex = cardDataTable?.cardTableIndex ?: ""
-            val accSellection =
-                addPad(
+            val accSellection ="00"
+              /*  addPad(
                     AppPreference.getString(AppPreference.ACC_SEL_KEY),
                     "0",
                     2
-                ) //cardDataTable.getA//"00"
-
+                ) //cardDataTable.getA//"00"*/
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
             when (cardProcessedData.getTransType()) {
                 BhTransactionType.EMI_SALE.type -> {
-
-
+                 /*   indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
+                            "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
+                            "${bankEmiTandCData?.issuerID}," +
+                            "${bankEmiTandCData?.emiSchemeID},1,0,${cardProcessedData.getEmiTransactionAmount()}," +
+                            "${bankEmiSchemeData?.discountAmount},${bankEmiSchemeData?.loanAmount},${bankEmiSchemeData?.tenure}," +
+                            "${bankEmiSchemeData?.tenureInterestRate},${bankEmiSchemeData?.emiAmount},${bankEmiSchemeData?.cashBackAmount}," +
+                            "${bankEmiSchemeData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                            ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${bankEmiSchemeData?.processingFee},${bankEmiSchemeData?.processingRate}," +
+                            "${bankEmiSchemeData?.totalProcessingFee},,${bankEmiSchemeData?.instantDiscount}"
+*/
                 }
-*//*0|46|1|00,460133,54,135,25,586,650000,0,635960,3,1300,216596,14040,635748,12,8,,8287305603,,0,0,0,0,,*//*
+/*0|46|1|00,460133,54,135,25,586,650000,0,635960,3,1300,216596,14040,635748,12,8,,8287305603,,0,0,0,0,,*/
                 BhTransactionType.BRAND_EMI.type -> {
+                    val brandData=batchdata?.emiBrandData
+                    val productData=batchdata?.emiProductData
+                    val categoryData=batchdata?.emiCategoryData
+                    val tenureData=batchdata?.emiTenureDataModel
+                    val imeiOrSerialNo=batchdata?.imeiOrSerialNum
+                    val emiIssuerDataModel=batchdata?.emiIssuerDataModel
 
+                 val  indicator =   "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
+                         "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
+                         "${emiIssuerDataModel?.issuerID},${emiIssuerDataModel?.emiSchemeID},${brandData?.brandID}," +
+                         "${productData?.productID},${cardProcessedData.getTransactionAmount()}," +
+                         "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
+                         "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
+                         "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                         "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
+                         "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
+
+                     /*"0|53|2|00," +
+                         "53468000," +
+                         "54,312,${brandData?.brandID}," +
+                         "${productData?.productID},${cardProcessedData.getTransactionAmount()}," +
+                         "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
+                         "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
+                         "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                         "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
+                         "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"*/
+
+/*0|53|2|00,53468000,54,312,11,3384,65555,5000,60555,3,900,20489,0,61467,,,,,,0,0,0,0,,0*/
+
+                    addFieldByHex(58, indicator ?: "")
+
+
+                  /*  var imeiOrSerialNo:String?=null
+                    if(brandEMIData?.imeiORserailNum !="" ){
+                        imeiOrSerialNo=brandEMIData?.imeiORserailNum
+                    }
+
+                    indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
+                            "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
+                            "${bankEmiTandCData?.issuerID},${bankEmiTandCData?.emiSchemeID},${brandEMIData?.brandID}," +
+                            "${brandEMIData?.productID},${cardProcessedData.getEmiTransactionAmount()}," +
+                            "${bankEmiSchemeData?.discountAmount},${bankEmiSchemeData?.loanAmount},${bankEmiSchemeData?.tenure}," +
+                            "${bankEmiSchemeData?.tenureInterestRate},${bankEmiSchemeData?.emiAmount},${bankEmiSchemeData?.cashBackAmount}," +
+                            "${bankEmiSchemeData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                            "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${bankEmiSchemeData?.processingFee},${bankEmiSchemeData?.processingRate}," +
+                            "${bankEmiSchemeData?.totalProcessingFee},,${bankEmiSchemeData?.instantDiscount}"
+*/
                 }
-*//*                0|43|1|00,438628,54,142,11,2358,1000000,0,1000000,3,1300,340581,0,1041743,,abcdxyz,,,,0,0,200.0,20000,42942319,
-                  0|60|5|00,60832632,52,144,11,2356,800000,18320,781680,3,1400,266663,0,815623,,12qw3e,,,,0,0,200.0,15634,52429840,*//*
+/*                0|43|1|00,438628,54,142,11,2358,1000000,0,1000000,3,1300,340581,0,1041743,,abcdxyz,,,,0,0,200.0,20000,42942319,
+                  0|60|5|00,60832632,52,144,11,2356,800000,18320,781680,3,1400,266663,0,815623,,12qw3e,,,,0,0,200.0,15634,52429840,*/
 
                 BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
                     //cardProcessedData.getMobileBillExtraData()?.second replace with billno
+                 /*   indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
+                            "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
+                            "${brandEMIByAccessCodeDataModel?.issuerID},${brandEMIByAccessCodeDataModel?.emiSchemeID},${brandEMIByAccessCodeDataModel?.brandID}," +
+                            "${brandEMIByAccessCodeDataModel?.productID},${brandEMIByAccessCodeDataModel?.orignalTxnAmt}," +
+                            "${brandEMIByAccessCodeDataModel?.discountAmount},${brandEMIByAccessCodeDataModel?.loanAmount},${brandEMIByAccessCodeDataModel?.tenure}," +
+                            "${brandEMIByAccessCodeDataModel?.interestAmount},${brandEMIByAccessCodeDataModel?.emiAmount},${brandEMIByAccessCodeDataModel?.cashBackAmount}," +
+                            "${brandEMIByAccessCodeDataModel?.netPayAmount},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                            "${brandEMIByAccessCodeDataModel?.productSerialCode ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${brandEMIByAccessCodeDataModel?.processingFee},${brandEMIByAccessCodeDataModel?.processingFeeRate}," +
+                            "${brandEMIByAccessCodeDataModel?.totalProcessingFee},${brandEMIByAccessCodeDataModel?.emiCode},${brandEMIByAccessCodeDataModel?.instaDiscount}"
+            */
 
                 }
 
                 else -> {
-                    indicator = if( cardProcessedData.getTransType()==BhTransactionType.TEST_EMI.type ){
-                            logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
+                   /* indicator = if( cardProcessedData.getTransType()==TransactionType.TEST_EMI.type ){
+                        logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
                         "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
                     }else
-                        "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"
+                        "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"*/
                 }
-            }*/
-
+            }
 
             Log.d("SALE Indicator:- ", indicator.toString())
             additionalData["indicatorF58"] = indicator ?: ""
@@ -244,12 +307,14 @@ class CreateTransactionPacket(
 
             val walletIssuerID = if (cardProcessedData.getTransType() == BhTransactionType.EMI_SALE.type || cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI.type) {
                // bankEmiTandCData?.issuerID?.let { addPad(it, "0", 2) } ?: 0
+                batchdata?.emiIssuerDataModel?.issuerID?.let { addPad(it, "0", 2) }
             }
             else if( cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type){
               ///  brandEMIByAccessCodeDataModel?.issuerID?.let { addPad(it, "0", 2) } ?: 0
+                "Null"
             }
             else {
-                issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
+                issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?:"Null"
             }
 
 

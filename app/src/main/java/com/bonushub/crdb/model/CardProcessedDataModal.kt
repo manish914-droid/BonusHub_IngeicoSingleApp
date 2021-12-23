@@ -6,6 +6,7 @@ import com.bonushub.crdb.view.activity.TransactionActivity.*
 import java.io.Serializable
 
 //Below Modal class is for holding Card Returning Data Fields:-
+
 class CardProcessedDataModal : Serializable {
     private var track1Data: String? = null
     private var track2Data: String? = null

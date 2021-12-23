@@ -29,8 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.app.Activity
 
 import android.content.Intent
-
-
+import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 
 
 @AndroidEntryPoint
@@ -59,6 +58,7 @@ class TenureSchemeActivity : AppCompatActivity() {
     }
 
     private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal>? = mutableListOf()
+    lateinit var emiIssuerTAndCDataList:BankEMIIssuerTAndCDataModal
     private val emiSchemeAndOfferAdapter: EMISchemeAndOfferAdapter by lazy {
         EMISchemeAndOfferAdapter(
             1,
@@ -80,8 +80,9 @@ class TenureSchemeActivity : AppCompatActivity() {
         var field57=""
         field57 = if(transactionType==BhTransactionType.BRAND_EMI.type) {
             "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
-                    "^${/*cardBinValue.substring(0, 8)*/""}^$transactionAmount"
+                    "^${/*cardBinValue.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }else{
+            // todo change pannumberData
             "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount"
         }
 
@@ -112,6 +113,7 @@ class TenureSchemeActivity : AppCompatActivity() {
                         println(Gson().toJson(genericResp.data))
                         val resp= genericResp.data as TenuresWithIssuerTncs
                         emiSchemeOfferDataList=resp.bankEMISchemesDataList
+                        emiIssuerTAndCDataList=resp.bankEMIIssuerTAndCList
                         setUpRecyclerView()
 
                     }
@@ -138,6 +140,8 @@ class TenureSchemeActivity : AppCompatActivity() {
                 )
                 val returnIntent = Intent()
                 returnIntent.putExtra("EMITenureDataModal", (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)))
+                returnIntent.putExtra("emiIssuerTAndCDataList", (emiIssuerTAndCDataList))
+                returnIntent.putExtra("cardProcessedDataModal", cardProcessedDataModal)
                 setResult(RESULT_OK, returnIntent)
                 finish()
 

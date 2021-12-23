@@ -692,9 +692,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PREAUTH_COMPLETE->{
-
                 transactFragment(PreAuthCompleteInputDetailFragment(),true)
-
                /* if (checkInternetConnection()) {
                 CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
@@ -740,14 +738,23 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                val dd=    DBModule.appDatabase.appDao.getBatchDataFromInvoice("000018")
                    println(dd.toString())
                }*/
-                lifecycleScope.launch(Dispatchers.IO) {
+                // todo uncomment below
+              /*  lifecycleScope.launch(Dispatchers.IO) {
                     //    appDao.insertBatchData(batchData)
                     val dd=    DBModule.appDatabase.appDao.getBatchData()
                     println(dd.toString())
                 }
-                transactFragment(VoidMainFragment())
-             //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+                transactFragment(VoidMainFragment())*/
+                val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber("53")
 
+                //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
+                val cdtIndex = cardDataTable?.cardTableIndex ?: ""
+                val accSellection =
+                    addPad(
+                        AppPreference.getString(AppPreference.ACC_SEL_KEY),
+                        "0",
+                        2
+                    )
 
             }
             EDashboardItem.PRE_AUTH_CATAGORY -> {

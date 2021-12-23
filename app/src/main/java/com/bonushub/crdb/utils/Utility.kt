@@ -1118,7 +1118,7 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData =  DBModule.appDatabase?.appDao?.getAllTerminalParameterTableData()?.get(0)
+            tptData = DBModule.appDatabase.appDao.getAllTerminalParameterTableData().get(0)
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }
@@ -1130,7 +1130,7 @@ object Field48ResponseTimestamp {
     fun getIssuerData(issuerId:String): IssuerParameterTable? {
         var issuerData: IssuerParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            issuerData =  DBModule.appDatabase?.appDao?.getIssuerTableDataByIssuerID(issuerId)
+            issuerData = DBModule.appDatabase.appDao.getIssuerTableDataByIssuerID(issuerId)
             val jsonResp=Gson().toJson(issuerData)
             println(jsonResp)
         }

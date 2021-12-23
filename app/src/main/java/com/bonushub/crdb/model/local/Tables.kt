@@ -5,6 +5,7 @@ import androidx.room.*
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
+import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
@@ -1049,7 +1050,9 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
     var emiBrandData: BrandEMIMasterDataModal?=null
     var emiCategoryData: BrandEMISubCategoryTable?=null
     var emiProductData: BrandEMIProductDataModal?=null
-    var tenureDataModel: BankEMITenureDataModal?=null
+    var emiTenureDataModel: BankEMITenureDataModal?=null
+    var emiIssuerDataModel: BankEMIIssuerTAndCDataModal?=null
+
 
 }
 // endregion

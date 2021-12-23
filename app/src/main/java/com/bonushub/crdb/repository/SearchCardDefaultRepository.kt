@@ -376,7 +376,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
     fun doReadRecord(record: CardRecord?, cardProcessedDataModal: CardProcessedDataModal) {
         cardProcessedDataModal.setPanNumberData(EMVInfoUtil.getRecordDataDesc(record))
         System.out.println("Card pannumber data"+EMVInfoUtil.getRecordDataDesc(record))
-        var encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
+        val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
         cardProcessedDataModal.setEncryptedPan(encrptedPan)
         println("Pannumber is"+EMVInfoUtil.getRecordDataDesc(record))
         TDES(EMVInfoUtil.getRecordDataDesc(record))
