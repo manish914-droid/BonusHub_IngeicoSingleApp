@@ -586,10 +586,10 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
 //endregion
 
-    fun getCDTData(): TerminalCommunicationTable? {
+    fun getCDTData(recordType:String): TerminalCommunicationTable? {
         var cdtData: TerminalCommunicationTable? = null
         runBlocking(Dispatchers.IO) {
-            cdtData = appDatabase?.appDao?.getTerminalCommunicationTableData()?.get(0)
+            cdtData = appDatabase?.appDao?.getTerminalCommunicationTableByRecordType(recordType)?.get(0)
         }
         return cdtData
     }
@@ -625,9 +625,9 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
 
 //region=====================================Get IP Port:-
-fun getIpPort(): InetSocketAddress {
+fun getIpPort(recordType:String = "1"): InetSocketAddress {
 
-    val cdt: TerminalCommunicationTable? = getCDTData()
+    val cdt: TerminalCommunicationTable? = getCDTData(recordType)
     return if (cdt != null) {
         InetSocketAddress(InetAddress.getByName(cdt.hostPrimaryIp), cdt.hostPrimaryPortNo.toInt())
     } else {

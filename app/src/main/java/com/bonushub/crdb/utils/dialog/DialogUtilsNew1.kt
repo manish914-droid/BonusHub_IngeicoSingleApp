@@ -64,6 +64,8 @@ class DialogUtilsNew1 {
                 edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(6))
             }
 
+            edtTextPassword.gravity = Gravity.CENTER_HORIZONTAL
+
             txtViewOk.setOnClickListener {
 
                 hideKeyboardIfOpen(activity)
@@ -126,6 +128,7 @@ class DialogUtilsNew1 {
 //                        if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
                     setOnEditorActionListener(getEditorActionListener { okbtn.performClick() })
                     setSelection(text.toString().length)
+                    gravity = Gravity.CENTER_HORIZONTAL
                 }
 
                 findViewById<TextView>(R.id.textViewHeader).text = title

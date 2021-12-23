@@ -92,7 +92,7 @@ object SocketHelper {
         try {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
-                val sAddress = Utility().getIpPort()
+                val sAddress = Utility().getIpPort("1")
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
                 }
