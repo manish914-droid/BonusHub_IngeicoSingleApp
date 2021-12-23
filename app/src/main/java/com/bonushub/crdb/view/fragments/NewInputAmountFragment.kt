@@ -773,7 +773,7 @@ EDashboardItem.PREAUTH_COMPLETE->{
 
             (activity as NavigationActivity).transactFragment(BillNumSerialNumEntryFragment().apply {
                 arguments =bun
-            })
+            }, true)
         } else {
                   brandEmiSubCatData?.let {
                         brandEmiProductData?.let { it1 ->

@@ -392,7 +392,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
     }
 
-    open fun transactFragment(fragment: Fragment, isBackStackAdded: Boolean = false): Boolean {
+    open fun transactFragment(fragment: Fragment, isBackStackAdded: Boolean = true): Boolean {
         val trans = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment, fragment, fragment::class.java.simpleName)
             addToBackStack(fragment::class.java.simpleName)

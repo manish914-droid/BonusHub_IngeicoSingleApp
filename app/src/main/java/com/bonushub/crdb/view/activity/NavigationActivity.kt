@@ -387,9 +387,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     //region============================On Back Pressed======================
     override fun onBackPressed() {
-        if (navHostFragment?.navController?.currentDestination?.label ==
+
+        //logger("current Fragment2",""+navHostFragment?.navController?.currentDestination?.label,"e")
+        /*if (navHostFragment?.navController?.currentDestination?.label ==
             NavControllerFragmentLabel.DASHBOARD_FRAGMENT_LABEL.destinationLabel || navHostFragment?.navController?.currentDestination?.label == "fragment_init"
-        ) {
+        )*/
+        /*logger("current Fragment3",""+supportFragmentManager.fragments.size)
+        logger("current Fragment4",""+supportFragmentManager.fragments.toString())
+        logger("current Fragment5",""+supportFragmentManager.fragments.get(0)::class.java.simpleName)*/
+            if (supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("NavHostFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("DashboardFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("InitFragment",true)) {
             Log.d("Dashboard:- ", "Inflated")
             if (isExpanded)
                 showLessOnBackPress?.showLessDashOptions()
@@ -728,7 +734,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             SubHeaderTitle.Brand_EMI_Master_Category.title
                         )
                     }
-                })
+                }, true)
 
 
             }
