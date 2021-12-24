@@ -18,7 +18,6 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
         val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
         val tpt = runBlocking(Dispatchers.IO) { getTptData() }
         val tid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
-        if (batchListData?.isNotEmpty() == true) {
             if (tpt != null) {
                 mti = Mti.SETTLEMENT_MTI.mti
 
@@ -157,7 +156,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 }
             }
             logger("SETTLEMENT REQ PACKET -->", this.isoMap, "e")
-        }
+
 
 
     }
