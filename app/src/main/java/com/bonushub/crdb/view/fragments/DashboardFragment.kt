@@ -215,6 +215,12 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
             "System Date Time:- ",
             "${getSystemTimeIn24Hour().terminalDate()} ${getSystemTimeIn24Hour().terminalTime()}"
         )
+
+        // region temp for testing
+//        tptData?.forceSettleTime = "183030"
+//        tptData?.forceSettle = "1"
+        // end region
+
         if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName)) {
 
             Log.d("Dashboard Open:- ", "Yes")
@@ -224,7 +230,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
             ) {
                 if ((tptData.forceSettleTime.toLong() == getSystemTimeIn24Hour().terminalTime().toLong()
                             || getSystemTimeIn24Hour().terminalTime().toLong() > tptData.forceSettleTime.toLong()
-                            ) && batchData.size > 0
+                            ) /*&& batchData.size > 0*/
                 ) {
                     logger("Auto Settle:- ", "Auto Settle Available")
                     val data = runBlocking(Dispatchers.IO) {
@@ -235,7 +241,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
                         CreateSettlementPacket(appDao).createSettlementISOPacket()
                     }
-                    GlobalScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         val settlementByteArray = data.generateIsoByteRequest()
                         (activity as NavigationActivity).settleBatch(
                             settlementByteArray,

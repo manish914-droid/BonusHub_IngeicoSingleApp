@@ -26,5 +26,13 @@ class BatchReversalRepository @Inject constructor(private val appDao: AppDao){
         return dataList
     }
 
+    suspend fun deleteBatchReversalTable(){
+
+        withContext(Dispatchers.IO) {
+            appDao.deleteBatchReversalTable()
+        }
+
+    }
+
 
 }

@@ -296,7 +296,9 @@ BhTransactionType.BRAND_EMI.type->{
                                             batchReversalData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                             batchReversalData.responseCode = ResponseCode.SUCCESS.value
                                             batchReversalData.roc= receiptDetail?.stan.toString()
+
                                             appDatabase.appDao.insertBatchReversalData(batchReversalData)
+
                                         }
                                     }
 

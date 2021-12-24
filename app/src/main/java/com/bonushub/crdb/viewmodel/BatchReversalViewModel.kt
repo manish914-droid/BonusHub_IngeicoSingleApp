@@ -17,5 +17,10 @@ class BatchReversalViewModel@ViewModelInject constructor(private val batchRevers
 
     }
 
+    suspend fun deleteBatchReversalTable(){
+
+        batchReversalRepository.deleteBatchReversalTable()
+    }
+
 
 }

@@ -30,6 +30,7 @@ import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.crdb.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.ingenico.hdfcpayment.listener.OnOperationListener
@@ -56,6 +57,8 @@ class SettlementFragment : Fragment() {
     private var settlementByteArray: ByteArray? = null
     private var navController: NavController? = null
     private var iDialog: IDialog? = null
+
+    private val batchReversalViewModel : BatchReversalViewModel by viewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -117,6 +120,7 @@ class SettlementFragment : Fragment() {
 
             DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info,
                 {
+
 
                     // **** for zero settlement *****
                     if (dataList.size == 0) {

@@ -172,10 +172,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
         })
 
-        //Settle Batch When Auto Settle == 1 After Sale:- kushal
-        if (appUpdateFromSale) {
-            autoSettleBatchData()
-        }
+        //Settle Batch When Auto Settle == 1 After Sale:- kushal -> auto settlement doing in dashboard
+//        if (appUpdateFromSale) {
+//            autoSettleBatchData()
+//        }
     }
 
 
@@ -889,6 +889,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             //regular auto settle check on dashboard:-
                             runBlocking(Dispatchers.IO) {
                                 appDao.deleteBatchTable()
+
+                                // clear reversal table and preference kushal
+                                appDao.deleteBatchReversalTable()
+                                AppPreference.clearReversal()
+                                AppPreference.saveLastCancelReceiptDetails("")
                             }
 
                             GlobalScope.launch(Dispatchers.Main) {
@@ -1067,6 +1072,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     //Here we are incrementing sale batch number also for next sale:-
                                     val updatedBatchNumber = getTptData()?.batchNumber?.toInt()?.plus(1)
                                     appDao?.updateBatchNumber(updatedBatchNumber.toString(), TableType.TERMINAL_PARAMETER_TABLE.code)
+
+                                    // clear reversal table and preference kushal
+                                    appDao.deleteBatchReversalTable()
+                                    AppPreference.clearReversal()
+                                    AppPreference.saveLastCancelReceiptDetails("")
+
                                 }
                                 //endregion
 

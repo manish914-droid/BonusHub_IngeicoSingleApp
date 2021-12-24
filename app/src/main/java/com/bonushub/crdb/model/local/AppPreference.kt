@@ -137,10 +137,10 @@ object AppPreference {
         edit?.apply()
     }
 
-    fun clearReversal() {
+   /* fun clearReversal() {
        // logger(TAG, "========CLEAR Reversal=========", "e")
         sharedPreference?.edit()?.putString(REVERSAL_DATA, "")?.apply()
-    }
+    }*/
 
 
     //region Below method is used to Save Batch File Data in App Preference:-
@@ -225,6 +225,8 @@ object AppPreference {
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         val jsonResp=Gson().toJson(receiptDetail)
         v?.edit()?.putString(LAST_CANCEL_RECEIPT_KEY, jsonResp?:"")?.apply()
+
+        saveReversal()
     }
     // end region
 
@@ -255,20 +257,33 @@ object AppPreference {
 
     // region need in report
     @JvmStatic
-    fun getReversal(): IsoDataWriter? {
+    fun getReversal(): String? {
         logger(TAG, "========getReversal=========", "e")
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         return if (v != null) {
             try {
                 val str = v.getString(GENERIC_REVERSAL_KEY, "")
                 if (!str.isNullOrEmpty()) {
-                    Gson().fromJson<IsoDataWriter>(str, object : TypeToken<IsoDataWriter>() {}.type)
+                   // Gson().fromJson<IsoDataWriter>(str, object : TypeToken<IsoDataWriter>() {}.type)
+                    return str
                 } else null
             } catch (ex: Exception) {
                 throw Exception("Reversal error!!!")
             }
         } else
             null
+    }
+
+    @JvmStatic
+    fun saveReversal(){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(GENERIC_REVERSAL_KEY, "true")?.apply()
+    }
+
+    @JvmStatic
+    fun clearReversal(){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(GENERIC_REVERSAL_KEY, "")?.apply()
     }
 
     // end region
