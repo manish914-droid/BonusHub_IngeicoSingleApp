@@ -4,95 +4,95 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nested_scroll_view"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+            android:background="@color/white">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <include
+                android:id="@+id/sub_header_view"
+                layout="@layout/sub_header_layout"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/lv_heading_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/pad_5"
+                android:layout_marginEnd="@dimen/pad_5"
+                android:background="@drawable/edge_bg_gray"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
 
-                <include
-                    android:id="@+id/sub_header_view"
-                    layout="@layout/sub_header_layout"
-                    android:visibility="visible" />
-
-                <LinearLayout
-                    android:id="@+id/lv_heading_view"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
-                    android:layout_marginStart="@dimen/pad_5"
-                    android:layout_marginEnd="@dimen/pad_5"
-                    android:background="@drawable/edge_bg_gray">
+                    android:layout_gravity="center"
+                    android:layout_weight=".7"
+                    android:fontFamily="@font/muli_semi_bold"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_5"
+                    android:text="@string/invoice"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_size_small" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight=".7"
-                        android:gravity="center"
-                        android:padding="@dimen/pad_5"
-                        android:text="@string/invoice"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_small"
-                        android:fontFamily="@font/muli_semi_bold"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight=".9"
-                        android:gravity="center"
-                        android:padding="@dimen/pad_5"
-                        android:text="@string/amount"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_small"
-                        android:fontFamily="@font/muli_semi_bold"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1.5"
-                        android:gravity="center"
-                        android:padding="@dimen/pad_5"
-                        android:text="@string/transaction_type"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_small"
-                        android:fontFamily="@font/muli_semi_bold"/>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight=".9"
-                        android:gravity="center"
-                        android:padding="@dimen/pad_5"
-                        android:text="@string/date"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="@dimen/text_size_small"
-                        android:fontFamily="@font/muli_semi_bold"/>
-
-
-                </LinearLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/settlement_rv"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/lv_heading_view" />
+                    android:layout_gravity="center"
+                    android:layout_weight=".9"
+                    android:fontFamily="@font/muli_semi_bold"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_5"
+                    android:text="@string/amount"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_size_small" />
 
-                <!--<ImageView
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1.5"
+                    android:fontFamily="@font/muli_semi_bold"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_5"
+                    android:text="@string/transaction_type"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_size_small" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".9"
+                    android:fontFamily="@font/muli_semi_bold"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_5"
+                    android:text="@string/date"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_size_small" />
+
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/settlement_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lv_heading_view" />
+
+            <!--<ImageView
                     android:id="@+id/empty_view_placeholder"
                     android:layout_width="@dimen/standard_placeholder_size"
                     android:layout_height="@dimen/standard_placeholder_size"
@@ -104,23 +104,23 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:id="@+id/empty_view_placeholder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:text="Batch Empty"
-                    android:fontFamily="@font/muli_regular"
-                    android:textSize="@dimen/text_size_regular"
-                    android:textColor="@color/txt_color"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/empty_view_placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_regular"
+                android:text="Batch Empty"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/settlement_floating_button"

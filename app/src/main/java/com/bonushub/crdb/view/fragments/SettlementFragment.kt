@@ -114,40 +114,72 @@ class SettlementFragment : Fragment() {
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
 
-            DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info,{
+            DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info,
+                {
 
-                PrintUtil(activity).printDetailReportupdate(dataList, activity) { detailPrintStatus ->
-                }
-                settlementViewModel.settlementResponse()
-                settlementViewModel.ingenciosettlement.observe(requireActivity()){ result ->
+                    // **** for zero settlement *****
+                    if (dataList.size == 0) {
 
-                    when (result.status) {
-                        Status.SUCCESS -> {
-                            CoroutineScope(Dispatchers.IO).launch{
-                              //  AppPreference.saveBatchInPreference(dataList as MutableList<BatchTable>)
-                                val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                settlementByteArray = data.generateIsoByteRequest()
-                                try {
-                                    (activity as NavigationActivity).settleBatch1(settlementByteArray) {
-                                    }
-                                } catch (ex: Exception) {
-                                    (activity as NavigationActivity).hideProgress()
-                                    ex.printStackTrace()
+                        GlobalScope.launch(
+                            Dispatchers.IO
+                        ) {
+                            val data =
+                                CreateSettlementPacket(appDao).createSettlementISOPacket()
+                            settlementByteArray =
+                                data.generateIsoByteRequest()
+                            try {
+                                (activity as NavigationActivity).settleBatch1(
+                                    settlementByteArray
+                                ) {
+                                    logger("zero settlement",it.toString(),"e")
                                 }
+                            } catch (ex: Exception) {
+                                (activity as NavigationActivity).hideProgress()
+                                ex.printStackTrace()
                             }
-                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                         }
-                        Status.ERROR -> {
 
-                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                        }
-                        Status.LOADING -> {
-                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+                    }else{
 
-
-                        }
+                    PrintUtil(activity).printDetailReportupdate(
+                        dataList,
+                        activity
+                    ) { detailPrintStatus ->
                     }
+                    settlementViewModel.settlementResponse()
+                    settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
 
+                        when (result.status) {
+                            Status.SUCCESS -> {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    //  AppPreference.saveBatchInPreference(dataList as MutableList<BatchTable>)
+                                    val data =
+                                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                    settlementByteArray = data.generateIsoByteRequest()
+                                    try {
+                                        (activity as NavigationActivity).settleBatch1(
+                                            settlementByteArray
+                                        ) {
+                                        }
+                                    } catch (ex: Exception) {
+                                        (activity as NavigationActivity).hideProgress()
+                                        ex.printStackTrace()
+                                    }
+                                }
+                                //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                            }
+                            Status.ERROR -> {
+
+                                // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                            }
+                            Status.LOADING -> {
+                                // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                            }
+                        }
+
+                    }
                 }
 
 
@@ -159,7 +191,7 @@ class SettlementFragment : Fragment() {
     //region====================================SetUp RecyclerView:-
     private fun setUpRecyclerView() {
         if (dataList.size > 0) {
-            fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE
+            // fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.VISIBLE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.VISIBLE
 
@@ -169,7 +201,7 @@ class SettlementFragment : Fragment() {
                 adapter = settlementAdapter
             }
         } else {
-            fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE
+            // fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.GONE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE

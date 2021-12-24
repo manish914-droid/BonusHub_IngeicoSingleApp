@@ -173,9 +173,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         })
 
         //Settle Batch When Auto Settle == 1 After Sale:- kushal
-//        if (appUpdateFromSale) {
-//            autoSettleBatchData()
-//        }
+        if (appUpdateFromSale) {
+            autoSettleBatchData()
+        }
     }
 
 
@@ -405,7 +405,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 else
                     exitApp()
             }
-        }
+        }else if(supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("BankFunctionsFragment",true)
+                ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
+                        ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("SettlementFragment",true) ){
+
+                    decideDashBoardOnBackPress()
+
+        }else{
+            supportFragmentManager.popBackStackImmediate()
+            }
     }
 
     override fun onEvents(event: VxEvent) {
