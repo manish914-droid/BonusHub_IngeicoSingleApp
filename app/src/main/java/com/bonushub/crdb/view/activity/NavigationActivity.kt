@@ -504,9 +504,31 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             EDashboardItem.BANK_EMI -> {
-
+                if (checkInternetConnection()) {
+                    //  val amt = data as String
+                    val amt = (data as Pair<*, *>).first.toString()
+                    val saleWithTipAmt = data.second.toString()
+                    startActivity(
+                        Intent(
+                            this,
+                            TransactionActivity::class.java
+                        ).apply {
+                            val formattedTransAmount = "%.2f".format(amt.toDouble())
+                            putExtra("saleAmt", formattedTransAmount)
+                            putExtra("type", BhTransactionType.SALE.type)
+                            putExtra("proc_code", ProcessingCode.SALE.code)
+                            putExtra("mobileNumber", extraPair?.first)
+                            putExtra("billNumber", extraPair?.second)
+                            putExtra("saleWithTipAmt", saleWithTipAmt)
+                            putExtra("edashboardItem",  EDashboardItem.SALE)
+                        }
+                    )
+                } else {
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
             }
 
+            // Brand EMI calling is set on
             EDashboardItem.BRAND_EMI -> {
 
 
@@ -661,9 +683,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
-    fun startTransactionActivity(amt:String,mobileNum:String="",billNum:String="",imeiOrSerialNum:String="",brandEmiSubCatData: BrandEMISubCategoryTable,
-                                 brandEmiProductData: BrandEMIProductDataModal,
-                                 brandDataMaster: BrandEMIMasterDataModal){
+    fun startTransactionActivityForEmi(eDashBoardItem: EDashboardItem,amt:String, mobileNum:String="", billNum:String="", imeiOrSerialNum:String="", brandEmiSubCatData: BrandEMISubCategoryTable?=null,
+                                       brandEmiProductData: BrandEMIProductDataModal?=null,
+                                       brandDataMaster: BrandEMIMasterDataModal?=null){
         val intent = Intent (this, TransactionActivity::class.java)
         intent.putExtra("mobileNumber", mobileNum)
         intent.putExtra("billNumber", billNum)
@@ -672,8 +694,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
-        intent.putExtra("edashboardItem", EDashboardItem.BRAND_EMI)
-        intent.putExtra("type", BhTransactionType.BRAND_EMI.type)
+        intent.putExtra("edashboardItem", eDashBoardItem)
+       var txnType=0
+        if(eDashBoardItem==EDashboardItem.BRAND_EMI){
+            txnType=   BhTransactionType.BRAND_EMI.type
+        }
+        if(eDashBoardItem==EDashboardItem.BANK_EMI){
+            txnType=   BhTransactionType.EMI_SALE.type
+        }
+        intent.putExtra("type", txnType)
         startActivity(intent)
 
     }

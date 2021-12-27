@@ -46,7 +46,7 @@ class TenureSchemeActivity : AppCompatActivity() {
     private var cardProcessedDataModal: CardProcessedDataModal? = null
     private var transactionType = -1
     private var bankEMIRequestCode = "4"
-    private var transactionAmount = "20000"
+   // private var transactionAmount = "20000"
     private val brandID by lazy {
         intent.getStringExtra("brandID")
     }
@@ -83,7 +83,7 @@ class TenureSchemeActivity : AppCompatActivity() {
                     "^${/*cardBinValue.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }else{
             // todo change pannumberData
-            "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^$transactionAmount"
+            "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^${cardProcessedDataModal?.getTransactionAmount()}"
         }
 
 
@@ -95,9 +95,7 @@ class TenureSchemeActivity : AppCompatActivity() {
             )
         ).get(TenureSchemeViewModel::class.java)
 
-
         binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)
-
 
        /* binding?.toolbarTxn?.mainToolbarStart?.setOnClickListener {
             navigateControlBackToTransaction(

@@ -67,6 +67,7 @@ class NewInputAmountFragment : Fragment() {
     private var brandEmiProductData: BrandEMIProductDataModal? = null
     private var brandDataMaster: BrandEMIMasterDataModal? = null
 
+    private var isBillNumRequiredForBankEmi = false
     private var binding: FragmentNewInputAmountBinding? = null
     private val keyModelSaleAmount: KeyboardModel by lazy {
         KeyboardModel()
@@ -121,6 +122,7 @@ class NewInputAmountFragment : Fragment() {
         binding?.subHeaderView?.subHeaderText?.text=eDashBoardItem.title
         binding?.subHeaderView?.headerImage?.setImageResource(eDashBoardItem.res)
         initAnimation()
+        setTptValue()
         when (eDashBoardItem) {
             EDashboardItem.SALE_WITH_CASH -> {
                 //  binding?.enterCashAmountTv?.visibility = View.VISIBLE
@@ -167,6 +169,17 @@ class NewInputAmountFragment : Fragment() {
                 }
 
             }
+            EDashboardItem.BANK_EMI->{
+                isMobileNumberEntryAndBillEntryRequiredOnBankEmi { isMobileNeeded, isBillNoNeeded ->
+                    if (isMobileNeeded) {
+                        binding?.mobNoCrdView?.visibility = View.VISIBLE
+                    } else {
+                        binding?.mobNoCrdView?.visibility = View.GONE
+                    }
+                    isBillNumRequiredForBankEmi = isBillNoNeeded
+                }
+
+            }
 
             else -> {
                 cashAmount?.visibility = View.GONE
@@ -185,7 +198,7 @@ class NewInputAmountFragment : Fragment() {
         setOnClickListeners()
     }
 
-    private fun observeNewInpuAmountViewModelForTpt():TerminalParameterTable? {
+    private fun setTptValue():TerminalParameterTable? {
         lifecycleScope.launch(Dispatchers.Main) {
             newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner,{
                 tpt = it
@@ -446,22 +459,7 @@ class NewInputAmountFragment : Fragment() {
     }
 
     private fun onOKClicked(amt: String) {
-        /* (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
-        arguments = Bundle().apply {
-          //  putSerializable("type", action)
-            // putString("proc_code", ProcessingCode.PRE_AUTH.code)
-           /// putString("mobileNumber", extraPair?.first)
-            putString("enquiryAmt", saleAmount.toString().trim())
-            // putSerializable("imagesData", emiCatalogueImageList as HashMap<*, *>)
-            //  putSerializable("brandEMIDataModal", brandEMIDataModal)
 
-        }
-    })*/
-
-        /*  iFrReq?.onFragmentRequest(
-        UiAction.EMI_ENQUIRY,
-        Pair(saleAmount.toString().trim(), "0")
-    )*/
         Log.e("SALE", "OK CLICKED  ${binding?.saleAmount?.text.toString()}")
         Log.e("CASh", "OK CLICKED  ${cashAmount?.text}")
         Log.e("AMT", "OK CLICKED  $amt")
@@ -557,26 +555,58 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             }
+            EDashboardItem.BANK_EMI -> {
+
+                if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
+                    maxAmountLimitDialog(iDialog,maxTxnLimit)
+                    return
+                }
+                isMobileNumberEntryAndBillEntryRequiredOnBankEmi { isMobileNeeded, isBillNumNeeded ->
+                    when {
+                        isMobileNeeded -> {
+                            when {
+                                !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length in 10..13) {
+                                    navigateToBankEmiNextProcess(saleAmount.toString().trim(),binding?.mobNumbr?.text.toString().trim())
+                                } else
+                                    context?.getString(R.string.enter_valid_mobile_number)
+                                        ?.let { showToast(it) }
+
+                                TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
+                                    navigateToBankEmiNextProcess(saleAmount.toString().trim(),binding?.mobNumbr?.text.toString().trim())
+
+                                }
+                            }
+                        }
+                        isBillNumNeeded -> {
+                            navigateToBankEmiNextProcess(saleAmount.toString().trim(),binding?.mobNumbr?.text.toString().trim())
+
+                        }
+                        else -> {
+                            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString())
+                        }
+                    }
+                }
+            }
             EDashboardItem.BRAND_EMI -> {
                 when {
                     // mobile entry  optional handling
                     brandEntryValidationModel?.isMobileNumReq == true -> {
                         when {
                             !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length == 10) {
-                                navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                                navigateToBrandEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
                             } else
                                 context?.getString(R.string.enter_valid_mobile_number)
                                     ?.let {showToast(it) }
 
                             TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
-                                navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                                navigateToBrandEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
                             }
                         }
                     }
                     // mobile entry mandatory handling
                     brandEntryValidationModel?.isMobileNumMandatory == true -> {
                         if (!TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) && (binding?.mobNumbr?.text.toString().length in 10..13)) {
-                            navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                            navigateToBrandEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
 
                         } else {
                             context?.getString(R.string.enter_valid_mobile_number)
@@ -585,7 +615,7 @@ class NewInputAmountFragment : Fragment() {
                     }
                     else -> {
                         // no mobile number require
-                        navigateToEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
+                        navigateToBrandEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
                     }
                 }
             }
@@ -632,7 +662,7 @@ class NewInputAmountFragment : Fragment() {
                 )
             }
             // todo change the calling
-EDashboardItem.PREAUTH_COMPLETE->{
+            EDashboardItem.PREAUTH_COMPLETE->{
     if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
         maxAmountLimitDialog(iDialog,maxTxnLimit)
         return
@@ -644,7 +674,7 @@ EDashboardItem.PREAUTH_COMPLETE->{
 
 }
             EDashboardItem.EMI_ENQUIRY -> {
-                if (observeNewInpuAmountViewModelForTpt()?.bankEnquiryMobNumberEntry == true) {
+                if (tpt?.bankEnquiryMobNumberEntry == true) {
                     showMobileBillDialog(activity, BhTransactionType.EMI_ENQUIRY.type) {
                         //  sendStartSale(inputAmountEditText?.text.toString(), extraPairData)
                         iFrReq?.onFragmentRequest(
@@ -659,8 +689,6 @@ EDashboardItem.PREAUTH_COMPLETE->{
                     )
                 }
             }
-
-
             EDashboardItem.BRAND_EMI_CATALOGUE -> {
                 when {
                     TextUtils.isEmpty(
@@ -673,7 +701,6 @@ EDashboardItem.PREAUTH_COMPLETE->{
                     )
                 }
             }
-
             EDashboardItem.BANK_EMI_CATALOGUE -> {
 
                 when {
@@ -687,7 +714,6 @@ EDashboardItem.PREAUTH_COMPLETE->{
                     )
                 }
             }
-
 
             else -> {
             }
@@ -739,6 +765,21 @@ EDashboardItem.PREAUTH_COMPLETE->{
 
     }
 
+    // fun for checking mobile number and Bill number on Emi sale
+    private fun isMobileNumberEntryAndBillEntryRequiredOnBankEmi(cb: (Boolean, Boolean) -> Unit) {
+                if (tpt?.reservedValues?.substring(1, 2) == "1" && tpt?.reservedValues?.substring(2, 3) == "1")
+                    cb(true, true)
+                else if (tpt?.reservedValues?.substring(1, 2) == "1")
+                    cb(true, false)
+                else if (tpt?.reservedValues?.substring(2, 3) == "1")
+                    cb(false, true)
+                else
+                    cb(false,false)
+
+
+
+    }
+
     //region=====================Condition to check Whether we need to show Serial input or not:-
     private fun isShowSerialDialog(): Boolean {
         return brandEmiProductData?.validationTypeName == "SerialNo" ||
@@ -754,12 +795,10 @@ EDashboardItem.PREAUTH_COMPLETE->{
     }
     //endregion
 
-    private fun navigateToEmiNextProcess(amt:String,mobileNum:String) {
-
+    private fun navigateToBrandEmiNextProcess(amt:String, mobileNum:String) {
         if (brandEntryValidationModel?.isBillNumReq == true || brandEntryValidationModel?.isBillNumMandatory == true || brandEntryValidationModel?.isIemeiOrSerialNumReq == true) {
        val bun=     Bundle().apply {
                 putSerializable("eDashBoardItem", eDashBoardItem)
-
                 putSerializable("brandValidation", brandEntryValidationModel)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
                 putSerializable("brandEmiProductData", brandEmiProductData)
@@ -778,17 +817,44 @@ EDashboardItem.PREAUTH_COMPLETE->{
                   brandEmiSubCatData?.let {
                         brandEmiProductData?.let { it1 ->
                             brandDataMaster?.let { it2 ->
-                                (activity as NavigationActivity).startTransactionActivity(amt=saleAmount.toString(),mobileNum = mobileNum,brandDataMaster = it2,
+                                (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum,brandDataMaster = it2,
                                     brandEmiSubCatData = it,brandEmiProductData = it1
                                 )
                             }
                         }
                     }
-
         }
 
     }
 
+    private fun navigateToBankEmiNextProcess(amt:String, mobileNum:String){
+        if (isBillNumRequiredForBankEmi) {
+            val bun  = Bundle().apply {
+                putSerializable("eDashBoardItem", eDashBoardItem)
+                putSerializable("mobileNum", binding?.mobNumbr?.text.toString())
+                putString("amt", amt)
+
+
+                putBoolean("isBillRequire", isBillNumRequiredForBankEmi)
+                putBoolean("isSerialNumRequired", false)
+
+               /* putSerializable("brandValidation", brandEntryValidationModel)
+                putSerializable("brandEmiSubCat", brandEmiSubCatData)
+                putSerializable("brandEmiProductData", brandEmiProductData)
+                putSerializable("brandDataMaster", brandDataMaster)*/
+            }
+            (activity as NavigationActivity).transactFragment(BillNumSerialNumEntryFragment().apply {
+                arguments =bun
+            })
+
+
+        } else {
+            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum
+            )
+
+        }
+
+    }
 
     private fun isMobileNumberEntryOnsale(cb: (Boolean, Boolean) -> Unit) {
         lifecycleScope.launch(Dispatchers.Main) {

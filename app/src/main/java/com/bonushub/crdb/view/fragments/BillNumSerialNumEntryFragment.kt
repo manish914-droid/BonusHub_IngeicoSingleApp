@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBillNumSerialNumEntryBinding
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
@@ -24,11 +23,8 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.pax.utils.EDashboardItem
 
-import kotlinx.android.synthetic.main.fragment_new_input_amount.*
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class BillNumSerialNumEntryFragment : Fragment() {
@@ -96,7 +92,8 @@ class BillNumSerialNumEntryFragment : Fragment() {
 
         binding?.serialNumEt?.setMaxLength(brandEmiProductData?.maxLength?.toInt() ?: 20)
         binding?.billNumEt?.setMaxLength( 16)
-        if (brandValidation.isBillNumReq || brandValidation.isBillNumMandatory) {
+
+        if (brandValidation.isBillNumReq || brandValidation.isBillNumMandatory || eDashBoardItem==EDashboardItem.BANK_EMI) {
             binding?.billnoCrdView?.visibility = View.VISIBLE
         } else {
             binding?.billnoCrdView?.visibility = View.GONE
@@ -129,10 +126,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
         }
         binding?.proceedBtn?.setOnClickListener {
             if (eDashBoardItem == EDashboardItem.BANK_EMI || eDashBoardItem == EDashboardItem.TEST_EMI) {
-                val pair = Pair(txnAmount, testEmiType)
-                val triple = Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true)
-             //   (activity as MainActivity).onFragmentRequest(eDashBoardItem, pair, triple)
-
+                (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString())
             } else if (eDashBoardItem == EDashboardItem.BRAND_EMI) {
                 navigateToTransaction()
 
@@ -192,26 +186,13 @@ class BillNumSerialNumEntryFragment : Fragment() {
             }
 
         }
-
         lifecycleScope.launch(Dispatchers.IO) {
-            //
-          //  saveBrandEMIDataToDB( binding?.serialNumEt?.text.toString().trim(),  binding?.serialNumEt?.text.toString().trim(), brandEMIDataModal, transType)
-
-          /* brandEMIDataModal.imeiORserailNum=binding?.serialNumEt?.text.toString().trim()
-            withContext(Dispatchers.Main) {
-                (activity as MainActivity).onFragmentRequest(
-                    eDashBoardItem,
-                    Pair(txnAmount, "0"),
-                    Triple(mobileNumber, binding?.billNumEt?.text.toString().trim(), true),brandEMIDataModal
-                )
-            }*/
             brandEmiProductData?.imeiOrSerialNum=binding?.serialNumEt?.text.toString()
             brandEmiProductData?.billNum=binding?.billNumEt?.text.toString().trim()
-
             brandEmiSubCatData?.let {
                 brandEmiProductData?.let { it1 ->
                     brandDataMaster?.let { it2 ->
-                        (activity as NavigationActivity).startTransactionActivity(amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(),imeiOrSerialNum=binding?.serialNumEt?.text.toString() ,brandDataMaster = it2,
+                        (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(),imeiOrSerialNum=binding?.serialNumEt?.text.toString() ,brandDataMaster = it2,
                             brandEmiSubCatData = it,brandEmiProductData = it1
                         )
                     }
