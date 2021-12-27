@@ -52,10 +52,10 @@ private var bankEMIRequestCode = "4"
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew(){
     private var emvBinding: ActivityEmvBinding? = null
-   // private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
+    private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
     private val transactionViewModel : TransactionViewModel by viewModels()
     //used for other cash amount
-  //  private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
+    private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
     private val restartHandlingList: MutableList<RestartHandlingModel> by lazy { mutableListOf<RestartHandlingModel>() }
     private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
 
@@ -230,16 +230,18 @@ BhTransactionType.BRAND_EMI.type->{
                                         if (receiptDetail != null) {
                                             val batchData=BatchTable(receiptDetail)
                                             creatCardProcessingModelData(receiptDetail)
-                                            cardProcessedDataModal.getEncryptedPan()?.let {
-                                                globalCardProcessedModel.setEncryptedPan(
-                                                    it
-                                                )
+                                          //  val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+
+                                         //   val jsonResp2=Gson().toJson(transactionISO)
+                                        //    println(jsonResp2)
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                               // transactionViewModel.serverCall(transactionISO)
                                             }
 
 
 
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                               batchData.emiIssuerDataModel=emiIssuerData
+                                                //    appDao.insertBatchData(batchData)
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.emiBrandData=brandDataMaster
                                                 batchData.emiCategoryData=brandEmiSubCatData
@@ -253,11 +255,10 @@ BhTransactionType.BRAND_EMI.type->{
                                                         it
                                                     )
                                                 }
-                                                val transactionISO =
-                                                    CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
-                                                transactionViewModel.serverCall(transactionISO)
-                                                val jsonResp2=Gson().toJson(transactionISO)
-                                                println(jsonResp2)
+                                              //  val transactionISO =CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
+                                             //   transactionViewModel.serverCall(transactionISO)
+                                              //  val jsonResp2=Gson().toJson(transactionISO)
+                                             //   println(jsonResp2)
                                                 printingSaleData(batchData)
                                             }
                                         }
@@ -393,15 +394,19 @@ BhTransactionType.BRAND_EMI.type->{
                                         if (receiptDetail != null) {
                                             val batchData=BatchTable(receiptDetail)
                                             creatCardProcessingModelData(receiptDetail)
-                                            val transactionISO =
+                                            /*val transactionISO =
                                                 CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-
-                                            val jsonResp2=Gson().toJson(transactionISO)
-                                            Log.d(TAG, "jsonResp : $jsonResp2")
+*/
+                                          //  val jsonResp2=Gson().toJson(transactionISO)
+                                          //  Log.d(TAG, "jsonResp : $jsonResp2")
                                             println(jsonResp)
                                             lifecycleScope.launch(Dispatchers.IO) {
+                                               // transactionViewModel.serverCall(transactionISO)
+                                            }
+                                            lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
-                                                transactionViewModel.serverCall(transactionISO)
+                                                //    appDao.insertBatchData(batchData)
+                                              //  transactionViewModel.serverCall(transactionISO)
                                                 batchData.invoice= receiptDetail.invoice.toString()
                                                 batchData.transactionType = com.bonushub.pax.utils.BhTransactionType.SALE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
