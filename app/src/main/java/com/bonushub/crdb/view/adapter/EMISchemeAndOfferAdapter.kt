@@ -32,7 +32,7 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: EMISchemeOfferHolder, position: Int) {
-        val modelData = emiSchemeDataList?.get(position)
+        val modelData = emiSchemeDataList?.get(holder.adapterPosition)
         if (modelData != null) {
             if (modelData.tenure == "1") {
                 holder.binding.tenureHeadingTv.text = modelData.tenureLabel

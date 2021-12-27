@@ -2,37 +2,43 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
+        android:background="@color/white"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/darkgray"
+            android:background="@color/white"
             android:descendantFocusability="blocksDescendants">
 
             <include
                 android:id="@+id/toolbar_txn"
                 layout="@layout/app_toolbar" />
 
+
             <TextView
                 android:id="@+id/emiSchemeTV"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/pad_16"
                 android:gravity="center"
                 android:padding="@dimen/pad_4"
-                android:text="@string/emi_scheme_and_offer"
-                android:textColor="@color/white"
+                android:text="@string/brandEmi"
+                android:textColor="@color/txt_color"
                 android:textSize="@dimen/text_size_xregular"
+                android:fontFamily="@font/muli_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:drawableLeft="@drawable/ic_brandemi"
+                android:drawablePadding="@dimen/pad_10"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_txn" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -42,7 +48,9 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emiSchemeTV" />
+                app:layout_constraintTop_toBottomOf="@+id/emiSchemeTV"
+                android:layout_marginStart="@dimen/pad_15"
+                android:layout_marginEnd="@dimen/pad_15"/>
 
          <!--   <ImageView
                 android:id="@+id/empty_view_placeholder"
@@ -71,8 +79,6 @@
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_xregular"
         app:backgroundTint="@color/hdfc_red_color"
-
-
-        />
+        android:drawableLeft="@drawable/ic_proceed_button" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
