@@ -1125,6 +1125,43 @@ object Field48ResponseTimestamp {
         return tptData
     }
 //endregion
+//region======================Get brand tnc Data:-
+fun getBrandTAndCDataByBrandId(brandId : String): String {
+    var brandTANDC: String? = null
+    runBlocking(Dispatchers.IO) {
+         brandTANDC  =  appDatabase?.appDao?.getBrandTAndCDataById(brandId)
+        val jsonResp=Gson().toJson(brandTANDC)
+        println(jsonResp)
+    }
+    return brandTANDC?:""
+}
+//endregion
+
+    //region======================Get issuer tnc Data:-
+    fun getIssuerTAndCDataByIssuerId(issuerId: String ): IssuerTAndCTable? {
+        var issuerTANDC:
+                IssuerTAndCTable?= null
+        runBlocking(Dispatchers.IO) {
+            issuerTANDC  =  appDatabase?.appDao?.getAllIssuerTAndCDataById(issuerId)
+            val jsonResp=Gson().toJson(issuerTANDC)
+            println(jsonResp)
+        }
+        return issuerTANDC
+    }
+//endregion
+
+    //region======================Get brand  Data:-
+    fun getBrandTAndCData(): MutableList<BrandTAndCTable?>? {
+        var brandTANDC: MutableList<BrandTAndCTable?>? = null
+        runBlocking(Dispatchers.IO) {
+            brandTANDC  =  appDatabase?.appDao?.getAllBrandTAndCData()
+            val jsonResp=Gson().toJson(brandTANDC)
+            println(jsonResp)
+        }
+        return brandTANDC
+    }
+//endregion
+
 
     //region======================Get TPT Data:-
     fun getIssuerData(issuerId:String): IssuerParameterTable? {

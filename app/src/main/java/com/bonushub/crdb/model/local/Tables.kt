@@ -1085,7 +1085,6 @@ data class InitDataListList(
     var isReportPasswordEnable: Boolean? = null,
     var isVoidPasswordEnable: Boolean? = null,
     var isTipEnable: Boolean? = null,
-
     ) // same
 
 @Entity

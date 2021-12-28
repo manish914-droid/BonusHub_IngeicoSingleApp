@@ -456,15 +456,14 @@ class TransactionActivity : BaseActivityNew() {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
                                             creatCardProcessingModelData(receiptDetail)
-                                            /* val transactionISO =
+                                             val transactionISO =
                                                  CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
- */
                                             //  val jsonResp2=Gson().toJson(transactionISO)
                                             //   Log.d(TAG, "jsonResp : $jsonResp2")
                                             println(jsonResp)
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
-                                                //    transactionViewModel.serverCall(transactionISO)
+                                                transactionViewModel.serverCall(transactionISO)
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
                                                     com.bonushub.pax.utils.BhTransactionType.SALE.type
