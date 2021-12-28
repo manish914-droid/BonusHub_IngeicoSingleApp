@@ -12,11 +12,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.model.local.BrandTAndCTable
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
+import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
@@ -71,7 +74,25 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
             }
         }
 
+        // temp for check db :- kushal
+        lifecycleScope.launch(Dispatchers.IO){
+            var tnc = DBModule.appDatabase.appDao.getAllBrandTAndCData()
+            logger("tnc",""+tnc.toString())
 
+//            var item1 = BrandTAndCTable("0","kushal 1")
+//            var tnc_row1 = DBModule.appDatabase.appDao.insertBrandTAndCData(item1)
+//            logger("tnc_row",""+tnc_row1.toString())
+//
+//            var tnc2 = DBModule.appDatabase.appDao.getAllBrandTAndCData()
+//            logger("tnc",""+tnc2.toString())
+//
+//            var item2 = BrandTAndCTable("1","kushal 2")
+//            var tnc_row2 = DBModule.appDatabase.appDao.insertBrandTAndCData(item2)
+//            logger("tnc_row",""+tnc_row2.toString())
+//
+//            var tnc3 = DBModule.appDatabase.appDao.getAllBrandTAndCData()
+//            logger("tnc",""+tnc3.toString())
+        }
 
     }
 

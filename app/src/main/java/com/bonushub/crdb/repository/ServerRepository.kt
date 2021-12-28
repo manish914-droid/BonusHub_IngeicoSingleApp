@@ -6,6 +6,7 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.serverApi.EMIRequestType
@@ -371,7 +372,9 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                     brandModel.brandId = splitData[0]
                                     brandModel.brandTAndC = splitData[1]
                                     // saving data to db
-                                    appDB.appDao.insertBrandTAndCData(brandModel)
+                                    //appDB.appDao.insertBrandTAndCData(brandModel) // kushal
+                                    DBModule.appDatabase.appDao.insertBrandTAndCData(brandModel)
+
 
                                 }
                             }
