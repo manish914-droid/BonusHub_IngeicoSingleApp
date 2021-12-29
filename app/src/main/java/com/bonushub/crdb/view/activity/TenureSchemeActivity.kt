@@ -30,6 +30,7 @@ import android.app.Activity
 
 import android.content.Intent
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
+import com.bonushub.crdb.utils.logger
 
 
 @AndroidEntryPoint
@@ -160,6 +161,29 @@ class TenureSchemeActivity : AppCompatActivity() {
     private fun onSchemeClickEvent(position: Int) {
         Log.d("Position:- ", emiSchemeOfferDataList?.get(position).toString())
         selectedSchemeUpdatedPosition = position
+
+//        var newList: MutableList<BankEMITenureDataModal>? = mutableListOf()
+//        newList?.toList()
+//        for(i in emiSchemeOfferDataList!!.indices)
+//        {
+//            var item = emiSchemeOfferDataList!![i]
+//            if(i == position)
+//            {
+//                item.isSelected = !item.isSelected
+//                newList?.add(item)
+//                //emiSchemeOfferDataList!![i].isSelected = !emiSchemeOfferDataList!![i].isSelected
+//            }else{
+//                item.isSelected = false
+//                newList?.add(item)
+//                //emiSchemeOfferDataList!![i].isSelected = false
+//            }
+//        }
+//
+//        logger("updateList",emiSchemeOfferDataList.toString())
+//        logger("updateList2",newList?.toList().toString())
+//
+//        emiSchemeAndOfferAdapter.submitList(newList?.toList())
+
     }
     //endregion
     //region=========================SetUp RecyclerView Data:-
@@ -170,6 +194,9 @@ class TenureSchemeActivity : AppCompatActivity() {
                 itemAnimator = DefaultItemAnimator()
                 adapter = emiSchemeAndOfferAdapter
             }
+
+//        var tempList = emiSchemeOfferDataList?.toList()
+//        emiSchemeAndOfferAdapter.submitList(tempList)
 
 
     }

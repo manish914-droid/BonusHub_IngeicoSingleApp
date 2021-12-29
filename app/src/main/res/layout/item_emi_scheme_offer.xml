@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cardView"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:theme="@style/Theme.MaterialComponents.Light"
-android:layout_margin="@dimen/pad_4"
-
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
->
+    android:layout_margin="@dimen/pad_4"
+    android:elevation="5dp">
 
     <LinearLayout
         android:id="@+id/parent_emi_view_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/pad_16"
-        android:background="@drawable/card_edge"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/pad_16">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,11 +24,11 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@drawable/edge_blue_bg_transparent"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="center"
-                android:padding="@dimen/pad_4"
-                android:background="@drawable/card_edge"
-
                 android:hint="@string/tenure"
+                android:padding="@dimen/pad_4"
                 android:textColor="@color/black"
                 android:textColorHint="@color/black"
                 android:textSize="@dimen/text_size_regular" />
@@ -42,11 +37,12 @@ android:layout_margin="@dimen/pad_4"
                 android:id="@+id/scheme_check_iv"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:layout_marginStart="@dimen/pad_16"
                 android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/pad_16"
                 android:layout_marginEnd="@dimen/pad_4"
                 android:background="@drawable/ic_check_box_selected_green"
-                android:contentDescription="@string/select_scheme" />
+                android:contentDescription="@string/select_scheme"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -56,9 +52,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_transaction_amount_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/txn_amount"
                 android:textColor="@color/black"
@@ -69,6 +67,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -82,9 +81,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_tenure_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/tenure"
                 android:textColor="@color/black"
@@ -95,6 +96,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -108,9 +110,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_loan_amount_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/loan_amount"
                 android:textColor="@color/black"
@@ -121,6 +125,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -134,9 +139,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_emi_amount_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/emi_amount"
                 android:textColor="@color/black"
@@ -147,6 +154,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -161,9 +169,11 @@ android:layout_margin="@dimen/pad_4"
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/tv_discount_amount_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/discount_amount"
                 android:textColor="@color/black"
@@ -174,6 +184,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -188,9 +199,11 @@ android:layout_margin="@dimen/pad_4"
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/tv_cashback_amount_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="center"
                 android:text="@string/cashback"
                 android:textColor="@color/black"
@@ -201,6 +214,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -208,16 +222,18 @@ android:layout_margin="@dimen/pad_4"
 
         <LinearLayout
             android:id="@+id/interestRateLL"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
+                android:id="@+id/tv_interest_rate_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/interest_rate"
                 android:textColor="@color/black"
@@ -228,6 +244,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -241,9 +258,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_total_interest_pay_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/total_interest_pay"
                 android:textColor="@color/black"
@@ -254,6 +273,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -267,9 +287,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_roi_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/roi_pa"
                 android:textColor="@color/black"
@@ -280,6 +302,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -293,9 +316,11 @@ android:layout_margin="@dimen/pad_4"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_total_emi_pay_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/total_emi_pay"
                 android:textColor="@color/black"
@@ -306,6 +331,7 @@ android:layout_margin="@dimen/pad_4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
@@ -316,27 +342,30 @@ android:layout_margin="@dimen/pad_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
-            android:visibility="visible"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <TextView
+                android:id="@+id/tv_offer_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/cashback_offer"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
+
             <TextView
                 android:id="@+id/tv_offer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
+                android:fontFamily="@font/muli_light"
                 android:gravity="start"
-
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

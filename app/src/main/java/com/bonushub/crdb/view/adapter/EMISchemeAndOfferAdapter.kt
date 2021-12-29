@@ -6,7 +6,9 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ItemEmiSchemeOfferBinding
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.utils.divideAmountBy100
@@ -32,7 +34,74 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: EMISchemeOfferHolder, position: Int) {
-        val modelData = emiSchemeDataList?.get(holder.adapterPosition)
+        val modelData = emiSchemeDataList?.get(position)
+
+        //region==========================Checked Particular Row of RecyclerView Logic:-
+        if (modelData?.isSelected == true) {
+            //holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#13E113"))) //
+            //holder.binding.schemeCheckIv.visibility = View.VISIBLE//
+            holder.binding.cardView.setBackgroundResource(R.drawable.edge_blue)
+            holder.binding.tenureHeadingTv.setBackgroundResource(R.drawable.edge_white_bg_transparent)
+           // holder.binding.tenureHeadingTv.setTextColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))
+            setViewColor(holder.binding.tenureHeadingTv,true)
+            setViewColor(holder.binding.tvTransactionAmountHeader,true)
+            setViewColor(holder.binding.tvTransactionAmount,true)
+            setViewColor(holder.binding.tvTenureHeader,true)
+            setViewColor(holder.binding.tvTenure,true)
+            setViewColor(holder.binding.tvLoanAmountHeader,true)
+            setViewColor(holder.binding.tvLoanAmount,true)
+
+            setViewColor(holder.binding.tvEmiAmountHeader,true)
+            setViewColor(holder.binding.tvEmiAmount,true)
+            setViewColor(holder.binding.tvDiscountAmountHeader,true)
+            setViewColor(holder.binding.tvDiscountAmount,true)
+            setViewColor(holder.binding.tvCashbackAmountHeader,true)
+            setViewColor(holder.binding.tvCashbackAmount,true)
+            setViewColor(holder.binding.tvInterestRateHeader,true)
+            setViewColor(holder.binding.tvInterestRate,true)
+            setViewColor(holder.binding.tvTotalInterestPayHeader,true)
+            setViewColor(holder.binding.tvTotalInterestPay,true)
+            setViewColor(holder.binding.tvRoiHeader,true)
+            setViewColor(holder.binding.tvRoi,true)
+            setViewColor(holder.binding.tvTotalEmiPayHeader,true)
+            setViewColor(holder.binding.tvTotalEmiPay,true)
+            setViewColor(holder.binding.tvOfferHeader,true)
+            setViewColor(holder.binding.tvOffer,true)
+            // schemeSelectCB(position)
+        } else {
+            //holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))
+            //holder.binding.schemeCheckIv.visibility = View.GONE//
+            holder.binding.cardView.setBackgroundResource(R.drawable.edge_blue_bg_blue_transparent)
+            holder.binding.tenureHeadingTv.setBackgroundResource(R.drawable.edge_blue_bg_transparent)
+           // holder.binding.tenureHeadingTv.setTextColor(ColorStateList.valueOf(Color.parseColor("#013480")))
+            setViewColor(holder.binding.tenureHeadingTv,false)
+            setViewColor(holder.binding.tenureHeadingTv,false)
+            setViewColor(holder.binding.tvTransactionAmountHeader,false)
+            setViewColor(holder.binding.tvTransactionAmount,false)
+            setViewColor(holder.binding.tvTenureHeader,false)
+            setViewColor(holder.binding.tvTenure,false)
+            setViewColor(holder.binding.tvLoanAmountHeader,false)
+            setViewColor(holder.binding.tvLoanAmount,false)
+
+            setViewColor(holder.binding.tvEmiAmountHeader,false)
+            setViewColor(holder.binding.tvEmiAmount,false)
+            setViewColor(holder.binding.tvDiscountAmountHeader,false)
+            setViewColor(holder.binding.tvDiscountAmount,false)
+            setViewColor(holder.binding.tvCashbackAmountHeader,false)
+            setViewColor(holder.binding.tvCashbackAmount,false)
+            setViewColor(holder.binding.tvInterestRateHeader,false)
+            setViewColor(holder.binding.tvInterestRate,false)
+            setViewColor(holder.binding.tvTotalInterestPayHeader,false)
+            setViewColor(holder.binding.tvTotalInterestPay,false)
+            setViewColor(holder.binding.tvRoiHeader,false)
+            setViewColor(holder.binding.tvRoi,false)
+            setViewColor(holder.binding.tvTotalEmiPayHeader,false)
+            setViewColor(holder.binding.tvTotalEmiPay,false)
+            setViewColor(holder.binding.tvOfferHeader,false)
+            setViewColor(holder.binding.tvOffer,false)
+        }
+        //endregion
+
         if (modelData != null) {
             if (modelData.tenure == "1") {
                 holder.binding.tenureHeadingTv.text = modelData.tenureLabel
@@ -123,25 +192,29 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
         }
 
         holder.binding.parentEmiViewLl.setOnClickListener {
-            index = position
+            //index = position
+            schemeSelectCB(position)
+            for(i in emiSchemeDataList!!.indices){
+                emiSchemeDataList[i].isSelected = i == position
+            }
             notifyDataSetChanged()
         }
 
-        //region==========================Checked Particular Row of RecyclerView Logic:-
-        if (index == position) {
-            holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#13E113")))
-            holder.binding.schemeCheckIv.visibility = View.VISIBLE
-            schemeSelectCB(position)
-        } else {
-            holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))
-            holder.binding.schemeCheckIv.visibility = View.GONE
-        }
-        //endregion
+
     }
 
 
     inner class EMISchemeOfferHolder(val binding: ItemEmiSchemeOfferBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    fun setViewColor(txtView:TextView,isWhite:Boolean){
+        if(isWhite)
+        {
+            txtView.setTextColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))
+        }else{
+            txtView.setTextColor(ColorStateList.valueOf(Color.parseColor("#013480")))
+        }
+    }
 }
 
 

@@ -67,18 +67,23 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <Button
+    <TextView
         android:id="@+id/emi_scheme_floating_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="18dp"
         android:layout_marginBottom="@dimen/pad_60"
+        android:paddingStart="@dimen/pad_20"
+        android:paddingEnd="@dimen/pad_20"
+        android:paddingTop="@dimen/pad_10"
+        android:paddingBottom="@dimen/pad_10"
         android:text="@string/proceed_txn"
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_xregular"
-        app:backgroundTint="@color/hdfc_red_color"
+        android:background="@drawable/edge_button"
+        android:drawablePadding="@dimen/pad_15"
         android:drawableLeft="@drawable/ic_proceed_button" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
