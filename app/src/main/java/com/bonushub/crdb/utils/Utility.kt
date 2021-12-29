@@ -1137,6 +1137,7 @@ fun getBrandTAndCDataByBrandId(brandId : String): String {
 }
 //endregion
 
+
     //region======================Get issuer tnc Data:-
     fun getIssuerTAndCDataByIssuerId(issuerId: String ): IssuerTAndCTable? {
         var issuerTANDC:
