@@ -268,6 +268,7 @@ class PrintUtil(context: Context?) {
                 //region=====================BRAND TAndC===============
                 if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
                     printBrandTnC(batchTable)
+                    printProduactData(batchTable)
                 }
 
                 if (receiptDetail.entryMode.equals("CLESS_EMV")) {
@@ -538,8 +539,7 @@ class PrintUtil(context: Context?) {
         val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
         val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
-        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? =
-            batchTable.emiIssuerDataModel
+        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
         val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
 
         val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
@@ -665,9 +665,9 @@ class PrintUtil(context: Context?) {
         }
 //endregion
 
-//region=====================Printing Merchant Brand Purchase Details:-
+        //region=====================Printing Merchant Brand Purchase Details:-
         if (batchTable.transactionType.equals(EDashboardItem.BRAND_EMI.title)) {
-//region====================Printing DBD Wise TAndC Brand EMI==================
+        //region====================Printing DBD Wise TAndC Brand EMI==================
             if (!isNoEmiOnlyCashBackApplied!!) {
                 if (copyType?.equals(EPrintCopyType.MERCHANT) == true && (brandEMIMasterDataModal?.mobileNumberBillNumberFlag?.get(
                         3
@@ -689,135 +689,145 @@ class PrintUtil(context: Context?) {
                 }
 
             }
-            printSeperator()
-            sigleLineText("-----**Product Details**-----", AlignMode.CENTER)
-            if (brandEMIMasterDataModal != null) {
-                textBlockList.add(sigleLineformat("Mer/Mfr Name:", AlignMode.LEFT))
+
+        }
+    }
+
+    private fun printProduactData(batchTable: BatchTable){
+        printSeperator()
+        val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
+        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
+        val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
+        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
+        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
+        val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
+        sigleLineText("-----**Product Details**-----", AlignMode.CENTER)
+        if (brandEMIMasterDataModal != null) {
+            textBlockList.add(sigleLineformat("Mer/Mfr Name:", AlignMode.LEFT))
+            textBlockList.add(
+                sigleLineformat(
+                    "${brandEMIMasterDataModal?.brandName}",
+                    AlignMode.RIGHT
+                )
+            )
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            textBlockList.add(sigleLineformat("Prod Cat:", AlignMode.LEFT))
+            textBlockList.add(
+                sigleLineformat(
+                    "${brandEMISubCategoryTable?.categoryName}",
+                    AlignMode.RIGHT
+                )
+            )
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+
+            if (brandEMIProductDataModal?.producatDesc == "subCat") {
+                if (!brandEMIProductDataModal?.productCategoryName.isNullOrEmpty()) {
+
+                    textBlockList.add(sigleLineformat("Prod desc:", AlignMode.LEFT))
+                    textBlockList.add(
+                        sigleLineformat(
+                            "${brandEMIProductDataModal?.productCategoryName}",
+                            AlignMode.RIGHT
+                        )
+                    )
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                }
+            }
+
+
+            textBlockList.add(sigleLineformat("Prod Name:", AlignMode.LEFT))
+            textBlockList.add(
+                sigleLineformat(
+                    "${brandEMIProductDataModal?.productName}",
+                    AlignMode.RIGHT
+                )
+            )
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            if (!TextUtils.isEmpty(batchTable?.imeiOrSerialNum)) {
+                textBlockList.add(sigleLineformat("Prod ${"IEMI"}:", AlignMode.LEFT))
                 textBlockList.add(
                     sigleLineformat(
-                        "${brandEMIMasterDataModal?.brandName}",
+                        "${batchTable?.imeiOrSerialNum}",
                         AlignMode.RIGHT
                     )
                 )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
-                textBlockList.add(sigleLineformat("Prod Cat:", AlignMode.LEFT))
-                textBlockList.add(
-                    sigleLineformat(
-                        "${brandEMISubCategoryTable?.categoryName}",
-                        AlignMode.RIGHT
-                    )
-                )
-                printer?.addMixStyleText(textBlockList)
-                textBlockList.clear()
-
-
-                if (brandEMIProductDataModal?.producatDesc == "subCat") {
-                    if (!brandEMIProductDataModal?.productCategoryName.isNullOrEmpty()) {
-
-                        textBlockList.add(sigleLineformat("Prod desc:", AlignMode.LEFT))
+            }
+            val mobnum="9808080810"
+            if (!TextUtils.isEmpty(mobnum)) {
+                when (brandEMIMasterDataModal.mobileNumberBillNumberFlag.substring(1, 2)) {
+                    "1" -> {
+                        // MASK PRINT
+                        val maskedMob = panMasking(
+                            mobnum,
+                            "000****000"
+                        )
+                        textBlockList.add(sigleLineformat("Mobile No:", AlignMode.LEFT))
                         textBlockList.add(
                             sigleLineformat(
-                                "${brandEMIProductDataModal?.productCategoryName}",
+                                maskedMob,
+                                AlignMode.RIGHT
+                            )
+                        )
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+
+                    }
+                    //PLAIN PRINT
+                    "2" -> {
+
+                        textBlockList.add(sigleLineformat("Mobile No:", AlignMode.LEFT))
+                        textBlockList.add(
+                            sigleLineformat(
+                                mobnum,
                                 AlignMode.RIGHT
                             )
                         )
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
                     }
-                }
-
-
-                textBlockList.add(sigleLineformat("Prod Name:", AlignMode.LEFT))
-                textBlockList.add(
-                    sigleLineformat(
-                        "${brandEMIProductDataModal?.productName}",
-                        AlignMode.RIGHT
-                    )
-                )
-                printer?.addMixStyleText(textBlockList)
-                textBlockList.clear()
-
-                if (!TextUtils.isEmpty(batchTable?.imeiOrSerialNum)) {
-                    textBlockList.add(sigleLineformat("Prod ${"IEMI"}:", AlignMode.LEFT))
-                    textBlockList.add(
-                        sigleLineformat(
-                            "${batchTable?.imeiOrSerialNum}",
-                            AlignMode.RIGHT
-                        )
-                    )
-                    printer?.addMixStyleText(textBlockList)
-                    textBlockList.clear()
-
-                }
-                val mobnum="9808080810"
-                if (!TextUtils.isEmpty(mobnum)) {
-                    when (brandEMIMasterDataModal.mobileNumberBillNumberFlag.substring(1, 2)) {
-                        "1" -> {
-                            // MASK PRINT
-                            val maskedMob = panMasking(
-                                mobnum,
-                                "000****000"
-                            )
-                            textBlockList.add(sigleLineformat("Mobile No:", AlignMode.LEFT))
-                            textBlockList.add(
-                                sigleLineformat(
-                                    maskedMob,
-                                    AlignMode.RIGHT
-                                )
-                            )
-                            printer?.addMixStyleText(textBlockList)
-                            textBlockList.clear()
-
-
-                        }
-                        //PLAIN PRINT
-                        "2" -> {
-
-                            textBlockList.add(sigleLineformat("Mobile No:", AlignMode.LEFT))
-                            textBlockList.add(
-                                sigleLineformat(
-                                    mobnum,
-                                    AlignMode.RIGHT
-                                )
-                            )
-                            printer?.addMixStyleText(textBlockList)
-                            textBlockList.clear()
-                        }
-                        else -> {
-                            // NO PRINT
-                        }
+                    else -> {
+                        // NO PRINT
                     }
                 }
-
-                //region====================Printing Tenure TAndC==================
-                if (!TextUtils.isEmpty(bankEMITenureDataModal?.tenureTAndC)) {
-                    printSeperator()
-                    val tenureTAndC: List<String>? = bankEMITenureDataModal?.tenureTAndC?.let {
-                        chunkTnC(
-                            it
-                        )
-                    }
-                    if (tenureTAndC != null) {
-                        for (st in tenureTAndC) {
-                            logger("TNC", st, "e")
-                            textBlockList.add(sigleLineformat(st, AlignMode.LEFT))
-
-                            printer?.addMixStyleText(textBlockList)
-                            textBlockList.clear()
-
-                        }
-                    }
-                    printSeperator()
-                }
-                //endregion
-
-
             }
-        }
-    }
 
+            //region====================Printing Tenure TAndC==================
+            if (!TextUtils.isEmpty(bankEMITenureDataModal?.tenureTAndC)) {
+                printSeperator()
+                val tenureTAndC: List<String>? = bankEMITenureDataModal?.tenureTAndC?.let {
+                    chunkTnC(
+                        it
+                    )
+                }
+                if (tenureTAndC != null) {
+                    for (st in tenureTAndC) {
+                        logger("TNC", st, "e")
+                        textBlockList.add(sigleLineformat(st, AlignMode.CENTER))
+
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+                    }
+                }
+                printSeperator()
+            }
+            //endregion
+
+
+        }
+        printSeperator()
+    }
 
     fun printDetailReportupdate(
         batch: MutableList<BatchTable>,

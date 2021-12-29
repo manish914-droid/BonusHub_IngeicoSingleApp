@@ -200,6 +200,9 @@ interface AppDao{
     @Query("SELECT * FROM IssuerTAndCTable")
     suspend fun getAllIssuerTAndCData(): MutableList<IssuerTAndCTable?>?
 
+    @Query("SELECT * FROM IssuerTAndCTable WHERE issuerId =:issuerId ")
+    suspend fun getAllIssuerTAndCDataById(issuerId:String): IssuerTAndCTable?
+
     @Query("DELETE FROM IssuerTAndCTable")
     suspend fun deleteIssuerTAndCData(): Int?
     //endregion
@@ -210,6 +213,9 @@ interface AppDao{
 
     @Query("SELECT * FROM BrandTAndCTable")
     suspend fun getAllBrandTAndCData(): MutableList<BrandTAndCTable?>?
+
+    @Query("SELECT brandTAndC FROM BrandTAndCTable WHERE brandId =:brandId ")
+    suspend fun getBrandTAndCDataById(brandId:String): String?
 
     @Query("DELETE FROM BrandTAndCTable")
     suspend fun deleteBrandTAndCData()
