@@ -599,6 +599,40 @@ class TransactionActivity : BaseActivityNew() {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+
+                                            // region sync transaction
+                                            lifecycleScope.launch(Dispatchers.IO){
+                                                creatCardProcessingModelData(receiptDetail)
+                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                // sync pending transaction
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
+
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                        logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+                                            }
+                                            // end region
+
+
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
@@ -704,6 +738,39 @@ class TransactionActivity : BaseActivityNew() {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+
+                                            // region sync transaction
+                                            lifecycleScope.launch(Dispatchers.IO){
+                                                creatCardProcessingModelData(receiptDetail)
+                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                // sync pending transaction
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
+
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                        logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+                                            }
+                                            // end region
+
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
@@ -808,6 +875,39 @@ class TransactionActivity : BaseActivityNew() {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+
+                                            // region sync transaction
+                                            lifecycleScope.launch(Dispatchers.IO){
+                                                creatCardProcessingModelData(receiptDetail)
+                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                // sync pending transaction
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
+
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                        logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+                                            }
+                                            // end region
+
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
@@ -913,6 +1013,40 @@ class TransactionActivity : BaseActivityNew() {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+
+                                            // region sync transaction
+                                            lifecycleScope.launch(Dispatchers.IO){
+                                                creatCardProcessingModelData(receiptDetail)
+                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                // sync pending transaction
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
+
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                        logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+                                            }
+                                            // end region
+
+
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
@@ -1020,6 +1154,40 @@ class TransactionActivity : BaseActivityNew() {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+
+                                            // region sync transaction
+                                            lifecycleScope.launch(Dispatchers.IO){
+                                                creatCardProcessingModelData(receiptDetail)
+                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                // sync pending transaction
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
+
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                        logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+                                            }
+                                            // end region
+
+
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()

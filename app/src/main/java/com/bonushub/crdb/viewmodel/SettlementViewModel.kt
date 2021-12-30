@@ -8,6 +8,7 @@ import com.bonushub.crdb.model.local.IngenicoSettlementResponse
 import com.bonushub.crdb.repository.SettlementRepository
 import com.bonushub.crdb.utils.Result
 import com.bonushub.crdb.utils.getBaseTID
+import com.bonushub.crdb.utils.logger
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.request.SettlementRequest
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ class SettlementViewModel @ViewModelInject constructor(private val settlementRep
 
     fun settlementResponse() {
         viewModelScope.launch {
+            logger("baseTID",listOf(getBaseTID(appDao)).toString())
             val settlementRequest = SettlementRequest(1, listOf(getBaseTID(appDao)))
             settlementRepository.fetchSettlementResponseData(settlementRequest).collect { result ->
                 withContext(Dispatchers.IO){

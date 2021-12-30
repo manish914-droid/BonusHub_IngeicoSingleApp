@@ -42,13 +42,17 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
                 //adding field 48
                 addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
-                for (i in 0 until batchListData.size) {
+                /*for (i in 0 until batchListData.size) {
                     when (batchListData[i]?.transactionType) {
                         BhTransactionType.SALE.type -> {
                             batchNumber = batchListData[i]?.receiptData?.batchNumber
                         }
 
                     }
+                }*/
+
+                if(batchListData.size > 0){
+                    batchNumber = batchListData[0].receiptData?.batchNumber
                 }
                 //Batch Number
                 batchNumber?.let { addPad(it, "0", 6, true) }?.let { addFieldByHex(60, it) }

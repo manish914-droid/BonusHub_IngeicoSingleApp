@@ -139,6 +139,7 @@
         app:elevation="@dimen/pad_0"
         app:icon="@drawable/ic_settlement"
         app:iconPadding="@dimen/pad_5"
-        app:iconTint="@color/white" />
+        app:iconTint="@color/white"
+        android:visibility="gone"/>
 
 </RelativeLayout>

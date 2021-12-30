@@ -125,6 +125,45 @@ class SettlementFragment : Fragment() {
                     // **** for zero settlement *****
                     if (dataList.size == 0) {
 
+                        /*settlementViewModel.settlementResponse()
+                        settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
+
+                            logger("result in Zero ",result.toString())
+
+                            when (result.status) {
+                                Status.SUCCESS -> {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        //  AppPreference.saveBatchInPreference(dataList as MutableList<BatchTable>)
+                                        val data =
+                                            CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                        settlementByteArray = data.generateIsoByteRequest()
+                                        try {
+                                            (activity as NavigationActivity).settleBatch1(
+                                                settlementByteArray
+                                            ) {
+                                                logger("zero settlement",it.toString(),"e")
+                                            }
+                                        } catch (ex: Exception) {
+                                            (activity as NavigationActivity).hideProgress()
+                                            ex.printStackTrace()
+                                        }
+                                    }
+                                    //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                                }
+                                Status.ERROR -> {
+
+                                    // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                                }
+                                Status.LOADING -> {
+                                    // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                                }
+                            }
+
+                        }*/
+
+                        //----------------------
                         lifecycleScope.launch(
                             Dispatchers.IO
                         ) {
@@ -196,7 +235,7 @@ class SettlementFragment : Fragment() {
     //region====================================SetUp RecyclerView:-
     private fun setUpRecyclerView() {
         if (dataList.size > 0) {
-            // fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
+             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.VISIBLE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.VISIBLE
 
@@ -206,7 +245,7 @@ class SettlementFragment : Fragment() {
                 adapter = settlementAdapter
             }
         } else {
-            // fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE  // visible for zero settlement
+             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.GONE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
