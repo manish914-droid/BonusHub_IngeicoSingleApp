@@ -112,6 +112,8 @@ class PrintUtil(context: Context?) {
         try {
             val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
             val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
+            val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
+             isNoEmiOnlyCashBackApplied  =  bankEMITenureDataModal?.tenure=="1"
             setLogoAndHeader()
 
             try {
@@ -157,16 +159,7 @@ class PrintUtil(context: Context?) {
                     )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-                /*   if (batchTable.transactionType.equals(EDashboardItem.BRAND_EMI.title)) {
-                       isNoEmiOnlyCashBackApplied = bankEMITenureDataModal?.tenure == "1"
-                       if (isNoEmiOnlyCashBackApplied == true) {
 
-                           BhTransactionType.SALE.txnTitle?.let { sigleLineText(it, AlignMode.CENTER) }
-                       } else {
-                           sigleLineText(batchTable.transactionType.toString(), AlignMode.CENTER)
-
-                       }
-                   }*/
 
                 if (isReversal) {
                     sigleLineText("TRANSACTION FAILED", AlignMode.CENTER)
@@ -293,6 +286,48 @@ class PrintUtil(context: Context?) {
                 sigleLineText(footerText[1], AlignMode.CENTER)
                 val bhlogo: ByteArray? = context?.let { printLogo(it, "BH.bmp") }
                 printer?.addBmpImage(0, FactorMode.BMP1X1, bhlogo)
+                sigleLineText(
+                    "App Version :${BuildConfig.VERSION_NAME}",
+                    AlignMode.CENTER
+                )
+
+                if(!isNoEmiOnlyCashBackApplied!!) {
+                    val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
+                    val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
+                    //region=======================Issuer Footer Terms and Condition=================
+                    if (!TextUtils.isEmpty(issuerTAndCData?.footerTAndC)) {
+                        printSeperator()
+                        printer?.feedLine(1)
+                        val issuerFooterTAndC =
+                            issuerTAndCData?.footerTAndC?.split(SplitterTypes.POUND.splitter)
+                        if (issuerFooterTAndC != null) {
+                            if (issuerFooterTAndC.isNotEmpty()) {
+                                for (i in issuerFooterTAndC.indices) {
+                                    if (!TextUtils.isEmpty(issuerFooterTAndC[i])) {
+                                        val limit = 48
+                                        val emiTnc = "#" + issuerFooterTAndC[i]
+                                        val chunks: List<String> = chunkTnC(emiTnc, limit)
+                                        for (st in chunks) {
+                                            logger("TNC", st, "e")
+                                            textBlockList.add(
+                                                sigleLineformat(
+                                                    st, AlignMode.LEFT
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "# ${issuerTAndCData.footerTAndC}", AlignMode.LEFT
+                                    )
+                                )
+
+                            }
+                        }
+                    }
+                }
 
             } catch (e: ParseException) {
                 e.printStackTrace()
@@ -421,6 +456,7 @@ class PrintUtil(context: Context?) {
         val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
         val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
+        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
 
         textBlockList.add(sigleLineformat("TXN AMOUNT:", AlignMode.LEFT))
         val txnAmount =
@@ -446,14 +482,15 @@ class PrintUtil(context: Context?) {
         )
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
-
         textBlockList.add(sigleLineformat("CARD ISSUER:", AlignMode.LEFT))
-        textBlockList.add(
-            sigleLineformat(
-                "$currencySymbol:${"%.2f".format(authAmount.toDouble())}",
-                AlignMode.RIGHT
+        if (bankEMIIssuerTAndCDataModal != null) {
+            textBlockList.add(
+                sigleLineformat(
+                    bankEMIIssuerTAndCDataModal.issuerName,
+                    AlignMode.RIGHT
+                )
             )
-        )
+        }
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
@@ -469,8 +506,8 @@ class PrintUtil(context: Context?) {
 
         textBlockList.add(sigleLineformat("TENURE:", AlignMode.LEFT))
         textBlockList.add(sigleLineformat(":${bankEMITenureDataModal?.tenure}", AlignMode.RIGHT))
-        printer?.addMixStyleText(textBlockList)
-        textBlockList.clear()
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
 
         textBlockList.add(sigleLineformat("CASH BACK:", AlignMode.LEFT))
         textBlockList.add(
@@ -544,7 +581,11 @@ class PrintUtil(context: Context?) {
         val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
 
         val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
+        val jsonRespp = Gson().toJson(issuerTAndCData)
 
+        println(jsonRespp)
+
+        logger("getting issuer tnc=",jsonRespp.toString(),"e")
         printSeperator()
         sigleLineText("CUSTOMER CONSENT FOR EMI", AlignMode.CENTER)
         //region=======================Issuer Header Terms and Condition=================
@@ -552,11 +593,13 @@ class PrintUtil(context: Context?) {
         val testTnc =
             "#.I have been offered the choice of normal as well as EMI for this purchase and I have chosen EMI.#.I have fully understood and accept the terms of EMI scheme and applicable charges mentioned in this charge-slip.#.EMI conversion subject to Banks discretion and by take minimum * working days.#.GST extra on the interest amount.#.For the first EMI, the interest will be calculated from the loan booking date till the payment due date.#.Convenience fee of Rs --.-- + GST will be applicable on EMI transactions."
         if (issuerTAndCData != null) {
+            logger("getting issuer h tnc=",issuerTAndCData.headerTAndC.toString(),"e")
             issuerHeaderTAndC =
                 if (batchTable.transactionType == BhTransactionType.TEST_EMI.type) {
                     testTnc.split(SplitterTypes.POUND.splitter)
                 } else {
                     issuerTAndCData.headerTAndC?.split(SplitterTypes.POUND.splitter)
+
                 }
         }
         if (issuerHeaderTAndC?.isNotEmpty() == true) {
@@ -587,7 +630,7 @@ class PrintUtil(context: Context?) {
 
         //region ======================Brand terms and Condition=========================
 
-        val brandId = brandEMIMasterDataModal?.brandID ?: "0"
+        val brandId = "3"
         val data = getBrandTAndCData()
         val jsonResp = Gson().toJson(data)
 
@@ -601,15 +644,18 @@ class PrintUtil(context: Context?) {
 
         for (st in chunk) {
             logger("Brand Tnc", st, "e")
-
-            textBlockList.add(
+            sigleLineText(
+                st.replace(bankEMIFooterTAndCSeparator, "")
+                    .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
+            )
+/*            textBlockList.add(
                 sigleLineformat(
                     st.replace(bankEMIFooterTAndCSeparator, "")
                         .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
                 )
             )
             printer?.addMixStyleText(textBlockList)
-            textBlockList.clear()
+            textBlockList.clear()*/
 
         }
 
@@ -617,6 +663,7 @@ class PrintUtil(context: Context?) {
         //region=====================SCHEME TAndC===============
         val emiCustomerConsent =
             bankEMIIssuerTAndCDataModal?.schemeTAndC?.split(SplitterTypes.POUND.splitter)
+        logger("getting emiCustomerConsent tnc=",emiCustomerConsent.toString(),"e")
         if (emiCustomerConsent?.isNotEmpty() == true) {
             for (i in emiCustomerConsent?.indices) {
                 val limit = 48

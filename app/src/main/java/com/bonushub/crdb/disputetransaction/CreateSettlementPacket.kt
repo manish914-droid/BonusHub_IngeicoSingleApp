@@ -9,6 +9,7 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -17,6 +18,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
     override fun createSettlementISOPacket(): IWriter = IsoDataWriter().apply {
         val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
         val tpt = runBlocking(Dispatchers.IO) { getTptData() }
+        var batchNumber:String?=null
         val tid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
             if (tpt != null) {
                 mti = Mti.SETTLEMENT_MTI.mti
@@ -40,9 +42,16 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
                 //adding field 48
                 addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
+                for (i in 0 until batchListData.size) {
+                    when (batchListData[i]?.transactionType) {
+                        BhTransactionType.SALE.type -> {
+                            batchNumber = batchListData[i]?.receiptData?.batchNumber
+                        }
 
+                    }
+                }
                 //Batch Number
-                addFieldByHex(60, addPad(tpt.batchNumber, "0", 6, true))
+                batchNumber?.let { addPad(it, "0", 6, true) }?.let { addFieldByHex(60, it) }
 
                 //adding field 61
                 addFieldByHex(61, addPad(DeviceHelper.getDeviceSerialNo() ?: "", " ", 15, false) + AppPreference.getBankCode())
@@ -105,32 +114,6 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 refundAmount =
                                     refundAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
                             }
-
-                          /*  TransactionType.SALE_WITH_CASH.type -> {
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmount?.toLong() ?: 0L)
-                            }
-                            TransactionType.CASH_AT_POS.type -> {
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmount?.toLong() ?: 0L)
-                            }
-                            TransactionType.PRE_AUTH_COMPLETE.type -> {
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmount?.toLong() ?: 0L)
-                            }
-                            TransactionType.TIP_SALE.type -> {
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i]?.totalAmount?.toLong() ?: 0L)
-                            }
-                            TransactionType.TEST_EMI.type -> {
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(100.toLong())
-                            }
-                            TransactionType.REFUNDREFUND.type -> {
-                                refundCount = refundCount.plus(1)
-                                refundAmount =
-                                    refundAmount.plus(batchListData[i]?.transactionalAmount?.toLong() ?: 0L)
-                            }*/
                         }
                     }
 

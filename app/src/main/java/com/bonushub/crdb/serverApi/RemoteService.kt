@@ -150,11 +150,16 @@ object IsoPacketCreator{
                 ?.let { addFieldByHex(61, it) }*/
 
             //adding Field 63
-            val deviceSerial = addPad(AppPreference.getString("serialNumber"), " ", 15, false)
+            val deviceSerial = addPad(
+                DeviceHelper.getDeviceSerialNo() ?: "",
+                " ",
+                15,
+                false
+            )
             val bankCode = AppPreference.getBankCode()
             val f63 = "$deviceSerial$bankCode"
             addFieldByHex(63, f63)
-        //    addFieldByHex(63, "5631453032343231373720202020203031")
+            //    addFieldByHex(63, "5631453032343231373720202020203031")  addFieldByHex(63, "5631453032343231373720202020203031")
         }
     }
     //endregion
