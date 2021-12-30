@@ -14,10 +14,7 @@ import com.bonushub.crdb.databinding.ActivityEmvBinding
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.model.CardProcessedDataModal
-import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.BatchTable
-import com.bonushub.crdb.model.local.BatchTableReversal
-import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
@@ -25,6 +22,7 @@ import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
+import com.bonushub.crdb.viewmodel.PendingSyncTransactionViewModel
 import com.bonushub.crdb.viewmodel.SearchViewModel
 import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.bonushub.pax.utils.*
@@ -48,10 +46,14 @@ private var bankEMIRequestCode = "4"
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew() {
+
+    private val pendingSyncTransactionViewModel: PendingSyncTransactionViewModel by viewModels()
+
     private var emvBinding: ActivityEmvBinding? = null
 
     // private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
     private val transactionViewModel: TransactionViewModel by viewModels()
+
 
     //used for other cash amount
     //  private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
@@ -121,6 +123,12 @@ class TransactionActivity : BaseActivityNew() {
                setupObserver()
            }*/
 
+        // temp for testing
+        lifecycleScope.launch(Dispatchers.IO){
+            var data = pendingSyncTransactionViewModel.getPendingSyncTransactionTableData()
+            logger("pending sync data size",""+data.value?.size?.toString())
+            logger("data",""+data.value.toString())
+        }
     }
 
     override fun onEvents(event: VxEvent) {
@@ -469,9 +477,21 @@ class TransactionActivity : BaseActivityNew() {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
 
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                        responseCode = genericResp?.toString())
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
+
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString())
+
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
                                                     }
                                                     is GenericResponse.Loading -> {
                                                             logger("Loading:- ", "in Loading $genericResp","e")

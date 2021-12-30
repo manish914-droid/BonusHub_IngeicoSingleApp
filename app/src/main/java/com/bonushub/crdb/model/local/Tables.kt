@@ -1124,3 +1124,12 @@ data class BatchTableReversal(var receiptData:ReceiptDetail?=null){
 
 }
 // endregion
+
+// region ======
+@Entity
+data class PendingSyncTransactionTable(
+    @PrimaryKey(autoGenerate = false)
+    var invoice: String="",
+    var batchTable: BatchTable?=null,
+    var responseCode: String?="")
+// end region

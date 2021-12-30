@@ -411,4 +411,18 @@ interface AppDao{
     suspend fun deleteBatchReversalTable()
 
     // endregion ================
+
+    // region =========== PendingSyncTransaction Table dao ==========
+    @Query("SELECT * FROM PendingSyncTransactionTable")
+    suspend fun getAllPendingSyncTransactionData(): MutableList<PendingSyncTransactionTable>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPendingSyncTransactionData(pendingSyncTransactionTable: PendingSyncTransactionTable): Long?
+
+    @Query("DELETE From PendingSyncTransactionTable")
+    suspend fun deletePendingSyncTransactionTable()
+
+    @Delete
+    suspend fun deletePendingSyncTransactionData(pendingSyncTransactionTable: PendingSyncTransactionTable)
+    // end region
 }

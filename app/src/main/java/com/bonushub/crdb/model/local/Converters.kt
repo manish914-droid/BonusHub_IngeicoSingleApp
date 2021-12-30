@@ -113,4 +113,15 @@ class Converters {
 
 
 
+    @TypeConverter
+    fun fromBatchTableData(batchTable: BatchTable?): String? {
+        return Gson().toJson(batchTable, BatchTable::class.java)
+    }
+
+    @TypeConverter
+    fun toBatchTableData(batchTable: String?): BatchTable? {
+        //  val type = object : TypeToken<BankEMITenureDataModal>() {}.type
+        return Gson().fromJson(batchTable, BatchTable::class.java)
+    }
+
 }
