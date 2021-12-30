@@ -19,6 +19,7 @@ import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BatchTableReversal
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.*
+import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -463,7 +464,22 @@ class TransactionActivity : BaseActivityNew() {
                                             println(jsonResp)
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
-                                                transactionViewModel.serverCall(transactionISO)
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+
+                                                //
+
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
                                                     com.bonushub.pax.utils.BhTransactionType.SALE.type
