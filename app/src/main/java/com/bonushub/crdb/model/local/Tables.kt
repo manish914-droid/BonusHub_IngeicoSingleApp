@@ -5,6 +5,7 @@ import androidx.room.*
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
@@ -1131,5 +1132,7 @@ data class PendingSyncTransactionTable(
     @PrimaryKey(autoGenerate = false)
     var invoice: String="",
     var batchTable: BatchTable?=null,
-    var responseCode: String?="")
+    var responseCode: String?="",
+    var cardProcessedDataModal:CardProcessedDataModal
+    )
 // end region

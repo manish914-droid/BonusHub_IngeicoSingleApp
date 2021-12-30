@@ -465,30 +465,30 @@ class TransactionActivity : BaseActivityNew() {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
                                             creatCardProcessingModelData(receiptDetail)
-                                             val transactionISO =
-                                                 CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                             val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
                                             //  val jsonResp2=Gson().toJson(transactionISO)
                                             //   Log.d(TAG, "jsonResp : $jsonResp2")
                                             println(jsonResp)
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
+
+                                                // sync pending transaction
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
                                                 when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
 
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                        responseCode = genericResp?.toString())
-
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
 
                                                         val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
                                                             batchTable = batchData,
-                                                            responseCode = genericResp?.toString())
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
 

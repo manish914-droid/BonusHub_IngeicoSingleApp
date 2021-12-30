@@ -23,10 +23,15 @@ import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.*
+import com.bonushub.crdb.repository.GenericResponse
+import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.InetAddress
@@ -981,6 +986,62 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
             0
         }
     }
+
+    fun syncPendingTransaction(transactionViewModel:TransactionViewModel)
+    {
+        runBlocking(Dispatchers.IO){
+            val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
+
+            for(item in pendingTxn){
+                val transactionISO = CreateTransactionPacket(item.cardProcessedDataModal).createTransactionPacket()
+
+                when(val genericResp = transactionViewModel.serverCall(transactionISO)){
+                    is GenericResponse.Success -> {
+                        com.bonushub.crdb.utils.logger("success:- ", "in success $genericResp", "e")
+                        // to remove transaction after sync
+                        appDatabase.appDao.deletePendingSyncTransactionData(item)
+                    }
+                    is GenericResponse.Error -> {
+                        com.bonushub.crdb.utils.logger("error:- ", "in error $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("error:- ", "try in next time", "e")
+
+                    }
+                    is GenericResponse.Loading -> {
+                        com.bonushub.crdb.utils.logger("Loading:- ", "in Loading $genericResp", "e")
+                    }
+                }
+            }
+
+        }
+    }
+
+    /*fun creatCardProcessingModelData(receiptDetail: ReceiptDetail):CardProcessedDataModal {
+        var globalCardProcessedModel = CardProcessedDataModal()
+
+        globalCardProcessedModel.setTransType(receiptDetail.)
+
+        globalCardProcessedModel.setProcessingCode("920001")
+        receiptDetail.txnAmount?.let { globalCardProcessedModel.setTransactionAmount(it.toLong()) }
+        receiptDetail.txnOtherAmount?.let { globalCardProcessedModel.setOtherAmount(it.toLong()) }
+        globalCardProcessedModel.setMobileBillExtraData(Pair(mobileNumber, billNumber))
+        receiptDetail.stan?.let { globalCardProcessedModel.setAuthRoc(it) }
+        globalCardProcessedModel.setCardMode("0553- emv with pin")
+        globalCardProcessedModel.setRrn(receiptDetail.rrn)
+        receiptDetail.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
+        globalCardProcessedModel.setTid(receiptDetail.tid)
+        globalCardProcessedModel.setMid(receiptDetail.mid)
+        globalCardProcessedModel.setBatch(receiptDetail.batchNumber)
+        globalCardProcessedModel.setInvoice(receiptDetail.invoice)
+        val date = receiptDetail.dateTime
+        val parts = date?.split(" ")
+        globalCardProcessedModel.setDate(parts!![0])
+        globalCardProcessedModel.setTime(parts[1])
+        globalCardProcessedModel.setTimeStamp(receiptDetail.dateTime!!)
+        globalCardProcessedModel.setPosEntryMode("0553")
+        receiptDetail.maskedPan?.let { globalCardProcessedModel.setPanNumberData(it) }
+
+        return globalCardProcessedModel
+    }*/
 
 }
 

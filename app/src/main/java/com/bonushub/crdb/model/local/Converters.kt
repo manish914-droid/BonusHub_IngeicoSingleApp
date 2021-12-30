@@ -1,6 +1,7 @@
 package com.bonushub.crdb.model.local
 
 import androidx.room.TypeConverter
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
@@ -120,8 +121,17 @@ class Converters {
 
     @TypeConverter
     fun toBatchTableData(batchTable: String?): BatchTable? {
-        //  val type = object : TypeToken<BankEMITenureDataModal>() {}.type
         return Gson().fromJson(batchTable, BatchTable::class.java)
+    }
+
+    @TypeConverter
+    fun fromCardProcessedDataModal(cardProcessedDataModal: CardProcessedDataModal?): String? {
+        return Gson().toJson(cardProcessedDataModal, CardProcessedDataModal::class.java)
+    }
+
+    @TypeConverter
+    fun toCardProcessedDataModal(cardProcessedDataModal: String?): CardProcessedDataModal? {
+        return Gson().fromJson(cardProcessedDataModal, CardProcessedDataModal::class.java)
     }
 
 }
