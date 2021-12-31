@@ -342,7 +342,7 @@ withContext(Dispatchers.Main) {
                                                     val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
 
                                                     // sync pending transaction
-                                                    Utility().syncPendingTransaction(transactionViewModel)
+                                                 //   Utility().syncPendingTransaction(transactionViewModel)
 
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
