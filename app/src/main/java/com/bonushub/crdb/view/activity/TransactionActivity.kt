@@ -1,22 +1,36 @@
 package com.bonushub.crdb.view.activity
 
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
+import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.entity.CardOption
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.repository.GenericResponse
+import com.bonushub.crdb.repository.ServerRepository
+import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -24,7 +38,9 @@ import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.PendingSyncTransactionViewModel
 import com.bonushub.crdb.viewmodel.SearchViewModel
+import com.bonushub.crdb.viewmodel.TenureSchemeViewModel
 import com.bonushub.crdb.viewmodel.TransactionViewModel
+import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -40,20 +56,24 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 private var bankEMIRequestCode = "4"
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew() {
+    /** need to use Hilt for instance initializing here..*/
+    private val remoteService: RemoteService = RemoteService()
+    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+
 
     private val pendingSyncTransactionViewModel: PendingSyncTransactionViewModel by viewModels()
-
     private var emvBinding: ActivityEmvBinding? = null
 
     // private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
     private val transactionViewModel: TransactionViewModel by viewModels()
-
 
     //used for other cash amount
     //  private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
@@ -108,82 +128,40 @@ class TransactionActivity : BaseActivityNew() {
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
 
         }
+        emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
+            finish()
+            startActivity(Intent(this, NavigationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             tid = getBaseTID(appDatabase.appDao)
             globalCardProcessedModel.setTransType(transactionType)
             setupFlow()
         }
 
-        /*   searchCardViewModel.fetchCardTypeData(globalCardProcessedModel,CardOption.create().apply {
-               supportICCard(true)
-               supportMagCard(true)
-               supportRFCard(false)
-           })
-           CoroutineScope(Dispatchers.Main).launch {
-               setupObserver()
-           }*/
-
-        // temp for testing
-        lifecycleScope.launch(Dispatchers.IO){
-            var data = pendingSyncTransactionViewModel.getPendingSyncTransactionTableData()
-            logger("pending sync data size",""+data.value?.size?.toString())
-            logger("data",""+data.value.toString())
-        }
     }
 
 
 
-    private suspend fun setupObserver() {
+    override fun onBackPressed() {
+        // For stopping backPress............
+    }
+
+    private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
+    private suspend fun setupEmvObserver() {
         withContext(Dispatchers.Main) {
             searchCardViewModel.allcadType.observe(
                 this@TransactionActivity,
-                Observer { cardProcessdatamodel ->
-                    when (cardProcessdatamodel.getReadCardType()) {
+                Observer { cardProcessDataModel ->
+                    globalCardProcessedModel=cardProcessDataModel
+                    globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
+                    when (globalCardProcessedModel.getReadCardType()) {
                         DetectCardType.EMV_CARD_TYPE -> {
-                            Toast.makeText(
-                                this@TransactionActivity,
-                                "EMV mode detected",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            when (cardProcessdatamodel.getTransType()) {
+                            when (globalCardProcessedModel.getTransType()) {
                                 BhTransactionType.SALE.type -> {
-                                    // Checking Insta Emi Available or not
-                                    var hasInstaEmi = false
-                                    val tpt =
-                                        runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
-                                    var limitAmt = 0f
-                                    if (tpt?.surChargeValue?.isNotEmpty()!!) {
-                                        limitAmt = try {
-                                            tpt.surChargeValue.toFloat() / 100
-                                        } catch (ex: Exception) {
-                                            0f
-                                        }
-                                    }
-                                    if (tpt.surcharge.isNotEmpty()) {
-                                        hasInstaEmi = try {
-                                            tpt.surcharge == "1"
-                                        } catch (ex: Exception) {
-                                            false
-                                        }
-                                    }
-
-                                    // Condition executes, If insta EMI is Available on card
-                                    if (limitAmt <= "2000".toLong() && hasInstaEmi) {
-                                        val intent = Intent(
-                                            this@TransactionActivity,
-                                            TenureSchemeActivity::class.java
-                                        ).apply {
-                                            putExtra("cardProcessedData", cardProcessdatamodel)
-                                            putExtra(
-                                                "transactionType",
-                                                cardProcessdatamodel.getTransType()
-                                            )
-                                        }
-                                        startActivity(intent)
-
-                                    } else {
-
-                                    }
+                                    showProgress()
+              continueTenureProcess()
                                 }
 
                                 BhTransactionType.BRAND_EMI.type -> {
@@ -193,15 +171,14 @@ class TransactionActivity : BaseActivityNew() {
                                     ).apply {
                                         val field57 =
                                             "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
-                                                    "^${/*cardBinValue.substring(0, 8)*/""}^$saleAmt"
-                                        cardProcessdatamodel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
-                                        putExtra("cardProcessedData", cardProcessdatamodel)
+                                                    "^${/*cardBinValue.substring(0, 8)*/""}^${globalCardProcessedModel?.getTransactionAmount()}"
+                                        putExtra("cardProcessedData", globalCardProcessedModel)
                                         putExtra("brandID", brandDataMaster.brandID)
                                         putExtra("productID", brandEmiProductData.productID)
                                         putExtra("imeiOrSerialNum", imeiOrSerialNum)
                                         putExtra(
                                             "transactionType",
-                                            cardProcessdatamodel.getTransType()
+                                            globalCardProcessedModel.getTransType()
                                         )
                                     }
                                     startActivityForResult(intent, BhTransactionType.BRAND_EMI.type)
@@ -212,12 +189,12 @@ class TransactionActivity : BaseActivityNew() {
                                         this@TransactionActivity,
                                         TenureSchemeActivity::class.java
                                     ).apply {
-                                        cardProcessdatamodel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
-                                        putExtra("cardProcessedData", cardProcessdatamodel)
+
+                                        putExtra("cardProcessedData", globalCardProcessedModel)
                                       /*  putExtra("brandID", brandDataMaster.brandID)
                                         putExtra("productID", brandEmiProductData.productID)
                                         putExtra("imeiOrSerialNum", imeiOrSerialNum)*/
-                                        putExtra("transactionType", cardProcessdatamodel.getTransType())
+                                        putExtra("transactionType", globalCardProcessedModel.getTransType())
                                     }
                                     startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
 
@@ -245,9 +222,54 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
 
+    private fun continueTenureProcess(){
+        val f57= "$bankEMIRequestCode^0^1^0^^${
+            globalCardProcessedModel.getPanNumberData()?.substring(0, 8)}^${globalCardProcessedModel?.getTransactionAmount()}"
+        tenureSchemeViewModel = ViewModelProvider(
+            this@TransactionActivity, TenureSchemeActivityVMFactory(
+                serverRepository,
+                globalCardProcessedModel.getPanNumberData() ?: "",
+                f57
+            )
+        ).get(TenureSchemeViewModel::class.java)
+        tenureSchemeViewModel.emiTenureLiveData.observe(
+            this,
+            {
+                hideProgress()
+                when (val genericResp = it) {
+                    is GenericResponse.Success -> {
+                        println(Gson().toJson(genericResp.data))
+                        val resp= genericResp.data as TenuresWithIssuerTncs
+                        showEMISaleDialog(resp.bankEMIIssuerTAndCList, resp.bankEMISchemesDataList)
+                    }
+                    is GenericResponse.Error -> {
+                       // ToastUtils.showToast(this, genericResp.errorMessage)
+                        println(genericResp.errorMessage.toString())
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            initiateNormalSale()
+                        }
+                    }
+                    is GenericResponse.Loading -> {
+
+                    }
+                }
+            })
+
+
+
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == BhTransactionType.BRAND_EMI.type || requestCode == BhTransactionType.EMI_SALE.type) {
+        // conversion of sale to Bank emi
+        var reqCode=requestCode
+        if(requestCode==BhTransactionType.SALE.type ){
+            reqCode=BhTransactionType.EMI_SALE.type
+            globalCardProcessedModel.setTransType(BhTransactionType.EMI_SALE.type)
+        }
+        if (reqCode == BhTransactionType.BRAND_EMI.type || reqCode == BhTransactionType.EMI_SALE.type) {
+            emvBinding?.subHeaderView?.subHeaderText?.text =getTransactionTypeName(globalCardProcessedModel.getTransType())
             if (resultCode == RESULT_OK) {
                 val emiTenureData =
                     data?.getParcelableExtra<BankEMITenureDataModal>("EMITenureDataModal")
@@ -263,7 +285,7 @@ class TransactionActivity : BaseActivityNew() {
                         EMISaleRequest(
                             amount = (saleAmt.toFloat() * 100).toLong(),
                             tipAmount = 0L,
-                            emiTxnName = transactionTypeEDashboardItem.title,
+                            emiTxnName = getTransactionTypeName(globalCardProcessedModel.getTransType()),//transactionTypeEDashboardItem.title,
                             tid = emiTenureData?.txnTID,
                             cardCaptureType = CardCaptureType.EMV_NO_CAPTURING,
                             track1 = null,
@@ -274,7 +296,7 @@ class TransactionActivity : BaseActivityNew() {
                             override fun onCompleted(result: PaymentResult?) {
                                 val txnResponse = result?.value as? TransactionResponse
                                 val receiptDetail = txnResponse?.receiptDetail
-                                receiptDetail?.txnName = transactionTypeEDashboardItem.title
+                                receiptDetail?.txnName = getTransactionTypeName(globalCardProcessedModel.getTransType())
                                 Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
                                 when (txnResponse?.responseCode) {
                                     ResponseCode.SUCCESS.value -> {
@@ -293,20 +315,23 @@ class TransactionActivity : BaseActivityNew() {
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.emiIssuerDataModel = emiIssuerData
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.emiBrandData = brandDataMaster
-                                                batchData.emiCategoryData = brandEmiSubCatData
-                                                batchData.emiProductData = brandEmiProductData
+                                                if(requestCode == BhTransactionType.BRAND_EMI.type) {
+                                                    batchData.emiBrandData = brandDataMaster
+                                                    batchData.emiCategoryData = brandEmiSubCatData
+                                                    batchData.emiProductData = brandEmiProductData
+                                                }
                                                 batchData.imeiOrSerialNum = imeiOrSerialNum
                                                 batchData.billNumber=billNumber
                                                 batchData.emiTenureDataModel = emiTenureData
                                                 batchData.transactionType =
-                                                    BhTransactionType.BRAND_EMI.type
+                                                    globalCardProcessedModel.getTransType()
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 cardProcessedDataModal.getPanNumberData()?.let {
                                                     globalCardProcessedModel.setPanNumberData(
                                                         it
                                                     )
                                                 }
+                                                printingSaleData(batchData)
                                         /*        val transactionISO =
                                                     CreateTransactionPacket(
                                                         globalCardProcessedModel,
@@ -316,7 +341,6 @@ class TransactionActivity : BaseActivityNew() {
                                                 val jsonResp2 = Gson().toJson(transactionISO)
                                                 println(jsonResp2)
                                                 printingSaleData(batchData)*/
-                                                printingSaleData(batchData)
                                             }
                                         }
                                     }
@@ -419,154 +443,53 @@ class TransactionActivity : BaseActivityNew() {
                         supportRFCard(false)
                     })
 
-                setupObserver()
+                setupEmvObserver()
 
             }
             EDashboardItem.SALE -> {
-                val amt = (saleAmt.toFloat() * 100).toLong()
-                var ecrID: String
-                try {
-                    val tranUuid = UUID.randomUUID().toString().also {
-                        ecrID = it
-
+                // Checking Insta Emi Available or not
+                var hasInstaEmi = false
+                val tpt =
+                    runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
+                var limitAmt = 0f
+                if (tpt?.surChargeValue?.isNotEmpty()!!) {
+                    limitAmt = try {
+                        tpt.surChargeValue.toFloat() / 100
+                    } catch (ex: Exception) {
+                        0f
                     }
-                    val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.SALE)
-                    restartHandlingList.add(restartHandlingModel)
-                    val jsonResp = Gson().toJson(restartHandlingModel)
-                    println(jsonResp)
-                    AppPreference.saveRestartDataPreference(jsonResp)
-                    DeviceHelper.doSaleTransaction(
-                        SaleRequest(
-                            amount = amt,
-                            tipAmount = 0L,
-                            transactionType = TransactionType.SALE,
-                            tid = tid,
-                            transactionUuid = tranUuid
-                        ),
-                        listener = object : OnPaymentListener.Stub() {
-                            override fun onCompleted(result: PaymentResult?) {
-                                val txnResponse = result?.value as? TransactionResponse
-                                val receiptDetail = txnResponse?.receiptDetail
-                                Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                                val jsonResp = Gson().toJson(receiptDetail)
-                                println(jsonResp)
-                                Log.d(TAG, "receiptDetail : $jsonResp")
-                                when (txnResponse?.responseCode) {
-                                    ResponseCode.SUCCESS.value -> {
-                                        val jsonResp = Gson().toJson(receiptDetail)
-                                        println(jsonResp)
-
-                                        AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
-
-                                        //   detailResponse.forEach { println(it) }
-                                        //  uids.add(ecrID)
-                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
-                                        if (receiptDetail != null) {
-                                            val batchData = BatchTable(receiptDetail)
-                                            creatCardProcessingModelData(receiptDetail)
-                                             val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                            //  val jsonResp2=Gson().toJson(transactionISO)
-                                            //   Log.d(TAG, "jsonResp : $jsonResp2")
-                                            println(jsonResp)
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-
-                                                // sync pending transaction
-                                                Utility().syncPendingTransaction(transactionViewModel)
-
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        logger("success:- ", "in success $genericResp","e")
-
-                                                    }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
-
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
-
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                            logger("Loading:- ", "in Loading $genericResp","e")
-                                                    }
-                                                }
-
-                                                //
-
-                                                batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.SALE.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
-                                            }
-                                        }
-                                    }
-                                    ResponseCode.FAILED.value,
-                                    ResponseCode.ABORTED.value -> {
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
-                                    }
-                                    ResponseCode.REVERSAL.value -> {
-                                        // kushal
-                                        // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                        /* val jsonResp=Gson().toJson(ReceiptDetail)
-                                         println(jsonResp)
-
-                                         try {
-                                             val str = jsonResp
-                                             if (!str.isNullOrEmpty()) {
-                                                 Gson().fromJson<ReceiptDetail>(
-                                                     str,
-                                                     object : TypeToken<ReceiptDetail>() {}.type
-                                                 )
-                                             } else null
-                                         } catch (ex: Exception) {
-                                             ex.printStackTrace()
-                                         }*/
-
-                                        AppPreference.saveLastCancelReceiptDetails(receiptDetail)
-
-                                        val batchReversalData = BatchTableReversal(receiptDetail)
-
-                                        lifecycleScope.launch(Dispatchers.IO) {
-                                            //    appDao.insertBatchData(batchData)
-                                            batchReversalData.invoice =
-                                                receiptDetail?.invoice.toString()
-                                            batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
-                                            batchReversalData.responseCode =
-                                                ResponseCode.SUCCESS.value
-                                            batchReversalData.roc = receiptDetail?.stan.toString()
-                                            appDatabase.appDao.insertBatchReversalData(
-                                                batchReversalData
-                                            )
-                                        }
-                                    }
-
-                                    // end region
-                                    else -> {
-                                        errorFromIngenico(
-                                            txnResponse?.responseCode,
-                                            txnResponse?.status.toString()
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    )
-                } catch (exc: Exception) {
-                    exc.printStackTrace()
                 }
+                if (tpt.surcharge.isNotEmpty()) {
+                    hasInstaEmi = try {
+                        tpt.surcharge == "1"
+                    } catch (ex: Exception) {
+                        false
+                    }
+                }
+
+                // Condition executes, If insta EMI is Available on card
+                if ((saleAmt.toFloat() * 100).toLong() >=  limitAmt && hasInstaEmi) {
+                    withContext(Dispatchers.Main) {
+                        emvBinding?.cardDetectImg?.visibility = View.VISIBLE
+                        emvBinding?.tvInsertCard?.visibility = View.VISIBLE
+                        emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
+                    }
+                    searchCardViewModel.fetchCardTypeData(
+                        globalCardProcessedModel,
+                        CardOption.create().apply {
+                            supportICCard(true)
+                            supportMagCard(true)
+                            supportRFCard(false)
+                        })
+
+                    setupEmvObserver()
+
+                } else {
+                    initiateNormalSale()
+                }
+
             }
+
             EDashboardItem.CASH_ADVANCE -> {
                 val amt = (saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
@@ -1269,6 +1192,227 @@ class TransactionActivity : BaseActivityNew() {
             else -> {
 
             }
+        }
+    }
+
+    private suspend fun initiateNormalSale(){
+        val amt = (saleAmt.toFloat() * 100).toLong()
+        var ecrID: String
+        try {
+            val tranUuid = UUID.randomUUID().toString().also {
+                ecrID = it
+
+            }
+            val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.SALE)
+            restartHandlingList.add(restartHandlingModel)
+            val jsonResp = Gson().toJson(restartHandlingModel)
+            println(jsonResp)
+            AppPreference.saveRestartDataPreference(jsonResp)
+            DeviceHelper.doSaleTransaction(
+                SaleRequest(
+                    amount = amt,
+                    tipAmount = 0L,
+                    transactionType = TransactionType.SALE,
+                    tid = tid,
+                    transactionUuid = tranUuid
+                ),
+                listener = object : OnPaymentListener.Stub() {
+                    override fun onCompleted(result: PaymentResult?) {
+                        val txnResponse = result?.value as? TransactionResponse
+                        val receiptDetail = txnResponse?.receiptDetail
+                        Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
+                        val jsonResp = Gson().toJson(receiptDetail)
+                        println(jsonResp)
+                        Log.d(TAG, "receiptDetail : $jsonResp")
+                        when (txnResponse?.responseCode) {
+                            ResponseCode.SUCCESS.value -> {
+                                val jsonResp = Gson().toJson(receiptDetail)
+                                println(jsonResp)
+
+                                AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
+
+                                //   detailResponse.forEach { println(it) }
+                                //  uids.add(ecrID)
+                                // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+                                if (receiptDetail != null) {
+                                    val batchData = BatchTable(receiptDetail)
+                                    creatCardProcessingModelData(receiptDetail)
+                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                    //  val jsonResp2=Gson().toJson(transactionISO)
+                                    //   Log.d(TAG, "jsonResp : $jsonResp2")
+                                    println(jsonResp)
+                                    lifecycleScope.launch(Dispatchers.IO) {
+                                        //    appDao.insertBatchData(batchData)
+
+                                        // sync pending transaction
+                                        Utility().syncPendingTransaction(transactionViewModel)
+
+                                        when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                        {
+                                            is GenericResponse.Success -> {
+                                                logger("success:- ", "in success $genericResp","e")
+
+                                            }
+                                            is GenericResponse.Error -> {
+                                                logger("error:- ", "in error $genericResp", "e")
+                                                logger("error:- ", "save transaction sync later", "e")
+
+                                                val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                    batchTable = batchData,
+                                                    responseCode = genericResp?.toString(),
+                                                    cardProcessedDataModal = globalCardProcessedModel)
+
+                                                pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+
+                                            }
+                                            is GenericResponse.Loading -> {
+                                                logger("Loading:- ", "in Loading $genericResp","e")
+                                            }
+                                        }
+
+                                        //
+
+                                        batchData.invoice = receiptDetail.invoice.toString()
+                                        batchData.transactionType =
+                                            com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                        appDatabase.appDao.insertBatchData(batchData)
+                                        printingSaleData(batchData)
+                                    }
+                                }
+                            }
+                            ResponseCode.FAILED.value,
+                            ResponseCode.ABORTED.value -> {
+                                errorFromIngenico(
+                                    txnResponse.responseCode,
+                                    txnResponse.status.toString()
+                                )
+                            }
+                            ResponseCode.REVERSAL.value -> {
+                                // kushal
+                                // region
+                                //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
+                                /* val jsonResp=Gson().toJson(ReceiptDetail)
+                                 println(jsonResp)
+
+                                 try {
+                                     val str = jsonResp
+                                     if (!str.isNullOrEmpty()) {
+                                         Gson().fromJson<ReceiptDetail>(
+                                             str,
+                                             object : TypeToken<ReceiptDetail>() {}.type
+                                         )
+                                     } else null
+                                 } catch (ex: Exception) {
+                                     ex.printStackTrace()
+                                 }*/
+
+                                AppPreference.saveLastCancelReceiptDetails(receiptDetail)
+
+                                val batchReversalData = BatchTableReversal(receiptDetail)
+
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    //    appDao.insertBatchData(batchData)
+                                    batchReversalData.invoice =
+                                        receiptDetail?.invoice.toString()
+                                    batchReversalData.transactionType =
+                                        com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                    batchReversalData.responseCode =
+                                        ResponseCode.SUCCESS.value
+                                    batchReversalData.roc = receiptDetail?.stan.toString()
+                                    appDatabase.appDao.insertBatchReversalData(
+                                        batchReversalData
+                                    )
+                                }
+                            }
+
+                            // end region
+                            else -> {
+                                errorFromIngenico(
+                                    txnResponse?.responseCode,
+                                    txnResponse?.status.toString()
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        } catch (exc: Exception) {
+            exc.printStackTrace()
+        }
+
+
+    }
+
+    private suspend fun initiateInstaEmi(bankEMIIssuerTandCData: BankEMIIssuerTAndCDataModal
+                                         ,  bankEMISchemesDataList: MutableList<BankEMITenureDataModal>){
+        val intent = Intent(
+            this@TransactionActivity,
+            TenureSchemeActivity::class.java
+        ).apply {
+            globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
+
+            putExtra("cardProcessedData", globalCardProcessedModel)
+            putExtra("transactionType", globalCardProcessedModel.getTransType())
+
+            putParcelableArrayListExtra("emiSchemeOfferDataList", bankEMISchemesDataList as java.util.ArrayList<out Parcelable>)
+            putExtra("emiIssuerTAndCDataList", bankEMIIssuerTandCData)
+        }
+        startActivityForResult(intent,globalCardProcessedModel.getTransType())
+
+    }
+
+    private fun showEMISaleDialog(  bankEMIIssuerTAndC: BankEMIIssuerTAndCDataModal
+                                   ,  bankEMISchemesDataList: MutableList<BankEMITenureDataModal>) {
+        val dialog = Dialog(this)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.show_emi_sale_dialog_view)
+
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+        val window = dialog.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT
+        )
+
+        dialog.findViewById<Button>(R.id.cardsaleButton).setOnClickListener {
+            dialog.dismiss()
+            //   cardProcessedDataModal.setTransType(BhTransactionType.SALE.type)
+            lifecycleScope.launch(Dispatchers.IO) {
+                initiateNormalSale()
+            }
+
+        }
+
+        dialog.findViewById<Button>(R.id.cardemiButton).setOnClickListener {
+            dialog.dismiss()
+            //  cardProcessedDataModal.setTransType(BhTransactionType.EMI_SALE.type)
+            //   cardProcessedDataModal.setEmiType(1)  //1 for insta emi
+            /* binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.emi_catalog_icon)
+             binding?.subHeaderView?.subHeaderText?.text = BhTransactionType.EMI_SALE.txnTitle*/
+            lifecycleScope.launch(Dispatchers.IO) {
+                initiateInstaEmi(bankEMIIssuerTAndC,bankEMISchemesDataList)
+            }
+
+
+        }
+
+        dialog.findViewById<ImageView>(R.id.closeDialog).setOnClickListener {
+            dialog.dismiss()
+            finish()
+            startActivity(Intent(this, NavigationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
+        try {
+            if (!dialog.isShowing && !(this as Activity).isFinishing) {
+                dialog.show()
+                dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+
+        } catch (ex: WindowManager.BadTokenException) {
+            ex.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 
