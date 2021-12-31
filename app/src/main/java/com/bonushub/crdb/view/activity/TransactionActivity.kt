@@ -331,6 +331,44 @@ class TransactionActivity : BaseActivityNew() {
                                                         it
                                                     )
                                                 }
+
+                                                // region sync transaction
+                                                lifecycleScope.launch(Dispatchers.IO){
+
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+
+                                                    creatCardProcessingModelData(receiptDetail)
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+
+                                                    // sync pending transaction
+                                                    Utility().syncPendingTransaction(transactionViewModel)
+
+                                                    when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                    {
+                                                        is GenericResponse.Success -> {
+                                                            logger("success:- ", "in success $genericResp","e")
+                                                            hideProgress()
+                                                        }
+                                                        is GenericResponse.Error -> {
+                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "save transaction sync later", "e")
+
+                                                            val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                                batchTable = batchData,
+                                                                responseCode = genericResp?.toString(),
+                                                                cardProcessedDataModal = globalCardProcessedModel)
+
+                                                            pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                            hideProgress()
+                                                        }
+                                                        is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                            hideProgress()
+                                                        }
+                                                    }
+                                                }
+                                                // end region
+
                                                 printingSaleData(batchData)
                                         /*        val transactionISO =
                                                     CreateTransactionPacket(
@@ -355,21 +393,6 @@ class TransactionActivity : BaseActivityNew() {
                                     ResponseCode.REVERSAL.value -> {
                                         // kushal
                                         // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-//                                        val jsonResp=Gson().toJson(ReceiptDetail)
-//                                        println(jsonResp)
-//
-//                                        try {
-//                                            val str = jsonResp
-//                                            if (!str.isNullOrEmpty()) {
-//                                                Gson().fromJson<ReceiptDetail>(
-//                                                    str,
-//                                                    object : TypeToken<ReceiptDetail>() {}.type
-//                                                )
-//                                            } else null
-//                                        } catch (ex: Exception) {
-//                                            ex.printStackTrace()
-//                                        }
 
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
@@ -524,8 +547,12 @@ class TransactionActivity : BaseActivityNew() {
 
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
+
+                                                showProgress(getString(R.string.transaction_syncing_msg))
+
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+
                                                 // sync pending transaction
                                                 Utility().syncPendingTransaction(transactionViewModel)
 
@@ -533,7 +560,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -545,10 +572,11 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
+                                                        hideProgress()
                                                     }
                                                 }
                                             }
@@ -663,6 +691,9 @@ class TransactionActivity : BaseActivityNew() {
 
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
+
+                                                showProgress(getString(R.string.transaction_syncing_msg))
+
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
                                                 // sync pending transaction
@@ -672,7 +703,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -684,10 +715,11 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
+                                                        hideProgress()
                                                     }
                                                 }
                                             }
@@ -716,21 +748,6 @@ class TransactionActivity : BaseActivityNew() {
                                     ResponseCode.REVERSAL.value -> {
                                         // kushal
                                         // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                        /* val jsonResp=Gson().toJson(ReceiptDetail)
-                                         println(jsonResp)
-
-                                         try {
-                                             val str = jsonResp
-                                             if (!str.isNullOrEmpty()) {
-                                                 Gson().fromJson<ReceiptDetail>(
-                                                     str,
-                                                     object : TypeToken<ReceiptDetail>() {}.type
-                                                 )
-                                             } else null
-                                         } catch (ex: Exception) {
-                                             ex.printStackTrace()
-                                         }*/
 
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
@@ -800,6 +817,9 @@ class TransactionActivity : BaseActivityNew() {
 
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
+
+                                                showProgress(getString(R.string.transaction_syncing_msg))
+
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
                                                 // sync pending transaction
@@ -809,7 +829,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -821,10 +841,11 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
+                                                        hideProgress()
                                                     }
                                                 }
                                             }
@@ -854,21 +875,6 @@ class TransactionActivity : BaseActivityNew() {
                                     ResponseCode.REVERSAL.value -> {
                                         // kushal
                                         // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                        /*val jsonResp=Gson().toJson(ReceiptDetail)
-                                        println(jsonResp)
-
-                                        try {
-                                            val str = jsonResp
-                                            if (!str.isNullOrEmpty()) {
-                                                Gson().fromJson<ReceiptDetail>(
-                                                    str,
-                                                    object : TypeToken<ReceiptDetail>() {}.type
-                                                )
-                                            } else null
-                                        } catch (ex: Exception) {
-                                            ex.printStackTrace()
-                                        }*/
 
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
@@ -938,6 +944,9 @@ class TransactionActivity : BaseActivityNew() {
 
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
+
+                                                showProgress(getString(R.string.transaction_syncing_msg))
+
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
                                                 // sync pending transaction
@@ -947,7 +956,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -959,10 +968,11 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
+                                                        hideProgress()
                                                     }
                                                 }
                                             }
@@ -993,21 +1003,6 @@ class TransactionActivity : BaseActivityNew() {
                                     ResponseCode.REVERSAL.value -> {
                                         // kushal
                                         // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                        /*val jsonResp=Gson().toJson(ReceiptDetail)
-                                        println(jsonResp)
-
-                                        try {
-                                            val str = jsonResp
-                                            if (!str.isNullOrEmpty()) {
-                                                Gson().fromJson<ReceiptDetail>(
-                                                    str,
-                                                    object : TypeToken<ReceiptDetail>() {}.type
-                                                )
-                                            } else null
-                                        } catch (ex: Exception) {
-                                            ex.printStackTrace()
-                                        }*/
 
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
@@ -1079,6 +1074,9 @@ class TransactionActivity : BaseActivityNew() {
 
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
+
+                                                showProgress(getString(R.string.transaction_syncing_msg))
+
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
                                                 // sync pending transaction
@@ -1088,7 +1086,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -1100,10 +1098,11 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
+                                                        hideProgress()
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
+                                                        hideProgress()
                                                     }
                                                 }
                                             }
@@ -1140,22 +1139,6 @@ class TransactionActivity : BaseActivityNew() {
                                     ResponseCode.REVERSAL.value -> {
                                         // kushal
                                         // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                        /*val jsonResp=Gson().toJson(ReceiptDetail)
-                                        println(jsonResp)
-
-                                        try {
-                                            val str = jsonResp
-                                            if (!str.isNullOrEmpty()) {
-                                                Gson().fromJson<ReceiptDetail>(
-                                                    str,
-                                                    object : TypeToken<ReceiptDetail>() {}.type
-                                                )
-                                            } else null
-                                        } catch (ex: Exception) {
-                                            ex.printStackTrace()
-                                        }*/
-
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                         val batchReversalData = BatchTableReversal(receiptDetail)
@@ -1245,27 +1228,29 @@ class TransactionActivity : BaseActivityNew() {
                                         //    appDao.insertBatchData(batchData)
 
                                         // sync pending transaction
+                                        showProgress(getString(R.string.transaction_syncing_msg))
                                         Utility().syncPendingTransaction(transactionViewModel)
 
                                         when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                         {
                                             is GenericResponse.Success -> {
+                                                hideProgress()
                                                 logger("success:- ", "in success $genericResp","e")
 
                                             }
                                             is GenericResponse.Error -> {
                                                 logger("error:- ", "in error $genericResp", "e")
                                                 logger("error:- ", "save transaction sync later", "e")
-
                                                 val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
                                                     batchTable = batchData,
                                                     responseCode = genericResp?.toString(),
                                                     cardProcessedDataModal = globalCardProcessedModel)
-
                                                 pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                hideProgress()
 
                                             }
                                             is GenericResponse.Loading -> {
+                                                hideProgress()
                                                 logger("Loading:- ", "in Loading $genericResp","e")
                                             }
                                         }
