@@ -775,6 +775,7 @@ fun getTransactionTypeName(type: Int): String? {
         BhTransactionType.EMI.type -> BhTransactionType.EMI.txnTitle
         BhTransactionType.EMI_SALE.type -> BhTransactionType.EMI_SALE.txnTitle
         BhTransactionType.TIP_SALE.type -> BhTransactionType.TIP_SALE.txnTitle
+        BhTransactionType.BRAND_EMI.type -> BhTransactionType.BRAND_EMI.txnTitle
         else -> "NONE"
     }
     return name

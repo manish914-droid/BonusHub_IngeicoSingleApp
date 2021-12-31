@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white">
 
     <androidx.core.widget.NestedScrollView
@@ -31,13 +32,13 @@
                 android:layout_margin="@dimen/pad_16"
                 android:gravity="center"
                 android:padding="@dimen/pad_4"
-                android:text="@string/brandEmi"
+                android:text="@string/select_tenure_txt"
                 android:textColor="@color/txt_color"
                 android:textSize="@dimen/text_size_xregular"
                 android:fontFamily="@font/muli_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:drawableLeft="@drawable/ic_brandemi"
+
                 android:drawablePadding="@dimen/pad_10"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_txn" />
 
@@ -45,6 +46,7 @@
                 android:id="@+id/emiSchemeOfferRV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                tools:listitem="@layout/item_emi_scheme_offer"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

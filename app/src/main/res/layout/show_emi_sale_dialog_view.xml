@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mob_no_crdView"
+   app:cardCornerRadius="@dimen/pad_10"
+    android:padding="@dimen/pad_10"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="@dimen/pad_16"
+    android:visibility="visible"
+   >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+android:padding="@dimen/pad_12"
+        android:layout_marginBottom="@dimen/pad_24"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/closeDialog"
+            android:layout_width="@dimen/drawer_item_size"
+            android:layout_height="@dimen/drawer_item_size"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/pad_16"
+            android:layout_marginEnd="@dimen/pad_20"
+            android:contentDescription="@string/app_name"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_close_24" />
+
+
+        <Button
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/congratulations"
+            android:textColor="@color/white"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
+          >
+
+        </Button>
+
+
+        <TextView
+            android:id="@+id/emi_sale_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/pad_16"
+            android:text="@string/emi_sale_hint"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_xsmall" />
+
+        <!--Buttons Normal Sale-->
+        <Button
+            android:id="@+id/cardsaleButton"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sale"
+            android:textColor="@color/white"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
+>
+
+
+        </Button>
+
+        <!--Buttons Insta emi-->
+        <Button
+            android:id="@+id/cardemiButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/emi"
+            android:textColor="@color/white"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
+   >
+        </Button>
+
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

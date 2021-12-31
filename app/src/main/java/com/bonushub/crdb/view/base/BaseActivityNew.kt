@@ -426,7 +426,7 @@ interface IDialog {
     )
 
     fun setProgressTitle(title: String)
-    fun onEvents(event: VxEvent)
+   // fun onEvents(event: VxEvent)
 
     fun showToast(msg: String)
     fun showProgress(progressMsg: String = "Please Wait....")

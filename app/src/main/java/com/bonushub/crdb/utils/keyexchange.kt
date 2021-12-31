@@ -56,7 +56,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
             val appName =
                 addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
 
-            val deviceModel = /*DeviceHelper.getDeviceModel()*/"  X990"
+            val deviceModel = DeviceHelper.getDeviceModel()?.substring(0,6)//"  X990"
 
             val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
          //   val version1 = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)

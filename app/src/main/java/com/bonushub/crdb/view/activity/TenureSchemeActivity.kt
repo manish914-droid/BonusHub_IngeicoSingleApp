@@ -2,7 +2,6 @@ package com.bonushub.crdb.view.activity
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -19,22 +18,20 @@ import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.adapter.EMISchemeAndOfferAdapter
-import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.TenureSchemeViewModel
-import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
 import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
 import com.bonushub.pax.utils.BhTransactionType
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import android.app.Activity
 
 import android.content.Intent
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.view.base.BaseActivityNew
 
 
 @AndroidEntryPoint
-class TenureSchemeActivity : AppCompatActivity() {
+class TenureSchemeActivity : BaseActivityNew() {
     /** need to use Hilt for instance initializing here..*/
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
@@ -57,9 +54,17 @@ class TenureSchemeActivity : AppCompatActivity() {
     private val imeiOrSerialNum by lazy {
         intent.getStringExtra("imeiOrSerialNum")
     }
+ private val emiSchemeOfferDataListFromIntent by lazy {
+        intent.getParcelableArrayListExtra<BankEMITenureDataModal>("emiSchemeOfferDataList") as MutableList<BankEMITenureDataModal>
+    }
+private val emiIssuerTAndCDataFromIntent by lazy {
+        intent.getParcelableExtra("emiIssuerTAndCDataList") as BankEMIIssuerTAndCDataModal?
+    }
+
+
 
     private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal>? = mutableListOf()
-    lateinit var emiIssuerTAndCDataList:BankEMIIssuerTAndCDataModal
+    lateinit var emiIssuerTAndCData: BankEMIIssuerTAndCDataModal
     private val emiSchemeAndOfferAdapter: EMISchemeAndOfferAdapter by lazy {
         EMISchemeAndOfferAdapter(
             1,
@@ -83,63 +88,83 @@ class TenureSchemeActivity : AppCompatActivity() {
             "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
                     "^${/*cardBinValue.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }else{
-            // todo change pannumberData
-            "$bankEMIRequestCode^0^1^0^^${cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)}^${cardProcessedDataModal?.getTransactionAmount()}"
+            "$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
+        }
+
+        if(transactionType==BhTransactionType.BRAND_EMI.type || transactionType==BhTransactionType.EMI_SALE.type) {
+         showProgress()
+            tenureSchemeViewModel = ViewModelProvider(
+                this, TenureSchemeActivityVMFactory(
+                    serverRepository,
+                    cardProcessedDataModal?.getPanNumberData() ?: "",
+                    field57
+                )
+            ).get(TenureSchemeViewModel::class.java)
+            //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
+            tenureSchemeViewModel.emiTenureLiveData.observe(
+                this,
+                {
+hideProgress()
+                    when (val genericResp = it) {
+                        is GenericResponse.Success -> {
+                            println(Gson().toJson(genericResp.data))
+                            val resp= genericResp.data as TenuresWithIssuerTncs
+                            emiSchemeOfferDataList=resp.bankEMISchemesDataList
+                            emiIssuerTAndCData=resp.bankEMIIssuerTAndCList
+                            setUpRecyclerView()
+
+                        }
+                        is GenericResponse.Error -> {
+                            ToastUtils.showToast(this, genericResp.errorMessage)
+                            println(genericResp.errorMessage.toString())
+                        }
+                        is GenericResponse.Loading -> {
+
+                        }
+                    }
+                })
+
+        }else if (transactionType==BhTransactionType.SALE.type ){
+            emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent
+            emiIssuerTAndCData= emiIssuerTAndCDataFromIntent!!
+            setUpRecyclerView()
         }
 
 
-        tenureSchemeViewModel = ViewModelProvider(
-            this, TenureSchemeActivityVMFactory(
-                serverRepository,
-                cardProcessedDataModal?.getPanNumberData() ?: "",
-                field57
-            )
-        ).get(TenureSchemeViewModel::class.java)
-
-        binding?.toolbarTxn?.mainToolbarStart?.setBackgroundResource(R.drawable.ic_back_arrow_white)
+        binding?.toolbarTxn?.mainToolbarStart?.apply {  setBackgroundResource(R.drawable.ic_back_arrow_white)
+        setOnClickListener {
+            finish()
+            startActivity(Intent(this@TenureSchemeActivity, NavigationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
+        }
 
        /* binding?.toolbarTxn?.mainToolbarStart?.setOnClickListener {
             navigateControlBackToTransaction(
                 isTransactionContinue = false
             )
         }*/
-      //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
-        tenureSchemeViewModel.emiTenureLiveData.observe(
-            this,
-            {
-                when (val genericResp = it) {
-                    is GenericResponse.Success -> {
-                        println(Gson().toJson(genericResp.data))
-                        val resp= genericResp.data as TenuresWithIssuerTncs
-                        emiSchemeOfferDataList=resp.bankEMISchemesDataList
-                        emiIssuerTAndCDataList=resp.bankEMIIssuerTAndCList
-                        setUpRecyclerView()
 
-                    }
-                    is GenericResponse.Error -> {
-                        ToastUtils.showToast(this, genericResp.errorMessage)
-                        println(genericResp.errorMessage.toString())
-                    }
-                    is GenericResponse.Loading -> {
-
-                    }
-                }
-            })
 
         //region======================Proceed TXN Floating Button OnClick Event:-
         binding?.emiSchemeFloatingButton?.setOnClickListener {
             if (selectedSchemeUpdatedPosition != -1) {
-                ToastUtils.showToast(
+               /* ToastUtils.showToast(
                     this,
                     (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)).toString()
-                )
+                )*/
                 Log.e(
                     "SELECTED TENURE ->  ",
                     (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)).toString()
                 )
+                Log.e(
+                    "Tncc ->  ",
+                    (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)).toString()
+                )
                 val returnIntent = Intent()
                 returnIntent.putExtra("EMITenureDataModal", (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)))
-                returnIntent.putExtra("emiIssuerTAndCDataList", (emiIssuerTAndCDataList))
+                returnIntent.putExtra("emiIssuerTAndCDataList", (emiIssuerTAndCData))
                 returnIntent.putExtra("cardProcessedDataModal", cardProcessedDataModal)
                 setResult(RESULT_OK, returnIntent)
                 finish()
@@ -156,6 +181,9 @@ class TenureSchemeActivity : AppCompatActivity() {
         //endregion
     }
 
+    override fun onBackPressed() {
+        // for stopping back press
+    }
 
     //region==========================onClickEvent==================================================
     private fun onSchemeClickEvent(position: Int) {

@@ -131,13 +131,13 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
             }
         }
     }
-     private suspend fun getIssuerTnc(dataCounter:String="0"){
+     private suspend fun getIssuerTnc(dataCounter:String="0",fromBankEmi:Boolean){
         val field57= "${EMIRequestType.ISSUER_T_AND_C.requestType}^$dataCounter"
         when(val genericResp = remoteService.field57GenericService(field57)){
             is GenericResponse.Success->{
                 val isoDataReader=genericResp.data
                 val tncString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
-                stubbingIssuerTAndCData(tncString)
+                stubbingIssuerTAndCData(tncString,fromBankEmi)
             }
             is GenericResponse.Error->{
                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
@@ -283,7 +283,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     }
     //endregion
     //region===========================Below method is used to Stubbing issuer terms and conditions data:-
-    private suspend fun stubbingIssuerTAndCData(issuerTAndC: String) {
+    private suspend fun stubbingIssuerTAndCData(issuerTAndC: String,fromBankEmi:Boolean) {
             if (!TextUtils.isEmpty(issuerTAndC)) {
                 val dataList = Utility().parseDataListWithSplitter("|", issuerTAndC)
                 if (dataList.isNotEmpty()) {
@@ -304,7 +304,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                       /*  issuerField57Data =
                             "${EMIRequestType.ISSUER_T_AND_C.requestType}^$issuerTAndCTotalRecord"
                         fetchIssuerTAndC()*/
-                        getIssuerTnc(issuerTAndCTotalRecord.toString())
+                        getIssuerTnc(issuerTAndCTotalRecord.toString(),fromBankEmi)
 
                     } else {
                         if (issuerTermsAndConditionsDataList.isNotEmpty()) {
@@ -330,7 +330,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                     appDB.appDao.insertIssuerTAndCData(issuerModel)
                                 }
                             }
-
+if(!fromBankEmi)
                             getBrandSubCategoryData("0")
 
                         }
@@ -378,7 +378,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
                                 }
                             }
-                            getIssuerTnc()
+                            getIssuerTnc(fromBankEmi = false)
 
                         }
                     }
@@ -715,15 +715,8 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                     } else {
                         Log.d("Total BankEMI Data:- ", bankEMISchemesDataList.toString())
                         Log.d("Total BankEMI TAndC:- ", parsingDataWithCurlyBrace[1])
-                      /*  ROCProviderV2.incrementFromResponse(
-                            ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
-                            AppPreference.getBankCode()
-                        )*/
-                       /* callback(
-                            Pair(bankEMISchemesDataList, bankEMIIssuerTAndCList),
-                            Triple(isBool, "", true)
-                        )*/
                         val tenuresWithIssuerTncs=TenuresWithIssuerTncs(bankEMIIssuerTAndCList,bankEMISchemesDataList)
+getIssuerTnc(fromBankEmi = true)
                         emiTenureMLData.postValue(GenericResponse.Success(tenuresWithIssuerTncs))
 
                     }

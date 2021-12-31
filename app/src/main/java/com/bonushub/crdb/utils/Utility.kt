@@ -595,7 +595,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     fun getCDTData(recordType:String): TerminalCommunicationTable? {
         var cdtData: TerminalCommunicationTable? = null
         runBlocking(Dispatchers.IO) {
-            cdtData = appDatabase?.appDao?.getTerminalCommunicationTableByRecordType(recordType)?.get(0)
+            cdtData = appDatabase.appDao.getTerminalCommunicationTableByRecordType(recordType).get(0)
         }
         return cdtData
     }
@@ -635,6 +635,7 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
 
     val cdt: TerminalCommunicationTable? = getCDTData(recordType)
     return if (cdt != null) {
+        Utility().logger("","IP -> ${cdt.hostPrimaryIp} , Port ->   ${cdt.hostPrimaryPortNo.toInt()}","e")
         InetSocketAddress(InetAddress.getByName(cdt.hostPrimaryIp), cdt.hostPrimaryPortNo.toInt())
     } else {
         InetSocketAddress(InetAddress.getByName(LYRA_IP_ADDRESS), PORT2)

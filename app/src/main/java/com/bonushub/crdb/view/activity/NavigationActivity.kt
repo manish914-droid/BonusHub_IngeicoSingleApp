@@ -416,9 +416,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
     }
 
-    override fun onEvents(event: VxEvent) {
-        TODO("Not yet implemented")
-    }
+
     //endregion
 
     //region======================================================method to exitApp:-

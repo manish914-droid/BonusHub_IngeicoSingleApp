@@ -40,13 +40,13 @@ class RemoteService @Inject constructor(){
         // val liveData= MutableLiveData<GenericResponse<IsoDataReader>>()
         return if(response.isSuccess){
             val isoDataReader=response.anyData as IsoDataReader
-            if(isoDataReader.isoMap[39]?.rawData?.hexStr2ByteArr()?.byteArr2Str() == "00")
+            if(isoDataReader.isoMap[39]?.rawData?.hexStr2ByteArr()?.byteArr2Str() == "00") {
                 GenericResponse.Success(response.anyData as IsoDataReader)
+            }
             else
                 GenericResponse.Error(response.message)
-        }else{
+        }else
             GenericResponse.Error(response.message)
-        }
     }
 
     suspend fun getHostTransaction(transactionISOByteArray: IsoDataWriter):GenericResponse<IsoDataReader?>{
