@@ -990,6 +990,8 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
 
     fun syncPendingTransaction(transactionViewModel:TransactionViewModel)
     {
+
+
         runBlocking(Dispatchers.IO){
             val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
