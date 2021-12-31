@@ -326,6 +326,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 batchData.transactionType =
                                                     globalCardProcessedModel.getTransType()
                                                 appDatabase.appDao.insertBatchData(batchData)
+                                                creatCardProcessingModelData(receiptDetail)
                                                 cardProcessedDataModal.getPanNumberData()?.let {
                                                     globalCardProcessedModel.setPanNumberData(
                                                         it
@@ -333,12 +334,12 @@ class TransactionActivity : BaseActivityNew() {
                                                 }
 
                                                 // region sync transaction
-                                                lifecycleScope.launch(Dispatchers.IO){
 
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
+withContext(Dispatchers.Main) {
+    showProgress(getString(R.string.transaction_syncing_msg))
+}
 
-                                                    creatCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
 
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(transactionViewModel)
@@ -348,6 +349,7 @@ class TransactionActivity : BaseActivityNew() {
                                                         is GenericResponse.Success -> {
                                                             logger("success:- ", "in success $genericResp","e")
                                                             hideProgress()
+                                                            printingSaleData(batchData)
                                                         }
                                                         is GenericResponse.Error -> {
                                                             logger("error:- ", "in error $genericResp", "e")
@@ -355,7 +357,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                                             val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
                                                                 batchTable = batchData,
-                                                                responseCode = genericResp?.toString(),
+                                                                responseCode = genericResp.toString(),
                                                                 cardProcessedDataModal = globalCardProcessedModel)
 
                                                             pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
@@ -366,10 +368,10 @@ class TransactionActivity : BaseActivityNew() {
                                                             hideProgress()
                                                         }
                                                     }
-                                                }
+
                                                 // end region
 
-                                                printingSaleData(batchData)
+
                                         /*        val transactionISO =
                                                     CreateTransactionPacket(
                                                         globalCardProcessedModel,
@@ -1218,18 +1220,22 @@ class TransactionActivity : BaseActivityNew() {
                                 //  uids.add(ecrID)
                                 // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                 if (receiptDetail != null) {
-                                    val batchData = BatchTable(receiptDetail)
-                                    creatCardProcessingModelData(receiptDetail)
-                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                    //  val jsonResp2=Gson().toJson(transactionISO)
-                                    //   Log.d(TAG, "jsonResp : $jsonResp2")
-                                    println(jsonResp)
+
+
                                     lifecycleScope.launch(Dispatchers.IO) {
                                         //    appDao.insertBatchData(batchData)
-
+                                        withContext(Dispatchers.Main){
+                                            showProgress(getString(R.string.transaction_syncing_msg))
+                                        }
+                                        val batchData = BatchTable(receiptDetail)
+                                        creatCardProcessingModelData(receiptDetail)
+                                        val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                        //  val jsonResp2=Gson().toJson(transactionISO)
+                                        //   Log.d(TAG, "jsonResp : $jsonResp2")
+                                        println(jsonResp)
                                         // sync pending transaction
-                                        showProgress(getString(R.string.transaction_syncing_msg))
-                                        Utility().syncPendingTransaction(transactionViewModel)
+
+                                      Utility().syncPendingTransaction(transactionViewModel)
 
                                         when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                         {

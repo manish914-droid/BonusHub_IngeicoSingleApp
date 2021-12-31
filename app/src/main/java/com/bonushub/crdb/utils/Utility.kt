@@ -988,11 +988,8 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
         }
     }
 
-    fun syncPendingTransaction(transactionViewModel:TransactionViewModel)
+ suspend   fun syncPendingTransaction(transactionViewModel:TransactionViewModel)
     {
-
-
-        runBlocking(Dispatchers.IO){
             val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
             for(item in pendingTxn){
@@ -1015,7 +1012,6 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
                 }
             }
 
-        }
     }
 
     /*fun creatCardProcessingModelData(receiptDetail: ReceiptDetail):CardProcessedDataModal {
