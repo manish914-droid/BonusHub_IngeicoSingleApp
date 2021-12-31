@@ -311,15 +311,22 @@ class CreateTransactionPacket(
 
             // old way
             //   val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
+var serialnumm=""
+            if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()||BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
+                val tenureData=batchdata?.emiTenureDataModel
+                serialnumm = if( cardProcessedData.getTid()==tenureData?.txnTID){
+                    DeviceHelper.getDeviceSerialNo().toString()
+                }else{
+                    tenureData?.txnTID.toString()
+                }
 
+
+}
             addFieldByHex(
                 61, addPad(
-                    DeviceHelper.getDeviceSerialNo() ?: "", " ", 15, false
+                    serialnumm ?: "", " ", 15, false
                 ) + AppPreference.getBankCode() + customerID + walletIssuerID + data
             )
-
-
-
 
             //adding field 62
             cardProcessedData.getInvoice()?.let { addFieldByHex(62, it) }

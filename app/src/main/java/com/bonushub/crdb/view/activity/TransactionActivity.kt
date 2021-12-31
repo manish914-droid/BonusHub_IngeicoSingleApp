@@ -125,7 +125,7 @@ class TransactionActivity : BaseActivityNew() {
         }else{
             emvBinding?.cardDetectImg?.visibility = View.GONE
             emvBinding?.tvInsertCard?.visibility = View.GONE
-            emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
+            emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
 
         }
         emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
@@ -279,7 +279,7 @@ class TransactionActivity : BaseActivityNew() {
                     data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
                 emvBinding?.cardDetectImg?.visibility = View.GONE
                 emvBinding?.tvInsertCard?.visibility = View.GONE
-                emvBinding?.subHeaderView?.backImageButton?.visibility = View.GONE
+                emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
                 try {
                     DeviceHelper.doEMITxn(
                         EMISaleRequest(
