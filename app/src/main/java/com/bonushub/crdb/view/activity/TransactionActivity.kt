@@ -335,7 +335,9 @@ class TransactionActivity : BaseActivityNew() {
                                                 // region sync transaction
                                                 lifecycleScope.launch(Dispatchers.IO){
 
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                    withContext(Dispatchers.Main){
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
+                                                    }
 
                                                     creatCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -347,7 +349,9 @@ class TransactionActivity : BaseActivityNew() {
                                                     {
                                                         is GenericResponse.Success -> {
                                                             logger("success:- ", "in success $genericResp","e")
-                                                            hideProgress()
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                         is GenericResponse.Error -> {
                                                             logger("error:- ", "in error $genericResp", "e")
@@ -359,11 +363,26 @@ class TransactionActivity : BaseActivityNew() {
                                                                 cardProcessedDataModal = globalCardProcessedModel)
 
                                                             pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                            hideProgress()
+
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                                ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                                finish()
+                                                                startActivity(
+                                                                    Intent(
+                                                                        this@TransactionActivity,
+                                                                        NavigationActivity::class.java
+                                                                    ).apply {
+                                                                        flags =
+                                                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                    })
+                                                            }
                                                         }
                                                         is GenericResponse.Loading -> {
                                                             logger("Loading:- ", "in Loading $genericResp","e")
-                                                            hideProgress()
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -548,7 +567,9 @@ class TransactionActivity : BaseActivityNew() {
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
 
-                                                showProgress(getString(R.string.transaction_syncing_msg))
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                }
 
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -572,7 +593,19 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                            finish()
+                                                            startActivity(
+                                                                Intent(
+                                                                    this@TransactionActivity,
+                                                                    NavigationActivity::class.java
+                                                                ).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+                                                        }
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
@@ -692,7 +725,9 @@ class TransactionActivity : BaseActivityNew() {
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
 
-                                                showProgress(getString(R.string.transaction_syncing_msg))
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                }
 
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -715,7 +750,19 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                            finish()
+                                                            startActivity(
+                                                                Intent(
+                                                                    this@TransactionActivity,
+                                                                    NavigationActivity::class.java
+                                                                ).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+                                                        }
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
@@ -818,7 +865,9 @@ class TransactionActivity : BaseActivityNew() {
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
 
-                                                showProgress(getString(R.string.transaction_syncing_msg))
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                }
 
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -841,7 +890,19 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                            finish()
+                                                            startActivity(
+                                                                Intent(
+                                                                    this@TransactionActivity,
+                                                                    NavigationActivity::class.java
+                                                                ).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+                                                        }
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
@@ -945,7 +1006,9 @@ class TransactionActivity : BaseActivityNew() {
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
 
-                                                showProgress(getString(R.string.transaction_syncing_msg))
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                }
 
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -968,7 +1031,19 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                            finish()
+                                                            startActivity(
+                                                                Intent(
+                                                                    this@TransactionActivity,
+                                                                    NavigationActivity::class.java
+                                                                ).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+                                                        }
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
@@ -1075,7 +1150,9 @@ class TransactionActivity : BaseActivityNew() {
                                             // region sync transaction
                                             lifecycleScope.launch(Dispatchers.IO){
 
-                                                showProgress(getString(R.string.transaction_syncing_msg))
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                }
 
                                                 creatCardProcessingModelData(receiptDetail)
                                                 val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -1098,7 +1175,19 @@ class TransactionActivity : BaseActivityNew() {
                                                             cardProcessedDataModal = globalCardProcessedModel)
 
                                                         pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                            finish()
+                                                            startActivity(
+                                                                Intent(
+                                                                    this@TransactionActivity,
+                                                                    NavigationActivity::class.java
+                                                                ).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+                                                        }
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
@@ -1228,7 +1317,9 @@ class TransactionActivity : BaseActivityNew() {
                                         //    appDao.insertBatchData(batchData)
 
                                         // sync pending transaction
-                                        showProgress(getString(R.string.transaction_syncing_msg))
+                                        withContext(Dispatchers.Main) {
+                                            showProgress(getString(R.string.transaction_syncing_msg))
+                                        }
                                         Utility().syncPendingTransaction(transactionViewModel)
 
                                         when(val genericResp = transactionViewModel.serverCall(transactionISO))
@@ -1246,7 +1337,19 @@ class TransactionActivity : BaseActivityNew() {
                                                     responseCode = genericResp?.toString(),
                                                     cardProcessedDataModal = globalCardProcessedModel)
                                                 pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                hideProgress()
+                                                withContext(Dispatchers.Main) {
+                                                    hideProgress()
+                                                    ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                    finish()
+                                                    startActivity(
+                                                        Intent(
+                                                            this@TransactionActivity,
+                                                            NavigationActivity::class.java
+                                                        ).apply {
+                                                            flags =
+                                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                        })
+                                                }
 
                                             }
                                             is GenericResponse.Loading -> {
