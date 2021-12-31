@@ -333,13 +333,14 @@ class TransactionActivity : BaseActivityNew() {
                                                     )
                                                 }
 
+                                                printingSaleData(batchData)
+
                                                 // region sync transaction
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(getString(R.string.transaction_syncing_msg))
+                                                }
 
-withContext(Dispatchers.Main) {
-    showProgress(getString(R.string.transaction_syncing_msg))
-}
-
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
+                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
 
                                                     // sync pending transaction
                                                  //   Utility().syncPendingTransaction(transactionViewModel)
@@ -348,8 +349,10 @@ withContext(Dispatchers.Main) {
                                                     {
                                                         is GenericResponse.Success -> {
                                                             logger("success:- ", "in success $genericResp","e")
-                                                            hideProgress()
-                                                            printingSaleData(batchData)
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
+
                                                         }
                                                         is GenericResponse.Error -> {
                                                             logger("error:- ", "in error $genericResp", "e")
@@ -378,7 +381,9 @@ withContext(Dispatchers.Main) {
                                                         }
                                                         is GenericResponse.Loading -> {
                                                             logger("Loading:- ", "in Loading $genericResp","e")
-                                                            hideProgress()
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
 
@@ -560,9 +565,17 @@ withContext(Dispatchers.Main) {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
 
-                                            // region sync transaction
-                                            lifecycleScope.launch(Dispatchers.IO){
+                                            // region print and save data
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice = receiptDetail.invoice.toString()
+                                                batchData.transactionType =
+                                                    com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
+                                            // end region
 
+                                            // region sync transaction
                                                 withContext(Dispatchers.Main) {
                                                     showProgress(getString(R.string.transaction_syncing_msg))
                                                 }
@@ -577,7 +590,9 @@ withContext(Dispatchers.Main) {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -605,21 +620,16 @@ withContext(Dispatchers.Main) {
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                 }
                                             }
                                             // end region
 
 
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-                                                batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
-                                            }
+
 
                                         }
 
@@ -718,8 +728,17 @@ withContext(Dispatchers.Main) {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
 
+                                            // region print and save data
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice = receiptDetail.invoice.toString()
+                                                batchData.transactionType =
+                                                    com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
+                                            // end region
+
                                             // region sync transaction
-                                            lifecycleScope.launch(Dispatchers.IO){
 
                                                 withContext(Dispatchers.Main) {
                                                     showProgress(getString(R.string.transaction_syncing_msg))
@@ -734,7 +753,9 @@ withContext(Dispatchers.Main) {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -762,20 +783,14 @@ withContext(Dispatchers.Main) {
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                 }
                                             }
                                             // end region
 
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-                                                batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
-                                            }
 
                                         }
 
@@ -858,9 +873,17 @@ withContext(Dispatchers.Main) {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
 
-                                            // region sync transaction
-                                            lifecycleScope.launch(Dispatchers.IO){
+                                            // region print and save data
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice = receiptDetail.invoice.toString()
+                                                batchData.transactionType =
+                                                    com.bonushub.pax.utils.BhTransactionType.REFUND.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
+                                            // end region
 
+                                            // region sync transaction
                                                 withContext(Dispatchers.Main) {
                                                     showProgress(getString(R.string.transaction_syncing_msg))
                                                 }
@@ -874,7 +897,9 @@ withContext(Dispatchers.Main) {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -902,20 +927,15 @@ withContext(Dispatchers.Main) {
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                 }
                                             }
                                             // end region
 
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-                                                batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.REFUND.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
-                                            }
+
 
                                         }
 
@@ -999,9 +1019,17 @@ withContext(Dispatchers.Main) {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
 
-                                            // region sync transaction
-                                            lifecycleScope.launch(Dispatchers.IO){
+                                            // region print and save data
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice = receiptDetail.invoice.toString()
+                                                batchData.transactionType =
+                                                    com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
+                                            // end region
 
+                                            // region sync transaction
                                                 withContext(Dispatchers.Main) {
                                                     showProgress(getString(R.string.transaction_syncing_msg))
                                                 }
@@ -1015,7 +1043,9 @@ withContext(Dispatchers.Main) {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -1043,21 +1073,14 @@ withContext(Dispatchers.Main) {
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                 }
                                             }
                                             // end region
 
-
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-                                                batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
-                                            }
 
                                         }
 
@@ -1143,9 +1166,17 @@ withContext(Dispatchers.Main) {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
 
-                                            // region sync transaction
-                                            lifecycleScope.launch(Dispatchers.IO){
+                                            // region print and save data
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                //    appDao.insertBatchData(batchData)
+                                                batchData.invoice = receiptDetail.invoice.toString()
+                                                batchData.transactionType =
+                                                    BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                appDatabase.appDao.insertBatchData(batchData)
+                                                printingSaleData(batchData)
+                                            // end region
 
+                                            // region sync transaction
                                                 withContext(Dispatchers.Main) {
                                                     showProgress(getString(R.string.transaction_syncing_msg))
                                                 }
@@ -1159,7 +1190,9 @@ withContext(Dispatchers.Main) {
                                                 {
                                                     is GenericResponse.Success -> {
                                                         logger("success:- ", "in success $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                     is GenericResponse.Error -> {
                                                         logger("error:- ", "in error $genericResp", "e")
@@ -1187,21 +1220,14 @@ withContext(Dispatchers.Main) {
                                                     }
                                                     is GenericResponse.Loading -> {
                                                         logger("Loading:- ", "in Loading $genericResp","e")
-                                                        hideProgress()
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
                                                     }
                                                 }
                                             }
                                             // end region
 
-
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
-                                                batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.PRE_AUTH_COMPLETE.type
-                                                appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
-                                            }
 
                                         }
 
@@ -1316,17 +1342,24 @@ withContext(Dispatchers.Main) {
                                         //  val jsonResp2=Gson().toJson(transactionISO)
                                         //   Log.d(TAG, "jsonResp : $jsonResp2")
                                         println(jsonResp)
-                                        // sync pending transaction
-                                        withContext(Dispatchers.Main) {
-                                            showProgress(getString(R.string.transaction_syncing_msg))
-                                        }
 
+                                        // region print and save data
+                                        batchData.invoice = receiptDetail.invoice.toString()
+                                        batchData.transactionType =
+                                            com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                        appDatabase.appDao.insertBatchData(batchData)
+                                        printingSaleData(batchData)
+                                        //end region
+
+                                        // region sync pending transaction
                                       Utility().syncPendingTransaction(transactionViewModel)
 
                                         when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                         {
                                             is GenericResponse.Success -> {
-                                                hideProgress()
+                                                withContext(Dispatchers.Main) {
+                                                    hideProgress()
+                                                }
                                                 logger("success:- ", "in success $genericResp","e")
 
                                             }
@@ -1354,18 +1387,14 @@ withContext(Dispatchers.Main) {
 
                                             }
                                             is GenericResponse.Loading -> {
-                                                hideProgress()
+                                                withContext(Dispatchers.Main) {
+                                                    hideProgress()
+                                                }
                                                 logger("Loading:- ", "in Loading $genericResp","e")
                                             }
                                         }
+                                        // end region
 
-                                        //
-
-                                        batchData.invoice = receiptDetail.invoice.toString()
-                                        batchData.transactionType =
-                                            com.bonushub.pax.utils.BhTransactionType.SALE.type
-                                        appDatabase.appDao.insertBatchData(batchData)
-                                        printingSaleData(batchData)
                                     }
                                 }
                             }
@@ -1378,23 +1407,6 @@ withContext(Dispatchers.Main) {
                             }
                             ResponseCode.REVERSAL.value -> {
                                 // kushal
-                                // region
-                                //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                /* val jsonResp=Gson().toJson(ReceiptDetail)
-                                 println(jsonResp)
-
-                                 try {
-                                     val str = jsonResp
-                                     if (!str.isNullOrEmpty()) {
-                                         Gson().fromJson<ReceiptDetail>(
-                                             str,
-                                             object : TypeToken<ReceiptDetail>() {}.type
-                                         )
-                                     } else null
-                                 } catch (ex: Exception) {
-                                     ex.printStackTrace()
-                                 }*/
-
                                 AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                 val batchReversalData = BatchTableReversal(receiptDetail)
