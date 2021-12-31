@@ -119,7 +119,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         EDashboardItem.SALE.title.uppercase(), EDashboardItem.CASH_ADVANCE.title.uppercase(),
                         EDashboardItem.SALE_WITH_CASH.title.uppercase(), EDashboardItem.REFUND.title.uppercase(),
                         EDashboardItem.PREAUTH.title.uppercase(),EDashboardItem.PREAUTH_COMPLETE.title.uppercase(),
-                        EDashboardItem.VOID_SALE.title.uppercase() -> {
+                        EDashboardItem.VOID_SALE.title.uppercase(),
+                        EDashboardItem.BANK_EMI.title.uppercase(),
+                        EDashboardItem.BRAND_EMI.title.uppercase()-> {
                             //BB
                             logger("print","util")
 
