@@ -18,17 +18,14 @@ import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.utils.DeviceHelper
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBrandTAndCData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBrandTAndCDataByBrandId
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerTAndCDataByIssuerId
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.panMasking
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
-import com.bonushub.crdb.utils.failureImpl
-import com.bonushub.crdb.utils.invoiceWithPadding
 
-import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.EPrintCopyType
 import com.bonushub.pax.utils.BhTransactionType
 import com.bonushub.pax.utils.EDashboardItem
@@ -56,7 +53,7 @@ class PrintUtil(context: Context?) {
     private var _issuerNameString = "ISSUER"
     private var isNoEmiOnlyCashBackApplied: Boolean? = null
     private val bankEMIFooterTAndCSeparator = "~!emi~~brd~~!brd~~iss~"
-
+    var nextLineAppendStr = ""
     init {
         this.context = context
         try {
@@ -115,7 +112,7 @@ class PrintUtil(context: Context?) {
             val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
              isNoEmiOnlyCashBackApplied  =  bankEMITenureDataModal?.tenure=="1"
             setLogoAndHeader()
-
+            val terminalData = getTptData()
             try {
                 receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
                 receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }
@@ -129,7 +126,7 @@ class PrintUtil(context: Context?) {
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
-                textBlockList.add(sigleLineformat("MID:${receiptDetail.mid}", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("MID:${terminalData?.merchantId}", AlignMode.LEFT))
                 textBlockList.add(sigleLineformat("TID:${receiptDetail.tid}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
@@ -231,7 +228,7 @@ class PrintUtil(context: Context?) {
                     "SALE", "SALECASH" -> {
                         saleTransaction(receiptDetail)
                     }
-                    EDashboardItem.BRAND_EMI.title -> {
+                   "EMI SALE" -> {
                         printEMISale(batchTable)
                     }
 
@@ -265,11 +262,11 @@ class PrintUtil(context: Context?) {
                 }
 
                 if (receiptDetail.entryMode.equals("CLESS_EMV")) {
-                    val terminalData = getTptData()
-                    sigleLineText(
-                        "PIN NOT REQUIRED FOR CONTACTLESS TRANSACTION UPTO ${terminalData?.ctlsCaption}",
-                        AlignMode.CENTER
-                    )
+
+                    textBlockList.add(sigleLineformat("PIN NOT REQUIRED FOR CONTACTLESS TRANSACTION UPTO ${receiptDetail?.cvmRequiredLimit}", AlignMode.CENTER))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
                 } else {
                     if (receiptDetail.isSignRequired == true)
                         sigleLineText("PIN VERIFIDE OK", AlignMode.CENTER)
@@ -277,10 +274,9 @@ class PrintUtil(context: Context?) {
                         sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER)
                     receiptDetail.cardHolderName?.let { sigleLineText(it, AlignMode.CENTER) }
                 }
-                sigleLineText(
-                    "I am satisfied with goods recived and agree to pay issuer agreenent.",
-                    AlignMode.CENTER
-                )
+                textBlockList.add(sigleLineformat("I am satisfied with goods recived and agree to pay issuer agreenent.", AlignMode.CENTER))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
                 sigleLineText(copyType.pName, AlignMode.CENTER)
                 sigleLineText(footerText[0], AlignMode.CENTER)
                 sigleLineText(footerText[1], AlignMode.CENTER)
@@ -297,9 +293,11 @@ class PrintUtil(context: Context?) {
                     //region=======================Issuer Footer Terms and Condition=================
                     if (!TextUtils.isEmpty(issuerTAndCData?.footerTAndC)) {
                         printSeperator()
-                        printer?.feedLine(1)
+
                         val issuerFooterTAndC =
                             issuerTAndCData?.footerTAndC?.split(SplitterTypes.POUND.splitter)
+                        logger("getting footer tnc1=",issuerTAndCData?.footerTAndC.toString(),"e")
+                        logger("issuerFooterTAndC-->=",issuerFooterTAndC.toString(),"e")
                         if (issuerFooterTAndC != null) {
                             if (issuerFooterTAndC.isNotEmpty()) {
                                 for (i in issuerFooterTAndC.indices) {
@@ -309,21 +307,26 @@ class PrintUtil(context: Context?) {
                                         val chunks: List<String> = chunkTnC(emiTnc, limit)
                                         for (st in chunks) {
                                             logger("TNC", st, "e")
-                                            textBlockList.add(
+                                     /*       textBlockList.add(
                                                 sigleLineformat(
                                                     st, AlignMode.LEFT
                                                 )
-                                            )
+                                            )*/
+                                            printer?.setHzScale(HZScale.SC1x1)
+                                            printer?.setHzSize(HZSize.DOT24x16)
+                                            printer?.addText( AlignMode.LEFT, st)
                                         }
                                     }
                                 }
                             } else {
-                                textBlockList.add(
+                           /*     textBlockList.add(
                                     sigleLineformat(
                                         "# ${issuerTAndCData.footerTAndC}", AlignMode.LEFT
                                     )
-                                )
-
+                                )*/
+                                printer?.setHzScale(HZScale.SC1x1)
+                                printer?.setHzSize(HZSize.DOT24x16)
+                                printer?.addText( AlignMode.LEFT, "# ${issuerTAndCData.footerTAndC}")
                             }
                         }
                     }
@@ -386,7 +389,7 @@ class PrintUtil(context: Context?) {
         return format
     }
 
-    // using this you can set your single text 
+    // using this you can set your single text
     private fun sigleLineText(text: String, alignMode: Int) {
         printer?.setHzScale(HZScale.SC1x1)
         printer?.setHzSize(HZSize.DOT24x24)
@@ -451,14 +454,11 @@ class PrintUtil(context: Context?) {
         var currencySymbol: String? = "Rs"
         val terminalData = getTptData()
         currencySymbol = terminalData?.currencySymbol
-        val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
-        val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
-        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
-        val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
+
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
         val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
 
-        textBlockList.add(sigleLineformat("TXN AMOUNT:", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
         val txnAmount =
             (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
         logger("txnAmount",""+txnAmount)
@@ -471,7 +471,7 @@ class PrintUtil(context: Context?) {
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
-        textBlockList.add(sigleLineformat("AUTH AMOUNT:", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("AUTH AMOUNT", AlignMode.LEFT))
         val authAmount =
             (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
         textBlockList.add(
@@ -482,7 +482,7 @@ class PrintUtil(context: Context?) {
         )
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
-        textBlockList.add(sigleLineformat("CARD ISSUER:", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("CARD ISSUER", AlignMode.LEFT))
         if (bankEMIIssuerTAndCDataModal != null) {
             textBlockList.add(
                 sigleLineformat(
@@ -493,66 +493,286 @@ class PrintUtil(context: Context?) {
         }
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
-
-        textBlockList.add(sigleLineformat("ROI:", AlignMode.LEFT))
+        val tenureDuration = "${bankEMITenureDataModal?.tenure} Months"
+        val tenureHeadingDuration = "${bankEMITenureDataModal?.tenure} Months Scheme"
+        var roi = bankEMITenureDataModal?.tenureInterestRate?.toInt()?.let { divideAmountBy100(it).toString() }
+        var loanamt = bankEMITenureDataModal?.loanAmount?.toInt()?.let { divideAmountBy100(it).toString() }
+        roi = "%.2f".format(roi?.toDouble()) + " %"
+        loanamt = "%.2f".format(loanamt?.toDouble())
+        textBlockList.add(sigleLineformat("ROI", AlignMode.LEFT))
         textBlockList.add(
             sigleLineformat(
-                "${bankEMITenureDataModal?.tenureInterestRate}",
+                "${roi}",
                 AlignMode.RIGHT
             )
         )
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
-        textBlockList.add(sigleLineformat("TENURE:", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat(":${bankEMITenureDataModal?.tenure}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat("TENURE", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("${tenureDuration}", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
+        //region===============Processing Fee Changes And Showing On ChargeSlip:-
+        if (!TextUtils.isEmpty(bankEMITenureDataModal?.processingFee)) {
+            if ((bankEMITenureDataModal?.processingFee) != "0") {
+                val procFee = "%.2f".format(
+                    (((bankEMITenureDataModal?.processingFee)?.toDouble())?.div(100)).toString()
+                        .toDouble()
+                )
+                textBlockList.add(sigleLineformat("PROC-FEE", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol $procFee", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+            }
+        }
 
-        textBlockList.add(sigleLineformat("CASH BACK:", AlignMode.LEFT))
+        if (!TextUtils.isEmpty(bankEMITenureDataModal?.processingRate)) {
+            val procFeeAmount =
+                bankEMITenureDataModal?.processingRate?.toFloat()?.div(100)
+            val pfeeData: Int? = procFeeAmount?.toInt()
+            if ((pfeeData.toString()) != "0") {
+                val procFeeAmount =
+                    "%.2f".format(
+                        bankEMITenureDataModal?.processingRate?.toFloat()?.div(100)
+                    ) + " %"
+
+                textBlockList.add(sigleLineformat("PROC-FEE", AlignMode.LEFT))
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol $procFeeAmount",
+                        AlignMode.RIGHT
+                    )
+                )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+            }
+        }
+        if (bankEMITenureDataModal != null) {
+            if (!TextUtils.isEmpty(bankEMITenureDataModal.totalProcessingFee)) {
+                if (!(bankEMITenureDataModal.totalProcessingFee).equals("0")) {
+                    val totalProcFeeAmount =
+                        "%.2f".format(bankEMITenureDataModal.totalProcessingFee.toFloat() / 100)
+
+                    textBlockList.add(sigleLineformat("PROC-FEE AMOUNT", AlignMode.LEFT))
+                    textBlockList.add(
+                        sigleLineformat(
+                            "$currencySymbol $totalProcFeeAmount",
+                            AlignMode.RIGHT
+                        )
+                    )
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                }
+            }
+        }
+
+        var cashBackPercentHeadingText = ""
+        var cashBackAmountHeadingText = ""
+        var islongTextHeading = true
+        if (bankEMIIssuerTAndCDataModal != null) {
+            when (bankEMIIssuerTAndCDataModal.issuerID) {
+                "51" -> {
+                    cashBackPercentHeadingText = "Mfg/Mer Payback"
+                    cashBackAmountHeadingText = "Mfg/Mer-"
+                    //  cashBackAmountHeadingText = "Mfg/Mer Payback Amt"
+                }
+                "64" -> {
+                    cashBackPercentHeadingText = "Mfg/Mer Payback"
+                    cashBackAmountHeadingText = "Mfg/Mer-"
+                    //  cashBackAmountHeadingText = "Mfg/Mer Payback Amt"
+                }
+                "52" -> {
+                    cashBackPercentHeadingText = "Mfg/Mer Cashback"
+                    cashBackAmountHeadingText = "Mfg/Mer-"
+                    //   cashBackAmountHeadingText = "Mfg/Mer Cashback Amt"
+                }
+                "55" -> {
+                    cashBackPercentHeadingText = "Mer/Mfr Cashback"
+                    cashBackAmountHeadingText = "Mer/Mfr-"
+                    //  cashBackAmountHeadingText = "Mer/Mfr Cashback Amt"
+                }
+                else -> {
+                    islongTextHeading = false
+                    cashBackPercentHeadingText = "CASH BACK"
+                    cashBackAmountHeadingText = "TOTAL CASH BACK"
+                }
+            }
+
+
+            when (bankEMIIssuerTAndCDataModal.issuerID) {
+                "51", "64" -> {
+                    nextLineAppendStr = "Payback Amt"
+                }
+                "52", "55" ,"54"-> {
+                    nextLineAppendStr = "Cashback Amt"
+                }
+
+            }
+        }
+
+        //region=============CashBack CalculatedValue====================
+        if (!TextUtils.isEmpty(bankEMITenureDataModal?.cashBackCalculatedValue)) {
+            if (islongTextHeading) {
+                textBlockList.add(sigleLineformat(cashBackPercentHeadingText, AlignMode.LEFT))
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol ${bankEMITenureDataModal?.cashBackCalculatedValue}",
+                        AlignMode.RIGHT
+                    )
+                )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+            } else {
+                textBlockList.add(sigleLineformat(cashBackPercentHeadingText, AlignMode.LEFT))
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol ${bankEMITenureDataModal?.cashBackCalculatedValue}",
+                        AlignMode.RIGHT
+                    )
+                )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+            }
+        }
+
+        if (!TextUtils.isEmpty(bankEMITenureDataModal?.cashBackAmount) && bankEMITenureDataModal?.cashBackAmount != "0") {
+            val cashBackAmount = "%.2f".format(
+                bankEMITenureDataModal?.cashBackAmount?.toFloat()
+                    ?.div(100)
+            )
+
+
+            textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
+            textBlockList.add(sigleLineformat(" ", AlignMode.RIGHT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+
+            textBlockList.add(sigleLineformat(nextLineAppendStr, AlignMode.LEFT))
+            textBlockList.add(sigleLineformat(":$currencySymbol $cashBackAmount", AlignMode.RIGHT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+        } else {
+            val cashBackAmount = "%.2f".format(
+                bankEMITenureDataModal?.cashBackAmount?.toFloat()
+                    ?.div(100)
+            )
+
+
+            textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
+            textBlockList.add(sigleLineformat("$currencySymbol $cashBackAmount", AlignMode.RIGHT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+        }
+        println("bankid ${bankEMIIssuerTAndCDataModal?.issuerID}")
+
+        var discountPercentHeadingText = ""
+        var discountAmountHeadingText = ""
+        islongTextHeading = true
+        when (bankEMIIssuerTAndCDataModal?.issuerID) {
+            "51" -> {
+                discountPercentHeadingText = "Mfg/Mer Payback"
+                discountAmountHeadingText = "Mfg/Mer-"
+                //  discountAmountHeadingText = "Mfg/Mer Payback Amt"
+            }
+            "64" -> {
+                discountPercentHeadingText = "Mfg/Mer Payback"
+                discountAmountHeadingText = "Mfg/Mer-"
+                // discountAmountHeadingText = "Mfg/Mer Payback Amt"
+            }
+            "52" -> {
+                discountPercentHeadingText = "Mfg/Mer Cashback"
+                discountAmountHeadingText = "Mfg/Mer-"
+                //  discountAmountHeadingText = "Mfg/Mer Cashback Amt"
+            }
+
+            "55" -> {
+                discountPercentHeadingText = "Mer/Mfr Cashback"
+                discountAmountHeadingText = "Mer/Mfr"
+                //  discountAmountHeadingText = "Mer/Mfr Cashback Amt"
+            }
+
+            else -> {
+                islongTextHeading = false
+                discountPercentHeadingText = "DISCOUNT"
+                discountAmountHeadingText = "TOTAL DISCOUNT"
+            }
+        }
+        if (!TextUtils.isEmpty(bankEMITenureDataModal?.discountCalculatedValue)) {
+            if (islongTextHeading) {
+
+                textBlockList.add(sigleLineformat(cashBackPercentHeadingText, AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol ${bankEMITenureDataModal?.discountCalculatedValue}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+            } else {
+                textBlockList.add(sigleLineformat(discountPercentHeadingText, AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol ${bankEMITenureDataModal?.discountCalculatedValue}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+            }
+        }
+        if (!TextUtils.isEmpty(bankEMITenureDataModal?.discountAmount) && bankEMITenureDataModal?.discountAmount != "0") {
+            val discAmount =
+                "%.2f".format(bankEMITenureDataModal?.discountAmount?.toFloat()?.div(100))
+
+            if (islongTextHeading) {
+
+              /*  textBlockList.add(sigleLineformat(discountPercentHeadingText, AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()*/
+
+                textBlockList.add(sigleLineformat(nextLineAppendStr, AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol ${discAmount}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+
+            } else {
+
+                textBlockList.add(sigleLineformat(nextLineAppendStr, AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol ${discAmount}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+            }
+        }
+
+
+
+
+
+
+        textBlockList.add(sigleLineformat("LOAN AMOUNT", AlignMode.LEFT))
         textBlockList.add(
             sigleLineformat(
-                "$currencySymbol:${bankEMITenureDataModal?.cashBackAmount}",
+                "$currencySymbol:${loanamt}",
                 AlignMode.RIGHT
             )
         )
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
-        textBlockList.add(sigleLineformat("TOTAL CASH BACK:", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("MONTHLY EMI", AlignMode.LEFT))
+        var emiAmount = bankEMITenureDataModal?.emiAmount?.toInt()?.let { divideAmountBy100(it).toString() }
         textBlockList.add(
             sigleLineformat(
-                "$currencySymbol:${bankEMITenureDataModal?.cashBackCalculatedValue}",
+                "$currencySymbol:${emiAmount}",
                 AlignMode.RIGHT
             )
         )
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
-        textBlockList.add(sigleLineformat("LOAN AMOUNT:", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("TOTAL INTEREST", AlignMode.LEFT))
+        var totalInterestPay = bankEMITenureDataModal?.totalInterestPay?.toInt()?.let { divideAmountBy100(it).toString() }
         textBlockList.add(
             sigleLineformat(
-                "$currencySymbol:${bankEMITenureDataModal?.loanAmount}",
-                AlignMode.RIGHT
-            )
-        )
-        printer?.addMixStyleText(textBlockList)
-        textBlockList.clear()
-
-        textBlockList.add(sigleLineformat("MONTHLY EMI:", AlignMode.LEFT))
-        textBlockList.add(
-            sigleLineformat(
-                "$currencySymbol:${bankEMITenureDataModal?.emiAmount}",
-                AlignMode.RIGHT
-            )
-        )
-        printer?.addMixStyleText(textBlockList)
-        textBlockList.clear()
-
-        textBlockList.add(sigleLineformat("TOTAL INTEREST:", AlignMode.LEFT))
-        textBlockList.add(
-            sigleLineformat(
-                "$currencySymbol:${bankEMITenureDataModal?.totalInterestPay}",
+                "$currencySymbol:${totalInterestPay}",
                 AlignMode.RIGHT
             )
         )
@@ -560,9 +780,10 @@ class PrintUtil(context: Context?) {
         textBlockList.clear()
 
         textBlockList.add(sigleLineformat("TOTAL AMT(With Int)", AlignMode.LEFT))
+        var totalEmiPay = bankEMITenureDataModal?.totalEmiPay?.toInt()?.let { divideAmountBy100(it).toString() }
         textBlockList.add(
             sigleLineformat(
-                "$currencySymbol:${bankEMITenureDataModal?.totalEmiPay}",
+                "$currencySymbol:${totalEmiPay}",
                 AlignMode.RIGHT
             )
         )
@@ -574,8 +795,6 @@ class PrintUtil(context: Context?) {
     private fun printBrandTnC(batchTable: BatchTable) {
 
         val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
-        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
-        val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
         val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
         val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
@@ -586,7 +805,7 @@ class PrintUtil(context: Context?) {
         println(jsonRespp)
 
         logger("getting issuer tnc=",jsonRespp.toString(),"e")
-        printSeperator()
+
         sigleLineText("CUSTOMER CONSENT FOR EMI", AlignMode.CENTER)
         //region=======================Issuer Header Terms and Condition=================
         var issuerHeaderTAndC: List<String>? = null
@@ -601,6 +820,8 @@ class PrintUtil(context: Context?) {
                     issuerTAndCData.headerTAndC?.split(SplitterTypes.POUND.splitter)
 
                 }
+            logger("getting header tnc=",issuerTAndCData.headerTAndC.toString(),"e")
+            logger("getting footer tnc=",issuerTAndCData.footerTAndC.toString(),"e")
         }
         if (issuerHeaderTAndC?.isNotEmpty() == true) {
             for (i in issuerHeaderTAndC.indices) {
@@ -611,14 +832,20 @@ class PrintUtil(context: Context?) {
                         val chunks: List<String> = chunkTnC(emiTnc, limit)
                         for (st in chunks) {
                             logger("issuerHeaderTAndC", st, "e")
-                            textBlockList.add(
+                            printer?.setHzScale(HZScale.SC1x1)
+                            printer?.setHzSize(HZSize.DOT24x16)
+                            printer?.addText( AlignMode.LEFT, st)
+                         /*   textBlockList.add(
                                 sigleLineformat(
                                     st,
-                                    AlignMode.LEFT
+                                    AlignMode.CENTER
                                 )
                             )
                             printer?.addMixStyleText(textBlockList)
-                            textBlockList.clear()
+                            textBlockList.clear()*/
+                   /*         textBlockList.add(sigleLineformat(st, AlignMode.LEFT))
+                            printer?.addMixStyleText(textBlockList)
+                            textBlockList.clear()*/
                         }
                     }
                 }
@@ -644,10 +871,14 @@ class PrintUtil(context: Context?) {
 
         for (st in chunk) {
             logger("Brand Tnc", st, "e")
-            sigleLineText(
+        /*    sigleLineText(
                 st.replace(bankEMIFooterTAndCSeparator, "")
-                    .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
-            )
+                    .replace(Companion.disclaimerIssuerClose, ""), AlignMode.CENTER
+            )*/
+            printer?.setHzScale(HZScale.SC1x1)
+            printer?.setHzSize(HZSize.DOT24x16)
+            printer?.addText( AlignMode.LEFT,  st.replace(bankEMIFooterTAndCSeparator, "")
+                .replace(Companion.disclaimerIssuerClose, ""))
 /*            textBlockList.add(
                 sigleLineformat(
                     st.replace(bankEMIFooterTAndCSeparator, "")
@@ -672,14 +903,18 @@ class PrintUtil(context: Context?) {
                     val chunks: List<String> = chunkTnC(emiTnc, limit)
                     for (st in chunks) {
                         logger("emiCustomerConsent", st, "e")
-                        textBlockList.add(
+                 /*       textBlockList.add(
                             sigleLineformat(
                                 st.replace(bankEMIFooterTAndCSeparator, "")
-                                    .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
+                                    .replace(Companion.disclaimerIssuerClose, ""), AlignMode.CENTER
                             )
                         )
                         printer?.addMixStyleText(textBlockList)
-                        textBlockList.clear()
+                        textBlockList.clear()*/
+                        printer?.setHzScale(HZScale.SC1x1)
+                        printer?.setHzSize(HZSize.DOT24x16)
+                        printer?.addText( AlignMode.LEFT,  st.replace(bankEMIFooterTAndCSeparator, "")
+                            .replace(Companion.disclaimerIssuerClose, ""))
                     }
                 }
 
@@ -748,6 +983,7 @@ class PrintUtil(context: Context?) {
         val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
         val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
+
         val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
         sigleLineText("-----**Product Details**-----", AlignMode.CENTER)
         if (brandEMIMasterDataModal != null) {
@@ -861,11 +1097,15 @@ class PrintUtil(context: Context?) {
                 if (tenureTAndC != null) {
                     for (st in tenureTAndC) {
                         logger("TNC", st, "e")
-                        textBlockList.add(sigleLineformat(st, AlignMode.CENTER))
+          /*              textBlockList.add(sigleLineformat(st, AlignMode.CENTER))
 
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
-
+*/
+                        printer?.setHzScale(HZScale.SC1x1)
+                        printer?.setHzSize(HZSize.DOT24x16)
+                        printer?.addText( AlignMode.LEFT,  st.replace(st, "")
+                            .replace(Companion.disclaimerIssuerClose, ""))
                     }
                 }
                 printSeperator()
@@ -911,11 +1151,11 @@ class PrintUtil(context: Context?) {
                     textBlockList.clear()
                     sigleLineText("DETAIL REPORT", AlignMode.CENTER)
 
-
+                    val terminalData = getTptData()
 
                     textBlockList.add(
                         sigleLineformat(
-                            "MID:${batch[0].receiptData?.mid}",
+                            "MID:${terminalData?.merchantId}",
                             AlignMode.LEFT
                         )
                     )
@@ -1057,7 +1297,7 @@ class PrintUtil(context: Context?) {
                             )
                             textBlockList.add(
                                 sigleLineformat(
-                                    "0000*0000",
+                                    "${b.receiptData?.maskedPan}",
                                     AlignMode.RIGHT
                                 )
                             )
@@ -1147,12 +1387,12 @@ class PrintUtil(context: Context?) {
                                 printer?.addMixStyleText(textBlockList)
                                 textBlockList.clear()
                             }
-
+                            val terminalData = getTptData()
                             if (iteration > 0) {
                                 printSeperator()
                                 textBlockList.add(
                                     sigleLineformat(
-                                        "MID:${batch[frequency].receiptData?.tid}",
+                                        "MID:${terminalData?.merchantId}",
                                         AlignMode.LEFT
                                     )
                                 )
@@ -1263,11 +1503,11 @@ class PrintUtil(context: Context?) {
                     textBlockList.clear()
                     sigleLineText("REVERSAL REPORT", AlignMode.CENTER)
 
-
+                    val terminalData = getTptData()
 
                     textBlockList.add(
                         sigleLineformat(
-                            "MID:${batch[0].receiptData?.mid}",
+                            "MID:${terminalData?.merchantId}",
                             AlignMode.LEFT
                         )
                     )
@@ -1503,12 +1743,12 @@ class PrintUtil(context: Context?) {
                                 printer?.addMixStyleText(textBlockList)
                                 textBlockList.clear()
                             }
-
+                            val terminalData = getTptData()
                             if (iteration > 0) {
                                 printSeperator()
                                 textBlockList.add(
                                     sigleLineformat(
-                                        "MID:${batch[frequency].receiptData?.tid}",
+                                        "MID:${terminalData?.merchantId}",
                                         AlignMode.LEFT
                                     )
                                 )
