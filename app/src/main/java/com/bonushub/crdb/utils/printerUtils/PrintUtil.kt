@@ -230,6 +230,8 @@ class PrintUtil(context: Context?) {
                     }
                    "EMI SALE" -> {
                         printEMISale(batchTable)
+                       printSeperator()
+                       printBrandTnC(batchTable)
                     }
 
                     "REVERSAL" -> {
@@ -257,7 +259,7 @@ class PrintUtil(context: Context?) {
 
                 //region=====================BRAND TAndC===============
                 if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
-                    printBrandTnC(batchTable)
+
                     printProduactData(batchTable)
                 }
 
@@ -274,7 +276,7 @@ class PrintUtil(context: Context?) {
                         sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER)
                     receiptDetail.cardHolderName?.let { sigleLineText(it, AlignMode.CENTER) }
                 }
-                textBlockList.add(sigleLineformat("I am satisfied with goods recived and agree to pay issuer agreenent.", AlignMode.CENTER))
+                textBlockList.add(sigleLineformat("I am satisfied with goods received and agree to pay issuer agreenent.", AlignMode.CENTER))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
                 sigleLineText(copyType.pName, AlignMode.CENTER)
@@ -798,6 +800,7 @@ class PrintUtil(context: Context?) {
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
         val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
         val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
+        var brandId = brandEMIMasterDataModal?.brandID
 
         val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
         val jsonRespp = Gson().toJson(issuerTAndCData)
@@ -857,7 +860,7 @@ class PrintUtil(context: Context?) {
 
         //region ======================Brand terms and Condition=========================
 
-        val brandId = "3"
+        //val brandId = brandEMIMasterDataModal?.brandID
         val data = getBrandTAndCData()
         val jsonResp = Gson().toJson(data)
 
@@ -865,20 +868,24 @@ class PrintUtil(context: Context?) {
         logger("size=",data?.size.toString(),"e")
         logger("getting=",data.toString(),"e")
         println(jsonResp)
-        val brandTnc = getBrandTAndCDataByBrandId(brandId)
-        logger("Brand Tnc", brandTnc, "e")
-        val chunk: List<String> = chunkTnC(brandTnc)
+       if (brandId != null) {
+           val brandTnc = getBrandTAndCDataByBrandId(brandId)
 
-        for (st in chunk) {
-            logger("Brand Tnc", st, "e")
-        /*    sigleLineText(
+           logger("Brand Tnc", brandTnc, "e")
+           val chunk: List<String> = chunkTnC(brandTnc)
+
+           for (st in chunk) {
+               logger("Brand Tnc", st, "e")
+               /*    sigleLineText(
                 st.replace(bankEMIFooterTAndCSeparator, "")
                     .replace(Companion.disclaimerIssuerClose, ""), AlignMode.CENTER
             )*/
-            printer?.setHzScale(HZScale.SC1x1)
-            printer?.setHzSize(HZSize.DOT24x16)
-            printer?.addText( AlignMode.LEFT,  st.replace(bankEMIFooterTAndCSeparator, "")
-                .replace(Companion.disclaimerIssuerClose, ""))
+               printer?.setHzScale(HZScale.SC1x1)
+               printer?.setHzSize(HZSize.DOT24x16)
+               printer?.addText(
+                   AlignMode.LEFT, st.replace(bankEMIFooterTAndCSeparator, "")
+                       .replace(Companion.disclaimerIssuerClose, "")
+               )
 /*            textBlockList.add(
                 sigleLineformat(
                     st.replace(bankEMIFooterTAndCSeparator, "")
@@ -888,8 +895,8 @@ class PrintUtil(context: Context?) {
             printer?.addMixStyleText(textBlockList)
             textBlockList.clear()*/
 
-        }
-
+           }
+       }
         //endregion
         //region=====================SCHEME TAndC===============
         val emiCustomerConsent =
