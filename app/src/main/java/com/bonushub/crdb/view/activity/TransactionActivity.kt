@@ -355,7 +355,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                                         }
                                                         is GenericResponse.Error -> {
-                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "in error ${genericResp.errorMessage}", "e")
                                                             logger("error:- ", "save transaction sync later", "e")
 
                                                             val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
