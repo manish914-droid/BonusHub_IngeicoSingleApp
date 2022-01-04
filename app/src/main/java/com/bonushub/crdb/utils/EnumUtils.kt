@@ -594,3 +594,14 @@ enum class CardEntryMode(val _name: String, val _value: String){
     MANUAL("MANUAL","0913- ctls emv with pin")
 }
 // end region
+
+// region
+enum class TestEmiItem(val id:String, val _name: String){
+    BASE_TID("1", "Base TID"),
+    OFFUS_TID("2", "OFFUS TID"),
+    _3_M_TID("3", "3 M TID"),
+    _6_M_TID("6", "6 M TID"),
+    _9_M_TID("9", "9 M TID"),
+    _12_M_TID("12", "12 M TID")
+}
+// end region

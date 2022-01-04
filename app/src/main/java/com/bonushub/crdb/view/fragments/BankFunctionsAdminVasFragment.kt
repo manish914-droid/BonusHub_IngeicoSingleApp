@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.fragments
 
+import android.app.Dialog
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -19,10 +20,13 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdminVasAdapter
 import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.crdb.view.fragments.tets_emi.TestEmiFragment
+import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.pax.utils.BankFunctionsAdminVasItem
@@ -43,6 +47,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     var binding:FragmentBankFunctionsAdminVasBinding? = null
 
     private val initViewModel : InitViewModel by viewModels()
+    private val bankFunctionsViewModel : BankFunctionsViewModel by viewModels()
+
     // for init`
     private var iDialog: IDialog? = null
 
@@ -162,6 +168,41 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
             BankFunctionsAdminVasItem.TEST_EMI ->{
                 // TEST EMI depends on bank emi
+                if(AppPreference.getLogin()){
+
+                    if(checkInternetConnection())
+                    {
+                        DialogUtilsNew1.showDialog(activity,getString(R.string.super_admin_password),getString(R.string.hint_enter_super_admin_password),object:OnClickDialogOkCancel{
+                            override fun onClickOk(dialog: Dialog, password: String) {
+
+                                logger("password",password)
+                                bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{
+
+                                    if(it)
+                                    {
+                                        dialog.dismiss()
+                                        (activity as NavigationActivity).transactFragment(TestEmiFragment(), true)
+
+
+                                    }else{
+                                        ToastUtils.showToast(requireContext(),R.string.invalid_password)
+                                    }
+                                })
+
+                            }
+
+                            override fun onClickCancel() {
+
+                            }
+
+                        }, false)
+
+                    }else{
+                        ToastUtils.showToast(requireContext(),getString(R.string.no_internet_available_please_check_your_internet))
+                    }
+                }else{
+                    ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
+                }
 
             }
 

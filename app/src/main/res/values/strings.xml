@@ -260,5 +260,8 @@
     <string name="sale">Normal Sale</string>
     <string name="emi">Insta EMI</string>
     <string name="select_tenure_txt">Select Tenure</string>
-    <string name="transaction_syncing_msg">Transaction Syncing...</string>
+    <string name="transaction_syncing_msg">Transaction Syncing…</string>
+
+    <!--Test EMI-->
+    <string name="test_emi_header">TEST EMI</string>
 </resources>
