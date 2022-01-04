@@ -1620,12 +1620,15 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     fun creatCardProcessingModelData(receiptDetail: ReceiptDetail) {
+        logger("",""+receiptDetail)
         globalCardProcessedModel.setProcessingCode("920001")
         receiptDetail.txnAmount?.let { globalCardProcessedModel.setTransactionAmount(it.toLong()) }
         receiptDetail.txnOtherAmount?.let { globalCardProcessedModel.setOtherAmount(it.toLong()) }
         globalCardProcessedModel.setMobileBillExtraData(Pair(mobileNumber, billNumber))
         receiptDetail.stan?.let { globalCardProcessedModel.setAuthRoc(it) }
-        globalCardProcessedModel.setCardMode("0553- emv with pin")
+        //globalCardProcessedModel.setCardMode("0553- emv with pin")
+        logger("mode22 ->",CardMode(receiptDetail.entryMode?:"",receiptDetail.isVerifyPin?:false),"e")
+        globalCardProcessedModel.setCardMode(CardMode(receiptDetail.entryMode?:"",receiptDetail.isVerifyPin?:false))
         globalCardProcessedModel.setRrn(receiptDetail.rrn)
         receiptDetail.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
         globalCardProcessedModel.setTid(receiptDetail.tid)
@@ -1639,6 +1642,62 @@ class TransactionActivity : BaseActivityNew() {
         globalCardProcessedModel.setTimeStamp(receiptDetail.dateTime!!)
         globalCardProcessedModel.setPosEntryMode("0553")
         receiptDetail.maskedPan?.let { globalCardProcessedModel.setPanNumberData(it) }
+    }
+
+    fun CardMode(entryMode:String, isPinVerify:Boolean):String
+    {
+        logger("entryMode",""+entryMode,"e")
+        when(entryMode){
+
+            CardEntryMode.EMV_WITH_PIN._name -> {
+                if(isPinVerify){
+                    return CardEntryMode.EMV_WITH_PIN._value
+                }else {
+                    return CardEntryMode.EMV_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.EMV_FALLBACK_SWIPE_WITH_PIN._name -> {
+                if(isPinVerify){
+                    return CardEntryMode.EMV_FALLBACK_SWIPE_WITH_PIN._value
+                }else {
+                    return CardEntryMode.EMV_FALLBACK_SWIPE_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.SWIPE_WITH_PIN._name -> {
+                if(isPinVerify){
+                    return CardEntryMode.SWIPE_WITH_PIN._value
+                }else {
+                    return CardEntryMode.SWIPE_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.CTLS_SWIPE_NO_PIN._name -> {
+                if(isPinVerify){
+                    return CardEntryMode.CTLS_SWIPE_WITH_PIN._value
+                }else {
+                    return CardEntryMode.CTLS_SWIPE_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.CTLS_EMV_NO_PIN._name -> {
+                if(isPinVerify){
+                    return CardEntryMode.CTLS_EMV_WITH_PIN._value
+                }else {
+                    return CardEntryMode.CTLS_EMV_NO_PIN._value
+                }
+
+            }
+            else -> {
+                return ""
+            }
+        }
+
     }
 
 

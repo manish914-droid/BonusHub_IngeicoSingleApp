@@ -577,3 +577,20 @@ enum class EPrintCopyType(val pName: String) {
     MERCHANT("**MERCHANT COPY**"), CUSTOMER("**CUSTOMER COPY**"), DUPLICATE("**DUPLICATE COPY**");
 }
 // end region
+
+// region
+enum class CardEntryMode(val _name: String, val _value: String){
+    EMV_WITH_PIN("INSERT","0553- EMV with pin"),
+    EMV_NO_PIN("INSERT","0553- EMV No pin"),
+    EMV_OFFLINE_PIN("INSERT","0554- EMV offline pin"),
+    EMV_FALLBACK_SWIPE_WITH_PIN("SWIPE","0623- EMV fallback to swipe with pin"),
+    EMV_FALLBACK_SWIPE_NO_PIN("SWIPE","0620- Emv fallback to swipe no pin - 620"),
+    SWIPE_WITH_PIN("SWIPE","0524- Swipe with pin"),
+    SWIPE_NO_PIN("SWIPE","0523- Swipe No pin"),
+    CTLS_SWIPE_NO_PIN("SWIPE","0921- CTLS swipe no pin"),
+    CTLS_SWIPE_WITH_PIN("SWIPE","0923- CTLS swipe with pin"),
+    CTLS_EMV_NO_PIN("CLESS_EMV","0911- CTLS emv no pin"),
+    CTLS_EMV_WITH_PIN("CLESS_EMV","0913- ctls emv with pin"),
+    MANUAL("MANUAL","0913- ctls emv with pin")
+}
+// end region
