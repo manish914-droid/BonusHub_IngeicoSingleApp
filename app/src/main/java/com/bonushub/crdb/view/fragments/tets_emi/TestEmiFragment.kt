@@ -12,6 +12,9 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentTestEmiBinding
 import com.bonushub.crdb.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.view.activity.NavigationActivity
+import com.bonushub.crdb.view.fragments.NewInputAmountFragment
+import com.bonushub.pax.utils.EDashboardItem
 import com.bonushub.pax.utils.TestEmiItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,6 +70,14 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
     }
 
     override fun testEmiItemClick(testEmiItem: TestEmiItem) {
+
+        (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable("type", EDashboardItem.TEST_EMI)
+                putString(NavigationActivity.INPUT_SUB_HEADING, "")
+                putString("TestEmiOption", TestEmiItem.BASE_TID.id)
+            }
+        }, true)
 
         when(testEmiItem){
 
