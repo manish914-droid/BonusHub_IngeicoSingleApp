@@ -2204,10 +2204,17 @@ class PrintUtil(context: Context?) {
                             }?.let {
                                 textBlockList.add(it)
                             }
-                            textBlockList.add(sigleLineformat(amt, AlignMode.CENTER))
-                            textBlockList.add(
+                            //textBlockList.add(sigleLineformat(amt, AlignMode.CENTER)) // old
+                            textBlockList.add(sigleLineformat("${amt} ${getCurrencySymbol(tpt)}", AlignMode.CENTER))
+                            /*textBlockList.add(
                                 sigleLineformat(
                                     "${m.count} ${getCurrencySymbol(tpt)}",
+                                    AlignMode.RIGHT
+                                )
+                            )*/
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${m.count}",
                                     AlignMode.RIGHT
                                 )
                             )
@@ -2257,12 +2264,12 @@ class PrintUtil(context: Context?) {
                                 )
                             )
                             textBlockList.add(
-                                sigleLineformat(
-                                    "%.2f".format(
-                                        (((m.total).toDouble()).div(
-                                            100
-                                        )).toString().toDouble()
-                                    ), AlignMode.CENTER
+                                sigleLineformat("${"%.2f".format(
+                                    (((m.total).toDouble()).div(
+                                        100
+                                    )).toString().toDouble()
+                                )} ${getCurrencySymbol(tpt)}"
+                                    , AlignMode.CENTER
                                 )
                             )
                             textBlockList.add(
