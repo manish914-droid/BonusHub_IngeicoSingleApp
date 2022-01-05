@@ -129,6 +129,22 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
             listner = object : OnOperationListener.Stub() {
                 override fun onCompleted(p0: OperationResult?) {
                     val response = p0?.value
+                    if (response is SettlementResponse) {
+                        response.apply {
+                            """
+                               Response_Code = $responseCode
+                               API_Response_Status = $status
+                               Response_Code = $responseCode
+                               Batch_number = $batchNumber
+                               App_version = $appVersion
+                               Release_date = $releaseDate
+                               TIDStatusList = [${tidStatusList.joinToString()}]
+                               TIDs = [${tidList.joinToString()}]
+                            """.trimIndent().apply { println(this) }
+                        }
+                    }
+
+
                     val settlementResponse = p0?.value as? SettlementResponse
                     var ingencioresponse          = IngenicoSettlementResponse()
                     when (settlementResponse?.responseCode) {

@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,13 +16,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.databinding.ItemSettlementBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
-import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
@@ -31,16 +27,10 @@ import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchReversalViewModel
-import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
-import com.ingenico.hdfcpayment.listener.OnOperationListener
-import com.ingenico.hdfcpayment.request.SettlementRequest
-import com.ingenico.hdfcpayment.response.OperationResult
-import com.ingenico.hdfcpayment.response.SettlementResponse
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import java.util.ArrayList
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,6 +49,8 @@ class SettlementFragment : Fragment() {
     private var iDialog: IDialog? = null
 
     private val batchReversalViewModel : BatchReversalViewModel by viewModels()
+
+    private var ioSope = CoroutineScope(Dispatchers.IO)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -96,6 +88,12 @@ class SettlementFragment : Fragment() {
                 dataList.clear()
                 dataList.addAll(batchData as MutableList<BatchTable>)
                 setUpRecyclerView()
+
+           /* ioSope.launch {
+                var listofTxnTid =  checkSettlementTid(dataList)
+                println("Total txn tid "+listofTxnTid)
+            }*/
+
             }
         //endregion
         //region================================RecyclerView On Scroll Extended Floating Button Hide/Show:-
@@ -190,8 +188,14 @@ class SettlementFragment : Fragment() {
                         activity
                     ) { detailPrintStatus ->
                     }
-                    settlementViewModel.settlementResponse()
-                    settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
+
+
+                        ioSope.launch {
+                            var listofTxnTid =  checkSettlementTid(dataList)
+                            settlementViewModel.settlementResponse(listofTxnTid)
+                        }
+
+                        settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
 
                         when (result.status) {
                             Status.SUCCESS -> {
@@ -278,6 +282,9 @@ internal class SettlementAdapter(private val list: List<BatchTable>) :
         holder.binding.tvBaseAmount.text = amount
         holder.binding.tvTransactionType.text = getTransactionTypeName(list[p1].transactionType)
         holder.binding.tvTransactionDate.text = list[p1].receiptData?.dateTime
+
+
+
 
     }
 

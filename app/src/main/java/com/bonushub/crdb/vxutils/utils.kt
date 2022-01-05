@@ -41,6 +41,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 private var listofTids= ArrayList<String>()
+private var listofTxnTids= ArrayList<String>()
 
 //Below method is used to encrypt Pannumber data:-
 fun getEncryptedPanorTrackData(panNumber: String,isTrackData: Boolean): String {
@@ -377,6 +378,18 @@ fun showMobileBillDialog(
         dialog?.show()
 
     }
+}
+
+
+//To check Initiaization Status
+suspend fun checkSettlementTid(batchData: MutableList<BatchTable>): ArrayList<String> {
+    listofTxnTids.clear()
+
+    val distinctByNameCusts = batchData.distinctBy{it -> it.receiptData?.tid}
+    distinctByNameCusts.forEach{ it ->
+        listofTxnTids.add(it.receiptData?.tid ?: "")
+    }
+    return listofTxnTids
 }
 
 
