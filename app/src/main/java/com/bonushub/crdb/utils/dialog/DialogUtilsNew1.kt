@@ -112,7 +112,8 @@ class DialogUtilsNew1 {
 
                 if (isNumeric||isTID) {
                     if(isTID){
-                        invoiceET.inputType = InputType.TYPE_CLASS_NUMBER
+                        //invoiceET.setKeyListener(DigitsKeyListener.getInstance("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
+                        invoiceET.inputType = InputType.TYPE_CLASS_TEXT
                     }else{
                         invoiceET.inputType = InputType.TYPE_CLASS_NUMBER
                         invoiceET.setKeyListener(DigitsKeyListener.getInstance("0123456789."))

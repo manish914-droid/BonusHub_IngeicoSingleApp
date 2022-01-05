@@ -456,7 +456,7 @@ sealed class VxEvent {
 // written by kushal
 // region for bank functions
 enum class BankFunctionsItem(val _name: String){
-    ADMIN_VAS("ADMIN VAS"),
+    ADMIN_VAS("BH ADMIN"),
     ADMIN_PAYMENT("ADMIN PAYMENT")
 }
 // end region
