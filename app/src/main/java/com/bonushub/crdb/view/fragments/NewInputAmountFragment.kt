@@ -44,6 +44,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 import com.bonushub.pax.utils.BhTransactionType
+import com.bonushub.pax.utils.UiAction
 
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,6 +58,7 @@ class NewInputAmountFragment : Fragment() {
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
     private lateinit var eDashBoardItem: EDashboardItem
+    private var testEmiTxnType: String? = null
     var tpt: TerminalParameterTable? = null
     public var hdfctpt: HDFCTpt? = null
     private var iDialog: IDialog? = null
@@ -115,6 +117,7 @@ class NewInputAmountFragment : Fragment() {
         brandEmiProductData =
             arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
+        testEmiTxnType = (arguments?.getSerializable("TestEmiOption") ?: "") as? String
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
@@ -555,7 +558,12 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             }
-            EDashboardItem.BANK_EMI -> {
+            EDashboardItem.BANK_EMI, EDashboardItem.TEST_EMI -> {
+
+                var uiAction = UiAction.BANK_EMI
+                if (eDashBoardItem == EDashboardItem.TEST_EMI) {
+                    uiAction = UiAction.TEST_EMI
+                }
 
                 if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
                     maxAmountLimitDialog(iDialog,maxTxnLimit)
@@ -834,7 +842,7 @@ class NewInputAmountFragment : Fragment() {
                 putSerializable("mobileNum", binding?.mobNumbr?.text.toString())
                 putString("amt", amt)
 
-
+                putString("testEmiType", testEmiTxnType ?: "") // test emi
                 putBoolean("isBillRequire", isBillNumRequiredForBankEmi)
                 putBoolean("isSerialNumRequired", false)
 
@@ -849,7 +857,7 @@ class NewInputAmountFragment : Fragment() {
 
 
         } else {
-            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum
+            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum, testEmiTxnType = testEmiTxnType?:""
             )
 
         }

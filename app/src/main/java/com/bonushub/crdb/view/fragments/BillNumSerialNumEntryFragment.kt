@@ -126,7 +126,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
         }
         binding?.proceedBtn?.setOnClickListener {
             if (eDashBoardItem == EDashboardItem.BANK_EMI || eDashBoardItem == EDashboardItem.TEST_EMI) {
-                (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString())
+                (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(), testEmiTxnType = testEmiType?:"")
             } else if (eDashBoardItem == EDashboardItem.BRAND_EMI) {
                 navigateToTransaction()
 
