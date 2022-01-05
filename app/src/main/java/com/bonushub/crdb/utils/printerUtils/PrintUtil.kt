@@ -2261,15 +2261,13 @@ class PrintUtil(context: Context?) {
                                     "%.2f".format(
                                         (((m.total).toDouble()).div(
                                             100
-                                        )).toString() +" " + getCurrencySymbol(
-                                            tpt
-                                        ).toDouble()
+                                        )).toString().toDouble()
                                     ), AlignMode.CENTER
                                 )
                             )
                             textBlockList.add(
                                 sigleLineformat(
-                                    "  = " + m.count, AlignMode.RIGHT
+                                    "  = " + m.count , AlignMode.RIGHT
                                 )
                             )
                             printer?.addMixStyleText(textBlockList)
