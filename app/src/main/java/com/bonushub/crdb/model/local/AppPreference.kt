@@ -184,7 +184,7 @@ object AppPreference {
         v?.edit()?.putString(LAST_SUCCESS_RECEIPT_KEY, receiptDetail?:"")?.apply()
     }
 
-    fun saveLastReceiptDetails(receiptDetail:ReceiptDetail?){
+    fun saveLastReceiptDetails(receiptDetail:BatchTable?){
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         val jsonResp=Gson().toJson(receiptDetail)
         v?.edit()?.putString(LAST_SUCCESS_RECEIPT_KEY, jsonResp?:"")?.apply()
@@ -193,7 +193,7 @@ object AppPreference {
 
     //region kushal
     @JvmStatic
-    fun getLastSuccessReceipt(): ReceiptDetail? {
+    fun getLastSuccessReceipt(): BatchTable? {
         logger(TAG, "========getLastSuccessReceipt=========", "e")
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 
@@ -201,9 +201,9 @@ object AppPreference {
             try {
                 val str = v.getString(LAST_SUCCESS_RECEIPT_KEY, "")
                 if (!str.isNullOrEmpty()) {
-                    Gson().fromJson<ReceiptDetail>(
+                    Gson().fromJson<BatchTable>(
                         str,
-                        object : TypeToken<ReceiptDetail>() {}.type
+                        object : TypeToken<BatchTable>() {}.type
                     )
                 } else null
             } catch (ex: Exception) {

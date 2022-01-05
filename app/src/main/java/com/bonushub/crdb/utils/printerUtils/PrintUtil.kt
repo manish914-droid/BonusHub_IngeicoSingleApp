@@ -156,13 +156,20 @@ class PrintUtil(context: Context?) {
                     )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-
+                val isNoEmiOnlyCashBackAppl : Boolean =  bankEMITenureDataModal?.tenure=="1"
 
                 if (isReversal) {
                     sigleLineText("TRANSACTION FAILED", AlignMode.CENTER)
                 } else {
-                    receiptDetail.txnName?.let { sigleLineText(it, AlignMode.CENTER) }
+                    if(isNoEmiOnlyCashBackAppl) {
+                        sigleLineText("SALE", AlignMode.CENTER)
+                    }
+                    else{
+                        receiptDetail.txnName?.let { sigleLineText(it, AlignMode.CENTER) }
+                    }
                 }
+
+
 
                 textBlockList.add(
                     sigleLineformat(
@@ -230,9 +237,8 @@ class PrintUtil(context: Context?) {
                     }
                    "EMI SALE" -> {
                         printEMISale(batchTable)
-                       printSeperator()
-                       printBrandTnC(batchTable)
-                    }
+
+                   }
 
                     "REVERSAL" -> {
 
@@ -256,8 +262,12 @@ class PrintUtil(context: Context?) {
                     }
                 }
                 printSeperator()
-
                 //region=====================BRAND TAndC===============
+                if(txnName.equals("EMI SALE")){
+                    printBrandTnC(batchTable)
+                    printSeperator()
+                }
+                //region=====================BRAND PRODUACT DATA===============
                 if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
 
                     printProduactData(batchTable)
@@ -289,7 +299,7 @@ class PrintUtil(context: Context?) {
                     AlignMode.CENTER
                 )
 
-                if(!isNoEmiOnlyCashBackApplied!!) {
+                if(!isNoEmiOnlyCashBackAppl) {
                     val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
                     val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
                     //region=======================Issuer Footer Terms and Condition=================
@@ -456,13 +466,13 @@ class PrintUtil(context: Context?) {
         var currencySymbol: String? = "Rs"
         val terminalData = getTptData()
         currencySymbol = terminalData?.currencySymbol
-
+        val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
         val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
 
         textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
         val txnAmount =
-            (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+            (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
         logger("txnAmount",""+txnAmount)
         textBlockList.add(
             sigleLineformat(
@@ -472,6 +482,32 @@ class PrintUtil(context: Context?) {
         )
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
+
+        logger("INSTA DISCOUNT", "  ${bankEMITenureDataModal?.instantDiscount}")
+        if (bankEMITenureDataModal?.instantDiscount?.toIntOrNull() != null) {
+            if (bankEMITenureDataModal?.instantDiscount.isNotBlank() && bankEMITenureDataModal?.instantDiscount.toInt() > 0) {
+                val instantDis =
+                    "%.2f".format(
+                        (((bankEMITenureDataModal.instantDiscount).toDouble()).div(
+                            100
+                        )).toString().toDouble()
+                    )
+
+                textBlockList.add(sigleLineformat("INSTA DISCOUNT", AlignMode.LEFT))
+                val authAmount =
+                    (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol:${instantDis}",
+                        AlignMode.RIGHT
+                    )
+                )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+            }
+        }
+
 
         textBlockList.add(sigleLineformat("AUTH AMOUNT", AlignMode.LEFT))
         val authAmount =
@@ -657,16 +693,23 @@ class PrintUtil(context: Context?) {
             printer?.addMixStyleText(textBlockList)
             textBlockList.clear()
         } else {
-            val cashBackAmount = "%.2f".format(
-                bankEMITenureDataModal?.cashBackAmount?.toFloat()
-                    ?.div(100)
-            )
+            if (bankEMITenureDataModal?.cashBackAmount != "0") {
+                val cashBackAmount = "%.2f".format(
+                    bankEMITenureDataModal?.cashBackAmount?.toFloat()
+                        ?.div(100)
+                )
 
 
-            textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
-            textBlockList.add(sigleLineformat("$currencySymbol $cashBackAmount", AlignMode.RIGHT))
-            printer?.addMixStyleText(textBlockList)
-            textBlockList.clear()
+                textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol $cashBackAmount",
+                        AlignMode.RIGHT
+                    )
+                )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+            }
         }
         println("bankid ${bankEMIIssuerTAndCDataModal?.issuerID}")
 
@@ -856,6 +899,9 @@ class PrintUtil(context: Context?) {
 
         }
         //endregion
+        if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
+
+
 
 
         //region ======================Brand terms and Condition=========================
@@ -870,11 +916,9 @@ class PrintUtil(context: Context?) {
         println(jsonResp)
        if (brandId != null) {
            val brandTnc = getBrandTAndCDataByBrandId(brandId)
-
            logger("Brand Tnc", brandTnc, "e")
            val chunk: List<String> = chunkTnC(brandTnc)
-
-           for (st in chunk) {
+            for (st in chunk) {
                logger("Brand Tnc", st, "e")
                /*    sigleLineText(
                 st.replace(bankEMIFooterTAndCSeparator, "")
@@ -981,10 +1025,11 @@ class PrintUtil(context: Context?) {
             }
 
         }
+        }
     }
 
     private fun printProduactData(batchTable: BatchTable){
-        printSeperator()
+
         val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
         val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
         val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
@@ -1111,8 +1156,7 @@ class PrintUtil(context: Context?) {
 */
                         printer?.setHzScale(HZScale.SC1x1)
                         printer?.setHzSize(HZSize.DOT24x16)
-                        printer?.addText( AlignMode.LEFT,  st.replace(st, "")
-                            .replace(Companion.disclaimerIssuerClose, ""))
+                        printer?.addText( AlignMode.LEFT,  st)
                     }
                 }
                 printSeperator()
@@ -1121,7 +1165,7 @@ class PrintUtil(context: Context?) {
 
 
         }
-        printSeperator()
+
     }
 
     fun printDetailReportupdate(
@@ -1505,7 +1549,7 @@ class PrintUtil(context: Context?) {
 
 
                     textBlockList.add(sigleLineformat("DATE:${date}", AlignMode.LEFT))
-                    textBlockList.add(sigleLineformat("TIME:${date}", AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat("TIME:${time}", AlignMode.RIGHT))
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
                     sigleLineText("REVERSAL REPORT", AlignMode.CENTER)
@@ -1854,7 +1898,7 @@ class PrintUtil(context: Context?) {
                 val time = formattime.format(td)
 
                 textBlockList.add(sigleLineformat("DATE:${date}", AlignMode.LEFT))
-                textBlockList.add(sigleLineformat("TIME:${date}", AlignMode.RIGHT))
+                textBlockList.add(sigleLineformat("TIME:${time}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
@@ -1944,7 +1988,7 @@ class PrintUtil(context: Context?) {
                 val time = formattime.format(td)
 
                 textBlockList.add(sigleLineformat("DATE:${date}", AlignMode.LEFT))
-                textBlockList.add(sigleLineformat("TIME:${date}", AlignMode.RIGHT))
+                textBlockList.add(sigleLineformat("TIME:${time}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
@@ -2108,7 +2152,7 @@ class PrintUtil(context: Context?) {
                             printSeperator()
 
                             textBlockList.add(sigleLineformat("MID:${hostMid}", AlignMode.LEFT))
-                            textBlockList.add(sigleLineformat("TIME:${date}", AlignMode.RIGHT))
+                            textBlockList.add(sigleLineformat("TID:${hostTid}", AlignMode.RIGHT))
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
 
@@ -2217,15 +2261,15 @@ class PrintUtil(context: Context?) {
                                     "%.2f".format(
                                         (((m.total).toDouble()).div(
                                             100
-                                        )).toString().toDouble()
+                                        )).toString() +" " + getCurrencySymbol(
+                                            tpt
+                                        ).toDouble()
                                     ), AlignMode.CENTER
                                 )
                             )
                             textBlockList.add(
                                 sigleLineformat(
-                                    "  = " + m.count + " " + getCurrencySymbol(
-                                        tpt
-                                    ), AlignMode.RIGHT
+                                    "  = " + m.count, AlignMode.RIGHT
                                 )
                             )
                             printer?.addMixStyleText(textBlockList)

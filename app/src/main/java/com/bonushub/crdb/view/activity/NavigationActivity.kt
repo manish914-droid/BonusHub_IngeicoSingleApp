@@ -782,11 +782,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.VOID_SALE->{
-                /* lifecycleScope.launch(Dispatchers.IO) {
-                   //    appDao.insertBatchData(batchData)
-               val dd=    DBModule.appDatabase.appDao.getBatchDataFromInvoice("000018")
-                   println(dd.toString())
-               }*/
+                transactFragment(VoidMainFragment())
                 // todo uncomment below
               /*  lifecycleScope.launch(Dispatchers.IO) {
                     //    appDao.insertBatchData(batchData)
@@ -798,12 +794,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                 //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
                 val cdtIndex = cardDataTable?.cardTableIndex ?: ""
-                val accSellection =
+           /*     val accSellection =
                     addPad(
                         AppPreference.getString(AppPreference.ACC_SEL_KEY),
                         "0",
                         2
-                    )
+                    )*/
 
             }
             EDashboardItem.PRE_AUTH_CATAGORY -> {

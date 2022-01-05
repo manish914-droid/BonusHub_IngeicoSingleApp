@@ -13,6 +13,7 @@ import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Utility
+import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.IssuerBankModal
 import com.bonushub.crdb.view.fragments.TenureBankModal
 import com.bonushub.pax.utils.IsoDataReader
@@ -327,7 +328,8 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                                         issuerModel.headerTAndC = splitData[1]
                                     }
                                     //save issuer tnc here..........
-                                    appDB.appDao.insertIssuerTAndCData(issuerModel)
+                                    DBModule.appDatabase.appDao.insertIssuerTAndCData(issuerModel)
+
                                 }
                             }
 if(!fromBankEmi)

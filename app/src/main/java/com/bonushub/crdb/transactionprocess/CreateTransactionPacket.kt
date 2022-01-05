@@ -311,7 +311,7 @@ class CreateTransactionPacket(
 
             // old way
             //   val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
-var serialnumm=""
+            var serialnumm=""
             if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()||BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
                 val tenureData=batchdata?.emiTenureDataModel
                 serialnumm = if( cardProcessedData.getTid()==tenureData?.txnTID){
@@ -321,7 +321,9 @@ var serialnumm=""
                 }
 
 
-}
+            }else{
+                serialnumm=     DeviceHelper.getDeviceSerialNo().toString()
+            }
             addFieldByHex(
                 61, addPad(
                     serialnumm ?: "", " ", 15, false

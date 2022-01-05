@@ -105,23 +105,24 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
             ReportsItem.LAST_RECEIPT -> {
 
-                val lastReceiptData = AppPreference.getLastSuccessReceipt()
+                val batchData = AppPreference.getLastSuccessReceipt()
 
-                val batchData = BatchTable(lastReceiptData)
+                //val batchData = BatchTable(lastReceiptData)
 
-                if (lastReceiptData != null) {
+                if (batchData != null) {
                     lifecycleScope.launch(Dispatchers.Main) {
                         iDiag?.showProgress(getString(R.string.printing_last_receipt))
                     }
 
 
-                    when (lastReceiptData.txnName) {
+                    when (batchData.receiptData?.txnName) {
                         EDashboardItem.SALE.title.uppercase(), EDashboardItem.CASH_ADVANCE.title.uppercase(),
                         EDashboardItem.SALE_WITH_CASH.title.uppercase(), EDashboardItem.REFUND.title.uppercase(),
                         EDashboardItem.PREAUTH.title.uppercase(),EDashboardItem.PREAUTH_COMPLETE.title.uppercase(),
                         EDashboardItem.VOID_SALE.title.uppercase(),
                         EDashboardItem.BANK_EMI.title.uppercase(),
-                        EDashboardItem.BRAND_EMI.title.uppercase()-> {
+                        EDashboardItem.BRAND_EMI.title.uppercase(),
+                        "EMI SALE"-> {
                             //BB
                             logger("print","util")
 
@@ -649,7 +650,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                            // dataList.clear()
                                            // dataList.addAll(batchReversalList as MutableList<BatchTable>)
                                             try {
-
+                                                Log.e("size==",""+batchReversalList.size)
                                                 // please change here batchReversalList
                                                 PrintUtil(activity).printReversalReportupdate(
                                                     batchReversalList,
