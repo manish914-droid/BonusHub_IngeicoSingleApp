@@ -206,7 +206,12 @@ class NewInputAmountFragment : Fragment() {
                 }
 
             }
+EDashboardItem.TEST_EMI->{
+    cashAmount?.visibility = View.GONE
+    binding?.cashAmtCrdView?.visibility = View.GONE
+    testEmiTxnType
 
+}
             else -> {
                 cashAmount?.visibility = View.GONE
                 binding?.cashAmtCrdView?.visibility = View.GONE
@@ -525,16 +530,16 @@ class NewInputAmountFragment : Fragment() {
                 if (saleTipAmt > 0) {
                     when {
                         !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length in 10..13) {
-                            val extraPairData =
-                                Triple(binding?.mobNumbr?.text.toString(), "", third = true)
                            // validateTIP(trnsAmt, saleAmt, extraPairData)
+                            temproryCheck(trnsAmt,saleAmount)
                         } else
                             context?.getString(R.string.enter_valid_mobile_number)
                                 ?.let { showToast( it) }
 
                         TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                             val extraPairData = Triple("", "", third = true)
-                          //  validateTIP(trnsAmt, saleAmt, extraPairData)
+                      // validateTIP(trnsAmt, saleAmt, extraPairData)
+                            temproryCheck(trnsAmt,saleAmount)
                         }
                     }
 
@@ -692,7 +697,6 @@ class NewInputAmountFragment : Fragment() {
                     Pair(saleAmount.toString().trim(), "0")
                 )
             }
-            // todo change the calling
             EDashboardItem.PREAUTH_COMPLETE->{
     if((saleAmount.toString().trim()).toDouble() > maxTxnLimit){
         maxAmountLimitDialog(iDialog,maxTxnLimit)
@@ -1054,6 +1058,38 @@ class NewInputAmountFragment : Fragment() {
                 }
             })
 
+        }
+
+    }
+
+    private fun temproryCheck(totalTransAmount: Double,saleAmt:Double){
+        lifecycleScope.launch(Dispatchers.IO) {
+           val tipamt= cashAmount?.text.toString().trim().toFloat()
+            if (isTipEnable(DBModule.appDatabase.appDao) && tipamt>=saleAmt) {
+                val msg =
+                    "Maximum tip allowed on this terminal is \u20B9 ${
+                        "%.2f".format(
+                            saleAmt
+                        )
+                    }."
+               withContext(Dispatchers.Main) {
+                    iDialog?.getInfoDialog("Tip Sale Error", msg) {}
+                }
+            } else {
+                val extraPairData = Triple(
+                    binding?.mobNumbr?.text.toString(),
+                    "",
+                    third = true
+                )
+                iFrReq?.onFragmentRequest(
+                    EDashboardItem.SALE,
+                    Pair(
+                        totalTransAmount.toString().trim(),
+                        cashAmount?.text.toString().trim()
+                    ), extraPairData
+                )
+
+            }
         }
 
     }
