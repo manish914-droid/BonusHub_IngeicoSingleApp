@@ -322,6 +322,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     batchData.emiProductData = brandEmiProductData
                                                 }
                                                 batchData.imeiOrSerialNum = imeiOrSerialNum
+                                                batchData.mobileNumber = mobileNumber // kushal add mobile num
                                                 batchData.billNumber=billNumber
                                                 batchData.emiTenureDataModel = emiTenureData
                                                 batchData.transactionType =

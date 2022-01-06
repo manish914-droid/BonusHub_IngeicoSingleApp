@@ -1099,7 +1099,7 @@ class PrintUtil(context: Context?) {
                 textBlockList.clear()
 
             }
-            val mobnum="9808080810"
+            val mobnum=batchTable.mobileNumber?:""
             if (!TextUtils.isEmpty(mobnum)) {
                 when (brandEMIMasterDataModal.mobileNumberBillNumberFlag.substring(1, 2)) {
                     "1" -> {

@@ -1054,6 +1054,7 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
     var emiProductData: BrandEMIProductDataModal?=null
     var emiTenureDataModel: BankEMITenureDataModal?=null
     var emiIssuerDataModel: BankEMIIssuerTAndCDataModal?=null
+    var mobileNumber: String?=null
 }
 // endregion
 
