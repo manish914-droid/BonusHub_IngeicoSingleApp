@@ -18,6 +18,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
 
 import com.bonushub.crdb.db.AppDatabase
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.local.HDFCTpt
@@ -27,11 +28,9 @@ import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.convertValue2BCD
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.maxAmountLimitDialog
-import com.bonushub.crdb.utils.KeyboardModel
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.showMobileBillDialog
 
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -138,6 +137,27 @@ class NewInputAmountFragment : Fragment() {
 
             }
             EDashboardItem.SALE -> {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    // for testing
+                   /* val result = DBModule.appDatabase.appDao.getIngenicoInitialization()
+                    logger("result", result?.get(0).toString(), "e")
+                    logger("result2", result?.get(0)?.tidList.toString(),"e")
+                    logger("result3", result?.get(0)?.tidStatusList.toString(),"e")
+                    logger("result4", result?.get(0)?.initdataList.toString(),"e")*/
+
+                    if(isTipEnable(DBModule.appDatabase.appDao))
+                    {
+                        withContext(Dispatchers.Main){
+                            binding?.cashAmtCrdView?.visibility = View.VISIBLE
+                            cashAmount?.hint = getString(R.string.enter_tip_amount)
+                        }
+                    }else{
+                        withContext(Dispatchers.Main){
+                            binding?.cashAmtCrdView?.visibility = View.GONE
+                        }
+                    }
+                   // logger("isTipEnable",""+isTipEnable(DBModule.appDatabase.appDao))
+                }
                /* if (checkHDFCTPTFieldsBitOnOff(TransactionType.TIP_SALE)) {
                     //   binding?.enterCashAmountTv?.visibility = View.VISIBLE
                     binding?.cashAmtCrdView?.visibility = View.VISIBLE
