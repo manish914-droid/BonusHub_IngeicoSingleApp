@@ -1425,7 +1425,7 @@ class PrintUtil(context: Context?) {
                                             )
                                         }", AlignMode.CENTER
                                     )*/
-                                            sigleLineformat("= + ${m.count}" , AlignMode.CENTER)
+                                            sigleLineformat("= ${m.count}" , AlignMode.CENTER)
                                 )
                                 /*textBlockList.add(
                                     sigleLineformat(
