@@ -141,6 +141,27 @@ class CreateTransactionPacket(
                 }
             }
 */
+            when (cardProcessedData.getTransType()) {
+                BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type ->
+                    addFieldByHex(
+                        54,
+                        addPad(cardProcessedData.getOtherAmount().toString(), "0", 12, true)
+                    )
+                BhTransactionType.SALE.type ->{
+                    if(cardProcessedData.getOtherAmount()!=0L)  {
+                        addFieldByHex(
+                            54,
+                            addPad(cardProcessedData.getTipAmount().toString(), "0", 12, true)
+                        )
+                    }
+
+                }
+                else -> {
+                }
+            }
+
+
+
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
             when (cardProcessedData.getTransType()) {
                 BhTransactionType.SALE.type -> {

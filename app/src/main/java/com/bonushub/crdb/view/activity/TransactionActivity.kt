@@ -87,6 +87,7 @@ class TransactionActivity : BaseActivityNew() {
 
 
     private val saleAmt by lazy { intent.getStringExtra("saleAmt") ?: "0" }
+    private var field54Data:Long?= null
     private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
     private val authCompletionData by lazy { intent.getSerializableExtra("authCompletionData") as AuthCompletionData }
 
@@ -539,6 +540,7 @@ class TransactionActivity : BaseActivityNew() {
             EDashboardItem.CASH_ADVANCE -> {
                 val amt = (saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
+                field54Data= amt
                 try {
                     DeviceHelper.doCashAdvanceTxn(
                         CashOnlyRequest(
@@ -701,6 +703,7 @@ class TransactionActivity : BaseActivityNew() {
                 try {
                     val amt = (saleAmt.toFloat() * 100).toLong()
                     val cashBackAmount = (cashBackAmt.toFloat() * 100).toLong()
+                    field54Data=cashBackAmount
                     var ecrID: String
 
                     DeviceHelper.doSaleWithCashTxn(
@@ -1299,6 +1302,9 @@ class TransactionActivity : BaseActivityNew() {
 
     private suspend fun initiateNormalSale(){
         val amt = (saleAmt.toFloat() * 100).toLong()
+        val cashBackAmount = (saleWithTipAmt.toFloat() * 100).toLong()
+        field54Data=cashBackAmount
+        Log.d(TAG, "tip amount: ${cashBackAmount}")
         var ecrID: String
         try {
             val tranUuid = UUID.randomUUID().toString().also {
@@ -1313,7 +1319,7 @@ class TransactionActivity : BaseActivityNew() {
             DeviceHelper.doSaleTransaction(
                 SaleRequest(
                     amount = amt,
-                    tipAmount = 0L,
+                    tipAmount = cashBackAmount,
                     transactionType = TransactionType.SALE,
                     tid = tid,
                     transactionUuid = tranUuid
@@ -1650,6 +1656,7 @@ class TransactionActivity : BaseActivityNew() {
         globalCardProcessedModel.setTime(parts[1])
         globalCardProcessedModel.setTimeStamp(receiptDetail.dateTime!!)
         globalCardProcessedModel.setPosEntryMode("0553")
+        field54Data?.let { globalCardProcessedModel.setOtherAmount(it) }
         receiptDetail.maskedPan?.let { globalCardProcessedModel.setPanNumberData(it) }
     }
 
