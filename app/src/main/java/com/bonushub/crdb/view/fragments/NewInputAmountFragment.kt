@@ -489,7 +489,7 @@ class NewInputAmountFragment : Fragment() {
         Log.e("SALE", "OK CLICKED  ${binding?.saleAmount?.text.toString()}")
         Log.e("CASh", "OK CLICKED  ${cashAmount?.text}")
         Log.e("AMT", "OK CLICKED  $amt")
-        val maxTxnLimit = 20000.0///"%.2f".format(getTransactionLimitForHDFCIssuer()).toDouble()
+        val maxTxnLimit = 1000000.0///"%.2f".format(getTransactionLimitForHDFCIssuer()).toDouble()
         Log.e("TXN LIMIT", "Txn type = $eDashBoardItem  Txn maxLimit = $maxTxnLimit")
 
         try {
@@ -534,7 +534,7 @@ class NewInputAmountFragment : Fragment() {
 
                         TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                             val extraPairData = Triple("", "", third = true)
-                            validateTIP(trnsAmt, saleAmt, extraPairData)
+                          //  validateTIP(trnsAmt, saleAmt, extraPairData)
                         }
                     }
 
