@@ -1658,8 +1658,10 @@ class TransactionActivity : BaseActivityNew() {
 
             CardEntryMode.EMV_WITH_PIN._name -> {
                 if(isPinVerify){
+                    logger("entryMode","EMV_WITH_PIN","e")
                     return CardEntryMode.EMV_WITH_PIN._value
                 }else {
+                    logger("entryMode","EMV_NO_PIN","e")
                     return CardEntryMode.EMV_NO_PIN._value
                 }
 
@@ -1667,8 +1669,10 @@ class TransactionActivity : BaseActivityNew() {
 
             CardEntryMode.EMV_FALLBACK_SWIPE_WITH_PIN._name -> {
                 if(isPinVerify){
+                    logger("entryMode","EMV_FALLBACK_SWIPE_WITH_PIN","e")
                     return CardEntryMode.EMV_FALLBACK_SWIPE_WITH_PIN._value
                 }else {
+                    logger("entryMode","EMV_FALLBACK_SWIPE_NO_PIN","e")
                     return CardEntryMode.EMV_FALLBACK_SWIPE_NO_PIN._value
                 }
 
@@ -1676,8 +1680,10 @@ class TransactionActivity : BaseActivityNew() {
 
             CardEntryMode.SWIPE_WITH_PIN._name -> {
                 if(isPinVerify){
+                    logger("entryMode","SWIPE_WITH_PIN","e")
                     return CardEntryMode.SWIPE_WITH_PIN._value
                 }else {
+                    logger("entryMode","SWIPE_NO_PIN","e")
                     return CardEntryMode.SWIPE_NO_PIN._value
                 }
 
@@ -1685,8 +1691,10 @@ class TransactionActivity : BaseActivityNew() {
 
             CardEntryMode.CTLS_SWIPE_NO_PIN._name -> {
                 if(isPinVerify){
+                    logger("entryMode","CTLS_SWIPE_WITH_PIN","e")
                     return CardEntryMode.CTLS_SWIPE_WITH_PIN._value
                 }else {
+                    logger("entryMode","CTLS_SWIPE_NO_PIN","e")
                     return CardEntryMode.CTLS_SWIPE_NO_PIN._value
                 }
 
@@ -1694,8 +1702,10 @@ class TransactionActivity : BaseActivityNew() {
 
             CardEntryMode.CTLS_EMV_NO_PIN._name -> {
                 if(isPinVerify){
+                    logger("entryMode","CTLS_EMV_WITH_PIN","e")
                     return CardEntryMode.CTLS_EMV_WITH_PIN._value
                 }else {
+                    logger("entryMode","CTLS_EMV_NO_PIN","e")
                     return CardEntryMode.CTLS_EMV_NO_PIN._value
                 }
 

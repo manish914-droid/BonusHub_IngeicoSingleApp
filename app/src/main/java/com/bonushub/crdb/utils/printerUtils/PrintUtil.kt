@@ -1197,7 +1197,7 @@ class PrintUtil(context: Context?) {
 
 
                     textBlockList.add(sigleLineformat("DATE:${date}", AlignMode.LEFT))
-                    textBlockList.add(sigleLineformat("TIME:${date}", AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat("TIME:${time}", AlignMode.RIGHT))
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
                     sigleLineText("DETAIL REPORT", AlignMode.CENTER)
@@ -1321,7 +1321,7 @@ class PrintUtil(context: Context?) {
                                 AlignMode.LEFT
                             )
                         )
-                        textBlockList.add(sigleLineformat(transAmount, AlignMode.RIGHT))
+                        textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:$transAmount", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
                         if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
@@ -1418,15 +1418,16 @@ class PrintUtil(context: Context?) {
                                     )
                                 )
                                 textBlockList.add(
-                                    sigleLineformat(
+                                    /*sigleLineformat(
                                         "=" + m.count + " ${
                                             getCurrencySymbol(
                                                 tpt
                                             )
                                         }", AlignMode.CENTER
-                                    )
+                                    )*/
+                                            sigleLineformat("= + ${m.count}" , AlignMode.CENTER)
                                 )
-                                textBlockList.add(
+                                /*textBlockList.add(
                                     sigleLineformat(
                                         "%.2f".format(
                                             (((m.total).toDouble()).div(
@@ -1434,6 +1435,8 @@ class PrintUtil(context: Context?) {
                                             )).toString().toDouble()
                                         ), AlignMode.RIGHT
                                     )
+                                )*/
+                                textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:${"%.2f".format((((m.total).toDouble()).div(100)).toString().toDouble())}", AlignMode.RIGHT)
                                 )
                                 printer?.addMixStyleText(textBlockList)
                                 textBlockList.clear()
@@ -1673,7 +1676,7 @@ class PrintUtil(context: Context?) {
                                 AlignMode.LEFT
                             )
                         )
-                        textBlockList.add(sigleLineformat(transAmount, AlignMode.RIGHT))
+                        textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:$transAmount", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
                         if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
@@ -1775,21 +1778,11 @@ class PrintUtil(context: Context?) {
                                 )
                                 textBlockList.add(
                                     sigleLineformat(
-                                        "=" + m.count + " ${
-                                            getCurrencySymbol(
-                                                tpt
-                                            )
-                                        }", AlignMode.CENTER
+                                        "= " + m.count, AlignMode.CENTER
                                     )
                                 )
                                 textBlockList.add(
-                                    sigleLineformat(
-                                        "%.2f".format(
-                                            (((m.total).toDouble()).div(
-                                                100
-                                            )).toString().toDouble()
-                                        ), AlignMode.RIGHT
-                                    )
+                                    sigleLineformat("${getCurrencySymbol(tpt)}:${"%.2f".format((((m.total).toDouble()).div(100)).toString().toDouble())}", AlignMode.RIGHT)
                                 )
                                 printer?.addMixStyleText(textBlockList)
                                 textBlockList.clear()
@@ -2205,7 +2198,7 @@ class PrintUtil(context: Context?) {
                                 textBlockList.add(it)
                             }
                             //textBlockList.add(sigleLineformat(amt, AlignMode.CENTER)) // old
-                            textBlockList.add(sigleLineformat("${amt} ${getCurrencySymbol(tpt)}", AlignMode.CENTER))
+                            textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:${amt}", AlignMode.CENTER))
                             /*textBlockList.add(
                                 sigleLineformat(
                                     "${m.count} ${getCurrencySymbol(tpt)}",
@@ -2264,11 +2257,11 @@ class PrintUtil(context: Context?) {
                                 )
                             )
                             textBlockList.add(
-                                sigleLineformat("${"%.2f".format(
+                                sigleLineformat("${getCurrencySymbol(tpt)}:${"%.2f".format(
                                     (((m.total).toDouble()).div(
                                         100
                                     )).toString().toDouble()
-                                )} ${getCurrencySymbol(tpt)}"
+                                )}"
                                     , AlignMode.CENTER
                                 )
                             )
