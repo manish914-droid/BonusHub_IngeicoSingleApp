@@ -1049,6 +1049,7 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
     var imeiOrSerialNum: String?=null
     var billNumber: String?=null
     var emiBrandData: BrandEMIMasterDataModal?=null
+    var emiSubCategoryData: BrandEMISubCategoryTable?=null
     var emiCategoryData: BrandEMISubCategoryTable?=null
     var emiProductData: BrandEMIProductDataModal?=null
     var emiTenureDataModel: BankEMITenureDataModal?=null

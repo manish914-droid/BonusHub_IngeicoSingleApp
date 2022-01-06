@@ -204,7 +204,7 @@ class CreateTransactionPacket(
 
                     val brandData=batchdata?.emiBrandData
                     val productData=batchdata?.emiProductData
-                    val categoryData=batchdata?.emiCategoryData
+                    val categoryData=batchdata?.emiSubCategoryData
                     val tenureData=batchdata?.emiTenureDataModel
                     val imeiOrSerialNo=batchdata?.imeiOrSerialNum
                     val emiIssuerDataModel=batchdata?.emiIssuerDataModel
@@ -307,36 +307,25 @@ class CreateTransactionPacket(
             else {
                 issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: "0"
             }
-
-
             // old way
             //   val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
-            var serialnumm=""
-            if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()||BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
+var serialnumm=""
+            serialnumm = if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()||BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
                 val tenureData=batchdata?.emiTenureDataModel
-                serialnumm = if( cardProcessedData.getTid()==tenureData?.txnTID){
+                if( cardProcessedData.getTid()==tenureData?.txnTID){
                     DeviceHelper.getDeviceSerialNo().toString()
                 }else{
                     tenureData?.txnTID.toString()
                 }
-
-
             }else{
-                serialnumm=     DeviceHelper.getDeviceSerialNo().toString()
+                DeviceHelper.getDeviceSerialNo().toString()
             }
-            addFieldByHex(
-                61, addPad(
-                    serialnumm ?: "", " ", 15, false
-                ) + AppPreference.getBankCode() + customerID + walletIssuerID + data
-            )
-
+            addFieldByHex(61, addPad(serialnumm ?: "", " ", 15, false) + AppPreference.getBankCode() + customerID + walletIssuerID + data)
             //adding field 62
             cardProcessedData.getInvoice()?.let { addFieldByHex(62, it) }
 
             //Here we are Saving Date , Time and TimeStamp in CardProcessedDataModal:-
             var year: String = "Year"
-
-
         }
     }
 

@@ -1031,7 +1031,8 @@ class PrintUtil(context: Context?) {
     private fun printProduactData(batchTable: BatchTable){
 
         val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
-        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiCategoryData
+        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiSubCategoryData
+        val brandEMICategoryData: BrandEMISubCategoryTable? = batchTable.emiCategoryData
         val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
         val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
@@ -1052,7 +1053,7 @@ class PrintUtil(context: Context?) {
             textBlockList.add(sigleLineformat("Prod Cat:", AlignMode.LEFT))
             textBlockList.add(
                 sigleLineformat(
-                    "${brandEMISubCategoryTable?.categoryName}",
+                    "${brandEMICategoryData?.categoryName}",
                     AlignMode.RIGHT
                 )
             )

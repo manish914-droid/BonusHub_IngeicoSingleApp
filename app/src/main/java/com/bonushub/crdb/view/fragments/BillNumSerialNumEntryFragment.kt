@@ -62,6 +62,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
       arguments?.getSerializable("brandValidation") as BrandEmiBillSerialMobileValidationModel
   }
   private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
+  private var brandEmiCatData: BrandEMISubCategoryTable? = null
     private var brandEmiProductData: BrandEMIProductDataModal? = null
     private var brandDataMaster: BrandEMIMasterDataModal? = null
 
@@ -87,6 +88,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
             parentFragmentManager.popBackStackImmediate()
         }
         brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
+        brandEmiCatData = arguments?.getSerializable("brandEmiCatData") as? BrandEMISubCategoryTable
         brandEmiProductData = arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
@@ -193,7 +195,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
                 brandEmiProductData?.let { it1 ->
                     brandDataMaster?.let { it2 ->
                         (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(),imeiOrSerialNum=binding?.serialNumEt?.text.toString() ,brandDataMaster = it2,
-                            brandEmiSubCatData = it,brandEmiProductData = it1
+                            brandEmiSubCatData = it,brandEmiCat = brandEmiCatData,brandEmiProductData = it1
                         )
                     }
                 }

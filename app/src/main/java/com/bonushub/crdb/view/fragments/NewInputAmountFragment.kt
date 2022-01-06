@@ -66,6 +66,7 @@ class NewInputAmountFragment : Fragment() {
     var brandEntryValidationModel: BrandEmiBillSerialMobileValidationModel? = null
 
     private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
+    private var brandEmiCatData: BrandEMISubCategoryTable? = null
     private var brandEmiProductData: BrandEMIProductDataModal? = null
     private var brandDataMaster: BrandEMIMasterDataModal? = null
 
@@ -114,6 +115,8 @@ class NewInputAmountFragment : Fragment() {
         newInputAmountViewModel = ViewModelProvider(this).get(NewInputAmountViewModel::class.java)
         brandEmiSubCatData =
             arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
+        brandEmiCatData =
+            arguments?.getSerializable("brandEmiCatData") as? BrandEMISubCategoryTable
         brandEmiProductData =
             arguments?.getSerializable("brandEmiProductData") as? BrandEMIProductDataModal
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
@@ -809,6 +812,7 @@ class NewInputAmountFragment : Fragment() {
                 putSerializable("eDashBoardItem", eDashBoardItem)
                 putSerializable("brandValidation", brandEntryValidationModel)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
+                putSerializable("brandEmiCatData", brandEmiCatData)
                 putSerializable("brandEmiProductData", brandEmiProductData)
                 putSerializable("brandDataMaster", brandDataMaster)
                 putSerializable("amt", amt)
@@ -826,11 +830,13 @@ class NewInputAmountFragment : Fragment() {
                         brandEmiProductData?.let { it1 ->
                             brandDataMaster?.let { it2 ->
                                 (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum,brandDataMaster = it2,
-                                    brandEmiSubCatData = it,brandEmiProductData = it1
+                                    brandEmiSubCatData = it,brandEmiCat=brandEmiCatData,brandEmiProductData = it1
                                 )
                             }
                         }
                     }
+
+
         }
 
     }

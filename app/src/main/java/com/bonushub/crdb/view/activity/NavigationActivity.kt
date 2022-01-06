@@ -681,7 +681,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
-    fun startTransactionActivityForEmi(eDashBoardItem: EDashboardItem,amt:String, mobileNum:String="", billNum:String="", imeiOrSerialNum:String="", brandEmiSubCatData: BrandEMISubCategoryTable?=null,
+    fun startTransactionActivityForEmi(eDashBoardItem: EDashboardItem,amt:String, mobileNum:String="", billNum:String="", imeiOrSerialNum:String="", brandEmiSubCatData: BrandEMISubCategoryTable?=null,brandEmiCat: BrandEMISubCategoryTable?=null,
                                        brandEmiProductData: BrandEMIProductDataModal?=null,
                                        brandDataMaster: BrandEMIMasterDataModal?=null, testEmiTxnType: String=""){
         val intent = Intent (this, TransactionActivity::class.java)
@@ -690,6 +690,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("saleAmt", amt)
         intent.putExtra("imeiOrSerialNum", imeiOrSerialNum)
         intent.putExtra("brandEmiSubCatData", brandEmiSubCatData)
+        intent.putExtra("brandEmiCat", brandEmiCat)
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
         intent.putExtra("edashboardItem", eDashBoardItem)

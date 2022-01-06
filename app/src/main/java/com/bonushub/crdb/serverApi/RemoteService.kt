@@ -10,6 +10,7 @@ import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import javax.inject.Inject
 
+ val bankEMIRequestCode = "4"
 
 class RemoteService @Inject constructor(){
 //:LiveData<GenericResponse<IsoDataReader>>
@@ -100,7 +101,12 @@ object IsoPacketCreator{
                 addFieldByHex(61, KeyExchanger.getF61())
 
                 //adding field 63
-                val deviceSerial = addPad(AppPreference.getString("serialNumber"), " ", 15, false)
+                val deviceSerial =    addPad(
+                    DeviceHelper.getDeviceSerialNo() ?: "",
+                    " ",
+                    15,
+                    false
+                )
                 val bankCode = AppPreference.getBankCode()
                 val f63 = "$deviceSerial$bankCode"
                 addFieldByHex(63, f63)

@@ -81,7 +81,12 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     private val brandEmiProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
     private val brandEmiSearchedProductDataList by lazy { mutableListOf<BrandEMIProductDataModal>() }
 
-// === EMI Tenure
+    private val serialNumBlockUnblockML = MutableLiveData<Boolean>()
+    val serialNumBlockUnblockL: LiveData<Boolean>
+        get() = serialNumBlockUnblockML
+
+
+    // === EMI Tenure
   lateinit var  bankEMIIssuerTAndCList: BankEMIIssuerTAndCDataModal
     private var bankEMISchemesDataList: MutableList<BankEMITenureDataModal> = mutableListOf()
 
@@ -188,7 +193,6 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
 
     }
-
     suspend fun getEMITenureData(field56Pan:String="0",field57:String,counter:String="0"){
        /* val field57=  "$bankEMIRequestCode^0^${brandEmiData?.brandID}^${brandEmiData?.productID}^${brandEmiData?.imeiORserailNum}" +
                 "^${*//*cardBinValue.substring(0, 8)*//*""}^$transactionAmount"
@@ -209,7 +213,6 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
             }
         }
     }
-
     suspend fun getIssuerList(field57RequestData:String) {
         totalRecord="0"
 
@@ -231,7 +234,25 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
             }
         }
     }
+     suspend fun blockUnblockSerialNum(field57RequestData: String):Pair<Boolean,String>{
+        return when(val genericResp=remoteService.field57GenericService(field57RequestData)){
+            is GenericResponse.Success->{
+                val isoDataReader = genericResp.data
+                val respMsg = isoDataReader?.isoMap?.get(58)?.parseRaw2String().toString()
+                //serialNumBlockUnblockML.postValue(true)
+              Pair(  true,respMsg)
+            }
+            is GenericResponse.Error->{
+                // serialNumBlockUnblockML.postValue(false)
+               Pair( false,genericResp.errorMessage.toString())
+            }
+            is GenericResponse.Loading->{
+                Pair( false,"Loading State")
+            }
+        }
 
+
+    }
 
 
     //region=================================Stubbing BrandEMI Master Data to List:-

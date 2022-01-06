@@ -51,6 +51,9 @@ class BrandEmiProductFragment : Fragment() {
         BrandEmiProductAdapter(::onItemClick)
     }
 
+
+    private var brandEmiCatData: BrandEMISubCategoryTable? = null
+
     private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +73,7 @@ class BrandEmiProductFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
+       brandEmiCatData = arguments?.getSerializable("brandEmiCat") as? BrandEMISubCategoryTable
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
         (activity as IDialog).showProgress()
@@ -132,6 +136,7 @@ class BrandEmiProductFragment : Fragment() {
             arguments = Bundle().apply {
                 putSerializable("brandEmiProductData", productData)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
+                putSerializable("brandEmiCatData", brandEmiCatData)
                 putSerializable("brandDataMaster", brandDataMaster)
                 putSerializable("type", eDashBoardItem )
             }

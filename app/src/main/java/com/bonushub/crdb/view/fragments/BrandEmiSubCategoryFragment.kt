@@ -17,6 +17,7 @@ import com.bonushub.crdb.view.adapter.BrandEMISubCategoryAdapter
 import com.bonushub.pax.utils.EDashboardItem
 import dagger.hilt.android.AndroidEntryPoint
 
+var catagory:BrandEMISubCategoryTable?=null
 // var FRAGMENT_COUNTER=0
 @AndroidEntryPoint
 class BrandEmiSubCategoryFragment : Fragment() {
@@ -85,7 +86,11 @@ class BrandEmiSubCategoryFragment : Fragment() {
     }
 
     private fun onCategoryItemClick(brandEMISubCategoryTable: BrandEMISubCategoryTable) {
-        Log.d("CategoryName:- ", brandEMISubCategoryTable.toString())
+     if(openedFragmentFromBrandData){
+         catagory=brandEMISubCategoryTable
+         Log.d("CategoryName:- ", brandEMISubCategoryTable.toString())
+     }
+       // Log.d("CategoryName:- ", brandEMISubCategoryTable.toString())
         filteredSubCat = brandSubCatList?.filter { brandEMISubCategoryTable.categoryID == it.parentCategoryID }
                     as ArrayList<BrandEMISubCategoryTable>
         Log.e("FILTEREDLIST", filteredSubCat.toString() + "  Filter List Size --->  ${filteredSubCat.size}")
@@ -100,6 +105,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
             (activity as NavigationActivity).transactFragment(BrandEmiProductFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable("brandEmiSubCat", brandEMISubCategoryTable)
+                    putSerializable("brandEmiCat", catagory)
                     putSerializable("brandDataMaster", brandDataMaster)
                     putSerializable("type", eDashBoardItem)
                 }
