@@ -79,7 +79,7 @@ class TransactionActivity : BaseActivityNew() {
     //  private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
     private val restartHandlingList: MutableList<RestartHandlingModel> by lazy { mutableListOf<RestartHandlingModel>() }
     private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
-
+    private val brandEmiCatData by lazy { intent.getSerializableExtra("brandEmiCat") as BrandEMISubCategoryTable }
     private val brandEmiSubCatData by lazy { intent.getSerializableExtra("brandEmiSubCatData") as BrandEMISubCategoryTable } //: BrandEMISubCategoryTable? = null
     private val brandEmiProductData by lazy { intent.getSerializableExtra("brandEmiProductData") as BrandEMIProductDataModal }
     private val brandDataMaster by lazy { intent.getSerializableExtra("brandDataMaster") as BrandEMIMasterDataModal }
@@ -318,6 +318,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 if(requestCode == BhTransactionType.BRAND_EMI.type) {
                                                     batchData.emiBrandData = brandDataMaster
                                                     batchData.emiCategoryData = brandEmiSubCatData
+                                                    batchData.emiCategoryData = brandEmiCatData
                                                     batchData.emiProductData = brandEmiProductData
                                                 }
                                                 batchData.imeiOrSerialNum = imeiOrSerialNum
