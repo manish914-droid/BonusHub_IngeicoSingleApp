@@ -527,7 +527,7 @@ class NewInputAmountFragment : Fragment() {
                         !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length in 10..13) {
                             val extraPairData =
                                 Triple(binding?.mobNumbr?.text.toString(), "", third = true)
-                            validateTIP(trnsAmt, saleAmt, extraPairData)
+                           // validateTIP(trnsAmt, saleAmt, extraPairData)
                         } else
                             context?.getString(R.string.enter_valid_mobile_number)
                                 ?.let { showToast( it) }
