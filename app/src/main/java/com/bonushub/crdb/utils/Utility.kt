@@ -19,6 +19,7 @@ import android.widget.Toast
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
@@ -1186,6 +1187,44 @@ object Field48ResponseTimestamp {
         return tptData
     }
 //endregion
+
+    // region
+    fun isTipEnable(): Boolean {
+        var isTipEnable: Boolean = false
+        runBlocking(Dispatchers.IO){
+            val result = DBModule.appDatabase.appDao.getIngenicoInitialization()
+
+            if(result != null && result.size > 0)
+            {
+                if(result.get(0)?.initdataList != null && result.get(0)?.initdataList!!.isNotEmpty()){
+                    logger("isTipEnable",""+result[0]?.initdataList!![0].isTipEnable)
+                    isTipEnable = result[0]?.initdataList!![0].isTipEnable ?:false
+                }
+            }
+        }
+
+        return isTipEnable
+    }
+    // end region
+
+    // region
+    fun getInitdataList(): InitDataListList? {
+        var initdataListItem: InitDataListList? = null
+        runBlocking(Dispatchers.IO){
+            val result = DBModule.appDatabase.appDao.getIngenicoInitialization()
+
+            if(result != null && result.size > 0)
+            {
+                if(result.get(0)?.initdataList != null && result.get(0)?.initdataList!!.isNotEmpty()){
+                    logger("isTipEnable",""+result[0]?.initdataList!![0].isTipEnable)
+                    initdataListItem = result[0]?.initdataList!![0]
+                }
+            }
+        }
+
+        return initdataListItem
+    }
+    // end region
 //region======================Get brand tnc Data:-
 fun getBrandTAndCDataByBrandId(brandId : String): String {
     var brandTANDC: String? = null

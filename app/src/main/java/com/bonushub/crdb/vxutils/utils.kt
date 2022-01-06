@@ -494,28 +494,10 @@ suspend fun checkTidUpdate(appDao: AppDao): Boolean {
     return false
 }
 
-//region
-suspend fun isTipEnable(appDao: AppDao): Boolean {
-    val isTipEnable: Boolean = false
-    val result = appDao.getIngenicoInitialization()
-
-    if(result != null && result.size > 0)
-    {
-        if(result.get(0)?.initdataList != null && result.get(0)?.initdataList!!.isNotEmpty()){
-            logger("isTipEnable",""+result[0]?.initdataList!![0].isTipEnable)
-            return result[0]?.initdataList!![0].isTipEnable ?:false
-        }
-    }
-
-    return isTipEnable
-}
-// end region
 
 fun Int?.isGreaterThan(other: Int?) = this != null && other != null && this > other
 
 fun Int?.isLessThan(other: Int?) = this != null && other != null && this < other
-
-
 
 
 

@@ -21,6 +21,7 @@ import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBrandTAndCData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBrandTAndCDataByBrandId
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getInitdataList
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerTAndCDataByIssuerId
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.panMasking
@@ -1885,6 +1886,11 @@ class PrintUtil(context: Context?) {
             try {
                 val tpt = getTptData()
                 setLogoAndHeader()
+
+                val initDataList = getInitdataList()
+                sigleLineText(initDataList?.merAddHeader1?:"", AlignMode.CENTER)
+                sigleLineText(initDataList?.merAddHeader2?:"", AlignMode.CENTER)
+
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
                 val formattime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
@@ -1973,6 +1979,10 @@ class PrintUtil(context: Context?) {
                 val tpt = getTptData()
 
                 setLogoAndHeader()
+
+                val initDataList = getInitdataList()
+                sigleLineText(initDataList?.merAddHeader1?:"", AlignMode.CENTER)
+                sigleLineText(initDataList?.merAddHeader2?:"", AlignMode.CENTER)
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)

@@ -30,6 +30,7 @@ import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.convertValue2BCD
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.isTipEnable
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.maxAmountLimitDialog
 
 import com.bonushub.crdb.view.activity.IFragmentRequest
@@ -145,13 +146,15 @@ class NewInputAmountFragment : Fragment() {
                     logger("result3", result?.get(0)?.tidStatusList.toString(),"e")
                     logger("result4", result?.get(0)?.initdataList.toString(),"e")*/
 
-                    if(isTipEnable(DBModule.appDatabase.appDao))
+                    if(isTipEnable())
                     {
+                        logger("isTipEnable()","true")
                         withContext(Dispatchers.Main){
                             binding?.cashAmtCrdView?.visibility = View.VISIBLE
                             cashAmount?.hint = getString(R.string.enter_tip_amount)
                         }
                     }else{
+                        logger("isTipEnable()","false")
                         withContext(Dispatchers.Main){
                             binding?.cashAmtCrdView?.visibility = View.GONE
                         }
@@ -1065,7 +1068,7 @@ EDashboardItem.TEST_EMI->{
     private fun temproryCheck(totalTransAmount: Double,saleAmt:Double){
         lifecycleScope.launch(Dispatchers.IO) {
            val tipamt= cashAmount?.text.toString().trim().toFloat()
-            if (isTipEnable(DBModule.appDatabase.appDao) && tipamt>=saleAmt) {
+            if (isTipEnable() && tipamt>=saleAmt) {
                 val msg =
                     "Maximum tip allowed on this terminal is \u20B9 ${
                         "%.2f".format(

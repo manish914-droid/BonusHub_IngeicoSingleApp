@@ -12,11 +12,8 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.BatchTable
-import com.bonushub.crdb.utils.DeviceHelper
-import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.utils.getBaseTID
-import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.NavigationActivity.Companion.TAG
@@ -150,14 +147,16 @@ class VoidMainFragment : Fragment() {
                 ((activity as NavigationActivity)).hideProgress()
                 if (printCB) {
                     printsts = printCB
-                    GlobalScope.launch(Dispatchers.Main) {
+                    //GlobalScope.launch(Dispatchers.Main) {
                         showMerchantAlertBox(batchTable)
-                    }
+                   // }
 
                 } else {
                     ToastUtils.showToast(activity,getString(R.string.printer_error))
                 }
             }
+
+            //((activity as NavigationActivity)).hideProgress()
         }
     }
 
@@ -171,6 +170,8 @@ class VoidMainFragment : Fragment() {
                 getString(R.string.print_customer_copy),
                 getString(R.string.print_customer_copy),
                 true, getString(R.string.positive_button_yes), { status ->
+
+                    (activity as NavigationActivity).hideProgress()
                     PrintUtil(activity as NavigationActivity).startPrinting(
                         batchTable,
                         EPrintCopyType.CUSTOMER,
@@ -182,6 +183,7 @@ class VoidMainFragment : Fragment() {
 
                     }
                 }, {
+                    (activity as NavigationActivity).hideProgress()
                     (activity as NavigationActivity).transactFragment(DashboardFragment())
                 })
         }
@@ -191,7 +193,7 @@ class VoidMainFragment : Fragment() {
     {
         var invoice = binding?.edtTextSearchTransaction?.text.toString()
         lifecycleScope.launch {
-            batchFileViewModel.getBatchTableDataByInvoice(invoice).observe(viewLifecycleOwner, { batchTable ->
+            batchFileViewModel.getBatchTableDataByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner, { batchTable ->
 
                 if(batchTable?.receiptData != null) {
 
@@ -199,14 +201,14 @@ class VoidMainFragment : Fragment() {
                     val parts = date?.split(" ")
                     println("Date: " + parts!![0])
                     println("Time: " + (parts[1]) )
-
+                    val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "")?.toDouble())?.div(100)).toString().toDouble())
                     DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
                         parts!![0],
                         parts!![1],
                         batchTable.receiptData?.tid ?: "",
                         batchTable.receiptData?.invoice ?: "",
-                        batchTable.receiptData?.txnAmount ?: ""
+                        amt
                     ) {
                         doVoidTransaction()
                     }
