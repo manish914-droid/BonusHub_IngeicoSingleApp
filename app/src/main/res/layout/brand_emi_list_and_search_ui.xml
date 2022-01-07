@@ -1,93 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".view.fragments.BrandEmiMasterCategoryFragment">
 
     <include
         android:id="@+id/sub_header_view"
         layout="@layout/sub_header_layout"
-        android:visibility="visible"
-       />
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/empty_txt"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:text="Category is empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_data_found"
         android:textSize="@dimen/text_size_large"
-        android:gravity="center"
-        />
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/data_search_Ui"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/sub_header_view"
         android:orientation="vertical"
-        android:visibility="visible"
-        >
-    <androidx.cardview.widget.CardView
-        android:id="@+id/searchView"
+        android:visibility="visible">
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/searchView"
 
-        android:layout_margin="@dimen/pad_10"
-        app:cardCornerRadius="@dimen/pad_12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-        >
+            android:layout_margin="@dimen/pad_10"
+            app:cardCornerRadius="@dimen/pad_12"
 
-    <LinearLayout
-        android:id="@+id/searchViewLV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/card_edge"
-      >
-
+            >
 
             <LinearLayout
+                android:id="@+id/searchViewLV"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="1">
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_edge">
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/brandSearchET"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight=".8"
-                    android:layout_gravity="center"
-                    android:background="@null"
-               android:gravity="center"
-                    android:hint="@string/searchBrand"
-                    android:inputType="text"
-                    android:paddingStart="@dimen/pad_16"
-                    android:paddingEnd="@dimen/pad_16"
-                    android:textColor="@color/black"
-                   />
 
-                <ImageView
-                    android:id="@+id/searchButton"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/pad_50"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_weight=".2"
-                    android:paddingTop="8dp"
-                    android:src="@drawable/ic_search_24"
-                    />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/brandSearchET"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight=".8"
+                        android:background="@null"
+                        android:gravity="center"
+                        android:hint="@string/searchBrand"
+                        android:inputType="text"
+                        android:paddingStart="@dimen/pad_16"
+                        android:paddingEnd="@dimen/pad_16"
+                        android:textColor="@color/black"
+                        android:imeOptions="actionDone"/>
+
+                    <ImageView
+                        android:id="@+id/searchButton"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/pad_50"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_weight=".2"
+                        android:paddingTop="8dp"
+                        android:src="@drawable/ic_search_24" />
+                </LinearLayout>
+
+
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/brandEmiMasterRV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_brand_emi_master" />
     </LinearLayout>
-    </androidx.cardview.widget.CardView>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/brandEmiMasterRV"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_brand_emi_master"
-        />
-</LinearLayout>
-</LinearLayout>
+</RelativeLayout>

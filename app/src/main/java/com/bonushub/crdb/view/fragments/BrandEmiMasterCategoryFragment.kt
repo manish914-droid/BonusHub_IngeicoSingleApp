@@ -1,6 +1,10 @@
 package com.bonushub.crdb.view.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +23,8 @@ import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.view.base.IDialog
@@ -29,6 +35,9 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class BrandEmiMasterCategoryFragment : Fragment() {
@@ -45,6 +54,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         BrandEMIMasterCategoryAdapter(::onItemClick)
     }
 
+    var brandEmiMasterDataList = mutableListOf<BrandEMIMasterDataModal>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,6 +84,10 @@ class BrandEmiMasterCategoryFragment : Fragment() {
 
         }
 
+        brandMasterBinding?.emptyTxt?.text = "No Data Found"
+        brandMasterBinding?.emptyTxt?.visibility = View.GONE
+        brandMasterBinding?.brandSearchET?.setText("")
+
         (activity as IDialog).showProgress()
         brandEmiMasterCategoryViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
 
@@ -85,6 +99,11 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                     is GenericResponse.Success -> {
                         println(Gson().toJson(genericResp.data))
                         setUpRecyclerView()
+
+                        brandEmiMasterDataList.clear()
+                        brandMasterBinding?.brandSearchET?.setText("")
+                        brandEmiMasterDataList.addAll(genericResp.data as List<BrandEMIMasterDataModal>)
+
                         brandEMIMasterCategoryAdapter.submitList(genericResp.data)
                     }
                     is GenericResponse.Error -> {
@@ -96,6 +115,31 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                     }
                 }
             })
+
+
+        //local search region
+
+        brandMasterBinding?.brandSearchET?.addTextChangedListener(object : TextWatcher {
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {
+                if (TextUtils.isEmpty(p0.toString())) {
+                    brandMasterBinding?.emptyTxt?.visibility = View.GONE
+                    brandEMIMasterCategoryAdapter.submitList(brandEmiMasterDataList)
+                    DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+                }
+            }
+        })
+
+        brandMasterBinding?.searchButton?.setOnClickListener {
+            logger("searchButton","click","e")
+            logger("searchButton",""+brandMasterBinding?.brandSearchET?.text.toString(),"e")
+            DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+            (activity as IDialog).showProgress()
+            getSearchedBrands(brandMasterBinding?.brandSearchET?.text.toString().trim())
+        }
+        // local search end region
     }
 
     //region===========================SetUp RecyclerView :-
@@ -144,5 +188,48 @@ class BrandEmiMasterCategoryFragment : Fragment() {
             }
         }
     }
+
+    //region===================Get Searched Results from Brand List:-
+    private fun getSearchedBrands(searchText: String?) {
+        val searchedDataList = mutableListOf<BrandEMIMasterDataModal>()
+        lifecycleScope.launch(Dispatchers.Default) {
+            if (!TextUtils.isEmpty(searchText)) {
+                for (i in 0 until brandEmiMasterDataList.size) {
+                    val brandData = brandEmiMasterDataList[i]
+                    //check whether brand name contains letter which is inserted in search box:-
+                    if (brandData.brandName.toLowerCase(Locale.ROOT).trim()
+                            .contains(searchText?.toLowerCase(Locale.ROOT)?.trim()!!)
+                    )
+                        searchedDataList.add(
+                            BrandEMIMasterDataModal(
+                                brandData.brandID, brandData.brandName,
+                                brandData.mobileNumberBillNumberFlag
+                            )
+                        )
+                    Log.d("searchedDataList:- ", searchedDataList.toString())
+                }
+                lifecycleScope.launch(Dispatchers.Main) {
+
+                    if(searchedDataList.size>0) {
+                        brandEMIMasterCategoryAdapter.submitList(searchedDataList)
+                        brandMasterBinding?.emptyTxt?.visibility = View.GONE
+                        (activity as IDialog).hideProgress()
+                    }
+                    else{
+
+                        brandEMIMasterCategoryAdapter.submitList(searchedDataList)
+                        (activity as IDialog).hideProgress()
+                        brandMasterBinding?.emptyTxt?.visibility = View.VISIBLE
+
+                    }
+                }
+            } else
+                withContext(Dispatchers.Main) {
+                    (activity as IDialog).hideProgress()
+
+                }
+        }
+    }
+    //endregion
 
 }
