@@ -267,4 +267,6 @@
 
     <!--Digi Pos-->
     <string name="digi_pos_header">DIGI POS</string>
+    <string name="vpa">VPA</string>
+    <string name="no_data_found">No Data Found</string>
 </resources>

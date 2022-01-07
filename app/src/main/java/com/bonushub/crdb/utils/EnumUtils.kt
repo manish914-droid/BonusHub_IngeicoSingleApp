@@ -608,7 +608,7 @@ enum class DigiPosItem(val title: String, val res: Int, val rank: Int = 15, var 
     STATIC_QR("STATIC QR", R.drawable.ic_qr_code, 904),
     SMS_PAY("SMS PAY", R.drawable.ic_sms_pay, 902),
     PENDING_TXN("PENDING TXN", R.drawable.ic_pending_txn, 903),
-    TXN_LIST("TXN LIST", R.drawable.ic_sms_pay, 903),
+    TXN_LIST("TXN LIST", R.drawable.ic_txn_list, 903),
     /*BHARAT_QR("Bharat QR", R.drawable.ic_qr_code, 905),*/
 }
 // end region
