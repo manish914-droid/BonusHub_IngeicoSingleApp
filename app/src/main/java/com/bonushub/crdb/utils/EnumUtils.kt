@@ -431,13 +431,8 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
  /*
     FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_advance, 666),
     LESS("View Less", R.drawable.ic_arrow_up, 888),
+*/
 
-    UPI("UPI COLLECT", R.drawable.upi_icon, 901),
-    SMS_PAY("SMS PAY", R.drawable.sms_icon, 902),
-    TXN_LIST("TXN LIST", R.drawable.sms_icon, 903),
-    PENDING_TXN("Pending Txn", R.drawable.pending_txn, 903),
-    STATIC_QR("Static QR", R.drawable.ic_qr_code, 904),
-    BHARAT_QR("Bharat QR", R.drawable.ic_qr_code, 905),*/
 
 
 }
@@ -603,5 +598,17 @@ enum class TestEmiItem(val id:String, val _name: String){
     _6_M_TID("6", "6 M TID"),
     _9_M_TID("9", "9 M TID"),
     _12_M_TID("12", "12 M TID")
+}
+// end region
+
+// region
+enum class DigiPosItem(val title: String, val res: Int, val rank: Int = 15, var childList:MutableList<EDashboardItem>?=null,) {
+    UPI("UPI COLLECT", R.drawable.ic_upi, 901),
+    DYNAMIC_QR("DYNAMIC QR", R.drawable.ic_qr_code, 906),
+    STATIC_QR("STATIC QR", R.drawable.ic_qr_code, 904),
+    SMS_PAY("SMS PAY", R.drawable.ic_sms_pay, 902),
+    PENDING_TXN("PENDING TXN", R.drawable.ic_pending_txn, 903),
+    TXN_LIST("TXN LIST", R.drawable.ic_sms_pay, 903),
+    /*BHARAT_QR("Bharat QR", R.drawable.ic_qr_code, 905),*/
 }
 // end region

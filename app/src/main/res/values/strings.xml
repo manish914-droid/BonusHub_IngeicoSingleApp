@@ -264,4 +264,7 @@
 
     <!--Test EMI-->
     <string name="test_emi_header">TEST EMI</string>
+
+    <!--Digi Pos-->
+    <string name="digi_pos_header">DIGI POS</string>
 </resources>
