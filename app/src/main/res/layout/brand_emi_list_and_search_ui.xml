@@ -62,11 +62,11 @@
                         android:background="@null"
                         android:gravity="center"
                         android:hint="@string/searchBrand"
+                        android:imeOptions="actionDone"
                         android:inputType="text"
                         android:paddingStart="@dimen/pad_16"
                         android:paddingEnd="@dimen/pad_16"
-                        android:textColor="@color/black"
-                        android:imeOptions="actionDone"/>
+                        android:textColor="@color/black" />
 
                     <ImageView
                         android:id="@+id/searchButton"

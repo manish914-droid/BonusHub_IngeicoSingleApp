@@ -191,6 +191,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
 
     //region===================Get Searched Results from Brand List:-
     private fun getSearchedBrands(searchText: String?) {
+
         val searchedDataList = mutableListOf<BrandEMIMasterDataModal>()
         lifecycleScope.launch(Dispatchers.Default) {
             if (!TextUtils.isEmpty(searchText)) {

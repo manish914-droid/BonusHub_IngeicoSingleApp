@@ -162,6 +162,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
 
     //region===================Get Searched Results from Brand List:-
     private fun getSearchedSubCategory(searchText: String?) {
+
         val searchedDataList = mutableListOf<BrandEMISubCategoryTable>()
         searchedDataList.clear()
 
