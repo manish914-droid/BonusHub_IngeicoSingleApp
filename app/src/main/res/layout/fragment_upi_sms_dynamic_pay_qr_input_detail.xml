@@ -47,10 +47,10 @@
                     android:inputType="number"
                     android:lines="1"
                     android:maxLength="8"
-                    android:padding="@dimen/pad_14"
+                    android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_regular" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -81,10 +81,10 @@
                     android:inputType="text"
                     android:lines="1"
                     android:maxLength="15"
-                    android:padding="@dimen/pad_14"
+                    android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_regular" />
             </com.google.android.material.card.MaterialCardView>
 
 
@@ -114,10 +114,10 @@
                     android:inputType="number"
                     android:lines="1"
                     android:maxLength="10"
-                    android:padding="@dimen/pad_14"
+                    android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_regular" />
             </com.google.android.material.card.MaterialCardView>
 
             <!--ENTER DESCRIPTION (OPTIONAL)-->
@@ -146,13 +146,31 @@
                     android:inputType="text"
                     android:lines="1"
                     android:maxLength="20"
-                    android:padding="@dimen/pad_14"
+                    android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_regular" />
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/btnProceed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/edge_button_blue"
+                android:drawablePadding="10dp"
+                android:fontFamily="@font/muli_regular"
+                android:gravity="center"
+                android:paddingStart="30dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="30dp"
+                android:paddingBottom="9dp"
+                android:text="Proceed"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small"
+                android:layout_gravity="center_horizontal"/>
+
+            <!--<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
@@ -165,7 +183,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/pad_5"
                     android:visibility="visible" />
-            </LinearLayout>
+            </LinearLayout>-->
         </LinearLayout>
 
     </LinearLayout>
