@@ -6,19 +6,21 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
 import com.bonushub.pax.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import java.util.HashMap
 import javax.inject.Inject
 
 
 class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : ISettlementPacketExchange {
-
+    val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
+    val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
     override fun createSettlementISOPacket(): IWriter = IsoDataWriter().apply {
-        val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
         val tpt = runBlocking(Dispatchers.IO) { getTptData() }
         var batchNumber:String?=null
-        val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
+
         if (tpt != null) {
             mti = Mti.SETTLEMENT_MTI.mti
 
@@ -68,167 +70,178 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                     + version + pcNumber + addPad("0", "0", 9)
             )
             //adding field 63
-            var saleCount = 0
-            var saleAmount = 0L
 
-            var refundCount = 0
-            var refundAmount = "0"
-
-            var saletid: String? = null
-            var salebatchNumber: String? = null
-
-            var emiCount = 0
-            var emiAmount = 0L
-
-            var emitid: String? = null
-            var emibatchNumber: String? = null
 
             //SEQUENCE-------> sale, emi sale ,sale with cash, cash only,auth comp,and tip transaction type will be included.
             //Manipulating Data based on condition for Field 63:-
             if (batchListData?.size > 0) {
-                for (i in 0 until batchListData.size) {
-                    when (batchListData[i]?.transactionType) {
-                        BhTransactionType.SALE.type -> {
-                            saletid = batchListData[i]?.receiptData?.tid
-                            salebatchNumber = batchListData[i]?.receiptData?.batchNumber
-                            saleCount = saleCount.plus(1)
-                            saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
-                        }
 
-                        BhTransactionType.EMI_SALE.type -> {
-                            var emiTid = batchListData[i]?.emiTenureDataModel?.txnTID
-                            if(baseTid == emiTid){
-                                //salebatchNumber = batchListData[i]?.receiptData?.batchNumber
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i].emiTenureDataModel?.transactionAmount?.toLong() ?: 0L)
-                            }
-                            else{
-                                emitid = batchListData[i]?.emiTenureDataModel?.txnTID
-                                emibatchNumber = batchListData[i]?.receiptData?.batchNumber
-                                emiCount = emiCount.plus(1)
-                                emiAmount = emiAmount.plus(batchListData[i].emiTenureDataModel?.transactionAmount?.toLong() ?: 0L)
-                            }
 
-                        }
+                val map = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
 
-                        BhTransactionType.BRAND_EMI.type -> {
-                            var emiTid = batchListData[i]?.emiTenureDataModel?.txnTID
-                            if(baseTid == emiTid){
-                                //salebatchNumber = batchListData[i]?.receiptData?.batchNumber
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i].emiTenureDataModel?.transactionAmount?.toLong() ?: 0L)
-                            }
-                            else{
-                                emitid = batchListData[i]?.emiTenureDataModel?.txnTID
-                                emibatchNumber = batchListData[i]?.receiptData?.batchNumber
-                                emiCount = emiCount.plus(1)
-                                emiAmount = emiAmount.plus(batchListData[i].emiTenureDataModel?.transactionAmount?.toLong() ?: 0L)
-                            }
-                        }
-                        BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
-                            var emiTid = batchListData[i]?.emiTenureDataModel?.txnTID
-                            if(baseTid == emiTid){
-                                //salebatchNumber = batchListData[i]?.receiptData?.batchNumber
-                                saleCount = saleCount.plus(1)
-                                saleAmount = saleAmount.plus(batchListData[i].emiTenureDataModel?.transactionAmount?.toLong() ?: 0L)
-                            }
-                            else{
-                                emitid = batchListData[i]?.emiTenureDataModel?.txnTID
-                                emibatchNumber = batchListData[i]?.receiptData?.batchNumber
-                                emiCount = emiCount.plus(1)
-                                emiAmount = emiAmount.plus(batchListData[i].emiTenureDataModel?.transactionAmount?.toLong() ?: 0L)
-                            }
-                        }
+                for (it in batchListData) {
 
-                        BhTransactionType.SALE_WITH_CASH.type -> {
-                            saleCount = saleCount.plus(1)
-                            saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                    val transAmt = try {
+                        it.receiptData?.txnAmount?.toLong()
+                    } catch (ex: Exception) {
+                        0L
+                    }
+                    if (map.containsKey(it.receiptData?.tid!!)) {
+                        val ma = map[it.receiptData?.tid!!] as MutableMap<Int, SummeryModel>
+                        if (ma!!.containsKey(it.transactionType)) {
+                            val m = ma[it.transactionType] as SummeryModel
+                            m.count += 1
+                            m.total += transAmt!!
+                            m.batchNumber  = it.receiptData?.batchNumber!!
+                        } else {
+                            val sm = SummeryModel(transactionType2Name(it.transactionType), 1, transAmt!!,it.receiptData?.tid ?: "",it.receiptData?.batchNumber!!)
+                            ma[it.transactionType] = sm
                         }
-
-                        BhTransactionType.CASH_AT_POS.type -> {
-                            saleCount = saleCount.plus(1)
-                            saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
+                    } else {
+                        val hm = HashMap<Int, SummeryModel>().apply {
+                            this[it.transactionType] = SummeryModel(transactionType2Name(it.transactionType), 1, transAmt!!,it.receiptData?.tid ?: "",it.receiptData?.batchNumber!!)
                         }
-
-                        BhTransactionType.PRE_AUTH_COMPLETE.type -> {
-                            saleCount = saleCount.plus(1)
-                            saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
-                        }
-                        BhTransactionType.TIP_SALE.type -> {
-                            saleCount = saleCount.plus(1)
-                            saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
-                        }
-
-                        BhTransactionType.TIP_SALE.type -> {
-                            saleCount = saleCount.plus(1)
-                            saleAmount = saleAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
-                        }
-
-                        BhTransactionType.REFUND.type -> {
-                            refundCount = refundCount.plus(1)
-                            refundAmount =
-                                refundAmount.plus(batchListData[i]?.receiptData?.txnAmount?.toLong() ?: 0L)
-                        }
+                        map[it.receiptData?.tid!!] = hm
                     }
                 }
 
-                val sCount = addPad(saleCount, "0", 3, true)
-                val sAmount = addPad(saleAmount.toString(), "0", 12, true)
+                //adding field 63
+                var saleCount = 0
+                var saleAmount = 0L
 
-                val rCount = addPad(refundCount, "0", 3, true)
-                val rAmount = addPad(refundAmount, "0", 12, true)
+                var refundCount = 0
+                var refundAmount = 0L
 
-                //   sale,sale with cash, cash only,auth comp,and tip transaction
+                var saletid: String? = null
+                var salebatchNumber: String? = null
+
+                var field63: String? = null
+
+                for ((key, _map) in map) {
+
+                    println("Key value in map "+key)
+
+                    for ((k, m) in _map) {
+                        println("key value in _map "+ k)
+                        println("Value value in _map "+ m)
+                        when (k) {
+                            BhTransactionType.SALE.type -> {
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+
+                            BhTransactionType.EMI_SALE.type -> {
+
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+
+                            }
+
+                            BhTransactionType.BRAND_EMI.type -> {
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+                            BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+
+                            BhTransactionType.SALE_WITH_CASH.type -> {
+
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+
+                            BhTransactionType.CASH_AT_POS.type -> {
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+
+                            BhTransactionType.PRE_AUTH_COMPLETE.type -> {
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+                            BhTransactionType.TIP_SALE.type -> {
+                                saletid = key
+                                salebatchNumber = m.batchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+
+                            BhTransactionType.REFUND.type -> {
+                                refundCount += m.count
+                                refundAmount += m.total
+                            }
+                        }
 
 
-                val sCountEmi = addPad(emiCount, "0", 3, true)
-                val sAmountEmi = addPad(emiAmount.toString(), "0", 12, true)
 
-                val rCountEmi = addPad(0, "0", 3, true)
-                val rAmountEmi = addPad(0, "0", 12, true)
+                        val sCount = addPad(saleCount, "0", 3, true)
+                        val sAmount = addPad(saleAmount.toString(), "0", 12, true)
 
-                //  emi sale
+                        val rCount = addPad(refundCount, "0", 3, true)
+                        val rAmount = addPad(refundAmount.toString(), "0", 12, true)
 
-                if(saleCount > 0 && emiCount > 0){
-                    addFieldByHex(
-                        63,
-                        addPad(saletid ?: "", "0", 8, true)+
-                                addPad(salebatchNumber ?: "", "0", 6, true)+
-                                addPad(sCount + sAmount + rCount + rAmount, "0", 90,
-                                    toLeft = false)+
-                                addPad(emitid ?: "", "0", 8, true)+
-                                addPad(emibatchNumber ?: "", "0", 6, true)+
-                                addPad(sCountEmi + sAmountEmi + rCountEmi + rAmountEmi, "0", 90,
-                                    toLeft = false)
-                    )
+                        //   sale,sale with cash, cash only,auth comp,and tip transaction
+
+                        if(null !=field63) {
+
+                            field63 += addPad(saletid ?: "", "0", 8, true) +
+                                    addPad(salebatchNumber ?: "", "0", 6, true) +
+                                    addPad(
+                                        sCount + sAmount + rCount + rAmount, "0", 90,
+                                        toLeft = false
+                                    )
+                        }
+                        else{
+                            field63 = addPad(saletid ?: "", "0", 8, true) +
+                                    addPad(salebatchNumber ?: "", "0", 6, true) +
+                                    addPad(
+                                        sCount + sAmount + rCount + rAmount, "0", 90,
+                                        toLeft = false
+                                    )
+                        }
+
+
+
+                        saleCount = 0;
+                        saleAmount = 0;
+                        refundCount = 0;
+                        refundAmount = 0;
+
+                    }
                 }
-               else if(emiCount > 0){
-                    addFieldByHex(
-                        63,
 
-                        addPad(emitid ?: "", "0", 8, true)+
-                                addPad(emibatchNumber ?: "", "0", 6, true)+
-                                addPad(sCountEmi + sAmountEmi + rCountEmi + rAmountEmi, "0", 90,
-                                    toLeft = false)
-                    )
-                }
-                else{
-                    addFieldByHex(
-                        63,
-                        addPad(saletid ?: "", "0", 8, true)+
-                                addPad(salebatchNumber ?: "", "0", 6, true)+
-                                addPad(sCount + sAmount + rCount + rAmount, "0", 90,
-                                    toLeft = false
-                                )
-                    )
-                }
+                addFieldByHex(63,field63!!)
+
+
             } else {
                 addFieldByHex(63, addPad(0, "0", 90, toLeft = false))
             }
         }
         logger("SETTLEMENT REQ PACKET -->", this.isoMap, "e")
 
-
-
     }
+
+    internal data class SummeryModel(
+        val type: String,
+        var count: Int = 0,
+        var total: Long = 0,
+        var hostTid: String,
+        var batchNumber: String
+    )
 }

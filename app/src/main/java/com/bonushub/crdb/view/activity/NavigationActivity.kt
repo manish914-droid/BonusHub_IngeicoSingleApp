@@ -2,6 +2,7 @@ package com.bonushub.crdb.view.activity
 
 import android.app.Dialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,6 +24,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bonushub.crdb.R
+import com.bonushub.crdb.appupdate.AppUpdateDownloadManager
+import com.bonushub.crdb.appupdate.OnDownloadCompleteListener
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
@@ -66,6 +69,7 @@ import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.coroutines.*
+import java.io.File
 import java.lang.Runnable
 import javax.inject.Inject
 
@@ -884,10 +888,48 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }, false)
         } else {
             if (checkInternetConnection())
-            ///  checkAndPerformOperation()
+              checkAndPerformOperation()
             else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
         }
     }
+
+    //Below method is used to check which action to perform on click of any module in app whether Force Settlement  , Init or Logon:-
+    private fun checkAndPerformOperation() {
+        if (checkInternetConnection()) {
+            if (AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
+                alertBoxWithAction(
+                    getString(R.string.batch_settle),
+                    getString(R.string.please_settle_batch),
+                    false, getString(R.string.positive_button_ok),
+                    {
+                        autoSettleBatchData()
+                    },
+                    {})
+
+            }
+            else if (AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString())) {
+                val tpt = runBlocking(Dispatchers.IO) { getTptData() }
+                if (tpt != null) {
+                    val tid = tpt.terminalId?.get(0)?.toLong().toString()
+
+                }
+            }
+            else if (AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())) {
+                val tpt = runBlocking(Dispatchers.IO) { getTptData() }
+                if (tpt != null) {
+                    val tid = tpt.terminalId?.get(0)?.toLong().toString()
+
+                }
+            }
+            else {
+               // VFService.showToast(getString(R.string.something_went_wrong))
+            }
+
+        } else {
+           // VFService.showToast(getString(R.string.no_internet_available_please_check_your_internet))
+        }
+    }
+
     //region================================================Settlement Server Hit:-
     suspend fun settleBatch(settlementByteArray: ByteArray?,
                             settlementCallFrom: String = SettlementComingFrom.SETTLEMENT.screenType,
@@ -1251,6 +1293,86 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             })
         }
     }
+
+    //Below method is used to update App through HTTP/HTTPs:-
+
+    private fun startHTTPSAppUpdate(appHostDownloadURL: String? = null, ftpIPPort: Int? = null, downloadAppFileName: String, downloadFileSize: String) {
+        showPercentDialog(getString(R.string.please_wait_downloading_application_update))
+        if (appHostDownloadURL != null) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            val appHostDownloadURL = appHostDownloadURL?.replace("/app", ":"+ftpIPPort)
+            //   AppUpdateDownloadManager(this@MainActivity,"https://bonushub.co.in/",
+            AppUpdateDownloadManager(this@NavigationActivity,appHostDownloadURL+"app"+"/"+"X990"+"/"+downloadAppFileName,
+                object : OnDownloadCompleteListener {
+                    override fun onError(msg: String) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            hideProgress()
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                            getInfoDialog(
+                                msg,
+                                "App Update Failed"
+                            ) {}
+                        }
+                    }
+
+                    override fun onDownloadComplete(path: String, appName: String, fileUri: File?) {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        if (!TextUtils.isEmpty(path)) {
+                            hideProgress()
+                            Log.d("DownloadAppFilePath:- ", path)
+
+                            val downloadedFile = File(fileUri?.path ?: "")
+
+                            if (!TextUtils.isEmpty(fileUri.toString())) {
+                                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(Uri.fromFile(fileUri), "application/vnd.android.package-archive")
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                    })
+                                }
+
+                        } else {
+                            hideProgress()
+                           // VFService.showToast(getString(R.string.something_went_wrong))
+                        }
+                    }
+                }).execute()
+
+
+            /*  AppUpdateDownloadManager("https://testapp.bonushub.co.in:8055/app/pos.zip",
+                       object : OnDownloadCompleteListener {
+                           override fun onError(msg: String) {
+                               GlobalScope.launch(Dispatchers.Main) {
+                                   hideProgress()
+                                   getInfoDialog(
+                                       getString(R.string.connection_error),
+                                       "No update available"
+                                   ) {}
+                               }
+                           }
+
+                           override fun onDownloadComplete(path: String, appName: String) {
+                               if (!TextUtils.isEmpty(path)) {
+                                   hideProgress()
+                                   Log.d("DownloadAppFilePath:- ", path)
+                                   autoInstallApk(path) { status, packageName, code ->
+                                       GlobalScope.launch(Dispatchers.Main) {
+                                           VFService.showToast(getString(R.string.app_updated_successfully))
+                                       }
+                                   }
+                               } else {
+                                   hideProgress()
+                                   VFService.showToast(getString(R.string.something_went_wrong))
+                               }
+                           }
+                       }).execute()*/
+
+        } else {
+          //  VFService.showToast("Download URL Not Found!!!")
+        }
+    }
+
+
+
 
     //Auto Settle Batch:- kushal
     private fun autoSettleBatchData() {
