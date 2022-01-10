@@ -22,4 +22,14 @@ class BrandEmiProductViewModel(private val serverRepository: ServerRepository,pr
             serverRepository.getBrandEmiProductData("0",brandId,subCatId)
         }
     }
+
+    suspend fun getBrandData(dataCounter:String,brandId:String,subCatId : String,searchedProductName:String, isSearchData:Boolean)
+    {
+        serverRepository.getBrandEmiProductData(dataCounter,brandId,subCatId, searchedProductName, isSearchData)
+    }
+
+    suspend fun getBrandData(dataCounter:String,brandId:String,subCatId : String)
+    {
+        serverRepository.getBrandEmiProductData("0",brandId,subCatId)
+    }
 }

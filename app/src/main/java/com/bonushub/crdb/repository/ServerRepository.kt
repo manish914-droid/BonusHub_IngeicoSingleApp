@@ -173,8 +173,17 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
 
     }
-     suspend fun getBrandEmiProductData(dataCounter: String="0",brandID:String?,categoryID:String?){
-        val field57=  "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
+     suspend fun getBrandEmiProductData(dataCounter: String="0",brandID:String?,categoryID:String?,searchedProductName:String = "", isSearchData:Boolean = false){
+         var field57 = ""
+         if(isSearchData){
+//             field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
+//             field57RequestData = "${EMIRequestType.BRAND_EMI_Product.requestType}^0^${brandEMIDataModal?.brandID}^${brandEMIDataModal?.categoryID}"
+//             field57RequestData = "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$totalRecord^${brandEMIDataModal?.brandID}^^$searchedProductName"
+             field57 = "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$dataCounter^${brandID}^^$searchedProductName"
+
+         }else {
+             field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
+         }
 
         when(val genericResp = remoteService.field57GenericService(field57)){
             is GenericResponse.Success->{
@@ -584,6 +593,7 @@ if(!fromBankEmi)
             if (!TextUtils.isEmpty(brandEMIProductData)) {
                 val dataList = Utility().parseDataListWithSplitter("|", brandEMIProductData)
                 if (dataList.isNotEmpty()) {
+                    logger("moreDataFlag","serverSide "+dataList[0],"e")
                     moreDataFlag = dataList[0]
                     perPageRecord = dataList[1]
                     totalRecord = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
@@ -618,10 +628,12 @@ if(!fromBankEmi)
                     }
 
                     //Refresh Field57 request value for Pagination if More Record Flag is True:-
+                    logger("moreDataFlag",""+moreDataFlag,"e")
                     if (moreDataFlag == "1") {
                      getBrandEmiProductData(totalRecord,brandID ,catagoryID)
                         Log.d("FullDataList:- ", brandEmiProductDataList.toString())
                     } else {
+                        logger("brandEmiProductDataList",""+brandEmiProductDataList.size)
                         brandEMIProductMLData.postValue(GenericResponse.Success(brandEmiProductDataList))
 
                         Log.d("Full Product Data:- ", Gson().toJson(brandEmiProductDataList))
