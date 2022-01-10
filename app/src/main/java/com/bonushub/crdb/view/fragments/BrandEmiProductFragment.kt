@@ -2,6 +2,9 @@ package com.bonushub.crdb.view.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +25,8 @@ import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
@@ -56,6 +61,10 @@ class BrandEmiProductFragment : Fragment() {
 
     private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
 
+    // for backpress manage
+    var isFirstTime = false
+    var firstTimeData : ArrayList<BrandEMIProductDataModal?>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -76,6 +85,8 @@ class BrandEmiProductFragment : Fragment() {
        brandEmiCatData = arguments?.getSerializable("brandEmiCat") as? BrandEMISubCategoryTable
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
+        logger("callInit","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID}","e")
+        isFirstTime = true
         (activity as IDialog).showProgress()
         brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
             BrandEmiProductViewModel::class.java
@@ -98,6 +109,7 @@ class BrandEmiProductFragment : Fragment() {
 
 
 
+
         brandEmiProductViewModel.brandEMIProductLivedata.observe(
             viewLifecycleOwner,
             {
@@ -105,8 +117,15 @@ class BrandEmiProductFragment : Fragment() {
                 when (val genericResp = it) {
                     is GenericResponse.Success -> {
                         println(Gson().toJson(genericResp.data))
+                        println("dataListSize"+Gson().toJson(genericResp.data?.size))
                         setUpRecyclerView()
                         brandEMIProductAdapter.submitList(genericResp.data)
+                        if(isFirstTime) {
+                            firstTimeData = ArrayList()
+                            firstTimeData!!.addAll(genericResp.data!!)
+                            //genericResp.data?.let { it1 -> firstTimeData!!.addAll(it1) }
+                            isFirstTime = false
+                        }
                     }
                     is GenericResponse.Error -> {
                         ToastUtils.showToast(activity, genericResp.errorMessage)
@@ -117,6 +136,53 @@ class BrandEmiProductFragment : Fragment() {
                     }
                 }
             })
+
+        // region search product from server
+
+        brandEmiProductBinding?.brandSearchET?.addTextChangedListener(object : TextWatcher {
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {
+                if (TextUtils.isEmpty(p0.toString())) {
+                    brandEmiProductBinding?.emptyTxt?.visibility = View.GONE
+                    DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+//                    (activity as IDialog).showProgress()
+//                    lifecycleScope.launch(Dispatchers.IO){
+//                        logger("callBackPress","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID}","e")
+//                        brandEmiProductViewModel.getBrandData("0",brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")
+//                        brandEMIProductAdapter.submitList(firstTimeData)
+//                        isFirstTime = false
+//                    }
+                    if(firstTimeData != null){
+                        brandEMIProductAdapter.submitList(firstTimeData)
+                        isFirstTime = false
+                    }
+                }
+            }
+        })
+        brandEmiProductBinding?.searchButton?.setOnClickListener {
+
+            DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+            brandEmiProductBinding?.emptyTxt?.visibility = View.GONE
+            var searchText = brandEmiProductBinding?.brandSearchET?.text.toString().trim()
+
+            (activity as IDialog).showProgress()
+
+            lifecycleScope.launch(Dispatchers.IO){
+                logger("callsearch","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID} ${searchText}","e")
+                brandEmiProductViewModel.getBrandData("0",brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"",searchText, true)
+            }
+            /*
+            totalRecord = "0"
+            brandEmiSearchedProductDataList.clear()
+            //Initially on searching of product we were not showing the products category with requestType 3.But now with request type 11,product category name is coming
+            field57RequestData = "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$totalRecord^${brandEMIDataModal?.brandID}^^$searchedProductName"
+            Log.d("57Data:-", field57RequestData.toString())
+            fetchBrandEMIProductDataFromHost(isSearchedDataCall = true)
+            */
+        }
+        // end region
     }
     //region===========================SetUp RecyclerView :-
     private fun setUpRecyclerView() {
