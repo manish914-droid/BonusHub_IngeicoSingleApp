@@ -20,10 +20,7 @@ import com.bonushub.pax.utils.IsoDataReader
 import com.bonushub.pax.utils.IsoDataWriter
 import com.bonushub.pax.utils.SplitterTypes
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class ServerRepository( val appDB: AppDatabase, private val remoteService: RemoteService) {
 
@@ -630,8 +627,10 @@ if(!fromBankEmi)
                     //Refresh Field57 request value for Pagination if More Record Flag is True:-
                     logger("moreDataFlag",""+moreDataFlag,"e")
                     if (moreDataFlag == "1") {
-                     getBrandEmiProductData(totalRecord,brandID ,catagoryID)
+                        logger("brandEmiProductDataList",""+brandEmiProductDataList.size)
                         Log.d("FullDataList:- ", brandEmiProductDataList.toString())
+                        getBrandEmiProductData(totalRecord,brandID ,catagoryID)
+
                     } else {
                         logger("brandEmiProductDataList",""+brandEmiProductDataList.size)
                         brandEMIProductMLData.postValue(GenericResponse.Success(brandEmiProductDataList))
