@@ -176,6 +176,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                             override fun onClickOk(dialog: Dialog, password: String) {
 
                                 logger("password",password)
+
                                 bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{
 
                                     if(it)
@@ -188,6 +189,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                         ToastUtils.showToast(requireContext(),R.string.invalid_password)
                                     }
                                 })
+
 
                             }
 

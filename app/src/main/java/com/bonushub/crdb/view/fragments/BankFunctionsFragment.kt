@@ -34,6 +34,7 @@ import com.ingenico.hdfcpayment.type.CvmAction
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -120,16 +121,20 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
         override fun onClickOk(dialog: Dialog, password:String) {
 
             dialogSuperAdminPassword = dialog
-            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{
 
-                if(it)
-                {
-                    dialogSuperAdminPassword?.dismiss()
-                    (activity as NavigationActivity).transactFragment(BankFunctionsAdminVasFragment(),true)
-                }else{
-                    ToastUtils.showToast(requireContext(),R.string.invalid_password)
-                }
-            })
+            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner, {
+
+                    if (it) {
+                        dialogSuperAdminPassword?.dismiss()
+                        (activity as NavigationActivity).transactFragment(
+                            BankFunctionsAdminVasFragment(),
+                            true
+                        )
+                    } else {
+                        ToastUtils.showToast(requireContext(), R.string.invalid_password)
+                    }
+                })
+
         }
 
         override fun onClickCancel() {

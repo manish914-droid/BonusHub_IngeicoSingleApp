@@ -224,6 +224,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                 }
             })
 
+
         }
 
         override fun onClickCancel() {

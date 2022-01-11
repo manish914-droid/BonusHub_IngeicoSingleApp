@@ -38,13 +38,11 @@ class BankFunctionsViewModel @ViewModelInject constructor(private val bankFuncti
     private var isSuperAdminPassword:LiveData<Boolean>? = null
     fun isSuperAdminPassword(password:String):LiveData<Boolean>? {
 
-        viewModelScope.launch {
             try {
                 isSuperAdminPassword = bankFunctionsRepository.isSuperAdminPassword(password)
             }catch (ex: Exception){
                 ex.printStackTrace()
             }
-        }
 
         return isSuperAdminPassword
 
