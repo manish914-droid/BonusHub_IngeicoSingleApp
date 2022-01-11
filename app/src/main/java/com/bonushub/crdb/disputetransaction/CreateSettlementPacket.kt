@@ -17,6 +17,7 @@ import javax.inject.Inject
 class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : ISettlementPacketExchange {
     val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
     val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
+    val reversaldata = runBlocking(Dispatchers.IO) { appDao.getAllBatchReversalData() }
     override fun createSettlementISOPacket(): IWriter = IsoDataWriter().apply {
         val tpt = runBlocking(Dispatchers.IO) { getTptData() }
         var batchNumber:String?=null
@@ -39,6 +40,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
             addFieldByHex(41, baseTid)
 
             //adding mid
+
             addFieldByHex(42, tpt.merchantId)
 
             //adding field 48
@@ -203,7 +205,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             field63 += addPad(saletid ?: "", "0", 8, true) +
                                     addPad(salebatchNumber ?: "", "0", 6, true) +
                                     addPad(
-                                        sCount + sAmount + rCount + rAmount, "0", 90,
+                                        sCount + sAmount + rCount + rAmount, "0", 30,
                                         toLeft = false
                                     )
                         }
@@ -211,7 +213,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             field63 = addPad(saletid ?: "", "0", 8, true) +
                                     addPad(salebatchNumber ?: "", "0", 6, true) +
                                     addPad(
-                                        sCount + sAmount + rCount + rAmount, "0", 90,
+                                        sCount + sAmount + rCount + rAmount, "0", 30,
                                         toLeft = false
                                     )
                         }
@@ -226,10 +228,29 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                     }
                 }
 
+                if(reversaldata.size > 0){
+                    reversaldata.forEach {
+                      saletid =  it.receiptData?.tid
+                        salebatchNumber  = it.receiptData?.batchNumber
+                    }
+
+                    field63 += addPad(saletid ?: "", "0", 8, true) +
+                            addPad(salebatchNumber ?: "", "0", 6, true) +
+                            addPad("0" + "0" + "0" + "0", "0", 30,
+                                toLeft = false
+                            )
+                }
+
+
+
                 addFieldByHex(63,field63!!)
 
 
-            } else {
+            }
+            else if(reversaldata.size >0 ){
+
+            }
+            else {
                 addFieldByHex(63, addPad(0, "0", 90, toLeft = false))
             }
         }
