@@ -141,6 +141,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         override fun onClickOk(dialog: Dialog, password:String) {
 
             dialogSuperAdminPassword = dialog
+
             bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner, {success ->
 
                 if(success) {
@@ -173,6 +174,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
 
             })
+
 
         }
 

@@ -20,6 +20,7 @@ import com.bonushub.crdb.view.fragments.TableEditHelper
 import com.bonushub.crdb.view.fragments.TidsListModel
 import com.bonushub.pax.utils.PrefConstant
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -43,17 +44,18 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         return data
     }
 
-    suspend fun isSuperAdminPassword(password:String):LiveData<Boolean>{
+    fun isSuperAdminPassword(password:String):LiveData<Boolean>{
         val data = MutableLiveData<Boolean>()
 
         // write logic whether super password is correct or not
-        withContext(Dispatchers.IO) {
+        runBlocking(Dispatchers.IO) {
             val tpt = appDao.getSingleRowTerminalParameterTableData()
             try {
                // logger("sap",""+tpt?.superAdminPassword)
 
             data.postValue(tpt?.superAdminPassword.equals(password,true))
             }catch (ex:Exception){
+                ex.printStackTrace()
                  data.postValue(false)
             }
         }
