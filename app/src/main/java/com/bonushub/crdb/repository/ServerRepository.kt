@@ -170,7 +170,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
 
 
     }
-     suspend fun getBrandEmiProductData(dataCounter: String="0",brandID:String?,categoryID:String?,searchedProductName:String = "", isSearchData:Boolean = false){
+     suspend fun getBrandEmiProductData(dataCounter: String="0",brandID:String?,categoryID:String?,searchedProductName:String = "", isSearchData:Boolean = false,callFromViewModel:Boolean = false){
          var field57 = ""
          if(isSearchData){
 //             field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
@@ -182,11 +182,16 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
              field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
          }
 
+         if(callFromViewModel)
+         {
+             brandEmiProductDataList.clear()
+         }
+
         when(val genericResp = remoteService.field57GenericService(field57)){
             is GenericResponse.Success->{
                 val isoDataReader=genericResp.data
                 val brandEmiProductDataString = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
-                stubbingBrandEMIProductDataToList(brandEmiProductDataString,brandID,categoryID)
+                stubbingBrandEMIProductDataToList(brandEmiProductDataString,brandID,categoryID,searchedProductName,isSearchData)
 
             }
             is GenericResponse.Error->{
@@ -586,7 +591,7 @@ if(!fromBankEmi)
     }
 
     //region=================================Stubbing BrandEMI Product Data and Display in List:-
-    private suspend fun stubbingBrandEMIProductDataToList(brandEMIProductData: String, brandID: String?,catagoryID:String?) {
+    private suspend fun stubbingBrandEMIProductDataToList(brandEMIProductData: String, brandID: String?,catagoryID:String?,searchedProductName:String = "", isSearchData:Boolean = false) {
             if (!TextUtils.isEmpty(brandEMIProductData)) {
                 val dataList = Utility().parseDataListWithSplitter("|", brandEMIProductData)
                 if (dataList.isNotEmpty()) {
@@ -629,7 +634,11 @@ if(!fromBankEmi)
                     if (moreDataFlag == "1") {
                         logger("brandEmiProductDataList",""+brandEmiProductDataList.size)
                         Log.d("FullDataList:- ", brandEmiProductDataList.toString())
+                        if(isSearchData){
+                        getBrandEmiProductData(totalRecord,brandID ,catagoryID,searchedProductName,isSearchData)
+                        }else{
                         getBrandEmiProductData(totalRecord,brandID ,catagoryID)
+                        }
 
                     } else {
                         logger("brandEmiProductDataList",""+brandEmiProductDataList.size)
@@ -640,6 +649,10 @@ if(!fromBankEmi)
                 }
             } else {
               //  Empty product data in f57
+                Log.d("List:- ","List is empty")
+                //brandEMIMasterCategoryMLData .postValue(GenericResponse.Error("List is empty"))
+                //brandEMIMasterCategoryMLData .postValue(GenericResponse.Success(mutableListOf<BrandEMIProductDataModal>()))
+                brandEMIProductMLData.postValue(GenericResponse.Success(brandEmiProductDataList))
             }
 
     }

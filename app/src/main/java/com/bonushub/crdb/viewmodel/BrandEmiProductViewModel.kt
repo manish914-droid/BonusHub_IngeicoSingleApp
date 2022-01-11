@@ -19,17 +19,17 @@ class BrandEmiProductViewModel(private val serverRepository: ServerRepository,pr
     init {
         viewModelScope.launch(Dispatchers.IO) {
             logger("Get DATA","----START----------","e")
-            serverRepository.getBrandEmiProductData("0",brandId,subCatId)
+            serverRepository.getBrandEmiProductData("0",brandId,subCatId,callFromViewModel = true)
         }
     }
 
     suspend fun getBrandData(dataCounter:String,brandId:String,subCatId : String,searchedProductName:String, isSearchData:Boolean)
     {
-        serverRepository.getBrandEmiProductData(dataCounter,brandId,subCatId, searchedProductName, isSearchData)
+        serverRepository.getBrandEmiProductData(dataCounter,brandId,subCatId, searchedProductName, isSearchData,callFromViewModel = true)
     }
 
     suspend fun getBrandData(dataCounter:String,brandId:String,subCatId : String)
     {
-        serverRepository.getBrandEmiProductData("0",brandId,subCatId)
+        serverRepository.getBrandEmiProductData("0",brandId,subCatId,callFromViewModel = true)
     }
 }

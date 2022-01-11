@@ -99,6 +99,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {
                 if (TextUtils.isEmpty(p0.toString())) {
+
                     brandSubCatBinding?.emptyTxt?.visibility = View.GONE
                     brandEMISubCategoryAdapter.submitList(filteredSubCat)
                     DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())

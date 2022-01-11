@@ -62,7 +62,7 @@ class BrandEmiProductFragment : Fragment() {
     private var brandEmiSubCatData: BrandEMISubCategoryTable? = null
 
     // for backpress manage
-    var isFirstTime = false
+    var isFirstTime = true
     var firstTimeData : ArrayList<BrandEMIProductDataModal?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +86,6 @@ class BrandEmiProductFragment : Fragment() {
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
 
         logger("callInit","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID}","e")
-        isFirstTime = true
         (activity as IDialog).showProgress()
         brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
             BrandEmiProductViewModel::class.java
@@ -114,26 +113,36 @@ class BrandEmiProductFragment : Fragment() {
             viewLifecycleOwner,
             {
                 (activity as IDialog).hideProgress()
-                when (val genericResp = it) {
-                    is GenericResponse.Success -> {
-                        println(Gson().toJson(genericResp.data))
-                        println("dataListSize"+Gson().toJson(genericResp.data?.size))
-                        setUpRecyclerView()
-                        brandEMIProductAdapter.submitList(genericResp.data)
-                        if(isFirstTime) {
-                            firstTimeData = ArrayList()
-                            firstTimeData!!.addAll(genericResp.data!!)
-                            //genericResp.data?.let { it1 -> firstTimeData!!.addAll(it1) }
-                            isFirstTime = false
+                logger("kushal","observer","e")
+                if(!isdataChange) {
+                    when (val genericResp = it) {
+                        is GenericResponse.Success -> {
+                            //  if(!isObserve){
+                            println(Gson().toJson(genericResp.data))
+                            println("dataListSize" + Gson().toJson(genericResp.data?.size))
+                            setUpRecyclerView()
+                            brandEMIProductAdapter.submitList(genericResp.data)
+                            if (isFirstTime) {
+                                firstTimeData = ArrayList()
+                                firstTimeData!!.addAll(genericResp.data!!)
+                                //genericResp.data?.let { it1 -> firstTimeData!!.addAll(it1) }
+                                isFirstTime = false
+                            }
+                            // }
+
+                        }
+                        is GenericResponse.Error -> {
+                            ToastUtils.showToast(activity, genericResp.errorMessage)
+                            println(genericResp.errorMessage.toString())
+                        }
+                        is GenericResponse.Loading -> {
+
                         }
                     }
-                    is GenericResponse.Error -> {
-                        ToastUtils.showToast(activity, genericResp.errorMessage)
-                        println(genericResp.errorMessage.toString())
-                    }
-                    is GenericResponse.Loading -> {
-
-                    }
+                }else{
+                    isdataChange = false
+                    setUpRecyclerView()
+                    brandEMIProductAdapter.submitList(firstTimeData)
                 }
             })
 
@@ -146,26 +155,31 @@ class BrandEmiProductFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {
                 if (TextUtils.isEmpty(p0.toString())) {
                     brandEmiProductBinding?.emptyTxt?.visibility = View.GONE
+                    isEditTextBlank = true
                     DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
-//                    (activity as IDialog).showProgress()
-//                    lifecycleScope.launch(Dispatchers.IO){
-//                        logger("callBackPress","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID}","e")
-//                        brandEmiProductViewModel.getBrandData("0",brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")
-//                        brandEMIProductAdapter.submitList(firstTimeData)
-//                        isFirstTime = false
+
+                    logger("kushal","brandSearchET1","e")
+//                    if(comeFromStack)
+//                    {
+//                        brandEmiProductBinding?.brandSearchET?.setText("")
 //                    }
+
                     if(firstTimeData != null){
+                        logger("kushal","brandSearchET2","e")
                         brandEMIProductAdapter.submitList(firstTimeData)
-                        isFirstTime = false
                     }
+                }else{
+                    isEditTextBlank = false
                 }
             }
         })
         brandEmiProductBinding?.searchButton?.setOnClickListener {
-
+            logger("kushal","searchButton","e")
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
             brandEmiProductBinding?.emptyTxt?.visibility = View.GONE
             var searchText = brandEmiProductBinding?.brandSearchET?.text.toString().trim()
+
+            isObserve = false
 
             (activity as IDialog).showProgress()
 
@@ -183,7 +197,33 @@ class BrandEmiProductFragment : Fragment() {
             */
         }
         // end region
+
+
+//        if(comeFromStack){
+//            brandEmiProductBinding?.brandSearchET?.setText("")
+//            comeFromStack = false
+//            logger("kushal","comeFromStack","e")
+//        }
     }
+
+    override fun onResume() {
+        super.onResume()
+        logger("kushal","onResume","e")
+        //brandEmiProductBinding?.brandSearchET?.setText("")
+        //brandEMIProductAdapter.submitList(firstTimeData)
+    }
+
+    var comeFromStack = false
+    var isObserve = false
+    var isEditTextBlank = true
+    var isdataChange = false
+    override fun onStop() {
+        super.onStop()
+        logger("kushal","onStop","e")
+        comeFromStack = true
+        isObserve = true
+    }
+
     //region===========================SetUp RecyclerView :-
     private fun setUpRecyclerView() {
         brandEmiProductBinding?.brandEmiMasterRV?.apply {
@@ -196,6 +236,7 @@ class BrandEmiProductFragment : Fragment() {
 
     //endregion
     private fun onItemClick(productData: BrandEMIProductDataModal) {
+
         println("On Product Clicked " + Gson().toJson(productData))
     ///    ToastUtils.showToast(activity, Gson().toJson(productData))
         (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
@@ -210,7 +251,14 @@ class BrandEmiProductFragment : Fragment() {
 
         //val intent = Intent (activity, TransactionActivity::class.java)
         //activity?.startActivity(intent)
-
+        if(!isEditTextBlank) {
+            brandEmiProductBinding?.brandSearchET?.setText("")
+            isdataChange = true
+        }else{
+            //isdataChange = false
+            brandEmiProductBinding?.brandSearchET?.setText("")
+            isdataChange = true
+        }
     }
 
 }
