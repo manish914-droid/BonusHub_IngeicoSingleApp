@@ -1188,6 +1188,16 @@ object Field48ResponseTimestamp {
     }
 //endregion
 
+    //region== insert digipos data
+    fun insertOrUpdateDigiposData(param: DigiPosDataTable){
+        runBlocking(Dispatchers.IO) {
+            appDatabase.appDao.insertOrUpdateDigiposData(
+                param
+            )
+        }
+
+    }
+
     // region
     fun isTipEnable(): Boolean {
         var isTipEnable: Boolean = false
