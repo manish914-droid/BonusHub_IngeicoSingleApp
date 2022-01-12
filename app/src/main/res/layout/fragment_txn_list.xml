@@ -1,43 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".view.fragments.digi_pos.TxnListFragment">
 
-    <include
-        android:id="@+id/sub_header_view"
-        layout="@layout/sub_header_layout"
-        android:visibility="visible" />
-
-    <RelativeLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bg_color">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/txtViewFilters"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/pad_30"
-            android:drawableRight="@drawable/ic_filter"
-            android:fontFamily="@font/muli_light"
-            android:text="Filters"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_regular"
-            android:layout_marginTop="@dimen/pad_5"
-            android:layout_marginBottom="@dimen/pad_5"/>
+            android:orientation="vertical">
 
-    </RelativeLayout>
+            <include
+                android:id="@+id/sub_header_view"
+                layout="@layout/sub_header_layout"
+                android:visibility="visible" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/pad_24"
-        android:layout_marginTop="@dimen/pad_5"
-        android:layout_marginEnd="@dimen/pad_24" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_color">
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/txtViewFilters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/pad_30"
+                    android:drawableRight="@drawable/ic_filter"
+                    android:fontFamily="@font/muli_light"
+                    android:text="Filters"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_regular"
+                    android:layout_marginTop="@dimen/pad_5"
+                    android:layout_marginBottom="@dimen/pad_5"/>
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/pad_24"
+                android:layout_marginTop="@dimen/pad_5"
+                android:layout_marginEnd="@dimen/pad_24" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+    <include
+        android:id="@+id/bottomSheet"
+        layout="@layout/digi_pos_txn_list_filter_bottom_sheet" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

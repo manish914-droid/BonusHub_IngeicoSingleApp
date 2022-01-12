@@ -1156,6 +1156,7 @@ data class PendingSyncTransactionTable(
 // end region
 
 //region == digipos
+@Entity
 data class DigiPosDataTable(
     // Digi POS Data
     var requestType: Int = 0,

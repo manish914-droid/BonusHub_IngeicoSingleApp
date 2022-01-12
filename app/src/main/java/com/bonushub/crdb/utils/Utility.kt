@@ -1218,6 +1218,28 @@ object Field48ResponseTimestamp {
     // end region
 
     // region
+    fun performOperation(tpt:TerminalParameterTable, callback: () -> Unit){
+
+        runBlocking(Dispatchers.IO){
+
+            when(tpt.actionId) {
+                "1", "2" -> {
+                    appDatabase.appDao.insertTerminalParameterDataInTable(tpt) ?: 0L
+                }
+                "3" -> appDatabase.appDao.deleteTerminalParameterTable(tpt)
+
+                else ->{
+
+                }
+            }
+
+            callback()
+        }
+
+    }
+    // end region
+
+    // region
     fun getInitdataList(): InitDataListList? {
         var initdataListItem: InitDataListList? = null
         runBlocking(Dispatchers.IO){

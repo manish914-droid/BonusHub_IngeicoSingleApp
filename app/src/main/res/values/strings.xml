@@ -280,5 +280,13 @@
     <string name="connection_error">Connection Error.\nTransaction Declined!!!</string>
     <string name="connection_failed">Connection Failed</string>
     <string name="no_internet_error">No Internet Available</string>
+    <string name="filterBy">Filter By</string>
+
+    <string name="upi_collect">UPI Collect</string>
+    <string name="sms_pay">SMS Pay</string>
+    <string name="static_qr">Static Qr</string>
+    <string name="ptxnID">PTXN ID</string>
+    <string name="mtxnID">MTXN ID</string>
+    <string name="_0_0">0.0</string>
 
 </resources>

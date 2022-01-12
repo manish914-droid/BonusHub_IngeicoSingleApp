@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,13 +13,17 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPendingTxnBinding
 import com.bonushub.crdb.databinding.FragmentTxnListBinding
 import com.bonushub.crdb.databinding.ItemPendingTxnBinding
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
 import com.bonushub.pax.utils.DigiPosItem
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class TxnListFragment : Fragment(), ITxnListItemClick {
+
+    private var sheetBehavior: BottomSheetBehavior<ConstraintLayout>? = null
 
     var binding:FragmentTxnListBinding? = null
     lateinit var digiPosItemType:DigiPosItem
@@ -37,6 +42,8 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sheetBehavior = binding?.bottomSheet?.let { BottomSheetBehavior.from(it.bottomLayout) }
 
         iTxnListItemClick = this
         digiPosItemType = arguments?.getSerializable("type") as DigiPosItem
@@ -57,6 +64,17 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
 
         binding?.txtViewFilters?.setOnClickListener {
             logger("filter","openBottomSheet","e")
+            toggleBottomSheet()
+        }
+    }
+
+    //Method to be called when Bottom Sheet Toggle:-
+    private fun toggleBottomSheet() {
+        if (sheetBehavior?.state != BottomSheetBehavior.STATE_EXPANDED) {
+            sheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        } else {
+            DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+            sheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
