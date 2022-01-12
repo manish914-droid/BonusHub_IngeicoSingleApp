@@ -96,6 +96,12 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
             DigiPosItem.STATIC_QR ->{
 
+                (activity as NavigationActivity).transactFragment(QrFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("type", DigiPosItem.STATIC_QR)
+                    }
+                })
+
             }
 
             DigiPosItem.SMS_PAY ->{
@@ -107,11 +113,19 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
             }
 
             DigiPosItem.PENDING_TXN ->{
-
+                (activity as NavigationActivity).transactFragment(PendingTxnFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("type", DigiPosItem.PENDING_TXN)
+                    }
+                })
             }
 
             DigiPosItem.TXN_LIST ->{
-
+                (activity as NavigationActivity).transactFragment(TxnListFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable("type", DigiPosItem.TXN_LIST)
+                    }
+                })
             }
         }
 

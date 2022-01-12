@@ -284,6 +284,7 @@ class DialogUtilsNew1 {
             positiveButtonText: String, negativeButtonText: String, imgHeaader:Int, callback: () -> Unit,
             cancelButtonCallback: () -> Unit
         ) {
+            // BaseActivity. getInfoDialog()
 
             Dialog(context).apply {
                 getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
@@ -332,12 +333,57 @@ class DialogUtilsNew1 {
 
         }
 
+
         fun hideKeyboardIfOpen(activity: Activity) {
             val view = activity.currentFocus
             if (view != null) {
                 val imm = activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
+        }
+
+        fun showPendingTxnDetailsDialog(
+            context: Context,
+            amount: String,
+            mode: String,
+            txnId: String,
+            mTxnId: String,
+            phoneNumber: String,
+            status: String,
+            callback: () -> Unit
+        ) {
+            Dialog(context).apply {
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.dialog_pending_txn_details)
+                setCancelable(false)
+                val window = window
+                window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                val txtViewAmount = findViewById<TextView>(R.id.txtViewAmount)
+                val txtViewMode = findViewById<TextView>(R.id.txtViewMode)
+                val txtViewTXNId = findViewById<TextView>(R.id.txtViewTXNId)
+                val txtViewMTXNId = findViewById<TextView>(R.id.txtViewMTXNId)
+                val txtViewPhoneNumber = findViewById<TextView>(R.id.txtViewPhoneNumber)
+                val txtViewStatus = findViewById<TextView>(R.id.txtViewStatus)
+                val txtViewOk = findViewById<TextView>(R.id.txtViewOk)
+
+                txtViewAmount.text = amount
+                txtViewMode.text = mode
+                txtViewTXNId.text = txnId
+                txtViewMTXNId.text = mTxnId
+                txtViewPhoneNumber.text = phoneNumber
+                txtViewStatus.text = status
+
+
+                txtViewOk.setOnClickListener {
+                    dismiss()
+                    callback()
+                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
         }
 
     }
