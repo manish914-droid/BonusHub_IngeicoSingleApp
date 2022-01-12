@@ -425,4 +425,9 @@ interface AppDao{
     @Delete
     suspend fun deletePendingSyncTransactionData(pendingSyncTransactionTable: PendingSyncTransactionTable)
     // end region
+
+
+    // region ========== DigiPos Table dao ======
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateDigiposData(digiPosData:DigiPosDataTable): Long?
 }

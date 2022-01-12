@@ -36,7 +36,7 @@
 
     <string name="help_desk_number_hint">Help Desk No: 0120252525</string>
     <string name="settlement">Settlement</string>
-    <string name="versionHint">App Version: v1.0.2</string>
+    <string name="versionHint">App Version: 02.01.02</string>
 
     <!--TODO: sub header-->
     <string name="back">Back</string>
@@ -276,4 +276,9 @@
     <string name="digi_pos_header">DIGI POS</string>
     <string name="vpa">VPA</string>
     <string name="no_data_found">No Data Found</string>
+    <!--HitServer-->
+    <string name="connection_error">Connection Error.\nTransaction Declined!!!</string>
+    <string name="connection_failed">Connection Failed</string>
+    <string name="no_internet_error">No Internet Available</string>
+
 </resources>

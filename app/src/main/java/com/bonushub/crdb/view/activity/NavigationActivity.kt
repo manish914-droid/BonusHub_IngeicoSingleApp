@@ -24,8 +24,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bonushub.crdb.R
-import com.bonushub.crdb.appupdate.AppUpdateDownloadManager
-import com.bonushub.crdb.appupdate.OnDownloadCompleteListener
+
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
@@ -1170,7 +1169,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         if (dataList.size > 1) {
                                             onBackPressed()
                                             writeAppRevisionIDInFile(this@NavigationActivity)
-                                            when (dataList[0]) {
+                                           /* when (dataList[0]) {
                                                 AppUpdate.MANDATORY_APP_UPDATE.updateCode -> {
                                                     if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
                                                       //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
@@ -1190,7 +1189,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                                 else -> {
                                                     onBackPressed()
                                                 }
-                                            }
+                                            }*/
                                         } else {
                                             //VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
 
@@ -1324,6 +1323,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     //Below method is used to update App through HTTP/HTTPs:-
 
+/*
     private fun startHTTPSAppUpdate(appHostDownloadURL: String? = null, ftpIPPort: Int? = null, downloadAppFileName: String, downloadFileSize: String) {
         showPercentDialog(getString(R.string.please_wait_downloading_application_update))
         if (appHostDownloadURL != null) {
@@ -1366,7 +1366,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }).execute()
 
 
-            /*  AppUpdateDownloadManager("https://testapp.bonushub.co.in:8055/app/pos.zip",
+            */
+/*  AppUpdateDownloadManager("https://testapp.bonushub.co.in:8055/app/pos.zip",
                        object : OnDownloadCompleteListener {
                            override fun onError(msg: String) {
                                GlobalScope.launch(Dispatchers.Main) {
@@ -1392,12 +1393,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                    VFService.showToast(getString(R.string.something_went_wrong))
                                }
                            }
-                       }).execute()*/
+                       }).execute()*//*
+
 
         } else {
           //  VFService.showToast("Download URL Not Found!!!")
         }
     }
+*/
 
 
 
