@@ -129,7 +129,7 @@
 
     <!--bank functions-->
     <string name="bank_functions_header">BANK FUNCTIONS</string>
-    <string name="admin_vas_header">ADMIN VAS</string>
+    <string name="admin_vas_header">BH ADMIN</string>
     <string name="terminal_param_header">TERMINAL PARAM</string>
     <string name="init_payment_app_header">INIT PAYMENT APP</string>
     <string name="communication_param_header">COMMUNICATION PARAM</string>
