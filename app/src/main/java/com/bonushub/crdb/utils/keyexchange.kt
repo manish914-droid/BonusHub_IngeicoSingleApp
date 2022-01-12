@@ -2,12 +2,15 @@ package com.bonushub.pax.utils
 
 
 import android.content.Context
+import android.util.Log
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.serverApi.ServerCommunicator
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.DemoConfig.*
@@ -15,11 +18,10 @@ import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 interface ITransactionPacketExchange {
     fun createTransactionPacket(): IWriter
@@ -48,7 +50,8 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
     var keWithInit = true
     var isHdfc = false
     var afterSettlement = false
-
+    @Inject
+    lateinit var appDao: AppDao
     companion object {
         val TAG = KeyExchanger::class.java.simpleName
 
@@ -493,14 +496,14 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
     }
 
     // region for auto settlement
-    /*suspend fun getDigiPosStatus(
+    suspend fun getDigiPosStatus(
         field57RequestData: String,
         processingCode: String, isSaveTransAsPending: Boolean = false,
         cb: (Boolean, String, String, String) -> Unit
     ) {
-
+        val baseTid = withContext(Dispatchers.IO) { getBaseTID(appDao) }
         val idw = IsoDataWriter().apply {
-            val terminalData = TerminalParameterTable.selectFromSchemeTable()
+            val terminalData = Field48ResponseTimestamp.getTptData()
             if (terminalData != null) {
                 mti = Mti.EIGHT_HUNDRED_MTI.mti
 
@@ -508,13 +511,13 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                 addField(3, processingCode)
 
                 //STAN(ROC) Field 11
-                addField(11, ROCProviderV2.getRoc(AppPreference.getBankCode()).toString())
+                addField(11, terminalData.roc)
 
                 //NII Field 24
                 addField(24, Nii.BRAND_EMI_MASTER.nii)
 
                 //TID Field 41
-                addFieldByHex(41, terminalData.terminalId)
+                addFieldByHex(41, baseTid)
 
                 //Connection Time Stamps Field 48
                 addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
@@ -533,7 +536,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                     6,
                     false
                 ) + addPad(
-                    VerifoneApp.appContext.getString(R.string.app_name),
+                    HDFCApplication.appContext.getString(R.string.app_name),
                     " ",
                     10,
                     false
@@ -559,10 +562,10 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
         HitServer.hitDigiPosServer(idw, isSaveTransAsPending) { result, success ->
             responseMsg = result
             if (success) {
-                ROCProviderV2.incrementFromResponse(
+           /*     ROCProviderV2.incrementFromResponse(
                     ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
                     AppPreference.getBankCode()
-                )
+                )*/
                 val responseIsoData: IsoDataReader = readIso(result, false)
                 logger("Transaction RESPONSE ", "---", "e")
                 logger("Transaction RESPONSE --->>", responseIsoData.isoMap, "e")
@@ -585,14 +588,14 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                 cb(isBool, responseMsg, responseField57, result)
 
             } else {
-                ROCProviderV2.incrementFromResponse(
+             /*   ROCProviderV2.incrementFromResponse(
                     ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
                     AppPreference.getBankCode()
-                )
+                )*/
                 cb(isBool, responseMsg, responseField57, result)
             }
         }
-    }*/
+    }
     // end region
 }
 

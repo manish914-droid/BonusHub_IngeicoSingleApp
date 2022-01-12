@@ -10,6 +10,7 @@ import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.utils.EDigiPosPaymentStatus
 import com.bonushub.pax.utils.EDashboardItem
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -291,7 +292,8 @@ data class TerminalCommunicationTable(
 
     @field:BHFieldParseIndex(42)
     // @field:BHFieldName("TID")
-    var tid: String = ""
+    var tid: String = "",
+
 
 )
 
@@ -672,9 +674,23 @@ data class TerminalParameterTable(
 
     var clearFBatch: String = "0",//This field is for Server Hit Status,
 
-    var bankEnquiryMobNumberEntry: Boolean = false
+    var bankEnquiryMobNumberEntry: Boolean = false,
+    @field:BHDashboardItem(EDashboardItem.DIGI_POS)
+    var isDigiposActive: String = ""
 
-)
+
+){
+    var digiPosResponseType: String = ""
+    var digiPosStatus: String = ""
+    var digiPosStatusMessage: String = ""
+    var digiPosStatusCode: String = ""
+    var digiPosTerminalStatus: String = ""
+    var digiPosBQRStatus: String = ""
+    var digiPosUPIStatus: String = ""
+    var digiPosSMSpayStatus: String = ""
+    var digiPosStaticQrDownloadRequired: String = ""
+    var digiPosCardCallBackRequired: String = ""
+}
 
 @Entity
 data class CardDataTable(
@@ -1138,3 +1154,29 @@ data class PendingSyncTransactionTable(
     var cardProcessedDataModal:CardProcessedDataModal
     )
 // end region
+
+//region == digipos
+data class DigiPosDataTable(
+    // Digi POS Data
+    var requestType: Int = 0,
+    var amount: String = "",
+    var description : String= "",
+    var vpa: String = "",
+    var mTxnId : String= "",
+
+    @PrimaryKey(autoGenerate = false)
+   var partnerTxnId : String= "",
+    var status : String= "",
+    var statusMsg : String= "",
+    var statusCode : String= "",
+    var customerMobileNumber : String= "",
+    var transactionTimeStamp : String= "",
+    var txnStatus : String= EDigiPosPaymentStatus.Pending.desciption,
+    var paymentMode : String= "",
+    var pgwTxnId : String= "",
+    var txnDate : String= "",
+    var txnTime : String= "",
+    var displayFormatedDate : String= ""
+)
+
+//end region
