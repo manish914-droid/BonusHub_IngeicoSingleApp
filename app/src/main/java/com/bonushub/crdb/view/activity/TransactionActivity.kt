@@ -336,7 +336,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     )
                                                 }
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData)
+                                                printingSaleData(batchData,{})
 
                                                 // region sync transaction
                                                 withContext(Dispatchers.Main) {
@@ -577,7 +577,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 batchData.transactionType =
                                                     com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData)
+                                                printingSaleData(batchData,{})
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                             // end region
 
@@ -743,7 +743,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData)
+                                                printingSaleData(batchData,{})
                                             // end region
 
                                             // region sync transaction
@@ -889,7 +889,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     com.bonushub.pax.utils.BhTransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData)
+                                                printingSaleData(batchData,{})
                                             // end region
 
                                             // region sync transaction
@@ -1036,7 +1036,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData)
+                                                printingSaleData(batchData,{})
                                             // end region
 
                                             // region sync transaction
@@ -1184,7 +1184,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     BhTransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData)
+                                                printingSaleData(batchData,{})
                                             // end region
 
                                             // region sync transaction
@@ -1347,9 +1347,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                     lifecycleScope.launch(Dispatchers.IO) {
                                         //    appDao.insertBatchData(batchData)
-                                        withContext(Dispatchers.Main){
-                                            showProgress(getString(R.string.transaction_syncing_msg))
-                                        }
+
                                         val batchData = BatchTable(receiptDetail)
                                         creatCardProcessingModelData(receiptDetail)
                                         val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
@@ -1363,11 +1361,68 @@ class TransactionActivity : BaseActivityNew() {
                                             com.bonushub.pax.utils.BhTransactionType.SALE.type
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
-                                        printingSaleData(batchData)
+                                        printingSaleData(batchData){
+
+
+                                                lifecycleScope.launch(Dispatchers.IO){
+
+                                                    withContext(Dispatchers.Main){
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
+                                                    }
+
+                                                Utility().syncPendingTransaction(transactionViewModel)
+
+                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                {
+                                                    is GenericResponse.Success -> {
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+
+                                                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+                                                            startActivity(intent)
+
+                                                        }
+                                                        logger("success:- ", "in success $genericResp","e")
+
+                                                    }
+                                                    is GenericResponse.Error -> {
+                                                        logger("error:- ", "in error $genericResp", "e")
+                                                        logger("error:- ", "save transaction sync later", "e")
+                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel)
+                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
+                                                            finish()
+                                                            startActivity(
+                                                                Intent(
+                                                                    this@TransactionActivity,
+                                                                    NavigationActivity::class.java
+                                                                ).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+                                                        }
+
+                                                    }
+                                                    is GenericResponse.Loading -> {
+                                                        withContext(Dispatchers.Main) {
+                                                            hideProgress()
+                                                        }
+                                                        logger("Loading:- ", "in Loading $genericResp","e")
+                                                    }
+                                                }
+
+                                                }
+
+                                        }
                                         //end region
 
                                         // region sync pending transaction
-                                      Utility().syncPendingTransaction(transactionViewModel)
+                                     /* Utility().syncPendingTransaction(transactionViewModel)
 
                                         when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                         {
@@ -1407,7 +1462,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 }
                                                 logger("Loading:- ", "in Loading $genericResp","e")
                                             }
-                                        }
+                                        }*/
                                         // end region
 
                                     }
@@ -1532,7 +1587,7 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
 
-    suspend fun printingSaleData(batchTable: BatchTable) {
+    suspend fun printingSaleData(batchTable: BatchTable, cb:(Boolean) ->Unit) {
         val receiptDetail = batchTable.receiptData
         withContext(Dispatchers.Main) {
             showProgress(getString(R.string.printing))
@@ -1548,7 +1603,7 @@ class TransactionActivity : BaseActivityNew() {
                     if (printCB) {
                         printsts = printCB
                         lifecycleScope.launch(Dispatchers.Main) {
-                            showMerchantAlertBox(batchTable)
+                            showMerchantAlertBox(batchTable, cb)
                         }
 
                     } else {
@@ -1556,6 +1611,7 @@ class TransactionActivity : BaseActivityNew() {
                             this@TransactionActivity as BaseActivityNew,
                             getString(R.string.printer_error)
                         )
+                        cb(false)
                     }
                 }
             }
@@ -1563,7 +1619,8 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     private fun showMerchantAlertBox(
-        batchTable: BatchTable
+        batchTable: BatchTable,
+        cb:(Boolean) ->Unit
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
 
@@ -1580,16 +1637,18 @@ class TransactionActivity : BaseActivityNew() {
                     ) { printCB, printingFail ->
                         (this@TransactionActivity as BaseActivityNew).hideProgress()
                         if (printCB) {
-                            val intent =
-                                Intent(this@TransactionActivity, NavigationActivity::class.java)
-                            startActivity(intent)
+
+                            cb(printCB)
+//                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                            startActivity(intent)
                         }
 
                     }
                 }, {
+                    cb(true)
                     (this@TransactionActivity as BaseActivityNew).hideProgress()
-                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
-                    startActivity(intent)
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
                 })
         }
     }
