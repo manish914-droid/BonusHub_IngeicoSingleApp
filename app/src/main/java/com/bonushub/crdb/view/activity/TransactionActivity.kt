@@ -1639,6 +1639,8 @@ class TransactionActivity : BaseActivityNew() {
                         if (printCB) {
 
                             cb(printCB)
+                            (this@TransactionActivity as BaseActivityNew).hideProgress()
+
 //                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
 //                            startActivity(intent)
                         }
