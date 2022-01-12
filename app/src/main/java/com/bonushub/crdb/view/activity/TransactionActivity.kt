@@ -162,7 +162,7 @@ class TransactionActivity : BaseActivityNew() {
                             when (globalCardProcessedModel.getTransType()) {
                                 BhTransactionType.SALE.type -> {
                                     showProgress()
-              continueTenureProcess()
+                                    continueTenureProcess()
                                 }
 
                                 BhTransactionType.BRAND_EMI.type -> {

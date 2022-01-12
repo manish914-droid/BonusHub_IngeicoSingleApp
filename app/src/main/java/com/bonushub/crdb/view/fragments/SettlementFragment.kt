@@ -20,7 +20,9 @@ import com.bonushub.crdb.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.databinding.ItemSettlementBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
+import com.bonushub.crdb.model.local.BatchTableReversal
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -43,6 +45,7 @@ class SettlementFragment : Fragment() {
     lateinit var appDao: AppDao
     private val settlementViewModel : SettlementViewModel by viewModels()
     private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }
+    private val dataListReversal: MutableList<BatchTableReversal> by lazy { mutableListOf<BatchTableReversal>() }
     private val settlementAdapter by lazy { SettlementAdapter(dataList) }
     private var settlementByteArray: ByteArray? = null
     private var navController: NavController? = null
@@ -89,12 +92,17 @@ class SettlementFragment : Fragment() {
                 dataList.addAll(batchData as MutableList<BatchTable>)
                 setUpRecyclerView()
 
-           /* ioSope.launch {
-                var listofTxnTid =  checkSettlementTid(dataList)
-                println("Total txn tid "+listofTxnTid)
-            }*/
-
             }
+
+        lifecycleScope.launch {
+            batchReversalViewModel?.getBatchTableReversalData()?.observe(viewLifecycleOwner) { batchReversalList ->
+              dataListReversal.clear()
+              dataListReversal.addAll(batchReversalList as MutableList<BatchTableReversal>)
+            }
+        }
+
+
+
         //endregion
         //region================================RecyclerView On Scroll Extended Floating Button Hide/Show:-
         fragmensettlementBinding.nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
@@ -191,8 +199,19 @@ class SettlementFragment : Fragment() {
 
 
                         ioSope.launch {
-                            var listofTxnTid =  checkSettlementTid(dataList)
-                            settlementViewModel.settlementResponse(listofTxnTid)
+                           var reversalTid  = checkReversal(dataListReversal)
+                           var listofTxnTid =  checkSettlementTid(dataList)
+
+                            val result: ArrayList<String> = ArrayList()
+                            result.addAll(listofTxnTid)
+
+                            for (e in reversalTid) {
+                                if (!result.contains(e)) result.add(e)
+                            }
+                           System.out.println("Total transaction tid is"+result.forEach {
+                               println("Tid are "+it)
+                           })
+                           settlementViewModel.settlementResponse(result)
                         }
 
                         settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
@@ -201,8 +220,7 @@ class SettlementFragment : Fragment() {
                             Status.SUCCESS -> {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     //  AppPreference.saveBatchInPreference(dataList as MutableList<BatchTable>)
-                                    val data =
-                                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                    val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                     settlementByteArray = data.generateIsoByteRequest()
                                     try {
                                         (activity as NavigationActivity).settleBatch1(

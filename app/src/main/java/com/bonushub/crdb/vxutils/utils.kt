@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
@@ -34,6 +35,10 @@ import com.ingenico.hdfcpayment.type.RequestStatus
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.pinpad.*
 import kotlinx.coroutines.*
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.lang.Runnable
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
@@ -42,6 +47,7 @@ import kotlin.collections.ArrayList
 
 private var listofTids= ArrayList<String>()
 private var listofTxnTids= ArrayList<String>()
+private var listofReversalTids= ArrayList<String>()
 
 //Below method is used to encrypt Pannumber data:-
 fun getEncryptedPanorTrackData(panNumber: String,isTrackData: Boolean): String {
@@ -380,6 +386,16 @@ fun showMobileBillDialog(
     }
 }
 
+//To check Reversal
+suspend fun checkReversal(batchData: MutableList<BatchTableReversal>): ArrayList<String> {
+    listofReversalTids.clear()
+
+    val distinctByNameCusts = batchData.distinctBy{it -> it.receiptData?.tid}
+    distinctByNameCusts.forEach{ it ->
+        listofReversalTids.add(it.receiptData?.tid ?: "")
+    }
+    return listofReversalTids
+}
 
 //To check Initiaization Status
 suspend fun checkSettlementTid(batchData: MutableList<BatchTable>): ArrayList<String> {
@@ -817,6 +833,20 @@ fun txnSuccessToast(context: Context, msg: String = "Transaction Approved") {
     }
 }
 
+//Below method is used to write App Revision ID for Update Confirmation:-
+fun writeAppRevisionIDInFile(context: Context) {
+    try {
+        val saveFile = File(context.externalCacheDir, "version.txt")
+        val writer = BufferedWriter(FileWriter(saveFile))
+        writer.write(BuildConfig.REVISION_ID.toString())
+        writer.flush()
+        writer.close()
+        Log.d("FilePath:- ", Uri.fromFile(saveFile).toString())
+    } catch (e: IOException) {
+      //  VFService.showToast("An error occurred.")
+        e.printStackTrace()
+    }
+}
 
 // region ============================Get System Time in 24Hour Format:-
 fun getSystemTimeIn24Hour(): String {

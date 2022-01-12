@@ -1167,7 +1167,35 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     delay(2000)
                                     if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
                                         val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
+                                        if (dataList.size > 1) {
+                                            onBackPressed()
+                                            writeAppRevisionIDInFile(this@NavigationActivity)
+                                            when (dataList[0]) {
+                                                AppUpdate.MANDATORY_APP_UPDATE.updateCode -> {
+                                                    if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
+                                                      //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                    else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
+                                                    //  startHTTPSAppUpdate1(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
+                                                        startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
+                                                }
+                                                AppUpdate.OPTIONAL_APP_UPDATE.updateCode -> {
+                                                    alertBoxWithAction(getString(R.string.app_update), getString(R.string.app_update_available_do_you_want_to_update), true, getString(R.string.yes), {
+                                                        if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
+                                                         //   startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                        else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
+                                                            startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
+                                                    },
+                                                        {})
+                                                }
+                                                else -> {
+                                                    onBackPressed()
+                                                }
+                                            }
+                                        } else {
+                                            //VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
 
+                                          //  startTCPIPAppUpdate(ProcessingCode.APP_UPDATE.code, chunkValue = "0", partialName = "0")
+                                        }
                                     } else {
                                         onBackPressed()
                                         when (isAppUpdateAvailableData) {
