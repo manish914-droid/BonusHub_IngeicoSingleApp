@@ -704,15 +704,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
         intent.putExtra("edashboardItem", eDashBoardItem)
-
-       var txnType=0
+       var txnType=BhTransactionType.NONE.type
         if(eDashBoardItem==EDashboardItem.BRAND_EMI){
             txnType=   BhTransactionType.BRAND_EMI.type
         }
         if(eDashBoardItem==EDashboardItem.BANK_EMI){
             txnType=   BhTransactionType.EMI_SALE.type
         }
-
         // test emi
         if(eDashBoardItem==EDashboardItem.TEST_EMI){
             txnType=   BhTransactionType.TEST_EMI.type
@@ -725,9 +723,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
     fun startTenure(){
         val intent = Intent (this, TenureSchemeActivity::class.java)
-
         startActivity(intent)
-
     }
 
     override  fun onDashBoardItemClick(action: EDashboardItem) {

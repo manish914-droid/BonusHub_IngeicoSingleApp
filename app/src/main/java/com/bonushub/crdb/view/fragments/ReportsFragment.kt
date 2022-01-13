@@ -309,7 +309,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             //Cancel Handling
                         })
                 } else {
-                    GlobalScope.launch(Dispatchers.Main) {
+                    lifecycleScope.launch(Dispatchers.Main) {
                         iDiag?.alertBoxWithAction(
                             getString(R.string.no_receipt),
                             getString(R.string.no_cancel_receipt_found),

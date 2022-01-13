@@ -161,6 +161,8 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
                     holder.binding.discountLL.visibility = View.GONE
                 }
                 if (transactionType == BhTransactionType.TEST_EMI.type) {
+                    holder.binding.tvTenure.text = modelData.tenure +" Months"
+                    holder.binding.tenureHeadingTv.text = modelData.tenure +" Months"
                     holder.binding.toatalemipayLL.visibility = View.GONE
                     holder.binding.tvInterestRate.text =
                         "" + divideAmountBy100(modelData.tenureInterestRate.toInt()).toString() + " %"
@@ -207,7 +209,7 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
     inner class EMISchemeOfferHolder(val binding: ItemEmiSchemeOfferBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    fun setViewColor(txtView:TextView,isWhite:Boolean){
+    private fun setViewColor(txtView:TextView, isWhite:Boolean){
         if(isWhite)
         {
             txtView.setTextColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))

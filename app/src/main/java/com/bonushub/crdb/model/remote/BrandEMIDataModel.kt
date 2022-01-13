@@ -83,9 +83,7 @@ data class BankEMITenureDataModal(
     var tenure: String,
     var tenureInterestRate: String,
     var effectiveRate: String,
-
     var instantDiscount: String="",
-
     var transactionAmount: String = "0",
     var discountAmount: String = "0",
     var discountFixedValue: String,
@@ -93,10 +91,8 @@ data class BankEMITenureDataModal(
     var loanAmount: String = "0",
     var emiAmount: String,
     var totalEmiPay: String,
-
     var processingFee: String,
     var processingRate: String,
-
     var totalProcessingFee: String,
     var totalInterestPay: String = "0",
     val cashBackAmount: String = "0",
@@ -105,7 +101,6 @@ data class BankEMITenureDataModal(
     var tenureWiseDBDTAndC: String,
     var discountCalculatedValue: String,
     var cashBackCalculatedValue: String,
-
     var tenureLabel:String="",
     var txnTID :String="",
     var isSelected:Boolean = false

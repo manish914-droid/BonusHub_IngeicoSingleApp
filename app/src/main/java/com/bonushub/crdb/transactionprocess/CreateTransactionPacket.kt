@@ -46,15 +46,11 @@ class CreateTransactionPacket(
         val terminalData = getTptData()
         if (terminalData != null) {
             logger("PINREQUIRED--->  ", cardProcessedData.getIsOnline().toString(), "e")
-            mti =
-                if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-                    Mti.REVERSAL.mti
-                } else {
-                    when (cardProcessedData.getTransType()) {
+            mti = when (cardProcessedData.getTransType()) {
                        BhTransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
                         else -> Mti.DEFAULT_MTI.mti
                     }
-                }
+
 
             //Processing Code Field 3
             addField(3, cardProcessedData.getProcessingCode().toString())
@@ -84,20 +80,6 @@ class CreateTransactionPacket(
             //    if(null !=cardProcessedData.getPosEntryMode().toString() && cardProcessedData.getPosEntryMode().toString().isNotEmpty())
             addField(22, cardProcessedData.getPosEntryMode().toString())
 
-            //Pan Sequence Number Field 23
-            /*         if (null != cardProcessedData.getApplicationPanSequenceValue())
-                addFieldByHex(
-                    23,
-                    addPad(
-                        cardProcessedData.getApplicationPanSequenceValue().toString(),
-                        "0",
-                        3,
-                        true
-                    )
-                )
-            else {
-                addFieldByHex(23, addPad("00", "0", 3, true))
-            }*/
 
             //NII Field 24
             addField(24, Nii.DEFAULT.nii)
@@ -116,31 +98,6 @@ class CreateTransactionPacket(
             //Connection Time Stamps Field 48
             addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
 
-            /*   //Field 52 in case of Pin
-            if (!(TextUtils.isEmpty(cardProcessedData.getGeneratePinBlock())) && cardProcessedData.getPinByPass() == 0)
-                addField(52, cardProcessedData.getGeneratePinBlock().toString())
-
-            //Field 54 in case od sale with cash AND Cash at POS.
-            when (cardProcessedData.getTransType()) {
-                BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type ->
-                    addFieldByHex(
-                        54,
-                        addPad(cardProcessedData.getOtherAmount().toString(), "0", 12, true)
-                    )
-                else -> {
-                }
-            }
-
-
-            //Field 55
-            when (cardProcessedData.getReadCardType()) {
-                DetectCardType.EMV_CARD_TYPE, DetectCardType.CONTACT_LESS_CARD_TYPE -> addField(
-                    55, cardProcessedData.getFiled55().toString()
-                )
-                else -> {
-                }
-            }
-*/
             when (cardProcessedData.getTransType()) {
                 BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type ->
                     addFieldByHex(
@@ -160,8 +117,6 @@ class CreateTransactionPacket(
                 }
             }
 
-
-
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
             when (cardProcessedData.getTransType()) {
                 BhTransactionType.SALE.type -> {
@@ -177,15 +132,6 @@ class CreateTransactionPacket(
                 }
 
             }
-
-
-            //Indicator Data Field 58
-
-              /*  addPad(
-                    AppPreference.getString(AppPreference.ACC_SEL_KEY),
-                    "0",
-                    2
-                ) //cardDataTable.getA//"00"*/
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
             when (cardProcessedData.getTransType()) {
 
@@ -260,6 +206,16 @@ class CreateTransactionPacket(
 
                 }
 
+                BhTransactionType.TEST_EMI.type->{
+                    val cardIndFirst = "0"
+                    val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
+                    val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
+                    //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
+                    val cdtIndex = cardDataTable?.cardTableIndex ?: ""
+                    val accSellection ="00"
+                    "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
+                    addFieldByHex(58, indicator ?: "")
+                }
                 else -> {
                   /*  indicator = if( cardProcessedData.getTransType()== TransactionType.TEST_EMI.type ){
                         logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
@@ -328,8 +284,7 @@ class CreateTransactionPacket(
             else {
                 issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: "0"
             }
-            // old way
-            //   val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
+
 var serialnumm=""
             serialnumm = if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()||BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
                 val tenureData=batchdata?.emiTenureDataModel
@@ -345,12 +300,10 @@ var serialnumm=""
             //adding field 62
             cardProcessedData.getInvoice()?.let { addFieldByHex(62, it) }
 
-            //Here we are Saving Date , Time and TimeStamp in CardProcessedDataModal:-
-            var year: String = "Year"
         }
     }
 
-    fun addIsoDateTime(iWriter: IsoDataWriter) {
+    private fun addIsoDateTime(iWriter: IsoDataWriter) {
         val dateTime: Long = Calendar.getInstance().timeInMillis
         val time: String = SimpleDateFormat("HHmmss", Locale.getDefault()).format(dateTime)
         val date: String = SimpleDateFormat("MMdd", Locale.getDefault()).format(dateTime)

@@ -8,6 +8,11 @@ import java.io.DataInputStream
 import java.net.Socket
 import java.nio.channels.ServerSocketChannel
 
+/**
+ * Author Lucky (SocketHelper for Server communication)
+ */
+var hitCounter = 1
+
 object SocketHelper {
     val TAG: String = SocketHelper::class.java.simpleName
     private var tct: TerminalCommunicationTable? = null
@@ -40,7 +45,7 @@ object SocketHelper {
 
                     val byteData = data.generateIsoByteRequest()
                     Utility().logger(SocketHelper.TAG, "Data Send = ${byteData.byteArr2HexStr()}")
-                  logISOReader("REQUEST",(data as IsoDataWriter).isoMap)
+                    logISOReader("REQUEST", (data as IsoDataWriter).isoMap)
                     Utility.ConnectionTimeStamps.startTransaction =
                         Field48ResponseTimestamp.getF48TimeStamp()
                     val sos = socket.getOutputStream()
@@ -64,7 +69,7 @@ object SocketHelper {
                     val isoReader = readIso(responseStr)
                     Utility().logger(KeyExchanger.TAG, isoReader.isoMap)
                     val respMsg = isoReader.isoMap[58]?.parseRaw2String() ?: ""
-                   /* return if (isoReader.isoMap[39]?.rawData?.hexStr2ByteArr()?.byteArr2Str() == "00")
+                    /* return if (isoReader.isoMap[39]?.rawData?.hexStr2ByteArr()?.byteArr2Str() == "00")
                         RespMessageStatusData(respMsg, true, isoReader)
                     else RespMessageStatusData(respMsg, false)*/
                     return RespMessageStatusData(respMsg, true, isoReader)
@@ -87,12 +92,15 @@ object SocketHelper {
     }
 
 
-    private suspend fun getSocket(): RespMessageStatusData {
+    private suspend fun getSocket(socketForAppUpdate: Boolean = false): RespMessageStatusData {
         Log.d("Getting Socket:- ", "Socket Started Here.....")
         try {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
-                val sAddress = Utility().getIpPort("1")
+                val sAddress = Utility().getIpPort(socketForAppUpdate, isPrimaryIpPort = hitCounter)
+                logger("Connection Details:- ", sAddress.toString(), "e")
+                logger("HIT COUNTER", "$hitCounter","e")
+
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
                 }
@@ -109,6 +117,7 @@ object SocketHelper {
                 }
                 socket.connect(sAddress, connTimeOut)//
                 socket.soTimeout = resTimeOut
+                hitCounter = 1
                 return RespMessageStatusData(isSuccess = true, anyData = socket)
             } else {
                 return RespMessageStatusData("No Comm Data Found", isSuccess = false)
@@ -116,12 +125,15 @@ object SocketHelper {
 
         } catch (ex: Exception) {
             ex.printStackTrace()
-            Utility().logger("EXCEPTION", "SOCKET NOT CONNECTED", "e")
-            return RespMessageStatusData(ex.message.toString(), isSuccess = false)
-        } finally {
-            Log.d("Finally Call:- ", "Final Block Runs Here.....")
+            println("SOCKET CONNECT Parent EXCEPTION")
+            return if (hitCounter == 1) {
+                hitCounter = 2
+                getSocket(socketForAppUpdate)
+
+            } else {
+                hitCounter = 1
+                RespMessageStatusData(ex.message ?: "Connection Error", isSuccess = false)
+            }
         }
     }
-
-
 }

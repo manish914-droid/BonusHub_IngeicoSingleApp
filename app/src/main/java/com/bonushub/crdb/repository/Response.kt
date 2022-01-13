@@ -6,8 +6,6 @@ sealed class Response(val data:IsoDataReader?=null,val errorMessage:String?=null
     class Loading:Response()
     class Success(isoDataReader: IsoDataReader):Response(data=isoDataReader)
     class Error(errorMsg: String):Response(errorMessage = errorMsg)
-
-
 }
 
 sealed class GenericResponse<T>(val data:T?=null,val errorMessage:String?=null){

@@ -25,6 +25,7 @@ import com.bonushub.crdb.view.fragments.DashboardFragment
 import com.bonushub.crdb.vxutils.BHTextView
 import com.bonushub.crdb.vxutils.Utility.*
 import com.bonushub.pax.utils.BhTransactionType
+import com.bonushub.pax.utils.TestEmiItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ingenico.hdfcpayment.listener.OnOperationListener
@@ -805,6 +806,7 @@ fun getTransactionTypeName(type: Int): String? {
         BhTransactionType.EMI_SALE.type -> BhTransactionType.EMI_SALE.txnTitle
         BhTransactionType.TIP_SALE.type -> BhTransactionType.TIP_SALE.txnTitle
         BhTransactionType.BRAND_EMI.type -> BhTransactionType.BRAND_EMI.txnTitle
+        BhTransactionType.TEST_EMI.type -> BhTransactionType.TEST_EMI.txnTitle
         else -> "NONE"
     }
     return name
@@ -869,3 +871,44 @@ fun String.terminalDate() = this.substring(0, 8)
 //region=================Get Terminal Date according to Passed Index Value:-
 fun String.terminalTime() = this.substring(8, this.length)
 //endregion
+
+fun getTidForTestTxn(testEmiItem:String):String{
+    val tpt = runBlocking(Dispatchers.IO) { getTptData() }
+    val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String>
+    val tidList= tpt.terminalId as ArrayList<String>
+    val hm= hashMapOf<String,String>()
+    for (tidIndices in linkedTid.indices){
+        when(linkedTid[tidIndices]){
+            "0"->{
+                // for Amex
+            }
+            "1"->{
+                // DC type
+                hm[TestEmiItem.BASE_TID.id] = tidList[tidIndices]
+            }
+            "2"->{
+                // off us Tid
+                hm[TestEmiItem.OFFUS_TID.id] = tidList[tidIndices]
+            }
+            "3"->{
+                // 3 months onus
+                hm[TestEmiItem._3_M_TID.id] = tidList[tidIndices]
+            }
+            "6"->{
+                // 6 months onus
+                hm[TestEmiItem._6_M_TID.id] = tidList[tidIndices]
+            }
+            "9"->{
+                // 9 months onus
+                hm[TestEmiItem._9_M_TID.id] = tidList[tidIndices]
+            }
+            "12"->{
+                // 12 months onus
+                hm[TestEmiItem._12_M_TID.id] = tidList[tidIndices]
+            }
+
+        }
+    }
+   return hm[testEmiItem]?:"00000000"
+
+}

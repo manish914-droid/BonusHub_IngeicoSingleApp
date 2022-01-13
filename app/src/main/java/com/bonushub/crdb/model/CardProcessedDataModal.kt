@@ -74,7 +74,7 @@ class CardProcessedDataModal : Serializable {
     private var doubleTap: Boolean = false
     //region
 
-     var testEmiOption:String="0"
+     var testEmiOption:String=""
     var indicatorF58=""
 /// region=====================================================Ingenico response
     private var rrn: String? = null

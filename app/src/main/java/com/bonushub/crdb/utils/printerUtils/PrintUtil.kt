@@ -2411,7 +2411,7 @@ class PrintUtil(context: Context?) {
     }
 
     //Below method is used to chunk the TNC's text(words's are not splitted in between) which was printed on EMI sale :-
-    fun chunkTnC(s: String, limit: Int = 32): List<String> {
+    private fun chunkTnC(s: String, limit: Int = 32): List<String> {
 
         var str = s
         val parts: MutableList<String> = ArrayList()

@@ -355,7 +355,7 @@ interface AppDao{
 
 
     @Query("SELECT * FROM TerminalCommunicationTable WHERE recordType = :redordType")
-    suspend fun getTerminalCommunicationTableByRecordType(redordType:String): MutableList<TerminalCommunicationTable?>
+    suspend fun getTerminalCommunicationTableByRecordType(redordType:String): TerminalCommunicationTable
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateTerminalCommunicationTable(terminalCommunicationTable: TerminalCommunicationTable)
