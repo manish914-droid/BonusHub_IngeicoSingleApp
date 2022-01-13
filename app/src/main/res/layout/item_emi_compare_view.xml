@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linearLayoutParent"
 
-    android:layout_width="@dimen/pad_120"
+    android:layout_width="@dimen/pad_100"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -31,6 +31,7 @@
                     android:id="@+id/frame_banks"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/pad_60"
+                    android:layout_margin="@dimen/pad_2"
                     android:background="@drawable/edge_gray_bg_white"
                     android:orientation="horizontal">
 
@@ -53,9 +54,8 @@
                         android:id="@+id/issuerDeleteIV"
                         android:layout_width="@dimen/pad_16"
                         android:layout_height="@dimen/pad_16"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/pad_36"
-                        android:layout_marginBottom="@dimen/pad_10"
+                        android:layout_gravity="end"
+                        android:layout_margin="5dp"
                         android:clickable="false"
                         android:contentDescription="@string/checked"
                         android:src="@drawable/ic_close_24" />
@@ -64,14 +64,15 @@
                 <TextView
                     android:id="@+id/transactionAmountTV"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="left"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -81,14 +82,15 @@
                 <TextView
                     android:id="@+id/discountAmount"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -98,14 +100,15 @@
                 <TextView
                     android:id="@+id/loanAmount"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -115,14 +118,15 @@
                 <TextView
                     android:id="@+id/roi"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -132,14 +136,15 @@
                 <TextView
                     android:id="@+id/emiAmount"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -149,14 +154,15 @@
                 <TextView
                     android:id="@+id/totalWithInterest"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -166,14 +172,15 @@
                 <TextView
                     android:id="@+id/cashbackAmount"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -183,14 +190,15 @@
                 <TextView
                     android:id="@+id/netCost"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:hint="@string/_500_00"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -200,13 +208,14 @@
                 <TextView
                     android:id="@+id/additionalOffer"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:fontFamily="@font/muli_regular"
                     android:gravity="center"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/txt_color"
-                    android:textSize="@dimen/text_size_small" />
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_margin="1dp"/>
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <View
