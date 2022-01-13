@@ -241,17 +241,16 @@ class PrintUtil(context: Context?) {
                     txnName = "REVERSAL"
                 }
 
-                when (txnName) {
-                    "SALE", "SALECASH" -> {
+                when (batchTable.transactionType) {
+                    BhTransactionType.SALE.type, BhTransactionType.CASH_AT_POS.type -> {
                         saleTransaction(receiptDetail)
                     }
-                   "EMI SALE" -> {
+                    BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
                         printEMISale(batchTable)
 
                    }
 
-                    "REVERSAL" -> {
-
+                    BhTransactionType.REVERSAL.type -> {
                         val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
                         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
                         textBlockList.add(
@@ -264,8 +263,6 @@ class PrintUtil(context: Context?) {
                         textBlockList.clear()
 
                     }
-
-
                     else -> {
                         voidTransaction(receiptDetail)
 
@@ -273,13 +270,12 @@ class PrintUtil(context: Context?) {
                 }
                 printSeperator()
                 //region=====================BRAND TAndC===============
-                if(txnName.equals("EMI SALE")){
+                if (batchTable.transactionType == BhTransactionType.EMI_SALE.type ||batchTable.transactionType == BhTransactionType.TEST_EMI.type||batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
                     printBrandTnC(batchTable)
 
                 }
                 //region=====================BRAND PRODUACT DATA===============
                 if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
-
                     printProduactData(batchTable)
                     printSeperator()
                     baseAmounthandling(batchTable)
@@ -428,10 +424,7 @@ class PrintUtil(context: Context?) {
         textBlockList.clear()
         if (receiptDetail.txnName.equals("SALE")) {
 
-            if (tipAmount == "0") {
-                textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
-                textBlockList.add(sigleLineformat(".............", AlignMode.RIGHT))
-            } else {
+            if (tipAmount != "0") {
                 textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
                 textBlockList.add(
                     sigleLineformat(
@@ -439,7 +432,10 @@ class PrintUtil(context: Context?) {
                         AlignMode.RIGHT
                     )
                 )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
             }
+
         } else {
             textBlockList.add(sigleLineformat("CASH AMOUNT: ", AlignMode.LEFT))
             textBlockList.add(
@@ -448,10 +444,11 @@ class PrintUtil(context: Context?) {
                     AlignMode.RIGHT
                 )
             )
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
         }
         // textBlockList.add(sigleLineformat( "00",AlignMode.RIGHT))
-        printer?.addMixStyleText(textBlockList)
-        textBlockList.clear()
+
         val totalAmount = "%.2f".format((amt.toDouble() + tipAmount.toDouble()))
         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
         textBlockList.add(sigleLineformat("INR:${totalAmount}", AlignMode.RIGHT))
@@ -910,11 +907,7 @@ class PrintUtil(context: Context?) {
         }
         //endregion
         if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
-
-
-
-
-        //region ======================Brand terms and Condition=========================
+            //region ======================Brand terms and Condition=========================
 
         //val brandId = brandEMIMasterDataModal?.brandID
         val data = getBrandTAndCData()
