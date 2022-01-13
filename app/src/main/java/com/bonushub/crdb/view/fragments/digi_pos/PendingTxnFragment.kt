@@ -69,10 +69,6 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
         }
 
 
-        binding?.txtViewSearch?.setOnClickListener {
-
-        }
-
         setupRecyclerview()
 
     }

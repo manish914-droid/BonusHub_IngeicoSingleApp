@@ -9,11 +9,11 @@
     android:clickable="true"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
-    app:layout_behavior="com.example.verifonevx990app.utils.LockableBottomSheetBehavior">
+    app:layout_behavior="com.bonushub.crdb.utils.LockableBottomSheetBehavior">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="420dp"
+        android:layout_height="320dp"
         android:background="@drawable/bottom_sheet_rounded_rectangle"
         android:backgroundTint="@color/white"
         android:orientation="vertical"
@@ -35,6 +35,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/pad_24"
                 android:layout_marginEnd="@dimen/pad_24"
+                android:layout_marginTop="@dimen/pad_5"
                 android:layout_weight="0.9"
                 android:fontFamily="@font/muli_regular"
                 android:text="@string/filterBy"
@@ -88,95 +89,120 @@
         </LinearLayout>-->
 
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/pad_24">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <LinearLayout
+            <RadioGroup
+                android:id="@+id/radioGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="">
+                android:layout_marginStart="@dimen/pad_20">
 
-                <RadioButton
-                    android:id="@+id/upiCollectBottomRB"
+                <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorGrey"
-                    android:text="@string/upi_collect"
-                    android:textColor="@color/colorGrey"
-                    android:fontFamily="@font/muli_light"
-                    android:textSize="@dimen/text_size_small"/>
+                    android:layout_height="wrap_content">
 
-                <RadioButton
-                    android:id="@+id/dynamicQRBottomRB"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/pad_32"
-                    android:buttonTint="@color/colorGrey"
-                    android:text="Dynamic QR"
-                    android:textColor="@color/colorGrey"
-                    android:textSize="@dimen/text_size_small"
-                    android:fontFamily="@font/muli_light"/>
-            </LinearLayout>
+                    <RadioButton
+                        android:id="@+id/upiCollectBottomRB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/text_gray2"
+                        android:fontFamily="@font/muli_light"
+                        android:text="@string/upi_collect"
+                        android:textColor="@color/text_gray2"
+                        android:textSize="@dimen/text_size_small" />
 
-            <LinearLayout
+                    <RadioButton
+                        android:id="@+id/dynamicQRBottomRB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/pad_10"
+                        android:layout_toEndOf="@+id/upiCollectBottomRB"
+                        android:buttonTint="@color/text_gray2"
+                        android:fontFamily="@font/muli_light"
+                        android:text="Dynamic QR"
+                        android:textColor="@color/text_gray2"
+                        android:textSize="@dimen/text_size_small" />
+
+                    <RadioButton
+                        android:id="@+id/smsPayBottomRB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/upiCollectBottomRB"
+                        android:buttonTint="@color/text_gray2"
+                        android:fontFamily="@font/muli_light"
+                        android:text="@string/sms_pay"
+                        android:textColor="@color/text_gray2"
+                        android:textSize="@dimen/text_size_small" />
+
+                    <RadioButton
+                        android:id="@+id/staticQRBottomRB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/upiCollectBottomRB"
+                        android:layout_marginStart="@dimen/pad_10"
+                        android:layout_toEndOf="@+id/upiCollectBottomRB"
+                        android:buttonTint="@color/text_gray2"
+                        android:fontFamily="@font/muli_light"
+                        android:text="@string/static_qr"
+                        android:textColor="@color/text_gray2"
+                        android:textSize="@dimen/text_size_small" />
+
+                </RelativeLayout>
+
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/btnApply"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <RadioButton
-                    android:id="@+id/smsPayBottomRB"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorGrey"
-                    android:text="@string/sms_pay"
-                    android:textColor="@color/colorGrey"
-                    android:fontFamily="@font/muli_light"
-                    android:textSize="@dimen/text_size_small"/>
-
-                <RadioButton
-                    android:id="@+id/staticQRBottomRB"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/pad_44"
-                    android:buttonTint="@color/colorGrey"
-                    android:text="@string/static_qr"
-                    android:textColor="@color/colorGrey"
-                    android:fontFamily="@font/muli_light"
-                    android:textSize="@dimen/text_size_small"/>
-            </LinearLayout>
-        </RadioGroup>
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="@dimen/pad_24"
+                android:background="@drawable/edge_button_blue"
+                android:drawablePadding="10dp"
+                android:fontFamily="@font/muli_regular"
+                android:gravity="center"
+                android:paddingStart="20dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="9dp"
+                android:text="Apply"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small" />
+        </RelativeLayout>
 
 
         <RadioGroup
             android:id="@+id/txnIDRG"
-            android:layout_width="280dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/pad_20"
             android:layout_marginTop="@dimen/pad_5"
-            android:layout_marginStart="@dimen/pad_24"
             android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/ptxnIDBottomRB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="@color/colorGrey"
-                android:text="@string/ptxnID"
-                android:textColor="@color/colorGrey"
+                android:buttonTint="@color/text_gray2"
                 android:fontFamily="@font/muli_light"
-                android:textSize="@dimen/text_size_small"/>
+                android:text="@string/ptxnID"
+                android:textColor="@color/text_gray2"
+                android:textSize="@dimen/text_size_small" />
 
             <RadioButton
                 android:id="@+id/mtxnIDBottomRB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pad_44"
-                android:buttonTint="@color/colorGrey"
-                android:text="@string/mtxnID"
-                android:textColor="@color/colorGrey"
+                android:layout_marginStart="28dp"
+                android:buttonTint="@color/text_gray2"
                 android:fontFamily="@font/muli_light"
-                android:textSize="@dimen/text_size_small"/>
+                android:text="@string/mtxnID"
+                android:textColor="@color/text_gray2"
+                android:textSize="@dimen/text_size_small"
+                />
 
         </RadioGroup>
 
@@ -189,9 +215,12 @@
             android:background="@drawable/edge_blue_bg_white"
             android:inputType="text"
             android:maxLength="50"
-            android:paddingStart="@dimen/pad_4"
+            android:paddingStart="20dp"
             android:textColor="@color/themeBackground"
-            tools:ignore="RtlSymmetry" />
+            tools:ignore="RtlSymmetry"
+            android:fontFamily="@font/muli_light"
+            android:textColorHint="@color/text_gray2"
+            android:textSize="@dimen/text_size_small"/>
 
 
         <TextView
@@ -201,10 +230,10 @@
             android:layout_marginStart="@dimen/pad_30"
             android:layout_marginTop="@dimen/pad_15"
             android:layout_marginEnd="@dimen/pad_24"
-            android:text="@string/amount"
-            android:textColor="@color/colorGrey"
             android:fontFamily="@font/muli_light"
-            android:textSize="@dimen/text_size_small"/>
+            android:text="@string/amount"
+            android:textColor="@color/text_gray2"
+            android:textSize="@dimen/text_size_small" />
 
 
         <com.bonushub.crdb.vxutils.AmountEditText
@@ -212,6 +241,7 @@
             android:layout_width="220dp"
             android:layout_height="40dp"
             android:layout_marginStart="@dimen/pad_30"
+            android:layout_marginTop="@dimen/pad_10"
             android:background="@drawable/edge_blue_bg_white"
             android:clickable="true"
             android:cursorVisible="false"
@@ -219,21 +249,21 @@
             android:drawableStart="@drawable/ic_indian_rupee"
             android:ems="10"
             android:focusable="true"
+            android:fontFamily="@font/muli_light"
             android:gravity="start|center_vertical"
             android:hint="@string/enter_amount"
             android:imeOptions="actionDone"
             android:inputType="number"
             android:lines="1"
             android:maxLength="11"
-            android:paddingStart="@dimen/pad_4"
+            android:paddingStart="0dp"
             android:text="@string/_0_0"
             android:textColor="@color/themeBackground"
-            android:textColorHint="@color/colorGrey"
+            android:textColorHint="@color/text_gray2"
             android:textSize="@dimen/text_size_small"
             app:fname="bold"
-            tools:ignore="RtlSymmetry"
-            android:layout_marginTop="@dimen/pad_10"/>
+            tools:ignore="RtlSymmetry" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

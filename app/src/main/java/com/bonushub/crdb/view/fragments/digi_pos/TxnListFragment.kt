@@ -1,6 +1,9 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +32,9 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
     lateinit var digiPosItemType:DigiPosItem
 
     lateinit var iTxnListItemClick:ITxnListItemClick
+
+    private var selectedFilterTransactionType: String = ""
+    private var selectedFilterTxnID: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +72,143 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
             logger("filter","openBottomSheet","e")
             toggleBottomSheet()
         }
+
+        // region bottom sheet
+        binding?.bottomSheet?.closeIconBottom?.setOnClickListener {
+            closeBottomSheet()
+        }
+
+        //region===================Filter Transaction Type's RadioButton OnClick events:-
+        binding?.bottomSheet?.upiCollectBottomRB?.setOnClickListener {
+
+            selectedFilterTransactionType =
+                binding?.bottomSheet?.upiCollectBottomRB?.text?.toString() ?: ""
+            //filterTransactionType = EnumDigiPosProcess.UPIDigiPOS.code
+            binding?.bottomSheet?.upiCollectBottomRB?.setTextColor(Color.parseColor("#001F79"))
+            binding?.bottomSheet?.upiCollectBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#001F79"))
+
+            binding?.bottomSheet?.dynamicQRBottomRB?.isChecked = false
+            binding?.bottomSheet?.dynamicQRBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.dynamicQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.smsPayBottomRB?.isChecked = false
+            binding?.bottomSheet?.smsPayBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.smsPayBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.staticQRBottomRB?.isChecked = false
+            binding?.bottomSheet?.staticQRBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.staticQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            Log.d("SelectedRB:- ", selectedFilterTransactionType)
+        }
+
+        binding?.bottomSheet?.dynamicQRBottomRB?.setOnClickListener {
+            selectedFilterTransactionType =
+                binding?.bottomSheet?.dynamicQRBottomRB?.text?.toString() ?: ""
+            //filterTransactionType = EnumDigiPosProcess.DYNAMIC_QR.code
+            binding?.bottomSheet?.dynamicQRBottomRB?.setTextColor(Color.parseColor("#001F79"))
+            binding?.bottomSheet?.dynamicQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#001F79"))
+
+            binding?.bottomSheet?.upiCollectBottomRB?.isChecked = false
+            binding?.bottomSheet?.upiCollectBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.upiCollectBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.smsPayBottomRB?.isChecked = false
+            binding?.bottomSheet?.smsPayBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.smsPayBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.staticQRBottomRB?.isChecked = false
+            binding?.bottomSheet?.staticQRBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.staticQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+            Log.d("SelectedRB:- ", selectedFilterTransactionType)
+        }
+
+        binding?.bottomSheet?.smsPayBottomRB?.setOnClickListener {
+            selectedFilterTransactionType =
+                binding?.bottomSheet?.smsPayBottomRB?.text?.toString() ?: ""
+            //filterTransactionType = EnumDigiPosProcess.SMS_PAYDigiPOS.code
+            binding?.bottomSheet?.smsPayBottomRB?.setTextColor(Color.parseColor("#001F79"))
+            binding?.bottomSheet?.smsPayBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#001F79"))
+
+            binding?.bottomSheet?.dynamicQRBottomRB?.isChecked = false
+            binding?.bottomSheet?.dynamicQRBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.dynamicQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.upiCollectBottomRB?.isChecked = false
+            binding?.bottomSheet?.upiCollectBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.upiCollectBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.staticQRBottomRB?.isChecked = false
+            binding?.bottomSheet?.staticQRBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.staticQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+            Log.d("SelectedRB:- ", selectedFilterTransactionType)
+        }
+
+        binding?.bottomSheet?.staticQRBottomRB?.setOnClickListener {
+            selectedFilterTransactionType =
+                binding?.bottomSheet?.staticQRBottomRB?.text?.toString() ?: ""
+           // filterTransactionType = EnumDigiPosProcess.STATIC_QR.code
+            binding?.bottomSheet?.staticQRBottomRB?.setTextColor(Color.parseColor("#001F79"))
+            binding?.bottomSheet?.staticQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#001F79"))
+
+            binding?.bottomSheet?.dynamicQRBottomRB?.isChecked = false
+            binding?.bottomSheet?.dynamicQRBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.dynamicQRBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.smsPayBottomRB?.isChecked = false
+            binding?.bottomSheet?.smsPayBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.smsPayBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+
+            binding?.bottomSheet?.upiCollectBottomRB?.isChecked = false
+            binding?.bottomSheet?.upiCollectBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.upiCollectBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+            Log.d("SelectedRB:- ", selectedFilterTransactionType)
+        }
+        //endregion
+
+        //region===================PTXN ID and MTXN ID RadioButtons OnClick Listener event:-
+        binding?.bottomSheet?.ptxnIDBottomRB?.setOnClickListener {
+            selectedFilterTxnID = binding?.bottomSheet?.ptxnIDBottomRB?.text?.toString() ?: ""
+            binding?.bottomSheet?.ptxnIDBottomRB?.setTextColor(Color.parseColor("#001F79"))
+            binding?.bottomSheet?.ptxnIDBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#001F79"))
+
+            binding?.bottomSheet?.mtxnIDBottomRB?.isChecked = false
+            binding?.bottomSheet?.mtxnIDBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.mtxnIDBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+        }
+
+        binding?.bottomSheet?.mtxnIDBottomRB?.setOnClickListener {
+            selectedFilterTxnID = binding?.bottomSheet?.mtxnIDBottomRB?.text?.toString() ?: ""
+            binding?.bottomSheet?.mtxnIDBottomRB?.setTextColor(Color.parseColor("#001F79"))
+            binding?.bottomSheet?.mtxnIDBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#001F79"))
+
+            binding?.bottomSheet?.ptxnIDBottomRB?.isChecked = false
+            binding?.bottomSheet?.ptxnIDBottomRB?.setTextColor(Color.parseColor("#707070"))
+            binding?.bottomSheet?.ptxnIDBottomRB?.buttonTintList =
+                ColorStateList.valueOf(Color.parseColor("#707070"))
+        }
+        //endregion
+
+        // end region
     }
 
     //Method to be called when Bottom Sheet Toggle:-
@@ -74,6 +217,15 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
             sheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
         } else {
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+            sheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    //Method to be called on Bottom Sheet Close:-
+    private fun closeBottomSheet() {
+        DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+        if (sheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+
             sheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }

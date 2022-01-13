@@ -991,12 +991,14 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
 
     suspend fun syncPendingTransaction(transactionViewModel:TransactionViewModel)
     {
-            val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
+        val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
-            for(item in pendingTxn){
-                val transactionISO = CreateTransactionPacket(item.cardProcessedDataModal).createTransactionPacket()
+        if(pendingTxn.size != 0) {
+            for (item in pendingTxn) {
+                val transactionISO =
+                    CreateTransactionPacket(item.cardProcessedDataModal).createTransactionPacket()
 
-                when(val genericResp = transactionViewModel.serverCall(transactionISO)){
+                when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
                     is GenericResponse.Success -> {
                         com.bonushub.crdb.utils.logger("success:- ", "in success $genericResp", "e")
                         // to remove transaction after sync
@@ -1012,6 +1014,7 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
                     }
                 }
             }
+        }
 
     }
 

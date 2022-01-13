@@ -15,6 +15,7 @@
     <color name="black">#000000</color>
     <color name="text_active">@color/heading</color>
     <color name="text_inactive">#777777</color>
+    <color name="text_gray2">#707070</color>
     <!--progress bar-->
     <color name="darkgreen">#006400</color>
     <!--text and hint-->
