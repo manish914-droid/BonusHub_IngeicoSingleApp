@@ -32,24 +32,31 @@
         <entry key="app/src/main/res/layout/app_toolbar.xml" value="0.1" />
         <entry key="app/src/main/res/layout/bank_function_right_icon.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/custom_toast.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/dialog_admin.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/footer_app.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/fragment_brand_emi.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.12" />
+        <entry key="app/src/main/res/layout/fragment_digi_pos_menu.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/fragment_emi_catalogue.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_emi_compare.xml" value="0.22" />
         <entry key="app/src/main/res/layout/fragment_emi_issuer_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_init.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_new_input_amount.xml" value="0.14" />
+        <entry key="app/src/main/res/layout/fragment_upi_collect.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/fragment_upi_sms_dynamic_pay_qr_input_detail.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/fragment_void_main.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/item_dashboart.xml" value="0.16" />
+        <entry key="app/src/main/res/layout/item_digi_pos.xml" value="0.33" />
         <entry key="app/src/main/res/layout/item_emi_compare_view.xml" value="0.2563176895306859" />
         <entry key="app/src/main/res/layout/item_emi_issuer_list.xml" value="0.14" />
         <entry key="app/src/main/res/layout/item_emi_issuer_tenure.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/item_emi_scheme_offer.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/item_ok_btn_dialog.xml" value="0.33" />
         <entry key="app/src/main/res/layout/main_drawer.xml" value="0.22" />
         <entry key="app/src/main/res/layout/main_list_item.xml" value="0.18" />
         <entry key="app/src/main/res/layout/mobile_bill_dialog_view.xml" value="0.18489583333333334" />
         <entry key="app/src/main/res/layout/msg_dialog.xml" value="0.5" />
-        <entry key="app/src/main/res/layout/navigation_footer_layout.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/navigation_footer_layout.xml" value="0.14" />
         <entry key="app/src/main/res/layout/new_enter_amount_keyboard.xml" value="0.33" />
         <entry key="app/src/main/res/layout/new_print_customer_copy.xml" value="0.17091454272863568" />
         <entry key="app/src/main/res/layout/new_tem_progress_dialog.xml" value="0.18489583333333334" />
