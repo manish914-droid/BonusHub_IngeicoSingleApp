@@ -36,9 +36,9 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
     var binding:FragmentUpiSmsDynamicPayQrInputDetailBinding? = null
     //lateinit var digiPosItemType:DigiPosItem
     private lateinit var transactionType: EDashboardItem
-    var amount = ""
-    var vpa = ""
-    var mobile = ""
+    private var amount_ = ""
+    private var vpa_ = ""
+    private var mobile_ = ""
     var uniqueID: String = ""
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,9 +108,9 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                         (activity as NavigationActivity).transactFragment(UpiCollectFragment().apply {
                             arguments = Bundle().apply {
                                 putSerializable("type", EDashboardItem.UPI)
-                                putSerializable("amount", amount)
-                                putSerializable("vpa", vpa)
-                                putSerializable("mobile", mobile)
+                                putSerializable("amount", amount_)
+                                putSerializable("vpa", vpa_)
+                                putSerializable("mobile", mobile_)
                             }
                         })
                     }
@@ -119,18 +119,13 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
                 EDashboardItem.DYNAMIC_QR->{
                     logger("transactionType",""+transactionType.title)
-//                    (activity as NavigationActivity).transactFragment(UpiCollectFragment().apply {
+//                    (activity as NavigationActivity).transactFragment(QrFragment().apply {
 //                        arguments = Bundle().apply {
-//                            putString("amount", binding?.amountEt?.text.toString().trim())
-//                            putString("vpa", binding?.vpaEt?.text.toString().trim())
-//                            putString("des", binding?.enterDescriptionEt?.text.toString().trim())
+//                            putSerializable("type", EDashboardItem.DYNAMIC_QR)
 //                        }
 //                    })
-                    (activity as NavigationActivity).transactFragment(QrFragment().apply {
-                        arguments = Bundle().apply {
-                            putSerializable("type", EDashboardItem.DYNAMIC_QR)
-                        }
-                    })
+
+                    validateAndSyncRequestToServer(binding?.amountEt?.text.toString().trim())
                 }
 
                 EDashboardItem.SMS_PAY ->{
@@ -142,6 +137,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 //                            putString("des", binding?.enterDescriptionEt?.text.toString().trim())
 //                        }
 //                    })
+                    validateAndSyncRequestToServer(binding?.amountEt?.text.toString().trim())
                 }
 
                 else ->{
@@ -154,21 +150,21 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
 
     fun isVerify():Boolean{
-        amount =  binding?.amountEt?.text.toString().trim()
-        vpa =  binding?.vpaEt?.text.toString().trim()
-        mobile =  binding?.mobileNumberEt?.text.toString().trim()
+        amount_ =  binding?.amountEt?.text.toString().trim()
+        vpa_ =  binding?.vpaEt?.text.toString().trim()
+        mobile_ =  binding?.mobileNumberEt?.text.toString().trim()
 
-        if(amount.isEmpty())
+        if(amount_.isEmpty())
         {
             ToastUtils.showToast(requireContext(),"Please Enter Amount")
             return false
         }
-        else if(vpa.isEmpty())
+        else if(vpa_.isEmpty())
         {
             ToastUtils.showToast(requireContext(),"Enter Valid VPA")
             return false
         }
-        else if(mobile.isEmpty() || mobile.length <10)
+        else if(mobile_.isEmpty() || mobile_.length <10)
         {
             ToastUtils.showToast(requireContext(),"Enter Valid Mobile Number")
             return false

@@ -58,9 +58,9 @@ class UpiCollectFragment : Fragment() {
         binding?.txtViewMobile?.text = mobile
 
         // temp for text
-        binding?.txtViewAmount?.text = "1,999.00"
-        binding?.txtViewVpa?.text = "ABC@YBL"
-        binding?.txtViewMobile?.text = "9942424299"
+//        binding?.txtViewAmount?.text = "1,999.00"
+//        binding?.txtViewVpa?.text = "ABC@YBL"
+//        binding?.txtViewMobile?.text = "9942424299"
 
 
         binding?.subHeaderView?.subHeaderText?.text = "UPI COLLECT"
@@ -278,9 +278,6 @@ class UpiCollectFragment : Fragment() {
                                                                             }*/
                                                                         }
                                                                         else -> {
-//                                                                            DigiPosDataTable.deletRecord(
-//                                                                                tabledata.partnerTxnId
-//                                                                            )
                                                                             Field48ResponseTimestamp.deleteDigiposData(tabledata)
 
                                                                         }
@@ -299,11 +296,6 @@ class UpiCollectFragment : Fragment() {
                                                                             getString(R.string.positive_button_ok),
                                                                             { alertPositiveCallback ->
                                                                                 if (alertPositiveCallback) {
-                                                                                    /*DigiPosDataTable.deletRecord(
-                                                                                        field57.split(
-                                                                                            "^"
-                                                                                        ).last()
-                                                                                    )*/
 
                                                                                     Field48ResponseTimestamp.deleteDigiposData(
                                                                                         field57.split(
