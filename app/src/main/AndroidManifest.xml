@@ -36,6 +36,8 @@
     <uses-permission android:name="titan.extperm.PERSIST_SET" />
     <uses-permission android:name="titan.extperm.PERSIST_GET" />
     <uses-permission android:name="titan.extperm.DEVICE_ADMIN" />
+    <uses-permission android:name="com.usdk.installappu.perm.NORMAL_FUNC" />
+
 
     <application
         android:name=".HDFCApplication"

@@ -243,7 +243,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     }
                     lifecycleScope.launch(Dispatchers.IO) {
                         val settlementByteArray = data.generateIsoByteRequest()
-                        (activity as NavigationActivity).settleBatch(
+                        (activity as NavigationActivity).settleBatch1(
                             settlementByteArray,
                             SettlementComingFrom.DASHBOARD.screenType
                         )

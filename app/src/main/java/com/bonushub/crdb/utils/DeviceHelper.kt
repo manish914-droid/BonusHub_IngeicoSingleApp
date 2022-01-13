@@ -21,6 +21,7 @@ import com.usdk.apiservice.aidl.emv.UEMV
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.aidl.printer.UPrinter
+import com.usdk.apiservice.aidl.tms.UTMS
 import com.usdk.apiservice.limited.DeviceServiceLimited
 
 object DeviceHelper   {
@@ -273,6 +274,17 @@ object DeviceHelper   {
         iRemoteService?.doSettlement(request,listener)
     }
 
+    @JvmStatic
+    @Throws(IllegalStateException::class)
+    fun getTMS(): UTMS? {
+        val iBinder = object : IBinderCreator() {
+            override fun create(): IBinder {
+                return vfDeviceService!!.tms
+            }
+
+        }.start()
+        return UTMS.Stub.asInterface(iBinder)
+    }
 
 
     @JvmStatic

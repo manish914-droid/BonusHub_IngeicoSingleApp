@@ -714,7 +714,8 @@ suspend fun updateIngenicoInitialization(appDao: AppDao, initialization: Ingenic
 fun deviceModel(): String{
     return try {
         var strdeviceModel = DeviceHelper.getDeviceModel() ?: ""
-
+        strdeviceModel = strdeviceModel.replace("\\s".toRegex(),"")
+        println("Device Model after trim is"+strdeviceModel.subSequence(0,6).toString())
         return strdeviceModel.subSequence(0,6).toString()
        }
     catch (ex: Exception){
