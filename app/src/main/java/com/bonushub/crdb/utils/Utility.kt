@@ -1048,17 +1048,17 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
                 when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
                     is GenericResponse.Success -> {
-                        com.bonushub.crdb.utils.logger("success:- ", "in success $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("success:- ", "in success ${genericResp.errorMessage}", "e")
                         // to remove transaction after sync
                         appDatabase.appDao.deletePendingSyncTransactionData(item)
                     }
                     is GenericResponse.Error -> {
-                        com.bonushub.crdb.utils.logger("error:- ", "in error $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("error:- ", "in error ${genericResp.errorMessage}", "e")
                         com.bonushub.crdb.utils.logger("error:- ", "try in next time", "e")
 
                     }
                     is GenericResponse.Loading -> {
-                        com.bonushub.crdb.utils.logger("Loading:- ", "in Loading $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("Loading:- ", "in Loading ${genericResp.errorMessage}", "e")
                     }
                 }
             }
@@ -1247,6 +1247,29 @@ object Field48ResponseTimestamp {
             )
         }
 
+    }
+
+    fun deleteDigiposData(digiPosDataTable: DigiPosDataTable){
+        runBlocking(Dispatchers.IO) {
+            appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+        }
+
+    }
+
+    fun deleteDigiposData(partnerTxnId: String){
+        runBlocking(Dispatchers.IO) {
+            var digiPosDataTable = DigiPosDataTable(partnerTxnId = partnerTxnId)
+            appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+        }
+
+    }
+
+    fun selectAllDigiPosData():MutableList<DigiPosDataTable>?{
+        runBlocking(Dispatchers.IO) {
+            return@runBlocking appDatabase.appDao.getAllDigiposData()
+        }
+
+        return null
     }
 
 

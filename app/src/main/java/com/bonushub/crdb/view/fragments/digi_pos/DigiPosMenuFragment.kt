@@ -1,24 +1,18 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentDigiPosMenuBinding
-import com.bonushub.crdb.databinding.FragmentTestEmiBinding
-import com.bonushub.crdb.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.databinding.ItemDigiPosBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.fragments.tets_emi.ITestEmiItemClick
-import com.bonushub.crdb.view.fragments.tets_emi.TestEmiAdapter
 import com.bonushub.pax.utils.DigiPosItem
 import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.TestEmiItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -81,7 +75,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
             DigiPosItem.UPI ->{
                 (activity as NavigationActivity).transactFragment(UpiSmsDynamicPayQrInputDetailFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", DigiPosItem.UPI)
+                        putSerializable("type", EDashboardItem.UPI)
                     }
                 })
             }
@@ -89,7 +83,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
             DigiPosItem.DYNAMIC_QR ->{
                 (activity as NavigationActivity).transactFragment(UpiSmsDynamicPayQrInputDetailFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", DigiPosItem.DYNAMIC_QR)
+                        putSerializable("type", EDashboardItem.DYNAMIC_QR)
                     }
                 })
             }
@@ -98,7 +92,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
                 (activity as NavigationActivity).transactFragment(QrFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", DigiPosItem.STATIC_QR)
+                        putSerializable("type", EDashboardItem.STATIC_QR)
                     }
                 })
 
@@ -107,7 +101,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
             DigiPosItem.SMS_PAY ->{
                 (activity as NavigationActivity).transactFragment(UpiSmsDynamicPayQrInputDetailFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", DigiPosItem.SMS_PAY)
+                        putSerializable("type", EDashboardItem.SMS_PAY)
                     }
                 })
             }
@@ -115,7 +109,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
             DigiPosItem.PENDING_TXN ->{
                 (activity as NavigationActivity).transactFragment(PendingTxnFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", DigiPosItem.PENDING_TXN)
+                        putSerializable("type", EDashboardItem.PENDING_TXN)
                     }
                 })
             }
@@ -123,7 +117,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
             DigiPosItem.TXN_LIST ->{
                 (activity as NavigationActivity).transactFragment(TxnListFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", DigiPosItem.TXN_LIST)
+                        putSerializable("type", EDashboardItem.TXN_LIST)
                     }
                 })
             }

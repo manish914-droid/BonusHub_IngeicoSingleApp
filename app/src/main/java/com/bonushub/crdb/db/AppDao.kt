@@ -428,6 +428,12 @@ interface AppDao{
 
 
     // region ========== DigiPos Table dao ======
+    @Query("SELECT * FROM DigiPosDataTable")
+    suspend fun getAllDigiposData(): MutableList<DigiPosDataTable>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateDigiposData(digiPosData:DigiPosDataTable): Long?
+
+    @Delete
+    suspend fun deleteDigiposData(digiPosData: DigiPosDataTable)
 }
