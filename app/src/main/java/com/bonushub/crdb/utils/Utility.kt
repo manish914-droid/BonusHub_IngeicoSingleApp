@@ -1201,6 +1201,8 @@ object Field48ResponseTimestamp {
 
     }
 
+
+
     // region
     fun isTipEnable(): Boolean {
         var isTipEnable: Boolean = false

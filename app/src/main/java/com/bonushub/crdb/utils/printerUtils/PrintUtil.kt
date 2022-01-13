@@ -215,7 +215,11 @@ class PrintUtil(context: Context?) {
                 textBlockList.add(sigleLineformat("TVR:${receiptDetail.tvr}", AlignMode.LEFT))
                 textBlockList.add(sigleLineformat("TSI:${receiptDetail.tsi}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
 
+                textBlockList.add(sigleLineformat("AID:${receiptDetail.aid}", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("TC:${receiptDetail.tc}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
                 if (isReversal) {
