@@ -25,6 +25,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bonushub.crdb.R
+import com.bonushub.crdb.appupdate.AppUpdateDownloadManager
+import com.bonushub.crdb.appupdate.OnDownloadCompleteListener
 
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
@@ -67,6 +69,8 @@ import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
+import com.usdk.apiservice.aidl.tms.OnResultListener
+import com.usdk.apiservice.aidl.tms.TMSData
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_navigation.*
@@ -877,7 +881,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         subHeading: String,
         action: EDashboardItem, testEmiOption: String = "0"
     ) {
-        if (
+        System.out.println("Insert Block option "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
+        System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
+        System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
+
+            if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
         ) {
@@ -932,108 +940,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
-    //region================================================Settlement Server Hit:-
-    suspend fun settleBatch(settlementByteArray: ByteArray?,
-                            settlementCallFrom: String = SettlementComingFrom.SETTLEMENT.screenType,
-                            settlementCB: ((Boolean) -> Unit)? = null) {
-        runOnUiThread {
-            showProgress()
-        }
-        if (settlementByteArray != null) {
-            HitServer.apply { reversalToBeSaved = null }
-                .hitServer(settlementByteArray, { result, success ->
-                    if (success && !TextUtils.isEmpty(result)) {
-                        hideProgress()
-                        tempSettlementByteArray = settlementByteArray
-                        val responseIsoData: IsoDataReader = readIso(result, false)
-                        logger("Transaction RESPONSE ", "---", "e")
-                        logger("Transaction RESPONSE --->>", responseIsoData.isoMap, "e")
-                        Log.e("Success 39-->  ", responseIsoData.isoMap[39]?.parseRaw2String().toString() + "---->" + responseIsoData.isoMap[58]?.parseRaw2String().toString())
-
-                        val responseCode = responseIsoData.isoMap[39]?.parseRaw2String().toString()
-                        val hostMsg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
-
-                        val terminalParameterTable = getTptData()
-                        val isAppUpdateAvailableData = responseIsoData.isoMap[63]?.parseRaw2String()
-
-                        Log.d("Success Data:- ", result)
-                        Log.d("isAppUpdate:- ", isAppUpdateAvailableData.toString())
-                        //Below we are placing values in preference for the use to know whether batch is settled or not:-
-
-                        if (responseCode == "00" || responseCode == "95") {
-                            //Change status of autoSettle File Based Variable after Settlement Success to avoid
-                            //regular auto settle check on dashboard:-
-                            runBlocking(Dispatchers.IO) {
-                                appDao.deleteBatchTable()
-
-                                // clear reversal table and preference kushal
-                                appDao.deleteBatchReversalTable()
-                                AppPreference.clearReversal()
-                                AppPreference.saveLastCancelReceiptDetails("")
-                            }
-
-                            GlobalScope.launch(Dispatchers.Main) {
-                                txnSuccessToast(
-                                    this@NavigationActivity,
-                                    getString(R.string.settlement_success)
-                                )
-                                if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
-                                    val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
-                                } else {
-                                    onBackPressed()
-                                    when (isAppUpdateAvailableData) {
-                                        "00" -> {
-                                            if (terminalParameterTable != null) {
-                                                val tid = getBaseTID(appDao)
-                                                showProgress()
-                                                initViewModel.insertInfo1(tid)
-                                                observeMainViewModel()
-                                            }
-                                        }
 
 
-                                    }
-                                }
-                            }
-
-                            when (settlementCallFrom) {
-                                SettlementComingFrom.SETTLEMENT.screenType -> AppPreference.saveBoolean(
-                                    PreferenceKeyConstant.IsAutoSettleDone.keyName,
-                                    false
-                                )
-
-                                SettlementComingFrom.DASHBOARD.screenType -> {
-                                    AppPreference.saveBoolean(
-                                        PreferenceKeyConstant.IsAutoSettleDone.keyName,
-                                        true
-                                    )
-
-                                    // kushal
-                                    AppPreference.saveString(
-                                        PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName,
-                                        getSystemTimeIn24Hour().terminalDate()
-                                    )
-
-                                }
-
-                            }
-
-                        } else {
-                            AppPreference.saveBoolean(
-                                PreferenceKeyConstant.SETTLEMENT_FAILED.keyName,
-                                true
-                            )
-                            hideProgress()
-
-                        }
-                    } else {
-                        hideProgress()
-                    }
-                }, {
-                    //backToCalled(it, false, true)
-                })
-        }
-    }
 
     private fun observeMainViewModel(){
 
@@ -1254,7 +1162,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         if (dataList.size > 1) {
                                             onBackPressed()
                                             writeAppRevisionIDInFile(this@NavigationActivity)
-                                           /* when (dataList[0]) {
+                                            when (dataList[0]) {
                                                 AppUpdate.MANDATORY_APP_UPDATE.updateCode -> {
                                                     if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
                                                       //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
@@ -1274,7 +1182,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                                 else -> {
                                                     onBackPressed()
                                                 }
-                                            }*/
+                                            }
                                         } else {
                                             //VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
 
@@ -1408,14 +1316,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     //Below method is used to update App through HTTP/HTTPs:-
 
-/*
     private fun startHTTPSAppUpdate(appHostDownloadURL: String? = null, ftpIPPort: Int? = null, downloadAppFileName: String, downloadFileSize: String) {
         showPercentDialog(getString(R.string.please_wait_downloading_application_update))
         if (appHostDownloadURL != null) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             val appHostDownloadURL = appHostDownloadURL?.replace("/app", ":"+ftpIPPort)
             //   AppUpdateDownloadManager(this@MainActivity,"https://bonushub.co.in/",
-            AppUpdateDownloadManager(this@NavigationActivity,appHostDownloadURL+"app"+"/"+"X990"+"/"+downloadAppFileName,
+            //https://testapp.bonushub.co.in:8055/app/pos.zip
+            AppUpdateDownloadManager(this@NavigationActivity,appHostDownloadURL+"app"+"/"+"APOSA8"+"/"+downloadAppFileName,
                 object : OnDownloadCompleteListener {
                     override fun onError(msg: String) {
                         GlobalScope.launch(Dispatchers.Main) {
@@ -1437,11 +1345,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             val downloadedFile = File(fileUri?.path ?: "")
 
                             if (!TextUtils.isEmpty(fileUri.toString())) {
-                                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                                        setDataAndType(Uri.fromFile(fileUri), "application/vnd.android.package-archive")
-                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    })
-                                }
+                                autoInstallApk(fileUri.toString()) { status, packageName, code ->
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            // VFService.showToast(getString(R.string.app_updated_successfully))
+                                        }
+                                    }
+                            }
 
                         } else {
                             hideProgress()
@@ -1451,8 +1360,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }).execute()
 
 
-            */
-/*  AppUpdateDownloadManager("https://testapp.bonushub.co.in:8055/app/pos.zip",
+            /*  AppUpdateDownloadManager("https://testapp.bonushub.co.in:8055/app/pos.zip",
                        object : OnDownloadCompleteListener {
                            override fun onError(msg: String) {
                                GlobalScope.launch(Dispatchers.Main) {
@@ -1478,16 +1386,86 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                    VFService.showToast(getString(R.string.something_went_wrong))
                                }
                            }
-                       }).execute()*//*
-
+                       }).execute()*/
 
         } else {
           //  VFService.showToast("Download URL Not Found!!!")
         }
     }
-*/
+
+    //region=========================Auto Install Apk Execution Code:-
+    fun autoInstallApk(filePath: String?, apkInstallCB: (Boolean, String, Int) -> Unit) {
+        val pInfo = this@NavigationActivity?.packageManager?.getPackageInfo(this@NavigationActivity.packageName, 0)
+        //  showProgress(getString(R.string.please_wait_aaplication_is_configuring_updates))
+
+        val param = Bundle()
+        param.putString(TMSData.FILE_PATH, filePath)
+
+        DeviceHelper.getTMS()?.install(param,object : OnResultListener.Stub() {
+            override fun onSuccess() {
+                GlobalScope.launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@NavigationActivity,
+                        "Automatic App update Success",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onError(errorList: MutableList<Bundle>?) {
+
+                if (errorList != null) {
+                    for (item in errorList) {
+                        println("Automatic installing"+item.getString(TMSData.ERROR_MESSAGE))
+                    }
+                }
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@NavigationActivity,
+                        "Automatic App update fail",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        })
 
 
+
+    /* if (systemManager != null && !TextUtils.isEmpty(filePath)) {
+            try {
+                systemManager?.installApp(
+                    filePath, object : IAppInstallObserver.Stub() {
+                        @Throws(RemoteException::class)
+                        override fun onInstallFinished(packageName: String, returnCode: Int) {
+                            Log.d(TAG, "$packageName : $returnCode")
+                            runOnUiThread {
+                                Log.d(TAG, "$packageName : $returnCode")
+                                Toast.makeText(this@MainActivity, "$packageName : $returnCode", Toast.LENGTH_LONG).show()
+                            }
+                            //   hideProgress()
+                            apkInstallCB(true, packageName, returnCode)
+                        }
+                    },
+                    "com.example.verifonevx990app"
+                )
+            } catch (e: RemoteException) {
+                e.printStackTrace()
+                //   hideProgress()
+                apkInstallCB(true, "", 500)
+            } catch (ex: java.lang.Exception) {
+                Log.d(TAG, ex.printStackTrace().toString())
+                //   hideProgress()
+                apkInstallCB(true, "", 500)
+            }
+        } else {
+            hideProgress()
+            runOnUiThread {
+                VFService.showToast("Something went wrong!!!")
+            }
+        }*/
+    }
+//endregion
 
 
     //Auto Settle Batch:- kushal
@@ -1503,13 +1481,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
 
         GlobalScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) {
-                //(this@MainActivity as BaseActivity).showProgress("Digi POS Txn Uploading")
-                showProgress("Digi POS Txn Uploading")
-            }
-            Log.e("UPLOAD DIGI", " ----------------------->  START")
-            uploadPendingDigiPosTxn(this@NavigationActivity as BaseActivity, appDao) {
-                Log.e("UPLOAD DIGI", " ----------------------->  BEFOR PRINT")
                 hideProgress()
                 PrintUtil(this@NavigationActivity).printDetailReportupdate(
                     settlementBatchData,
@@ -1525,7 +1496,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                         val isoByteArray = settlementPacket.generateIsoByteRequest()
                         GlobalScope.launch(Dispatchers.IO) {
-                            settleBatch(isoByteArray)
+                            settleBatch1(isoByteArray)
                         }
                     } else
                         alertBoxWithAction(getString(R.string.printing_error),
@@ -1533,7 +1504,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             false, getString(R.string.positive_button_ok),
                             {}, {})
                 }
-            }
+
         }
 
 
