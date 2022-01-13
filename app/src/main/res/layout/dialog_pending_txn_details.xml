@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    app:cardCornerRadius="@dimen/pad_10"
+    android:elevation="@dimen/pad_5"
+    android:layout_marginStart="@dimen/pad_20"
+    android:layout_marginEnd="@dimen/pad_20">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/relLayDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="15dp">
+
+
+            <View
+                android:id="@+id/viewCenterHorizontal"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/txtViewAmountTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/viewCenterHorizontal"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/muli_bold"
+                android:text="Amount:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@+id/txtViewAmountTitle"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
+
+            <TextView
+                android:id="@+id/txtViewModeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewAmountTitle"
+                android:layout_alignEnd="@+id/viewCenterHorizontal"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/muli_bold"
+                android:text="Mode:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewAmountTitle"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/txtViewModeTitle"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
+
+            <TextView
+                android:id="@+id/txtViewTXNIdTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewModeTitle"
+                android:layout_alignEnd="@+id/viewCenterHorizontal"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/muli_bold"
+                android:text="TXN Id:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewTXNId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewModeTitle"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/txtViewTXNIdTitle"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
+
+            <TextView
+                android:id="@+id/txtViewMTXNIdTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewTXNIdTitle"
+                android:layout_alignEnd="@+id/viewCenterHorizontal"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/muli_bold"
+                android:text="MTXN Id:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewMTXNId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewTXNIdTitle"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/txtViewMTXNIdTitle"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
+
+            <TextView
+                android:id="@+id/txtViewPhoneNumberTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewMTXNIdTitle"
+                android:layout_alignEnd="@+id/viewCenterHorizontal"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/muli_bold"
+                android:text="Mobile:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewPhoneNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewMTXNIdTitle"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/txtViewPhoneNumberTitle"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
+
+            <TextView
+                android:id="@+id/txtViewStatusTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewPhoneNumberTitle"
+                android:layout_alignEnd="@+id/viewCenterHorizontal"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/muli_bold"
+                android:text="Status:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtViewPhoneNumberTitle"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/txtViewStatusTitle"
+                android:fontFamily="@font/muli_light"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relLayDetails"
+            android:background="#013480"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/pad_20"
+            android:paddingBottom="@dimen/pad_20">
+
+
+            <TextView
+                android:id="@+id/txtViewOk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/edge_white_bg_blue"
+                android:fontFamily="@font/muli_regular"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingStart="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_15"
+                android:text="@string/ok"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_regular" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

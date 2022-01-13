@@ -213,7 +213,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     override fun alertBoxWithAction(
         title: String, msg: String, showCancelButton: Boolean,
         positiveButtonText: String, alertCallback: (Boolean) -> Unit,
-        cancelButtonCallback: (Boolean) -> Unit
+        cancelButtonCallback: (Boolean) -> Unit, dialogIcon:Int
     ) {
         val dialogBuilder = Dialog(this)
         //builder.setTitle(title)
@@ -221,18 +221,23 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         val bindingg = NewPrintCustomerCopyBinding.inflate(LayoutInflater.from(this))
 
         dialogBuilder.setContentView(bindingg.root)
-        if (title == getString(R.string.print_customer_copy)|| title == getString(R.string.sms_upi_pay)|| title == getString(R.string.no_receipt)) {
-            if(title==getString(R.string.sms_upi_pay)){
-                bindingg.imgPrinter.setImageResource(R.drawable.ic_link_icon)
-            } else if(title==getString(R.string.print_customer_copy)){
-                bindingg.imgPrinter.setImageResource(R.drawable.ic_printer)
-            } else if(title==getString(R.string.no_receipt)){
-                bindingg.imgPrinter.setImageResource(R.drawable.ic_info)
+        if(dialogIcon == 0){
+            if (title == getString(R.string.print_customer_copy)|| title == getString(R.string.sms_upi_pay)|| title == getString(R.string.no_receipt)) {
+                if(title==getString(R.string.sms_upi_pay)){
+                    bindingg.imgPrinter.setImageResource(R.drawable.ic_link_icon)
+                } else if(title==getString(R.string.print_customer_copy)){
+                    bindingg.imgPrinter.setImageResource(R.drawable.ic_printer)
+                } else if(title==getString(R.string.no_receipt)){
+                    bindingg.imgPrinter.setImageResource(R.drawable.ic_info)
+                }
+                bindingg.imgPrinter.visibility = View.VISIBLE
+            } else {
+                // bindingg.imgPrinter.visibility = View.GONE
             }
-            bindingg.imgPrinter.visibility = View.VISIBLE
-        } else {
-           // bindingg.imgPrinter.visibility = View.GONE
+        }else{
+            bindingg.imgPrinter.setImageResource(dialogIcon)
         }
+
         if(positiveButtonText==""){
             bindingg.yesBtn.visibility=View.GONE
 
@@ -435,7 +440,7 @@ interface IDialog {
     fun getInfoDialogdoubletap(title: String, msg: String, acceptCb: (Boolean, Dialog) -> Unit)
     fun alertBoxWithAction(
         title: String, msg: String, showCancelButton: Boolean, positiveButtonText: String,
-        alertCallback: (Boolean) -> Unit, cancelButtonCallback: (Boolean) -> Unit
+        alertCallback: (Boolean) -> Unit, cancelButtonCallback: (Boolean) -> Unit, dialogIcon:Int = 0
     )
 
     fun alertBoxWithOnlyOk(

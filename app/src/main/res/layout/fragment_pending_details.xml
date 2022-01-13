@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".view.fragments.digi_pos.PendingDetailsFragment">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:id="@+id/relLayTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sub_header_view"
+        android:layout_marginStart="@dimen/pad_20"
+        android:layout_marginEnd="@dimen/pad_20"
+        android:background="@drawable/edge_blue_2"
+        android:padding="@dimen/pad_12">
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txtViewTxnStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_extra_light"
+                android:text="Transaction Pending"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/txtViewTxnStatus"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/pad_10"
+                android:src="@drawable/ic_init_payment_null" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/txtViewAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:fontFamily="@font/muli_regular"
+            android:text="300.00"
+            android:textColor="@color/txt_color"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/txtViewDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtViewAmount"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginBottom="@dimen/pad_10"
+            android:fontFamily="@font/muli_regular"
+            android:text="25 APRIL, 05:39 PM"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular" />
+
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnGetStatus"
+        android:layout_below="@+id/relLayTop"
+        android:layout_marginTop="@dimen/pad_15"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/pad_20"
+            android:layout_marginEnd="@dimen/pad_20"
+            android:background="@drawable/edge_blue_2"
+            android:orientation="vertical"
+            android:padding="@dimen/pad_15">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imgViewSmsPay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_sms_qr" />
+
+                <TextView
+                    android:id="@+id/txtViewModeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewSmsPay"
+                    android:fontFamily="@font/muli_extra_light"
+                    android:text="MODE:"
+                    android:textColor="#80013480"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewModeTitle"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewSmsPay"
+                    android:fontFamily="@font/muli_regular"
+                    android:text="SMS PAY"
+                    android:textColor="@color/txt_color"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_10">
+
+                <ImageView
+                    android:id="@+id/imgViewMobile"
+                    android:layout_width="@dimen/pad_30"
+                    android:layout_height="@dimen/pad_30"
+                    android:src="@drawable/ic_mobile_transparent2" />
+
+                <TextView
+                    android:id="@+id/txtViewMobileTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewMobile"
+                    android:fontFamily="@font/muli_extra_light"
+                    android:text="MOBILE NUMBER:"
+                    android:textColor="#80013480"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewMobile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewMobileTitle"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewMobile"
+                    android:fontFamily="@font/muli_regular"
+                    android:text="1234567895"
+                    android:textColor="@color/txt_color"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_10">
+
+                <ImageView
+                    android:id="@+id/imgViewPtxn"
+                    android:layout_width="@dimen/pad_30"
+                    android:layout_height="@dimen/pad_30"
+                    android:src="@drawable/ic_mobile_transparent2"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/txtViewPtxnTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewPtxn"
+                    android:fontFamily="@font/muli_extra_light"
+                    android:text="PTXN ID:"
+                    android:textColor="#80013480"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewPtxnId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewPtxnTitle"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewPtxn"
+                    android:fontFamily="@font/muli_regular"
+                    android:text="1234567895"
+                    android:textColor="@color/txt_color"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_10">
+
+                <ImageView
+                    android:id="@+id/imgViewMtxn"
+                    android:layout_width="@dimen/pad_30"
+                    android:layout_height="@dimen/pad_30"
+                    android:src="@drawable/ic_mobile_transparent2"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/txtViewMtxnTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewMtxn"
+                    android:fontFamily="@font/muli_extra_light"
+                    android:text="MTXN ID:"
+                    android:textColor="#80013480"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewMtxnId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewMtxnTitle"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewMtxn"
+                    android:fontFamily="@font/muli_regular"
+                    android:text="1234567895"
+                    android:textColor="@color/txt_color"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_10">
+
+                <ImageView
+                    android:id="@+id/imgViewTxnStatus"
+                    android:layout_width="@dimen/pad_30"
+                    android:layout_height="@dimen/pad_30"
+                    android:src="@drawable/ic_mobile_transparent2"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/txtViewTxnStatusTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewTxnStatus"
+                    android:fontFamily="@font/muli_extra_light"
+                    android:text="TXN STATUS"
+                    android:textColor="#80013480"
+                    android:textSize="@dimen/text_size_xsmall" />
+
+                <TextView
+                    android:id="@+id/txtViewTxnStatus2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtViewTxnStatusTitle"
+                    android:layout_marginStart="@dimen/pad_10"
+                    android:layout_toEndOf="@+id/imgViewTxnStatus"
+                    android:fontFamily="@font/muli_regular"
+                    android:text="1234567895"
+                    android:textColor="@color/txt_color"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/btnGetStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@drawable/edge_button"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
+        android:paddingStart="30dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="30dp"
+        android:paddingBottom="9dp"
+        android:text="GET STATUS"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small" />
+</RelativeLayout>

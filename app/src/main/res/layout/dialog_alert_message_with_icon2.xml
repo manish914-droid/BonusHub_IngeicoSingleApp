@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/custom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/pad_15"
+        android:layout_marginTop="@dimen/pad_40"
+        android:layout_marginEnd="@dimen/pad_15"
+        app:cardCornerRadius="@dimen/pad_10">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_20"
+                android:background="#FFFFFF"
+                android:gravity="bottom"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/dialog_heading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="26dp"
+                    android:fontFamily="@font/muli_light"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_8"
+                    android:textColor="@color/themeBackground"
+                    android:textSize="@dimen/text_size_regular"
+                    android:text="Payment link has been sent."/>
+
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#2349B5"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+
+                <TextView
+                    android:id="@+id/dialog_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="7dp"
+                    android:fontFamily="@font/muli_extra_light"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_small"
+                    android:visibility="visible"
+                    android:text="Would you like to check payment status now."/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/dialog_msg"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/noBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/dialog_msg"
+                        android:layout_marginEnd="@dimen/pad_15"
+                        android:background="@drawable/edge_bg_white"
+                        android:fontFamily="@font/muli_regular"
+                        android:paddingStart="18dp"
+                        android:paddingTop="@dimen/pad_10"
+                        android:paddingEnd="18dp"
+                        android:paddingBottom="@dimen/pad_10"
+                        android:text="@string/no"
+                        android:textAllCaps="true"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/text_size_small" />
+
+
+                    <TextView
+                        android:id="@+id/yesBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/dialog_msg"
+                        android:layout_marginStart="@dimen/pad_15"
+                        android:background="@drawable/edge_white_bg_blue"
+                        android:fontFamily="@font/muli_regular"
+                        android:paddingStart="@dimen/pad_15"
+                        android:paddingTop="@dimen/pad_10"
+                        android:paddingEnd="@dimen/pad_15"
+                        android:paddingBottom="@dimen/pad_10"
+                        android:textAllCaps="true"
+                        android:text="@string/yes"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_small" />
+
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/img_header"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:elevation="5dp"
+        android:visibility="visible"
+        android:src="@drawable/ic_link_circle"/>
+
+
+</RelativeLayout>

@@ -36,7 +36,7 @@
 
     <string name="help_desk_number_hint">Help Desk No: 0120252525</string>
     <string name="settlement">Settlement</string>
-    <string name="versionHint">App Version: v1.0.2</string>
+    <string name="versionHint">App Version: 02.01.02</string>
 
     <!--TODO: sub header-->
     <string name="back">Back</string>
@@ -129,7 +129,7 @@
 
     <!--bank functions-->
     <string name="bank_functions_header">BANK FUNCTIONS</string>
-    <string name="admin_vas_header">ADMIN VAS</string>
+    <string name="admin_vas_header">BH ADMIN</string>
     <string name="terminal_param_header">TERMINAL PARAM</string>
     <string name="init_payment_app_header">INIT PAYMENT APP</string>
     <string name="communication_param_header">COMMUNICATION PARAM</string>
@@ -276,4 +276,17 @@
     <string name="digi_pos_header">DIGI POS</string>
     <string name="vpa">VPA</string>
     <string name="no_data_found">No Data Found</string>
+    <!--HitServer-->
+    <string name="connection_error">Connection Error.\nTransaction Declined!!!</string>
+    <string name="connection_failed">Connection Failed</string>
+    <string name="no_internet_error">No Internet Available</string>
+    <string name="filterBy">Filter By</string>
+
+    <string name="upi_collect">UPI Collect</string>
+    <string name="sms_pay">SMS Pay</string>
+    <string name="static_qr">Static Qr</string>
+    <string name="ptxnID">PTXN ID</string>
+    <string name="mtxnID">MTXN ID</string>
+    <string name="_0_0">0.0</string>
+
 </resources>

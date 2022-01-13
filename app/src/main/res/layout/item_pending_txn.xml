@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/pad_10"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgViewTxnStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_init_payment_success" />
+
+
+        <TextView
+            android:id="@+id/txtViewTxnType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/pad_10"
+            android:layout_toEndOf="@+id/imgViewTxnStatus"
+            android:drawableStart="@drawable/ic_sms_pay_transparent"
+            android:drawablePadding="@dimen/pad_5"
+            android:ellipsize="end"
+            android:fontFamily="@font/muli_extra_light"
+            android:text="SMS Pay"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_small" />
+
+        <TextView
+            android:id="@+id/txtViewDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtViewTxnType"
+            android:layout_marginStart="@dimen/pad_10"
+            android:layout_marginTop="@dimen/pad_5"
+            android:layout_toEndOf="@+id/imgViewTxnStatus"
+            android:drawableStart="@drawable/ic_calendra_transparent"
+            android:drawablePadding="@dimen/pad_5"
+            android:ellipsize="end"
+            android:fontFamily="@font/muli_extra_light"
+            android:text="25 April, 05:39 PM"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_small" />
+
+        <LinearLayout
+            android:id="@+id/linLay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="@dimen/pad_5"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtViewAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_rupay_transparent"
+                android:drawablePadding="@dimen/pad_5"
+                android:ellipsize="end"
+                android:fontFamily="@font/muli_extra_light"
+                android:text="300.00"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/txtViewPhoneNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:drawableStart="@drawable/ic_mobile_transparent"
+                android:drawablePadding="@dimen/pad_5"
+                android:ellipsize="end"
+                android:fontFamily="@font/muli_extra_light"
+                android:text="******3211"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_small" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/btnGetStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edge_button"
+        android:fontFamily="@font/muli_extra_light"
+        android:gravity="center"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp"
+        android:text="Get Status"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/pad_10"
+        android:background="#59013480" />
+
+</LinearLayout>

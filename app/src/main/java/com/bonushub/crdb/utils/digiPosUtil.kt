@@ -1,11 +1,20 @@
 package com.bonushub.crdb.utils
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.view.base.BaseActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val QR_FILE_NAME = "staticQr"
 enum class EnumDigiPosProcess(val code: String) {
     InitializeDigiPOS("1"),
     UPIDigiPOS("2"),
@@ -30,6 +39,32 @@ enum class EDigiPosPaymentStatus(val code: Int, val desciption: String) {
 
 enum class EnumDigiPosProcessingCode(val code: String) {
     DIGIPOSPROCODE("982003")
+}
+
+enum class EDigiPosTerminalStatusResponseCodes(val statusCode: String) {
+    SuccessString("Success"),
+    FailString("Failed"),
+    ActiveString("Active"),
+    DeactiveString("Deactive"),
+}
+
+enum class LOG_TAG(val tag: String) {
+    DIGIPOS("DIGI_POS_TAG")
+
+}
+
+
+// retrieve static qr on internal storage
+suspend fun loadStaticQrFromInternalStorage(): Bitmap? {
+    return withContext(Dispatchers.IO) {
+        var bitmap: Bitmap? = null
+        val file = HDFCApplication.appContext.filesDir.listFiles()
+        file?.filter { it.name == "$QR_FILE_NAME.jpg" }?.map {
+            val bytes = it.readBytes()
+            bitmap = BitmapUtils.convertCompressedByteArrayToBitmap(bytes)
+        }
+        bitmap
+    }
 }
 
 // region
@@ -163,4 +198,66 @@ fun getDateInDisplayFormatDigipos(dateStr: String): String {
     }catch (ex:Exception){
         ""
     }
+}
+fun getCurrentDateInDisplayFormatDigipos(): String {
+    val dNow = Date()
+    val fttt = SimpleDateFormat("dd MMM, h:mm aa", Locale.getDefault())
+    return fttt.format(dNow)
+}
+
+object BitmapUtils {
+    /**
+     * Converts bitmap to byte array in PNG format
+     * @param bitmap source bitmap
+     * @return result byte array
+     */
+    fun convertBitmapToByteArray(bitmap: Bitmap?): ByteArray {
+        var baos: ByteArrayOutputStream? = null
+        return try {
+            baos = ByteArrayOutputStream()
+            bitmap?.compress(Bitmap.CompressFormat.PNG, 100, baos)
+            baos.toByteArray()
+        } finally {
+            if (baos != null) {
+                try {
+                    baos.close()
+                } catch (e: IOException) {
+                    Log.e(
+                        BitmapUtils::class.java.simpleName,
+                        "ByteArrayOutputStream was not closed"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Converts bitmap to the byte array without compression
+     * @param bitmap source bitmap
+     * @return result byte array
+     */
+    fun convertBitmapToByteArrayUncompressed(bitmap: Bitmap): ByteArray {
+        val byteBuffer = ByteBuffer.allocate(bitmap.byteCount)
+        bitmap.copyPixelsToBuffer(byteBuffer)
+        byteBuffer.rewind()
+        return byteBuffer.array()
+    }
+
+    /**
+     * Converts compressed byte array to bitmap
+     * @param src source array
+     * @return result bitmap
+     */
+    fun convertCompressedByteArrayToBitmap(src: ByteArray): Bitmap {
+        return BitmapFactory.decodeByteArray(src, 0, src.size)
+    }
+
+    fun getBitmap(byteArr: ByteArray): Bitmap {
+        val bmp = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+        val buffer = ByteBuffer.wrap(byteArr)
+        bmp.copyPixelsFromBuffer(buffer)
+        return bmp
+    }
+
+
 }

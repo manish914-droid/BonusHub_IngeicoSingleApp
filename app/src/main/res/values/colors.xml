@@ -15,6 +15,7 @@
     <color name="black">#000000</color>
     <color name="text_active">@color/heading</color>
     <color name="text_inactive">#777777</color>
+    <color name="text_gray2">#707070</color>
     <!--progress bar-->
     <color name="darkgreen">#006400</color>
     <!--text and hint-->
@@ -36,4 +37,8 @@
     <color name="text_gray">#9F9F9F</color>
     <color name="footer_color">#25282D</color>
     <color name="ter_color">#013480</color>
+
+    <color name="bg_color">#F4F4F4</color>
+    <color name="trans_black">#6A000000</color>
+
 </resources>
