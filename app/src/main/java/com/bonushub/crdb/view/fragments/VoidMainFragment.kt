@@ -191,21 +191,21 @@ class VoidMainFragment : Fragment() {
 
     private fun searchTransaction()
     {
-        var invoice = binding?.edtTextSearchTransaction?.text.toString()
+        val invoice = binding?.edtTextSearchTransaction?.text.toString()
         lifecycleScope.launch {
             batchFileViewModel.getBatchTableDataByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner, { batchTable ->
 
                 if(batchTable?.receiptData != null) {
 
                     val date = batchTable.receiptData?.dateTime ?: ""
-                    val parts = date?.split(" ")
-                    println("Date: " + parts!![0])
+                    val parts = date.split(" ")
+                    println("Date: " + parts[0])
                     println("Time: " + (parts[1]) )
                     val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "")?.toDouble())?.div(100)).toString().toDouble())
                     DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
-                        parts!![0],
-                        parts!![1],
+                        parts[0],
+                        parts[1],
                         batchTable.receiptData?.tid ?: "",
                         batchTable.receiptData?.invoice ?: "",
                         amt

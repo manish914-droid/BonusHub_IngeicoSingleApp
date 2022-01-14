@@ -51,8 +51,8 @@ val LYRA_IP_ADDRESS = "192.168.250.10"
 var PORT2 = 4124
 //203.112.151.169, port = 8109
 
-val NEW_IP_ADDRESS ="192.168.250.10"/*"192.168.250.10"*/ //"203.112.151.169"//
-var PORT =4124//8109// /*9101*//*4124*/8109
+val NEW_IP_ADDRESS ="203.112.151.169"//"192.168.250.10"/*"192.168.250.10"*/ //"203.112.151.169"//
+var PORT =8109//4124//// /*9101*//*4124*/8109
 
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 
@@ -596,7 +596,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     fun getCDTData(recordType:String): TerminalCommunicationTable? {
         var cdtData: TerminalCommunicationTable? = null
         runBlocking(Dispatchers.IO) {
-            cdtData = appDatabase.appDao.getTerminalCommunicationTableByRecordType(recordType).get(0)
+            cdtData = appDatabase.appDao.getTerminalCommunicationTableByRecordType(recordType)
         }
         return cdtData
     }
@@ -632,16 +632,64 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
 
 //region=====================================Get IP Port:-
-fun getIpPort(recordType:String = "1"): InetSocketAddress {
+    fun getIpPort(isAppUpdate:Boolean=false,isPrimaryIpPort:Int=1): InetSocketAddress? {
+        val txnCpt = getCDTData("1")
+        val appUpdateCpt=getCDTData("2")
+        if(isAppUpdate){
+            return when {
+                appUpdateCpt!=null -> {
+                    if(isPrimaryIpPort==1) {
+                        InetSocketAddress(
+                            InetAddress.getByName(appUpdateCpt.hostPrimaryIp),
+                            appUpdateCpt.hostPrimaryPortNo.toInt()
+                        )
+                    }
+                    else{
+                        InetSocketAddress(
+                            InetAddress.getByName(appUpdateCpt.hostSecIp),
+                            appUpdateCpt.hostSecPortNo.toInt()
+                        )
+                    }
+                }
+                else -> {
+                    if (txnCpt != null) {
+                        if(isPrimaryIpPort==1) {
+                            InetSocketAddress(
+                                InetAddress.getByName(txnCpt.hostPrimaryIp),
+                                txnCpt.hostPrimaryPortNo.toInt()
+                            )
+                        }else{
+                            InetSocketAddress(
+                                InetAddress.getByName(txnCpt.hostSecIp),
+                                txnCpt.hostSecPortNo.toInt()
+                            )
+                        }
+                    } else {
+                        InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
+                    }
+                }
+            }
+        }else{
+            return if (txnCpt != null) {
+                if(isPrimaryIpPort==1) {
+                    InetSocketAddress(
+                        InetAddress.getByName(txnCpt.hostPrimaryIp),
+                        txnCpt.hostPrimaryPortNo.toInt()
+                    )
+                }else{
+                    InetSocketAddress(
+                        InetAddress.getByName(txnCpt.hostSecIp),
+                        txnCpt.hostSecPortNo.toInt()
+                    )
+                }
+            } else {
+                InetSocketAddress(InetAddress.getByName(NEW_IP_ADDRESS), PORT)
+            }
 
-    val cdt: TerminalCommunicationTable? = getCDTData(recordType)
-    return if (cdt != null) {
-        Utility().logger("","IP -> ${cdt.hostPrimaryIp} , Port ->   ${cdt.hostPrimaryPortNo.toInt()}","e")
-        InetSocketAddress(InetAddress.getByName(cdt.hostPrimaryIp), cdt.hostPrimaryPortNo.toInt())
-    } else {
-        InetSocketAddress(InetAddress.getByName(LYRA_IP_ADDRESS), PORT2)
+        }
+
     }
-}
+
 //endregion
 
     open class OnTextChange(private val cb: (String) -> Unit) : TextWatcher {
@@ -1000,17 +1048,17 @@ fun getIpPort(recordType:String = "1"): InetSocketAddress {
 
                 when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
                     is GenericResponse.Success -> {
-                        com.bonushub.crdb.utils.logger("success:- ", "in success $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("success:- ", "in success ${genericResp.errorMessage}", "e")
                         // to remove transaction after sync
                         appDatabase.appDao.deletePendingSyncTransactionData(item)
                     }
                     is GenericResponse.Error -> {
-                        com.bonushub.crdb.utils.logger("error:- ", "in error $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("error:- ", "in error ${genericResp.errorMessage}", "e")
                         com.bonushub.crdb.utils.logger("error:- ", "try in next time", "e")
 
                     }
                     is GenericResponse.Loading -> {
-                        com.bonushub.crdb.utils.logger("Loading:- ", "in Loading $genericResp", "e")
+                        com.bonushub.crdb.utils.logger("Loading:- ", "in Loading ${genericResp.errorMessage}", "e")
                     }
                 }
             }
@@ -1183,7 +1231,7 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData = DBModule.appDatabase.appDao.getAllTerminalParameterTableData().get(0)
+            tptData = DBModule.appDatabase.appDao.getAllTerminalParameterTableData()[0]
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }
@@ -1199,6 +1247,29 @@ object Field48ResponseTimestamp {
             )
         }
 
+    }
+
+    fun deleteDigiposData(digiPosDataTable: DigiPosDataTable){
+        runBlocking(Dispatchers.IO) {
+            appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+        }
+
+    }
+
+    fun deleteDigiposData(partnerTxnId: String){
+        runBlocking(Dispatchers.IO) {
+            var digiPosDataTable = DigiPosDataTable(partnerTxnId = partnerTxnId)
+            appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+        }
+
+    }
+
+    fun selectAllDigiPosData():MutableList<DigiPosDataTable>?{
+        runBlocking(Dispatchers.IO) {
+            return@runBlocking appDatabase.appDao.getAllDigiposData()
+        }
+
+        return null
     }
 
 

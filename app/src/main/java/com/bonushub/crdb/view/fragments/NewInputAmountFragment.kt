@@ -198,7 +198,7 @@ class NewInputAmountFragment : Fragment() {
                 }
 
             }
-            EDashboardItem.BANK_EMI->{
+            EDashboardItem.BANK_EMI , EDashboardItem.TEST_EMI->{
                 isMobileNumberEntryAndBillEntryRequiredOnBankEmi { isMobileNeeded, isBillNoNeeded ->
                     if (isMobileNeeded) {
                         binding?.mobNoCrdView?.visibility = View.VISIBLE
@@ -209,12 +209,7 @@ class NewInputAmountFragment : Fragment() {
                 }
 
             }
-EDashboardItem.TEST_EMI->{
-    cashAmount?.visibility = View.GONE
-    binding?.cashAmtCrdView?.visibility = View.GONE
-    testEmiTxnType
 
-}
             else -> {
                 cashAmount?.visibility = View.GONE
                 binding?.cashAmtCrdView?.visibility = View.GONE
@@ -621,7 +616,7 @@ EDashboardItem.TEST_EMI->{
 
                         }
                         else -> {
-                            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString())
+                            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(), testEmiTxnType = testEmiTxnType?:"")
                         }
                     }
                 }
@@ -813,9 +808,6 @@ EDashboardItem.TEST_EMI->{
                     cb(false, true)
                 else
                     cb(false,false)
-
-
-
     }
 
     //region=====================Condition to check Whether we need to show Serial input or not:-
@@ -857,7 +849,7 @@ EDashboardItem.TEST_EMI->{
                         brandEmiProductData?.let { it1 ->
                             brandDataMaster?.let { it2 ->
                                 (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum,brandDataMaster = it2,
-                                    brandEmiSubCatData = it,brandEmiCat=brandEmiCatData,brandEmiProductData = it1
+                                    brandEmiSubCatData = it,brandEmiCat=brandEmiCatData,brandEmiProductData = it1, testEmiTxnType = testEmiTxnType?:""
                                 )
                             }
                         }
@@ -924,34 +916,32 @@ EDashboardItem.TEST_EMI->{
     private fun checkHDFCTPTFieldsBitOnOff(bhTransactionType: BhTransactionType, hdfcTpt:HDFCTpt): Boolean {
         Log.d("HDFC TPT:- ", hdfcTpt.toString())
         var data: String? = null
-        if (hdfcTpt != null) {
-            when (bhTransactionType) {
-                BhTransactionType.VOID -> {
-                    data = convertValue2BCD(hdfcTpt.localTerminalOption)
-                    return data[1] == '1' // checking second position of data for on/off case
-                }
-                BhTransactionType.REFUND -> {
-                    data = convertValue2BCD(hdfcTpt.localTerminalOption)
-                    return data[2] == '1' // checking third position of data for on/off case
-                }
-                BhTransactionType.TIP_ADJUSTMENT -> {
-                    data = convertValue2BCD(hdfcTpt.localTerminalOption)
-                    return data[3] == '1' // checking fourth position of data for on/off case
-                }
-                BhTransactionType.TIP_SALE -> {
-                    data = convertValue2BCD(hdfcTpt.option1)
-                   if(data[2] == '1'){ // checking third position of data for on/off case
-                       binding?.cashAmtCrdView?.visibility = View.VISIBLE
-                       cashAmount?.hint =
-                           HDFCApplication.appContext.getString(R.string.enter_tip_amount)
-                   }else{
-                       cashAmount?.visibility = View.GONE
-                       binding?.cashAmtCrdView?.visibility = View.GONE
-                       //  binding?.enterCashAmountTv?.visibility = View.GONE
-                   }
-                }
-                else -> {
-                }
+        when (bhTransactionType) {
+            BhTransactionType.VOID -> {
+                data = convertValue2BCD(hdfcTpt.localTerminalOption)
+                return data[1] == '1' // checking second position of data for on/off case
+            }
+            BhTransactionType.REFUND -> {
+                data = convertValue2BCD(hdfcTpt.localTerminalOption)
+                return data[2] == '1' // checking third position of data for on/off case
+            }
+            BhTransactionType.TIP_ADJUSTMENT -> {
+                data = convertValue2BCD(hdfcTpt.localTerminalOption)
+                return data[3] == '1' // checking fourth position of data for on/off case
+            }
+            BhTransactionType.TIP_SALE -> {
+                data = convertValue2BCD(hdfcTpt.option1)
+               if(data[2] == '1'){ // checking third position of data for on/off case
+                   binding?.cashAmtCrdView?.visibility = View.VISIBLE
+                   cashAmount?.hint =
+                       HDFCApplication.appContext.getString(R.string.enter_tip_amount)
+               }else{
+                   cashAmount?.visibility = View.GONE
+                   binding?.cashAmtCrdView?.visibility = View.GONE
+                   //  binding?.enterCashAmountTv?.visibility = View.GONE
+               }
+            }
+            else -> {
             }
         }
 
@@ -1001,7 +991,7 @@ EDashboardItem.TEST_EMI->{
                     if (maxTipLimit != 0f) { // flat tip check is applied
                         if (tipAmount <= maxTipLimit!!) {
                             // iDialog?.showProgress()
-                            GlobalScope.launch {
+                            lifecycleScope.launch(Dispatchers.IO){
 
                                 iFrReq?.onFragmentRequest(
                                     EDashboardItem.SALE,
@@ -1018,7 +1008,7 @@ EDashboardItem.TEST_EMI->{
                                         maxTipLimit
                                     )
                                 }."
-                            GlobalScope.launch(Dispatchers.Main) {
+                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDialog?.getInfoDialog("Tip Sale Error", msg) {}
                             }
                         }
@@ -1028,7 +1018,7 @@ EDashboardItem.TEST_EMI->{
                         if (maxAmountTip != null) {
                             if (tipAmount <= maxAmountTip.toFloat()) {
                                 //   iDialog?.showProgress()
-                                GlobalScope.launch {
+                                 lifecycleScope.launch(Dispatchers.IO) {
 
                                     iFrReq?.onFragmentRequest(
                                         EDashboardItem.SALE,
@@ -1050,7 +1040,7 @@ EDashboardItem.TEST_EMI->{
                                              )}% tip allowed on this terminal.\nTip limit for this transaction is \u20B9 ${"%.2f".format(
                                                  formatMaxTipAmount.toDouble()
                                              )}"*/
-                                GlobalScope.launch(Dispatchers.Main) {
+                                lifecycleScope.launch(Dispatchers.Main) {
                                     iDialog?.getInfoDialog("Tip Sale Error", msg) {}
                                 }
                             }

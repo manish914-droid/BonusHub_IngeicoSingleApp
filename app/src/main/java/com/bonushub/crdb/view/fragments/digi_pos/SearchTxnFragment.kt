@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPendingTxnBinding
-import com.bonushub.pax.utils.DigiPosItem
+import com.bonushub.pax.utils.EDashboardItem
 
 
 class SearchTxnFragment : Fragment() {
 
-    lateinit var digiPosItemType:DigiPosItem
+    lateinit var transactionType:EDashboardItem
     var binding:FragmentPendingTxnBinding? = null
 
     override fun onCreateView(
@@ -27,13 +27,13 @@ class SearchTxnFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        digiPosItemType = arguments?.getSerializable("type") as DigiPosItem
+        transactionType = arguments?.getSerializable("type") as EDashboardItem
 
         binding?.linLayPendingTnx?.visibility = View.GONE
         binding?.linLaySearch?.visibility = View.VISIBLE
 
-        binding?.subHeaderView?.subHeaderText?.text = digiPosItemType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(digiPosItemType.res)
+        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
+        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {

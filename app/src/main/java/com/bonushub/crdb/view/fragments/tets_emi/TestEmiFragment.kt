@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentTestEmiBinding
 import com.bonushub.crdb.databinding.ItemBankFunctionsBinding
+import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.NewInputAmountFragment
@@ -24,7 +25,7 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
     var binding:FragmentTestEmiBinding? = null
 
-    private val testEmiItem: MutableList<TestEmiItem> by lazy { mutableListOf<TestEmiItem>() }
+    private var testEmiItem: MutableList<TestEmiItem> =mutableListOf()
     private var iTestEmiItemClick: ITestEmiItemClick? = null
 
     override fun onCreateView(
@@ -51,13 +52,52 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
             }
         }
 
+
         iTestEmiItemClick = this
         testEmiItem.clear()
-        testEmiItem.addAll(TestEmiItem.values())
+        val tpt=Field48ResponseTimestamp.getTptData()
+        val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String>
+        for (tid in linkedTid){
+            when(tid){
+             "0"->{
+                 // for Amex
+
+             }
+                "1"->{
+                    // DC type
+                    testEmiItem.add(TestEmiItem.BASE_TID)
+                }
+                "2"->{
+                    // off us Tid
+                    testEmiItem.add(TestEmiItem.OFFUS_TID)
+                }
+                "3"->{
+                    // 3 months onus
+                    testEmiItem.add(TestEmiItem._3_M_TID)
+                }
+                "6"->{
+                    // 6 months onus
+                    testEmiItem.add(TestEmiItem._6_M_TID)
+                }
+                "9"->{
+                    // 9 months onus
+                    testEmiItem.add(TestEmiItem._9_M_TID)
+                }
+                "12"->{
+                    // 12 months onus
+                    testEmiItem.add(TestEmiItem._12_M_TID)
+                }
+
+            }
+        }
+        val sortedList = testEmiItem.sortedWith(compareBy { it.id })
+        testEmiItem=sortedList as MutableList<TestEmiItem>
 
         setupRecyclerview()
 
     }
+
+
 
     private fun setupRecyclerview(){
         lifecycleScope.launch(Dispatchers.Main) {
@@ -71,45 +111,49 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
     override fun testEmiItemClick(testEmiItem: TestEmiItem) {
 
-        (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable("type", EDashboardItem.TEST_EMI)
-                putString(NavigationActivity.INPUT_SUB_HEADING, "")
-                putString("TestEmiOption", TestEmiItem.BASE_TID.id)
-            }
-        }, true)
+/*
+var testEmiOption="0"
 
         when(testEmiItem){
-
             TestEmiItem.BASE_TID ->{
+                testEmiOption=TestEmiItem.BASE_TID.id
                 logger("BASE_TID","click")
             }
 
             TestEmiItem.OFFUS_TID ->{
+                testEmiOption=TestEmiItem.OFFUS_TID.id
                 logger("OFFUS_TID","click")
-
             }
 
             TestEmiItem._3_M_TID ->{
+                testEmiOption=TestEmiItem._3_M_TID.id
                 logger("_3_M_TID","click")
-
             }
 
             TestEmiItem._6_M_TID ->{
+                testEmiOption=TestEmiItem._6_M_TID.id
                 logger("_6_M_TID","click")
-
             }
 
             TestEmiItem._9_M_TID ->{
+                testEmiOption=TestEmiItem._9_M_TID.id
                 logger("_9_M_TID","click")
-
             }
 
             TestEmiItem._12_M_TID ->{
+                testEmiOption=TestEmiItem._12_M_TID.id
                 logger("_12_M_TID","click")
-
             }
-        }
+        }*/
+
+        (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable("type", EDashboardItem.TEST_EMI)
+                putString(NavigationActivity.INPUT_SUB_HEADING, "")
+                putString("TestEmiOption", testEmiItem.id)
+            }
+        }, true)
+
 
     }
 }

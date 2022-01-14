@@ -643,7 +643,6 @@ if(!fromBankEmi)
                     } else {
                         logger("brandEmiProductDataList",""+brandEmiProductDataList.size)
                         brandEMIProductMLData.postValue(GenericResponse.Success(brandEmiProductDataList))
-
                         Log.d("Full Product Data:- ", Gson().toJson(brandEmiProductDataList))
                     }
                 }

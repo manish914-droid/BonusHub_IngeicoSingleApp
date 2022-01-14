@@ -281,7 +281,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
                         prop.isAccessible = true
                         //val fieldName = prop.name
                         try {
-                            val value = prop.get(table.get(0))
+                            val value = prop.get(table)
                             if (value is String) {
                                 dataListLocal?.add(TableEditHelper(ann.name, value, ann2.index))
                             }
@@ -313,7 +313,6 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
             //val table: Any? = getTable()
 
             val table: Any? = appDao.getTerminalCommunicationTableByRecordType(recordType)
-                    .get(0)
 
             if (table != null) {
                 if (data.isNotEmpty()) {

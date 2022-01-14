@@ -1,29 +1,27 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPendingTxnBinding
-import com.bonushub.crdb.databinding.FragmentUpiSmsDynamicPayQrInputDetailBinding
-import com.bonushub.crdb.databinding.ItemDigiPosBinding
 import com.bonushub.crdb.databinding.ItemPendingTxnBinding
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.pax.utils.DigiPosItem
+import com.bonushub.pax.utils.EDashboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class PendingTxnFragment : Fragment(), IPendingListItemClick {
 
-    lateinit var digiPosItemType:DigiPosItem
+    lateinit var transactionType:EDashboardItem
 
     lateinit var iPendingListItemClick:IPendingListItemClick
     var binding:FragmentPendingTxnBinding? = null
@@ -42,13 +40,13 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
         super.onViewCreated(view, savedInstanceState)
 
         iPendingListItemClick = this
-        digiPosItemType = arguments?.getSerializable("type") as DigiPosItem
+        transactionType = arguments?.getSerializable("type") as EDashboardItem
 
         binding?.linLayPendingTnx?.visibility = View.VISIBLE
         binding?.linLaySearch?.visibility = View.GONE
 
-        binding?.subHeaderView?.subHeaderText?.text = digiPosItemType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(digiPosItemType.res)
+        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
+        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -62,7 +60,7 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
         binding?.txtViewSearch?.setOnClickListener {
             (activity as NavigationActivity).transactFragment(SearchTxnFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable("type", DigiPosItem.PENDING_TXN)
+                    putSerializable("type", EDashboardItem.PENDING_TXN)
                 }
             })
 
@@ -90,7 +88,7 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
 
             (activity as NavigationActivity).transactFragment(PendingDetailsFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable("type", DigiPosItem.PENDING_TXN)
+                    putSerializable("type", EDashboardItem.PENDING_TXN)
                 }
             })
 

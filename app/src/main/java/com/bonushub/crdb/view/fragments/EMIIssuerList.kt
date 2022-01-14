@@ -399,6 +399,8 @@ class EMIIssuerList : Fragment() {
             selectedTenure = temporaryAllTenureList[position].bankTenure ?: ""
            
             binding?.selectAllBankCheckButton?.isChecked = false
+            binding?.selectAllBankCheckButton?.text = getString(R.string.select_all_banks)
+
             Log.d("GsonResponse:- ", Gson().toJson(allIssuerBankList))
             refreshedBanksByTenure = allIssuerBankList.filter {
                 it.issuerBankTenure == temporaryAllTenureList[position].bankTenure

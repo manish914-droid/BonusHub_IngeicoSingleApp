@@ -1,6 +1,5 @@
 package com.bonushub.crdb.view.activity
 
-
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -31,6 +30,7 @@ import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.RemoteService
+import com.bonushub.crdb.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -56,10 +56,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.collections.ArrayList
-
-
-private var bankEMIRequestCode = "4"
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew() {
@@ -78,10 +74,10 @@ class TransactionActivity : BaseActivityNew() {
     //used for other cash amount
     //  private val transactionOtherAmountValue by lazy { intent.getStringExtra("otherAmount") ?: "0" }
     private val restartHandlingList: MutableList<RestartHandlingModel> by lazy { mutableListOf<RestartHandlingModel>() }
-    private val testEmiOperationType by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
+    private val testEmiOption by lazy { intent.getStringExtra("TestEmiOption") ?: "0" }
     private val brandEmiCatData by lazy { intent.getSerializableExtra("brandEmiCat") as BrandEMISubCategoryTable }
     private val brandEmiSubCatData by lazy { intent.getSerializableExtra("brandEmiSubCatData") as BrandEMISubCategoryTable } //: BrandEMISubCategoryTable? = null
-    private val brandEmiProductData by lazy { intent.getSerializableExtra("brandEmiProductData") as BrandEMIProductDataModal }
+   private val brandEmiProductData by lazy { intent.getSerializableExtra("brandEmiProductData") as BrandEMIProductDataModal }
     private val brandDataMaster by lazy { intent.getSerializableExtra("brandDataMaster") as BrandEMIMasterDataModal }
     private val imeiOrSerialNum by lazy { intent.getStringExtra("imeiOrSerialNum") ?: "" }
 
@@ -119,7 +115,7 @@ class TransactionActivity : BaseActivityNew() {
         emvBinding?.subHeaderView?.subHeaderText?.text = transactionTypeEDashboardItem.title
         globalCardProcessedModel.setTransType(transactionType)
 
-        if (transactionTypeEDashboardItem == EDashboardItem.BRAND_EMI || transactionTypeEDashboardItem == EDashboardItem.BANK_EMI ) {
+        if (transactionTypeEDashboardItem == EDashboardItem.BRAND_EMI || transactionTypeEDashboardItem == EDashboardItem.BANK_EMI || transactionTypeEDashboardItem == EDashboardItem.TEST_EMI ) {
             emvBinding?.cardDetectImg?.visibility = View.VISIBLE
             emvBinding?.tvInsertCard?.visibility = View.VISIBLE
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
@@ -135,6 +131,7 @@ class TransactionActivity : BaseActivityNew() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
         }
+        emvBinding?.baseAmtTv?.text = saleAmt
         lifecycleScope.launch(Dispatchers.IO) {
             tid = getBaseTID(appDatabase.appDao)
             globalCardProcessedModel.setTransType(transactionType)
@@ -181,23 +178,22 @@ class TransactionActivity : BaseActivityNew() {
                                             "transactionType",
                                             globalCardProcessedModel.getTransType()
                                         )
+                                        putExtra("mobileNumber", mobileNumber)
                                     }
                                     startActivityForResult(intent, BhTransactionType.BRAND_EMI.type)
                                 }
 
-                                BhTransactionType.EMI_SALE.type->{
+                                BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type->{
                                     val intent = Intent(
                                         this@TransactionActivity,
                                         TenureSchemeActivity::class.java
                                     ).apply {
 
+                                        putExtra("testEmiOption", testEmiOption)
                                         putExtra("cardProcessedData", globalCardProcessedModel)
-                                      /*  putExtra("brandID", brandDataMaster.brandID)
-                                        putExtra("productID", brandEmiProductData.productID)
-                                        putExtra("imeiOrSerialNum", imeiOrSerialNum)*/
                                         putExtra("transactionType", globalCardProcessedModel.getTransType())
                                     }
-                                    startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
+                                    startActivityForResult(intent, globalCardProcessedModel.getTransType())
 
                                 }
 
@@ -269,7 +265,7 @@ class TransactionActivity : BaseActivityNew() {
             reqCode=BhTransactionType.EMI_SALE.type
             globalCardProcessedModel.setTransType(BhTransactionType.EMI_SALE.type)
         }
-        if (reqCode == BhTransactionType.BRAND_EMI.type || reqCode == BhTransactionType.EMI_SALE.type) {
+        if (reqCode == BhTransactionType.BRAND_EMI.type || reqCode == BhTransactionType.EMI_SALE.type || reqCode == BhTransactionType.TEST_EMI.type ) {
             emvBinding?.subHeaderView?.subHeaderText?.text =getTransactionTypeName(globalCardProcessedModel.getTransType())
             if (resultCode == RESULT_OK) {
                 val emiTenureData =
@@ -282,9 +278,18 @@ class TransactionActivity : BaseActivityNew() {
                 emvBinding?.tvInsertCard?.visibility = View.GONE
                 emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
                 try {
+
+                    var amt= 0L
+                    if(reqCode == BhTransactionType.TEST_EMI.type){
+                        globalCardProcessedModel.testEmiOption=testEmiOption
+                        emiTenureData?.txnTID= getTidForTestTxn(testEmiOption)
+                        amt=100L
+                    }else{
+                        amt  = (saleAmt.toFloat() * 100).toLong()
+                    }
                     DeviceHelper.doEMITxn(
                         EMISaleRequest(
-                            amount = (saleAmt.toFloat() * 100).toLong(),
+                            amount = amt,
                             tipAmount = 0L,
                             emiTxnName = getTransactionTypeName(globalCardProcessedModel.getTransType()),//transactionTypeEDashboardItem.title,
                             tid = emiTenureData?.txnTID,
@@ -297,28 +302,24 @@ class TransactionActivity : BaseActivityNew() {
                             override fun onCompleted(result: PaymentResult?) {
                                 val txnResponse = result?.value as? TransactionResponse
                                 val receiptDetail = txnResponse?.receiptDetail
+
+
                                 receiptDetail?.txnName = getTransactionTypeName(globalCardProcessedModel.getTransType())
                                 Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                                when (txnResponse?.responseCode) {
+                              var isUnblockingNeeded=false
+                                    when (txnResponse?.responseCode) {
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp = Gson().toJson(receiptDetail)
                                         println(jsonResp)
                                        // AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
-                                            creatCardProcessingModelData(receiptDetail)
-                                            cardProcessedDataModal.getEncryptedPan()?.let {
-                                                globalCardProcessedModel.setEncryptedPan(
-                                                    it
-                                                )
-                                            }
-
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.emiIssuerDataModel = emiIssuerData
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 if(requestCode == BhTransactionType.BRAND_EMI.type) {
                                                     batchData.emiBrandData = brandDataMaster
-                                                    batchData.emiCategoryData = brandEmiSubCatData
+                                                    batchData.emiSubCategoryData = brandEmiSubCatData
                                                     batchData.emiCategoryData = brandEmiCatData
                                                     batchData.emiProductData = brandEmiProductData
                                                 }
@@ -326,31 +327,27 @@ class TransactionActivity : BaseActivityNew() {
                                                 batchData.mobileNumber = mobileNumber // kushal add mobile num
                                                 batchData.billNumber=billNumber
                                                 batchData.emiTenureDataModel = emiTenureData
-                                                batchData.transactionType =
-                                                    globalCardProcessedModel.getTransType()
+                                                    batchData.transactionType =
+                                                        globalCardProcessedModel.getTransType()
                                                 appDatabase.appDao.insertBatchData(batchData)
-                                                creatCardProcessingModelData(receiptDetail)
+                                                createCardProcessingModelData(receiptDetail)
+                                                // because we did not save pan num in plain
                                                 cardProcessedDataModal.getPanNumberData()?.let {
                                                     globalCardProcessedModel.setPanNumberData(
                                                         it
                                                     )
                                                 }
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData,{})
-
-                                                // region sync transaction
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
-                                                }
-
-                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
-
-                                                    // sync pending transaction
-                                                 //   Utility().syncPendingTransaction(transactionViewModel)
-
+                                                printingSaleData(batchData){
+                                                    // region sync transaction
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
+                                                    }
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
+                                                    //   sync pending transaction
+                                                   //    Utility().syncPendingTransaction(transactionViewModel)
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
-
                                                         is GenericResponse.Success -> {
                                                             logger("success:- ", "in success $genericResp","e")
                                                             withContext(Dispatchers.Main) {
@@ -361,26 +358,14 @@ class TransactionActivity : BaseActivityNew() {
                                                         is GenericResponse.Error -> {
                                                             logger("error:- ", "in error ${genericResp.errorMessage}", "e")
                                                             logger("error:- ", "save transaction sync later", "e")
-
                                                             val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
                                                                 batchTable = batchData,
                                                                 responseCode = genericResp.toString(),
                                                                 cardProcessedDataModal = globalCardProcessedModel)
-
                                                             pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-
                                                             withContext(Dispatchers.Main) {
                                                                 hideProgress()
-                                                                ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                                finish()
-                                                                startActivity(
-                                                                    Intent(
-                                                                        this@TransactionActivity,
-                                                                        NavigationActivity::class.java
-                                                                    ).apply {
-                                                                        flags =
-                                                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                    })
+                                                                errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
                                                             }
                                                         }
                                                         is GenericResponse.Loading -> {
@@ -390,44 +375,28 @@ class TransactionActivity : BaseActivityNew() {
                                                             }
                                                         }
                                                     }
+                                                    // end region
 
-                                                // end region
+                                                }
 
 
-                                        /*        val transactionISO =
-                                                    CreateTransactionPacket(
-                                                        globalCardProcessedModel,
-                                                        batchData
-                                                    ).createTransactionPacket()
-                                                transactionViewModel.serverCall(transactionISO)
-                                                val jsonResp2 = Gson().toJson(transactionISO)
-                                                println(jsonResp2)
-                                                printingSaleData(batchData)*/
                                             }
                                         }
                                     }
                                     ResponseCode.FAILED.value,
                                     ResponseCode.ABORTED.value -> {
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+                                        isUnblockingNeeded=true
                                     }
-
                                     ResponseCode.REVERSAL.value -> {
-                                        // kushal
-                                        // region
-
+                                        isUnblockingNeeded=true
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
-
                                         val batchReversalData = BatchTableReversal(receiptDetail)
-
                                         lifecycleScope.launch(Dispatchers.IO) {
                                             //    appDao.insertBatchData(batchData)
                                             batchReversalData.invoice =
                                                 receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                BhTransactionType.SALE.type
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
@@ -436,12 +405,20 @@ class TransactionActivity : BaseActivityNew() {
                                             )
                                         }
                                     }
-
                                     else -> {
-                                        errorFromIngenico(
-                                            txnResponse?.responseCode,
-                                            txnResponse?.status.toString()
-                                        )
+                                        isUnblockingNeeded=true
+                                    }
+                                }
+
+                                if (emiTenureData != null && isUnblockingNeeded) {
+                                    if (emiIssuerData != null) {
+                                        txnResponse?.responseCode?.let {
+                                            txnResponse.status.toString().let { it1 ->
+                                                unBlockingImeiSerialNum(emiTenureData,emiIssuerData,
+                                                    it, it1
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -450,14 +427,48 @@ class TransactionActivity : BaseActivityNew() {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 }
-
-
             }
             if (resultCode == RESULT_CANCELED) {
                 // Write  code if there's no result
             }
         }
     }
+
+    private fun unBlockingImeiSerialNum(bankEmiTenureData:BankEMITenureDataModal,schemeData:BankEMIIssuerTAndCDataModal,txnRespCode:String,txnResponseMsg:String){
+        if(imeiOrSerialNum.isNotBlank()){
+            var isBlockUnblockSuccess=Pair(false,"")
+
+            //   "Request Type^Skip Record Count^Brand Id^ProductID^Product serial^Bin Value^Transaction Amt^Issuer Id^Mobile No^EMI Scheme^Tenure^txn response code^txn response msg"
+
+            val field57="13^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}^${globalCardProcessedModel.getEncryptedPan()}^${bankEmiTenureData.totalEmiPay}^${schemeData.issuerID}^${mobileNumber}^${schemeData.emiSchemeID}^${bankEmiTenureData.tenure}^${txnRespCode}^${txnResponseMsg}"
+
+            showProgress("Blocking Serial/IMEI")
+            lifecycleScope.launch(Dispatchers.IO) {
+                isBlockUnblockSuccess=  serverRepository.blockUnblockSerialNum(field57)
+                hideProgress()
+                if(isBlockUnblockSuccess.first){
+                    errorFromIngenico(
+                        txnRespCode,
+                        txnResponseMsg
+                    )
+
+                }else {
+                    withContext(Dispatchers.Main) {
+                        showToast(isBlockUnblockSuccess.second)
+                    }
+                }
+
+            }
+
+        }else{
+            errorFromIngenico(
+                txnRespCode,
+                txnResponseMsg
+            )
+        }
+
+    }
+
 
 
     //Below function is used to deal with EMV Card Fallback when we insert EMV Card from other side then chip side:-
@@ -479,9 +490,9 @@ class TransactionActivity : BaseActivityNew() {
 
 
     private suspend fun setupFlow() {
-        emvBinding?.baseAmtTv?.text = saleAmt
+
         when (transactionTypeEDashboardItem) {
-            EDashboardItem.BRAND_EMI ,EDashboardItem.BANK_EMI-> {
+            EDashboardItem.BRAND_EMI ,EDashboardItem.BANK_EMI ,EDashboardItem.TEST_EMI-> {
                 searchCardViewModel.fetchCardTypeData(
                     globalCardProcessedModel,
                     CardOption.create().apply {
@@ -497,7 +508,7 @@ class TransactionActivity : BaseActivityNew() {
                 // Checking Insta Emi Available or not
                 var hasInstaEmi = false
                 val tpt =
-                    runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
+                    withContext(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
                 var limitAmt = 0f
                 if (tpt?.surChargeValue?.isNotEmpty()!!) {
                     limitAmt = try {
@@ -571,71 +582,60 @@ class TransactionActivity : BaseActivityNew() {
                                             val batchData = BatchTable(receiptDetail)
 
                                             // region print and save data
-                                            lifecycleScope.launch(Dispatchers.IO) {
+                                            lifecycleScope.launch(Dispatchers.IO){
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
                                                     com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
-                                                printingSaleData(batchData,{})
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                            // end region
 
-                                            // region sync transaction
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
-                                                }
-
-                                                creatCardProcessingModelData(receiptDetail)
-                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-
-                                                // sync pending transaction
-                                                Utility().syncPendingTransaction(transactionViewModel)
-
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        logger("success:- ", "in success $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                        }
+                                                printingSaleData(batchData){
+                                                    // region sync transaction
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
 
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
+                                                    createCardProcessingModelData(receiptDetail)
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
 
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                            finish()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@TransactionActivity,
-                                                                    NavigationActivity::class.java
-                                                                ).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                })
+                                                    // sync pending transaction
+                                                  //  Utility().syncPendingTransaction(transactionViewModel)
+
+                                                    when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                    {
+                                                        is GenericResponse.Success -> {
+                                                            logger("success:- ", "in success $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                        logger("Loading:- ", "in Loading $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
+                                                        is GenericResponse.Error -> {
+                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "save transaction sync later", "e")
+
+                                                            val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                                batchTable = batchData,
+                                                                responseCode = genericResp?.toString(),
+                                                                cardProcessedDataModal = globalCardProcessedModel)
+
+                                                            pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                                errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
+                                                            }
+                                                        }
+                                                        is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
                                                 }
+
                                             }
-                                            // end region
-
-
-
+                                            // endregion
 
                                         }
 
@@ -676,7 +676,7 @@ class TransactionActivity : BaseActivityNew() {
                                             batchReversalData.invoice =
                                                 receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                BhTransactionType.SALE.type
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
@@ -737,69 +737,51 @@ class TransactionActivity : BaseActivityNew() {
 
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                                //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
                                                     com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData,{})
-                                            // end region
-
-                                            // region sync transaction
-
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
-                                                }
-
-                                                creatCardProcessingModelData(receiptDetail)
-                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                                // sync pending transaction
-                                                Utility().syncPendingTransaction(transactionViewModel)
-
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        logger("success:- ", "in success $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                        }
+                                                printingSaleData(batchData){
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
-
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
-
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                            finish()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@TransactionActivity,
-                                                                    NavigationActivity::class.java
-                                                                ).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                })
+                                                    createCardProcessingModelData(receiptDetail)
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    // sync pending transaction
+                                                //    Utility().syncPendingTransaction(transactionViewModel)
+                                                    when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                    {
+                                                        is GenericResponse.Success -> {
+                                                            logger("success:- ", "in success $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                        logger("Loading:- ", "in Loading $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
+                                                        is GenericResponse.Error -> {
+                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "save transaction sync later", "e")
+
+                                                            val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                                batchTable = batchData,
+                                                                responseCode = genericResp?.toString(),
+                                                                cardProcessedDataModal = globalCardProcessedModel)
+
+                                                            pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                                errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
+                                                            }
+                                                        }
+                                                        is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
-                                            // end region
-
-
                                         }
 
 
@@ -824,7 +806,7 @@ class TransactionActivity : BaseActivityNew() {
                                             batchReversalData.invoice =
                                                 receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                BhTransactionType.SALE.type
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
@@ -889,58 +871,49 @@ class TransactionActivity : BaseActivityNew() {
                                                     com.bonushub.pax.utils.BhTransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData,{})
-                                            // end region
-
-                                            // region sync transaction
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
-                                                }
-
-                                                creatCardProcessingModelData(receiptDetail)
-                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                                // sync pending transaction
-                                                Utility().syncPendingTransaction(transactionViewModel)
-
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        logger("success:- ", "in success $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                        }
+                                                printingSaleData(batchData){
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
 
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
+                                                    createCardProcessingModelData(receiptDetail)
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    // sync pending transaction
+                                                   //   Utility().syncPendingTransaction(transactionViewModel)
 
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                            finish()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@TransactionActivity,
-                                                                    NavigationActivity::class.java
-                                                                ).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                })
+                                                    when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                    {
+                                                        is GenericResponse.Success -> {
+                                                            logger("success:- ", "in success $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                        logger("Loading:- ", "in Loading $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
+                                                        is GenericResponse.Error -> {
+                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "save transaction sync later", "e")
+
+                                                            val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                                batchTable = batchData,
+                                                                responseCode = genericResp?.toString(),
+                                                                cardProcessedDataModal = globalCardProcessedModel)
+
+                                                            pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                                errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
+                                                            }
+                                                        }
+                                                        is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
                                                 }
+
+
                                             }
                                             // end region
 
@@ -971,7 +944,7 @@ class TransactionActivity : BaseActivityNew() {
                                             batchReversalData.invoice =
                                                 receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                BhTransactionType.SALE.type
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
@@ -1036,58 +1009,49 @@ class TransactionActivity : BaseActivityNew() {
                                                     com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData,{})
-                                            // end region
-
-                                            // region sync transaction
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
-                                                }
-
-                                                creatCardProcessingModelData(receiptDetail)
-                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                                // sync pending transaction
-                                                Utility().syncPendingTransaction(transactionViewModel)
-
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        logger("success:- ", "in success $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                        }
+                                                printingSaleData(batchData){
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
 
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
+                                                    createCardProcessingModelData(receiptDetail)
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    // sync pending transaction
+                                                   // Utility().syncPendingTransaction(transactionViewModel)
 
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                            finish()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@TransactionActivity,
-                                                                    NavigationActivity::class.java
-                                                                ).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                })
+                                                    when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                    {
+                                                        is GenericResponse.Success -> {
+                                                            logger("success:- ", "in success $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                        logger("Loading:- ", "in Loading $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
+                                                        is GenericResponse.Error -> {
+                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "save transaction sync later", "e")
+
+                                                            val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                                batchTable = batchData,
+                                                                responseCode = genericResp?.toString(),
+                                                                cardProcessedDataModal = globalCardProcessedModel)
+
+                                                            pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                                errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
+                                                            }
+                                                        }
+                                                        is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
                                                 }
+
+
                                             }
                                             // end region
 
@@ -1117,7 +1081,7 @@ class TransactionActivity : BaseActivityNew() {
                                             batchReversalData.invoice =
                                                 receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                BhTransactionType.SALE.type
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
@@ -1175,7 +1139,6 @@ class TransactionActivity : BaseActivityNew() {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
-
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
@@ -1184,60 +1147,49 @@ class TransactionActivity : BaseActivityNew() {
                                                     BhTransactionType.PRE_AUTH_COMPLETE.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                printingSaleData(batchData,{})
-                                            // end region
+                                                printingSaleData(batchData){
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(getString(R.string.transaction_syncing_msg))
+                                                    }
+                                                    createCardProcessingModelData(receiptDetail)
+                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    // sync pending transaction
+                                                 //   Utility().syncPendingTransaction(transactionViewModel)
 
-                                            // region sync transaction
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(getString(R.string.transaction_syncing_msg))
-                                                }
+                                                    when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                                    {
+                                                        is GenericResponse.Success -> {
+                                                            logger("success:- ", "in success $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
+                                                        }
+                                                        is GenericResponse.Error -> {
+                                                            logger("error:- ", "in error $genericResp", "e")
+                                                            logger("error:- ", "save transaction sync later", "e")
 
-                                                creatCardProcessingModelData(receiptDetail)
-                                                val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                                // sync pending transaction
-                                                Utility().syncPendingTransaction(transactionViewModel)
+                                                            val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                                batchTable = batchData,
+                                                                responseCode = genericResp?.toString(),
+                                                                cardProcessedDataModal = globalCardProcessedModel)
 
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        logger("success:- ", "in success $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
+                                                            pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                                errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
+                                                            }
+                                                        }
+                                                        is GenericResponse.Loading -> {
+                                                            logger("Loading:- ", "in Loading $genericResp","e")
+                                                            withContext(Dispatchers.Main) {
+                                                                hideProgress()
+                                                            }
                                                         }
                                                     }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
 
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
-
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                            finish()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@TransactionActivity,
-                                                                    NavigationActivity::class.java
-                                                                ).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                })
-                                                        }
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                        logger("Loading:- ", "in Loading $genericResp","e")
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                        }
-                                                    }
                                                 }
                                             }
-                                            // end region
+
 
 
                                         }
@@ -1270,7 +1222,7 @@ class TransactionActivity : BaseActivityNew() {
                                             batchReversalData.invoice =
                                                 receiptDetail?.invoice.toString()
                                             batchReversalData.transactionType =
-                                                com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                                BhTransactionType.SALE.type
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
@@ -1334,136 +1286,62 @@ class TransactionActivity : BaseActivityNew() {
                         Log.d(TAG, "receiptDetail : $jsonResp")
                         when (txnResponse?.responseCode) {
                             ResponseCode.SUCCESS.value -> {
-                                val jsonResp = Gson().toJson(receiptDetail)
-                                println(jsonResp)
-
                               //  AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
 
                                 //   detailResponse.forEach { println(it) }
                                 //  uids.add(ecrID)
                                 // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                 if (receiptDetail != null) {
-
-
                                     lifecycleScope.launch(Dispatchers.IO) {
-                                        //    appDao.insertBatchData(batchData)
-
-                                        val batchData = BatchTable(receiptDetail)
-                                        creatCardProcessingModelData(receiptDetail)
-                                        val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
-                                        //  val jsonResp2=Gson().toJson(transactionISO)
-                                        //   Log.d(TAG, "jsonResp : $jsonResp2")
+                                          val batchData = BatchTable(receiptDetail)
                                         println(jsonResp)
-
-                                        // region print and save data
                                         batchData.invoice = receiptDetail.invoice.toString()
                                         batchData.transactionType =
-                                            com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                            BhTransactionType.SALE.type
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
                                         printingSaleData(batchData){
+                                            withContext(Dispatchers.Main){
+                                                showProgress(getString(R.string.transaction_syncing_msg))
+                                            }
+                                            createCardProcessingModelData(receiptDetail)
+                                            val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                            // sync pending transaction
+                                      //      Utility().syncPendingTransaction(transactionViewModel)
 
-
-                                                lifecycleScope.launch(Dispatchers.IO){
-
-                                                    withContext(Dispatchers.Main){
-                                                        showProgress(getString(R.string.transaction_syncing_msg))
-                                                    }
-
-                                                Utility().syncPendingTransaction(transactionViewModel)
-
-                                                when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                                {
-                                                    is GenericResponse.Success -> {
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-
-                                                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
-                                                            startActivity(intent)
-
-                                                        }
+                                            when(val genericResp = transactionViewModel.serverCall(transactionISO))
+                                            {
+                                                is GenericResponse.Success -> {
+                                                    withContext(Dispatchers.Main) {
                                                         logger("success:- ", "in success $genericResp","e")
-
+                                                        hideProgress()
+                                                    goToDashBoard()
                                                     }
-                                                    is GenericResponse.Error -> {
-                                                        logger("error:- ", "in error $genericResp", "e")
-                                                        logger("error:- ", "save transaction sync later", "e")
-                                                        val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp?.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel)
-                                                        pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                            ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                            finish()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@TransactionActivity,
-                                                                    NavigationActivity::class.java
-                                                                ).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                                })
-                                                        }
-
-                                                    }
-                                                    is GenericResponse.Loading -> {
-                                                        withContext(Dispatchers.Main) {
-                                                            hideProgress()
-                                                        }
-                                                        logger("Loading:- ", "in Loading $genericResp","e")
-                                                    }
-                                                }
 
                                                 }
+                                                is GenericResponse.Error -> {
+                                                    logger("error:- ", "in error $genericResp", "e")
+                                                    val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
+                                                        batchTable = batchData,
+                                                        responseCode = genericResp.toString(),
+                                                        cardProcessedDataModal = globalCardProcessedModel)
+                                                    pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
+                                                    withContext(Dispatchers.Main) {
+                                                        hideProgress()
+                                                        errorOnSyncing(genericResp.errorMessage?:"Sync Error....")
+                                                    }
+
+                                                }
+                                                is GenericResponse.Loading -> {
+                                                    withContext(Dispatchers.Main) {
+                                                        hideProgress()
+                                                    }
+                                                    logger("Loading:- ", "in Loading $genericResp","e")
+                                                }
+                                            }
 
                                         }
-                                        //end region
 
-                                        // region sync pending transaction
-                                     /* Utility().syncPendingTransaction(transactionViewModel)
-
-                                        when(val genericResp = transactionViewModel.serverCall(transactionISO))
-                                        {
-                                            is GenericResponse.Success -> {
-                                                withContext(Dispatchers.Main) {
-                                                    hideProgress()
-                                                }
-                                                logger("success:- ", "in success $genericResp","e")
-
-                                            }
-                                            is GenericResponse.Error -> {
-                                                logger("error:- ", "in error $genericResp", "e")
-                                                logger("error:- ", "save transaction sync later", "e")
-                                                val pendingSyncTransactionTable = PendingSyncTransactionTable(invoice = receiptDetail?.invoice.toString(),
-                                                    batchTable = batchData,
-                                                    responseCode = genericResp?.toString(),
-                                                    cardProcessedDataModal = globalCardProcessedModel)
-                                                pendingSyncTransactionViewModel.insertPendingSyncTransactionData(pendingSyncTransactionTable)
-                                                withContext(Dispatchers.Main) {
-                                                    hideProgress()
-                                                    ToastUtils.showToast(this@TransactionActivity,genericResp.toString())
-                                                    finish()
-                                                    startActivity(
-                                                        Intent(
-                                                            this@TransactionActivity,
-                                                            NavigationActivity::class.java
-                                                        ).apply {
-                                                            flags =
-                                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                        })
-                                                }
-
-                                            }
-                                            is GenericResponse.Loading -> {
-                                                withContext(Dispatchers.Main) {
-                                                    hideProgress()
-                                                }
-                                                logger("Loading:- ", "in Loading $genericResp","e")
-                                            }
-                                        }*/
-                                        // end region
 
                                     }
                                 }
@@ -1476,7 +1354,6 @@ class TransactionActivity : BaseActivityNew() {
                                 )
                             }
                             ResponseCode.REVERSAL.value -> {
-                                // kushal
                                 AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                 val batchReversalData = BatchTableReversal(receiptDetail)
@@ -1486,7 +1363,7 @@ class TransactionActivity : BaseActivityNew() {
                                     batchReversalData.invoice =
                                         receiptDetail?.invoice.toString()
                                     batchReversalData.transactionType =
-                                        com.bonushub.pax.utils.BhTransactionType.SALE.type
+                                        BhTransactionType.SALE.type
                                     batchReversalData.responseCode =
                                         ResponseCode.SUCCESS.value
                                     batchReversalData.roc = receiptDetail?.stan.toString()
@@ -1587,7 +1464,8 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
 
-    suspend fun printingSaleData(batchTable: BatchTable, cb:(Boolean) ->Unit) {
+
+    suspend fun printingSaleData(batchTable: BatchTable, cb:suspend (Boolean) ->Unit) {
         val receiptDetail = batchTable.receiptData
         withContext(Dispatchers.Main) {
             showProgress(getString(R.string.printing))
@@ -1611,7 +1489,10 @@ class TransactionActivity : BaseActivityNew() {
                             this@TransactionActivity as BaseActivityNew,
                             getString(R.string.printer_error)
                         )
-                        cb(false)
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            cb(false)
+                        }
+
                     }
                 }
             }
@@ -1620,7 +1501,7 @@ class TransactionActivity : BaseActivityNew() {
 
     private fun showMerchantAlertBox(
         batchTable: BatchTable,
-        cb:(Boolean) ->Unit
+        cb: suspend (Boolean) ->Unit
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
 
@@ -1637,8 +1518,10 @@ class TransactionActivity : BaseActivityNew() {
                     ) { printCB, printingFail ->
                         (this@TransactionActivity as BaseActivityNew).hideProgress()
                         if (printCB) {
+                           lifecycleScope.launch(Dispatchers.IO) {
 
-                            cb(printCB)
+                               cb(printCB)
+                           }
                             (this@TransactionActivity as BaseActivityNew).hideProgress()
 
 //                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
@@ -1647,7 +1530,11 @@ class TransactionActivity : BaseActivityNew() {
 
                     }
                 }, {
-                    cb(true)
+                    lifecycleScope.launch(Dispatchers.IO) {
+
+
+                        cb(true)
+                    }
                     (this@TransactionActivity as BaseActivityNew).hideProgress()
 //                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
 //                    startActivity(intent)
@@ -1688,6 +1575,23 @@ class TransactionActivity : BaseActivityNew() {
 
     }
 
+   suspend fun errorOnSyncing(msg:String){
+        withContext(Dispatchers.Main) {
+            alertBoxWithAction(
+                getString(R.string.no_receipt),
+                msg,
+                false,
+                getString(R.string.positive_button_ok),
+                {
+                    finish()
+                    goToDashBoard()
+                },
+                {})
+        }
+
+
+    }
+
     private fun goToDashBoard() {
         startActivity(Intent(this@TransactionActivity, NavigationActivity::class.java).apply {
             flags =
@@ -1695,9 +1599,34 @@ class TransactionActivity : BaseActivityNew() {
         })
     }
 
-    fun creatCardProcessingModelData(receiptDetail: ReceiptDetail) {
+    fun createCardProcessingModelData(receiptDetail: ReceiptDetail) {
         logger("",""+receiptDetail)
-        globalCardProcessedModel.setProcessingCode("920001")
+        when(globalCardProcessedModel.getTransType()){
+            BhTransactionType.SALE.type , BhTransactionType.TEST_EMI.type,
+            BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type,
+            BhTransactionType.PRE_AUTH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.SALE.code)
+            }
+            BhTransactionType.CASH_AT_POS.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.CASH_AT_POS.code)
+            }
+            BhTransactionType.SALE_WITH_CASH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.SALE_WITH_CASH.code)
+            }
+            BhTransactionType.VOID.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.VOID.code)
+            }
+            BhTransactionType.REFUND.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.REFUND.code)
+            }
+            BhTransactionType.VOID_PREAUTH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.VOID_PREAUTH.code)
+            }
+            BhTransactionType.PRE_AUTH_COMPLETE.type->{
+            globalCardProcessedModel.setProcessingCode(ProcessingCode.PRE_SALE_COMPLETE.code)
+            }
+        }
+
         receiptDetail.txnAmount?.let { globalCardProcessedModel.setTransactionAmount(it.toLong()) }
         receiptDetail.txnOtherAmount?.let { globalCardProcessedModel.setOtherAmount(it.toLong()) }
         globalCardProcessedModel.setMobileBillExtraData(Pair(mobileNumber, billNumber))
@@ -1707,7 +1636,9 @@ class TransactionActivity : BaseActivityNew() {
         globalCardProcessedModel.setCardMode(CardMode(receiptDetail.entryMode?:"",receiptDetail.isVerifyPin?:false))
         globalCardProcessedModel.setRrn(receiptDetail.rrn)
         receiptDetail.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
+
         globalCardProcessedModel.setTid(receiptDetail.tid)
+
         globalCardProcessedModel.setMid(receiptDetail.mid)
         globalCardProcessedModel.setBatch(receiptDetail.batchNumber)
         globalCardProcessedModel.setInvoice(receiptDetail.invoice)

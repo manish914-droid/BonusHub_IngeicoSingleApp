@@ -108,7 +108,7 @@
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/side_heading_options"
-                    android:layout_width="130dp"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/pad_24"
                     android:orientation="vertical">
@@ -246,7 +246,7 @@
                     android:id="@+id/compareRV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/pad_30"
+                    android:layout_marginTop="@dimen/pad_24"
                     android:layout_weight="1" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.constraintlayout.widget.ConstraintLayout>

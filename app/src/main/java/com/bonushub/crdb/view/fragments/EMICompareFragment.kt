@@ -137,8 +137,10 @@ class EMICompareFragment : Fragment() {
     private fun onItemDeleteClick(position: Int) {
         if (position > -1) {
             Log.d("PositionClicked:- ", position.toString())
+            Log.d("dataList.size:- ", dataList.size.toString())
             dataList.removeAt(position)
             emiCompareAdapter.refreshAdapterList(dataList)
+            Log.d("dataList.size:- ", dataList.size.toString())
 
             if (dataList.isEmpty())
                 parentFragmentManager.popBackStackImmediate()

@@ -2,7 +2,6 @@ package com.bonushub.crdb.view.activity
 
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,9 +24,13 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 import android.content.Intent
+import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
-import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.base.BaseActivityNew
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.pow
 
 
 @AndroidEntryPoint
@@ -51,8 +54,15 @@ class TenureSchemeActivity : BaseActivityNew() {
     private val productID by lazy {
         intent.getStringExtra("productID")
     }
+    private val testEmiOption by lazy {
+        intent.getStringExtra("testEmiOption")
+    }
     private val imeiOrSerialNum by lazy {
         intent.getStringExtra("imeiOrSerialNum")
+    }
+
+    private val mobileNumber by lazy {
+        intent.getStringExtra("mobileNumber")
     }
  private val emiSchemeOfferDataListFromIntent by lazy {
         intent.getParcelableArrayListExtra<BankEMITenureDataModal>("emiSchemeOfferDataList") as MutableList<BankEMITenureDataModal>
@@ -63,11 +73,11 @@ private val emiIssuerTAndCDataFromIntent by lazy {
 
 
 
-    private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal>? = mutableListOf()
-    lateinit var emiIssuerTAndCData: BankEMIIssuerTAndCDataModal
+    private var emiSchemeOfferDataList: MutableList<BankEMITenureDataModal> = mutableListOf()
+     var emiIssuerTAndCData: BankEMIIssuerTAndCDataModal?=null
     private val emiSchemeAndOfferAdapter: EMISchemeAndOfferAdapter by lazy {
         EMISchemeAndOfferAdapter(
-            1,
+            transactionType,
             emiSchemeOfferDataList,
             ::onSchemeClickEvent
         )
@@ -128,6 +138,14 @@ hideProgress()
             emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent
             emiIssuerTAndCData= emiIssuerTAndCDataFromIntent!!
             setUpRecyclerView()
+        }else if(transactionType==BhTransactionType.TEST_EMI.type){
+lifecycleScope.launch(Dispatchers.IO) {
+    emiSchemeOfferDataList = calculateEmi()
+    withContext(Dispatchers.Main) {
+        setUpRecyclerView()
+    }
+}
+
         }
 
 
@@ -162,19 +180,13 @@ hideProgress()
                     "Tncc ->  ",
                     (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)).toString()
                 )
-                val returnIntent = Intent()
-                returnIntent.putExtra("EMITenureDataModal", (emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)))
-                returnIntent.putExtra("emiIssuerTAndCDataList", (emiIssuerTAndCData))
-                returnIntent.putExtra("cardProcessedDataModal", cardProcessedDataModal)
-                setResult(RESULT_OK, returnIntent)
-                finish()
 
-                /*
-                for cancel case
+                emiSchemeOfferDataList?.get(selectedSchemeUpdatedPosition)?.let { it1 ->
+                    blockingImeiSerialNum(
+                        it1,emiIssuerTAndCData
+                    )
+                }
 
-                val returnIntent = Intent()
-                setResult(RESULT_CANCELED, returnIntent)
-                finish()*/
             }   else
                 ToastUtils.showToast(this,getString(R.string.please_select_scheme))
         }
@@ -189,46 +201,226 @@ hideProgress()
     private fun onSchemeClickEvent(position: Int) {
         Log.d("Position:- ", emiSchemeOfferDataList?.get(position).toString())
         selectedSchemeUpdatedPosition = position
-
-//        var newList: MutableList<BankEMITenureDataModal>? = mutableListOf()
-//        newList?.toList()
-//        for(i in emiSchemeOfferDataList!!.indices)
-//        {
-//            var item = emiSchemeOfferDataList!![i]
-//            if(i == position)
-//            {
-//                item.isSelected = !item.isSelected
-//                newList?.add(item)
-//                //emiSchemeOfferDataList!![i].isSelected = !emiSchemeOfferDataList!![i].isSelected
-//            }else{
-//                item.isSelected = false
-//                newList?.add(item)
-//                //emiSchemeOfferDataList!![i].isSelected = false
-//            }
-//        }
-//
-//        logger("updateList",emiSchemeOfferDataList.toString())
-//        logger("updateList2",newList?.toList().toString())
-//
-//        emiSchemeAndOfferAdapter.submitList(newList?.toList())
-
     }
     //endregion
+
     //region=========================SetUp RecyclerView Data:-
     private fun setUpRecyclerView() {
-
             binding?.emiSchemeOfferRV?.apply {
                 layoutManager = LinearLayoutManager(context)
                 itemAnimator = DefaultItemAnimator()
                 adapter = emiSchemeAndOfferAdapter
             }
 
-//        var tempList = emiSchemeOfferDataList?.toList()
-//        emiSchemeAndOfferAdapter.submitList(tempList)
-
-
     }
     //endregion
 
+private fun blockingImeiSerialNum(bankEmiTenureData:BankEMITenureDataModal,schemeData:BankEMIIssuerTAndCDataModal?){
+    if(imeiOrSerialNum?.isNotBlank() == true){
+        var isBlockUnblockSuccess=Pair(false,"")
+
+     //   "Request Type^Skip Record Count^Brand Id^ProductID^Product serial^Bin Value^Transaction Amt^Issuer Id^Mobile No^EMI Scheme^Tenure"
+
+val field57="12^0^${brandID}^${productID}^${imeiOrSerialNum}^${""}^${bankEmiTenureData.totalEmiPay}^${schemeData?.issuerID}^${mobileNumber}^${schemeData?.emiSchemeID}^${bankEmiTenureData.tenure}"
+       // 12^0^11^3361^123rr^^256662^51^^141^3
+        showProgress("Blocking Serial/IMEI")
+        lifecycleScope.launch(Dispatchers.IO) {
+           isBlockUnblockSuccess=  serverRepository.blockUnblockSerialNum(field57)
+            hideProgress()
+            if(isBlockUnblockSuccess.first){
+                val returnIntent = Intent()
+                returnIntent.putExtra("EMITenureDataModal", (emiSchemeOfferDataList.get(selectedSchemeUpdatedPosition)))
+                returnIntent.putExtra("emiIssuerTAndCDataList", (emiIssuerTAndCData))
+                returnIntent.putExtra("cardProcessedDataModal", cardProcessedDataModal)
+                setResult(RESULT_OK, returnIntent)
+                finish()
+
+                /*
+                for cancel case
+
+                val returnIntent = Intent()
+                setResult(RESULT_CANCELED, returnIntent)
+                finish()*/
+
+            }else {
+                withContext(Dispatchers.Main) {
+                    showToast(isBlockUnblockSuccess.second)
+                }
+            }
+
+        }
+
+    }else{
+        val returnIntent = Intent()
+        returnIntent.putExtra("EMITenureDataModal", (emiSchemeOfferDataList[selectedSchemeUpdatedPosition]))
+        returnIntent.putExtra("emiIssuerTAndCDataList", (emiIssuerTAndCData))
+        returnIntent.putExtra("cardProcessedDataModal", cardProcessedDataModal)
+        setResult(RESULT_OK, returnIntent)
+        finish()
+
+        /*
+        for cancel case
+
+        val returnIntent = Intent()
+        setResult(RESULT_CANCELED, returnIntent)
+        finish()*/
+    }
+
+}
+
+  private fun  calculateEmi(): MutableList<BankEMITenureDataModal> {
+         var bankEMIDataModal: BankEMITenureDataModal? = null
+        when(testEmiOption) {
+            "3" -> {
+                val monthlyEmi3 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 11.0f, 3.0f) }
+
+                val totalInterestPay3 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi3?.times(3.0))?.minus(it) }
+
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "3", "1100",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi3.toString(), "", "", "", "", totalInterestPay3.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add (bankEMIDataModal)
+            }
+            "6"->{
+                val monthlyEmi6 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 12.0f, 6.0f) }
+
+                val totalInterestPay6 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi6?.times(6.0))?.minus(it) }
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "6", "1200",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi6.toString(), "", "", "", "", totalInterestPay6.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add(bankEMIDataModal)
+            }
+            "9"-> {
+                val monthlyEmi9 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 13.0f, 9.0f) }
+
+                val totalInterestPay9 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi9?.times(9.0))?.minus(it) }
+
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "9", "1300",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi9.toString(), "", "", "", "", totalInterestPay9.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add(bankEMIDataModal )
+            }
+            "12"-> {
+                val monthlyEmi12 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 14.0f, 12.0f) }
+
+                val totalInterestPay12 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi12?.times(12.0))?.minus(it) }
+
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "12", "1400",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi12.toString(), "", "", "", "", totalInterestPay12.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add(bankEMIDataModal )
+            }
+            else->{
+                val monthlyEmi3 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 11.0f, 3.0f) }
+
+                val totalInterestPay3 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi3?.times(3.0))?.minus(it) }
+
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "3", "1100",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi3.toString(), "", "", "", "", totalInterestPay3.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add (bankEMIDataModal )
+                val monthlyEmi6 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 12.0f, 6.0f) }
+
+                val totalInterestPay6 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi6?.times(6.0))?.minus(it) }
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "6", "1200",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi6.toString(), "", "", "", "", totalInterestPay6.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add(bankEMIDataModal )
+                val monthlyEmi9 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 13.0f, 9.0f) }
+
+                val totalInterestPay9 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi9?.times(9.0))?.minus(it) }
+
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "9", "1300",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi9.toString(), "", "", "", "", totalInterestPay9.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add(bankEMIDataModal )
+                val monthlyEmi12 = cardProcessedDataModal?.getTransactionAmount()?.toFloat()
+                    ?.let { emiCalculator(it, 14.0f, 12.0f) }
+
+                val totalInterestPay12 = cardProcessedDataModal?.getTransactionAmount()?.toDouble()
+                    ?.let { (monthlyEmi12?.times(12.0))?.minus(it) }
+
+
+                bankEMIDataModal = BankEMITenureDataModal(
+                    "12", "1400",
+                    "", "", cardProcessedDataModal?.getTransactionAmount().toString(), "", "", "",
+                    cardProcessedDataModal?.getTransactionAmount().toString(),
+                    monthlyEmi12.toString(), "", "", "", "", totalInterestPay12.toString(), "", "",
+                    "", "", "", ""
+                )
+
+                emiSchemeOfferDataList.add(bankEMIDataModal )
+                Log.d("emiScheme:- ", Gson().toJson(emiSchemeOfferDataList))
+
+            }
+        }
+        return  emiSchemeOfferDataList
+    }
+    private fun emiCalculator(principalAmount: Float, rate: Float, time: Float): Double {
+        var r = rate
+        val t = time
+        r /= (12 * 100) // one month interest
+
+        val emi: Float = (principalAmount * r * (1 + r).toDouble().pow(t.toDouble()).toFloat()
+                / ((1 + r).toDouble().pow(t.toDouble()) - 1).toFloat())
+
+        return emi.toDouble()
+    }
 
 }

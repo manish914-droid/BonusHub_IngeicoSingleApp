@@ -428,6 +428,14 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
 
     TEST_EMI("Test Emi TXN", R.drawable.ic_digi_pos, 777),
     // just for handling the test emi not used in dashboard items
+
+    UPI("UPI COLLECT", R.drawable.ic_upi, 901),
+    DYNAMIC_QR("DYNAMIC QR", R.drawable.ic_qr_code, 906),
+    STATIC_QR("STATIC QR", R.drawable.ic_qr_code, 904),
+    SMS_PAY("SMS PAY", R.drawable.ic_sms_pay, 902),
+    PENDING_TXN("PENDING TXN", R.drawable.ic_pending_txn, 903),
+    TXN_LIST("TXN LIST", R.drawable.ic_txn_list, 903),
+
  /*
     FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_advance, 666),
     LESS("View Less", R.drawable.ic_arrow_up, 888),
@@ -592,6 +600,7 @@ enum class CardEntryMode(val _name: String, val _value: String){
 
 // region
 enum class TestEmiItem(val id:String, val _name: String){
+    AMEX_TID("0", "AMEX TID"),
     BASE_TID("1", "Base TID"),
     OFFUS_TID("2", "OFFUS TID"),
     _3_M_TID("3", "3 M TID"),
