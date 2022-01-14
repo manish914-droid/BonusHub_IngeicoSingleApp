@@ -8,7 +8,14 @@ plugins {
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    signingConfigs {
+        release {
+            storeFile file('/home/manishkumar/Documents/app_release_keys/bonushdfc.jks')
+            storePassword 'Bonus@123'
+            keyAlias 'Android'
+            keyPassword "Bonus@123"
+        }
+    }
 
     defaultConfig {
         applicationId "com.bonushub.crdb"
@@ -16,7 +23,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
-        buildConfigField "long", "REVISION_ID", "210105"
+        buildConfigField "long", "REVISION_ID", "210104"
         versionName "02.01.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,6 +33,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
         }
     }
     compileOptions {

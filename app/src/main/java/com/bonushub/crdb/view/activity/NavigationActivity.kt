@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.activity
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -1336,11 +1337,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         }
                     }
 
+                    @SuppressLint("LongLogTag")
                     override fun onDownloadComplete(path: String, appName: String, fileUri: File?) {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                         if (!TextUtils.isEmpty(path)) {
                             hideProgress()
                             Log.d("DownloadAppFilePath:- ", path)
+                            Log.d("DownloadAppFilePath file uri :- ", fileUri?.toString() ?: "")
 
                             val downloadedFile = File(fileUri?.path ?: "")
 
@@ -1416,7 +1419,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                 if (errorList != null) {
                     for (item in errorList) {
-                        println("Automatic installing"+item.getString(TMSData.ERROR_MESSAGE))
+                        println("Automatic installing -> "+item.getString(TMSData.ERROR_MESSAGE))
                     }
                 }
 

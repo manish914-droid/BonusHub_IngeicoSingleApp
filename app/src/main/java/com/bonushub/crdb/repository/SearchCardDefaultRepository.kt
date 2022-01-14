@@ -309,17 +309,22 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
     protected fun manageAID() {
         //   outputBlueText("****** manage AID ******")
         val aids = arrayOf(
-            "A000000333010106",
-            "A000000333010103",
-            "A000000333010102",
-            "A000000333010101",
-            "A0000000651010",
-            "A0000000043060",
-            "A0000000041010",
-            "A000000003101001",
-            "A000000003101002",
-            "A000000003101004",
-            "A0000000031010"
+            "A000000333010106", //PBOC
+            "A000000333010103", //PBOC
+            "A000000333010102", //PBOC
+            "A000000333010101", //PBOC
+            "A0000000651010",   //JCB
+            "A0000001523010",   //Diners
+            "A0000005241010",   //Rupay
+            "A0000000043060", //Masters
+            "A0000000041010", //Masters
+            "A000000003101001", // Visa
+            "A000000003101002", // Visa
+            "A000000003101004", // Visa
+            "A0000000031010"    // Visa
+
+        //9F0608A000000333010103
+
         )
         for (aid in aids) {
             val ret: Int = emv!!.manageAID(ActionFlag.ADD, aid, true)

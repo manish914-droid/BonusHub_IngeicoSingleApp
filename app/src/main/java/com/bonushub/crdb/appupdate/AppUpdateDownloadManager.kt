@@ -2,6 +2,7 @@ package com.bonushub.crdb.appupdate
 
 import android.content.Context
 import android.os.AsyncTask
+import android.os.Environment
 import android.util.Log
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.HttpsTrustManager
@@ -21,12 +22,13 @@ class AppUpdateDownloadManager(var context: Context,
 
     private val appName = "BonusHub.apk"
    // private var fileUri: Uri? = null
-    private val downloadedFilePath = File("/sdcard/", appName)
+   val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk_test/"
+    private val downloadedFilePath = File(PATH, appName)
 
     override fun doInBackground(vararg params: String?): String {
         var input: InputStream? = null
         var output: OutputStream? = null
-        val PATH = "/sdcard/"
+        val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk_test/"
         val connection: HttpsURLConnection
         try {
             val url = URL(appHostDownloadURL)
