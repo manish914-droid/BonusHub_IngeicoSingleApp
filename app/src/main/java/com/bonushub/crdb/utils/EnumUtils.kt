@@ -521,6 +521,7 @@ enum class PrefConstant(val keyName: Any) {
     FTP_FILE_NAME("ftp_file_name"),
     FTP_FILE_SIZE("ftp_file_size"),
     BLOCK_MENU_OPTIONS("block_menu_options"),
+    BLOCK_MENU_OPTIONS_INGENICO("block_menu_options_ingenico"),
     INSERT_PPK_DPK("insert_ppk_dpk"),
     INIT_AFTER_SETTLEMENT("init_after_settlement"),
     VOID_ROC_INCREMENT("void_roc_increment"),

@@ -30,6 +30,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
+import com.bonushub.pax.utils.PrefConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -170,9 +171,7 @@ class SettlementFragment : Fragment() {
                         }*/
 
                         //----------------------
-                        lifecycleScope.launch(
-                            Dispatchers.IO
-                        ) {
+                        lifecycleScope.launch(Dispatchers.IO) {
                             val data =
                                 CreateSettlementPacket(appDao).createSettlementISOPacket()
                             settlementByteArray =
@@ -191,12 +190,10 @@ class SettlementFragment : Fragment() {
 
                     }else{
 
-                    PrintUtil(activity).printDetailReportupdate(
-                        dataList,
-                        activity
-                    ) { detailPrintStatus ->
-                    }
+                    PrintUtil(activity).printDetailReportupdate(dataList, activity) {
+                            detailPrintStatus ->
 
+                    }
 
                         ioSope.launch {
                            var reversalTid  = checkReversal(dataListReversal)
@@ -219,14 +216,13 @@ class SettlementFragment : Fragment() {
                         when (result.status) {
                             Status.SUCCESS -> {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    //  AppPreference.saveBatchInPreference(dataList as MutableList<BatchTable>)
+                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+
                                     val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                     settlementByteArray = data.generateIsoByteRequest()
                                     try {
-                                        (activity as NavigationActivity).settleBatch1(
-                                            settlementByteArray
-                                        ) {
-                                        }
+                                        (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
                                     } catch (ex: Exception) {
                                         (activity as NavigationActivity).hideProgress()
                                         ex.printStackTrace()
@@ -235,7 +231,8 @@ class SettlementFragment : Fragment() {
                                 //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
                             Status.ERROR -> {
-
+                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
                                 // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
                             }
                             Status.LOADING -> {
