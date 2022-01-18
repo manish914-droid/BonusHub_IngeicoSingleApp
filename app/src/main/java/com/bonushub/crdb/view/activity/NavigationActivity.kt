@@ -52,6 +52,7 @@ import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
+import com.bonushub.crdb.view.fragments.digi_pos.DigiPosMenuFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthCompleteFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthPendingFragment
@@ -1149,10 +1150,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                 AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, "")
 
                                 GlobalScope.launch(Dispatchers.Main) {
-                                    txnSuccessToast(
-                                        this@NavigationActivity,
-                                        getString(R.string.settlement_success)
-                                    )
+                                    alertBoxMsgWithIconOnly(R.drawable.ic_tick,getString(R.string.settlement_success))
+//                                    txnSuccessToast(
+//                                        this@NavigationActivity,
+//                                        getString(R.string.settlement_success)
+//                                    )
                                     delay(2000)
                                     if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
                                         val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
@@ -1242,10 +1244,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
                                     GlobalScope.launch(Dispatchers.Main) {
-                                        txnSuccessToast(
-                                            this@NavigationActivity,
-                                            getString(R.string.settlement_success)
-                                        )
+                                        alertBoxMsgWithIconOnly(R.drawable.ic_tick,getString(R.string.settlement_success))
+//                                        txnSuccessToast(
+//                                            this@NavigationActivity,
+//                                            getString(R.string.settlement_success)
+//                                        )
                                         delay(2000)
                                         if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
                                             val dataList =

@@ -56,9 +56,9 @@
     </LinearLayout>
 
     <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:elevation="@dimen/pad_5"
         android:src="@drawable/ic_success_correct"
         app:layout_constraintBottom_toTopOf="@+id/custom_toast_layout"
         app:layout_constraintEnd_toEndOf="parent"

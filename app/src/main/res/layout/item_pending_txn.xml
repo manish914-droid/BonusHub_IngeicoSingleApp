@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/pad_10"
     android:background="@color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/parentSubHeader">
 
     <RelativeLayout
         android:layout_width="match_parent"

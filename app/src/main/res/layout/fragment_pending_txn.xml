@@ -12,7 +12,7 @@
         layout="@layout/sub_header_layout"
         android:visibility="visible" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/pad_24"
@@ -21,6 +21,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/linLayTab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -61,6 +62,7 @@
             android:id="@+id/linLayPendingTnx"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/linLayTab"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -74,6 +76,7 @@
             android:id="@+id/linLaySearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/linLayTab"
             android:orientation="vertical"
             android:visibility="gone">
 
@@ -125,6 +128,16 @@
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/empty_view_text"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/no_pending_transaction_found_want_to_search_transaction"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:visibility="gone" />
+    </RelativeLayout>
 
 </LinearLayout>

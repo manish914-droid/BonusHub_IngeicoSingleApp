@@ -1272,6 +1272,14 @@ object Field48ResponseTimestamp {
         return null
     }
 
+    fun selectDigiPosDataAccordingToTxnStatus(status: String):MutableList<DigiPosDataTable>?{
+        runBlocking(Dispatchers.IO) {
+            return@runBlocking appDatabase.appDao.getDigiPosDataTableByTxnStatus(status)
+        }
+
+        return null
+    }
+
 
 
     // region

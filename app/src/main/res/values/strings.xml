@@ -294,4 +294,10 @@
     <string name="transaction_failed_msg">Transaction Failed</string>
     <string name="network_error">Please enable your data connection</string>
     <string name="txn_status_still_pending">Txn Status Still Pending Check Later</string>
+
+    <string name="enter_mobile_number_optional">Mobile number(optional)</string>
+    <string name="scan_qr_code_to_pay_n_nwould_you_like_to_check_payment_status_now">Scan QR code to pay.\nWould you like to check payment status now.</string>
+    <string name="scan_qr_pay">Scan QR code to pay.</string>
+    <string name="no_pending_transaction_found_want_to_search_transaction">No Pending Transaction found want to search transaction</string>
+
 </resources>

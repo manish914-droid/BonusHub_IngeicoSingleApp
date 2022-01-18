@@ -14,6 +14,11 @@ import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
 
+//region===================Const To Used to Determine Which Item is Clicked in DigiPosTXN List Fragment:-
+const val GET_TXN_STATUS = "getTXNStatus"
+const val SHOW_TXN_DETAIL_PAGE = "showTXNDetailPage"
+//endregion
+
 const val QR_FILE_NAME = "staticQr"
 enum class EnumDigiPosProcess(val code: String) {
     InitializeDigiPOS("1"),
@@ -27,6 +32,7 @@ enum class EnumDigiPosProcess(val code: String) {
 
 
 }
+
 
 enum class EDigiPosPaymentStatus(val code: Int, val desciption: String) {
     Pending(0, "InProgress"),

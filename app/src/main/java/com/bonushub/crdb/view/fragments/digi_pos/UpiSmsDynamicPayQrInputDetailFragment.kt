@@ -93,6 +93,20 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
         }
         // end region
 
+        when (transactionType) {
+            EDashboardItem.SMS_PAY, EDashboardItem.DYNAMIC_QR -> {
+                binding?.mobileNumberEt?.hint = getString(R.string.enter_mobile_number)
+            }
+            EDashboardItem.UPI -> {
+                binding?.mobileNumberEt?.hint = getString(R.string.enter_mobile_number_optional)
+
+            }
+            else -> {
+
+            }
+        }
+
+
         binding?.amountEt?.text.toString().trim()
         binding?.btnProceed?.setOnClickListener {
 
@@ -164,7 +178,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
             ToastUtils.showToast(requireContext(),"Enter Valid VPA")
             return false
         }
-        else if(mobile_.isEmpty() || mobile_.length <10)
+        else if(mobile_.isNotEmpty() && mobile_.length <10)
         {
             ToastUtils.showToast(requireContext(),"Enter Valid Mobile Number")
             return false

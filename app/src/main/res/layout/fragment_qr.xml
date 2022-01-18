@@ -63,6 +63,7 @@
 
 
             <TextView
+                android:id="@+id/payMsg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="70dp"
@@ -75,6 +76,7 @@
                 android:textSize="@dimen/text_size_regular" />
 
             <TextView
+                android:id="@+id/payMsg2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="70dp"
