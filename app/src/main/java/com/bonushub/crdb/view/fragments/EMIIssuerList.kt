@@ -437,6 +437,22 @@ class EMIIssuerList : Fragment() {
     }
 //endregion
 
+    override fun onStop() {
+        super.onStop()
+        compareActionName = null
+        allIssuerBankList.clear()
+        allIssuerTenureList.clear()
+        temporaryAllIssuerList.clear()
+        temporaryAllTenureList.clear()
+        refreshedBanksByTenure.clear()
+        totalRecord = "0"
+        moreDataFlag = "0"
+        totalRecord = "0"
+        perPageRecord = "0"
+        selectedTenure = null
+    }
+
+
 }
 //region===============Below adapter is used to show the All Issuer Bank lists available:-
 class IssuerListAdapter(
@@ -556,6 +572,7 @@ class IssuerListAdapter(
         notifyDataSetChanged()
     }
     //endregion
+
 }
 //endregion
 

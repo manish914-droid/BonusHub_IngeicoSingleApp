@@ -2,9 +2,11 @@ package com.bonushub.crdb.view.fragments
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
@@ -16,10 +18,14 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.viewmodel.InitViewModel
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.showToast
 
-import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
+import com.bonushub.pax.utils.KeyExchanger
+import com.google.gson.Gson
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -93,19 +99,110 @@ class InitFragment : Fragment() {
 
             when (result.status) {
                 Status.SUCCESS -> {
-                    CoroutineScope(Dispatchers.IO).launch{
-                        Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
-                            iDialog?.hideProgress()
-                            CoroutineScope(Dispatchers.Main).launch {
-                                (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(R.drawable.ic_tick,
-                                    requireContext().getString(R.string.successfull_init))
+                    var isStaticQrAvailable=false
+
+                    lifecycleScope.launch(Dispatchers.IO){
+                        Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
+                            //--region
+
+                            lifecycleScope.launch(Dispatchers.IO){
+                            KeyExchanger.getDigiPosStatus(
+                                EnumDigiPosProcess.InitializeDigiPOS.code,
+                                EnumDigiPosProcessingCode.DIGIPOSPROCODE.code, false
+                            ) { isSuccess, responseMsg, responsef57, fullResponse ->
+                                try {
+                                    if (isSuccess) {
+                                        //1^Success^Success^S101^Active^Active^Active^Active^0^1
+                                        val responsF57List = responsef57.split("^")
+                                        Log.e("F56->>", responsef57)
+                                        //  if (responsF57List[4] == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+                                        val tpt1 = Field48ResponseTimestamp.getTptData()
+                                        tpt1?.digiPosResponseType = responsF57List[0].toString()
+                                        tpt1?.digiPosStatus = responsF57List[1].toString()
+                                        tpt1?.digiPosStatusMessage =
+                                            responsF57List[2].toString()
+                                        tpt1?.digiPosStatusCode = responsF57List[3].toString()
+                                        tpt1?.digiPosTerminalStatus  = responsF57List[4].toString()
+                                        tpt1?.digiPosBQRStatus = responsF57List[5].toString()
+                                        tpt1?.digiPosUPIStatus =  responsF57List[6].toString()
+                                        tpt1?.digiPosSMSpayStatus = responsF57List[7].toString()
+                                        tpt1?.digiPosStaticQrDownloadRequired =
+                                            responsF57List[8].toString()
+                                        tpt1?.digiPosCardCallBackRequired =
+                                            responsF57List[9].toString()
+
+                                        if ((tpt1?.digiPosTerminalStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) && (tpt1?.digiPosUPIStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
+                                                    || tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
+                                                    || tpt1.digiPosSMSpayStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) ){
+                                            tpt1.isDigiposActive = "1"
+                                        }
+                                        else{
+                                            tpt1?.isDigiposActive = "0"
+                                        }
+
+                                        if (tpt1 != null) {
+                                            Field48ResponseTimestamp.performOperation(tpt1) {
+                                                logger(
+                                                    LOG_TAG.DIGIPOS.tag,
+                                                    "Terminal parameter Table updated successfully $tpt1 "
+                                                )
+                                                //val ttp = TerminalParameterTable.selectFromSchemeTable()
+                                                val ttp = Field48ResponseTimestamp.getTptData()
+                                                val tptObj = Gson().toJson(ttp)
+                                                logger(
+                                                    LOG_TAG.DIGIPOS.tag,
+                                                    "After success      $tptObj "
+                                                )
+                                            }
+                                            if (tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+                                                var imgbm: Bitmap? = null
+                                                runBlocking(Dispatchers.IO) {
+                                                    val tpt= Field48ResponseTimestamp.getTptData()
+                                                    imgbm = loadStaticQrFromInternalStorage() // it return null when file not exist
+                                                    if(imgbm==null || tpt?.digiPosStaticQrDownloadRequired =="1") {
+                                                        isStaticQrAvailable=true
+                                                    }
+                                                }
+
+                                            }
+
+                                        }
+
+                                        //  }
+
+                                        /* else {
+                                                logger("DIGI_POS", "DIGI_POS_UNAVAILABLE")
+                                            }*/
+                                    }else{
+                                        //VFService.showToast(responseMsg)
+                                    }
+
+                                } catch (ex: java.lang.Exception) {
+                                    ex.printStackTrace()
+                                    logger(
+                                        LOG_TAG.DIGIPOS.tag,
+                                        "Somethig wrong... in response data field 57"
+                                    )
+                                }
                             }
+                                (activity as NavigationActivity).hideProgress()
+                                Field48ResponseTimestamp.showToast("Navigation")
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    (activity as NavigationActivity).alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                        (activity as NavigationActivity).getString(R.string.successfull_init))
+                                }
+                            }
+                            // end region
+                      /*      (activity as NavigationActivity).hideProgress()
+                            Field48ResponseTimestamp.showToast("Navigation")
+                            CoroutineScope(Dispatchers.Main).launch {
+                                (activity as NavigationActivity).alertBoxMsgWithIconOnly(R.drawable.ic_tick,
+                                    (activity as NavigationActivity).getString(R.string.successfull_init))
+                            }*/
 
                         }
 
                     }
-
-
                 }
                 Status.ERROR -> {
                     iDialog?.hideProgress()

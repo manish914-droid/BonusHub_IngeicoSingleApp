@@ -1035,6 +1035,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             }
                             // end region
                             hideProgress()
+                            Field48ResponseTimestamp.showToast("Navigation")
                             CoroutineScope(Dispatchers.Main).launch {
                                 alertBoxMsgWithIconOnly(R.drawable.ic_tick,
                                     this@NavigationActivity.getString(R.string.successfull_init))
@@ -1607,8 +1608,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             DeviceHelper.getTransactionByUId(uid,object: OnOperationListener.Stub(){
 
                 override fun onCompleted(p0: OperationResult?) {
-
-
                     p0?.value?.apply {
                         println("Status = $status")
                         println("Response code = $responseCode")

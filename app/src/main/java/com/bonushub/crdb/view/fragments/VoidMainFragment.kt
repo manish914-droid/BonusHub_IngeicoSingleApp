@@ -5,20 +5,33 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
+import com.bonushub.crdb.databinding.ActivityEmvBinding
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.BatchTable
+import com.bonushub.crdb.model.local.PendingSyncTransactionTable
+import com.bonushub.crdb.repository.GenericResponse
+import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.activity.NavigationActivity.Companion.TAG
+import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
+import com.bonushub.crdb.viewmodel.PendingSyncTransactionViewModel
+import com.bonushub.crdb.viewmodel.TransactionViewModel
+import com.bonushub.pax.utils.BhTransactionType
+import com.bonushub.pax.utils.CardEntryMode
 import com.bonushub.pax.utils.EPrintCopyType
+import com.bonushub.pax.utils.ProcessingCode
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -35,11 +48,15 @@ import java.util.*
 
 @AndroidEntryPoint
 class VoidMainFragment : Fragment() {
-
+    private var globalCardProcessedModel = CardProcessedDataModal()
 
     var binding:FragmentVoidMainBinding? = null
     private val batchFileViewModel: BatchFileViewModel by viewModels()
+    private val pendingSyncTransactionViewModel: PendingSyncTransactionViewModel by viewModels()
 
+
+    // private val transactionAmountValue by lazy { intent.getStringExtra("amt") ?: "0" }
+    private val transactionViewModel: TransactionViewModel by viewModels()
     private var tid ="000000"
 
     override fun onCreateView(
@@ -58,7 +75,7 @@ class VoidMainFragment : Fragment() {
         // set header
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.void_sale)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_void)
-
+        globalCardProcessedModel.setTransType(BhTransactionType.VOID.type)
 
         lifecycleScope.launch(Dispatchers.IO) {
             tid=  getBaseTID(DBModule.appDatabase.appDao)
@@ -101,7 +118,74 @@ class VoidMainFragment : Fragment() {
                                 println(jsonResp)
                                 val batchTable =BatchTable(receiptDetail)
                                 if (receiptDetail != null) {
-                                 printingSaleData(batchTable)
+                                    lifecycleScope.launch(Dispatchers.IO) {
+                                        printingSaleData(batchTable) {
+                                            withContext(Dispatchers.Main) {
+                                                (activity as BaseActivityNew).showProgress(
+                                                    getString(
+                                                        R.string.transaction_syncing_msg
+                                                    )
+                                                )
+                                            }
+                                            createCardProcessingModelData(receiptDetail)
+                                            val transactionISO =
+                                                CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                            // sync pending transaction
+                                            //   Utility().syncPendingTransaction(transactionViewModel)
+
+                                            when (val genericResp =
+                                                transactionViewModel.serverCall(transactionISO)) {
+                                                is GenericResponse.Success -> {
+                                                    logger(
+                                                        "success:- ",
+                                                        "in success $genericResp",
+                                                        "e"
+                                                    )
+                                                    withContext(Dispatchers.Main) {
+                                                        (activity as BaseActivityNew).hideProgress()
+                                                    }
+                                                }
+                                                is GenericResponse.Error -> {
+                                                    logger("error:- ", "in error $genericResp", "e")
+                                                    logger(
+                                                        "error:- ",
+                                                        "save transaction sync later",
+                                                        "e"
+                                                    )
+
+                                                    val pendingSyncTransactionTable =
+                                                        PendingSyncTransactionTable(
+                                                            invoice = receiptDetail?.invoice.toString(),
+                                                            batchTable = batchTable,
+                                                            responseCode = genericResp?.toString(),
+                                                            cardProcessedDataModal = globalCardProcessedModel
+                                                        )
+
+                                                    pendingSyncTransactionViewModel.insertPendingSyncTransactionData(
+                                                        pendingSyncTransactionTable
+                                                    )
+                                                    withContext(Dispatchers.Main) {
+                                                        (activity as BaseActivityNew).hideProgress()
+                                                        errorOnSyncing(
+                                                            genericResp.errorMessage
+                                                                ?: "Sync Error...."
+                                                        )
+                                                    }
+                                                }
+                                                is GenericResponse.Loading -> {
+                                                    logger(
+                                                        "Loading:- ",
+                                                        "in Loading $genericResp",
+                                                        "e"
+                                                    )
+                                                    withContext(Dispatchers.Main) {
+                                                        (activity as BaseActivityNew).hideProgress()
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    }
                                 }
 
 
@@ -133,58 +217,79 @@ class VoidMainFragment : Fragment() {
         }
     }
 
-    fun printingSaleData(batchTable: BatchTable) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            (activity as NavigationActivity).showProgress(getString(R.string.printing))
-
+    suspend fun printingSaleData(batchTable: BatchTable, cb:suspend (Boolean) ->Unit) {
+        val receiptDetail = batchTable.receiptData
+        withContext(Dispatchers.Main) {
+            (activity as BaseActivityNew). showProgress(getString(R.string.printing))
             var printsts = false
-            PrintUtil(activity as NavigationActivity).startPrinting(
-                batchTable,
-                EPrintCopyType.MERCHANT,
-                (activity as NavigationActivity)
-            ) { printCB, printingFail ->
+            if (receiptDetail != null) {
+                PrintUtil(activity as BaseActivityNew).startPrinting(
+                    batchTable,
+                    EPrintCopyType.MERCHANT,
+                  activity as BaseActivityNew
+                ) { printCB, printingFail ->
 
-                ((activity as NavigationActivity)).hideProgress()
-                if (printCB) {
-                    printsts = printCB
-                    //GlobalScope.launch(Dispatchers.Main) {
-                        showMerchantAlertBox(batchTable)
-                   // }
+                    (activity as BaseActivityNew).hideProgress()
+                    if (printCB) {
+                        printsts = printCB
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            showMerchantAlertBox(batchTable, cb)
+                        }
 
-                } else {
-                    ToastUtils.showToast(activity,getString(R.string.printer_error))
+                    } else {
+                        ToastUtils.showToast(
+                            activity as BaseActivityNew,
+                            getString(R.string.printer_error)
+                        )
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            cb(false)
+                        }
+
+                    }
                 }
             }
-
-            //((activity as NavigationActivity)).hideProgress()
         }
     }
 
     private fun showMerchantAlertBox(
-        batchTable: BatchTable
+        batchTable: BatchTable,
+        cb: suspend (Boolean) ->Unit
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
-            (activity as NavigationActivity).showProgress(getString(R.string.printing))
+
             val printerUtil: PrintUtil? = null
-            (activity as NavigationActivity).alertBoxWithAction(
+            (activity as BaseActivityNew).alertBoxWithAction(
                 getString(R.string.print_customer_copy),
                 getString(R.string.print_customer_copy),
                 true, getString(R.string.positive_button_yes), { status ->
-
-                    (activity as NavigationActivity).hideProgress()
-                    PrintUtil(activity as NavigationActivity).startPrinting(
+                    (activity as BaseActivityNew). showProgress(getString(R.string.printing))
+                    PrintUtil(activity as BaseActivityNew).startPrinting(
                         batchTable,
                         EPrintCopyType.CUSTOMER,
-                        activity as NavigationActivity
+                        activity as BaseActivityNew
                     ) { printCB, printingFail ->
+                        (activity as BaseActivityNew).hideProgress()
                         if (printCB) {
-                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                            lifecycleScope.launch(Dispatchers.IO) {
+
+                                cb(printCB)
+                            }
+                            (activity as BaseActivityNew).hideProgress()
+
+//                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                            startActivity(intent)
                         }
 
                     }
                 }, {
-                    (activity as NavigationActivity).hideProgress()
-                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                    lifecycleScope.launch(Dispatchers.IO) {
+
+
+                        cb(true)
+                    }
+                    (activity as BaseActivityNew).hideProgress()
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
                 })
         }
     }
@@ -217,6 +322,139 @@ class VoidMainFragment : Fragment() {
                 }
             })
         }
+
+    }
+    fun createCardProcessingModelData(receiptDetail: ReceiptDetail) {
+        logger("",""+receiptDetail)
+        when(globalCardProcessedModel.getTransType()){
+            BhTransactionType.SALE.type , BhTransactionType.TEST_EMI.type,
+            BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type,
+            BhTransactionType.PRE_AUTH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.SALE.code)
+            }
+            BhTransactionType.CASH_AT_POS.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.CASH_AT_POS.code)
+            }
+            BhTransactionType.SALE_WITH_CASH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.SALE_WITH_CASH.code)
+            }
+            BhTransactionType.VOID.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.VOID.code)
+            }
+            BhTransactionType.REFUND.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.REFUND.code)
+            }
+            BhTransactionType.VOID_PREAUTH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.VOID_PREAUTH.code)
+            }
+            BhTransactionType.PRE_AUTH_COMPLETE.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.PRE_SALE_COMPLETE.code)
+            }
+        }
+
+        receiptDetail.txnAmount?.let { globalCardProcessedModel.setTransactionAmount(it.toLong()) }
+        receiptDetail.txnOtherAmount?.let { globalCardProcessedModel.setOtherAmount(it.toLong()) }
+
+        receiptDetail.stan?.let { globalCardProcessedModel.setAuthRoc(it) }
+        //globalCardProcessedModel.setCardMode("0553- emv with pin")
+        logger("mode22 ->",CardMode(receiptDetail.entryMode?:"",receiptDetail.isVerifyPin?:false),"e")
+        globalCardProcessedModel.setCardMode(CardMode(receiptDetail.entryMode?:"",receiptDetail.isVerifyPin?:false))
+        globalCardProcessedModel.setRrn(receiptDetail.rrn)
+        receiptDetail.authCode?.let { globalCardProcessedModel.setAuthCode(it) }
+
+        globalCardProcessedModel.setTid(receiptDetail.tid)
+
+        globalCardProcessedModel.setMid(receiptDetail.mid)
+        globalCardProcessedModel.setBatch(receiptDetail.batchNumber)
+        globalCardProcessedModel.setInvoice(receiptDetail.invoice)
+        val date = receiptDetail.dateTime
+        val parts = date?.split(" ")
+        globalCardProcessedModel.setDate(parts!![0])
+        globalCardProcessedModel.setTime(parts[1])
+        globalCardProcessedModel.setTimeStamp(receiptDetail.dateTime!!)
+        globalCardProcessedModel.setPosEntryMode("0553")
+
+        receiptDetail.maskedPan?.let { globalCardProcessedModel.setPanNumberData(it) }
+
+    }
+    fun CardMode(entryMode:String, isPinVerify:Boolean):String
+    {
+        logger("entryMode",""+entryMode,"e")
+        when(entryMode){
+
+            CardEntryMode.EMV_WITH_PIN._name -> {
+                if(isPinVerify){
+                    logger("entryMode","EMV_WITH_PIN","e")
+                    return CardEntryMode.EMV_WITH_PIN._value
+                }else {
+                    logger("entryMode","EMV_NO_PIN","e")
+                    return CardEntryMode.EMV_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.EMV_FALLBACK_SWIPE_WITH_PIN._name -> {
+                if(isPinVerify){
+                    logger("entryMode","EMV_FALLBACK_SWIPE_WITH_PIN","e")
+                    return CardEntryMode.EMV_FALLBACK_SWIPE_WITH_PIN._value
+                }else {
+                    logger("entryMode","EMV_FALLBACK_SWIPE_NO_PIN","e")
+                    return CardEntryMode.EMV_FALLBACK_SWIPE_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.SWIPE_WITH_PIN._name -> {
+                if(isPinVerify){
+                    logger("entryMode","SWIPE_WITH_PIN","e")
+                    return CardEntryMode.SWIPE_WITH_PIN._value
+                }else {
+                    logger("entryMode","SWIPE_NO_PIN","e")
+                    return CardEntryMode.SWIPE_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.CTLS_SWIPE_NO_PIN._name -> {
+                if(isPinVerify){
+                    logger("entryMode","CTLS_SWIPE_WITH_PIN","e")
+                    return CardEntryMode.CTLS_SWIPE_WITH_PIN._value
+                }else {
+                    logger("entryMode","CTLS_SWIPE_NO_PIN","e")
+                    return CardEntryMode.CTLS_SWIPE_NO_PIN._value
+                }
+
+            }
+
+            CardEntryMode.CTLS_EMV_NO_PIN._name -> {
+                if(isPinVerify){
+                    logger("entryMode","CTLS_EMV_WITH_PIN","e")
+                    return CardEntryMode.CTLS_EMV_WITH_PIN._value
+                }else {
+                    logger("entryMode","CTLS_EMV_NO_PIN","e")
+                    return CardEntryMode.CTLS_EMV_NO_PIN._value
+                }
+
+            }
+            else -> {
+                return ""
+            }
+        }
+
+    }
+    suspend fun errorOnSyncing(msg:String){
+        withContext(Dispatchers.Main) {
+            (activity as BaseActivityNew). alertBoxWithAction(
+                getString(R.string.no_receipt),
+                msg,
+                false,
+                getString(R.string.positive_button_ok),
+                {
+                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+                },
+                {})
+        }
+
 
     }
 }

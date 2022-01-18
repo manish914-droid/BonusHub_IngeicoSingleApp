@@ -5,15 +5,13 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.os.DeadObjectException
+import android.os.Message
 import android.os.RemoteException
 import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.di.DBModule
-import com.bonushub.crdb.model.local.BatchTable
-import com.bonushub.crdb.model.local.BatchTableReversal
-import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
-import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
@@ -25,6 +23,7 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerTAndCDataByIssu
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.panMasking
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
+import com.bonushub.crdb.view.base.BaseActivityNew
 
 import com.bonushub.pax.utils.EPrintCopyType
 import com.bonushub.pax.utils.BhTransactionType
@@ -34,6 +33,7 @@ import com.google.gson.Gson
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.type.TransactionType
 import com.usdk.apiservice.aidl.printer.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -2394,12 +2394,176 @@ class PrintUtil(context: Context?) {
         }
     }
 
+    fun printSMSUPIChagreSlip(
+        digiPosData: DigiPosDataTable,
+        copyType: EPrintCopyType,
+        context: Context?,
+        printerCallback: (Boolean, Int) -> Unit
+    ) {
+        //  printer=null
+        try {
+            var currencySymbol: String? = "Rs"
+            val terminalData = getTptData()
+            currencySymbol = terminalData?.currencySymbol
+
+            setLogoAndHeaderForDigiPos()
+
+          /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
+            receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
+
+            printSeperator()
+            textBlockList.add(sigleLineformat("DATE:${digiPosData.txnDate}", AlignMode.LEFT))
+            textBlockList.add(sigleLineformat("TIME:${digiPosData.txnTime}", AlignMode.RIGHT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            textBlockList.add(sigleLineformat("TID:${terminalData?.terminalId}", AlignMode.LEFT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+
+
+
+            textBlockList.add(sigleLineformat("Partner Txn Id:${digiPosData.partnerTxnId}", AlignMode.LEFT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            textBlockList.add(sigleLineformat("mTxnId:${digiPosData.mTxnId}", AlignMode.LEFT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            textBlockList.add(sigleLineformat("PgwTxnId:${digiPosData.pgwTxnId}", AlignMode.LEFT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            printSeperator()
+
+            val str = "Txn Status:${digiPosData.txnStatus}"
+            sigleLineText(
+                str,
+                AlignMode.CENTER
+            )
+            sigleLineText(
+                "Txn Amount :  $currencySymbol ${digiPosData.amount}",
+                AlignMode.CENTER
+            )
+
+            printSeperator()
+
+            textBlockList.add(sigleLineformat("Mob:${digiPosData.customerMobileNumber}", AlignMode.LEFT))
+            textBlockList.add(sigleLineformat( "Mode:${digiPosData.paymentMode}", AlignMode.RIGHT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
+
+            sigleLineText(copyType.pName, AlignMode.CENTER)
+            sigleLineText(footerText[0], AlignMode.CENTER)
+            sigleLineText(footerText[1], AlignMode.CENTER)
+            val bhlogo: ByteArray? = context?.let { printLogo(it, "BH.bmp") }
+            printer?.addBmpImage(0, FactorMode.BMP1X1, bhlogo)
+            sigleLineText(
+                "App Version :${BuildConfig.VERSION_NAME}",
+                AlignMode.CENTER
+            )
+
+
+            //
+            //   printer?.addText(format, "---------X-----------X----------")
+            printer?.feedLine(4)
+
+            // start print here
+            printer?.startPrint(
+                ISmSUpiPrintListener(
+                    this,
+                    context,
+                    copyType,
+                    digiPosData,
+                    printerCallback
+                )
+            )
+        } catch (ex: DeadObjectException) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take charge slip from the Report menu."
+            )
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take charge slip from the Report menu."
+            )
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take charge slip from the Report menu."
+            )
+        } finally {
+            //   VFService.connectToVFService(VerifoneApp.appContext)
+        }
+    }
+
     private fun printSeperator() {
         sigleLineText("-----------------------------------------", AlignMode.CENTER)
     }
 
+    internal open class ISmSUpiPrintListener(
+        var printerUtil: PrintUtil,
+        var context: Context?,
+        var copyType: EPrintCopyType,
+        var digiPosData: DigiPosDataTable,
+        var isSuccess: (Boolean, Int) -> Unit
+    ) : OnPrintListener.Stub() {
+        @Throws(RemoteException::class)
+        override fun onError(error: Int) {
+            if (error == 240)
+            //VFService.showToast("Printing roll not available..")
+                isSuccess(true, 0)
+            else
+            //VFService.showToast("Printer Error------> $error")
+                isSuccess(false, 0)
+        }
+
+        @Throws(RemoteException::class)
+        override fun onFinish() {
+            val msg = Message()
+            msg.data.putString("msg", "print finished")
+            // VFService.showToast("Printing Successfully")
+            when (copyType) {
+                EPrintCopyType.MERCHANT -> {
+                    GlobalScope.launch(Dispatchers.Main) {
+
+                        (context as BaseActivityNew).showMerchantAlertBoxSMSUpiPay(
+                            printerUtil,
+                            digiPosData
+                        ) { dialogCB ->
+                            isSuccess(dialogCB, 1)
+                        }
+
+                    }
+
+                }
+                EPrintCopyType.CUSTOMER -> {
+                    //VFService.showToast("Customer Transaction Slip Printed Successfully")
+                    isSuccess(false, 1)
+                }
+                EPrintCopyType.DUPLICATE -> {
+                    isSuccess(true, 1)
+                }
+            }
+        }
+    }
+
     private fun setLogoAndHeader() {
         val image: ByteArray? = context?.let { printLogo(it, "hdfc_print_logo.bmp") }
+        printer?.addBmpImage(0, FactorMode.BMP1X1, image)
+    }
+
+    private fun setLogoAndHeaderForDigiPos() {
+        val image: ByteArray? = context?.let { printLogo(it, Companion.DIGI_SMART_HUB_LOGO) }
         printer?.addBmpImage(0, FactorMode.BMP1X1, image)
     }
 
@@ -2438,5 +2602,6 @@ class PrintUtil(context: Context?) {
 
     companion object {
         private const val disclaimerIssuerClose = "~!iss~"
+        const val DIGI_SMART_HUB_LOGO = "smart_hub.bmp"
     }
 }

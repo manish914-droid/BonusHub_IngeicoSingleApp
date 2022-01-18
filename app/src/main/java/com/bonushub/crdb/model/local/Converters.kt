@@ -134,4 +134,6 @@ class Converters {
         return Gson().fromJson(cardProcessedDataModal, CardProcessedDataModal::class.java)
     }
 
+
+
 }

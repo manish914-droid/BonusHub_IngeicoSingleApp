@@ -19,23 +19,35 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bonushub.crdb.R
 
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.BatchTable
+import com.bonushub.crdb.model.local.PendingSyncTransactionTable
+import com.bonushub.crdb.repository.GenericResponse
+import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 
 
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.DashBoardAdapter
+import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
-import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.PreferenceKeyConstant
-import com.bonushub.pax.utils.SettlementComingFrom
+import com.bonushub.pax.utils.*
+import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.model.ReceiptDetail
+import com.ingenico.hdfcpayment.model.TransactionDetail
+import com.ingenico.hdfcpayment.response.OperationResult
+import com.ingenico.hdfcpayment.response.TransactionDataResponse
+import com.ingenico.hdfcpayment.type.RequestStatus
 import com.mindorks.example.coroutines.utils.Status
 
 
@@ -88,7 +100,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Log.d("Dashboard:- ", "onViewCreated")
         isDashboardOpen = true
         Utility().hideSoftKeyboard(requireActivity())
-
+       // restartHandaling()
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()
 
@@ -257,6 +269,152 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         }
     }
     //endregion
+
+
+    private fun restartHandaling() {
+        val restatDataList = AppPreference.getRestartDataPreference()
+        if (restatDataList != null) {
+            val uid=restatDataList.transactionUuid
+            println("uid = $uid")
+            DeviceHelper.getTransactionByUId(uid,object: OnOperationListener.Stub(){
+
+                override fun onCompleted(p0: OperationResult?) {
+                    val txnResponse = p0?.value as? TransactionDataResponse
+                    p0?.value?.apply {
+                        println("Status = $status")
+                        println("Response code = $responseCode")
+                        println("Response code = $responseCode")
+                    }
+                    when(txnResponse?.status){
+                        RequestStatus.ABORTED,
+                        RequestStatus.FAILED ->{
+
+                        }
+                        RequestStatus.SUCCESS ->{
+                            val transactionDetail =
+                                ((p0.value as? TransactionDataResponse)?.transactionDetail)
+                            println("transactionDetail data = $transactionDetail")
+                            if (transactionDetail != null) {
+                                restartStubData(transactionDetail)
+                            }
+                        }
+
+                    }
+
+
+                }
+            })
+        }
+    }
+
+    fun restartStubData(transactionDetail: TransactionDetail){
+        val cvmResult: com.ingenico.hdfcpayment.type.CvmAction?=null
+        val cvmRequiredLimit:Long?=null
+           val receiptDetail= ReceiptDetail(transactionDetail.authCode, transactionDetail.aid, transactionDetail.batchNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, "14/01/2022 19:09:18", transactionDetail.invoice, transactionDetail.mid, transactionDetail.merAddHeader1, transactionDetail.merAddHeader2,  transactionDetail.rrn, transactionDetail. stan, transactionDetail.tc,
+               transactionDetail.tid, transactionDetail.tsi, transactionDetail.tvr, transactionDetail.entryMode, transactionDetail.txnName,
+               transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, transactionDetail.pan,
+               isVerifyPin = true,
+               isSignRequired = false,
+               cvmResult = cvmResult,
+             cvmRequiredLimit=cvmRequiredLimit
+           )
+
+        if (receiptDetail != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val batchData = BatchTable(receiptDetail)
+
+                batchData.invoice = receiptDetail.invoice.toString()
+                println("invoice code = ${receiptDetail.invoice.toString()}")
+                batchData.transactionType =
+                    BhTransactionType.SALE.type
+               // DBModule.appDatabase.appDao.insertBatchData(batchData)
+                AppPreference.saveLastReceiptDetails(batchData)
+                printingSaleData(batchData){
+
+
+                }
+
+
+            }
+        }
+
+    }
+    suspend fun printingSaleData(batchTable: BatchTable, cb:suspend (Boolean) ->Unit) {
+        val receiptDetail = batchTable.receiptData
+        withContext(Dispatchers.Main) {
+            (activity as BaseActivityNew). showProgress(getString(R.string.printing))
+            var printsts = false
+            if (receiptDetail != null) {
+                PrintUtil(activity as BaseActivityNew).startPrinting(
+                    batchTable,
+                    EPrintCopyType.MERCHANT,
+                   activity as BaseActivityNew
+                ) { printCB, printingFail ->
+
+                    (activity as BaseActivityNew).hideProgress()
+                    if (printCB) {
+                        printsts = printCB
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            showMerchantAlertBox(batchTable, cb)
+                        }
+
+                    } else {
+                        ToastUtils.showToast(
+                            activity as BaseActivityNew,
+                            getString(R.string.printer_error)
+                        )
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            cb(false)
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showMerchantAlertBox(
+        batchTable: BatchTable,
+        cb: suspend (Boolean) ->Unit
+    ) {
+        lifecycleScope.launch(Dispatchers.Main) {
+
+            val printerUtil: PrintUtil? = null
+            (activity as BaseActivityNew).alertBoxWithAction(
+                getString(R.string.print_customer_copy),
+                getString(R.string.print_customer_copy),
+                true, getString(R.string.positive_button_yes), { status ->
+                    (activity as BaseActivityNew). showProgress(getString(R.string.printing))
+                    PrintUtil(activity as BaseActivityNew).startPrinting(
+                        batchTable,
+                        EPrintCopyType.CUSTOMER,
+                       activity as BaseActivityNew
+                    ) { printCB, printingFail ->
+                        (activity as BaseActivityNew).hideProgress()
+                        if (printCB) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+
+                                cb(printCB)
+                            }
+                            (activity as BaseActivityNew).hideProgress()
+
+//                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                            startActivity(intent)
+                        }
+
+                    }
+                }, {
+                    lifecycleScope.launch(Dispatchers.IO) {
+
+
+                        cb(true)
+                    }
+                    (activity as BaseActivityNew).hideProgress()
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
+                })
+        }
+    }
 }
 
 

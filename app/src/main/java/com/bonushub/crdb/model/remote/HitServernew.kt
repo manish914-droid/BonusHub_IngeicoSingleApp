@@ -3,16 +3,21 @@
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
+import com.bonushub.crdb.R
+import com.bonushub.crdb.model.local.DigiPosDataTable
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
+import com.bonushub.crdb.serverApi.HitServer.openSocket
 import com.bonushub.crdb.serverApi.ProgressCallback
 import com.bonushub.crdb.serverApi.ServerMessageCallback
 import com.bonushub.crdb.serverApi.ServerMessageCallbackSale
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.pax.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getF48TimeStamp
 import java.io.DataInputStream
 import java.io.FileOutputStream
 import java.net.Socket
+import java.net.SocketTimeoutException
 import java.nio.channels.ServerSocketChannel
 
 /*val LYRA_IP_ADDRESS = "192.168.250.10"
@@ -238,78 +243,7 @@ object HitServernew  {
         }
     }
 
-    /*  suspend fun openSocket(): Socket? {
-          try {
-              tct = TerminalCommunicationTable.selectFromSchemeTable()  // always get tct it may get refresh meanwhile
-              if (tct != null) {
 
-                  val sAddress = VFService.getIpPort()
-
-                  ServerSocketChannel.open().apply {
-                      configureBlocking(false)
-                  }
-
-                  val socket = Socket()
-
-                  val connTimeOut = try {
-                      (tct as TerminalCommunicationTable).connectTimeOut.toInt() * 1000
-                  } catch (ex: Exception) {
-                      30 * 1000
-                  }
-
-                  val resTimeOut = try {
-                      (tct as TerminalCommunicationTable).responseTimeOut.toInt() * 1000
-                  } catch (ex: Exception) {
-                      30 * 1000
-                  }
-                  socket.connect(sAddress, connTimeOut)
-                  socket.soTimeout = resTimeOut
-                  return socket
-
-              } else return null
-
-          } catch (ex: Exception) {
-              ex.printStackTrace()
-              return null
-          }
-      }*/
-
-   /* suspend fun openSocket(): Socket? {
-        try {
-            tct = Utility().getTctData()
-            if (tct != null) {
-
-                val sAddress = Utility().getIpPort()
-
-                ServerSocketChannel.open().apply {
-                    configureBlocking(false)
-                }
-
-                val socket = Socket()
-
-                val connTimeOut = try {
-                    (tct as TerminalCommunicationTable).connectTimeOut.toInt() * 1000
-                } catch (ex: Exception) {
-                    30 * 1000
-                }
-
-                val resTimeOut = try {
-                    (tct as TerminalCommunicationTable).responseTimeOut.toInt() * 1000
-                } catch (ex: Exception) {
-                    30 * 1000
-                }
-                socket.connect(sAddress, connTimeOut)
-                socket.soTimeout = resTimeOut
-                return socket
-
-            } else return null
-
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            return null
-        }
-    }
-*/
 
 }
 
