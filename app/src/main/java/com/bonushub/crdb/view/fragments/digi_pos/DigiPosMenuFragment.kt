@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.databinding.FragmentDigiPosMenuBinding
 import com.bonushub.crdb.databinding.ItemDigiPosBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.pax.utils.DigiPosItem
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.DigiPosItem
+import com.bonushub.crdb.utils.EDashboardItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -9,8 +9,6 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.model.remote.RestartHandlingModel
 import com.bonushub.crdb.utils.addPad
 import com.bonushub.crdb.utils.logger
-import com.bonushub.pax.utils.IsoDataWriter
-import com.bonushub.pax.utils.PreferenceKeyConstant
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ingenico.hdfcpayment.model.ReceiptDetail

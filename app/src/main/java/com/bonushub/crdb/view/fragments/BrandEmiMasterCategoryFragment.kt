@@ -30,7 +30,7 @@ import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

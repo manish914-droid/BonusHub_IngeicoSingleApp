@@ -5,12 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.ActivityEmvBinding
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.CardProcessedDataModal
@@ -28,10 +26,10 @@ import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.PendingSyncTransactionViewModel
 import com.bonushub.crdb.viewmodel.TransactionViewModel
-import com.bonushub.pax.utils.BhTransactionType
-import com.bonushub.pax.utils.CardEntryMode
-import com.bonushub.pax.utils.EPrintCopyType
-import com.bonushub.pax.utils.ProcessingCode
+import com.bonushub.crdb.utils.BhTransactionType
+import com.bonushub.crdb.utils.CardEntryMode
+import com.bonushub.crdb.utils.EPrintCopyType
+import com.bonushub.crdb.utils.ProcessingCode
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -41,7 +39,6 @@ import com.ingenico.hdfcpayment.response.TransactionResponse
 import com.ingenico.hdfcpayment.type.ResponseCode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*

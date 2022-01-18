@@ -3,15 +3,10 @@ package com.bonushub.crdb.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ItemBankFunctionsInitPaymentBinding
-import com.bonushub.crdb.view.fragments.BankFunctionsAdminVasFragment
-import com.bonushub.crdb.view.fragments.BankFunctionsFragment
 import com.bonushub.crdb.view.fragments.TidsListModel
-import com.bonushub.pax.utils.EDashboardItem
 import java.util.*
 
 class BankFunctionsInitPaymentAppAdapter(var tidsList:ArrayList<TidsListModel>) : RecyclerView.Adapter<BankFunctionsInitPaymentAppAdapter.BankFunctionsInitPaymentViewHolder>() {

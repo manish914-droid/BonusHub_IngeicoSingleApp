@@ -1,6 +1,5 @@
 package com.bonushub.crdb.view.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -17,7 +16,6 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.BrandEmiListAndSearchUiBinding
 import com.bonushub.crdb.db.AppDatabase
-import com.bonushub.crdb.model.local.BrandEMIDataTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
@@ -28,14 +26,11 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.view.activity.TransactionActivity
-import com.bonushub.crdb.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.view.adapter.BrandEmiProductAdapter
 import com.bonushub.crdb.view.base.IDialog
-import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.BrandEmiProductViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

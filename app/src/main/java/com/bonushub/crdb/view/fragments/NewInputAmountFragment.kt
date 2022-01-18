@@ -18,7 +18,6 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentNewInputAmountBinding
 
 import com.bonushub.crdb.db.AppDatabase
-import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.local.HDFCTpt
@@ -37,14 +36,13 @@ import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.NewInputAmountViewModel
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-import com.bonushub.pax.utils.BhTransactionType
-import com.bonushub.pax.utils.UiAction
+import com.bonushub.crdb.utils.BhTransactionType
+import com.bonushub.crdb.utils.UiAction
 
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint

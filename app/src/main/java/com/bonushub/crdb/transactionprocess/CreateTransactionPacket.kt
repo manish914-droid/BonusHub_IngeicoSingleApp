@@ -12,7 +12,6 @@ import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
-import com.ingenico.hdfcpayment.type.TransactionType
 
 
 import java.text.SimpleDateFormat
@@ -256,7 +255,8 @@ class CreateTransactionPacket(
             val issuerParameterTable =
                 getIssuerData(AppPreference.WALLET_ISSUER_ID)
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-            val pcNumbers = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)+addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
+            val pcNumbers = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)+addPad(AppPreference.getString(
+                PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
             val data = ConnectionType.GPRS.code + addPad(
                 deviceModel(), "*",
                 6,
@@ -286,7 +286,7 @@ class CreateTransactionPacket(
             }
 
 var serialnumm=""
-            serialnumm = if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()||BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
+            serialnumm = if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()|| BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
                 val tenureData=batchdata?.emiTenureDataModel
                 if( cardProcessedData.getTid()==tenureData?.txnTID){
                     DeviceHelper.getDeviceSerialNo().toString()

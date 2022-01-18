@@ -26,7 +26,7 @@ import java.util.*
 
 class UpiCollectFragment : Fragment() {
 
-    lateinit var transactionType:EDashboardItem
+    lateinit var transactionType: EDashboardItem
 
     var uniqueID: String = ""
     var amount = ""

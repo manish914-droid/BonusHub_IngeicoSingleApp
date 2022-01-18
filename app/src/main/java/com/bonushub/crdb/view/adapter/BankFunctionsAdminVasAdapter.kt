@@ -1,15 +1,11 @@
 package com.bonushub.crdb.view.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.view.fragments.IBankFunctionsAdminVasItemClick
-import com.bonushub.pax.utils.BankFunctionsAdminVasItem
+import com.bonushub.crdb.utils.BankFunctionsAdminVasItem
 
 class BankFunctionsAdminVasAdapter(var iBankFunctionsAdminVasItemClick: IBankFunctionsAdminVasItemClick?, private val listItem: MutableList<BankFunctionsAdminVasItem>) : RecyclerView.Adapter<BankFunctionsAdminVasAdapter.BankFunctionsAdminVasViewHolder>() {
 

@@ -19,7 +19,7 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.adapter.EMISchemeAndOfferAdapter
 import com.bonushub.crdb.viewmodel.TenureSchemeViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
-import com.bonushub.pax.utils.BhTransactionType
+import com.bonushub.crdb.utils.BhTransactionType
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -94,14 +94,14 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         transactionType        = intent?.getIntExtra("transactionType",-1) ?: -1
 
         var field57=""
-        field57 = if(transactionType==BhTransactionType.BRAND_EMI.type) {
+        field57 = if(transactionType== BhTransactionType.BRAND_EMI.type) {
             "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
                     "^${/*cardBinValue.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }else{
             "$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }
 
-        if(transactionType==BhTransactionType.BRAND_EMI.type || transactionType==BhTransactionType.EMI_SALE.type) {
+        if(transactionType== BhTransactionType.BRAND_EMI.type || transactionType== BhTransactionType.EMI_SALE.type) {
          showProgress()
             tenureSchemeViewModel = ViewModelProvider(
                 this, TenureSchemeActivityVMFactory(
@@ -134,11 +134,11 @@ hideProgress()
                     }
                 })
 
-        }else if (transactionType==BhTransactionType.SALE.type ){
+        }else if (transactionType== BhTransactionType.SALE.type ){
             emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent
             emiIssuerTAndCData= emiIssuerTAndCDataFromIntent!!
             setUpRecyclerView()
-        }else if(transactionType==BhTransactionType.TEST_EMI.type){
+        }else if(transactionType== BhTransactionType.TEST_EMI.type){
 lifecycleScope.launch(Dispatchers.IO) {
     emiSchemeOfferDataList = calculateEmi()
     withContext(Dispatchers.Main) {

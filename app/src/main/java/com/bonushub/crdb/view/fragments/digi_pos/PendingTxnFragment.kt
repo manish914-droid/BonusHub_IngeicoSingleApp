@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPendingTxnBinding
@@ -22,7 +20,7 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectDigiPosDataAccordi
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +31,7 @@ import java.util.*
 
 class PendingTxnFragment : Fragment(), IPendingListItemClick {
 
-    lateinit var transactionType:EDashboardItem
+    lateinit var transactionType: EDashboardItem
 
     lateinit var iPendingListItemClick:IPendingListItemClick
     var binding:FragmentPendingTxnBinding? = null

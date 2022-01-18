@@ -13,12 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.FragmentEmiCatalogueBinding
 import com.bonushub.crdb.databinding.FragmentEmiCompareBinding
 import com.bonushub.crdb.databinding.ItemEmiCompareViewBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.EMICompareDiffUtil
-import com.bonushub.pax.utils.UiAction
+import com.bonushub.crdb.utils.UiAction
 import com.google.gson.Gson
 import java.util.*
 

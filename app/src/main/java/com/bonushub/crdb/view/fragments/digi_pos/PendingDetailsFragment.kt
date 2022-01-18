@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.databinding.FragmentPendingDetailsBinding
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 
 
 class PendingDetailsFragment : Fragment() {
 
     var binding:FragmentPendingDetailsBinding? = null
-    lateinit var transactionType:EDashboardItem
+    lateinit var transactionType: EDashboardItem
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

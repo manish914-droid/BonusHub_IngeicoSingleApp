@@ -19,7 +19,7 @@ import com.bonushub.crdb.utils.ingenico.TLV
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.TransactionActivity
 import com.bonushub.crdb.view.activity.TransactionActivity.*
-import com.bonushub.pax.utils.EFallbackCode
+import com.bonushub.crdb.utils.EFallbackCode
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode

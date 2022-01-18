@@ -12,29 +12,19 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsBinding
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.di.DBModule
-import com.bonushub.crdb.model.local.BatchTable
-import com.bonushub.crdb.model.local.BrandTAndCTable
 import com.bonushub.crdb.utils.DeviceHelper
 import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
-import com.bonushub.crdb.utils.logger
-import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
-import com.bonushub.pax.utils.BankFunctionsItem
-import com.bonushub.pax.utils.EPrintCopyType
+import com.bonushub.crdb.utils.BankFunctionsItem
 import com.ingenico.hdfcpayment.listener.OnOperationListener
-import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.response.OperationResult
-import com.ingenico.hdfcpayment.type.CvmAction
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -173,5 +163,5 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
 
 interface IBankFunctionItemClick{
 
-    fun bankFunctionItemClick(bankFunctionsItem:BankFunctionsItem)
+    fun bankFunctionItemClick(bankFunctionsItem: BankFunctionsItem)
 }

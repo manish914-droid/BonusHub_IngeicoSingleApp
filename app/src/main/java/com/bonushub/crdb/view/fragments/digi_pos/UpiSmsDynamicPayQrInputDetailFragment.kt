@@ -19,10 +19,10 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
-import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.IsoDataReader
+import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.IsoDataReader
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
-import com.bonushub.pax.utils.readIso
+import com.bonushub.crdb.utils.readIso
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

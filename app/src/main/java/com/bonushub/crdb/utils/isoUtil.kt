@@ -1,4 +1,4 @@
-package com.bonushub.pax.utils
+package com.bonushub.crdb.utils
 
 
 const val SUCCESS="00"

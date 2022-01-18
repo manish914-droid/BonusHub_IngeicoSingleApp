@@ -2,7 +2,6 @@ package com.bonushub.crdb.view.base
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.NativeActivity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -23,8 +22,7 @@ import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
 import com.bonushub.crdb.model.local.DigiPosDataTable
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.pax.utils.EPrintCopyType
-import com.bonushub.pax.utils.VxEvent
+import com.bonushub.crdb.utils.EPrintCopyType
 
 abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 

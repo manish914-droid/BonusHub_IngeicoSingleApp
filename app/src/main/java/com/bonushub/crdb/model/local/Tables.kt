@@ -1,6 +1,5 @@
 package com.bonushub.crdb.model.local
 
-import androidx.annotation.NonNull
 import androidx.room.*
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
@@ -11,12 +10,8 @@ import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.EDigiPosPaymentStatus
-import com.bonushub.pax.utils.EDashboardItem
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
+import com.bonushub.crdb.utils.EDashboardItem
 import com.ingenico.hdfcpayment.model.ReceiptDetail
-import com.ingenico.hdfcpayment.type.CvmAction
-import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
 

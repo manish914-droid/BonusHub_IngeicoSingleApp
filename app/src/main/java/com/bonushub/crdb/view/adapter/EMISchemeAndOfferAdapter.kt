@@ -13,8 +13,7 @@ import com.bonushub.crdb.databinding.ItemEmiSchemeOfferBinding
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.utils.divideAmountBy100
 import com.bonushub.crdb.utils.makeTextViewResizable
-import com.bonushub.pax.utils.BhTransactionType
-import com.ingenico.hdfcpayment.type.TransactionType
+import com.bonushub.crdb.utils.BhTransactionType
 
 
 internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private val emiSchemeDataList: MutableList<BankEMITenureDataModal>?, private var schemeSelectCB: (Int) -> Unit) : RecyclerView.Adapter<EMISchemeAndOfferAdapter.EMISchemeOfferHolder>()

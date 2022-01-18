@@ -1,4 +1,4 @@
-package com.bonushub.pax.utils
+package com.bonushub.crdb.utils
 
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.R

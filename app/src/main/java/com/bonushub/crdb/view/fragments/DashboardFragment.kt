@@ -20,16 +20,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
+import com.bonushub.crdb.appupdate.SendAppUpdateConfirmationPacket
+import com.bonushub.crdb.appupdate.SyncAppUpdateConfirmation
 
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.db.AppDao
-import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
-import com.bonushub.crdb.model.local.PendingSyncTransactionTable
-import com.bonushub.crdb.repository.GenericResponse
-import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -48,7 +46,6 @@ import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
-import com.mindorks.example.coroutines.utils.Status
 
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,6 +61,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         var toRefresh = true
         val TAG = DashboardFragment::class.java.simpleName
     }
+    private var counter = 0
     @Inject
     lateinit var appDao: AppDao
     private val settlementViewModel : SettlementViewModel by viewModels()
@@ -152,9 +150,63 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     }.await()
 
                 }
+                sendConfirmationToHost()
             })
 
         }
+
+    }
+
+    /*Below method only executed when the app is updated to newer version and
+ previous store version in file < new app updated version:- */
+    private fun sendConfirmationToHost() {
+        try {
+            context?.let {
+                getRevisionIDFromFile(it) { isRevisionIDSame ->
+                    if (isRevisionIDSame) {
+                        sendConfirmation()
+                    }
+
+                }
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            CoroutineScope(Dispatchers.Main).launch {
+               // VFService.showToast(getString(R.string.confirmation_app_update_failed))
+            }
+
+        }
+    }
+
+    //Sync App Confirmation to Host:-
+    private fun sendConfirmation() {
+        val appUpdateConfirmationISOData = SendAppUpdateConfirmationPacket(appDao).createAppUpdateConfirmationPacket()
+        val isoByteArray = appUpdateConfirmationISOData.generateIsoByteRequest()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            activity?.let {
+                (it as? NavigationActivity)?.showProgress(getString(R.string.please_wait))
+            }
+        }
+        SyncAppUpdateConfirmation(isoByteArray) { syncStatus ->
+            GlobalScope.launch(Dispatchers.Main) {
+                activity?.let {
+                    (it as? NavigationActivity)?.hideProgress()
+                }
+                if (syncStatus) {
+                    AppPreference.saveBoolean("isUpdate", true)
+                    context?.let { it1 ->
+                        writeAppRevisionIDInFile(it1)
+                    }
+                } else {
+                    counter += 1
+                    if (counter < 2) {
+                        sendConfirmation()
+                    }
+                }
+            }
+        }
+
 
     }
 

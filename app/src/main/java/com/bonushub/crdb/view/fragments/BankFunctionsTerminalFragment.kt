@@ -30,7 +30,7 @@ import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
-import com.bonushub.pax.utils.PreferenceKeyConstant
+import com.bonushub.crdb.utils.PreferenceKeyConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope

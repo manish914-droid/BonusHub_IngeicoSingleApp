@@ -15,7 +15,7 @@ import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsCommParamAdapter
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
-import com.bonushub.pax.utils.CommunicationParamItem
+import com.bonushub.crdb.utils.CommunicationParamItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
 
     private val bankFunctionsViewModel: BankFunctionsViewModel by viewModels()
 
-    private lateinit var type :CommunicationParamItem
+    private lateinit var type : CommunicationParamItem
     lateinit var terminalParameterTable: TerminalParameterTable
 
     var binding: FragmentCommunicationOptionBinding? = null

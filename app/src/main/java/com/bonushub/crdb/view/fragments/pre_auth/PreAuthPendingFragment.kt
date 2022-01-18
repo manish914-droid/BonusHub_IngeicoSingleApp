@@ -8,12 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
-import com.bonushub.crdb.databinding.FragmentPreAuthBinding
 import com.bonushub.crdb.databinding.FragmentPreAuthPendingBinding
 import com.bonushub.crdb.databinding.ItemPreAuthPendingBinding
-import com.bonushub.crdb.databinding.ItemReportsBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.pax.utils.EDashboardItem
 
 
 class PreAuthPendingFragment : Fragment() {

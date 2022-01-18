@@ -30,7 +30,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
-import com.bonushub.pax.utils.PrefConstant
+import com.bonushub.crdb.utils.PrefConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

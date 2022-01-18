@@ -22,13 +22,13 @@ class AppUpdateDownloadManager(var context: Context,
 
     private val appName = "BonusHub.apk"
    // private var fileUri: Uri? = null
-   val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk_test/"
+   val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk/"
     private val downloadedFilePath = File(PATH, appName)
 
     override fun doInBackground(vararg params: String?): String {
         var input: InputStream? = null
         var output: OutputStream? = null
-        val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk_test/"
+        val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk/"
         val connection: HttpsURLConnection
         try {
             val url = URL(appHostDownloadURL)

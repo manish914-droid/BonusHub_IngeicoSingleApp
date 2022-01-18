@@ -19,12 +19,10 @@ import android.widget.Toast
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
-import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.di.scope.BHFieldParseIndex
-import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
@@ -32,12 +30,10 @@ import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
-import com.ingenico.hdfcpayment.model.ReceiptDetail
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject

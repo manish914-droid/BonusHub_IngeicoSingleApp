@@ -24,8 +24,6 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.DashboardFragment
 import com.bonushub.crdb.vxutils.BHTextView
 import com.bonushub.crdb.vxutils.Utility.*
-import com.bonushub.pax.utils.BhTransactionType
-import com.bonushub.pax.utils.TestEmiItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ingenico.hdfcpayment.listener.OnOperationListener
@@ -36,10 +34,7 @@ import com.ingenico.hdfcpayment.type.RequestStatus
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.pinpad.*
 import kotlinx.coroutines.*
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
+import java.io.*
 import java.lang.Runnable
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
@@ -848,6 +843,46 @@ fun writeAppRevisionIDInFile(context: Context) {
     } catch (e: IOException) {
       //  VFService.showToast("An error occurred.")
         e.printStackTrace()
+    }
+}
+
+//Below Method is used to get App Revision ID Saved in Terminal File:-
+fun getRevisionIDFromFile(context: Context, cb: (Boolean) -> Unit) {
+    try {
+        readAppRevisionIDFromFile(context) { fileStoredAppRevisionID ->
+            if (!TextUtils.isEmpty(fileStoredAppRevisionID)) {
+                if (fileStoredAppRevisionID < BuildConfig.REVISION_ID.toString()) {
+                    cb(true)
+                } else
+                    cb(false)
+            } else
+                cb(false)
+        }
+    } catch (ex: Exception) {
+        ex.printStackTrace()
+        cb(false)
+    }
+}
+
+//Below method is used to read App Revision ID from saved File in Terminal:-
+fun readAppRevisionIDFromFile(context: Context, cb: (String) -> Unit) {
+    var revisionID: String? = null
+    try {
+        val file = File(context.externalCacheDir, "version.txt")
+        val text: StringBuilder? = null
+        val br = BufferedReader(FileReader(file))
+        var line: String?
+        while (br.readLine().also { line = it } != null) {
+            text?.append(line)
+            text?.append('\n')
+            revisionID = line.toString()
+        }
+        Log.d("DataList:- ", revisionID.toString())
+        br.close().toString()
+        cb(revisionID ?: "")
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        cb(revisionID ?: "")
     }
 }
 

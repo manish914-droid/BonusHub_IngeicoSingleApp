@@ -7,7 +7,6 @@ import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
-import com.bonushub.pax.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.util.HashMap

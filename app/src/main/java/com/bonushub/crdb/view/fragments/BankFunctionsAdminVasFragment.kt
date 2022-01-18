@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
@@ -29,8 +28,8 @@ import com.bonushub.crdb.view.fragments.tets_emi.TestEmiFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
-import com.bonushub.pax.utils.BankFunctionsAdminVasItem
-import com.bonushub.pax.utils.PreferenceKeyConstant
+import com.bonushub.crdb.utils.BankFunctionsAdminVasItem
+import com.bonushub.crdb.utils.PreferenceKeyConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -313,5 +312,5 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
 interface IBankFunctionsAdminVasItemClick{
 
-    fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem:BankFunctionsAdminVasItem)
+    fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem)
 }

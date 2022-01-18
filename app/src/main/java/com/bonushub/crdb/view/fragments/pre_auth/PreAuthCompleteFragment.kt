@@ -7,12 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPreAuthCompleteBinding
-import com.bonushub.crdb.databinding.FragmentPreAuthCompleteDetailBinding
-import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.view.fragments.AuthCompletionData
-import com.bonushub.pax.utils.EDashboardItem
 
 
 class PreAuthCompleteFragment : Fragment() {

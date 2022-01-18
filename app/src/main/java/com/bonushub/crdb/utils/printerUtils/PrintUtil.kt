@@ -10,7 +10,6 @@ import android.os.RemoteException
 import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.BuildConfig
-import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.model.remote.BankEMITenureDataModal
@@ -25,13 +24,12 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.panMasking
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
 import com.bonushub.crdb.view.base.BaseActivityNew
 
-import com.bonushub.pax.utils.EPrintCopyType
-import com.bonushub.pax.utils.BhTransactionType
-import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.SplitterTypes
+import com.bonushub.crdb.utils.EPrintCopyType
+import com.bonushub.crdb.utils.BhTransactionType
+import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.SplitterTypes
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.model.ReceiptDetail
-import com.ingenico.hdfcpayment.type.TransactionType
 import com.usdk.apiservice.aidl.printer.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

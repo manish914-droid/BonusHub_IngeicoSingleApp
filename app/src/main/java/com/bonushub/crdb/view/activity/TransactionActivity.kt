@@ -261,8 +261,8 @@ class TransactionActivity : BaseActivityNew() {
         super.onActivityResult(requestCode, resultCode, data)
         // conversion of sale to Bank emi
         var reqCode=requestCode
-        if(requestCode==BhTransactionType.SALE.type ){
-            reqCode=BhTransactionType.EMI_SALE.type
+        if(requestCode== BhTransactionType.SALE.type ){
+            reqCode= BhTransactionType.EMI_SALE.type
             globalCardProcessedModel.setTransType(BhTransactionType.EMI_SALE.type)
         }
         if (reqCode == BhTransactionType.BRAND_EMI.type || reqCode == BhTransactionType.EMI_SALE.type || reqCode == BhTransactionType.TEST_EMI.type ) {
@@ -492,7 +492,7 @@ class TransactionActivity : BaseActivityNew() {
     private suspend fun setupFlow() {
 
         when (transactionTypeEDashboardItem) {
-            EDashboardItem.BRAND_EMI ,EDashboardItem.BANK_EMI ,EDashboardItem.TEST_EMI-> {
+            EDashboardItem.BRAND_EMI , EDashboardItem.BANK_EMI , EDashboardItem.TEST_EMI-> {
                 searchCardViewModel.fetchCardTypeData(
                     globalCardProcessedModel,
                     CardOption.create().apply {
@@ -586,7 +586,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.CASH_AT_POS.type
+                                                    BhTransactionType.CASH_AT_POS.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
 
@@ -739,7 +739,7 @@ class TransactionActivity : BaseActivityNew() {
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.SALE_WITH_CASH.type
+                                                    BhTransactionType.SALE_WITH_CASH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 printingSaleData(batchData){
@@ -868,7 +868,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.REFUND.type
+                                                    BhTransactionType.REFUND.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 printingSaleData(batchData){
@@ -1006,7 +1006,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
                                                 batchData.transactionType =
-                                                    com.bonushub.pax.utils.BhTransactionType.PRE_AUTH.type
+                                                    BhTransactionType.PRE_AUTH.type
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 printingSaleData(batchData){

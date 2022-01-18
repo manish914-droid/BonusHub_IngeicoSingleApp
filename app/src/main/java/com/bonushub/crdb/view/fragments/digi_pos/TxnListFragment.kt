@@ -17,7 +17,7 @@ import com.bonushub.crdb.databinding.FragmentTxnListBinding
 import com.bonushub.crdb.databinding.ItemPendingTxnBinding
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.logger
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
     private var sheetBehavior: BottomSheetBehavior<ConstraintLayout>? = null
 
     var binding:FragmentTxnListBinding? = null
-    lateinit var transactionType:EDashboardItem
+    lateinit var transactionType: EDashboardItem
 
     lateinit var iTxnListItemClick:ITxnListItemClick
 

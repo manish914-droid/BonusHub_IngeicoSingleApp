@@ -10,9 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.bonushub.crdb.R
 import com.bonushub.crdb.view.activity.IFragmentRequest
-import com.bonushub.crdb.view.fragments.DashboardFragment
 
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import java.util.ArrayList
 
 class DashBoardAdapter(private val fragReq: IFragmentRequest?, var lessMoreClick: (item: EDashboardItem) -> Unit

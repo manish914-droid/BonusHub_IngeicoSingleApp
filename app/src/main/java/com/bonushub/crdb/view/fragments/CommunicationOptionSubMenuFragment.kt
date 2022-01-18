@@ -27,8 +27,8 @@ import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
-import com.bonushub.pax.utils.CommunicationParamItem
-import com.bonushub.pax.utils.PreferenceKeyConstant
+import com.bonushub.crdb.utils.CommunicationParamItem
+import com.bonushub.crdb.utils.PreferenceKeyConstant
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +43,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
     private val batchFileViewModel: BatchFileViewModel by viewModels()
     private var iBankFunctionsTableEditItemClick:IBankFunctionsTableEditItemClick? = null
-    private lateinit var type :CommunicationParamItem
+    private lateinit var type : CommunicationParamItem
     lateinit var dataList: ArrayList<TableEditHelper?>
     lateinit var mAdapter : BankFunctionsTableEditAdapter
 

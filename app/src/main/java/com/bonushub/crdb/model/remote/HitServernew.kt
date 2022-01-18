@@ -3,21 +3,16 @@
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
-import com.bonushub.crdb.R
-import com.bonushub.crdb.model.local.DigiPosDataTable
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
-import com.bonushub.crdb.serverApi.HitServer.openSocket
 import com.bonushub.crdb.serverApi.ProgressCallback
 import com.bonushub.crdb.serverApi.ServerMessageCallback
 import com.bonushub.crdb.serverApi.ServerMessageCallbackSale
 import com.bonushub.crdb.utils.*
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.pax.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getF48TimeStamp
 import java.io.DataInputStream
 import java.io.FileOutputStream
 import java.net.Socket
-import java.net.SocketTimeoutException
 import java.nio.channels.ServerSocketChannel
 
 /*val LYRA_IP_ADDRESS = "192.168.250.10"
@@ -34,7 +29,7 @@ object HitServernew  {
 
 
     @Synchronized
-    suspend fun hitServer(data: IWriter,needReversalSaved:Boolean=false):RespMessageStatusData{
+    suspend fun hitServer(data: IWriter, needReversalSaved:Boolean=false):RespMessageStatusData{
         try {
             if (Utility().checkInternetConnection()) {
                 with(Utility.ConnectionTimeStamps) {

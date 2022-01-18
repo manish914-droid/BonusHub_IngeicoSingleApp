@@ -36,7 +36,8 @@
 
     <string name="help_desk_number_hint">Help Desk No: 0120252525</string>
     <string name="settlement">Settlement</string>
-    <string name="versionHint">App Version: 02.01.02</string>
+    <string name="versionHint">App Version: 02.01.01</string>
+    <string name="please_wait_aaplication_is_configuring_updates">Please Wait Application is Configuring Updates....</string>
 
     <!--TODO: sub header-->
     <string name="back">Back</string>

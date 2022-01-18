@@ -18,7 +18,7 @@ import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.updateBaseTid
 import com.bonushub.crdb.view.fragments.TableEditHelper
 import com.bonushub.crdb.view.fragments.TidsListModel
-import com.bonushub.pax.utils.PrefConstant
+import com.bonushub.crdb.utils.PrefConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext

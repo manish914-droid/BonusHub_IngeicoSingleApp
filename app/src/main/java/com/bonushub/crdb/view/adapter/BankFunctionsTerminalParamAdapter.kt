@@ -1,17 +1,11 @@
 package com.bonushub.crdb.view.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ItemBankFunctionsTerminalParamBinding
 import com.bonushub.crdb.view.fragments.IBankFunctionsTerminalItemClick
 import com.bonushub.crdb.view.fragments.TableEditHelper
-import com.bonushub.pax.utils.BankFunctionsTerminalItem
 
 class BankFunctionsTerminalParamAdapter(private var dataList:ArrayList<TableEditHelper?>, private var iBankFunctionsTerminalItemClick: IBankFunctionsTerminalItemClick?) : RecyclerView.Adapter<BankFunctionsTerminalParamAdapter.BankFunctionsTerminalParamViewHolder>() {
 

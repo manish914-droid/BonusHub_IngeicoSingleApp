@@ -16,7 +16,7 @@ import com.bonushub.crdb.utils.BitmapUtils.convertCompressedByteArrayToBitmap
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.view.base.BaseActivityNew
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 class QrFragment : Fragment() {
 
     var binding:FragmentQrBinding? = null
-    lateinit var transactionType:EDashboardItem
+    lateinit var transactionType: EDashboardItem
     private lateinit var QrBytes: ByteArray
     private lateinit var digiPosTabledata: DigiPosDataTable
 

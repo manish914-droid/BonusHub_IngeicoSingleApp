@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,7 +19,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
@@ -41,7 +39,6 @@ import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.repository.keyexchangeDataSource
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
@@ -50,14 +47,10 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.performOperation
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
-import com.bonushub.crdb.view.base.BaseActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
-import com.bonushub.crdb.view.fragments.digi_pos.DigiPosMenuFragment
-import com.bonushub.crdb.view.fragments.pre_auth.PreAuthCompleteFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthPendingFragment
-import com.bonushub.crdb.view.fragments.pre_auth.PreAuthVoidFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
@@ -65,7 +58,6 @@ import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
-import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TransactionDataResponse
@@ -75,6 +67,7 @@ import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.aidl.tms.OnResultListener
 import com.usdk.apiservice.aidl.tms.TMSData
+import com.usdk.apiservice.aidl.tms.UTMS
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_navigation.*
@@ -87,6 +80,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
+
+    private var tms: UTMS? = null
     @Inject
     lateinit var appDao: AppDao
     private var navigationBinding: ActivityNavigationBinding?=null
@@ -700,7 +695,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
     }
 
-    fun startTransactionActivityForEmi(eDashBoardItem: EDashboardItem,amt:String, mobileNum:String="", billNum:String="", imeiOrSerialNum:String="", brandEmiSubCatData: BrandEMISubCategoryTable?=null,brandEmiCat: BrandEMISubCategoryTable?=null,
+    fun startTransactionActivityForEmi(eDashBoardItem: EDashboardItem, amt:String, mobileNum:String="", billNum:String="", imeiOrSerialNum:String="", brandEmiSubCatData: BrandEMISubCategoryTable?=null, brandEmiCat: BrandEMISubCategoryTable?=null,
                                        brandEmiProductData: BrandEMIProductDataModal?=null,
                                        brandDataMaster: BrandEMIMasterDataModal?=null, testEmiTxnType: String=""){
         val intent = Intent (this, TransactionActivity::class.java)
@@ -713,15 +708,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
         intent.putExtra("edashboardItem", eDashBoardItem)
-       var txnType=BhTransactionType.NONE.type
-        if(eDashBoardItem==EDashboardItem.BRAND_EMI){
+       var txnType= BhTransactionType.NONE.type
+        if(eDashBoardItem== EDashboardItem.BRAND_EMI){
             txnType=   BhTransactionType.BRAND_EMI.type
         }
-        if(eDashBoardItem==EDashboardItem.BANK_EMI){
+        if(eDashBoardItem== EDashboardItem.BANK_EMI){
             txnType=   BhTransactionType.EMI_SALE.type
         }
         // test emi
-        if(eDashBoardItem==EDashboardItem.TEST_EMI){
+        if(eDashBoardItem== EDashboardItem.TEST_EMI){
             txnType=   BhTransactionType.TEST_EMI.type
         }
         intent.putExtra("TestEmiOption", testEmiTxnType)
@@ -1432,76 +1427,54 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //region=========================Auto Install Apk Execution Code:-
     fun autoInstallApk(filePath: String?, apkInstallCB: (Boolean, String, Int) -> Unit) {
         val pInfo = this@NavigationActivity?.packageManager?.getPackageInfo(this@NavigationActivity.packageName, 0)
-        //  showProgress(getString(R.string.please_wait_aaplication_is_configuring_updates))
-
-        val param = Bundle()
-        param.putString(TMSData.FILE_PATH, filePath)
-
-        DeviceHelper.getTMS()?.install(param,object : OnResultListener.Stub() {
-            override fun onSuccess() {
-                GlobalScope.launch(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@NavigationActivity,
-                        "Automatic App update Success",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-
-            override fun onError(errorList: MutableList<Bundle>?) {
-
-                if (errorList != null) {
-                    for (item in errorList) {
-                        println("Automatic installing -> "+item.getString(TMSData.ERROR_MESSAGE))
-                    }
-                }
-
-                GlobalScope.launch(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@NavigationActivity,
-                        "Automatic App update fail",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        })
-
-
-
-    /* if (systemManager != null && !TextUtils.isEmpty(filePath)) {
+        tms = DeviceHelper.getTMS()
+         showProgress(getString(R.string.please_wait_aaplication_is_configuring_updates))
+        if (tms != null && !TextUtils.isEmpty(filePath)) {
             try {
-                systemManager?.installApp(
-                    filePath, object : IAppInstallObserver.Stub() {
-                        @Throws(RemoteException::class)
-                        override fun onInstallFinished(packageName: String, returnCode: Int) {
-                            Log.d(TAG, "$packageName : $returnCode")
-                            runOnUiThread {
-                                Log.d(TAG, "$packageName : $returnCode")
-                                Toast.makeText(this@MainActivity, "$packageName : $returnCode", Toast.LENGTH_LONG).show()
-                            }
-                            //   hideProgress()
-                            apkInstallCB(true, packageName, returnCode)
-                        }
-                    },
-                    "com.example.verifonevx990app"
-                )
-            } catch (e: RemoteException) {
-                e.printStackTrace()
-                //   hideProgress()
-                apkInstallCB(true, "", 500)
-            } catch (ex: java.lang.Exception) {
-                Log.d(TAG, ex.printStackTrace().toString())
-                //   hideProgress()
-                apkInstallCB(true, "", 500)
+                val param = Bundle()
+                param.putString(TMSData.FILE_PATH, filePath)
+                tms?.install(param,listener)
             }
-        } else {
+            catch (ex: Exception){
+                ex.printStackTrace()
+                hideProgress()
+            }
+        }
+       else{
             hideProgress()
             runOnUiThread {
-                VFService.showToast("Something went wrong!!!")
+              CoroutineScope(Dispatchers.Main).launch {
+                  Toast.makeText(this@NavigationActivity,"Something went wrong!!!",Toast.LENGTH_SHORT).show()
+
+              }
             }
-        }*/
+        }
+
     }
 //endregion
+    private val listener: OnResultListener = object : OnResultListener.Stub() {
+        @Throws(RemoteException::class)
+        override fun onSuccess() {
+            hideProgress()
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(this@NavigationActivity,"Application updated successfully",Toast.LENGTH_SHORT).show()
+            }
+            println("Application installed succeesfully")
+            println("=> onSuccess")
+        }
+
+        @Throws(RemoteException::class)
+        override fun onError(errorList: List<Bundle>) {
+            hideProgress()
+            println("=> onError")
+            for (item in errorList) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(this@NavigationActivity,item.getString(TMSData.ERROR_MESSAGE),Toast.LENGTH_SHORT).show()
+                }
+                println(item.getString(TMSData.ERROR_MESSAGE))
+            }
+        }
+    }
 
 
     //Auto Settle Batch:- kushal

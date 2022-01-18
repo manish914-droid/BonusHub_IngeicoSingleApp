@@ -29,10 +29,10 @@ object HitServer  {
     private var callback: ServerMessageCallback? = null
     private var callbackInit: ServerMessageCallbackInit? = null
     private var callbackSale: ServerMessageCallbackSale? = null
-    var reversalToBeSaved:IsoDataWriter?=null
+    var reversalToBeSaved: IsoDataWriter?=null
 
     @Synchronized
-    suspend fun hitServer(data: ByteArray, callback: ServerMessageCallback, progressMsg: ProgressCallback){
+    suspend fun hitServer(data: ByteArray, callback: ServerMessageCallback, progressMsg: ProgressCallback,isAppUpdate: Boolean = false){
         this@HitServer.callback = callback
         try {
             if (Utility().checkInternetConnection()) {

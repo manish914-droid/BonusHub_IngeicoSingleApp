@@ -5,14 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPreAuthBinding
 import com.bonushub.crdb.databinding.ItemReportsBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 
 
 class PreAuthFragment : Fragment() {
@@ -66,7 +65,7 @@ class PreAuthFragment : Fragment() {
     }
 }
 
-class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>,var cb: (EDashboardItem) -> Unit) : RecyclerView.Adapter<PreAuthOptionAdapter.PreAuthCategoryViewHolder>() {
+class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>, var cb: (EDashboardItem) -> Unit) : RecyclerView.Adapter<PreAuthOptionAdapter.PreAuthCategoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreAuthCategoryViewHolder {
 

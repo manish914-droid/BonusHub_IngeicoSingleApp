@@ -12,11 +12,10 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentTestEmiBinding
 import com.bonushub.crdb.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.utils.Field48ResponseTimestamp
-import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.NewInputAmountFragment
-import com.bonushub.pax.utils.EDashboardItem
-import com.bonushub.pax.utils.TestEmiItem
+import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.TestEmiItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -160,7 +159,7 @@ var testEmiOption="0"
 
 interface ITestEmiItemClick{
 
-    fun testEmiItemClick(testEmiItem:TestEmiItem)
+    fun testEmiItemClick(testEmiItem: TestEmiItem)
 }
 
 // adapter

@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPendingTxnBinding
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 
 
 class SearchTxnFragment : Fragment() {
 
-    lateinit var transactionType:EDashboardItem
+    lateinit var transactionType: EDashboardItem
     var binding:FragmentPendingTxnBinding? = null
 
     override fun onCreateView(

@@ -21,7 +21,7 @@ import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.model.remote.BrandEmiBillSerialMobileValidationModel
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -95,7 +95,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
         binding?.serialNumEt?.setMaxLength(brandEmiProductData?.maxLength?.toInt() ?: 20)
         binding?.billNumEt?.setMaxLength( 16)
 
-        if (brandValidation.isBillNumReq || brandValidation.isBillNumMandatory || eDashBoardItem==EDashboardItem.BANK_EMI) {
+        if (brandValidation.isBillNumReq || brandValidation.isBillNumMandatory || eDashBoardItem== EDashboardItem.BANK_EMI) {
             binding?.billnoCrdView?.visibility = View.VISIBLE
         } else {
             binding?.billnoCrdView?.visibility = View.GONE

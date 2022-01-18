@@ -12,12 +12,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentReportsBinding
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.BatchFileDataTable
 import com.bonushub.crdb.model.local.BatchTable
-import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.utils.invoiceWithPadding
-import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.ReportsAdapter
@@ -25,15 +22,10 @@ import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
-import com.bonushub.pax.utils.*
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.ingenico.hdfcpayment.model.ReceiptDetail
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class ReportsFragment : Fragment(), IReportsFragmentItemClick {
@@ -118,7 +110,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     when (batchData.receiptData?.txnName) {
                         EDashboardItem.SALE.title.uppercase(), EDashboardItem.CASH_ADVANCE.title.uppercase(),
                         EDashboardItem.SALE_WITH_CASH.title.uppercase(), EDashboardItem.REFUND.title.uppercase(),
-                        EDashboardItem.PREAUTH.title.uppercase(),EDashboardItem.PREAUTH_COMPLETE.title.uppercase(),
+                        EDashboardItem.PREAUTH.title.uppercase(), EDashboardItem.PREAUTH_COMPLETE.title.uppercase(),
                         EDashboardItem.VOID_SALE.title.uppercase(),
                         EDashboardItem.BANK_EMI.title.uppercase(),
                         EDashboardItem.BRAND_EMI.title.uppercase(),

@@ -16,13 +16,11 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentEmiCatalogueBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.TerminalParameterTable
-import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.view.activity.IFragmentRequest
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
-import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.EmiCatalogueViewModel
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

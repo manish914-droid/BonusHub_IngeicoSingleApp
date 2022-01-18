@@ -3,20 +3,11 @@ package com.bonushub.crdb.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.scope.BHDashboardItem
-import com.bonushub.crdb.model.local.TerminalParameterTable
-import com.bonushub.crdb.utils.isExpanded
 import com.bonushub.crdb.view.fragments.DashboardFragment
-import com.bonushub.crdb.view.fragments.TableEditHelper
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 
 class DashboardRepository {
 

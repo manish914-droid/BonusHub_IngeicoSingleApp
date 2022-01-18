@@ -1,10 +1,9 @@
 @file:JvmName("Iso")
 
-package com.bonushub.pax.utils
+package com.bonushub.crdb.utils
 
 
 
-import com.bonushub.crdb.utils.*
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,7 +28,8 @@ enum class ISO_FIELD_TYPE { BCD, LLVR , BYTE}
  * @param fieldType similar use of isFixedLen
  * */
 abstract class AbstractIsoField(val fieldNo: Byte, val fieldName: String = "",
-                                val isFixedLen: Boolean = false, val fieldType: ISO_FIELD_TYPE = ISO_FIELD_TYPE.BCD)
+                                val isFixedLen: Boolean = false, val fieldType: ISO_FIELD_TYPE = ISO_FIELD_TYPE.BCD
+)
 
 
 /**
@@ -41,7 +41,8 @@ abstract class AbstractIsoField(val fieldNo: Byte, val fieldName: String = "",
  *
  * */
 class IsoField private constructor(fieldNo: Byte, fieldName: String = "",
-                                   isFixedLen: Boolean = false, fieldType: ISO_FIELD_TYPE = ISO_FIELD_TYPE.BCD)
+                                   isFixedLen: Boolean = false, fieldType: ISO_FIELD_TYPE = ISO_FIELD_TYPE.BCD
+)
     : AbstractIsoField(fieldNo, fieldName, isFixedLen, fieldType) {
     var len: Int = 0
     var rawData: String = ""

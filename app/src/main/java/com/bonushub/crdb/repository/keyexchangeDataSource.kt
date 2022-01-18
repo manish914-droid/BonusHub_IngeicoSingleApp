@@ -2,23 +2,18 @@ package com.bonushub.crdb.repository
 
 
 
-import android.graphics.Bitmap
 import android.os.RemoteException
 import android.text.TextUtils
-import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
-import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
-import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.vxutils.Utility.*
 
 import com.bonushub.pax.utils.*
-import com.google.gson.Gson
 import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.data.IntValue

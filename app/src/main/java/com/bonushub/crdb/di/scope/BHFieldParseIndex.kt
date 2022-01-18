@@ -1,6 +1,6 @@
 package com.bonushub.crdb.di.scope
 
-import com.bonushub.pax.utils.EDashboardItem
+import com.bonushub.crdb.utils.EDashboardItem
 
 @MustBeDocumented
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)

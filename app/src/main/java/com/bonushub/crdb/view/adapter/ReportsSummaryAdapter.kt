@@ -4,19 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.databinding.ItemReportsBinding
 import com.bonushub.crdb.databinding.ItemSummaryReport1Binding
 import com.bonushub.crdb.databinding.ItemSummaryReportBinding
-import com.bonushub.crdb.view.fragments.IReportsFragmentItemClick
 import com.bonushub.crdb.view.fragments.SummaryReportModel
 import com.bonushub.crdb.view.fragments.SummaryReportSubModel
-import com.bonushub.pax.utils.ReportsItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ReportsSummaryAdapter(var context:Context,var dataList:ArrayList<SummaryReportModel>) : RecyclerView.Adapter<ReportsSummaryAdapter.ReportsViewHolder>() {
 

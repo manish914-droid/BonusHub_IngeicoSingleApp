@@ -2,7 +2,6 @@ package com.bonushub.crdb.repository
 
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.db.AppDatabase
@@ -10,15 +9,12 @@ import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.serverApi.EMIRequestType
-import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.IssuerBankModal
 import com.bonushub.crdb.view.fragments.TenureBankModal
-import com.bonushub.pax.utils.IsoDataReader
-import com.bonushub.pax.utils.IsoDataWriter
-import com.bonushub.pax.utils.SplitterTypes
+import com.bonushub.crdb.utils.SplitterTypes
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 
