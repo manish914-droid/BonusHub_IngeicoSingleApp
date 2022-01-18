@@ -390,6 +390,7 @@ enum class CrossSellRequestType(val requestTypeCode: Int,val requestName:String=
 }
 
 
+
 enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, var childList:MutableList<EDashboardItem>?=null,) {
     NONE("No Option Found", R.drawable.ic_sale),
     SALE("Sale", R.drawable.ic_sale, 1),
@@ -399,6 +400,8 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     EMI_PRO("Brand EMI By Code", R.drawable.ic_brand_emi_code, 5),
     EMI_ENQUIRY("EMI Catalogue", R.drawable.ic_emicatalogue, 6),
     PREAUTH("Pre-Auth", R.drawable.ic_preauth, 7),
+
+
 
    PREAUTH_COMPLETE("Pre-Auth Complete", R.drawable.ic_preauth, 5),
     PREAUTH_VIEW("Pre-Auth View", R.drawable.ic_preauth, 65),
@@ -427,7 +430,6 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     LESS("View Less", R.drawable.ic_digi_pos, 888),
 
     TEST_EMI("Test Emi TXN", R.drawable.ic_digi_pos, 777),
-    // just for handling the test emi not used in dashboard items
 
     UPI("UPI COLLECT", R.drawable.ic_upi, 901),
     DYNAMIC_QR("DYNAMIC QR", R.drawable.ic_qr_code, 906),
@@ -435,6 +437,9 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     SMS_PAY("SMS PAY", R.drawable.ic_sms_pay, 902),
     PENDING_TXN("PENDING TXN", R.drawable.ic_pending_txn, 903),
     TXN_LIST("TXN LIST", R.drawable.ic_txn_list, 903),
+    // just for handling the test emi not used in dashboard items
+
+
 
  /*
     FLEXI_PAY("Flexi Pay", R.drawable.ic_cash_advance, 666),
@@ -521,6 +526,7 @@ enum class PrefConstant(val keyName: Any) {
     FTP_FILE_NAME("ftp_file_name"),
     FTP_FILE_SIZE("ftp_file_size"),
     BLOCK_MENU_OPTIONS("block_menu_options"),
+    BLOCK_MENU_OPTIONS_INGENICO("block_menu_options_ingenico"),
     INSERT_PPK_DPK("insert_ppk_dpk"),
     INIT_AFTER_SETTLEMENT("init_after_settlement"),
     VOID_ROC_INCREMENT("void_roc_increment"),

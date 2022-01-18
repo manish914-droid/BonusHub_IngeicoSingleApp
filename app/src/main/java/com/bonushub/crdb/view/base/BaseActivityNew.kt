@@ -20,7 +20,10 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.DialogMsgWithIconBinding
 import com.bonushub.crdb.databinding.ItemOkBtnDialogBinding
 import com.bonushub.crdb.databinding.NewPrintCustomerCopyBinding
+import com.bonushub.crdb.model.local.DigiPosDataTable
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
+import com.bonushub.pax.utils.EPrintCopyType
 import com.bonushub.pax.utils.VxEvent
 
 abstract class BaseActivityNew : AppCompatActivity(), IDialog {
@@ -397,6 +400,8 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
     }
 
+
+
     open fun transactFragment(fragment: Fragment, isBackStackAdded: Boolean = true): Boolean {
         val trans = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment, fragment, fragment::class.java.simpleName)
@@ -405,6 +410,35 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         if (isBackStackAdded) trans.addToBackStack(null)
         return trans.commitAllowingStateLoss() >= 0
     }
+
+    fun showMerchantAlertBoxSMSUpiPay(
+        printerUtil: PrintUtil,
+        digiposData: DigiPosDataTable,
+        dialogCB: (Boolean) -> Unit
+    ) {
+        alertBoxWithAction(
+            getString(R.string.print_customer_copy),
+            getString(R.string.print_customer_copy),
+            true, getString(R.string.positive_button_yes), { status ->
+                if (status) {
+                    printerUtil.printSMSUPIChagreSlip(
+                        digiposData,
+                        EPrintCopyType.CUSTOMER,
+                        this
+                    ) { customerCopyPrintSuccess, printingFail ->
+                        if (!customerCopyPrintSuccess) {
+                            //  VFService.showToast(getString(R.string.customer_copy_print_success))
+                            dialogCB(false)
+                        }
+                    }
+
+                }
+            }, {
+                dialogCB(false)
+            })
+    }
+
+
     override fun onDestroy() {
         hideProgress()
         super.onDestroy()

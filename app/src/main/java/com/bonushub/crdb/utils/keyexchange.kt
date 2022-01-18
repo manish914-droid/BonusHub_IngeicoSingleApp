@@ -90,7 +90,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                     addField(3, processingCode)
 
                     //STAN(ROC) Field 11
-                    addField(11, terminalData.roc)
+                    addField(11, "000236")
 
                     //NII Field 24
                     addField(24, Nii.BRAND_EMI_MASTER.nii)
@@ -110,7 +110,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                     val pcNumber2 =
                         addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
                     val f61 = ConnectionType.GPRS.code + addPad(
-                        AppPreference.getString("deviceModel"),
+                        deviceModel(),
                         " ",
                         6,
                         false

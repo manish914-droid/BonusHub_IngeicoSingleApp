@@ -20,6 +20,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
@@ -59,6 +60,7 @@ import com.bonushub.crdb.view.fragments.pre_auth.PreAuthPendingFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthVoidFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
+import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
@@ -101,12 +103,17 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private var mid: String? = null
     private var pinpad: UPinpad? = null
     private var pinpadLimited: PinpadLimited? = null
+    private val settlementViewModel : SettlementViewModel by viewModels()
+
+
     private val dialog by lazy {   Dialog(this) }
     companion object {
         val TAG = NavigationActivity::class.java.simpleName
         const val INPUT_SUB_HEADING = "input_amount"
 
     }
+    private var ioSope = CoroutineScope(Dispatchers.IO)
+
     @Inject
     lateinit var appDatabase: AppDatabase
 
@@ -874,11 +881,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
     // endregion
 //Below Method is to Handle the Input Fragment Inflate with the Sub Heading it belongs to:-
-    fun inflateInputFragment(
-        fragment: Fragment,
-        subHeading: String,
-        action: EDashboardItem, testEmiOption: String = "0"
-    ) {
+    fun inflateInputFragment(fragment: Fragment, subHeading: String, action: EDashboardItem, testEmiOption: String = "0") {
+
         System.out.println("Insert Block option "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
         System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
         System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
@@ -1032,6 +1036,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             }
                             // end region
                             hideProgress()
+                            Field48ResponseTimestamp.showToast("Navigation")
                             CoroutineScope(Dispatchers.Main).launch {
                                 alertBoxMsgWithIconOnly(R.drawable.ic_tick,
                                     this@NavigationActivity.getString(R.string.successfull_init))
@@ -1251,15 +1256,44 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 //                                        )
                                         delay(2000)
                                         if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
-                                            val dataList =
-                                                isAppUpdateAvailableData?.split("|") as MutableList<String>
+                                            val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
+                                            if (dataList.size > 1) {
+                                                onBackPressed()
+                                                writeAppRevisionIDInFile(this@NavigationActivity)
+                                                when (dataList[0]) {
+                                                    AppUpdate.MANDATORY_APP_UPDATE.updateCode -> {
+                                                        if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
+                                                           // startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                        else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
+                                                            startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
+                                                    }
+                                                    AppUpdate.OPTIONAL_APP_UPDATE.updateCode -> {
+                                                        alertBoxWithAction(getString(R.string.app_update), getString(R.string.app_update_available_do_you_want_to_update), true, getString(R.string.yes), {
+                                                            if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
+                                                              //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                            else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
+                                                                startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8])  //------------>HTTPS App Update not in use currently
+                                                        },
+                                                            {})
+                                                    }
+                                                    else -> {
+                                                        onBackPressed()
+                                                    }
+                                                }
+                                            } else {
+                                               // VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
+                                                onBackPressed()
+                                            }
 
                                         } else {
                                             onBackPressed()
                                             when (isAppUpdateAvailableData) {
                                                 "00" -> {
                                                     if (terminalParameterTable != null) {
-
+                                                        val tid = getBaseTID(appDao)
+                                                        showProgress()
+                                                        initViewModel.insertInfo1(tid)
+                                                        observeMainViewModel()
                                                     }
                                                 }
 
@@ -1476,6 +1510,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         val settlementBatchData = runBlocking(Dispatchers.IO) {
             appDao.getAllBatchData()
         }
+
+        val dataListReversal = runBlocking(Dispatchers.IO) {
+            appDao.getAllBatchReversalData()
+        }
+
+
         val processingCode: String = if (appUpdateFromSale) {
             ProcessingCode.SETTLEMENT.code
         } else {
@@ -1484,15 +1524,63 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
         GlobalScope.launch(Dispatchers.IO) {
                 hideProgress()
-                PrintUtil(this@NavigationActivity).printDetailReportupdate(
-                    settlementBatchData,
-                    this@NavigationActivity
-                ) { detailPrintStatus ->
+            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())){
+                PrintUtil(this@NavigationActivity).printDetailReportupdate(settlementBatchData, this@NavigationActivity) {
+                        detailPrintStatus -> }
+
+                ioSope.launch {
+
+                    var reversalTid  = checkReversal(dataListReversal)
+                    var listofTxnTid =  checkSettlementTid(settlementBatchData)
+
+                    val result: ArrayList<String> = ArrayList()
+                    result.addAll(listofTxnTid)
+
+                    for (e in reversalTid) {
+                        if (!result.contains(e)) result.add(e)
+                    }
+                    System.out.println("Total transaction tid is"+result.forEach {
+                        println("Tid are "+it)
+                    })
+                    settlementViewModel.settlementResponse(result)
+                }
+
+                settlementViewModel.ingenciosettlement.observe(this@NavigationActivity) { result ->
+                    when (result.status) {
+                        Status.SUCCESS -> {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+
+                                val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                var settlementByteArray = data.generateIsoByteRequest()
+                                try {
+                                    settleBatch1(settlementByteArray) {}
+                                } catch (ex: Exception) {
+                                    hideProgress()
+                                    ex.printStackTrace()
+                                }
+                            }
+                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                        }
+                        Status.ERROR -> {
+                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
+                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                        }
+                        Status.LOADING -> {
+                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                        }
+                    }
+                }
+
+            }
+            else {
+                PrintUtil(this@NavigationActivity).printDetailReportupdate(settlementBatchData, this@NavigationActivity) { detailPrintStatus ->
                     if (detailPrintStatus) {
-                        /*val settlementPacket = CreateSettlementPacket(
-                            processingCode,
-                            settlementBatchData
-                        ).createSettlementISOPacket()*/
+
                         // this code below converted
                         val settlementPacket = CreateSettlementPacket(appDao).createSettlementISOPacket()
 
@@ -1507,6 +1595,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             {}, {})
                 }
 
+            }
+
+
         }
 
 
@@ -1520,8 +1611,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             DeviceHelper.getTransactionByUId(uid,object: OnOperationListener.Stub(){
 
                 override fun onCompleted(p0: OperationResult?) {
-
-
                     p0?.value?.apply {
                         println("Status = $status")
                         println("Response code = $responseCode")
