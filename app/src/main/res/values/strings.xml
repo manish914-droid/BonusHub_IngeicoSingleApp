@@ -175,7 +175,7 @@
     <string name="total_emi_pay">Total EMI Pay</string>
     <string name="please_select_scheme">Please Select Scheme</string>
     <string name="loan_amount">Loan Amount</string>
-    <string name="roi_pa">R.o.i</string>
+    <string name="roi_pa">ROI (p.a.)</string>
     <!--Base Activity-->
     <string name="app_name_2">BonusHub</string>
     <string name="settle_batch">Settle Batch</string>

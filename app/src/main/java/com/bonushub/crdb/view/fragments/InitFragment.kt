@@ -185,6 +185,15 @@ class InitFragment : Fragment() {
                                     )
                                 }
                             }
+                                if(isStaticQrAvailable){
+                                    // getting static qr from server if required
+                                    withContext(Dispatchers.IO){
+                                     /*   getStaticQrFromServerAndSaveToFile(context as NavigationActivity){
+                                            // FAIL AND SUCCESS HANDELED IN FUNCTION getStaticQrFromServerAndSaveToFile itself
+                                        }*/
+                                    }
+
+                                }
                                 (activity as NavigationActivity).hideProgress()
                                 Field48ResponseTimestamp.showToast("Navigation")
                                 CoroutineScope(Dispatchers.Main).launch {
@@ -203,6 +212,7 @@ class InitFragment : Fragment() {
                         }
 
                     }
+
                 }
                 Status.ERROR -> {
                     iDialog?.hideProgress()

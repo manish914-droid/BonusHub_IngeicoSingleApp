@@ -669,6 +669,9 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(70)
     var flexiPayMaxAmountLimit: String = "",
 
+    @field:BHDashboardItem(EDashboardItem.EMI_ENQUIRY)
+    var bankEnquiry: String = "",
+
     var clearFBatch: String = "0",//This field is for Server Hit Status,
 
     var bankEnquiryMobNumberEntry: Boolean = false,
@@ -737,7 +740,7 @@ data class CardDataTable(
     @field:BHFieldParseIndex(14)
     var singleLine: String = "",
 
-    @field:BHFieldParseIndex(15)
+
     var tipAdjustAllowed: String = "",
 
     @field:BHFieldParseIndex(16)

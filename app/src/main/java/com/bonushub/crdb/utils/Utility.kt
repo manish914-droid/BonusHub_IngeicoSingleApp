@@ -209,9 +209,31 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                         when (terminalParameterTable.actionId) {
                             "1", "2" -> {
                                 terminalParameterTable.stan = "000001"
-                                insertStatus = appDatabase?.appDao
-                                    ?.insertTerminalParameterDataInTable(terminalParameterTable)
-                                    ?: 0L
+
+                                try {
+                                    //Check for Enabling BANK EMI Enquiry on terminal from reservedValues .
+                                    if (terminalParameterTable.reservedValues[6] == '1' ) {
+                                        terminalParameterTable.bankEnquiry = "1"
+                                        //Check for Enabling Phone number at the time of EMI Enquiry on terminal by reservedValues check
+                                        terminalParameterTable.bankEnquiryMobNumberEntry =
+                                            terminalParameterTable.reservedValues[7].toString().toInt() == 1
+                                    }
+                                    //Check for Enabling BRAND EMI Enquiry on terminal from reservedValues .
+                                    if (terminalParameterTable.reservedValues[10] == '1' ) {
+                                        terminalParameterTable.bankEnquiry = "1"
+                                        //Check for Enabling Phone number at the time of EMI Enquiry on terminal by reservedValues check
+                                        terminalParameterTable.bankEnquiryMobNumberEntry =
+                                            terminalParameterTable.reservedValues[7].toString().toInt() == 1
+                                    }
+
+                                } catch (ex: Exception) {
+                                    //ex.printStackTrace()
+                                    println("Exception in brand catalogue display on dashboard")
+                                } finally {
+                                    insertStatus = appDatabase?.appDao
+                                        ?.insertTerminalParameterDataInTable(terminalParameterTable)
+                                        ?: 0L
+                                    }
                             }
                             "3" -> appDatabase?.appDao
                                 ?.deleteTerminalParameterTable(terminalParameterTable)

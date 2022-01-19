@@ -39,7 +39,6 @@ import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
-import com.bonushub.pax.utils.*
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.model.TransactionDetail
