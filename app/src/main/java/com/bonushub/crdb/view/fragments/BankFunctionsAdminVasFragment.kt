@@ -223,7 +223,11 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
             BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
                 // INIT PAYMENT APP
+                if(AppPreference.getLogin()){
                 (activity as NavigationActivity).transactFragment(BankFunctionsInitPaymentAppFragment(), true)
+                }else{
+                    ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
+                }
             }
         }
     }

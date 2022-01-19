@@ -37,6 +37,7 @@ import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.serverApi.HitServer
@@ -377,8 +378,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private fun refreshDrawer() {
         lifecycleScope.launch{
            // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
-            val tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
-
+            var tpt:TerminalParameterTable? = null
+            if(AppPreference.getLogin()) {
+                tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            }else{
+                tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+            }
             // old
            /* var listofTids = ArrayList<String>()
             tpt?.tidType?.forEachIndexed { index, tidType ->

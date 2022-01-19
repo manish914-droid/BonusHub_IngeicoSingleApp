@@ -31,7 +31,14 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
 
         // write logic whether password is correct or not
         withContext(Dispatchers.IO){
-            val tpt = appDao.getSingleRowTerminalParameterTableData()
+           // val tpt = appDao.getSingleRowTerminalParameterTableData() // old
+            var tpt:TerminalParameterTable? = null
+            if(AppPreference.getLogin()) {
+                tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            }else{
+                tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+            }
+
             try {
                 // logger("sap",""+tpt?.adminPassword)
                 var adminPassword = tpt?.adminPassword?.substring(0,4)
@@ -49,9 +56,15 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
 
         // write logic whether super password is correct or not
         runBlocking(Dispatchers.IO) {
-            val tpt = appDao.getSingleRowTerminalParameterTableData()
+            //val tpt = appDao.getSingleRowTerminalParameterTableData() // old
             try {
                // logger("sap",""+tpt?.superAdminPassword)
+                var tpt:TerminalParameterTable? = null
+                if(AppPreference.getLogin()) {
+                    tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+                }else{
+                    tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+                }
 
             data.postValue(tpt?.superAdminPassword.equals(password,true))
             }catch (ex:Exception){
