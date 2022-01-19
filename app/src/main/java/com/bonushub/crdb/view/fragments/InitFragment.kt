@@ -71,6 +71,11 @@ class InitFragment : Fragment() {
 
         })
 
+        //region Below Code write App Revision ID to file when first time Init Screen opens
+        //in App after that this file will override after settlement:-
+        context?.let { writeAppRevisionIDInFile(it) }
+        //endregion
+
         fragmentInitBinding.ifProceedBtn.setOnClickListener {
        iDialog?.showProgress(getString(R.string.please_wait_host))
             initViewModel.insertInfo1(fragmentInitBinding.ifEt.text.toString())
