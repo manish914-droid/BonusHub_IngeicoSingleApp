@@ -410,7 +410,19 @@ suspend fun checkSettlementTid(batchData: MutableList<BatchTable>): ArrayList<St
 suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
     listofTids.clear()
     val tpt = appDao.getAllTerminalParameterTableData()
-    tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+
+    tpt.forEachIndexed { index, terminalParameterTable ->
+        if(terminalParameterTable?.tidType == "1"){
+            listofTids.add(0,terminalParameterTable.terminalId)
+        }
+        else if(terminalParameterTable?.tidType != "-1"){
+            listofTids.add(terminalParameterTable?.terminalId ?: "")
+        }
+    }
+
+    //Have to change again
+  /*  tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+        //Have to change again
         if(tidType == "1"){
             tpt[0]?.terminalId?.get(index)
             listofTids.add(0,tpt[0]?.terminalId?.get(index) ?: "")
@@ -418,18 +430,28 @@ suspend fun checkBaseTid(appDao: AppDao): ArrayList<String> {
         else{
             listofTids.add(tpt[0]?.terminalId?.get(index) ?: "")
         }
-    }
+    }*/
     return listofTids
 }
 
 suspend fun getBaseTID(appDao: AppDao):String{
     val tpt = appDao.getAllTerminalParameterTableData()
     var tid=""
-    tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+
+    tpt.forEachIndexed { index, terminalParameterTable ->
+        if(terminalParameterTable?.tidType == "1"){
+            tid = terminalParameterTable.terminalId
+        }
+
+    }
+
+    //Have to change again
+  /*  tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+        //Have to change again
         if (tidType == "1") {
             tid = tpt[0]?.terminalId?.get(index).toString()
         }
-    }
+    }*/
     return tid
 
 }
@@ -438,7 +460,18 @@ suspend fun getBaseTID(appDao: AppDao):String{
 suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> {
     listofTids.clear()
     var tpt = appDao?.getAllTerminalParameterTableData()
-    tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+    tpt.forEachIndexed { index, terminalParameterTable ->
+        if(terminalParameterTable?.tidType.equals("1")){
+            listofTids.add(updatedTid)
+        }
+        else if(terminalParameterTable?.tidType != "-1"){
+            listofTids.add(terminalParameterTable?.terminalId ?: "")
+        }
+    }
+
+    //Have to change again
+ /*   tpt[0]?.tidType?.forEachIndexed { index, tidType ->
+        //Have to change again
         if(tidType.equals("1")){
             tpt[0]?.terminalId?.get(index)
             listofTids.add(updatedTid)
@@ -446,7 +479,7 @@ suspend fun updateBaseTid(appDao: AppDao, updatedTid:String): ArrayList<String> 
         else{
             listofTids.add(tpt[0]?.terminalId?.get(index) ?: "")
         }
-    }
+    }*/
     return listofTids
 }
 
@@ -460,25 +493,33 @@ suspend fun checkTidUpdate(appDao: AppDao): Boolean {
         if(rseultsize > 0){
             result.forEach { IngenicoInitialization ->
                 val tidList = IngenicoInitialization?.tidList
-                if(tidList?.size == tpt[0]?.terminalId?.size){
+                //Have to change again
+                //here size -1 becz dummy tpt record come from assets
+                if(tidList?.size == tpt.size-1){
 
                     isdiffTid = true
                     return isdiffTid
                 }
-                else if(tidList?.size.isGreaterThan(tpt[0]?.terminalId?.size)){
-                    val difference = tidList?.filter { !(tpt[0]?.terminalId?.contains(it) == true)
-                    }
+                //here size -1 becz dummy tpt record come from assets
+                else if(tidList?.size.isGreaterThan(tpt.size-1)){
 
                     var strstatus = ArrayList<String>()
-                    tpt[0]?.terminalId?.forEach {
-                        strstatus.add("Success")
+                    tpt.forEach {
+                        if(it?.tidType !="-1")
+                            strstatus.add("Success")
+                    }
+
+                    var arrayListTid = ArrayList<String>()
+                    tpt.forEach {
+                        if(it?.tidType !="-1")
+                            arrayListTid.add(it?.terminalId ?: "")
                     }
 
                     var ingenicoInitialization = IngenicoInitialization()
                     ingenicoInitialization.id = 0
                     ingenicoInitialization.responseCode    = IngenicoInitialization?.responseCode
                     ingenicoInitialization.apiresponseCode = IngenicoInitialization?.apiresponseCode
-                    ingenicoInitialization.tidList         = tpt[0]?.terminalId
+                    ingenicoInitialization.tidList         = arrayListTid
                     ingenicoInitialization.tidStatusList   = strstatus
                     ingenicoInitialization.initdataList    = IngenicoInitialization?.initdataList
 
@@ -499,12 +540,14 @@ suspend fun checkTidUpdate(appDao: AppDao): Boolean {
                     isdiffTid = false
                     return isdiffTid
                 }
+
             }
         }
     }
 
     return false
 }
+
 
 
 fun Int?.isGreaterThan(other: Int?) = this != null && other != null && this > other

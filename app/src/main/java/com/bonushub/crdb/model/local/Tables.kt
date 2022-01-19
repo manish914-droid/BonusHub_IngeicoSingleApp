@@ -386,16 +386,15 @@ data class TerminalParameterTable(
     var actionId: String = "",
 
     @field:BHFieldParseIndex(2)
-    @PrimaryKey
     var tableId: String = "",
 
     @field:BHFieldParseIndex(3)
     var isActive: String = "",
 
-    @TypeConverters(Converters::class)
+    @PrimaryKey
     @field:BHFieldParseIndex(4)
     @field: BHFieldName("TID")
-    var terminalId: List<String>? = listOf(),
+    var terminalId: String = "",
 
     @field:BHFieldParseIndex(5)
     @field:BHFieldName("MID")
@@ -632,10 +631,9 @@ data class TerminalParameterTable(
     var fPushTimeStamp: String = "",
 
     //region=========New Fields for HDFC===========
-    @TypeConverters(Converters::class)
     @field:BHFieldParseIndex(60)
     @field:BHFieldName("Tid Type")
-    var tidType: List<String>? = listOf(),  // if type is 1 main else child tid
+    var tidType: String = "",  // if type is 1 main else child tid
 
 
     @field:BHFieldParseIndex(61)
@@ -652,7 +650,7 @@ data class TerminalParameterTable(
 
     @field:BHFieldParseIndex(64)
     @field:BHFieldName("LinkTidType")
-    var LinkTidType: List<String> = listOf(),  // LinkTidType : for Amex  - 0,DC type - 1 ,offus Tid - 2, 3 months onus - 3,6 months onus - 6, 9 months onus - 9,12 months onus- 12
+    var LinkTidType: String = "",  // LinkTidType : for Amex  - 0,DC type - 1 ,offus Tid - 2, 3 months onus - 3,6 months onus - 6, 9 months onus - 9,12 months onus- 12
 
     @field:BHFieldParseIndex(67)
     @field:BHFieldName("STAN")

@@ -390,7 +390,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         val tidsWithStatusList = ArrayList<TidsListModel>()
 
         try {
-            withContext(Dispatchers.IO) {
+          /*  withContext(Dispatchers.IO) {
                 val tpt = appDao.getTerminalParameterTableData()
 
                 val IngenicoInitializationTable = appDao.getIngenicoInitialization()
@@ -480,7 +480,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
                 }
 
                 dataList.postValue(tidsWithStatusList)
-            }
+            }*/
         }catch (ex:Exception)
         {
             ex.printStackTrace()

@@ -380,10 +380,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             tpt?.tidType?.forEachIndexed { index, tidType ->
                 if(tidType.equals("1")){
                     tpt?.terminalId?.get(index)
-                    listofTids.add(0,tpt?.terminalId?.get(index) ?: "")
+                    //Have to change again
+                  //  listofTids.add(0,tpt?.terminalId?.get(index) ?: "")
                 }
                 else{
-                    listofTids.add(tpt?.terminalId?.get(index) ?: "")
+                    //Have to change again
+                   // listofTids.add(tpt?.terminalId?.get(index) ?: "")
                 }
             }
 

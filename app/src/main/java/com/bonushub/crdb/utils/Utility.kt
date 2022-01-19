@@ -323,7 +323,9 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     val index = ann.index
                     if (dataList.size > index) {
                         e.isAccessible = true
-                        if(dataList[2]== "106" && index == 4){
+                        e.set(tableName, dataList[index])
+
+                    /*    if(dataList[2]== "106" && index == 4){
                             var string = String()
                             for(i in dataList[index]){
                                 println("Index for TID "+i)
@@ -334,7 +336,6 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                             println("Index for TID2 "+list)
                             e.set(tableName, list)
                         }
-
                         else if(dataList[2]== "106" && index == 60){
                             var string = String()
                             for(i in dataList[index]){
@@ -360,7 +361,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                         else {
                             e.set(tableName, dataList[index])
 
-                        }
+                        }*/
                     }
                 }
             }
