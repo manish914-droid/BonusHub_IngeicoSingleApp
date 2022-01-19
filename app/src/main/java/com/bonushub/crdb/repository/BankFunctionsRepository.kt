@@ -389,6 +389,8 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         val dataList = MutableLiveData<ArrayList<TidsListModel>>()
         val tidsWithStatusList = ArrayList<TidsListModel>()
 
+        //Have to change again
+
         try {
           /*  withContext(Dispatchers.IO) {
                 val tpt = appDao.getTerminalParameterTableData()
