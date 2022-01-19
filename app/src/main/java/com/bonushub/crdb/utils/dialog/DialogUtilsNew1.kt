@@ -350,7 +350,8 @@ class DialogUtilsNew1 {
             mTxnId: String,
             phoneNumber: String,
             status: String,
-            callback: () -> Unit
+            callback: () -> Unit,
+            callbackPrint: () -> Unit
         ) {
             Dialog(context).apply {
                 getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
@@ -369,6 +370,7 @@ class DialogUtilsNew1 {
                 val txtViewPhoneNumber = findViewById<TextView>(R.id.txtViewPhoneNumber)
                 val txtViewStatus = findViewById<TextView>(R.id.txtViewStatus)
                 val txtViewOk = findViewById<TextView>(R.id.txtViewOk)
+                val txtViewPrint = findViewById<TextView>(R.id.txtViewPrint)
 
                 txtViewAmount.text = amount
                 txtViewMode.text = mode
@@ -381,6 +383,11 @@ class DialogUtilsNew1 {
                 txtViewOk.setOnClickListener {
                     dismiss()
                     callback()
+                }
+
+                txtViewPrint.setOnClickListener {
+                    dismiss()
+                    callbackPrint()
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }.show()

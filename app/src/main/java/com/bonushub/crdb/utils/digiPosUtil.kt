@@ -1,11 +1,17 @@
 package com.bonushub.crdb.utils
 
+import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.model.local.DigiPosDataTable
+import com.bonushub.crdb.utils.BitmapUtils.convertCompressedByteArrayToBitmap
 import com.bonushub.crdb.view.base.BaseActivity
+import com.bonushub.crdb.view.base.BaseActivityNew
+import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -274,4 +280,69 @@ object BitmapUtils {
     }
 
 
+}
+
+suspend fun getStaticQrFromServerAndSaveToFile(activity: Activity, cb: (Boolean) -> Unit) {
+    withContext(Dispatchers.Main) {
+        (activity as BaseActivityNew).showProgress()
+    }
+    getDigiPosStatus(
+        EnumDigiPosProcess.STATIC_QR.code,
+        EnumDigiPosProcessingCode.DIGIPOSPROCODE.code
+    ) { isSuccess, responseMsg, responsef57, fullResponse ->
+        (activity as BaseActivityNew).hideProgress()
+        try {
+            if (isSuccess) {
+                val respDataList = responsef57.split("^")
+//reqest type, parterid,status,statusmsg,statuscode,qrLink,QrBlob
+                val tabledata = DigiPosDataTable()
+                tabledata.requestType = respDataList[0].toInt()
+                tabledata.partnerTxnId = respDataList[1]
+                tabledata.status = respDataList[2]
+                tabledata.statusMsg = respDataList[3]
+                tabledata.statusCode = respDataList[4]
+                val qrLink = respDataList[5]
+                val responseIsoData: IsoDataReader = readIso(fullResponse, false)
+
+                Log.e(
+                    "BitmapHexString-->  ",
+                    responseIsoData.isoMap[59]?.rawData.toString() + "---->"
+                )
+                val blobHexString = responseIsoData.isoMap[59]?.rawData.toString()
+                //   val blobHexString = respDataList[6]
+                val byteArray = blobHexString.decodeHexStringToByteArray()
+                val bmp = convertCompressedByteArrayToBitmap(byteArray)
+                if (saveStaticQrToInternalStorage(bmp)) {
+                    logger("StaticQr", "Successfully save qr Bitmap to file", "e")
+                    cb(true)
+                } else {
+                    logger("StaticQr", "Not saved qr Bitmap to file", "e")
+                    cb(false)
+                }
+            } else {
+                logger("StaticQr", "Fail from server", "e")
+                cb(false)
+            }
+        } catch (ex: Exception) {
+            cb(false)
+            ex.printStackTrace()
+        }
+    }
+
+}
+
+// saving static qr on internal storage
+fun saveStaticQrToInternalStorage(bmp: Bitmap): Boolean {
+    return try {
+        HDFCApplication.appContext.openFileOutput("$QR_FILE_NAME.jpg", Context.MODE_PRIVATE)
+            .use { stream ->
+                if (!bmp.compress(Bitmap.CompressFormat.JPEG, 95, stream)) {
+                    throw IOException("Could'nt save bitmap")
+                }
+            }
+        true
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        false
+    }
 }

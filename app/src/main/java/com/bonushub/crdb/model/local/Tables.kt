@@ -1,5 +1,7 @@
 package com.bonushub.crdb.model.local
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.*
 import com.bonushub.crdb.di.scope.BHDashboardItem
 import com.bonushub.crdb.di.scope.BHFieldName
@@ -665,6 +667,9 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(70)
     var flexiPayMaxAmountLimit: String = "",
 
+    @field:BHDashboardItem(EDashboardItem.EMI_ENQUIRY)
+    var bankEnquiry: String = "",
+
     var clearFBatch: String = "0",//This field is for Server Hit Status,
 
     var bankEnquiryMobNumberEntry: Boolean = false,
@@ -733,7 +738,7 @@ data class CardDataTable(
     @field:BHFieldParseIndex(14)
     var singleLine: String = "",
 
-    @field:BHFieldParseIndex(15)
+
     var tipAdjustAllowed: String = "",
 
     @field:BHFieldParseIndex(16)
@@ -1171,6 +1176,61 @@ data class DigiPosDataTable(
     var txnDate : String= "",
     var txnTime : String= "",
     var displayFormatedDate : String= ""
-)
+): Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readString().toString()
+    ) {
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun writeToParcel(p0: Parcel?, p1: Int) {
+        p0?.writeInt(requestType)
+        p0?.writeString(amount)
+        p0?.writeString(description)
+        p0?.writeString(vpa)
+        p0?.writeString(mTxnId)
+        p0?.writeString(partnerTxnId)
+        p0?.writeString(status)
+        p0?.writeString(statusMsg)
+        p0?.writeString(statusCode)
+        p0?.writeString(customerMobileNumber)
+        p0?.writeString(transactionTimeStamp)
+        p0?.writeString(txnStatus)
+        p0?.writeString(paymentMode)
+        p0?.writeString(pgwTxnId)
+        p0?.writeString(txnDate)
+        p0?.writeString(txnTime)
+        p0?.writeString(displayFormatedDate)
+    }
+
+    companion object CREATOR : Parcelable.Creator<DigiPosDataTable> {
+        override fun createFromParcel(parcel: Parcel): DigiPosDataTable {
+            return DigiPosDataTable(parcel)
+        }
+
+        override fun newArray(size: Int): Array<DigiPosDataTable?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
 
 //end region

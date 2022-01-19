@@ -175,7 +175,7 @@
     <string name="total_emi_pay">Total EMI Pay</string>
     <string name="please_select_scheme">Please Select Scheme</string>
     <string name="loan_amount">Loan Amount</string>
-    <string name="roi_pa">R.o.i</string>
+    <string name="roi_pa">ROI (p.a.)</string>
     <!--Base Activity-->
     <string name="app_name_2">BonusHub</string>
     <string name="settle_batch">Settle Batch</string>
@@ -300,5 +300,9 @@
     <string name="scan_qr_code_to_pay_n_nwould_you_like_to_check_payment_status_now">Scan QR code to pay.\nWould you like to check payment status now.</string>
     <string name="scan_qr_pay">Scan QR code to pay.</string>
     <string name="no_pending_transaction_found_want_to_search_transaction">No Pending Transaction found want to search transaction</string>
+
+    <string name="print">Print</string>
+    <string name="getStatus">Get Status</string>
+    <string name="failed">Failed!!!</string>
 
 </resources>

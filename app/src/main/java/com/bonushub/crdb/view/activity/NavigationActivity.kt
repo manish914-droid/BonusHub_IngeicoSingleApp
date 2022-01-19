@@ -44,11 +44,13 @@ import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.performOperation
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.*
+import com.bonushub.crdb.view.fragments.digi_pos.DigiPosMenuFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthFragment
 import com.bonushub.crdb.view.fragments.pre_auth.PreAuthPendingFragment
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
@@ -869,6 +871,34 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 })
 
             }
+            EDashboardItem.DIGI_POS -> {
+                /* if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+             !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
+             !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
+         ) {*/
+                if (checkInternetConnection()) {
+                    transactFragment(DigiPosMenuFragment().apply {
+                        //   DigiPosDataTable.clear()
+
+                        val dp = selectAllDigiPosData()
+                        val dpObj = Gson().toJson(dp)
+                        logger("UPDATEDIGI", dpObj, "e")
+
+                        arguments = Bundle().apply {
+                            putSerializable("type", EDashboardItem.DIGI_POS)
+                            // putString(INPUT_SUB_HEADING, "")
+                        }
+                    })
+
+                } else {
+                   showToast(getString(R.string.no_internet_available_please_check_your_internet))
+                }
+                /*} else {
+            checkAndPerformOperation()
+        }*/
+
+            }
+
             else->{
 
 

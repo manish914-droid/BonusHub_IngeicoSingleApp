@@ -28,7 +28,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/txtViewTxnStatus"
+                android:id="@+id/transactionMessageTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/muli_extra_light"
@@ -38,16 +38,17 @@
 
 
             <ImageView
+                android:id="@+id/transactionIV"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_below="@+id/txtViewTxnStatus"
+                android:layout_below="@+id/transactionMessageTV"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/pad_10"
                 android:src="@drawable/ic_init_payment_null" />
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/txtViewAmount"
+            android:id="@+id/transactionAmountTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -57,10 +58,10 @@
             android:textSize="30sp" />
 
         <TextView
-            android:id="@+id/txtViewDateTime"
+            android:id="@+id/transactionDateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewAmount"
+            android:layout_below="@+id/transactionAmountTV"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="@dimen/pad_10"
             android:layout_marginBottom="@dimen/pad_10"
@@ -75,7 +76,7 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btnGetStatus"
+        android:layout_above="@+id/printButton"
         android:layout_below="@+id/relLayTop"
         android:layout_marginTop="@dimen/pad_15"
         android:fillViewport="true">
@@ -111,7 +112,7 @@
                     android:textSize="@dimen/text_size_xsmall" />
 
                 <TextView
-                    android:id="@+id/txtViewMode"
+                    android:id="@+id/paymentModeTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtViewModeTitle"
@@ -147,7 +148,7 @@
                     android:textSize="@dimen/text_size_xsmall" />
 
                 <TextView
-                    android:id="@+id/txtViewMobile"
+                    android:id="@+id/mobileNumberTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtViewMobileTitle"
@@ -184,7 +185,7 @@
                     android:textSize="@dimen/text_size_xsmall" />
 
                 <TextView
-                    android:id="@+id/txtViewPtxnId"
+                    android:id="@+id/ptxnTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtViewPtxnTitle"
@@ -221,7 +222,7 @@
                     android:textSize="@dimen/text_size_xsmall" />
 
                 <TextView
-                    android:id="@+id/txtViewMtxnId"
+                    android:id="@+id/mtxnTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtViewMtxnTitle"
@@ -258,7 +259,7 @@
                     android:textSize="@dimen/text_size_xsmall" />
 
                 <TextView
-                    android:id="@+id/txtViewTxnStatus2"
+                    android:id="@+id/txnStatusTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txtViewTxnStatusTitle"
@@ -277,7 +278,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <TextView
-        android:id="@+id/btnGetStatus"
+        android:id="@+id/printButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

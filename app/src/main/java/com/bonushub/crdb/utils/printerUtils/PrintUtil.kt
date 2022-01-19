@@ -279,23 +279,50 @@ class PrintUtil(context: Context?) {
                     baseAmounthandling(batchTable)
                 }
 
+                printer?.setAscScale(ASCScale.SC1x2)
+                printer?.setAscSize(ASCSize.DOT16x8)
+
                 if (receiptDetail.entryMode.equals("CLESS_EMV")) {
                     textBlockList.add(sigleLineformat("PIN NOT REQUIRED FOR CONTACTLESS TRANSACTION UPTO ${receiptDetail?.cvmRequiredLimit}", AlignMode.CENTER))
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
                 } else {
-                    if (receiptDetail.isSignRequired == true)
-                        sigleLineText("PIN VERIFIDE OK", AlignMode.CENTER)
-                    if (receiptDetail.isSignRequired != true)
-                        sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER)
+                    if (receiptDetail.isVerifyPin == true){
+                        sigleLineText("PIN VERIFIDE OK", AlignMode.CENTER)}
+
+                    if (receiptDetail.isVerifyPin == true){
+                        sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER)}
+                    else{
+                        sigleLineText("SIGN ...................", AlignMode.CENTER)
+                    }
+
+
                     receiptDetail.cardHolderName?.let { sigleLineText(it, AlignMode.CENTER) }
                 }
-                textBlockList.add(sigleLineformat("I am satisfied with goods received and agree to pay issuer agreenent.", AlignMode.CENTER))
-                printer?.addMixStyleText(textBlockList)
-                textBlockList.clear()
+
+                printer?.setAscScale(ASCScale.SC1x1)
+                printer?.setAscSize(ASCSize.DOT24x8)
+
+                try{
+                    val issuerParameterTable = Field48ResponseTimestamp.getIssuerData(AppPreference.WALLET_ISSUER_ID)
+
+                    var dec = issuerParameterTable?.walletIssuerDisclaimer
+
+                   // textBlockList.add(sigleLineformat("I am satisfied with goods received and agree to pay issuer agreenent.", AlignMode.CENTER))
+                    logger("dec",dec?:"")
+                    textBlockList.add(sigleLineformat(dec?:"", AlignMode.CENTER))
+
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                }
+
                 sigleLineText(copyType.pName, AlignMode.CENTER)
                 sigleLineText(footerText[0], AlignMode.CENTER)
                 sigleLineText(footerText[1], AlignMode.CENTER)
+
                 val bhlogo: ByteArray? = context?.let { printLogo(it, "BH.bmp") }
                 printer?.addBmpImage(0, FactorMode.BMP1X1, bhlogo)
                 sigleLineText(
@@ -328,8 +355,10 @@ class PrintUtil(context: Context?) {
                                                     st, AlignMode.LEFT
                                                 )
                                             )*/
-                                            printer?.setHzScale(HZScale.SC1x1)
-                                            printer?.setHzSize(HZSize.DOT24x16)
+//                                            printer?.setHzScale(HZScale.SC1x1)
+//                                            printer?.setHzSize(HZSize.DOT24x16)
+                                            printer?.setAscScale(ASCScale.SC1x1)
+                                            printer?.setAscSize(ASCSize.DOT24x8)
                                             printer?.addText( AlignMode.LEFT, st)
                                         }
                                     }
@@ -340,8 +369,10 @@ class PrintUtil(context: Context?) {
                                         "# ${issuerTAndCData.footerTAndC}", AlignMode.LEFT
                                     )
                                 )*/
-                                printer?.setHzScale(HZScale.SC1x1)
-                                printer?.setHzSize(HZSize.DOT24x16)
+//                                printer?.setHzScale(HZScale.SC1x1)
+//                                printer?.setHzSize(HZSize.DOT24x16)
+                                printer?.setAscScale(ASCScale.SC1x1)
+                                printer?.setAscSize(ASCSize.DOT24x8)
                                 printer?.addText( AlignMode.LEFT, "# ${issuerTAndCData.footerTAndC}")
                             }
                         }
@@ -877,27 +908,33 @@ class PrintUtil(context: Context?) {
         if (issuerHeaderTAndC?.isNotEmpty() == true) {
             for (i in issuerHeaderTAndC.indices) {
                 if (!TextUtils.isEmpty(issuerHeaderTAndC?.get(i))) {
-                    val limit = 46
+                    val limit = 48
                     if (!(issuerHeaderTAndC[i].isBlank())) {
                         val emiTnc = "#" + issuerHeaderTAndC[i]
                         val chunks: List<String> = chunkTnC(emiTnc, limit)
+                        printer?.setAscScale(ASCScale.SC1x1)
+                        printer?.setAscSize(ASCSize.DOT24x8)
                         for (st in chunks) {
                             logger("issuerHeaderTAndC", st, "e")
-                            printer?.setHzScale(HZScale.SC1x1)
-                            printer?.setHzSize(HZSize.DOT24x16)
-                            printer?.addText( AlignMode.LEFT, st)
-                         /*   textBlockList.add(
+//                            printer?.setHzScale(HZScale.SC1x1)
+//                            printer?.setHzSize(HZSize.DOT24x16)
+                            //printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNTOEND)
+                            //printer?.addText( AlignMode.LEFT, st)
+                            textBlockList.add(
                                 sigleLineformat(
                                     st,
-                                    AlignMode.CENTER
+                                    AlignMode.LEFT
                                 )
                             )
                             printer?.addMixStyleText(textBlockList)
-                            textBlockList.clear()*/
+                            textBlockList.clear()
                    /*         textBlockList.add(sigleLineformat(st, AlignMode.LEFT))
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()*/
                         }
+
+                        // reset printer font
+                        printer?.setAscSize(ASCSize.DOT24x12)
                     }
                 }
             }
@@ -918,29 +955,36 @@ class PrintUtil(context: Context?) {
        if (brandId != null) {
            val brandTnc = getBrandTAndCDataByBrandId(brandId)
            logger("Brand Tnc", brandTnc, "e")
-           val chunk: List<String> = chunkTnC(brandTnc)
+           val chunk: List<String> = chunkTnC(brandTnc,48)
+           printer?.setAscScale(ASCScale.SC1x1)
+           printer?.setAscSize(ASCSize.DOT24x8)
             for (st in chunk) {
                logger("Brand Tnc", st, "e")
                /*    sigleLineText(
                 st.replace(bankEMIFooterTAndCSeparator, "")
                     .replace(Companion.disclaimerIssuerClose, ""), AlignMode.CENTER
             )*/
-               printer?.setHzScale(HZScale.SC1x1)
-               printer?.setHzSize(HZSize.DOT24x16)
-               printer?.addText(
-                   AlignMode.LEFT, st.replace(bankEMIFooterTAndCSeparator, "")
-                       .replace(Companion.disclaimerIssuerClose, "")
-               )
-/*            textBlockList.add(
+//               printer?.setHzScale(HZScale.SC1x1)
+//               printer?.setHzSize(HZSize.DOT24x16)
+
+               // printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNTOEND)
+//               printer?.addText(
+//                   AlignMode.LEFT, st.replace(bankEMIFooterTAndCSeparator, "")
+//                       .replace(Companion.disclaimerIssuerClose, "")
+//               )
+            textBlockList.add(
                 sigleLineformat(
                     st.replace(bankEMIFooterTAndCSeparator, "")
                         .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
                 )
             )
             printer?.addMixStyleText(textBlockList)
-            textBlockList.clear()*/
+            textBlockList.clear()
 
            }
+
+           // reset printer font
+           printer?.setAscSize(ASCSize.DOT24x12)
        }
         //endregion
         //region=====================SCHEME TAndC===============
@@ -953,6 +997,8 @@ class PrintUtil(context: Context?) {
                 if (!(emiCustomerConsent?.get(i).isNullOrBlank())) {
                     val emiTnc = "#" + (emiCustomerConsent?.get(i) ?: "")
                     val chunks: List<String> = chunkTnC(emiTnc, limit)
+                    printer?.setAscScale(ASCScale.SC1x1)
+                    printer?.setAscSize(ASCSize.DOT24x8)
                     for (st in chunks) {
                         logger("emiCustomerConsent", st, "e")
                  /*       textBlockList.add(
@@ -963,10 +1009,20 @@ class PrintUtil(context: Context?) {
                         )
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()*/
-                        printer?.setHzScale(HZScale.SC1x1)
-                        printer?.setHzSize(HZSize.DOT24x16)
-                        printer?.addText( AlignMode.LEFT,  st.replace(bankEMIFooterTAndCSeparator, "")
-                            .replace(Companion.disclaimerIssuerClose, ""))
+//                        printer?.setHzScale(HZScale.SC1x1)
+//                        printer?.setHzSize(HZSize.DOT24x16)
+                        //-------------old
+                       // printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNTOEND)
+//                        printer?.addText( AlignMode.LEFT,  st.replace(bankEMIFooterTAndCSeparator, "")
+//                            .replace(Companion.disclaimerIssuerClose, ""))
+
+                        textBlockList.add(
+                            sigleLineformat(st.replace(bankEMIFooterTAndCSeparator, "")
+                                .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
+                            )
+                        )
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
                     }
                 }
 
@@ -1021,6 +1077,9 @@ class PrintUtil(context: Context?) {
                             }
                         }
                     }
+
+                    // reset printer font
+                    printer?.setAscSize(ASCSize.DOT24x12)
                 }
 
             }
@@ -1082,6 +1141,15 @@ class PrintUtil(context: Context?) {
                     textBlockList.clear()
                 }
             }
+
+            /*if (brandEMIMasterDataModal.producatDesc == "subCat") {
+                if (!brandEMIMasterDataModal.childSubCategoryName.isNullOrEmpty()) {
+                    printer?.addText(
+                        textInLineFormatBundle,
+                        formatTextLMR("Prod desc", ":", brandEmiData.childSubCategoryName, 10)
+                    )
+                }
+            }*/
 
 
             textBlockList.add(sigleLineformat("Prod Name:", AlignMode.LEFT))
@@ -2505,7 +2573,10 @@ class PrintUtil(context: Context?) {
     }
 
     private fun printSeperator() {
-        sigleLineText("-----------------------------------------", AlignMode.CENTER)
+
+        printer?.setAscSize(ASCSize.DOT24x12)
+        printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNONELINE)
+        sigleLineText("----------------------------------------", AlignMode.CENTER)
     }
 
     internal open class ISmSUpiPrintListener(
@@ -2570,8 +2641,8 @@ class PrintUtil(context: Context?) {
 
         var str = s
         val parts: MutableList<String> = ArrayList()
-        while (str.length > 34) {
-            var splitAt = 34 - 1
+        while (str.length > limit) {
+            var splitAt = limit - 1
             while (splitAt > 0 && !Character.isWhitespace(str[splitAt])) {
                 splitAt--
             }
