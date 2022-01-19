@@ -176,6 +176,7 @@ fun String.hexStr2ByteArr(): ByteArray {
     return arr
 }
 
+
 /**
  * Converts byte (-128 to 127) into hex String with two chars
  * */
@@ -219,6 +220,14 @@ fun String.str2ByteArr(): ByteArray {
         bA[index] = cArray[index].toByte()
     }
     return bA
+}
+
+fun String.decodeHexStringToByteArray(): ByteArray {
+    require(length % 2 == 0) { "Must have an even length" }
+
+    return chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
 }
 
 

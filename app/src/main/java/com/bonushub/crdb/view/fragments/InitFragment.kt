@@ -185,13 +185,14 @@ class InitFragment : Fragment() {
                                     )
                                 }
                             }
+
                                 if(isStaticQrAvailable){
                                     // getting static qr from server if required
-                                    withContext(Dispatchers.IO){
-                                     /*   getStaticQrFromServerAndSaveToFile(context as NavigationActivity){
+                                    //withContext(Dispatchers.IO){
+                                        getStaticQrFromServerAndSaveToFile(requireActivity()){
                                             // FAIL AND SUCCESS HANDELED IN FUNCTION getStaticQrFromServerAndSaveToFile itself
-                                        }*/
-                                    }
+                                        }
+                                    //}
 
                                 }
                                 (activity as NavigationActivity).hideProgress()
