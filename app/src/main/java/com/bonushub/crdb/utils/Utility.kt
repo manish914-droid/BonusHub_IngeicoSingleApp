@@ -1250,7 +1250,7 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData = DBModule.appDatabase.appDao.getAllTerminalParameterTableData()[0]
+            tptData = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }

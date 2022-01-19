@@ -24,7 +24,8 @@ class DashboardRepository {
        val itemList = mutableListOf<EDashboardItem>()
          val list1 = arrayListOf<EDashboardItem>()
          val list2 = arrayListOf<EDashboardItem>()
-        var table = DBModule.appDatabase?.appDao.getAllTerminalParameterTableData()?.get(0)
+
+        var table =  DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
         if (table != null) {
             if (DashboardFragment.toRefresh || itemList.isEmpty()) {
                 itemList.clear()
