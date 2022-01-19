@@ -376,22 +376,25 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //region==========Setting for sidebar details==========
     private fun refreshDrawer() {
         lifecycleScope.launch{
-            val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0)
+           // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
+            val tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
 
-            var listofTids = ArrayList<String>()
+            // old
+           /* var listofTids = ArrayList<String>()
             tpt?.tidType?.forEachIndexed { index, tidType ->
                 if(tidType.equals("1")){
                     tpt?.terminalId?.get(index)
-                    //Have to change again
+                    //Have to change again done
                   //  listofTids.add(0,tpt?.terminalId?.get(index) ?: "")
                 }
                 else{
-                    //Have to change again
+                    //Have to change again done
                    // listofTids.add(tpt?.terminalId?.get(index) ?: "")
                 }
-            }
+            }*/
 
-            tid = getString(R.string.terminal_id) + "   : " + listofTids[0]
+            //tid = getString(R.string.terminal_id) + "   : " + listofTids[0]  // old
+            tid = getString(R.string.terminal_id) + "   : " + tpt?.terminalId
             mid = getString(R.string.merchant_id) + "  : " + tpt?.merchantId
 
             withContext(Dispatchers.Main){

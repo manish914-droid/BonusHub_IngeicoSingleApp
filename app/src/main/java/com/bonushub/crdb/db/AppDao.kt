@@ -344,6 +344,9 @@ interface AppDao{
     //endregion
 
     // region bank functions
+    @Query("SELECT * FROM TerminalParameterTable WHERE tidType = :tidType")
+    suspend fun getTerminalParameterTableDataByTidType(tidType:String): TerminalParameterTable?
+
     @Query("SELECT * FROM TerminalParameterTable LIMIT 1")
     suspend fun getSingleRowTerminalParameterTableData(): TerminalParameterTable?
 
