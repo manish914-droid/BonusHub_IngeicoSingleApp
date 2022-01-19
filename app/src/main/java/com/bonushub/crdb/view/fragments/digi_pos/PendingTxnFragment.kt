@@ -123,7 +123,7 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
     override fun iPendingListItemClick() {
         logger("pending list","click")
 
-        DialogUtilsNew1.showPendingTxnDetailsDialog(requireContext(),"300.00","SMS Pay","000156","15462","******7415","Pending") {
+        DialogUtilsNew1.showPendingTxnDetailsDialog(requireContext(),"300.00","SMS Pay","000156","15462","******7415","Pending",{}) {
 
             (activity as NavigationActivity).transactFragment(PendingDetailsFragment().apply {
                 arguments = Bundle().apply {
@@ -313,8 +313,9 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
             SHOW_TXN_DETAIL_PAGE -> {
                 (activity as NavigationActivity).transactFragment(PendingDetailsFragment().apply {
                     arguments = Bundle().apply {
-                        //putParcelable("data", digiPosData[position])// kushal
+                        putParcelable("data", digiPosData[position])// kushal
                         // putString(INPUT_SUB_HEADING, "")
+                        putSerializable("type", EDashboardItem.PENDING_TXN)
                     }
                 })
 

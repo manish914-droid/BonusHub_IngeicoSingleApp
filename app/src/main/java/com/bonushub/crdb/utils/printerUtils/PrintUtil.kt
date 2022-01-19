@@ -877,27 +877,34 @@ class PrintUtil(context: Context?) {
         if (issuerHeaderTAndC?.isNotEmpty() == true) {
             for (i in issuerHeaderTAndC.indices) {
                 if (!TextUtils.isEmpty(issuerHeaderTAndC?.get(i))) {
-                    val limit = 46
+                    val limit = 48
                     if (!(issuerHeaderTAndC[i].isBlank())) {
                         val emiTnc = "#" + issuerHeaderTAndC[i]
                         val chunks: List<String> = chunkTnC(emiTnc, limit)
                         for (st in chunks) {
                             logger("issuerHeaderTAndC", st, "e")
-                            printer?.setHzScale(HZScale.SC1x1)
-                            printer?.setHzSize(HZSize.DOT24x16)
+//                            printer?.setHzScale(HZScale.SC1x1)
+//                            printer?.setHzSize(HZSize.DOT24x16)
+                            printer?.setAscScale(ASCScale.SC1x1)
+                            printer?.setAscSize(ASCSize.DOT24x8)
+                            printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNTOEND)
                             printer?.addText( AlignMode.LEFT, st)
-                         /*   textBlockList.add(
+                            /*textBlockList.add(
                                 sigleLineformat(
                                     st,
                                     AlignMode.CENTER
                                 )
                             )
+                            printer
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()*/
                    /*         textBlockList.add(sigleLineformat(st, AlignMode.LEFT))
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()*/
                         }
+
+                        // reset printer font
+                        printer?.setAscSize(ASCSize.DOT24x12)
                     }
                 }
             }
@@ -918,20 +925,23 @@ class PrintUtil(context: Context?) {
        if (brandId != null) {
            val brandTnc = getBrandTAndCDataByBrandId(brandId)
            logger("Brand Tnc", brandTnc, "e")
-           val chunk: List<String> = chunkTnC(brandTnc)
+           val chunk: List<String> = chunkTnC(brandTnc,48)
             for (st in chunk) {
                logger("Brand Tnc", st, "e")
                /*    sigleLineText(
                 st.replace(bankEMIFooterTAndCSeparator, "")
                     .replace(Companion.disclaimerIssuerClose, ""), AlignMode.CENTER
             )*/
-               printer?.setHzScale(HZScale.SC1x1)
-               printer?.setHzSize(HZSize.DOT24x16)
+//               printer?.setHzScale(HZScale.SC1x1)
+//               printer?.setHzSize(HZSize.DOT24x16)
+                printer?.setAscScale(ASCScale.SC1x1)
+                printer?.setAscSize(ASCSize.DOT24x8)
+                printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNTOEND)
                printer?.addText(
                    AlignMode.LEFT, st.replace(bankEMIFooterTAndCSeparator, "")
                        .replace(Companion.disclaimerIssuerClose, "")
                )
-/*            textBlockList.add(
+           /* textBlockList.add(
                 sigleLineformat(
                     st.replace(bankEMIFooterTAndCSeparator, "")
                         .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
@@ -941,6 +951,9 @@ class PrintUtil(context: Context?) {
             textBlockList.clear()*/
 
            }
+
+           // reset printer font
+           printer?.setAscSize(ASCSize.DOT24x12)
        }
         //endregion
         //region=====================SCHEME TAndC===============
@@ -963,10 +976,21 @@ class PrintUtil(context: Context?) {
                         )
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()*/
-                        printer?.setHzScale(HZScale.SC1x1)
-                        printer?.setHzSize(HZSize.DOT24x16)
+//                        printer?.setHzScale(HZScale.SC1x1)
+//                        printer?.setHzSize(HZSize.DOT24x16)
+                        printer?.setAscScale(ASCScale.SC1x1)
+                        printer?.setAscSize(ASCSize.DOT24x8)
+                        printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNTOEND)
                         printer?.addText( AlignMode.LEFT,  st.replace(bankEMIFooterTAndCSeparator, "")
                             .replace(Companion.disclaimerIssuerClose, ""))
+
+//                        textBlockList.add(
+//                            sigleLineformat(st.replace(bankEMIFooterTAndCSeparator, "")
+//                                .replace(Companion.disclaimerIssuerClose, ""), AlignMode.LEFT
+//                            )
+//                        )
+//                        printer?.addMixStyleText(textBlockList)
+//                        textBlockList.clear()
                     }
                 }
 
@@ -1021,6 +1045,9 @@ class PrintUtil(context: Context?) {
                             }
                         }
                     }
+
+                    // reset printer font
+                    printer?.setAscSize(ASCSize.DOT24x12)
                 }
 
             }
@@ -2505,6 +2532,7 @@ class PrintUtil(context: Context?) {
     }
 
     private fun printSeperator() {
+        printer?.setPrintFormat(PrintFormat.FORMAT_MOREDATAPROC, PrintFormat.VALUE_MOREDATAPROC_PRNONELINE)
         sigleLineText("-----------------------------------------", AlignMode.CENTER)
     }
 
@@ -2570,8 +2598,8 @@ class PrintUtil(context: Context?) {
 
         var str = s
         val parts: MutableList<String> = ArrayList()
-        while (str.length > 34) {
-            var splitAt = 34 - 1
+        while (str.length > limit) {
+            var splitAt = limit - 1
             while (splitAt > 0 && !Character.isWhitespace(str[splitAt])) {
                 splitAt--
             }

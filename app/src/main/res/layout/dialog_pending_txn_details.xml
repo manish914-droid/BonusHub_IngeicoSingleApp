@@ -180,6 +180,8 @@
             android:background="#013480"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
             android:paddingTop="@dimen/pad_20"
             android:paddingBottom="@dimen/pad_20">
 
@@ -189,17 +191,39 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:background="@drawable/edge_blue_bg_white"
+                android:fontFamily="@font/muli_regular"
+                android:gravity="center"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="@string/ok"
+                android:textAllCaps="true"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                android:layout_marginStart="@dimen/pad_15"
+                android:layout_marginEnd="@dimen/pad_15"/>
+
+            <TextView
+                android:id="@+id/txtViewPrint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:background="@drawable/edge_white_bg_blue"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="center"
+                android:paddingStart="@dimen/pad_24"
+                android:paddingEnd="@dimen/pad_24"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:paddingStart="@dimen/pad_15"
-                android:paddingEnd="@dimen/pad_15"
-                android:text="@string/ok"
+                android:text="@string/print"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
-                android:textSize="@dimen/text_size_regular" />
+                android:textSize="@dimen/text_size_regular"
+                android:layout_marginStart="@dimen/pad_15"
+                android:layout_marginEnd="@dimen/pad_15"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </LinearLayout>

@@ -89,7 +89,7 @@
                 android:visibility="visible">
 
                 <EditText
-                    android:id="@+id/search_et"
+                    android:id="@+id/txnIdSearchET"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/edge_blue_bg_white"
