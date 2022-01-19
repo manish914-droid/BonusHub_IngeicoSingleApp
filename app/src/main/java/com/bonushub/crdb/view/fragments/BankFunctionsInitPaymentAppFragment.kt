@@ -155,4 +155,4 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
 
 }
 
-data class TidsListModel(var tids:String, var des:String,var status:String)
+data class TidsListModel(var tids:String, var des:String,var status:String,var linkTidType:String)
