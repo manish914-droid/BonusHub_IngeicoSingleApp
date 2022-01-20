@@ -12,13 +12,12 @@ import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.utils.PrefConstant
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.logger
-import com.bonushub.crdb.utils.updateBaseTid
 import com.bonushub.crdb.view.fragments.TableEditHelper
 import com.bonushub.crdb.view.fragments.TidsListModel
-import com.bonushub.crdb.utils.PrefConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -85,7 +84,13 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
 
         withContext(Dispatchers.IO) {
 
-        var table = appDao.getTerminalParameterTableData()
+       // var table = appDao.getTerminalParameterTableData() // old
+            var table:TerminalParameterTable? = null
+            if(AppPreference.getLogin()) {
+                table = appDao?.getTerminalParameterTableDataByTidType("1")
+            }else{
+                table = appDao?.getTerminalParameterTableDataByTidType("-1")
+            }
 
             val props = TerminalParameterTable::class.java.declaredFields
             for (prop in props) {
@@ -98,7 +103,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
                     prop.isAccessible = true
                     //val fieldName = prop.name
                     try {
-                        val value = prop.get(table.get(0))
+                        val value = prop.get(table)
                         if (value is String) {
                             dataListLocal?.add(TableEditHelper(ann.name, value, ann2.index))
                             //dataList.value?.add(TableEditHelper(fieldName, value,ann2.index))
@@ -179,7 +184,13 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         //val table: Any? = getTable()
 
         withContext(Dispatchers.IO) {
-        val table: Any? = appDao.getTerminalParameterTableData().get(0)
+        //val table: Any? = appDao.getTerminalParameterTableData().get(0) // old
+            var table:TerminalParameterTable? = null
+            if(AppPreference.getLogin()) {
+                table = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            }else{
+                table = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+            }
 
         if (table != null) {
             if (data.isNotEmpty()) {
@@ -200,14 +211,17 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
                                 // logger("TID case update",value.toString(),"e")
                                 // logger("TID case update",ed?.titleValue?:"")
 
-                                val tids = updateBaseTid(
-                                    appDao,
-                                    ed?.titleValue ?: ""
-                                )
+                                    // old
+//                                val tids = updateBaseTid(
+//                                    appDao,
+//                                    ed?.titleValue ?: ""
+//                                )
 
                                 // logger("TID case update",tids.toString(),"e")
 
-                                prop.set(table, tids)
+                                    // old
+                               // prop.set(table, tids)
+                                prop.set(table, ed?.titleValue)
 
 
                             }

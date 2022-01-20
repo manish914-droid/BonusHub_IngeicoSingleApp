@@ -45,10 +45,10 @@
                             android:name="androidx.navigation.fragment.NavHostFragment"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            app:defaultNavHost="true"
-                            app:navGraph="@navigation/navigation_graph"
                             android:layout_above="@+id/footerApp"
-                            android:layout_below="@+id/toobar"/>
+                            android:layout_below="@+id/toobar"
+                            app:defaultNavHost="true"
+                            app:navGraph="@navigation/navigation_graph" />
 
                         <include layout="@layout/footer_app"
                             android:id="@+id/footerApp"

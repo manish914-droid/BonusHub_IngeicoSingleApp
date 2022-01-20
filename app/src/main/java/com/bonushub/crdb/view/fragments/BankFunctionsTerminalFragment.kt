@@ -19,6 +19,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsTerminalBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.checkBaseTid
@@ -120,9 +121,17 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         */
 
         runBlocking{
-            val tids = checkBaseTid(DBModule.appDatabase.appDao)
+           // val tids = checkBaseTid(DBModule.appDatabase.appDao) // old
 
-            if(dataList[position]?.titleValue.equals(tids[0])) {
+            var tpt: TerminalParameterTable? = null
+            if(AppPreference.getLogin()) {
+                tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            }else{
+                tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+            }
+
+            //if(dataList[position]?.titleValue.equals(tids[0])) { // old
+            if(dataList[position]?.titleValue.equals(tpt?.terminalId)) {
 
                 verifySuperAdminPasswordAndUpdate()
             }else{
