@@ -16,6 +16,7 @@ import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentCommunicationOptionSubMenuBinding
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.utils.ToastUtils
 import com.bonushub.crdb.utils.checkBaseTid
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
@@ -99,9 +100,17 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                 */
 
                 runBlocking {
-                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+                    //val tids = checkBaseTid(DBModule.appDatabase?.appDao) // old
 
-                    if (dataList[position]?.titleValue.equals(tids[0])){
+                    var tpt: TerminalParameterTable? = null
+                    if(AppPreference.getLogin()) {
+                        tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+                    }else{
+                        tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+                    }
+
+                    //if (dataList[position]?.titleValue.equals(tids[0])){// old
+                    if (dataList[position]?.titleValue.equals(tpt?.terminalId)){
                         verifySuperAdminPasswordAndUpdate()
                     }else {
                         updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
@@ -113,9 +122,17 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
             CommunicationParamItem.APP_UPDATE_PARAM -> {
                 logger("sub","menu2")
                 runBlocking {
-                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
+                    //val tids = checkBaseTid(DBModule.appDatabase?.appDao) // old
 
-                    if (dataList[position]?.titleValue.equals(tids[0])){
+                    var tpt: TerminalParameterTable? = null
+                    if(AppPreference.getLogin()) {
+                        tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+                    }else{
+                        tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+                    }
+
+                   // if (dataList[position]?.titleValue.equals(tids[0])){ // old
+                    if (dataList[position]?.titleValue.equals(tpt?.terminalId)){
                         verifySuperAdminPasswordAndUpdate()
                     }else {
                         updateTPTOptionsValue(position, dataList[position]?.titleName?:"")
@@ -285,10 +302,19 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                 iDialog?.showProgress(getString(R.string.please_wait_host))
 
                 runBlocking {
-                    val tids = checkBaseTid(DBModule.appDatabase?.appDao)
-                    if(!tids.get(0).isEmpty()!!) {
+                    // val tids = checkBaseTid(DBModule.appDatabase?.appDao) // old
+                    var tpt:TerminalParameterTable? = null
+                    if(AppPreference.getLogin()) {
+                        tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+                    }else{
+                        tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+                    }
 
-                        initViewModel.insertInfo1(tids[0] ?:"")
+                   // if(!tids.get(0).isEmpty()!!) {
+                    if(!tpt?.terminalId.isNullOrEmpty()) {
+
+                        //initViewModel.insertInfo1(tids[0] ?:"") // old
+                        initViewModel.insertInfo1(tpt?.terminalId?:"")
                         observeMainViewModel()
                     }
                 }

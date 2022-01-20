@@ -24,11 +24,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.R
 import com.bonushub.crdb.appupdate.AppUpdateDownloadManager
 import com.bonushub.crdb.appupdate.OnDownloadCompleteListener
 
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
+import com.bonushub.crdb.databinding.FooterAppBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
@@ -74,6 +76,7 @@ import com.usdk.apiservice.aidl.tms.UTMS
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_navigation.*
+import kotlinx.android.synthetic.main.navigation_footer_layout.view.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.lang.Runnable
@@ -376,6 +379,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     //region==========Setting for sidebar details==========
     private fun refreshDrawer() {
+
+
+        headerView?.let { footer?.version_name?.text = "App Version :${BuildConfig.VERSION_NAME}"}
+        headerView?.let { footer?.help_desk_number?.text = getString(R.string.help_desk_number_hint)}
+
         lifecycleScope.launch{
            // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
             var tpt:TerminalParameterTable? = null
@@ -407,7 +415,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 mainDrawerBinding?.mdMidTv?.text = mid
             }
         }
-
 
     }
 

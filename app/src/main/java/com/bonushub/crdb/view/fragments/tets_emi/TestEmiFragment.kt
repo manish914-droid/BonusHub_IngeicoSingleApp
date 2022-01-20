@@ -54,8 +54,18 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
         iTestEmiItemClick = this
         testEmiItem.clear()
-        val tpt=Field48ResponseTimestamp.getTptData()
-        val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String>
+        //val tpt=Field48ResponseTimestamp.getTptData() // old
+        val tpt=Field48ResponseTimestamp.getAllTptData()
+       // val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String> // old
+        val linkedTid = ArrayList<String>()
+
+        for(item in tpt)
+        {
+            if(!item?.terminalId.equals("-1")) {
+                linkedTid.add(item?.LinkTidType ?: "")
+            }
+        }
+
         for (tid in linkedTid){
             when(tid){
              "0"->{

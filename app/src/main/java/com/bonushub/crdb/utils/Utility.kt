@@ -37,6 +37,7 @@ import java.net.InetSocketAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 
 /**
@@ -592,7 +593,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
 //endregion
 
-    //region======================Get TPT Data:-
+    //region======================Get TPT Data:-  // already present in line no 1250
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
@@ -1251,6 +1252,18 @@ object Field48ResponseTimestamp {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
             tptData = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            val jsonResp=Gson().toJson(tptData)
+            println(jsonResp)
+        }
+        return tptData
+    }
+//endregion
+//
+// region======================Get TPT Data:-
+    fun getAllTptData(): ArrayList<TerminalParameterTable?> {
+        var tptData = ArrayList<TerminalParameterTable?>()
+        runBlocking(Dispatchers.IO) {
+            tptData = DBModule.appDatabase.appDao?.getTerminalParameterTableData() as ArrayList<TerminalParameterTable?>
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }
