@@ -17,6 +17,7 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -182,7 +183,7 @@ class QrFragment : Fragment() {
 
                                                 txnSuccessToast(activity as Context)
                                                 // kushal
-                                               /* PrintUtil(context).printSMSUPIChagreSlip(
+                                                PrintUtil(context).printSMSUPIChagreSlip(
                                                     tabledata,
                                                     EPrintCopyType.MERCHANT,
                                                     context
@@ -198,7 +199,7 @@ class QrFragment : Fragment() {
                                                         }
 
                                                     }
-                                                }*/
+                                                }
                                             }
                                             else -> {
                                                 deleteDigiposData(

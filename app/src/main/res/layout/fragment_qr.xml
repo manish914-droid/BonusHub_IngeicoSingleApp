@@ -38,7 +38,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginStart="@dimen/pad_50"
                 android:layout_marginEnd="@dimen/pad_50"
-                android:background="@color/colorGrey" />
+                android:background="@color/white" />
 
         </RelativeLayout>
 

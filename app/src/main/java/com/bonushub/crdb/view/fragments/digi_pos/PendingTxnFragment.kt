@@ -21,6 +21,7 @@ import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -351,7 +352,13 @@ class PendingTxnListAdapter(private var digiData:ArrayList<DigiPosDataTable>,pri
 
         var model = digiData[position]
 
-        val amountData = "\u20B9 $model.amount}"
+        val amountData = "\u20B9 ${model.amount}"
+        // temp for test
+//        logger("model.paymentMode",""+model.paymentMode)
+//        logger("model.paymentMode",""+model.displayFormatedDate)
+//        logger("model.paymentMode",""+amountData)
+//        logger("model.paymentMode",""+model.customerMobileNumber)
+
         holder.viewBinding.txtViewTxnType.text = model.paymentMode
         holder.viewBinding.txtViewDateTime.text = model.displayFormatedDate
         holder.viewBinding.txtViewAmount.text = amountData

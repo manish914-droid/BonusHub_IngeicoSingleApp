@@ -13,9 +13,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
+import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentTxnListBinding
 import com.bonushub.crdb.databinding.ItemPendingTxnBinding
+import com.bonushub.crdb.di.DBModule
+import com.bonushub.crdb.model.local.AppPreference
+import com.bonushub.crdb.model.local.TerminalParameterTable
+import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.view.activity.NavigationActivity
@@ -23,10 +28,12 @@ import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.parseDataListWithSplitter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -46,6 +53,21 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
     private var txnDataList = mutableListOf<DigiPosTxnModal>()
     private lateinit var digiPosTxnListAdapter: DigiPosTxnListAdapter
 
+    private var iDialog:BaseActivityNew? = null
+
+    private var perPageRecord = "0"
+    private var hasMoreData = false
+    private var pageNumber = "1"
+    private var partnerTransactionID = ""
+    private var mTransactionID = ""
+    private var bottomSheetAmountData = ""
+    private var filterTransactionType = ""
+    private var totalRecord = "0"
+    private var requestTypeID = EnumDigiPosProcess.TXN_LIST.code
+    private var field57RequestData = "$requestTypeID^$totalRecord^$filterTransactionType^$bottomSheetAmountData^$partnerTransactionID^$mTransactionID^$pageNumber^"
+    private var tempDataList = mutableListOf<String>()
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,6 +81,7 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        iDialog = (activity as BaseActivityNew)
         sheetBehavior = binding?.bottomSheet?.let { BottomSheetBehavior.from(it.bottomLayout) }
 
         iTxnListItemClick = this
@@ -83,7 +106,7 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
         )
         // end region
         setupRecyclerview()
-      //  getDigiPosTransactionListFromHost() // kushal
+        getDigiPosTransactionListFromHost() // kushal
 
         binding?.txtViewFilters?.setOnClickListener {
             logger("filter","openBottomSheet","e")
@@ -356,6 +379,209 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
     override fun iTxnListItemClick() {
         logger("item","click","e")
     }
+
+    private var processingCode = EnumDigiPosProcessingCode.DIGIPOSPROCODE.code
+
+    //region==========================Get DigiPos TXN List Data from Host:-
+    private fun getDigiPosTransactionListFromHost() {
+        Log.d("Field57:- ", field57RequestData)
+        iDialog?.showProgress()
+        val idw = runBlocking(Dispatchers.IO) {
+            IsoDataWriter().apply {
+                //val terminalData = TerminalParameterTable.selectFromSchemeTable() // old
+
+                var terminalData: TerminalParameterTable? = null
+                if(AppPreference.getLogin()) {
+                    terminalData = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+                }else{
+                    terminalData = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+                }
+
+                if (terminalData != null) {
+                    mti = Mti.EIGHT_HUNDRED_MTI.mti
+
+                    //Processing Code Field 3
+                    addField(3, processingCode)
+
+                    //STAN(ROC) Field 11
+                    //addField(11, ROCProviderV2.getRoc(AppPreference.getBankCode()).toString()) // kushal
+                    addField(11, "000236")
+
+                    //NII Field 24
+                    addField(24, Nii.BRAND_EMI_MASTER.nii)
+
+                    //TID Field 41
+                    addFieldByHex(41, terminalData.terminalId)
+
+                    //Connection Time Stamps Field 48
+                    addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
+
+                    //adding Field 57
+                    addFieldByHex(57, field57RequestData)
+
+                    //adding Field 61
+                    val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
+                    val pcNumber =
+                        addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
+                    val pcNumber2 =
+                        addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
+                    val f61 = ConnectionType.GPRS.code + addPad(
+                        AppPreference.getString("deviceModel"),
+                        " ",
+                        6,
+                        false
+                    ) + addPad(
+                        HDFCApplication.appContext.getString(R.string.app_name),
+                        " ",
+                        10,
+                        false
+                    ) + version + pcNumber + pcNumber2
+                    //adding Field 61
+                    addFieldByHex(61, f61)
+
+                    //adding Field 63
+                    val deviceSerial =
+                        addPad(AppPreference.getString("serialNumber"), " ", 15, false)
+                    val bankCode = AppPreference.getBankCode()
+                    val f63 = "$deviceSerial$bankCode"
+                    addFieldByHex(63, f63)
+                }
+            }
+        }
+
+        logger("DIGIPOS REQ1>>", idw.isoMap, "e")
+
+        // val idwByteArray = idw.generateIsoByteRequest()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            HitServer.hitDigiPosServer(idw, false) { result, success ->
+                if (success) {
+                    var responseMsg = ""
+                    val responseIsoData: IsoDataReader = readIso(result, false)
+                    val txnMsg=   responseIsoData.isoMap[39]?.parseRaw2String().toString() +
+                            responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                    // kushal
+                    /*ROCProviderV2.incrementFromResponse(
+                        ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
+                        AppPreference.getBankCode()
+                    )*/
+
+                    logger("Transaction RESPONSE ", "---", "e")
+                    logger("Transaction RESPONSE --->>", responseIsoData.isoMap, "e")
+                    Log.e(
+                        "Success 39-->  ",
+                        responseIsoData.isoMap[39]?.parseRaw2String().toString() + "---->" +
+                                responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                    )
+                    val successResponseCode =
+                        responseIsoData.isoMap[39]?.parseRaw2String().toString()
+                    if (responseIsoData.isoMap[58] != null) {
+                        responseMsg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                    }
+
+                    val responseField57 = responseIsoData.isoMap[57]?.parseRaw2String().toString()
+
+                    when (successResponseCode) {
+                        "00" -> {
+                            if (responseIsoData.isoMap[57] != null) {
+                                parseTXNListDataAndShowInRecyclerView(responseField57)
+                            }
+                        }
+
+                        "-1" -> {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                iDialog?.hideProgress()
+                                // binding?.emptyViewPlaceholder?.visibility= View.VISIBLE
+                                ToastUtils.showToast(requireContext(),responseMsg)
+                                digiPosTxnListAdapter.refreshAdapterList(txnDataList)
+                            }
+                        }
+
+                        else -> {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                iDialog?.hideProgress()
+                                digiPosTxnListAdapter.refreshAdapterList(txnDataList)
+                                hasMoreData = false
+                                iDialog?.alertBoxWithAction(
+                                    getString(R.string.error), txnMsg,
+                                    false, getString(R.string.positive_button_ok),
+                                    { parentFragmentManager.popBackStackImmediate() }, {}, R.drawable.ic_info)
+                            }
+                        }
+                    }
+                } else {
+                    // kushal
+                    /*ROCProviderV2.incrementFromResponse(
+                        ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
+                        AppPreference.getBankCode()
+                    )*/
+
+                    iDialog?.hideProgress()
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        iDialog?.hideProgress()
+                        hasMoreData = false
+                        iDialog?.alertBoxWithAction(
+                            getString(R.string.error), result,
+                            false, getString(R.string.positive_button_ok),
+                            { parentFragmentManager.popBackStackImmediate() }, {},R.drawable.ic_info)
+                    }
+                }
+            }
+        }
+    }
+    //endregion
+
+    //region========================Parse DigiPos TXN List Data and Show in RecyclerView:-
+    private fun parseTXNListDataAndShowInRecyclerView(field57Data: String) {
+        if (!TextUtils.isEmpty(field57Data)) {
+            val dataList =
+                parseDataListWithSplitter(SplitterTypes.VERTICAL_LINE.splitter, field57Data)
+            if (dataList.isNotEmpty()) {
+                requestTypeID = dataList[0]
+                //hasMoreData = dataList[1] ----> This Data from Host will always be "0" so we need to manage Pagination in App-End Side
+                perPageRecord = dataList[2]
+                totalRecord = (totalRecord.toInt().plus(perPageRecord.toInt()).toString())
+
+                tempDataList.clear()
+                tempDataList = dataList.subList(3, dataList.size)
+                for (i in tempDataList.indices) {
+                    //Below we are splitting Data from tempDataList to extract brandID , categoryID , parentCategoryID , categoryName:-
+                    if (!TextUtils.isEmpty(tempDataList[i])) {
+                        val splitData = parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter,
+                            tempDataList[i]
+                        )
+                        txnDataList.add(
+                            DigiPosTxnModal(
+                                requestTypeID,
+                                splitData[0], splitData[1],
+                                splitData[2], splitData[3],
+                                splitData[4], splitData[5],
+                                splitData[6], splitData[7],
+                                splitData[8], splitData[9],
+                                splitData[10], splitData[11]
+                            )
+                        )
+                    }
+                }
+                //Inflate Update Data in Adapter List:-
+                lifecycleScope.launch(Dispatchers.Main) {
+                    hasMoreData = tempDataList.isNotEmpty() && tempDataList.size >= 10
+                    if (txnDataList.isNotEmpty()) {
+                        digiPosTxnListAdapter.refreshAdapterList(txnDataList)
+                    }
+                    iDialog?.hideProgress()
+                }
+            }
+        } else {
+            lifecycleScope.launch(Dispatchers.Main) {
+                iDialog?.hideProgress()
+                hasMoreData = false
+                ToastUtils.showToast(requireContext(),"No Data Found")
+            }
+        }
+    }
+    //endregion
 
 }
 

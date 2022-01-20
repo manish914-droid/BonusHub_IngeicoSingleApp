@@ -1290,42 +1290,51 @@ object Field48ResponseTimestamp {
     //region== insert digipos data
     fun insertOrUpdateDigiposData(param: DigiPosDataTable){
         runBlocking(Dispatchers.IO) {
-            appDatabase.appDao.insertOrUpdateDigiposData(
+            val effectedRow = appDatabase.appDao.insertOrUpdateDigiposData(
                 param
             )
+            logger("effectedRow",""+effectedRow)
         }
 
     }
 
     fun deleteDigiposData(digiPosDataTable: DigiPosDataTable){
         runBlocking(Dispatchers.IO) {
-            appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+            val effectedRow = appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+            logger("effectedRow",""+effectedRow)
         }
 
     }
 
     fun deleteDigiposData(partnerTxnId: String){
         runBlocking(Dispatchers.IO) {
-            var digiPosDataTable = DigiPosDataTable(partnerTxnId = partnerTxnId)
-            appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+            val digiPosDataTable = DigiPosDataTable(partnerTxnId = partnerTxnId)
+            val effectedRow = appDatabase.appDao.deleteDigiposData(digiPosDataTable)
+            logger("effectedRow",""+effectedRow)
         }
 
     }
 
-    fun selectAllDigiPosData():MutableList<DigiPosDataTable>?{
-        runBlocking(Dispatchers.IO) {
-            return@runBlocking appDatabase.appDao.getAllDigiposData()
-        }
+    fun selectAllDigiPosData():ArrayList<DigiPosDataTable?>{
 
-        return null
+        var digiPosData = ArrayList<DigiPosDataTable?>()
+        runBlocking(Dispatchers.IO) {
+            digiPosData = DBModule.appDatabase.appDao.getAllDigiposData() as ArrayList<DigiPosDataTable?>
+            val jsonResp=Gson().toJson(digiPosData)
+            println(jsonResp)
+        }
+        return digiPosData
     }
 
-    fun selectDigiPosDataAccordingToTxnStatus(status: String):MutableList<DigiPosDataTable>?{
-        runBlocking(Dispatchers.IO) {
-            return@runBlocking appDatabase.appDao.getDigiPosDataTableByTxnStatus(status)
-        }
+    fun selectDigiPosDataAccordingToTxnStatus(status: String):ArrayList<DigiPosDataTable?>{
 
-        return null
+        var digiPosData: java.util.ArrayList<DigiPosDataTable?>
+        runBlocking(Dispatchers.IO) {
+            digiPosData = DBModule.appDatabase.appDao.getDigiPosDataTableByTxnStatus(status) as ArrayList<DigiPosDataTable?>
+            val jsonResp=Gson().toJson(digiPosData)
+            println(jsonResp)
+        }
+        return digiPosData
     }
 
 
@@ -1532,5 +1541,24 @@ fun getBrandTAndCDataByBrandId(brandId : String): String {
             return sb.toString()
         } else return ""
     }
+
+    //region=======================DataParser According to Splitter Provided in Method and Return MutableList:-
+    fun parseDataListWithSplitter(splitterType: String, data: String): MutableList<String> {
+        var dataList = mutableListOf<String>()
+        when (splitterType) {
+            SplitterTypes.CLOSED_CURLY_BRACE.splitter -> {
+                dataList = data.split(splitterType) as MutableList<String>
+            }
+            SplitterTypes.VERTICAL_LINE.splitter -> {
+                dataList = data.split(splitterType) as MutableList<String>
+            }
+            SplitterTypes.CARET.splitter -> {
+                dataList = data.split(splitterType) as MutableList<String>
+            }
+        }
+
+        return dataList
+    }
+//endregion
 
 }

@@ -21,6 +21,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EDashboardItem
 import com.bonushub.crdb.utils.IsoDataReader
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.bonushub.crdb.utils.readIso
 import com.google.gson.Gson
@@ -365,7 +366,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                             txnSuccessToast(activity as Context)
                                                                             // kushal
                                                                             logger("call","printSMSUPIChagreSlip","e")
-                                                                            /*PrintUtil(context).printSMSUPIChagreSlip(
+                                                                            PrintUtil(context).printSMSUPIChagreSlip(
                                                                                 tabledata,
                                                                                 EPrintCopyType.MERCHANT,
                                                                                 context
@@ -375,7 +376,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
 
                                                                                 }
-                                                                            }*/
+                                                                            }
                                                                         }
                                                                         else -> {
                                                                             Field48ResponseTimestamp.deleteDigiposData(
@@ -406,7 +407,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
                                                                                 }
                                                                             },
-                                                                            {})
+                                                                            {},
+                                                                            R.drawable.ic_info)
                                                                     }
                                                                 }
 
@@ -426,7 +428,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                 val dpObj = Gson().toJson(dp)
                                                 logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                                 parentFragmentManager.popBackStack()
-                                            })
+                                            },
+                                            R.drawable.ic_link_circle)
                                     } else {
                                         // received other than S101(show Fail info dialog here)
                                         withContext(Dispatchers.Main) {
@@ -444,7 +447,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                         parentFragmentManager.popBackStack()
                                                     }
                                                 },
-                                                {})
+                                                {},
+                                                R.drawable.ic_info)
                                         }
 
                                     }
@@ -480,11 +484,12 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                         val blobByteArray = BytesUtil.hexString2Bytes(blobHexString)
 
                                         //    val blobByteArray = blobHexString.decodeHexStringToByteArray()
+                                        var transactionTypeTemp = transactionType
                                         (activity as BaseActivityNew).transactFragment(QrFragment().apply {
                                             arguments = Bundle().apply {
                                                 putByteArray("QrByteArray", blobByteArray)
-                                                putSerializable("type", transactionType)
-                                               // putParcelable("tabledata", tabledata) // kushal
+                                                putSerializable("type", transactionTypeTemp)
+                                                putParcelable("tabledata", tabledata) // kushal
                                             }
                                         })
                                     } else if (respDataList[2] == EDigiPosPaymentStatus.Fail.desciption) {

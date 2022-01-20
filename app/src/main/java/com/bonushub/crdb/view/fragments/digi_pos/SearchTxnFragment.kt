@@ -109,9 +109,9 @@ class SearchTxnFragment : Fragment() {
                         tabledata.mTxnId = statusRespDataList[4]
                         tabledata.partnerTxnId = statusRespDataList[6]
                         tabledata.transactionTimeStamp = statusRespDataList[7]
-                        val dateTime = statusRespDataList[7].split(" ")
-                        tabledata.txnDate = dateTime[0]
-                        tabledata.txnTime = dateTime[1]
+//                        val dateTime = statusRespDataList[7].split(" ")
+//                        tabledata.txnDate = dateTime[0]
+//                        tabledata.txnTime = dateTime[1]
                         tabledata.amount = statusRespDataList[8]
                         tabledata.paymentMode = statusRespDataList[9]
                         tabledata.customerMobileNumber = statusRespDataList[10]
@@ -180,12 +180,15 @@ class SearchTxnFragment : Fragment() {
                 txtViewPrint.visibility=View.GONE
             }
 
+            status=digiData.status
+
             txtViewAmount.text = digiData.amount
             txtViewMode.text = digiData.paymentMode
             txtViewTXNId.text = digiData.partnerTxnId
             txtViewMTXNId.text = digiData.mTxnId
             txtViewPhoneNumber.text = digiData.customerMobileNumber
             txtViewStatus.text = status
+
 
 
             txtViewOk.setOnClickListener {

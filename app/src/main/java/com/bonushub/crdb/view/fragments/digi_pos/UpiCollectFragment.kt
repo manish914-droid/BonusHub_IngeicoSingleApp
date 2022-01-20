@@ -14,6 +14,7 @@ import com.bonushub.crdb.model.local.DigiPosDataTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
@@ -265,7 +266,7 @@ class UpiCollectFragment : Fragment() {
 
                                                                             txnSuccessToast(activity as Context)
                                                                         // kushal
-                                                                        /*PrintUtil(context).printSMSUPIChagreSlip(
+                                                                        PrintUtil(context).printSMSUPIChagreSlip(
                                                                                 tabledata,
                                                                                 EPrintCopyType.MERCHANT,
                                                                                 context
@@ -275,7 +276,7 @@ class UpiCollectFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
 
                                                                                 }
-                                                                            }*/
+                                                                            }
                                                                         }
                                                                         else -> {
                                                                             Field48ResponseTimestamp.deleteDigiposData(tabledata)
@@ -305,7 +306,7 @@ class UpiCollectFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
                                                                                 }
                                                                             },
-                                                                            {})
+                                                                            {}, R.drawable.ic_info)
                                                                     }
                                                                 }
 
@@ -325,7 +326,7 @@ class UpiCollectFragment : Fragment() {
                                                 val dpObj = Gson().toJson(dp)
                                                 logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                                 parentFragmentManager.popBackStack()
-                                            })
+                                            }, R.drawable.ic_link_circle)
                                     } else {
                                         // received other than S101(show Fail info dialog here)
                                         withContext(Dispatchers.Main) {
@@ -343,7 +344,7 @@ class UpiCollectFragment : Fragment() {
                                                         parentFragmentManager.popBackStack()
                                                     }
                                                 },
-                                                {})
+                                                {}, R.drawable.ic_info)
                                         }
 
                                     }

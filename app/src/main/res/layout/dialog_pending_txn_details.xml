@@ -168,7 +168,8 @@
                 android:layout_toEndOf="@+id/txtViewStatusTitle"
                 android:fontFamily="@font/muli_light"
                 android:textColor="@color/txt_color"
-                android:textSize="@dimen/text_size_regular" />
+                android:textSize="@dimen/text_size_regular"
+                />
 
         </RelativeLayout>
 
