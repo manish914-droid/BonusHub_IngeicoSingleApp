@@ -921,6 +921,59 @@ data class HDFCCdt(
     var issuerName: String = ""
 )
 
+//table for WifiCommunication Table 203
+@Entity
+data class WifiCommunicationTable(
+
+    @field:BHFieldParseIndex(0)
+    var parameterControlId: String = "",
+
+    @field:BHFieldParseIndex(1)
+    var actionId: String = "",
+
+    @PrimaryKey
+    @field:BHFieldParseIndex(2)
+    var tableId: String = "",
+
+    @field:BHFieldParseIndex(3)
+    var isActive: String = "",
+
+    @field:BHFieldParseIndex(4)
+    var recordId: String = "",
+
+    @field:BHFieldParseIndex(5)
+    var gprPrimaryHostIP : String = "",
+
+    @field:BHFieldParseIndex(6)
+    var gprPrimaryHostPort : String = "",
+
+    @field:BHFieldParseIndex(7)
+    var gprAPN : String = "",
+
+    @field:BHFieldParseIndex(8)
+    var gprAPNUserName: String = "",
+
+    @field:BHFieldParseIndex(9)
+    var gprAPNPassword : String = "",
+
+    @field:BHFieldParseIndex(10)
+    var gprsTimeOut: String = "",
+
+    @field:BHFieldParseIndex(11)
+    var wifiHostIP : String = "",
+
+    @field:BHFieldParseIndex(12)
+    var wifiHostPort : String = "",
+
+    @field:BHFieldParseIndex(13)
+    var wifiTimeOut : String = "",
+
+    @field:BHFieldParseIndex(14)
+    var reserveValue : String = "",
+
+
+    )
+
 //region===========================================BrandEMIMasterCategory Table:-
 @Entity
 data class BrandEMIMasterCategoryTable(

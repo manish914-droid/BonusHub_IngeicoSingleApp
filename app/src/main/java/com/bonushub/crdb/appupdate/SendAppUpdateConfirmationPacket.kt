@@ -56,7 +56,7 @@ class SendAppUpdateConfirmationPacket@Inject constructor(private var appDao: App
             val bankCode = AppPreference.getBankCode()
             val f63 = "$deviceSerial$bankCode"
             addFieldByHex(63, f63)
-
+            logger("Update confirmation REQ PACKET -->", this.isoMap, "e")
         }
     }
 }

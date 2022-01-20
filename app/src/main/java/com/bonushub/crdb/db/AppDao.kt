@@ -146,6 +146,10 @@ interface AppDao{
     @Query("SELECT * FROM HDFCCdt")
     suspend fun getAllHDFCCDTTableData(): MutableList<HDFCCdt?>?
 
+    //region================================Wifi CDT Table Manipulation:-
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWifiCTTable(wifiCommunicationTable: WifiCommunicationTable): Long?
+
     fun getCardDataByHDFCCDTPanNumber(panNumber: String): HDFCCdt? = runBlocking {
         val cdtl = getAllHDFCCDTTableData()
         var result: HDFCCdt? = null
@@ -166,6 +170,10 @@ interface AppDao{
 
     @Delete
     suspend fun deleteHDFCCDT(hdfcCdt: HDFCCdt)
+    //endregion
+
+    @Delete
+    suspend fun deleteWifiCT(wifiCommunicationTable: WifiCommunicationTable)
     //endregion
 
     //region=================================BrandEMIMasterCategory Table Manipulation:-

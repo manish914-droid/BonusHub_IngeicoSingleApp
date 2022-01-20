@@ -290,6 +290,22 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     }
                 }
             }
+            splitter[2] == "203" -> {
+                val wifiCtTable = WifiCommunicationTable()
+                parseTableData(wifiCtTable, splitter) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        var insertStatus = 0L
+                        when (wifiCtTable.actionId) {
+                            "1", "2" -> {
+                                insertStatus =
+                                    appDatabase?.appDao?.insertWifiCTTable(wifiCtTable) ?: 0L
+                            }
+                            "3" -> appDatabase?.appDao?.deleteWifiCT(wifiCtTable)
+                        }
+                        Log.d("Wifi CDT Insert:- ", insertStatus.toString())
+                    }
+                }
+            }
         }
     }
 //endregion
