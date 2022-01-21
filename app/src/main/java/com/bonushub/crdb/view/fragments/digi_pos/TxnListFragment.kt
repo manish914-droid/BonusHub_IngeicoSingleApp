@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -29,6 +30,7 @@ import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.utils.EDashboardItem
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.parseDataListWithSplitter
+import com.bonushub.crdb.view.base.IDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -38,14 +40,14 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 
-class TxnListFragment : Fragment(), ITxnListItemClick {
+class TxnListFragment : Fragment() {
 
     private var sheetBehavior: BottomSheetBehavior<ConstraintLayout>? = null
 
     var binding:FragmentTxnListBinding? = null
     lateinit var transactionType: EDashboardItem
 
-    lateinit var iTxnListItemClick:ITxnListItemClick
+   // lateinit var iTxnListItemClick:ITxnListItemClick
 
     private var selectedFilterTransactionType: String = ""
     private var selectedFilterTxnID: String = ""
@@ -67,6 +69,8 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
     private var field57RequestData = "$requestTypeID^$totalRecord^$filterTransactionType^$bottomSheetAmountData^$partnerTransactionID^$mTransactionID^$pageNumber^"
     private var tempDataList = mutableListOf<String>()
 
+    private var selectedFilterTxnIDValue: String = ""
+    private var selectedFilterAmountValue: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +88,7 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
         iDialog = (activity as BaseActivityNew)
         sheetBehavior = binding?.bottomSheet?.let { BottomSheetBehavior.from(it.bottomLayout) }
 
-        iTxnListItemClick = this
+      //  iTxnListItemClick = this
         transactionType = arguments?.getSerializable("type") as EDashboardItem
 
         binding?.subHeaderView?.subHeaderText?.text = transactionType.title
@@ -112,6 +116,35 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
             logger("filter","openBottomSheet","e")
             toggleBottomSheet()
         }
+
+        binding?.bottomSheet?.applyReset?.setOnClickListener {
+            binding?.bottomSheet?.amountBottomET?.setText("0.0")
+            binding?.bottomSheet?.transactionIDET?.text?.clear()
+            binding?.bottomSheet?.txnIDRG?.clearCheck()
+            binding?.bottomSheet?.upiCollectBottomRB?.isChecked = false
+            binding?.bottomSheet?.dynamicQRBottomRB?.isChecked=false
+            binding?.bottomSheet?.smsPayBottomRB?.isChecked=false
+            binding?.bottomSheet?.staticQRBottomRB?.isChecked=false
+            cleardata()
+
+        }
+
+        //region======================Filter Apply Button onclick event:-
+        binding?.bottomSheet?.applyFilter?.setOnClickListener {
+            val amtStr = binding?.bottomSheet?.amountBottomET?.text?.toString() ?: "0.0"
+            bottomSheetAmountData = if (amtStr == "0.0") "" else amtStr
+            if (binding?.bottomSheet?.ptxnIDBottomRB?.isChecked == true)
+                partnerTransactionID = binding?.bottomSheet?.transactionIDET?.text.toString()
+            if (binding?.bottomSheet?.mtxnIDBottomRB?.isChecked == true)
+                mTransactionID = binding?.bottomSheet?.transactionIDET?.text.toString()
+
+            field57RequestData = "$requestTypeID^0^$filterTransactionType^$bottomSheetAmountData^$partnerTransactionID^$mTransactionID^1^"
+            closeBottomSheet()
+            tempDataList.clear()
+            txnDataList.clear()
+            getDigiPosTransactionListFromHost()
+        }
+        //endregion
 
         // region bottom sheet
         binding?.bottomSheet?.closeIconBottom?.setOnClickListener {
@@ -248,7 +281,23 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
         }
         //endregion
 
-        // end region
+        //region======================OnScrollListener to Load More Data in RecyclerView:-
+        binding?.transactionListRV?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!binding?.transactionListRV?.canScrollVertically(1)!! && dy > 0 && hasMoreData) {
+                    Log.d("MoreData:- ", "Loading.....")
+                    pageNumber = pageNumber.toInt().plus(1).toString()
+                    field57RequestData =
+                        "$requestTypeID^$totalRecord^$filterTransactionType^$bottomSheetAmountData^$partnerTransactionID^$mTransactionID^" +
+                                "$pageNumber^"
+                    getDigiPosTransactionListFromHost()
+                }
+            }
+
+        })
+        //endregion
     }
 
     //Method to be called when Bottom Sheet Toggle:-
@@ -261,7 +310,37 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
         }
     }
 
+    private  fun cleardata(){
+        selectedFilterTransactionType = ""
+        selectedFilterTxnID = ""
+        selectedFilterTxnIDValue = ""
+        selectedFilterAmountValue = ""
+        hasMoreData = false
+        perPageRecord = "0"
+        totalRecord = "0"
+        pageNumber = "1"
+        partnerTransactionID = ""
+        mTransactionID = ""
+        bottomSheetAmountData = ""
+        filterTransactionType = ""
+        tempDataList.clear()
+        txnDataList.clear()
+    }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        //if (context is IDialog) iDialog = context // kushal
+    }
+
+    override fun onStop() {
+        super.onStop()
+        cleardata()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+       // iDialog = null // kushal
+    }
 
     //region==================OnItemClickCB:-
     private fun onItemClickCB(position: Int, clickItem: String) {
@@ -376,9 +455,9 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
         }
     }
 
-    override fun iTxnListItemClick() {
+    /*override fun iTxnListItemClick() {
         logger("item","click","e")
-    }
+    }*/
 
     private var processingCode = EnumDigiPosProcessingCode.DIGIPOSPROCODE.code
 
@@ -585,10 +664,10 @@ class TxnListFragment : Fragment(), ITxnListItemClick {
 
 }
 
-interface ITxnListItemClick{
+/*interface ITxnListItemClick{
 
     fun iTxnListItemClick()
-}
+}*/
 
 class DigiPosTxnListAdapter( private var dataList: MutableList<DigiPosTxnModal>?,
                              private val onCategoryItemClick: (Int, String) -> Unit) : RecyclerView.Adapter<DigiPosTxnListAdapter.TxnListViewHolder>() {
