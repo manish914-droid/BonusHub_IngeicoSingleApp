@@ -13,7 +13,6 @@
     <string name="app_update_available_do_you_want_to_update">App updates are available, Do you want to update?</string>
 
 
-
     <!--TODO: Fallback-->
     <string name="fallback">Fallback</string>
     <string name="please_use_another_option">Please use another option for Transaction</string>
@@ -304,5 +303,6 @@
     <string name="print">Print</string>
     <string name="getStatus">Get Status</string>
     <string name="failed">Failed!!!</string>
+    <string name="txn_detail_page">TXN Detail Page</string>
 
 </resources>

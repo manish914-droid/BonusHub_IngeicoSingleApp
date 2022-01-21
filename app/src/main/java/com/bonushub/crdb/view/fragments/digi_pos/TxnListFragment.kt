@@ -426,11 +426,11 @@ class TxnListFragment : Fragment() {
                 }
             } else {
                     //DigiPosTXNListDetailPage()
-                (activity as NavigationActivity).transactFragment(PendingDetailsFragment().apply {
+                (activity as NavigationActivity).transactFragment(DigiPosTXNListDetailFragment().apply {
                     arguments = Bundle().apply {
                         putParcelable("data", txnDataList[position])
                         // putString(INPUT_SUB_HEADING, "")
-                        putSerializable("type", EDashboardItem.PENDING_TXN)
+                       // putSerializable("type", EDashboardItem.PENDING_TXN)
                     }
                 })
             }
