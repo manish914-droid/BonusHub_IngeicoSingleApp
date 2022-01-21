@@ -365,7 +365,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                 responsef57
                                                                             )
 
-                                                                            txnSuccessToast(activity as Context)
+                                                                            (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                                            //txnSuccessToast(activity as Context)
                                                                             // kushal
                                                                             logger("call","printSMSUPIChagreSlip","e")
                                                                             PrintUtil(context).printSMSUPIChagreSlip(

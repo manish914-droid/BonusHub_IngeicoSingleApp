@@ -183,7 +183,8 @@ class QrFragment : Fragment() {
                                                 )
                                                 Log.e("F56->>", responsef57)
 
-                                                txnSuccessToast(activity as Context)
+                                                (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                //txnSuccessToast(activity as Context)
                                                 // kushal
                                                 PrintUtil(context).printSMSUPIChagreSlip(
                                                     tabledata,

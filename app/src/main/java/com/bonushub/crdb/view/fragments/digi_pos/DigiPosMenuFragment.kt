@@ -13,6 +13,8 @@ import com.bonushub.crdb.databinding.ItemDigiPosBinding
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.utils.DigiPosItem
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.hexString2String
+import com.bonushub.crdb.utils.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -56,6 +58,16 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
         digiPosItem.addAll(DigiPosItem.values())
 
         setupRecyclerview()
+
+        try {
+            val h1 = hexString2String("4E4F494441202020202020202020202020202020202020")
+            val h2 = hexString2String("4E4F494441202020202020202055502020202020202020")
+            logger("h1",h1)
+            logger("h2",h2)
+        }catch (ex:Exception)
+        {
+            ex.printStackTrace()
+        }
     }
 
     private fun setupRecyclerview(){

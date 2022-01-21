@@ -27,6 +27,7 @@ import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EPrintCopyType
 import com.bonushub.crdb.utils.BhTransactionType
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getInitdataList
 import com.bonushub.crdb.utils.SplitterTypes
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -1305,6 +1306,13 @@ class PrintUtil(context: Context?) {
                     setLogoAndHeader()
                   /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
                     receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
+                    val ingtpt=getInitdataList()
+                    val header1= ingtpt?.merAddHeader1
+                    val header2=ingtpt?.merAddHeader2
+
+                    sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()
                     val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -2004,6 +2012,16 @@ class PrintUtil(context: Context?) {
                 setLogoAndHeader()
                /* receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
                 receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
+
+                val ingtpt=getInitdataList()
+                val header1= ingtpt?.merAddHeader1
+                val header2=ingtpt?.merAddHeader2
+
+                logger("header1",header1?:"")
+                logger("header2",header2?:"")
+                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
                 val formattime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
@@ -2092,6 +2110,16 @@ class PrintUtil(context: Context?) {
                 val tpt = getTptData()
 
                 setLogoAndHeader()
+
+                val ingtpt=getInitdataList()
+                val header1= ingtpt?.merAddHeader1
+                val header2=ingtpt?.merAddHeader2
+
+                logger("header1",header1?:"")
+                logger("header2",header2?:"")
+                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -2476,6 +2504,13 @@ class PrintUtil(context: Context?) {
 
           /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
             receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
+
+            val ingtpt=getInitdataList()
+            val header1= ingtpt?.merAddHeader1
+            val header2=ingtpt?.merAddHeader2
+
+            sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+            sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
             printSeperator()
             textBlockList.add(sigleLineformat("DATE:${digiPosData.txnDate}", AlignMode.LEFT))
