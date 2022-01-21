@@ -196,7 +196,10 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                                     when (statusRespDataList[5]) {
                                         EDigiPosPaymentStatus.Pending.desciption -> {
                                             tabledata.txnStatus = statusRespDataList[5]
-                                            ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                            lifecycleScope.launch(Dispatchers.Main){
+                                                ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                            }
+
                                         }
 
                                         EDigiPosPaymentStatus.Approved.desciption -> {
@@ -261,7 +264,9 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                                             EDigiPosPaymentStatus.Pending.desciption
                                         )
                                     val dpObj = Gson().toJson(dp)
-                                    ToastUtils.showToast(requireContext(),statusRespDataList[1])
+                                    lifecycleScope.launch(Dispatchers.Main){
+                                        ToastUtils.showToast(requireContext(),statusRespDataList[1])
+                                    }
                                     logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                     Log.e("F56->>", responsef57)
                                     runBlocking(Dispatchers.Main) {

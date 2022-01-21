@@ -162,7 +162,9 @@ class QrFragment : Fragment() {
                                                     tabledata
                                                 )
                                                 Log.e("F56->>", responsef57)
+                                                lifecycleScope.launch(Dispatchers.Main){
                                                 ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                                }
                                                 lifecycleScope.launch(Dispatchers.Main) {
                                                     parentFragmentManager.popBackStack(
                                                         DigiPosMenuFragment::class.java.simpleName,
@@ -205,7 +207,9 @@ class QrFragment : Fragment() {
                                                 deleteDigiposData(
                                                     tabledata.partnerTxnId
                                                 )
+                                                lifecycleScope.launch(Dispatchers.Main){
                                                 ToastUtils.showToast(requireContext(),statusRespDataList[5])
+                                                }
 
                                             }
                                         }

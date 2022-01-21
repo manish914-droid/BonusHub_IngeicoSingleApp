@@ -53,6 +53,7 @@ class SearchTxnFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -65,6 +66,7 @@ class SearchTxnFragment : Fragment() {
 
         binding?.txtViewPendingTxn?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -73,6 +75,7 @@ class SearchTxnFragment : Fragment() {
         }
 
         binding?.btnSearch?.setOnClickListener {
+            DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
             validateAndHitServer()
         }
 

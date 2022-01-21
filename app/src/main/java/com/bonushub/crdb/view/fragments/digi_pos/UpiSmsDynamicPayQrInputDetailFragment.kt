@@ -61,6 +61,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -342,12 +343,13 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                 "F56->>",
                                                                                 responsef57
                                                                             )
-                                                                            ToastUtils.showToast(activity,
-                                                                                getString(R.string.txn_status_still_pending)
-                                                                            )
+
                                                                             lifecycleScope.launch(
                                                                                 Dispatchers.Main
                                                                             ) {
+                                                                                ToastUtils.showToast(activity,
+                                                                                    getString(R.string.txn_status_still_pending)
+                                                                                )
                                                                                 parentFragmentManager.popBackStackImmediate()
                                                                             }
                                                                         }
@@ -495,7 +497,9 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                     } else if (respDataList[2] == EDigiPosPaymentStatus.Fail.desciption) {
                                         deleteDigiposData(uniqueID)
                                     } else {
-                                        ToastUtils.showToast(activity,respDataList[3])
+                                        lifecycleScope.launch(Dispatchers.Main) {
+                                            ToastUtils.showToast(activity, respDataList[3])
+                                        }
                                     }
                                 }
                             }
@@ -505,7 +509,9 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                         }
                     } else {
 
-                        ToastUtils.showToast(activity,responseMsg)
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            ToastUtils.showToast(activity, responseMsg)
+                        }
                     }
 
                 } catch (ex: Exception) {

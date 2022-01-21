@@ -69,6 +69,7 @@ class UpiCollectFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -242,13 +243,11 @@ class UpiCollectFragment : Fragment() {
                                                                                 "F56->>",
                                                                                 responsef57
                                                                             )
-                                                                            ToastUtils.showToast(
-                                                                                activity,
-                                                                                getString(R.string.txn_status_still_pending)
-                                                                            )
-                                                                            lifecycleScope.launch(
-                                                                                Dispatchers.Main
-                                                                            ) {
+                                                                            lifecycleScope.launch(Dispatchers.Main){
+                                                                                ToastUtils.showToast(
+                                                                                    activity,
+                                                                                    getString(R.string.txn_status_still_pending)
+                                                                                )
                                                                                 parentFragmentManager.popBackStackImmediate()
                                                                             }
                                                                         }
@@ -400,8 +399,10 @@ class UpiCollectFragment : Fragment() {
                             }
                         }
                     } else {
+                        lifecycleScope.launch(Dispatchers.Main){
+                            ToastUtils.showToast(activity, responseMsg)
+                        }
 
-                        ToastUtils.showToast(activity, responseMsg)
                     }
 
                 } catch (ex: Exception) {

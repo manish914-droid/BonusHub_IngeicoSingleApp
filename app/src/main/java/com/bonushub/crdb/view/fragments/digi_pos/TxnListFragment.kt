@@ -96,6 +96,7 @@ class TxnListFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -118,6 +119,9 @@ class TxnListFragment : Fragment() {
         }
 
         binding?.bottomSheet?.applyReset?.setOnClickListener {
+
+            DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+
             binding?.bottomSheet?.amountBottomET?.setText("0.0")
             binding?.bottomSheet?.transactionIDET?.text?.clear()
             binding?.bottomSheet?.txnIDRG?.clearCheck()
@@ -131,6 +135,9 @@ class TxnListFragment : Fragment() {
 
         //region======================Filter Apply Button onclick event:-
         binding?.bottomSheet?.applyFilter?.setOnClickListener {
+
+            DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+
             val amtStr = binding?.bottomSheet?.amountBottomET?.text?.toString() ?: "0.0"
             bottomSheetAmountData = if (amtStr == "0.0") "" else amtStr
             if (binding?.bottomSheet?.ptxnIDBottomRB?.isChecked == true)
@@ -393,8 +400,11 @@ class TxnListFragment : Fragment() {
                                         }
                                         ""->{
                                             if(statusRespDataList[1].toLowerCase(Locale.ROOT).equals("Failed", true)){
-                                                (activity as BaseActivityNew).hideProgress()
-                                                ToastUtils.showToast(requireContext(),statusRespDataList[1])
+                                                    withContext(Dispatchers.Main){
+                                                        (activity as BaseActivityNew).hideProgress()
+                                                        ToastUtils.showToast(requireContext(),statusRespDataList[1])
+                                                    }
+
                                             }
                                         }
                                         else -> {
