@@ -22,7 +22,8 @@ class SyncAppUpdateConfirmation(private var confirmationISOData: ByteArray, cb: 
         HitServer.hitServer(offlineSaleIso, { result, success ->
             if (success) {
                 //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
-             //   Utility().incrementRoc()
+               // Utility().incrementRoc()
+                Utility().incrementUpdateRoc()
               //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
 
                 val responseIsoData: IsoDataReader = readIso(result, false)

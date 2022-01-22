@@ -150,6 +150,9 @@ interface AppDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWifiCTTable(wifiCommunicationTable: WifiCommunicationTable): Long?
 
+    @Query("SELECT * FROM WifiCommunicationTable")
+    suspend fun getAllWifiCTTableData(): MutableList<WifiCommunicationTable?>?
+
     fun getCardDataByHDFCCDTPanNumber(panNumber: String): HDFCCdt? = runBlocking {
         val cdtl = getAllHDFCCDTTableData()
         var result: HDFCCdt? = null
@@ -234,6 +237,10 @@ interface AppDao{
     @Query("SELECT stan FROM TerminalParameterTable")
     fun getRoc(): String?
 
+    //region==========================Read , Update , Reset ROC From Terminal Parameter Table:-
+    @Query("SELECT stan FROM TerminalParameterTable WHERE tidType = :tidType")
+    fun getUpdateRoc(tidType: String): String?
+
     @Query("SELECT * FROM TerminalParameterTable LIMIT :limit OFFSET :offset")
     fun selectFromSchemeTable(limit: Int, offset: Int): TerminalParameterTable?
 
@@ -256,7 +263,8 @@ interface AppDao{
     }
 
 
-
+    @Query("UPDATE TerminalParameterTable SET stan = :roc WHERE tableId = :tableID AND tidType = :tidType")
+    fun updateStan(roc: String, tableID: String, tidType: String)
 
     @Query("UPDATE TerminalParameterTable SET stan = :roc WHERE tableId = :tableID")
     fun updateRoc(roc: String, tableID: String)
@@ -269,6 +277,9 @@ interface AppDao{
     //region==========================Read , Update , Reset INVOICE From Terminal Parameter Table:-
     @Query("SELECT invoiceNumber FROM TerminalParameterTable")
     fun getInvoice(): String?
+
+    @Query("UPDATE TerminalParameterTable SET invoiceNumber = :invoice WHERE tableId = :tableID AND tidType = :tidType")
+    fun updatedInvoice(invoice: String, tableID: String,tidType: String)
 
     @Query("UPDATE TerminalParameterTable SET invoiceNumber = :invoice WHERE tableId = :tableID")
     fun updateInvoice(invoice: String, tableID: String)

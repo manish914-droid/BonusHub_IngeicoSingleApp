@@ -254,6 +254,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             navHostFragment?.navController?.navigate(R.id.dashBoardFragment)
 
         } else {
+            AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
             GlobalScope.launch(Dispatchers.IO) {
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())

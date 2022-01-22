@@ -411,6 +411,28 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 //endregion
 
     //region========================Increment ROC===============
+    fun incrementUpdateRoc() {
+        var increasedRoc = 0
+        val roc = runBlocking(Dispatchers.IO) {  appDatabase?.appDao?.getUpdateRoc("1") }
+        if (!TextUtils.isEmpty(roc) && roc?.toInt() != 0) {
+            increasedRoc = roc?.toInt()?.plus(1) ?: 0
+            if (increasedRoc > 999999) {
+                increasedRoc = 1
+                appDatabase?.appDao?.updateStan(
+                    addPad(increasedRoc, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code,"1"
+                )
+            } else {
+                appDatabase?.appDao?.updateStan(
+                    addPad(increasedRoc, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code,"1"
+                )
+            }
+        }
+    }
+    //endregion
+
+    //region========================Increment ROC===============
     fun incrementRoc() {
         var increasedRoc = 0
         val roc = appDatabase?.appDao?.getRoc()
@@ -430,7 +452,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             }
         }
     }
-//endregion
+   //endregion
 
     fun getROC(): String? {
         return runBlocking(Dispatchers.IO) { appDatabase?.appDao?.getRoc() }
@@ -459,6 +481,20 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             appDatabase?.appDao?.updateInvoice(
                 addPad(increaseInvoice, "0", 6, true),
                 TableType.TERMINAL_PARAMETER_TABLE.code
+            )
+        }
+    }
+//endregion
+
+    //region========================Increment ROC===============
+    fun incrementUpdateInvoice() {
+        var increaseInvoice = 0
+        val invoice = appDatabase?.appDao?.getInvoice()
+        if (!TextUtils.isEmpty(invoice) && invoice?.toInt() != 0) {
+            increaseInvoice = invoice?.toInt()?.plus(1) ?: 0
+            appDatabase?.appDao?.updatedInvoice(
+                addPad(increaseInvoice, "0", 6, true),
+                TableType.TERMINAL_PARAMETER_TABLE.code,"1"
             )
         }
     }
