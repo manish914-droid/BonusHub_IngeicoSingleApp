@@ -188,6 +188,13 @@ object DeviceHelper   {
     }
 
     /**
+     * Execute CommConnection Transaction
+     * */
+    fun setCommunicationSettings(request: CommRequest, listener: OnOperationListener) {
+        iRemoteService?.setCommunicationSettings(request, listener)
+    }
+
+    /**
      * Execute Terminal Initialization transaction
      * */
     fun doTerminalInitialization(request: TerminalInitializationRequest?, listener: OnOperationListener?) {

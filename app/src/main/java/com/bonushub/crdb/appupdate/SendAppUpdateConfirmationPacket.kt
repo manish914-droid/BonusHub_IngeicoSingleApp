@@ -43,10 +43,11 @@ class SendAppUpdateConfirmationPacket@Inject constructor(private var appDao: App
 
             //adding Field 61
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-            val pcNumber = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+            val pcNumber1 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+            val pcNumber2 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
             val data = ConnectionType.GPRS.code + addPad(deviceModel(), " ", 6, false) +
                     addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false) +
-                    version + addPad("0", "0", 9) + pcNumber
+                    version +  pcNumber1 + pcNumber2
 
             //Adding Field 61:-
             addFieldByHex(61, data)

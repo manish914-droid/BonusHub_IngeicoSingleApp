@@ -27,6 +27,7 @@ import com.bonushub.crdb.vxutils.Utility.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.request.CommRequest
 import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TerminalInitializationResponse
@@ -580,6 +581,56 @@ fun Int?.isLessThan(other: Int?) = this != null && other != null && this < other
     return initializationstatus
 }
 
+//Do communication Txn
+suspend fun doCommsTransaction(appDao: AppDao){
+
+    val wifiCommunicationTable = runBlocking(Dispatchers.IO){appDao.getAllWifiCTTableData()}
+
+    val request = CommRequest(
+        gprsIp   = wifiCommunicationTable?.get(0)?.gprPrimaryHostIP,
+        gprsPort = wifiCommunicationTable?.get(0)?.gprPrimaryHostPort,
+        wifiIp   = wifiCommunicationTable?.get(0)?.wifiHostIP,
+        wifiPort = wifiCommunicationTable?.get(0)?.wifiHostPort,
+        apn      = wifiCommunicationTable?.get(0)?.gprAPN,
+        username = wifiCommunicationTable?.get(0)?.gprAPNUserName,
+        password = wifiCommunicationTable?.get(0)?.gprAPNPassword
+    )
+
+
+    DeviceHelper.setCommunicationSettings(
+        request = request,
+        listener = object : OnOperationListener.Stub() {
+
+            override fun onCompleted(result: OperationResult?) {
+               println("Result: ${result?.value?.status}")
+
+                println("Result responseCode: ${(result?.value)?.responseCode}")
+
+                println("Completed transaction...")
+
+                val status = result?.value?.status
+                when (status) {
+                    RequestStatus.SUCCESS -> {
+                        println("Success")
+                        AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "1")
+
+                        println("Wifi comm ->"+AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName))
+                    }
+                    RequestStatus.FAILED -> {
+                        AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                        println("Failed")
+                    }
+                    else -> {
+                        AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                        println("Error")
+                    }
+                }
+            }
+
+        }
+    )
+}
+
 //Do initiaization
  suspend fun doInitializtion(appDao: AppDao,listofTids: ArrayList<String>) {
    val checkdiffTid = checkTidUpdate(appDao)
@@ -730,6 +781,7 @@ fun Int?.isLessThan(other: Int?) = this != null && other != null && this < other
         }
         catch (ex: Exception){
             ex.printStackTrace()
+            println("Exception is "+ex.printStackTrace())
         }
     }
 

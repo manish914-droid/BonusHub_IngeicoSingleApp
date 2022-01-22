@@ -7,6 +7,7 @@ import java.io.Serializable
 
 //region=================Preference Keys==============
 enum class PreferenceKeyConstant(var keyName: String) {
+    Wifi_Communication("wifi_communication"),
     PC_NUMBER_ONE("pc_number_one"),
     PC_NUMBER_TWO("pc_number_two"),
     INSERT_PPK_DPK("insert_ppk_dpk"),
