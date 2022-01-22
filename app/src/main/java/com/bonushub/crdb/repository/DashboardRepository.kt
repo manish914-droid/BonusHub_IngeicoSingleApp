@@ -54,7 +54,7 @@ class DashboardRepository {
                     itemList.add(EDashboardItem.NONE)
                 }
                 Log.d("itemList===>:- ", Gson().toJson(itemList))
-                itemList.add(EDashboardItem.MERCHANT_REFERRAL)
+                //itemList.add(EDashboardItem.MERCHANT_REFERRAL)  // disable MRP
                 itemList.add(EDashboardItem.CROSS_SELL)
                 itemList.add(EDashboardItem.PREAUTH_VIEW)
                 Log.d("itemList===>:- ", Gson().toJson(itemList))
