@@ -21,6 +21,7 @@ import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -195,7 +196,10 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                                     when (statusRespDataList[5]) {
                                         EDigiPosPaymentStatus.Pending.desciption -> {
                                             tabledata.txnStatus = statusRespDataList[5]
-                                            ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                            lifecycleScope.launch(Dispatchers.Main){
+                                                ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                            }
+
                                         }
 
                                         EDigiPosPaymentStatus.Approved.desciption -> {
@@ -260,7 +264,9 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                                             EDigiPosPaymentStatus.Pending.desciption
                                         )
                                     val dpObj = Gson().toJson(dp)
-                                    ToastUtils.showToast(requireContext(),statusRespDataList[1])
+                                    lifecycleScope.launch(Dispatchers.Main){
+                                        ToastUtils.showToast(requireContext(),statusRespDataList[1])
+                                    }
                                     logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                     Log.e("F56->>", responsef57)
                                     runBlocking(Dispatchers.Main) {
@@ -351,7 +357,13 @@ class PendingTxnListAdapter(private var digiData:ArrayList<DigiPosDataTable>,pri
 
         var model = digiData[position]
 
-        val amountData = "\u20B9 $model.amount}"
+        val amountData = "\u20B9 ${model.amount}"
+        // temp for test
+//        logger("model.paymentMode",""+model.paymentMode)
+//        logger("model.paymentMode",""+model.displayFormatedDate)
+//        logger("model.paymentMode",""+amountData)
+//        logger("model.paymentMode",""+model.customerMobileNumber)
+
         holder.viewBinding.txtViewTxnType.text = model.paymentMode
         holder.viewBinding.txtViewDateTime.text = model.displayFormatedDate
         holder.viewBinding.txtViewAmount.text = amountData

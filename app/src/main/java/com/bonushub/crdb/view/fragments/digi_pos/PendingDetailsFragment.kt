@@ -124,6 +124,7 @@ class PendingDetailsFragment : Fragment() {
                     if (isSuccess) {
                         //  val statusRespDataList = responsef57.split("^")
                         //   val status = statusRespDataList[5]
+
                         (activity as BaseActivityNew)?.hideProgress()
                         lifecycleScope.launch(Dispatchers.Main) {
 

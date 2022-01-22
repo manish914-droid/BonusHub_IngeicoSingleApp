@@ -154,7 +154,7 @@
             </RadioGroup>
 
             <TextView
-                android:id="@+id/btnApply"
+                android:id="@+id/applyFilter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -169,6 +169,26 @@
                 android:paddingEnd="20dp"
                 android:paddingBottom="9dp"
                 android:text="Apply"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_small" />
+
+            <TextView
+                android:id="@+id/applyReset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/applyFilter"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="@dimen/pad_24"
+                android:background="@drawable/edge_button_blue"
+                android:drawablePadding="10dp"
+                android:fontFamily="@font/muli_regular"
+                android:gravity="center"
+                android:paddingStart="20dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="9dp"
+                android:text="Reset"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_small" />
         </RelativeLayout>

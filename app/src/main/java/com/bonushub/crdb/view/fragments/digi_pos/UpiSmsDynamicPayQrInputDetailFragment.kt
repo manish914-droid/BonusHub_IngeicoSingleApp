@@ -21,6 +21,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EDashboardItem
 import com.bonushub.crdb.utils.IsoDataReader
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.bonushub.crdb.utils.readIso
 import com.google.gson.Gson
@@ -60,6 +61,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -341,12 +343,13 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                 "F56->>",
                                                                                 responsef57
                                                                             )
-                                                                            ToastUtils.showToast(activity,
-                                                                                getString(R.string.txn_status_still_pending)
-                                                                            )
+
                                                                             lifecycleScope.launch(
                                                                                 Dispatchers.Main
                                                                             ) {
+                                                                                ToastUtils.showToast(activity,
+                                                                                    getString(R.string.txn_status_still_pending)
+                                                                                )
                                                                                 parentFragmentManager.popBackStackImmediate()
                                                                             }
                                                                         }
@@ -362,10 +365,11 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                 responsef57
                                                                             )
 
-                                                                            txnSuccessToast(activity as Context)
+                                                                            (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                                            //txnSuccessToast(activity as Context)
                                                                             // kushal
                                                                             logger("call","printSMSUPIChagreSlip","e")
-                                                                            /*PrintUtil(context).printSMSUPIChagreSlip(
+                                                                            PrintUtil(context).printSMSUPIChagreSlip(
                                                                                 tabledata,
                                                                                 EPrintCopyType.MERCHANT,
                                                                                 context
@@ -375,7 +379,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
 
                                                                                 }
-                                                                            }*/
+                                                                            }
                                                                         }
                                                                         else -> {
                                                                             Field48ResponseTimestamp.deleteDigiposData(
@@ -406,7 +410,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
                                                                                 }
                                                                             },
-                                                                            {})
+                                                                            {},
+                                                                            R.drawable.ic_info)
                                                                     }
                                                                 }
 
@@ -426,7 +431,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                 val dpObj = Gson().toJson(dp)
                                                 logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                                 parentFragmentManager.popBackStack()
-                                            })
+                                            },
+                                            R.drawable.ic_link_circle)
                                     } else {
                                         // received other than S101(show Fail info dialog here)
                                         withContext(Dispatchers.Main) {
@@ -444,7 +450,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                         parentFragmentManager.popBackStack()
                                                     }
                                                 },
-                                                {})
+                                                {},
+                                                R.drawable.ic_info)
                                         }
 
                                     }
@@ -480,17 +487,20 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                         val blobByteArray = BytesUtil.hexString2Bytes(blobHexString)
 
                                         //    val blobByteArray = blobHexString.decodeHexStringToByteArray()
+                                        var transactionTypeTemp = transactionType
                                         (activity as BaseActivityNew).transactFragment(QrFragment().apply {
                                             arguments = Bundle().apply {
                                                 putByteArray("QrByteArray", blobByteArray)
-                                                putSerializable("type", transactionType)
-                                               // putParcelable("tabledata", tabledata) // kushal
+                                                putSerializable("type", transactionTypeTemp)
+                                                putParcelable("tabledata", tabledata) // kushal
                                             }
                                         })
                                     } else if (respDataList[2] == EDigiPosPaymentStatus.Fail.desciption) {
                                         deleteDigiposData(uniqueID)
                                     } else {
-                                        ToastUtils.showToast(activity,respDataList[3])
+                                        lifecycleScope.launch(Dispatchers.Main) {
+                                            ToastUtils.showToast(activity, respDataList[3])
+                                        }
                                     }
                                 }
                             }
@@ -500,7 +510,9 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                         }
                     } else {
 
-                        ToastUtils.showToast(activity,responseMsg)
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            ToastUtils.showToast(activity, responseMsg)
+                        }
                     }
 
                 } catch (ex: Exception) {

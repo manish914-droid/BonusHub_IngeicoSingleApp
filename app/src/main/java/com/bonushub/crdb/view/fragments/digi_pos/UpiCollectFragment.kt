@@ -14,6 +14,7 @@ import com.bonushub.crdb.model.local.DigiPosDataTable
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
@@ -68,6 +69,7 @@ class UpiCollectFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
+                DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 parentFragmentManager.popBackStackImmediate()
             }catch (ex:Exception)
             {
@@ -241,13 +243,11 @@ class UpiCollectFragment : Fragment() {
                                                                                 "F56->>",
                                                                                 responsef57
                                                                             )
-                                                                            ToastUtils.showToast(
-                                                                                activity,
-                                                                                getString(R.string.txn_status_still_pending)
-                                                                            )
-                                                                            lifecycleScope.launch(
-                                                                                Dispatchers.Main
-                                                                            ) {
+                                                                            lifecycleScope.launch(Dispatchers.Main){
+                                                                                ToastUtils.showToast(
+                                                                                    activity,
+                                                                                    getString(R.string.txn_status_still_pending)
+                                                                                )
                                                                                 parentFragmentManager.popBackStackImmediate()
                                                                             }
                                                                         }
@@ -262,10 +262,10 @@ class UpiCollectFragment : Fragment() {
                                                                                 "F56->>",
                                                                                 responsef57
                                                                             )
-
-                                                                            txnSuccessToast(activity as Context)
+                                                                            (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                                            //txnSuccessToast(activity as Context)
                                                                         // kushal
-                                                                        /*PrintUtil(context).printSMSUPIChagreSlip(
+                                                                        PrintUtil(context).printSMSUPIChagreSlip(
                                                                                 tabledata,
                                                                                 EPrintCopyType.MERCHANT,
                                                                                 context
@@ -275,7 +275,7 @@ class UpiCollectFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
 
                                                                                 }
-                                                                            }*/
+                                                                            }
                                                                         }
                                                                         else -> {
                                                                             Field48ResponseTimestamp.deleteDigiposData(tabledata)
@@ -305,7 +305,7 @@ class UpiCollectFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
                                                                                 }
                                                                             },
-                                                                            {})
+                                                                            {}, R.drawable.ic_info)
                                                                     }
                                                                 }
 
@@ -325,7 +325,7 @@ class UpiCollectFragment : Fragment() {
                                                 val dpObj = Gson().toJson(dp)
                                                 logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                                 parentFragmentManager.popBackStack()
-                                            })
+                                            }, R.drawable.ic_link_circle)
                                     } else {
                                         // received other than S101(show Fail info dialog here)
                                         withContext(Dispatchers.Main) {
@@ -343,7 +343,7 @@ class UpiCollectFragment : Fragment() {
                                                         parentFragmentManager.popBackStack()
                                                     }
                                                 },
-                                                {})
+                                                {}, R.drawable.ic_info)
                                         }
 
                                     }
@@ -399,8 +399,10 @@ class UpiCollectFragment : Fragment() {
                             }
                         }
                     } else {
+                        lifecycleScope.launch(Dispatchers.Main){
+                            ToastUtils.showToast(activity, responseMsg)
+                        }
 
-                        ToastUtils.showToast(activity, responseMsg)
                     }
 
                 } catch (ex: Exception) {

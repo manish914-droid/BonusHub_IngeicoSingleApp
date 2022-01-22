@@ -17,6 +17,7 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -161,7 +162,9 @@ class QrFragment : Fragment() {
                                                     tabledata
                                                 )
                                                 Log.e("F56->>", responsef57)
+                                                lifecycleScope.launch(Dispatchers.Main){
                                                 ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                                }
                                                 lifecycleScope.launch(Dispatchers.Main) {
                                                     parentFragmentManager.popBackStack(
                                                         DigiPosMenuFragment::class.java.simpleName,
@@ -180,9 +183,10 @@ class QrFragment : Fragment() {
                                                 )
                                                 Log.e("F56->>", responsef57)
 
-                                                txnSuccessToast(activity as Context)
+                                                (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                //txnSuccessToast(activity as Context)
                                                 // kushal
-                                               /* PrintUtil(context).printSMSUPIChagreSlip(
+                                                PrintUtil(context).printSMSUPIChagreSlip(
                                                     tabledata,
                                                     EPrintCopyType.MERCHANT,
                                                     context
@@ -198,13 +202,15 @@ class QrFragment : Fragment() {
                                                         }
 
                                                     }
-                                                }*/
+                                                }
                                             }
                                             else -> {
                                                 deleteDigiposData(
                                                     tabledata.partnerTxnId
                                                 )
+                                                lifecycleScope.launch(Dispatchers.Main){
                                                 ToastUtils.showToast(requireContext(),statusRespDataList[5])
+                                                }
 
                                             }
                                         }
