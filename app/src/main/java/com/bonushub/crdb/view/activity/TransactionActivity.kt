@@ -1304,14 +1304,20 @@ class TransactionActivity : BaseActivityNew() {
                                         val tpt = runBlocking(Dispatchers.IO) {
                                             getTptDataByTid(receiptDetail.tid ?: "")
                                         }
-
-                                          val batchData = BatchTable(receiptDetail)
+                                        val batchData = BatchTable(receiptDetail)
                                         println(jsonResp)
                                         batchData.invoice = receiptDetail.invoice.toString()
                                         batchData.transactionType = BhTransactionType.SALE.type
                                         batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                        batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                        batchData.bonushubStan        = tpt?.stan ?: ""
+
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
+                                        //To increment base Stan
+                                        Utility().incrementUpdateRoc()
+                                        //To increment base invoice
+                                        Utility().incrementUpdateInvoice()
                                         printingSaleData(batchData){
                                             withContext(Dispatchers.Main){
                                                 showProgress(getString(R.string.transaction_syncing_msg))
