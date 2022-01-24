@@ -1,6 +1,8 @@
 package com.bonushub.crdb.view.fragments
 
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,19 +14,20 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsInitPaymentAppBinding
 import com.bonushub.crdb.di.DBModule
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.checkBaseTid
-import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.BankFunctionsInitPaymentAppAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.viewmodel.InitViewModel
+import com.bonushub.pax.utils.KeyExchanger
+import com.google.gson.Gson
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class BankFunctionsInitPaymentAppFragment : Fragment() {
@@ -135,8 +138,109 @@ class BankFunctionsInitPaymentAppFragment : Fragment() {
 
             when (result.status) {
                 Status.SUCCESS -> {
-                    iDialog?.hideProgress()
-                    (activity as NavigationActivity).transactFragment(DashboardFragment())
+
+                    var isStaticQrAvailable=false
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+
+                        KeyExchanger.getDigiPosStatus(
+                            EnumDigiPosProcess.InitializeDigiPOS.code,
+                            EnumDigiPosProcessingCode.DIGIPOSPROCODE.code, false
+                        ) { isSuccess, responseMsg, responsef57, fullResponse ->
+                            try {
+                                if (isSuccess) {
+                                    //1^Success^Success^S101^Active^Active^Active^Active^0^1
+                                    val responsF57List = responsef57.split("^")
+                                    Log.e("F56->>", responsef57)
+                                    //  if (responsF57List[4] == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+                                    val tpt1 = Field48ResponseTimestamp.getTptData()
+                                    tpt1?.digiPosResponseType = responsF57List[0].toString()
+                                    tpt1?.digiPosStatus = responsF57List[1].toString()
+                                    tpt1?.digiPosStatusMessage =
+                                        responsF57List[2].toString()
+                                    tpt1?.digiPosStatusCode = responsF57List[3].toString()
+                                    tpt1?.digiPosTerminalStatus = responsF57List[4].toString()
+                                    tpt1?.digiPosBQRStatus = responsF57List[5].toString()
+                                    tpt1?.digiPosUPIStatus = responsF57List[6].toString()
+                                    tpt1?.digiPosSMSpayStatus = responsF57List[7].toString()
+                                    tpt1?.digiPosStaticQrDownloadRequired =
+                                        responsF57List[8].toString()
+                                    tpt1?.digiPosCardCallBackRequired =
+                                        responsF57List[9].toString()
+
+                                    if ((tpt1?.digiPosTerminalStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) && (tpt1?.digiPosUPIStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
+                                                || tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
+                                                || tpt1.digiPosSMSpayStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode)
+                                    ) {
+                                        tpt1.isDigiposActive = "1"
+                                    } else {
+                                        tpt1?.isDigiposActive = "0"
+                                    }
+
+                                    if (tpt1 != null) {
+                                        Field48ResponseTimestamp.performOperation(tpt1) {
+                                            logger(
+                                                LOG_TAG.DIGIPOS.tag,
+                                                "Terminal parameter Table updated successfully $tpt1 "
+                                            )
+                                            //val ttp = TerminalParameterTable.selectFromSchemeTable()
+                                            val ttp = Field48ResponseTimestamp.getTptData()
+                                            val tptObj = Gson().toJson(ttp)
+                                            logger(
+                                                LOG_TAG.DIGIPOS.tag,
+                                                "After success      $tptObj "
+                                            )
+                                        }
+                                        if (tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+                                            var imgbm: Bitmap? = null
+                                            runBlocking(Dispatchers.IO) {
+                                                val tpt = Field48ResponseTimestamp.getTptData()
+                                                imgbm =
+                                                    loadStaticQrFromInternalStorage() // it return null when file not exist
+                                                if (imgbm == null || tpt?.digiPosStaticQrDownloadRequired == "1") {
+                                                    isStaticQrAvailable = true
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+
+                                    //  }
+
+                                    /* else {
+                                            logger("DIGI_POS", "DIGI_POS_UNAVAILABLE")
+                                        }*/
+                                } else {
+                                    //VFService.showToast(responseMsg)
+                                }
+
+                            } catch (ex: java.lang.Exception) {
+                                ex.printStackTrace()
+                                logger(
+                                    LOG_TAG.DIGIPOS.tag,
+                                    "Somethig wrong... in response data field 57"
+                                )
+                            }
+                        }
+
+                        if (isStaticQrAvailable) {
+                            // getting static qr from server if required
+                            //withContext(Dispatchers.IO){
+                            getStaticQrFromServerAndSaveToFile(requireActivity()) {
+                                // FAIL AND SUCCESS HANDELED IN FUNCTION getStaticQrFromServerAndSaveToFile itself
+                            }
+                            //}
+
+                        }
+
+                        withContext(Dispatchers.Main)
+                        {
+                            iDialog?.hideProgress()
+                            (activity as NavigationActivity).transactFragment(DashboardFragment())
+                        }
+                    }
+
                 }
                 Status.ERROR -> {
                     iDialog?.hideProgress()

@@ -6,6 +6,7 @@ import com.bonushub.crdb.model.local.TerminalParameterTable
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import javax.inject.Inject
@@ -74,7 +75,7 @@ object IsoPacketCreator{
     suspend fun createIsoPacketWithF57(field57RequestData: String)
             : IsoDataWriter =
         IsoDataWriter().apply {
-            val terminalData: TerminalParameterTable? = (Utility().getTptData())
+            val terminalData: TerminalParameterTable? = (getTptData())
             if (terminalData != null) {
                 mti = Mti.EIGHT_HUNDRED_MTI.mti
 
@@ -91,7 +92,9 @@ object IsoPacketCreator{
                 addField(24, Nii.BRAND_EMI_MASTER.nii)
 
                 //TID Field 41
-                terminalData.terminalId?.get(0)?.let { addFieldByHex(41,  it.toString()) }
+                //terminalData.terminalId?.get(0)?.let { addFieldByHex(41,  it.toString()) }
+               // addFieldByHex(41, getBaseTID(DBModule.appDatabase.appDao))
+                addFieldByHex(41, terminalData.terminalId)
                 Log.d("terminalId:- ", terminalData.terminalId.toString())
 
                 //adding field 57
@@ -115,7 +118,7 @@ object IsoPacketCreator{
 
     //region=========================BankEMI ISO Request Packet===============================
      suspend fun createGetTenureIso(pan:String,field57RequestData: String): IsoDataWriter = IsoDataWriter().apply {
-        val terminalData: TerminalParameterTable? = (Utility().getTptData())
+        val terminalData: TerminalParameterTable? = (getTptData())
         if (terminalData != null) {
             mti = Mti.EIGHT_HUNDRED_MTI.mti
 
@@ -132,7 +135,8 @@ object IsoPacketCreator{
             addField(24, Nii.BRAND_EMI_MASTER.nii)
 
             //TID Field 41
-            addFieldByHex(41, getBaseTID(DBModule.appDatabase.appDao))
+            //addFieldByHex(41, getBaseTID(DBModule.appDatabase.appDao))
+            addFieldByHex(41, terminalData.terminalId)
 
             //This is for bankemi/insta emi/brand emi
             //New field 56 added by Manish Kumar for getting tenure
