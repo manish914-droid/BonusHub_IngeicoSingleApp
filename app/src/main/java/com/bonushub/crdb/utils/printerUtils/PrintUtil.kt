@@ -28,6 +28,7 @@ import com.bonushub.crdb.utils.EPrintCopyType
 import com.bonushub.crdb.utils.BhTransactionType
 import com.bonushub.crdb.utils.EDashboardItem
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getInitdataList
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectDigiPosDataAccordingToTxnStatus
 import com.bonushub.crdb.utils.SplitterTypes
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -1603,6 +1604,55 @@ class PrintUtil(context: Context?) {
                 }
 
                 //endregion
+                // region === Below code is execute when digi txns are available on POS
+                val digiPosDataList =
+                    selectDigiPosDataAccordingToTxnStatus(EDigiPosPaymentStatus.Approved.desciption) as ArrayList<DigiPosDataTable>
+                if (digiPosDataList.isNotEmpty()) {
+                    printSeperator()
+                    // centerText(textFormatBundle, "---------X-----------X----------")
+
+                    sigleLineText("Digi Pos Detail Report", AlignMode.CENTER)
+
+                    tpt?.terminalId?.let { sigleLineText( "TID : $it",AlignMode.CENTER) }
+                    printSeperator()
+                    // Txn description
+                    textBlockList.add(sigleLineformat("MODE", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("AMOUNT(INR)", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    textBlockList.add(sigleLineformat("PartnetTxnId", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("DATE-TIME", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    textBlockList.add(sigleLineformat("mTxnId", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("pgwTxnId", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    printSeperator()
+                    //Txn Detail
+                    for (digiPosData in digiPosDataList) {
+
+                        textBlockList.add(sigleLineformat( digiPosData.paymentMode, AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat( digiPosData.amount, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+                        textBlockList.add(sigleLineformat(digiPosData.partnerTxnId, AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat( digiPosData.txnDate + "  " + digiPosData.txnTime, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+                        textBlockList.add(sigleLineformat(  digiPosData.mTxnId, AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat(  digiPosData.pgwTxnId, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+                        sigleLineText("----------------------------------------", AlignMode.CENTER)
+                    }
+                    //   DigiPosDataTable.deletAllRecordAccToTxnStatus(EDigiPosPaymentStatus.Approved.desciption)
+                }
+                //endregion
+
+
                 if (batch.isNotEmpty()) {
                     printSeperator()
                     sigleLineText("Bonushub", AlignMode.CENTER)
@@ -2060,6 +2110,8 @@ class PrintUtil(context: Context?) {
                 textBlockList.clear()
 
                 sigleLineText("ZERO SETTLEMENT SUCCESSFUL", AlignMode.CENTER)
+                if (!isLastSummary)
+                digiposReport()
                 sigleLineText("BonusHub", AlignMode.CENTER)
                 sigleLineText("App Version", AlignMode.CENTER)
 
@@ -2438,9 +2490,9 @@ class PrintUtil(context: Context?) {
 
                 }
                 // Below code is used for Digi POS Settlement report
-                if (!isLastSummary) {
-
-                }
+                // Below code is used for Digi POS Settlement report
+                if (!isLastSummary)
+                digiposReport()
                 sigleLineText("Bonushub", AlignMode.CENTER)
                 sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
 
@@ -2488,6 +2540,66 @@ class PrintUtil(context: Context?) {
         }
     }
 
+    fun digiposReport(){
+
+            val digiPosDataList =
+                selectDigiPosDataAccordingToTxnStatus(EDigiPosPaymentStatus.Approved.desciption)
+            val requiredTxnhm = hashMapOf<String, ArrayList<DigiPosDataTable>>()
+            if (digiPosDataList.isNotEmpty()) {
+                for (i in digiPosDataList) {
+                    val digiData = arrayListOf<DigiPosDataTable>()
+                    for (j in digiPosDataList) {
+                        if (i != null) {
+                            if (j != null) {
+                                if (i.paymentMode == j.paymentMode) {
+                                    digiData.add(j)
+                                    requiredTxnhm[i.paymentMode] = digiData
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ///  centerText(textFormatBundle, "---------X-----------X----------")
+                sigleLineText("Digi Pos Summary Report", AlignMode.CENTER)
+               val tpt= getTptData()
+                tpt?.terminalId?.let { sigleLineText( "TID : $it",AlignMode.CENTER) }
+                printSeperator()
+                // Txn description
+                textBlockList.add(sigleLineformat("TXN TYPE", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("TOTAL", AlignMode.CENTER))
+                textBlockList.add(sigleLineformat("COUNT", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+                printSeperator()
+                var totalAmount = 0.0f
+                var totalCount = 0
+                for ((k, v) in requiredTxnhm) {
+                    val txnType = k
+                    val txnCount = v.size
+                    var txnTotalAmount = 0.0f
+                    for (value in v) {
+                        txnTotalAmount += (value.amount.toFloat())
+                        totalAmount += (value.amount.toFloat())
+                        totalCount++
+                    }
+
+                    textBlockList.add(sigleLineformat(txnType, AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat( txnCount.toString() + getCurrencySymbol(tpt), AlignMode.CENTER))
+                    textBlockList.add(sigleLineformat( "%.2f".format(txnTotalAmount), AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                }
+                printSeperator()
+                textBlockList.add(sigleLineformat("Total TXNs", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat( totalCount.toString() + getCurrencySymbol(tpt), AlignMode.CENTER))
+                textBlockList.add(sigleLineformat( "%.2f".format(totalAmount), AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+                printSeperator()
+            }
+
+    }
     fun printSMSUPIChagreSlip(
         digiPosData: DigiPosDataTable,
         copyType: EPrintCopyType,
