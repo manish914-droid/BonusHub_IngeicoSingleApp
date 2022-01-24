@@ -6,6 +6,7 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptDataByTid
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.transactionType2Name
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -19,6 +20,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
     val reversaldata = runBlocking(Dispatchers.IO) { appDao.getAllBatchReversalData() }
     override fun createSettlementISOPacket(): IWriter = IsoDataWriter().apply {
         val tpt = runBlocking(Dispatchers.IO) { getTptData() }
+        val tptbatchnumber = runBlocking(Dispatchers.IO) { getTptDataByTid(baseTid) }
         var batchNumber:String?=null
 
         if (tpt != null) {
@@ -54,7 +56,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
             }*/
 
             if(batchListData.size > 0){
-                batchNumber = batchListData[0].receiptData?.batchNumber
+                batchNumber = tptbatchnumber?.batchNumber
             }
             //Batch Number
             batchNumber?.let { addPad(it, "0", 6, true) }?.let { addFieldByHex(60, it) }
@@ -93,14 +95,15 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             val m = ma[it.transactionType] as SummeryModel
                             m.count += 1
                             m.total += transAmt!!
-                            m.batchNumber  = it.receiptData?.batchNumber!!
+                            m.ingenicobatchNumber  = it.receiptData?.batchNumber!!
+                            m.bonushubbatchNumber  = it.bonushubbatchnumber
                         } else {
-                            val sm = SummeryModel(transactionType2Name(it.transactionType), 1, transAmt!!,it.receiptData?.tid ?: "",it.receiptData?.batchNumber!!)
+                            val sm = SummeryModel(transactionType2Name(it.transactionType), 1, transAmt!!,it.receiptData?.tid ?: "",it.receiptData?.batchNumber!!,it.bonushubbatchnumber)
                             ma[it.transactionType] = sm
                         }
                     } else {
                         val hm = HashMap<Int, SummeryModel>().apply {
-                            this[it.transactionType] = SummeryModel(transactionType2Name(it.transactionType), 1, transAmt!!,it.receiptData?.tid ?: "",it.receiptData?.batchNumber!!)
+                            this[it.transactionType] = SummeryModel(transactionType2Name(it.transactionType), 1, transAmt!!,it.receiptData?.tid ?: "",it.receiptData?.batchNumber!!,it.bonushubbatchnumber)
                         }
                         map[it.receiptData?.tid!!] = hm
                     }
@@ -114,7 +117,8 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 var refundAmount = 0L
 
                 var saletid: String? = null
-                var salebatchNumber: String? = null
+                var ingenicosalebatchNumber: String? = null
+                var bonushubsalebatchNumber: String? = null
 
                 var field63: String? = null
 
@@ -128,7 +132,8 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                         when (k) {
                             BhTransactionType.SALE.type -> {
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
@@ -136,7 +141,8 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             BhTransactionType.EMI_SALE.type -> {
 
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
 
@@ -144,13 +150,15 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
                             BhTransactionType.BRAND_EMI.type -> {
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
                             BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
@@ -158,27 +166,31 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             BhTransactionType.SALE_WITH_CASH.type -> {
 
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
 
                             BhTransactionType.CASH_AT_POS.type -> {
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
 
                             BhTransactionType.PRE_AUTH_COMPLETE.type -> {
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
                             BhTransactionType.TIP_SALE.type -> {
                                 saletid = key
-                                salebatchNumber = m.batchNumber
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
@@ -202,7 +214,8 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                         if(null !=field63) {
 
                             field63 += addPad(saletid ?: "", "0", 8, true) +
-                                    addPad(salebatchNumber ?: "", "0", 6, true) +
+                                    addPad(bonushubsalebatchNumber ?: "", "0", 6, true) +
+                                    addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
                                     addPad(
                                         sCount + sAmount + rCount + rAmount, "0", 30,
                                         toLeft = false
@@ -210,7 +223,8 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                         }
                         else{
                             field63 = addPad(saletid ?: "", "0", 8, true) +
-                                    addPad(salebatchNumber ?: "", "0", 6, true) +
+                                    addPad(bonushubsalebatchNumber ?: "", "0", 6, true) +
+                                    addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
                                     addPad(
                                         sCount + sAmount + rCount + rAmount, "0", 30,
                                         toLeft = false
@@ -230,11 +244,11 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 if(reversaldata.size > 0){
                     reversaldata.forEach {
                       saletid =  it.receiptData?.tid
-                        salebatchNumber  = it.receiptData?.batchNumber
+                        ingenicosalebatchNumber  = it.receiptData?.batchNumber
                     }
 
                     field63 += addPad(saletid ?: "", "0", 8, true) +
-                            addPad(salebatchNumber ?: "", "0", 6, true) +
+                            addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
                             addPad("0" + "0" + "0" + "0", "0", 30,
                                 toLeft = false
                             )
@@ -262,6 +276,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
         var count: Int = 0,
         var total: Long = 0,
         var hostTid: String,
-        var batchNumber: String
+        var ingenicobatchNumber: String,
+        var bonushubbatchNumber: String
     )
 }

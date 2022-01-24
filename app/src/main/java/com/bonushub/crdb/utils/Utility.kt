@@ -413,7 +413,10 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     //region========================Increment ROC===============
     fun incrementUpdateRoc() {
         var increasedRoc = 0
-        val roc = runBlocking(Dispatchers.IO) {  appDatabase?.appDao?.getUpdateRoc("1") }
+        val roc = runBlocking(Dispatchers.IO) {
+            appDatabase?.appDao?.getUpdateRoc("1")
+        }
+        println("Incremented roc value "+roc)
         if (!TextUtils.isEmpty(roc) && roc?.toInt() != 0) {
             increasedRoc = roc?.toInt()?.plus(1) ?: 0
             if (increasedRoc > 999999) {
@@ -486,16 +489,28 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
 //endregion
 
-    //region========================Increment ROC===============
+    //region========================Increment Invoice===============
     fun incrementUpdateInvoice() {
         var increaseInvoice = 0
-        val invoice = appDatabase?.appDao?.getInvoice()
+        val invoice = runBlocking(Dispatchers.IO) {
+            appDatabase?.appDao?.getUpdatedInvoice("1")
+        }
+        println("Incremented Invoice value "+invoice)
         if (!TextUtils.isEmpty(invoice) && invoice?.toInt() != 0) {
             increaseInvoice = invoice?.toInt()?.plus(1) ?: 0
-            appDatabase?.appDao?.updatedInvoice(
-                addPad(increaseInvoice, "0", 6, true),
-                TableType.TERMINAL_PARAMETER_TABLE.code,"1"
-            )
+            if (increaseInvoice > 999999) {
+                increaseInvoice = 1
+                appDatabase?.appDao?.updatedInvoice(
+                    addPad(increaseInvoice, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code,"1"
+                )
+            }
+            else {
+                appDatabase?.appDao?.updatedInvoice(
+                    addPad(increaseInvoice, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code, "1"
+                )
+            }
         }
     }
 //endregion
@@ -508,13 +523,25 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     //region=======================Increment Batch Number================
     fun incrementBatchNumber() {
         var increaseBatch = 0
-        val batch = appDatabase?.appDao?.getBatchNumber()
+        val batch = runBlocking(Dispatchers.IO) {
+            appDatabase?.appDao?.getUpdatedBatchNumber("1")
+        }
+        println("Incremented Batch number "+batch)
         if (!TextUtils.isEmpty(batch) && batch?.toInt() != 0) {
             increaseBatch = batch?.toInt()?.plus(1) ?: 0
-            appDatabase?.appDao?.updateBatchNumber(
-                addPad(increaseBatch, "0", 6, true),
-                TableType.TERMINAL_PARAMETER_TABLE.code
-            )
+            if (increaseBatch > 999999) {
+                increaseBatch = 1
+                appDatabase?.appDao?.updatedInvoice(
+                    addPad(increaseBatch, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code,"1"
+                )
+            }
+            else {
+                appDatabase?.appDao?.updatedBatchNumber(
+                    addPad(increaseBatch, "0", 6, true),
+                    TableType.TERMINAL_PARAMETER_TABLE.code, "1"
+                )
+            }
         }
     }
 //endregion
@@ -1303,13 +1330,27 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            tptData = appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }
         return tptData
     }
 //endregion
+
+    //region======================Get TPT Data By terminal id:-
+    fun getTptDataByTid(tid: String): TerminalParameterTable? {
+        var tptData: TerminalParameterTable? = null
+        runBlocking(Dispatchers.IO) {
+            tptData = appDatabase.appDao?.getTerminalParameterTableDataByTid(tid)
+            val jsonResp=Gson().toJson(tptData)
+            println(jsonResp)
+        }
+        return tptData
+    }
+//endregion
+
+
 //
 // region======================Get TPT Data:-
     fun getAllTptData(): ArrayList<TerminalParameterTable?> {

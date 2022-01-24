@@ -33,6 +33,8 @@ import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptDataByTid
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
@@ -314,6 +316,11 @@ class TransactionActivity : BaseActivityNew() {
                                        // AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+                                            val tpt = runBlocking(Dispatchers.IO) {
+                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                            }
+                                            println("Selected tid id "+tpt?.terminalId)
+                                            println("Batch number in emi "+tpt?.batchNumber)
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.emiIssuerDataModel = emiIssuerData
                                                 batchData.invoice = receiptDetail.invoice.toString()
@@ -1293,11 +1300,16 @@ class TransactionActivity : BaseActivityNew() {
                                 // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                 if (receiptDetail != null) {
                                     lifecycleScope.launch(Dispatchers.IO) {
+
+                                        val tpt = runBlocking(Dispatchers.IO) {
+                                            getTptDataByTid(receiptDetail.tid ?: "")
+                                        }
+
                                           val batchData = BatchTable(receiptDetail)
                                         println(jsonResp)
                                         batchData.invoice = receiptDetail.invoice.toString()
-                                        batchData.transactionType =
-                                            BhTransactionType.SALE.type
+                                        batchData.transactionType = BhTransactionType.SALE.type
+                                        batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
                                         printingSaleData(batchData){

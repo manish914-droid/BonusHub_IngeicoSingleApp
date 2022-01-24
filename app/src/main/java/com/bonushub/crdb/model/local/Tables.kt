@@ -1112,6 +1112,7 @@ data class BrandEMIAccessDataModalTable(
 data class BatchTable(var receiptData:ReceiptDetail?=null){
     @PrimaryKey(autoGenerate = false)
     var invoice: String=""
+    var bonushubbatchnumber: String = ""
     var transactionType: Int = 0
     var imeiOrSerialNum: String?=null
     var billNumber: String?=null

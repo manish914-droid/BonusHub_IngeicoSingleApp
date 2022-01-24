@@ -278,6 +278,9 @@ interface AppDao{
     @Query("SELECT invoiceNumber FROM TerminalParameterTable")
     fun getInvoice(): String?
 
+    @Query("SELECT invoiceNumber FROM TerminalParameterTable WHERE tidType = :tidType")
+    fun getUpdatedInvoice(tidType: String): String?
+
     @Query("UPDATE TerminalParameterTable SET invoiceNumber = :invoice WHERE tableId = :tableID AND tidType = :tidType")
     fun updatedInvoice(invoice: String, tableID: String,tidType: String)
 
@@ -292,8 +295,14 @@ interface AppDao{
     @Query("SELECT batchNumber FROM TerminalParameterTable")
     fun getBatchNumber(): String?
 
+    @Query("SELECT batchNumber FROM TerminalParameterTable WHERE tidType = :tidType")
+    fun getUpdatedBatchNumber(tidType: String): String?
+
     @Query("UPDATE TerminalParameterTable SET batchNumber = :batch WHERE tableId = :tableID")
     fun updateBatchNumber(batch: String, tableID: String)
+
+    @Query("UPDATE TerminalParameterTable SET batchNumber = :batch WHERE tableId = :tableID AND tidType = :tidType")
+    fun updatedBatchNumber(batch: String, tableID: String,tidType: String)
 
     @Query("UPDATE TerminalParameterTable SET batchNumber = :batch WHERE tableId = :tableID")
     fun clearBatchNumber(batch: String, tableID: String)
@@ -364,7 +373,11 @@ interface AppDao{
 
     // region bank functions
     @Query("SELECT * FROM TerminalParameterTable WHERE tidType = :tidType")
-    suspend fun getTerminalParameterTableDataByTidType(tidType:String): TerminalParameterTable?
+    suspend fun getTerminalParameterTableDataByTidType(tidType: String): TerminalParameterTable?
+
+    // region bank functions
+    @Query("SELECT * FROM TerminalParameterTable WHERE terminalId = :tid")
+    suspend fun getTerminalParameterTableDataByTid(tid: String): TerminalParameterTable?
 
     @Query("SELECT * FROM TerminalParameterTable LIMIT 1")
     suspend fun getSingleRowTerminalParameterTableData(): TerminalParameterTable?
