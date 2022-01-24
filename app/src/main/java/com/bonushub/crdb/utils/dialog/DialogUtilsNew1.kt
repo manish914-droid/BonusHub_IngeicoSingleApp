@@ -393,6 +393,52 @@ class DialogUtilsNew1 {
             }.show()
         }
 
+
+        fun showUpiCollectDialog(
+            context: Context,
+            amount: String,
+            vpa: String,
+            mobile: String,
+            callback: () -> Unit,
+            callbackPrint: () -> Unit
+        ) {
+            Dialog(context).apply {
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.fragment_upi_collect)
+                setCancelable(false)
+                val window = window
+                window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT
+                )
+                val txtViewAmount = findViewById<TextView>(R.id.txtViewAmount)
+                val txtViewVpa = findViewById<TextView>(R.id.txtViewVpa)
+                val txtViewMobile = findViewById<TextView>(R.id.txtViewMobile)
+                val enter_description_et = findViewById<EditText>(R.id.enter_description_et)
+                val btnProceed = findViewById<TextView>(R.id.btnProceed)
+
+
+                txtViewAmount.text = amount
+                txtViewVpa.text = vpa
+                txtViewMobile.text = mobile
+                //enter_description_et.text = mTxnId
+                //btnProceed.text = phoneNumber
+
+
+                btnProceed.setOnClickListener {
+                    dismiss()
+                    callback()
+                }
+
+//                txtViewPrint.setOnClickListener {
+//                    dismiss()
+//                    callbackPrint()
+//                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+        }
+
     }
 
 }

@@ -54,7 +54,8 @@ class SearchTxnFragment : Fragment() {
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
                 DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
-                parentFragmentManager.popBackStackImmediate()
+                //parentFragmentManager.popBackStackImmediate()
+                parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
             }catch (ex:Exception)
             {
                 ex.printStackTrace()
@@ -103,30 +104,49 @@ class SearchTxnFragment : Fragment() {
                     if (isSuccess) {
                         val statusRespDataList = responsef57.split("^")
 
-                        val tabledata = DigiPosDataTable()
-                        tabledata.requestType = statusRespDataList[0].toInt()
-                        //  tabledata.partnerTxnId = statusRespDataList[1]
-                        tabledata.status = statusRespDataList[1]
-                        tabledata.statusMsg = statusRespDataList[2]
-                        tabledata.statusCode = statusRespDataList[3]
-                        tabledata.mTxnId = statusRespDataList[4]
-                        tabledata.partnerTxnId = statusRespDataList[6]
-                        tabledata.transactionTimeStamp = statusRespDataList[7]
-//                        val dateTime = statusRespDataList[7].split(" ")
-//                        tabledata.txnDate = dateTime[0]
-//                        tabledata.txnTime = dateTime[1]
-                        tabledata.amount = statusRespDataList[8]
-                        tabledata.paymentMode = statusRespDataList[9]
-                        tabledata.customerMobileNumber = statusRespDataList[10]
-                        tabledata.description = statusRespDataList[11]
-                        tabledata.pgwTxnId = statusRespDataList[12]
-                        tabledata.txnStatus=statusRespDataList[5]
+                        try {
+                            val tabledata = DigiPosDataTable()
+                            tabledata.requestType = statusRespDataList[0].toInt()
+                            //  tabledata.partnerTxnId = statusRespDataList[1]
+                            tabledata.status = statusRespDataList[1]
+                            tabledata.statusMsg = statusRespDataList[2]
+                            tabledata.statusCode = statusRespDataList[3]
+                            tabledata.mTxnId = statusRespDataList[4]
+                            tabledata.partnerTxnId = statusRespDataList[6]
+                            tabledata.transactionTimeStamp = statusRespDataList[7]
+                            val dateTime = statusRespDataList[7].split(" ")
+                            tabledata.txnDate = dateTime[0]
+                            tabledata.txnTime = dateTime[1]
+                            tabledata.amount = statusRespDataList[8]
+                            tabledata.paymentMode = statusRespDataList[9]
+                            tabledata.customerMobileNumber = statusRespDataList[10]
+                            tabledata.description = statusRespDataList[11]
+                            tabledata.pgwTxnId = statusRespDataList[12]
+                            tabledata.txnStatus=statusRespDataList[5]
+                            val dpObj = Gson().toJson(tabledata)
+                            logger("SEARCH STATUS", "--->      $dpObj ")
+                            Log.e("F56->>", responsef57)
+                            lifecycleScope.launch(Dispatchers.Main){
+                                txnStatusDialog(tabledata)
+                            }
+                        }catch (ex:Exception){
+                            ex.printStackTrace()
 
-                        val dpObj = Gson().toJson(tabledata)
-                        logger("SEARCH STATUS", "--->      $dpObj ")
-                        Log.e("F56->>", responsef57)
-                        lifecycleScope.launch(Dispatchers.Main){
-                            txnStatusDialog(tabledata)
+                            lifecycleScope.launch(Dispatchers.Main){
+                                (activity as BaseActivityNew).alertBoxWithAction(
+                                    getString(R.string.failed),
+                                    statusRespDataList[1],
+                                    false,
+                                    getString(R.string.positive_button_ok),
+                                    { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            //parentFragmentManager.popBackStack()
+                                            parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
+                                        }
+                                    },
+                                    {})
+                            }
+
                         }
 
                     }
@@ -139,7 +159,8 @@ class SearchTxnFragment : Fragment() {
                                 getString(R.string.positive_button_ok),
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
-                                        parentFragmentManager.popBackStack()
+                                        //parentFragmentManager.popBackStack()
+                                        parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                                     }
                                 },
                                 {})
@@ -196,11 +217,14 @@ class SearchTxnFragment : Fragment() {
 
             txtViewOk.setOnClickListener {
                 dismiss()
-                parentFragmentManager.popBackStack()
+              //  parentFragmentManager.popBackStack()
+                parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
+
             }
 
             txtViewPrint.setOnClickListener {
                 dismiss()
+
                 PrintUtil(context).printSMSUPIChagreSlip(
                     digiData,
                     EPrintCopyType.DUPLICATE,
@@ -209,7 +233,8 @@ class SearchTxnFragment : Fragment() {
                     //context.hideProgress()
                     if (!alertCB) {
                         dismiss()
-                        parentFragmentManager.popBackStack()
+                        //parentFragmentManager.popBackStack()
+                        parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
 
                     }
                 }

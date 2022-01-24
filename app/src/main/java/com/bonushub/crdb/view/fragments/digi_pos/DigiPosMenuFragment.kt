@@ -1,5 +1,6 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +11,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.databinding.FragmentDigiPosMenuBinding
 import com.bonushub.crdb.databinding.ItemDigiPosBinding
+import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.BitmapUtils.convertBitmapToByteArray
 import com.bonushub.crdb.view.activity.NavigationActivity
-import com.bonushub.crdb.utils.DigiPosItem
-import com.bonushub.crdb.utils.EDashboardItem
-import com.bonushub.crdb.utils.hexString2String
-import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.view.base.BaseActivityNew
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 
 class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
@@ -59,7 +61,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
         setupRecyclerview()
 
-        try {
+        /*try {
             val h1 = hexString2String("4E4F494441202020202020202020202020202020202020")
             val h2 = hexString2String("4E4F494441202020202020202055502020202020202020")
             logger("h1",h1)
@@ -67,7 +69,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
         }catch (ex:Exception)
         {
             ex.printStackTrace()
-        }
+        }*/
     }
 
     private fun setupRecyclerview(){
@@ -89,24 +91,82 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
                     arguments = Bundle().apply {
                         putSerializable("type", EDashboardItem.UPI)
                     }
-                })
+                },false)
             }
 
-            DigiPosItem.DYNAMIC_QR ->{
+            DigiPosItem.BHARAT_QR ->{
                 (activity as NavigationActivity).transactFragment(UpiSmsDynamicPayQrInputDetailFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("type", EDashboardItem.DYNAMIC_QR)
+                        putSerializable("type", EDashboardItem.BHARAT_QR)
                     }
-                })
+                },false)
             }
 
             DigiPosItem.STATIC_QR ->{
 
-                (activity as NavigationActivity).transactFragment(QrFragment().apply {
+                var imgbm: Bitmap? = null
+                runBlocking(Dispatchers.IO) {
+                    imgbm = loadStaticQrFromInternalStorage() // it return null when file not exist
+                    if(imgbm!=null) {
+                        val bmBytes = convertBitmapToByteArray(imgbm)
+                        logger("StaticQr", "Already parsed Bitmap", "e")
+                        (activity as NavigationActivity).transactFragment(QrFragment().apply {
+                            arguments = Bundle().apply {
+                                putByteArray("QrByteArray", bmBytes)
+                                putSerializable("type",transactionType)
+                                putSerializable("type", EDashboardItem.STATIC_QR)
+                                // putParcelable("tabledata",tabledata)
+                            }
+                        },false)
+                    }
+                    else {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            getStaticQrFromServerAndSaveToFile(activity as BaseActivityNew) {
+                                if (it) {
+                                    logger(
+                                        "StaticQr",
+                                        "Get Static Qr from server and  saves to file success ",
+                                        "e"
+                                    )
+                                    lifecycleScope.launch(Dispatchers.IO) {
+                                        imgbm =
+                                            loadStaticQrFromInternalStorage() // it return null when file not exist
+                                        if (imgbm != null) {
+                                            val bmBytes = convertBitmapToByteArray(imgbm)
+                                            logger("StaticQr", "Already parsed Bitmap", "e")
+                                            (activity as NavigationActivity).transactFragment(QrFragment().apply {
+                                                arguments = Bundle().apply {
+                                                    putByteArray("QrByteArray", bmBytes)
+                                                    putSerializable("type", transactionType)
+                                                    putSerializable("type", EDashboardItem.STATIC_QR)
+                                                    // putParcelable("tabledata",tabledata)
+                                                }
+                                            },false)
+                                        }
+                                    }
+
+                                } else {
+                                    lifecycleScope.launch(Dispatchers.Main){
+                                        ToastUtils.showToast(requireContext(),"Static Qr not available.")
+                                    }
+                                    logger(
+                                        "StaticQr",
+                                        "Get Static Qr from server and  file not successfully saved",
+                                        "e"
+                                    )
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+                /*(activity as NavigationActivity).transactFragment(QrFragment().apply {
                     arguments = Bundle().apply {
                         putSerializable("type", EDashboardItem.STATIC_QR)
                     }
-                })
+                })*/
 
             }
 
@@ -115,7 +175,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
                     arguments = Bundle().apply {
                         putSerializable("type", EDashboardItem.SMS_PAY)
                     }
-                })
+                },false)
             }
 
             DigiPosItem.PENDING_TXN ->{
@@ -123,7 +183,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
                     arguments = Bundle().apply {
                         putSerializable("type", EDashboardItem.PENDING_TXN)
                     }
-                })
+                },false)
             }
 
             DigiPosItem.TXN_LIST ->{
@@ -131,7 +191,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
                     arguments = Bundle().apply {
                         putSerializable("type", EDashboardItem.TXN_LIST)
                     }
-                })
+                },false)
             }
         }
 

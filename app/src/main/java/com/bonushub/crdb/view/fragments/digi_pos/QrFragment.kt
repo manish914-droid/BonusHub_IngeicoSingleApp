@@ -1,6 +1,5 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -63,7 +62,8 @@ class QrFragment : Fragment() {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
-                parentFragmentManager.popBackStackImmediate()
+                //parentFragmentManager.popBackStackImmediate()
+                parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
             }catch (ex:Exception)
             {
                 ex.printStackTrace()
@@ -88,15 +88,16 @@ class QrFragment : Fragment() {
 
         binding?.btnNo?.setOnClickListener {
             logger("btnNo","click","e")
-            parentFragmentManager.popBackStackImmediate()
-            //parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
+           // parentFragmentManager.popBackStackImmediate()
+            parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
+
         }
 
         binding?.btnYes?.setOnClickListener {
             logger("btnYes","click","e")
 
             when (transactionType) {
-                EDashboardItem.DYNAMIC_QR -> {
+                EDashboardItem.BHARAT_QR -> {
                     lifecycleScope.launch(Dispatchers.IO) {
                         withContext(Dispatchers.Main) {
                             (activity as BaseActivityNew).showProgress()
@@ -166,10 +167,11 @@ class QrFragment : Fragment() {
                                                 ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
                                                 }
                                                 lifecycleScope.launch(Dispatchers.Main) {
-                                                    parentFragmentManager.popBackStack(
-                                                        DigiPosMenuFragment::class.java.simpleName,
-                                                        0
-                                                    )
+//                                                    parentFragmentManager.popBackStack(
+//                                                        DigiPosMenuFragment::class.java.simpleName,
+//                                                        0
+//                                                    )
+                                                    parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
 
                                                 }
 
@@ -183,7 +185,9 @@ class QrFragment : Fragment() {
                                                 )
                                                 Log.e("F56->>", responsef57)
 
+                                                lifecycleScope.launch(Dispatchers.Main){
                                                 (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                    }
                                                 //txnSuccessToast(activity as Context)
                                                 // kushal
                                                 PrintUtil(context).printSMSUPIChagreSlip(
@@ -254,7 +258,8 @@ class QrFragment : Fragment() {
                                                     deleteDigiposData(
                                                         digiPosTabledata.partnerTxnId
                                                     )
-                                                    parentFragmentManager.popBackStack()
+                                                    //parentFragmentManager.popBackStack()
+                                                    parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                                                 }
                                             },
                                             {})
@@ -281,7 +286,8 @@ class QrFragment : Fragment() {
                      if (imgbm == null) {
                          logger("StaticQr", "  DELETED SUCCESS", "e")
                      }*/
-                    parentFragmentManager.popBackStack()
+                   // parentFragmentManager.popBackStack()
+                    parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                 }
 
                 else -> {
