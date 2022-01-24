@@ -1,6 +1,5 @@
 package com.bonushub.crdb.view.fragments.digi_pos
 
-import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -41,6 +40,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
     private var vpa_ = ""
     private var mobile_ = ""
     var uniqueID: String = ""
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,6 +54,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         transactionType = arguments?.getSerializable("type") as EDashboardItem
        // digiPosItemType = arguments?.getSerializable("type") as DigiPosItem
 
@@ -79,7 +81,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                 binding?.enterDescriptionCrdView?.visibility = View.GONE
             }
 
-            EDashboardItem.DYNAMIC_QR, EDashboardItem.SMS_PAY ->{
+            EDashboardItem.BHARAT_QR, EDashboardItem.SMS_PAY ->{
                 binding?.enterAmountCrdView?.visibility = View.VISIBLE
                 binding?.vpaCrdView?.visibility = View.GONE
                 binding?.mobileNumberCrdView?.visibility = View.VISIBLE
@@ -96,7 +98,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
         // end region
 
         when (transactionType) {
-            EDashboardItem.SMS_PAY, EDashboardItem.DYNAMIC_QR -> {
+            EDashboardItem.SMS_PAY, EDashboardItem.BHARAT_QR -> {
                 binding?.mobileNumberEt?.hint = getString(R.string.enter_mobile_number)
             }
             EDashboardItem.UPI -> {
@@ -128,12 +130,14 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                 putSerializable("vpa", vpa_)
                                 putSerializable("mobile", mobile_)
                             }
-                        })
+                        }, false)
+
+                       // DialogUtilsNew1.showUpiCollectDialog(requireContext(),amount_,vpa_,mobile_,{},{})
                     }
 
                 }
 
-                EDashboardItem.DYNAMIC_QR->{
+                EDashboardItem.BHARAT_QR->{
                     logger("transactionType",""+transactionType.title)
 //                    (activity as NavigationActivity).transactFragment(QrFragment().apply {
 //                        arguments = Bundle().apply {
@@ -204,12 +208,12 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                 context?.getString(R.string.enter_valid_mobile_number)
                     ?.let {  ToastUtils.showToast(activity,it) }
 
-            (transactionType == EDashboardItem.SMS_PAY || transactionType == EDashboardItem.DYNAMIC_QR) && binding?.mobileNumberEt?.text.toString().length != 10 -> {
+            (transactionType == EDashboardItem.SMS_PAY || transactionType == EDashboardItem.BHARAT_QR) && binding?.mobileNumberEt?.text.toString().length != 10 -> {
                 context?.getString(R.string.enter_valid_mobile_number)
                     ?.let {  ToastUtils.showToast(activity,it) }
             }
 
-            transactionType == EDashboardItem.DYNAMIC_QR && !TextUtils.isEmpty(binding?.mobileNumberEt?.text.toString()) && binding?.mobileNumberEt?.text.toString().length != 10 ->
+            transactionType == EDashboardItem.BHARAT_QR && !TextUtils.isEmpty(binding?.mobileNumberEt?.text.toString()) && binding?.mobileNumberEt?.text.toString().length != 10 ->
                 context?.getString(R.string.enter_valid_mobile_number)
                     ?.let {  ToastUtils.showToast(activity,it) }
 
@@ -231,7 +235,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                 var f56 = ""
                 f56 = when (transactionType) {
                     EDashboardItem.UPI -> EnumDigiPosProcess.UPIDigiPOS.code + "^" + formattedAmt + "^" + binding?.enterDescriptionEt?.text?.toString() + "^" + binding?.mobileNumberEt?.text?.toString() + "^" + binding?.vpaEt?.text?.toString() + "^" + uniqueID
-                    EDashboardItem.DYNAMIC_QR -> EnumDigiPosProcess.DYNAMIC_QR.code + "^" + formattedAmt + "^" + binding?.enterDescriptionEt?.text?.toString() + "^" + binding?.mobileNumberEt?.text?.toString() + "^" + uniqueID
+                    EDashboardItem.BHARAT_QR -> EnumDigiPosProcess.DYNAMIC_QR.code + "^" + formattedAmt + "^" + binding?.enterDescriptionEt?.text?.toString() + "^" + binding?.mobileNumberEt?.text?.toString() + "^" + uniqueID
                     else -> EnumDigiPosProcess.SMS_PAYDigiPOS.code + "^" + formattedAmt + "^" + binding?.enterDescriptionEt?.text?.toString() + "^" + binding?.mobileNumberEt?.text?.toString() + "^" + uniqueID
                 }
                 sendReceiveDataFromHost(f56)
@@ -365,7 +369,10 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                 responsef57
                                                                             )
 
-                                                                            (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                                            lifecycleScope.launch(Dispatchers.Main){
+                                                                                (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                                            }
+
                                                                             //txnSuccessToast(activity as Context)
                                                                             // kushal
                                                                             logger("call","printSMSUPIChagreSlip","e")
@@ -458,7 +465,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                 }
                             }
 
-                            EDashboardItem.DYNAMIC_QR -> {
+                            EDashboardItem.BHARAT_QR -> {
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     val respDataList = responsef57.split("^")
 //reqest type, parterid,status,statusmsg,statuscode,QrBlob

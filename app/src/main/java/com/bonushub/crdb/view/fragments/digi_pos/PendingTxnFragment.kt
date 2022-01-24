@@ -66,7 +66,8 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
-                parentFragmentManager.popBackStackImmediate()
+                //parentFragmentManager.popBackStackImmediate()
+                parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
             }catch (ex:Exception)
             {
                 ex.printStackTrace()
@@ -78,7 +79,7 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                 arguments = Bundle().apply {
                     putSerializable("type", EDashboardItem.PENDING_TXN)
                 }
-            })
+            }, false)
 
         }
 

@@ -433,7 +433,7 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     TEST_EMI("Test Emi TXN", R.drawable.ic_digi_pos, 777),
 
     UPI("UPI COLLECT", R.drawable.ic_upi, 901),
-    DYNAMIC_QR("DYNAMIC QR", R.drawable.ic_qr_code, 906),
+    BHARAT_QR("BHARAT QR", R.drawable.ic_qr_code, 906),
     STATIC_QR("STATIC QR", R.drawable.ic_qr_code, 904),
     SMS_PAY("SMS PAY", R.drawable.ic_sms_pay, 902),
     PENDING_TXN("PENDING TXN", R.drawable.ic_pending_txn, 903),
@@ -620,7 +620,7 @@ enum class TestEmiItem(val id:String, val _name: String){
 // region
 enum class DigiPosItem(val title: String, val res: Int, val rank: Int = 15, var childList:MutableList<EDashboardItem>?=null,) {
     UPI("UPI COLLECT", R.drawable.ic_upi, 901),
-    DYNAMIC_QR("DYNAMIC QR", R.drawable.ic_qr_code, 906),
+    BHARAT_QR("BHARAT QR", R.drawable.ic_qr_code, 906),
     STATIC_QR("STATIC QR", R.drawable.ic_qr_code, 904),
     SMS_PAY("SMS PAY", R.drawable.ic_sms_pay, 902),
     PENDING_TXN("PENDING TXN", R.drawable.ic_pending_txn, 903),

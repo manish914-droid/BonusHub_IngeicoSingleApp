@@ -904,7 +904,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             putSerializable("type", EDashboardItem.DIGI_POS)
                             // putString(INPUT_SUB_HEADING, "")
                         }
-                    })
+                    }, false)
 
                 } else {
                    showToast(getString(R.string.no_internet_available_please_check_your_internet))
