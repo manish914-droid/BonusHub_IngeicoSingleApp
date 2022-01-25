@@ -28,6 +28,7 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
+import com.bonushub.crdb.model.remote.RestartHandlingModel
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -335,13 +336,14 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     }
     //endregion
 
+    var restatDataList:RestartHandlingModel? = null
 
     private fun restartHandaling() {
-        val restatDataList = AppPreference.getRestartDataPreference()
+        restatDataList = AppPreference.getRestartDataPreference()
         if (restatDataList != null) {
-            val uid=restatDataList.transactionUuid
+            val uid=restatDataList?.transactionUuid
             println("uid = $uid")
-            DeviceHelper.getTransactionByUId(uid,object: OnOperationListener.Stub(){
+            DeviceHelper.getTransactionByUId(uid!!,object: OnOperationListener.Stub(){
 
                 override fun onCompleted(p0: OperationResult?) {
                     val txnResponse = p0?.value as? TransactionDataResponse
@@ -386,6 +388,15 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
         if (receiptDetail != null) {
             lifecycleScope.launch(Dispatchers.IO) {
+
+                // here get batch data
+                if(restatDataList?.transactionType == EDashboardItem.BANK_EMI || restatDataList?.transactionType == EDashboardItem.BRAND_EMI || restatDataList?.transactionType == EDashboardItem.TEST_EMI)
+                {
+                    restatDataList?.batchData?.receiptData = receiptDetail
+                    val batchData = restatDataList?.batchData
+
+                }
+
                 val batchData = BatchTable(receiptDetail)
 
                 batchData.invoice = receiptDetail.invoice.toString()

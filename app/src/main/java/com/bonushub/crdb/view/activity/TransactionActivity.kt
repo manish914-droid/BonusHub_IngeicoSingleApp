@@ -300,6 +300,47 @@ val cardCaptureType:CardCaptureType
                         cardCaptureType=CardCaptureType.EMV_NO_CAPTURING
                     }
 
+                    // region save data for PFR
+                    val batchData = BatchTable(null)
+                        batchData.emiIssuerDataModel = emiIssuerData
+                        batchData.invoice = ""
+                        if(requestCode == BhTransactionType.BRAND_EMI.type) {
+                            batchData.emiBrandData = brandDataMaster
+                            batchData.emiSubCategoryData = brandEmiSubCatData
+                            batchData.emiCategoryData = brandEmiCatData
+                            batchData.emiProductData = brandEmiProductData
+                        }
+                        batchData.imeiOrSerialNum = imeiOrSerialNum
+                        batchData.mobileNumber = mobileNumber
+                        batchData.billNumber=billNumber
+                        batchData.emiTenureDataModel = emiTenureData
+                        batchData.transactionType = globalCardProcessedModel.getTransType()
+
+                    val tranUuid = UUID.randomUUID().toString()
+                    var restartHandlingModel: RestartHandlingModel?  = null
+                    when(reqCode){
+
+                        BhTransactionType.BRAND_EMI.type ->{
+                            restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.BANK_EMI, batchData)
+                        }
+
+
+                        BhTransactionType.EMI_SALE.type ->{
+                            restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.BRAND_EMI, batchData)
+                        }
+
+
+                        BhTransactionType.TEST_EMI.type ->{
+                            restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.TEST_EMI, batchData)
+                        }
+                    }
+                   // val restartHandlingModel = RestartHandlingModel(tranUuid, requestCode, batchData)
+                    restartHandlingList.add(restartHandlingModel!!)
+                    val jsonResp = Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
+
+                    // end region
                     DeviceHelper.doEMITxn(
                         EMISaleRequest(
                             amount = amt,
@@ -354,6 +395,9 @@ val cardCaptureType:CardCaptureType
                                                     )
                                                 }
                                                 AppPreference.saveLastReceiptDetails(batchData)
+
+                                                AppPreference.clearRestartDataPreference()
+
                                                 printingSaleData(batchData){
                                                     // region sync transaction
                                                     withContext(Dispatchers.Main) {
@@ -399,11 +443,16 @@ val cardCaptureType:CardCaptureType
                                             }
                                         }
                                     }
-                                    ResponseCode.FAILED.value,
+                                    ResponseCode.FAILED.value, ->{
+                                        AppPreference.clearRestartDataPreference()
+                                    }
                                     ResponseCode.ABORTED.value -> {
                                         isUnblockingNeeded=true
+                                        AppPreference.clearRestartDataPreference()
                                     }
                                     ResponseCode.REVERSAL.value -> {
+                                        AppPreference.clearRestartDataPreference()
+
                                         isUnblockingNeeded=true
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
                                         val batchReversalData = BatchTableReversal(receiptDetail)
@@ -1316,7 +1365,6 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                         batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                         batchData.bonushubStan        = tpt?.stan ?: ""
-
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
                                         //To increment base Stan
