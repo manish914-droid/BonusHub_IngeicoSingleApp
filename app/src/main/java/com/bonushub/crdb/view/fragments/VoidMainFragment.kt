@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.BatchTable
@@ -52,9 +53,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class VoidMainFragment : Fragment() {
+    @Inject
+    lateinit var appDao: AppDao
     private var globalCardProcessedModel = CardProcessedDataModal()
 
     var binding:FragmentVoidMainBinding? = null
@@ -136,7 +140,7 @@ class VoidMainFragment : Fragment() {
                                             }
                                             createCardProcessingModelData(receiptDetail)
                                             val transactionISO =
-                                                CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                             // sync pending transaction
                                             //   Utility().syncPendingTransaction(transactionViewModel)
 

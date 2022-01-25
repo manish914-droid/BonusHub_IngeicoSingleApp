@@ -1143,7 +1143,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         if(pendingTxn.size != 0) {
             for (item in pendingTxn) {
                 val transactionISO =
-                    CreateTransactionPacket(item.cardProcessedDataModal).createTransactionPacket()
+                    CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal).createTransactionPacket()
 
                 when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
                     is GenericResponse.Success -> {

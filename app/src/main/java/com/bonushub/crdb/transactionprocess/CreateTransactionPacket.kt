@@ -1,6 +1,5 @@
 package com.bonushub.crdb.transactionprocess
 
-import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
@@ -36,7 +35,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
          //To get Base Tid
         val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
         //To get base Tid batch Number
-        val tptbatchnumber = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptDataByTid(baseTid) }
+        val tptbaseTiddata = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptDataByTid(baseTid) }
 
 
         //Condition To Check BhTransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
@@ -74,7 +73,8 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             }
 
             //STAN(ROC) Field 11
-            cardProcessedData?.getAuthRoc()?.let { addField(11, it) }
+           // cardProcessedData?.getAuthRoc()?.let { addField(11, it) }
+            addField(11,tptbaseTiddata?.stan ?: "")
 
             //Date and Time Field 12 & 13
             val date = cardProcessedData.getTimeStamp()
@@ -123,9 +123,6 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                 }
             }
 
-         //   Field 56 -  old (means main transaction’s BH Base tid)stan 6 digits and then old data time yymmddhhmmss
-
-           // addFieldByHex()
 
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
             when (cardProcessedData.getTransType()) {
@@ -147,18 +144,26 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
           //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
 
 
-            var fielddata60 = addPad(tptbatchnumber?.batchNumber ?: "", "0", 6, true)+
-                    addPad(batchListData[0].receiptData?.tid ?: "", "0", 8, true)+
-                    addPad(batchListData[0].receiptData?.batchNumber ?: "", "0", 6, true)+
-                    addPad(batchListData[0].receiptData?.stan ?: "", "0", 6, true)+
-                    addPad(batchListData[0].receiptData?.invoice ?: "", "0", 6, true)+
-                    addPad(batchListData[0].receiptData?.aid ?: "", "0", 10, true)+
-                    addPad(batchListData[0].receiptData?.tc ?: "", "0", 6, true)+
-                    addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
+            var bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
+            var emptyString: String= ""
+            var ingenicotid          = addPad(batchListData[0].receiptData?.tid ?: "", "0", 8, true)
+            var ingenibatchnumber    = addPad(batchListData[0].receiptData?.batchNumber ?: "", "0", 6, true)
+            var ingenicostan         = addPad(batchListData[0].receiptData?.stan ?: "", "0", 6, true)
+            var ingenicoInvoice        = addPad(batchListData[0].receiptData?.invoice ?: "", "0", 6, true)
+            var ingenicoaid      = batchListData[0].receiptData?.aid ?: ""
+            var ingenicotc     = batchListData[0].receiptData?.tc ?: ""
+            var ingenicoappName     = batchListData[0].receiptData?.appName ?: ""
 
-            addFieldByHex(60,"")
+            var fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
+                              "$ingenibatchnumber|$ingenicostan|$ingenicoInvoice|"+
+                              "$ingenicoaid|$ingenicotc|$ingenicoappName|"
 
-            addFieldByHex(62,"")
+
+            println("Field 60 value is -> "+ fielddata60)
+
+            addFieldByHex(60,fielddata60)
+
+
 
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
             when (cardProcessedData.getTransType()) {
@@ -262,7 +267,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             val gcc = "0"
             var field60: String? = null
              var batchNumber: String? = null
-            when {
+       /*     when {
                 !TextUtils.isEmpty(cardProcessedData.getMobileBillExtraData()?.first) -> {
                     batchNumber = addPad(terminalData.batchNumber, "0", 6, true)
                     val mobileNumber = cardProcessedData.getMobileBillExtraData()?.first
@@ -277,7 +282,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                         addFieldByHex(60, batchNumber)
                     }
                 }
-            }
+            }*/
 
             //adding field 61
             //adding field 61
@@ -314,7 +319,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                 issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: "0"
             }
 
-var serialnumm=""
+          var serialnumm=""
             serialnumm = if(BhTransactionType.BRAND_EMI.type==cardProcessedData.getTransType()|| BhTransactionType.EMI_SALE.type==cardProcessedData.getTransType() ) {
                 val tenureData=batchdata?.emiTenureDataModel
                 if( cardProcessedData.getTid()==tenureData?.txnTID){
@@ -327,7 +332,9 @@ var serialnumm=""
             }
             addFieldByHex(61, addPad(serialnumm ?: "", " ", 15, false) + AppPreference.getBankCode() + customerID + walletIssuerID + data)
             //adding field 62
-            cardProcessedData.getInvoice()?.let { addFieldByHex(62, it) }
+         //   cardProcessedData.getInvoice()?.let { addFieldByHex(62, it) }
+
+            addFieldByHex(62, tptbaseTiddata?.invoiceNumber ?: "")
 
         }
     }
