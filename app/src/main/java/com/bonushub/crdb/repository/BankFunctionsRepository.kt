@@ -87,9 +87,9 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
        // var table = appDao.getTerminalParameterTableData() // old
             var table:TerminalParameterTable? = null
             if(AppPreference.getLogin()) {
-                table = appDao?.getTerminalParameterTableDataByTidType("1")
+                table = appDao.getTerminalParameterTableDataByTidType("1")
             }else{
-                table = appDao?.getTerminalParameterTableDataByTidType("-1")
+                table = appDao.getTerminalParameterTableDataByTidType("-1")
             }
 
             val props = TerminalParameterTable::class.java.declaredFields

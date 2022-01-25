@@ -100,12 +100,12 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                             "=> onCardSwiped" + String.format(
                                 "==> Track %s state: %d",
                                 i + 1,
-                                trackStates!![i]
+                                trackStates[i]
                             )
                         )
                     }
 
-                    var serviceCode = track.getString(EMVData.SERVICE_CODE)
+                    val serviceCode = track.getString(EMVData.SERVICE_CODE)
 
                     if (serviceCode != null) {
                         cardProcessedDataModal.setServiceCodeData(serviceCode)
@@ -123,15 +123,30 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                              //Checking Fallback
                         if (scFirstByte == '2' || scFirstByte == '6') {
                             doEndProcess(EFallbackCode.Swipe_fallback.fallBackCode, cardProcessedDataModal)
+                        }else{
+                            cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
+                            cardProcessedDataModal.setTrack2Data(track.getString(EMVData.TRACK2)?:"")
+                            cardProcessedDataModal.setTrack1Data(track.getString(EMVData.TRACK1)?:"")
+                            cardProcessedDataModal.setPanNumberData(track.getString(EMVData.PAN)?:"")
+                            val encryptPanData = getEncryptedPanorTrackData(track.getString(EMVData.PAN)?:"", true)
+                            cardProcessedDataModal.setEncryptedPan(encryptPanData)
+                            println("Track data is" + track.getString(EMVData.TRACK2))
+                            _insertCardStatus.postValue(cardProcessedDataModal)
+                            emv?.stopSearch()
                         }
                      }
                     else {
 
                         cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
-                        var encryptTrack2data =
+                      /*  val encryptTrack2data =
                             getEncryptedPanorTrackData(track.getString(EMVData.TRACK2) ?: "", true)
+                        println("Track data is" + track.getString(EMVData.TRACK2))*/
+                        cardProcessedDataModal.setTrack2Data(track.getString(EMVData.TRACK2)?:"")
+                        cardProcessedDataModal.setTrack1Data(track.getString(EMVData.TRACK1)?:"")
+                        cardProcessedDataModal.setPanNumberData(track.getString(EMVData.PAN)?:"")
+                        val encryptPanData = getEncryptedPanorTrackData(track.getString(EMVData.PAN)?:"", true)
+                        cardProcessedDataModal.setEncryptedPan(encryptPanData)
                         println("Track data is" + track.getString(EMVData.TRACK2))
-                        cardProcessedDataModal.setTrack2Data(encryptTrack2data ?: "")
                         _insertCardStatus.postValue(cardProcessedDataModal)
                         emv?.stopSearch()
                     }
@@ -260,8 +275,6 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                 //EMV Fallback case when we insert card from other side then chip side:-
                 cardProcessedDataModal.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
                 cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
-
-
                 (context as? TransactionActivity)?.handleEMVFallbackFromError(context.getString(R.string.fallback), context.getString(R.string.please_use_another_option), false) {
                     cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
                     detectCard(cardProcessedDataModal, CardOption.create().apply {

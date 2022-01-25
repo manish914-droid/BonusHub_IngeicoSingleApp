@@ -161,8 +161,8 @@ data class TerminalCommunicationTable(
     @field:BHFieldParseIndex(4)
     var recordId: String = "",
 
-    @field:BHFieldParseIndex(5)
     @PrimaryKey
+    @field:BHFieldParseIndex(5)
     var recordType: String = "",
 
     @field:BHFieldParseIndex(7)

@@ -110,7 +110,6 @@ class CreateTransactionPacket(
                             addPad(cardProcessedData.getTipAmount().toString(), "0", 12, true)
                         )
                     }
-
                 }
                 else -> {
                 }
@@ -232,7 +231,7 @@ class CreateTransactionPacket(
             //Adding Field 60 value on basis of Condition Whether it consist Mobile Number Data , Bill Number Data or not:-
             val gcc = "0"
             var field60: String? = null
-            var batchNumber: String? = null
+             var batchNumber: String? = null
             when {
                 !TextUtils.isEmpty(cardProcessedData.getMobileBillExtraData()?.first) -> {
                     batchNumber = addPad(terminalData.batchNumber, "0", 6, true)

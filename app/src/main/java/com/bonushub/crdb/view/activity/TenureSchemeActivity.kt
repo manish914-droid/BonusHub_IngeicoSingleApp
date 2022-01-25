@@ -125,11 +125,25 @@ hideProgress()
 
                         }
                         is GenericResponse.Error -> {
-                            ToastUtils.showToast(this, genericResp.errorMessage)
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                alertBoxWithAction(
+                                    getString(R.string.no_receipt),
+                                    genericResp.errorMessage?:"Oops something went wrong",
+                                    false,
+                                    getString(R.string.positive_button_ok),
+                                    {
+                                        finish()
+                                        startActivity(Intent(this@TenureSchemeActivity, NavigationActivity::class.java).apply {
+                                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        })
+                                    },
+                                    {})
+                            }
+                          //  ToastUtils.showToast(this, genericResp.errorMessage)
                             println(genericResp.errorMessage.toString())
                         }
                         is GenericResponse.Loading -> {
-
+// currently not in use ....
                         }
                     }
                 })

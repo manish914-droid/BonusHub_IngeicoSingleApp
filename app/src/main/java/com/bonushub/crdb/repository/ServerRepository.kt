@@ -10,6 +10,7 @@ import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
+import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.IssuerBankModal
@@ -292,7 +293,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                     if (moreDataFlag == "1") {
                         getBrandData(totalRecord)
                     } else {
-                        GlobalScope.launch (Dispatchers.IO){
+                        withContext(Dispatchers.IO){
                             if (matchHostAndDBTimeStamp()) {
                                 brandEMIMasterCategoryMLData.postValue(
                                     GenericResponse.Success(
@@ -783,16 +784,30 @@ getIssuerTnc(fromBankEmi = true)
     //endregion
     //region=======================Check Whether we got Updated Data from Host or to use Previous BrandEMIMaster Store Data:-
     private suspend fun matchHostAndDBTimeStamp(): Boolean {
-        val dbTimeStamps = appDB.appDao.getBrandTimeStampFromDB()
-        var isDataMatch=false
-        if (!dbTimeStamps?.brandTAndCTimeStamp.isNullOrBlank() &&
-            !dbTimeStamps?.issuerTAndCTimeStamp.isNullOrBlank() &&
-            !dbTimeStamps?.brandCategoryUpdatedTimeStamp.isNullOrBlank()) {
-            isDataMatch = issuerTAndCTimeStamp == dbTimeStamps?.issuerTAndCTimeStamp &&
-                    brandTAndCTimeStamp == dbTimeStamps?.brandTAndCTimeStamp &&
-                    brandCategoryUpdatedTimeStamp==dbTimeStamps?.brandCategoryUpdatedTimeStamp
-        }
+        var isDataMatch = false
+        withContext(Dispatchers.IO) {
+            val dbTimeStamps = appDB.appDao.getBrandTimeStampFromDB()
+           /* val brandTnc = appDB.appDao.getAllBrandTAndCData()
+            val issuerTnC = appDB.appDao.getAllIssuerTAndCData()
+            val brandCatSubCat = appDB.appDao.getBrandEMISubCategoryData()
+            val getBrandTAndC = Field48ResponseTimestamp.getBrandTAndCData()
+            val terminalHasData =
+                !brandTnc.isNullOrEmpty() && !issuerTnC.isNullOrEmpty() && !brandCatSubCat.isNullOrEmpty()
+*/
+            if (!dbTimeStamps?.brandTAndCTimeStamp.isNullOrBlank() &&
+                !dbTimeStamps?.issuerTAndCTimeStamp.isNullOrBlank() &&
+                !dbTimeStamps?.brandCategoryUpdatedTimeStamp.isNullOrBlank()
+            ) {
+
+                isDataMatch =
+                    issuerTAndCTimeStamp == dbTimeStamps?.issuerTAndCTimeStamp &&
+                            brandTAndCTimeStamp == dbTimeStamps?.brandTAndCTimeStamp &&
+                            brandCategoryUpdatedTimeStamp == dbTimeStamps?.brandCategoryUpdatedTimeStamp
+
+            }
+             }
         return isDataMatch
+
     }
     //endregion
 

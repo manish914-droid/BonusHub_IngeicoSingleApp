@@ -25,7 +25,7 @@ class SyncAppUpdateConfirmation(private var confirmationISOData: ByteArray, cb: 
                // Utility().incrementRoc()
                 Utility().incrementUpdateRoc()
                 Utility().incrementUpdateInvoice()
-                Utility().incrementBatchNumber()
+
               //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
 
                 val responseIsoData: IsoDataReader = readIso(result, false)
