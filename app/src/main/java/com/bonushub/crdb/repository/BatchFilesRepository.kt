@@ -39,6 +39,23 @@ class BatchFilesRepository @Inject constructor(private val appDao: AppDao){
         return dataList
     }
 
+    suspend fun getBatchTableDataListByInvoice(invoice: String?) : LiveData<MutableList<BatchTable?>> {
+        val dataList = MutableLiveData<MutableList<BatchTable?>>()
+
+        withContext(Dispatchers.IO) {
+
+            val table = appDao.getBatchTableDataListByInvoice(invoice)
+//            if (table != null) {
+//
+//                table.sortBy { it?.hostInvoice?.toInt() }
+//                table.reverse()
+//            }
+            dataList.postValue(table)
+
+        }
+        return dataList
+    }
+
     /*suspend fun getBrandEMIDataTable(hostInvoice: String?, hostTid: String) : LiveData<BrandEMIDataTable?>{
         val dataList = MutableLiveData<BrandEMIDataTable?>()
 

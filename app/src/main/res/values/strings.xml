@@ -304,5 +304,6 @@
     <string name="getStatus">Get Status</string>
     <string name="failed">Failed!!!</string>
     <string name="txn_detail_page">TXN Detail Page</string>
+    <string name="void_refund_not_allowed">Void of Refund not allowed</string>
 
 </resources>
