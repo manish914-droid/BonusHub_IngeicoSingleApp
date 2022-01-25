@@ -9,6 +9,9 @@ import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.DigiPosDataTable
 import com.bonushub.crdb.utils.BitmapUtils.convertCompressedByteArrayToBitmap
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.deleteDigiposData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectDigiPosDataAccordingToTxnStatus
 import com.bonushub.crdb.view.base.BaseActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
@@ -206,6 +209,105 @@ suspend fun uploadPendingDigiPosTxn(activity: BaseActivity, appDao: AppDao, cb: 
     {
         ex.printStackTrace()
     }
+}
+
+suspend fun uploadPendingDigiPosTxn(activity: Activity,cb: (Boolean) -> Unit){
+    val digiPosDataList = selectDigiPosDataAccordingToTxnStatus(EDigiPosPaymentStatus.Pending.desciption) as ArrayList<DigiPosDataTable>
+    if(digiPosDataList.size==0){
+        Log.e("UPLOAD DIGI"," ----------------------->  NO PENDING DIGI POS TXN FOUND ...END")
+        cb(true)
+        return
+    }
+    for(digiPosTabledata in digiPosDataList) {
+        Log.e("TXN ID to upload -->"," ------ID--->  ${digiPosTabledata.partnerTxnId}   --------> Amount----> ${digiPosTabledata.amount} ")
+        val req57 = EnumDigiPosProcess.GET_STATUS.code + "^" + digiPosTabledata.partnerTxnId + "^^"
+        getDigiPosStatus(req57, EnumDigiPosProcessingCode.DIGIPOSPROCODE.code, false)
+        { isSuccess, responseMsg, responsef57, fullResponse ->
+            try {
+                if (isSuccess) {
+                    val statusRespDataList = responsef57.split("^")
+                    if(statusRespDataList[5]== EDigiPosPaymentStatus.Pending.desciption || statusRespDataList[5]== EDigiPosPaymentStatus.Approved.desciption){
+                        val tabledata =
+                            DigiPosDataTable()
+                        tabledata.requestType =
+                            statusRespDataList[0].toInt()
+                        //  tabledata.partnerTxnId = statusRespDataList[1]
+                        tabledata.status =
+                            statusRespDataList[1]
+                        tabledata.statusMsg =
+                            statusRespDataList[2]
+                        tabledata.statusCode =
+                            statusRespDataList[3]
+                        tabledata.mTxnId =
+                            statusRespDataList[4]
+                        tabledata.partnerTxnId =
+                            statusRespDataList[6]
+                        tabledata.transactionTimeStamp =
+                            statusRespDataList[7]
+                        tabledata.displayFormatedDate =
+                            getDateInDisplayFormatDigipos(
+                                statusRespDataList[7]
+                            )
+                        val dateTime =
+                            statusRespDataList[7].split(
+                                " "
+                            )
+                        tabledata.txnDate = dateTime[0]
+                        tabledata.txnTime = dateTime[1]
+                        tabledata.amount =
+                            statusRespDataList[8]
+                        tabledata.paymentMode =
+                            statusRespDataList[9]
+                        tabledata.customerMobileNumber =
+                            statusRespDataList[10]
+                        tabledata.description =
+                            statusRespDataList[11]
+                        tabledata.pgwTxnId =
+                            statusRespDataList[12]
+
+                        when (statusRespDataList[5]) {
+                            EDigiPosPaymentStatus.Pending.desciption -> {
+                                tabledata.txnStatus =
+                                    statusRespDataList[5]
+                                ToastUtils.showToast(activity, statusRespDataList[5])
+                                insertOrUpdateDigiposData(
+                                    tabledata
+                                )
+                                Log.e("UPLOADED PENDING->>", responsef57)
+                            }
+                            EDigiPosPaymentStatus.Approved.desciption -> {
+                                tabledata.txnStatus =
+                                    statusRespDataList[5]
+                                insertOrUpdateDigiposData(tabledata)
+                                Log.e("UPLOADED SUCCESS->>", responsef57)
+                            }
+                            else -> {
+                                deleteDigiposData(
+                                    tabledata.partnerTxnId
+                                )
+                                Log.e("UPLOAD FAIL->>", responsef57)
+                                ToastUtils.showToast(activity,statusRespDataList[5])
+                            }
+                        }
+                    }else{
+                        deleteDigiposData(digiPosTabledata.partnerTxnId)
+                        logger( LOG_TAG.DIGIPOS.tag,"Fail Txn response of Partner id --->  ${digiPosTabledata.partnerTxnId} ","e")
+                    }
+                } else {
+                    logger( LOG_TAG.DIGIPOS.tag,"Fail Txn() response of Partner id --->  ${digiPosTabledata.partnerTxnId}  --->  Other than 00 response","e")
+                }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                logger(
+                    LOG_TAG.DIGIPOS.tag,
+                    "Somethig wrong... in UPLOAD DIGIPOS response data field 57 ","e"
+                )
+                cb(true)
+            }
+        }
+    }
+    Log.e("UPLOAD DIGI"," ----------------------->  END")
+    cb(true)
 }
 // end region
 

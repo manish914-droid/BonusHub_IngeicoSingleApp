@@ -1,13 +1,21 @@
 package com.bonushub.crdb.view.fragments
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.di.DBModule
@@ -29,6 +37,7 @@ import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.bonushub.crdb.utils.BhTransactionType
 import com.bonushub.crdb.utils.CardEntryMode
 import com.bonushub.crdb.utils.EPrintCopyType
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.ProcessingCode
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -37,6 +46,7 @@ import com.ingenico.hdfcpayment.request.VoidRequest
 import com.ingenico.hdfcpayment.response.PaymentResult
 import com.ingenico.hdfcpayment.response.TransactionResponse
 import com.ingenico.hdfcpayment.type.ResponseCode
+import com.ingenico.hdfcpayment.type.TransactionType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -294,7 +304,7 @@ class VoidMainFragment : Fragment() {
     private fun searchTransaction()
     {
         val invoice = binding?.edtTextSearchTransaction?.text.toString()
-        lifecycleScope.launch {
+        /*lifecycleScope.launch {
             batchFileViewModel.getBatchTableDataByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner, { batchTable ->
 
                 if(batchTable?.receiptData != null) {
@@ -318,9 +328,81 @@ class VoidMainFragment : Fragment() {
                     ToastUtils.showToast(requireContext(),"Data not found.")
                 }
             })
+        }*/
+
+        lifecycleScope.launch {
+            batchFileViewModel.getBatchTableDataListByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner, { allbat ->
+
+                logger("batchTable",allbat.size.toString(),"e")
+                var voidData: BatchTable? = null
+                val bat:ArrayList<BatchTable> = arrayListOf()
+                if (allbat != null) {
+                    for (i in allbat) {
+                        if (i?.transactionType== BhTransactionType.SALE.type||
+                            i?.transactionType== BhTransactionType.EMI_SALE.type||
+                            i?.transactionType== BhTransactionType.REFUND.type||
+                            i?.transactionType== BhTransactionType.SALE_WITH_CASH.type||
+                            i?.transactionType== BhTransactionType.CASH_AT_POS.type||
+                            i?.transactionType== BhTransactionType.TIP_SALE.type||
+                            i?.transactionType== BhTransactionType.TEST_EMI.type||
+                            i?.transactionType== BhTransactionType.BRAND_EMI.type||
+                            i?.transactionType==  BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type)
+                            bat.add(i)
+                    }
+
+                    val tpt = getTptData()
+                    when (bat.size) {
+                        0 -> ToastUtils.showToast(requireContext(),getString(R.string.no_data_found))
+                        1 -> {
+                            voidData = bat.first()
+                            if (voidData?.transactionType == BhTransactionType.REFUND.type && tpt?.voidRefund != "1") {
+                                ToastUtils.showToast(requireContext(),getString(R.string.void_refund_not_allowed))
+                            } else {
+
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    voidTransConfirmationDialog(voidData)
+                                }
+                            }
+                        }
+                        else -> {
+                            // todo dialog here...
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                voidTransInvoicesDialog(bat as ArrayList<BatchTable>)
+                            }
+                        }
+                    }
+
+                }
+
+            })
         }
 
     }
+
+    private fun voidTransConfirmationDialog(batchTable: BatchTable) {
+
+        if(batchTable?.receiptData != null) {
+
+                    val date = batchTable.receiptData?.dateTime ?: ""
+                    val parts = date.split(" ")
+                    println("Date: " + parts[0])
+                    println("Time: " + (parts[1]) )
+                    val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "")?.toDouble())?.div(100)).toString().toDouble())
+                    DialogUtilsNew1.showVoidSaleDetailsDialog(
+                        requireContext(),
+                        parts[0],
+                        parts[1],
+                        batchTable.receiptData?.tid ?: "",
+                        batchTable.receiptData?.invoice ?: "",
+                        amt
+                    ) {
+                        doVoidTransaction()
+                    }
+                }else{
+                    ToastUtils.showToast(requireContext(),"Data not found.")
+                }
+    }
+
     fun createCardProcessingModelData(receiptDetail: ReceiptDetail) {
         logger("",""+receiptDetail)
         when(globalCardProcessedModel.getTransType()){
@@ -452,6 +534,65 @@ class VoidMainFragment : Fragment() {
                 {})
         }
 
+
+    }
+
+    private fun voidTransInvoicesDialog(voidData: ArrayList<BatchTable>) {
+        val dialog = Dialog(requireActivity())
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.recyclerview_layout)
+
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+        val window = dialog.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        val rv = dialog.findViewById<RecyclerView>(R.id.recycler_view)
+        val adptr = VoidTxnAdapter(voidData) {
+            dialog.hide()
+            voidTransConfirmationDialog(it)
+        }
+        rv.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = adptr
+        }
+        dialog.show()
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+}
+
+class VoidTxnAdapter(
+    var batchData: ArrayList<BatchTable>,
+    var cb: (BatchTable) -> Unit
+) :
+    RecyclerView.Adapter<VoidTxnAdapter.VoidTxnViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VoidTxnViewHolder {
+        return VoidTxnViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_void_invoices_data, parent, false)
+        )
+    }
+
+    override fun onBindViewHolder(holder: VoidTxnViewHolder, position: Int) {
+        val voidData = batchData[position]
+        holder.tidView.text = "TID : " + voidData?.receiptData?.tid
+        holder.invoiceView.text = "INVOICE : " + voidData.bonushubInvoice
+        holder.voidView.setOnClickListener {
+            //  VFService.showToast("CLICKED  $position")
+            cb(voidData)
+        }
+    }
+
+    override fun getItemCount(): Int = batchData.size
+
+
+    class VoidTxnViewHolder(var v: View) : RecyclerView.ViewHolder(v) {
+        var tidView = v.findViewById<TextView>(R.id.txn_tid_tv)
+        var invoiceView = v.findViewById<TextView>(R.id.txn_invoice_tv)
+        var voidView = v.findViewById<CardView>(R.id.voidTxnLL)
 
     }
 }

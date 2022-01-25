@@ -28,6 +28,14 @@ class BatchFileViewModel@ViewModelInject constructor(private val batchFilesRepos
 
     }
 
+    private var batchTableDataListByInvoice : LiveData<MutableList<BatchTable?>>? = null
+    suspend fun getBatchTableDataListByInvoice(invoice: String?) : LiveData<MutableList<BatchTable?>>
+    {
+        batchTableDataListByInvoice = batchFilesRepository.getBatchTableDataListByInvoice(invoice)
+        return batchTableDataListByInvoice as LiveData<MutableList<BatchTable?>>
+
+    }
+
     /*private var brandEMIDataTable : LiveData<BrandEMIDataTable?>? = null
     suspend fun getBrandEMIDataTable(hostInvoice: String?, hostTid: String) : LiveData<BrandEMIDataTable?>
     {

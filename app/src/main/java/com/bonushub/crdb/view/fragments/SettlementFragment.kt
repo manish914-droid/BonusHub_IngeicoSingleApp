@@ -195,6 +195,9 @@ class SettlementFragment : Fragment() {
 
                     }
 
+                        // region digipos data upload
+                        // end region
+
                         ioSope.launch {
                            var reversalTid  = checkReversal(dataListReversal)
                            var listofTxnTid =  checkSettlementTid(dataList)
@@ -219,14 +222,24 @@ class SettlementFragment : Fragment() {
                                     AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
                                     AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
 
-                                    val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                    settlementByteArray = data.generateIsoByteRequest()
-                                    try {
-                                        (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
-                                    } catch (ex: Exception) {
-                                        (activity as NavigationActivity).hideProgress()
-                                        ex.printStackTrace()
+                                    // region upload digipos pending txn
+                                    logger("UPLOAD DIGI"," ----------------------->  START","e")
+                                    uploadPendingDigiPosTxn(requireActivity()){
+                                        logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
+                                        CoroutineScope(Dispatchers.IO).launch{
+                                            val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                            settlementByteArray = data.generateIsoByteRequest()
+                                            try {
+                                                (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
+                                            } catch (ex: Exception) {
+                                                (activity as NavigationActivity).hideProgress()
+                                                ex.printStackTrace()
+                                            }
+                                        }
+
                                     }
+                                    // end region
+
                                 }
                                 //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }

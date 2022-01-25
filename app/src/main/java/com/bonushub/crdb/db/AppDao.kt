@@ -418,6 +418,9 @@ interface AppDao{
     @Query("SELECT * FROM BatchTable WHERE invoice = :invoice")// AND transactionType != :transType")
     fun getBatchDataFromInvoice(invoice: String?): BatchTable?
 
+    @Query("SELECT * FROM BatchTable WHERE invoice = :invoice")
+    suspend fun getBatchTableDataListByInvoice(invoice: String?): MutableList<BatchTable?>?
+
     // endregion ================
 
 
