@@ -316,4 +316,11 @@ object AppPreference {
     }
 
     // end reegion
+
+    // region
+    fun clearRestartDataPreference() {
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(RESTART_HANDLING, "")?.apply()
+    }
+    //endregion
 }
