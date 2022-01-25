@@ -876,7 +876,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 transactFragment(PreAuthPendingFragment(),true)
             }
             EDashboardItem.MERCHANT_REFERRAL->{
-                transactFragment(BrandEmiMasterCategoryFragment().apply {
+             /*   transactFragment(BrandEmiMasterCategoryFragment().apply {
                     arguments = Bundle().apply {
                         putSerializable("type", action)
                         putString(
@@ -884,7 +884,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             SubHeaderTitle.Brand_EMI_Master_Category.title
                         )
                     }
-                })
+                })*/
 
             }
             EDashboardItem.DIGI_POS -> {

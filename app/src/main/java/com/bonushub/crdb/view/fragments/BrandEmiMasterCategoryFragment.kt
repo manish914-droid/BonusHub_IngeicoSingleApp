@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonushub.crdb.HDFCApplication
+import com.bonushub.crdb.MainActivity
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.BrandEmiListAndSearchUiBinding
 import com.bonushub.crdb.db.AppDatabase
@@ -31,6 +32,7 @@ import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiViewModelFactory
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.view.base.BaseActivityNew
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -107,7 +109,21 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                         brandEMIMasterCategoryAdapter.submitList(genericResp.data)
                     }
                     is GenericResponse.Error -> {
-                        ToastUtils.showToast(activity, genericResp.errorMessage)
+                    //    ToastUtils.showToast(activity, genericResp.errorMessage)
+                        //(activity as MainActivity).show
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            (activity as BaseActivityNew).alertBoxWithAction(
+                                getString(R.string.no_receipt),
+                                genericResp.errorMessage?:"Oops something went wrong",
+                                false,
+                                getString(R.string.positive_button_ok),
+                                {
+                                   /* finish()
+                                    goToDashBoard()*/
+                                parentFragmentManager.popBackStack()
+                                },
+                                {})
+                        }
                         println(genericResp.errorMessage.toString())
                     }
                     is GenericResponse.Loading -> {

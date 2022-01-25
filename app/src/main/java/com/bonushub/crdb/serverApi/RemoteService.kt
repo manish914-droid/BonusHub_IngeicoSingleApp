@@ -91,7 +91,8 @@ object IsoPacketCreator{
                 addField(24, Nii.BRAND_EMI_MASTER.nii)
 
                 //TID Field 41
-                terminalData.terminalId?.get(0)?.let { addFieldByHex(41,  it.toString()) }
+               // terminalData.terminalId?.get(0)?.let { addFieldByHex(41,  it.toString()) }
+                addFieldByHex(41, getBaseTID(DBModule.appDatabase.appDao))
                 Log.d("terminalId:- ", terminalData.terminalId.toString())
 
                 //adding field 57
