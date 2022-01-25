@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.model.local.AppPreference
@@ -12,15 +13,15 @@ import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class CreateTransactionPacket(
-    private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?=null
-    ) :
-    ITransactionPacketExchange {
+class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?=null) : ITransactionPacketExchange {
 
     private var indicator: String? = null
     //  private var brandEMIData: brandEMIData? = null
@@ -31,6 +32,13 @@ class CreateTransactionPacket(
    // val receiptDetail: ReceiptDetail =batchTable.receiptData ?: ReceiptDetail(
 
     override fun createTransactionPacket(): IsoDataWriter = IsoDataWriter().apply {
+        val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
+         //To get Base Tid
+        val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
+        //To get base Tid batch Number
+        val tptbatchnumber = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptDataByTid(baseTid) }
+
+
         //Condition To Check BhTransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
         /*if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
             brandEMIByAccessCodeData =
@@ -88,7 +96,7 @@ class CreateTransactionPacket(
            val authcpdewithpading= cardProcessedData.getAuthCode()?.let { Padding(it) }
             authcpdewithpading?.let { addFieldByHex(38, it) }
             //TID Field 41
-            cardProcessedData.getTid()?.let { addFieldByHex(41, it) }
+            cardProcessedData.getTid()?.let { addFieldByHex(41, baseTid) } //here will be base tid
 
             //MID Field 42
             terminalData.merchantId?.let { addFieldByHex(42, it) }
@@ -115,6 +123,10 @@ class CreateTransactionPacket(
                 }
             }
 
+         //   Field 56 -  old (means main transaction’s BH Base tid)stan 6 digits and then old data time yymmddhhmmss
+
+           // addFieldByHex()
+
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
             when (cardProcessedData.getTransType()) {
                 BhTransactionType.SALE.type -> {
@@ -130,6 +142,24 @@ class CreateTransactionPacket(
                 }
 
             }
+
+          //  Filed 60-
+          //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
+
+
+            var fielddata60 = addPad(tptbatchnumber?.batchNumber ?: "", "0", 6, true)+
+                    addPad(batchListData[0].receiptData?.tid ?: "", "0", 8, true)+
+                    addPad(batchListData[0].receiptData?.batchNumber ?: "", "0", 6, true)+
+                    addPad(batchListData[0].receiptData?.stan ?: "", "0", 6, true)+
+                    addPad(batchListData[0].receiptData?.invoice ?: "", "0", 6, true)+
+                    addPad(batchListData[0].receiptData?.aid ?: "", "0", 10, true)+
+                    addPad(batchListData[0].receiptData?.tc ?: "", "0", 6, true)+
+                    addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
+
+            addFieldByHex(60,"")
+
+            addFieldByHex(62,"")
+
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
             when (cardProcessedData.getTransType()) {
 

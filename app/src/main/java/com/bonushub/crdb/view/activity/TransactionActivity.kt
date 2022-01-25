@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.ActivityEmvBinding
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule.appDatabase
 import com.bonushub.crdb.entity.CardOption
@@ -63,9 +64,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew() {
+
+    @Inject
+    lateinit var appDao: AppDao
+
     /** need to use Hilt for instance initializing here..*/
     private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
@@ -403,7 +409,7 @@ val cardCaptureType:CardCaptureType
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel,batchData).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     //   sync pending transaction
                                                    //    Utility().syncPendingTransaction(transactionViewModel)
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
@@ -638,21 +644,36 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         println(jsonResp)
 
 
+
                                        // AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
+
+                                            //To get tpt data acccording to tid
+                                            val tpt = runBlocking(Dispatchers.IO) {
+                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                            }
+
                                             val batchData = BatchTable(receiptDetail)
 
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO){
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.CASH_AT_POS.type
+                                                batchData.transactionType = BhTransactionType.CASH_AT_POS.type
+                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                                batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                                batchData.bonushubStan        = tpt?.stan ?: ""
+
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+
+                                                //To increment base Stan
+                                                Utility().incrementUpdateRoc()
+                                                //To increment base invoice
+                                                Utility().incrementUpdateInvoice()
 
                                                 printingSaleData(batchData){
                                                     // region sync transaction
@@ -661,7 +682,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     }
 
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
 
                                                     // sync pending transaction
                                                   //  Utility().syncPendingTransaction(transactionViewModel)
@@ -799,19 +820,34 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
 
+
+                                            //To get tpt data acccording to tid
+                                            val tpt = runBlocking(Dispatchers.IO) {
+                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                            }
+
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.SALE_WITH_CASH.type
+                                                batchData.transactionType = BhTransactionType.SALE_WITH_CASH.type
+                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                                batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                                batchData.bonushubStan        = tpt?.stan ?: ""
+
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+
+                                                //To increment base Stan
+                                                Utility().incrementUpdateRoc()
+                                                //To increment base invoice
+                                                Utility().incrementUpdateInvoice()
+
                                                 printingSaleData(batchData){
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                                     // sync pending transaction
                                                 //    Utility().syncPendingTransaction(transactionViewModel)
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
@@ -926,22 +962,33 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
+                                            //To get tpt data acccording to tid
+                                            val tpt = runBlocking(Dispatchers.IO) {
+                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                            }
 
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.REFUND.type
+                                                batchData.transactionType = BhTransactionType.REFUND.type
+                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                                batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                                batchData.bonushubStan        = tpt?.stan ?: ""
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                //To increment base Stan
+                                                Utility().incrementUpdateRoc()
+                                                //To increment base invoice
+                                                Utility().incrementUpdateInvoice()
+
                                                 printingSaleData(batchData){
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
 
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                                     // sync pending transaction
                                                    //   Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1079,7 +1126,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     }
 
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                                     // sync pending transaction
                                                    // Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1216,7 +1263,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                                     // sync pending transaction
                                                  //   Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1355,6 +1402,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                 if (receiptDetail != null) {
                                     lifecycleScope.launch(Dispatchers.IO) {
 
+                                        //To get tpt data acccording to tid
                                         val tpt = runBlocking(Dispatchers.IO) {
                                             getTptDataByTid(receiptDetail.tid ?: "")
                                         }
@@ -1362,6 +1410,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         println(jsonResp)
                                         batchData.invoice = receiptDetail.invoice.toString()
                                         batchData.transactionType = BhTransactionType.SALE.type
+                                        //To assign bonushub batchnumber,bonushub invoice,bonuhub stan
                                         batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                         batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                         batchData.bonushubStan        = tpt?.stan ?: ""
@@ -1376,7 +1425,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 showProgress(getString(R.string.transaction_syncing_msg))
                                             }
                                             createCardProcessingModelData(receiptDetail)
-                                            val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                            val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                             // sync pending transaction
                                       //      Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1525,7 +1574,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 showProgress(getString(R.string.transaction_syncing_msg))
                                             }
                                             createCardProcessingModelData(receiptDetail)
-                                            val transactionISO = CreateTransactionPacket(globalCardProcessedModel).createTransactionPacket()
+                                            val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
                                             // sync pending transaction
                                             //      Utility().syncPendingTransaction(transactionViewModel)
 
