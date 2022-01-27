@@ -94,6 +94,7 @@
                 android:layout_marginStart="100dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="100dp"
+                android:gravity="center"
                 android:layout_marginBottom="@dimen/pad_14">
 
                 <TextView
@@ -109,7 +110,8 @@
                     android:paddingBottom="@dimen/pad_12"
                     android:text="No"
                     android:textColor="@color/txt_color"
-                    android:textSize="@dimen/text_size_xregular" />
+                    android:textSize="@dimen/text_size_xregular"
+                    />
 
                 <TextView
                     android:id="@+id/btnYes"
