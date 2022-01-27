@@ -856,7 +856,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                 //    Utility().syncPendingTransaction(transactionViewModel)
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
@@ -997,7 +997,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     }
 
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                    //   Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1135,7 +1135,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     }
 
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                    // Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1272,7 +1272,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
                                                     createCardProcessingModelData(receiptDetail)
-                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                                    val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                  //   Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1434,7 +1434,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 showProgress(getString(R.string.transaction_syncing_msg))
                                             }
                                             createCardProcessingModelData(receiptDetail)
-                                            val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                            val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
                                       //      Utility().syncPendingTransaction(transactionViewModel)
 
@@ -1583,7 +1583,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 showProgress(getString(R.string.transaction_syncing_msg))
                                             }
                                             createCardProcessingModelData(receiptDetail)
-                                            val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                            val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
                                             //      Utility().syncPendingTransaction(transactionViewModel)
 
