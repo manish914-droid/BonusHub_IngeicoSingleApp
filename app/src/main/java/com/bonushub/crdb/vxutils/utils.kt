@@ -27,6 +27,7 @@ import com.bonushub.crdb.vxutils.Utility.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.ingenico.hdfcpayment.listener.OnOperationListener
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.CommRequest
 import com.ingenico.hdfcpayment.request.TerminalInitializationRequest
 import com.ingenico.hdfcpayment.response.OperationResult
@@ -71,6 +72,37 @@ fun getEncryptedPanorTrackData(panNumber: String,isTrackData: Boolean): String {
 
         return result
     } else return "TRACK57_LENGTH<8"
+
+}
+
+fun getEncryptedDataForSyncing(panNum:String,receiptData: ReceiptDetail):String{
+    //  02,36|PAN Number |card holder name~Application label~CardIssuerCountryCode~mode of txn~pin entry type
+
+  /*  mode of txn- 3 for CTLS, emv-2, swipe 1
+    Pin entry type - 1 for online pin and 2 for offline pin and 0 signature
+*/
+    var pinentry=0
+    pinentry = if(receiptData.isVerifyPin == true){
+        1
+    }else{
+        2
+    }
+
+    var  dataDescription = "02,36|$panNum~${receiptData.cardHolderName}~${receiptData.appName}~~2~${pinentry}"
+    val dataLength = dataDescription.length
+    val DIGIT_8 = 8
+    if (dataLength >= DIGIT_8) {
+        val mod = dataLength % DIGIT_8
+        if (mod != 0) {
+            val padding = DIGIT_8 - mod
+            val totalLength = dataLength + padding
+            dataDescription = addPad(dataDescription, " ", totalLength, false)
+        }
+        logger("Field 56", " -->$dataDescription", "e")
+
+        return calculateDes(dataDescription)
+    } else return "TRACK57_LENGTH<8"
+
 
 }
 
