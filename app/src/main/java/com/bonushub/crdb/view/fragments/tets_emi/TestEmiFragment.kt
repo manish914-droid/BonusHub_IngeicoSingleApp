@@ -61,7 +61,7 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
         for(item in tpt)
         {
-            if(!item?.terminalId.equals("-1")) {
+            if(!item?.LinkTidType.equals("-1")) {
                 linkedTid.add(item?.LinkTidType ?: "")
             }
         }

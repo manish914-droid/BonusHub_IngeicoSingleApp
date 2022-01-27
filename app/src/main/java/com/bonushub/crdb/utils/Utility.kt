@@ -1338,6 +1338,18 @@ object Field48ResponseTimestamp {
     }
 //endregion
 
+    //region======================Get TPT Data:-
+    fun getTptDataByLinkTidType(linkTidType:String): TerminalParameterTable? {
+        var tptData: TerminalParameterTable? = null
+        runBlocking(Dispatchers.IO) {
+            tptData = appDatabase.appDao?.getTerminalParameterTableDataByLinkTidType(linkTidType)
+            val jsonResp=Gson().toJson(tptData)
+            println(jsonResp)
+        }
+        return tptData
+    }
+//endregion
+
     //region======================Get TPT Data By terminal id:-
     fun getTptDataByTid(tid: String): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null

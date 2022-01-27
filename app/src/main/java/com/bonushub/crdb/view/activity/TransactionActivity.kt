@@ -401,7 +401,6 @@ val cardCaptureType:CardCaptureType
                                                     )
                                                 }
                                                 AppPreference.saveLastReceiptDetails(batchData)
-
                                                 AppPreference.clearRestartDataPreference()
 
                                                 printingSaleData(batchData){
@@ -1364,7 +1363,7 @@ lifecycleScope.launch(Dispatchers.IO) {
         val amt = (saleAmt.toFloat() * 100).toLong()
         val cashBackAmount = (saleWithTipAmt.toFloat() * 100).toLong()
         field54Data=cashBackAmount
-        Log.d(TAG, "tip amount: ${cashBackAmount}")
+        Log.d(TAG, "tip amount: $cashBackAmount")
         var ecrID: String
         try {
             val tranUuid = UUID.randomUUID().toString().also {
