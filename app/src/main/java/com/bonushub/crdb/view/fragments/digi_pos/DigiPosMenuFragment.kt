@@ -13,6 +13,7 @@ import com.bonushub.crdb.databinding.FragmentDigiPosMenuBinding
 import com.bonushub.crdb.databinding.ItemDigiPosBinding
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.BitmapUtils.convertBitmapToByteArray
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +58,29 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
         iDigiPosMenuItemClick = this
         digiPosItem.clear()
-        digiPosItem.addAll(DigiPosItem.values())
+       // digiPosItem.addAll(DigiPosItem.values())
+
+        // region get tpt data
+        val tpt = getTptData()
+        if (tpt?.digiPosUPIStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+            //binding?.upiBtn?.visibility = View.VISIBLE
+            digiPosItem.add(DigiPosItem.UPI)
+        }
+        if (tpt?.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+//            binding?.staticQrBtn?.visibility = View.VISIBLE
+//            binding?.dynamicQrBtn?.visibility = View.VISIBLE
+            digiPosItem.add(DigiPosItem.BHARAT_QR)
+            digiPosItem.add(DigiPosItem.STATIC_QR)
+
+        }
+        if (tpt?.digiPosSMSpayStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
+           // binding?.smsPayBtn?.visibility = View.VISIBLE
+            digiPosItem.add(DigiPosItem.SMS_PAY)
+        }
+
+        digiPosItem.add(DigiPosItem.PENDING_TXN)
+        digiPosItem.add(DigiPosItem.TXN_LIST)
+        // end region
 
         setupRecyclerview()
 
