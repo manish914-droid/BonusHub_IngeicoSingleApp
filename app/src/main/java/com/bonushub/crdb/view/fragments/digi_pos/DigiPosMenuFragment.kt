@@ -104,6 +104,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
             DigiPosItem.STATIC_QR ->{
 
+                var transactionTypeTemp = transactionType
                 var imgbm: Bitmap? = null
                 runBlocking(Dispatchers.IO) {
                     imgbm = loadStaticQrFromInternalStorage() // it return null when file not exist
@@ -113,7 +114,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
                         (activity as NavigationActivity).transactFragment(QrFragment().apply {
                             arguments = Bundle().apply {
                                 putByteArray("QrByteArray", bmBytes)
-                                putSerializable("type",transactionType)
+                                putSerializable("type",transactionTypeTemp)
                                 putSerializable("type", EDashboardItem.STATIC_QR)
                                 // putParcelable("tabledata",tabledata)
                             }
@@ -137,7 +138,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
                                             (activity as NavigationActivity).transactFragment(QrFragment().apply {
                                                 arguments = Bundle().apply {
                                                     putByteArray("QrByteArray", bmBytes)
-                                                    putSerializable("type", transactionType)
+                                                    putSerializable("type", transactionTypeTemp)
                                                     putSerializable("type", EDashboardItem.STATIC_QR)
                                                     // putParcelable("tabledata",tabledata)
                                                 }
