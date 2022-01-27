@@ -98,7 +98,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Log.d("Dashboard:- ", "onViewCreated")
         isDashboardOpen = true
         Utility().hideSoftKeyboard(requireActivity())
-       // restartHandaling()
+        restartHandaling()
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()
 
@@ -117,8 +117,8 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
         logger("check",""+AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
         //region=======================Check For AutoSettle at regular interval if App is on Dashboard:-
-        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
-            checkForAutoSettle()
+//        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
+//            checkForAutoSettle()
         //endregion
     }
 
@@ -355,7 +355,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     when(txnResponse?.status){
                         RequestStatus.ABORTED,
                         RequestStatus.FAILED ->{
-
+logger("PFR","Failed","e")
                         }
                         RequestStatus.SUCCESS ->{
                             val transactionDetail =
@@ -389,15 +389,16 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         if (receiptDetail != null) {
             lifecycleScope.launch(Dispatchers.IO) {
 
+                var batchData = BatchTable(null)
                 // here get batch data
                 if(restatDataList?.transactionType == EDashboardItem.BANK_EMI || restatDataList?.transactionType == EDashboardItem.BRAND_EMI || restatDataList?.transactionType == EDashboardItem.TEST_EMI)
                 {
                     restatDataList?.batchData?.receiptData = receiptDetail
-                    val batchData = restatDataList?.batchData
+                    batchData = restatDataList?.batchData!!
 
+                }else{
+                    batchData = BatchTable(receiptDetail)
                 }
-
-                val batchData = BatchTable(receiptDetail)
 
                 batchData.invoice = receiptDetail.invoice.toString()
                 println("invoice code = ${receiptDetail.invoice.toString()}")
