@@ -114,8 +114,10 @@ class PrintUtil(context: Context?) {
             setLogoAndHeader()
             val terminalData = getTptData()
             try {
-                receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
-                receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }
+//                receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
+//                receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }
+                headerPrinting()
+
                 val date = receiptDetail.dateTime
                 val parts = date?.split(" ")
                 println("Date: " + parts!![0])
@@ -290,7 +292,7 @@ class PrintUtil(context: Context?) {
                     textBlockList.clear()
                 } else {
                     if (receiptDetail.isVerifyPin == true){
-                        sigleLineText("PIN VERIFIDE OK", AlignMode.CENTER)}
+                        sigleLineText("PIN VERIFIED OK", AlignMode.CENTER)}
 
                     if (receiptDetail.isVerifyPin == true){
                         sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER)}
@@ -1307,12 +1309,16 @@ class PrintUtil(context: Context?) {
                     setLogoAndHeader()
                   /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
                     receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
-                    val ingtpt=getInitdataList()
-                    val header1= ingtpt?.merAddHeader1
-                    val header2=ingtpt?.merAddHeader2
+//                    val ingtpt=getInitdataList()
+//                    val header1= ingtpt?.merAddHeader1
+//                    val header2=ingtpt?.merAddHeader2
+//                    val merchantName=ingtpt?.merchantName.toString().trim()
+//
+//                    sigleLineText(merchantName, AlignMode.CENTER)
+//                    sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+//                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
-                    sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
-                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+                    headerPrinting()
 
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()
@@ -1718,6 +1724,7 @@ class PrintUtil(context: Context?) {
                 } else {
                     //-----------------------------------------------
                     setLogoAndHeader()
+                    headerPrinting()
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()
                     val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -2063,14 +2070,19 @@ class PrintUtil(context: Context?) {
                /* receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
                 receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
 
-                val ingtpt=getInitdataList()
-                val header1= ingtpt?.merAddHeader1
-                val header2=ingtpt?.merAddHeader2
+//                val ingtpt=getInitdataList()
+//                val header1= ingtpt?.merAddHeader1
+//                val header2=ingtpt?.merAddHeader2
+//                val merchantName=ingtpt?.merchantName.toString().trim()
+//
+//                logger("header1",header1?:"")
+//                logger("header2",header2?:"")
+//                logger("merchantName",merchantName?:"")
+//                sigleLineText(merchantName, AlignMode.CENTER)
+//                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+//                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
-                logger("header1",header1?:"")
-                logger("header2",header2?:"")
-                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
-                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+                headerPrinting()
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -2163,15 +2175,19 @@ class PrintUtil(context: Context?) {
 
                 setLogoAndHeader()
 
-                val ingtpt=getInitdataList()
-                val header1= ingtpt?.merAddHeader1
-                val header2=ingtpt?.merAddHeader2
+//                val ingtpt=getInitdataList()
+//                val header1= ingtpt?.merAddHeader1
+//                val header2=ingtpt?.merAddHeader2
+//                val merchantName=ingtpt?.merchantName.toString().trim()
+//
+//                logger("header1",header1?:"")
+//                logger("header2",header2?:"")
+//                logger("merchantName",merchantName?:"")
+//                sigleLineText(merchantName, AlignMode.CENTER)
+//                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+//                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
-                logger("header1",header1?:"")
-                logger("header2",header2?:"")
-                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
-                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
-
+                headerPrinting()
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -2617,12 +2633,16 @@ class PrintUtil(context: Context?) {
           /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
             receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
 
-            val ingtpt=getInitdataList()
-            val header1= ingtpt?.merAddHeader1
-            val header2=ingtpt?.merAddHeader2
+//            val ingtpt=getInitdataList()
+//            val header1= ingtpt?.merAddHeader1
+//            val header2=ingtpt?.merAddHeader2
+//            val merchantName=ingtpt?.merchantName.toString().trim()
+//
+//            sigleLineText(merchantName, AlignMode.CENTER)
+//            sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+//            sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
-            sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
-            sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+            headerPrinting()
 
             printSeperator()
             textBlockList.add(sigleLineformat("DATE:${digiPosData.txnDate}", AlignMode.LEFT))
@@ -2819,5 +2839,17 @@ class PrintUtil(context: Context?) {
     companion object {
         private const val disclaimerIssuerClose = "~!iss~"
         const val DIGI_SMART_HUB_LOGO = "smart_hub.bmp"
+    }
+
+    private fun headerPrinting()
+    {
+        val ingtpt=getInitdataList()
+        val header1= ingtpt?.merAddHeader1
+        val header2=ingtpt?.merAddHeader2
+        val merchantName=ingtpt?.merchantName.toString().trim()
+
+        sigleLineText(merchantName, AlignMode.CENTER)
+        sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+        sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
     }
 }

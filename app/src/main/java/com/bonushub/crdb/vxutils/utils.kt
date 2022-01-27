@@ -20,6 +20,7 @@ import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptDataByLinkTidType
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.fragments.DashboardFragment
 import com.bonushub.crdb.vxutils.BHTextView
@@ -1036,7 +1037,9 @@ fun String.terminalDate() = this.substring(0, 8)
 fun String.terminalTime() = this.substring(8, this.length)
 //endregion
 
-fun getTidForTestTxn(testEmiItem:String):String{
+
+@Deprecated("Old way of getting tid for test emi")
+fun getTidForTestTxnOldLogic(testEmiItem:String):String{
     val tpt = runBlocking(Dispatchers.IO) { getTptData() }
     val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String>
     val tidList= tpt.terminalId as ArrayList<String>
@@ -1075,4 +1078,9 @@ fun getTidForTestTxn(testEmiItem:String):String{
     }
    return hm[testEmiItem]?:"00000000"
 
+}
+
+fun getTidForTestTxn(testEmiItem: String):String{
+    val requiredTpt = runBlocking(Dispatchers.IO) { getTptDataByLinkTidType(testEmiItem) }
+   return requiredTpt?.terminalId ?: "000000"
 }

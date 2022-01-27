@@ -1198,7 +1198,7 @@ data class BatchTableReversal(var receiptData:ReceiptDetail?=null){
     var emiProductData: BrandEMIProductDataModal?=null
     var responseCode: String?=""
 
-    var bonushubInvoice: String = ""  // add host invoice
+    var bonushubBatchnumber: String = ""
 }
 // endregion
 

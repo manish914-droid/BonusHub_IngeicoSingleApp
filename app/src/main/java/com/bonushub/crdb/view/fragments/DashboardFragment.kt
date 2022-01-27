@@ -98,7 +98,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Log.d("Dashboard:- ", "onViewCreated")
         isDashboardOpen = true
         Utility().hideSoftKeyboard(requireActivity())
-        restartHandaling()
+        //restartHandaling()
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()
 
@@ -117,8 +117,8 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
         logger("check",""+AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
         //region=======================Check For AutoSettle at regular interval if App is on Dashboard:-
-//        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
-//            checkForAutoSettle()
+        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
+            checkForAutoSettle()
         //endregion
     }
 

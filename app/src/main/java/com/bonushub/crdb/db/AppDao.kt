@@ -375,6 +375,10 @@ interface AppDao{
     @Query("SELECT * FROM TerminalParameterTable WHERE tidType = :tidType")
     suspend fun getTerminalParameterTableDataByTidType(tidType: String): TerminalParameterTable?
 
+    @Query("SELECT * FROM TerminalParameterTable WHERE LinkTidType = :LinkTidType")
+    suspend fun getTerminalParameterTableDataByLinkTidType(LinkTidType: String): TerminalParameterTable?
+
+
     // region bank functions
     @Query("SELECT * FROM TerminalParameterTable WHERE terminalId = :tid")
     suspend fun getTerminalParameterTableDataByTid(tid: String): TerminalParameterTable?
