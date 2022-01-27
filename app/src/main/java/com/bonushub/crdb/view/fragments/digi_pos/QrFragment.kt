@@ -70,20 +70,26 @@ class QrFragment : Fragment() {
             }
         }
 
-//        val paymsg = when (transactionType) {
-//            EDashboardItem.DYNAMIC_QR -> {
-//
-//                getString(R.string.scan_qr_code_to_pay_n_nwould_you_like_to_check_payment_status_now)
-//            }
-//            else -> {
-//                binding?.btnNo?.visibility = View.GONE
-//                binding?.btnYes?.text = getString(R.string.key_ok)
-//                getString(R.string.scan_qr_pay)
-//
-//            }
-//        }
-//        binding?.payMsg?.text = paymsg
-//        binding?.payMsg2?.visibility = View.GONE
+        //val paymsg =
+
+        when (transactionType) {
+            EDashboardItem.BHARAT_QR -> {
+
+                //getString(R.string.scan_qr_code_to_pay_n_nwould_you_like_to_check_payment_status_now)
+                binding?.payMsg?.visibility = View.VISIBLE
+                binding?.payMsg2?.visibility = View.VISIBLE
+            }
+            else -> {
+
+                binding?.payMsg?.visibility = View.VISIBLE
+                binding?.payMsg2?.visibility = View.GONE
+
+                binding?.btnNo?.visibility = View.GONE
+                binding?.btnYes?.text = getString(R.string.key_ok)
+               // getString(R.string.scan_qr_pay)
+
+            }
+        }
 
 
         binding?.btnNo?.setOnClickListener {
