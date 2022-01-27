@@ -31,19 +31,17 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
    // val receiptDetail: ReceiptDetail =batchTable.receiptData ?: ReceiptDetail(
 
     override fun createTransactionPacket(): IsoDataWriter = IsoDataWriter().apply {
-        val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
+        val batchListData = runBlocking(Dispatchers.IO) { appDao.getAllBatchData() }
          //To get Base Tid
         val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
         //To get base Tid batch Number
         val tptbaseTiddata = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptDataByTid(baseTid) }
-
 
         //Condition To Check BhTransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
         /*if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
             brandEMIByAccessCodeData =
                 runBlocking(Dispatchers.IO) { BrandEMIAccessDataModalTable.getBrandEMIByAccessCodeData() }
         }*/
-
 
         /* if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI.type) {
            // todo same
@@ -56,7 +54,6 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                        BhTransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
                         else -> Mti.DEFAULT_MTI.mti
                     }
-
 
             //Processing Code Field 3
             addField(3, cardProcessedData.getProcessingCode().toString())
@@ -127,15 +124,39 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
             when (cardProcessedData.getTransType()) {
                 BhTransactionType.SALE.type -> {
-                    cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
+                  //  02,36|PAN Number |card holder name~Application label~CardIssuerCountryCode~mode of txn~pin entry type
+              /* val pan = cardProcessedData.getPanNumberData()
+                    batchListData[0].receiptData?.cardHolderName
+                    batchListData[0].receiptData?.appName
+                    val data="02,36|$pan~"*/
+             val data=       cardProcessedData.getPanNumberData()?.let { batchListData[0].receiptData?.let { it1 ->
+                        getEncryptedDataForSyncing(it,
+                            it1
+                        )
+                    } }
+
+                    if (data != null) {
+                        addField(57,data)
+                    }
+                   /* cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
                         addField(57,
                             it
                         )
                         logger("field-57",it,"e")
-                    }
+                    }*/
                 }
                 BhTransactionType.BRAND_EMI.type , BhTransactionType.EMI_SALE.type->{
-                    cardProcessedData.getEncryptedPan()?.let { addField(57, it) }
+                    val data=       cardProcessedData.getPanNumberData()?.let { batchListData[0].receiptData?.let { it1 ->
+                        getEncryptedDataForSyncing(it,
+                            it1
+                        )
+                    } }
+
+                    if (data != null) {
+                        addField(57,data)
+                    }
+
+                  //  cardProcessedData.getEncryptedPan()?.let { addField(57, it) }
                 }
 
             }
@@ -144,22 +165,22 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
           //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
 
 
-            var bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
-            var emptyString: String= ""
-            var ingenicotid          = addPad(batchListData[0].receiptData?.tid ?: "", "0", 8, true)
-            var ingenibatchnumber    = addPad(batchListData[0].receiptData?.batchNumber ?: "", "0", 6, true)
-            var ingenicostan         = addPad(batchListData[0].receiptData?.stan ?: "", "0", 6, true)
-            var ingenicoInvoice        = addPad(batchListData[0].receiptData?.invoice ?: "", "0", 6, true)
-            var ingenicoaid      = batchListData[0].receiptData?.aid ?: ""
-            var ingenicotc     = batchListData[0].receiptData?.tc ?: ""
-            var ingenicoappName     = batchListData[0].receiptData?.appName ?: ""
+            val bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
+            val emptyString: String= ""
+            val ingenicotid          = addPad(batchListData[0].receiptData?.tid ?: "", "0", 8, true)
+            val ingenibatchnumber    = addPad(batchListData[0].receiptData?.batchNumber ?: "", "0", 6, true)
+            val ingenicostan         = addPad(batchListData[0].receiptData?.stan ?: "", "0", 6, true)
+            val ingenicoInvoice        = addPad(batchListData[0].receiptData?.invoice ?: "", "0", 6, true)
+            val ingenicoaid      = batchListData[0].receiptData?.aid ?: ""
+            val ingenicotc     = batchListData[0].receiptData?.tc ?: ""
+            val ingenicoappName     = batchListData[0].receiptData?.appName ?: ""
 
-            var fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
+            val fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
                               "$ingenibatchnumber|$ingenicostan|$ingenicoInvoice|"+
                               "$ingenicoaid|$ingenicotc|$ingenicoappName|"
 
 
-            println("Field 60 value is -> "+ fielddata60)
+            println("Field 60 value is -> $fielddata60")
 
             addFieldByHex(60,fielddata60)
 
