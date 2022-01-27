@@ -470,6 +470,13 @@ val cardCaptureType:CardCaptureType
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                            val tpt = runBlocking{
+                                                getTptDataByTid(receiptDetail?.tid ?: "")
+                                            }
+
+                                            batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
+
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
@@ -764,6 +771,12 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                            val tpt = runBlocking{
+                                                getTptDataByTid(receiptDetail?.tid ?: "")
+                                            }
+                                            batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
+
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
@@ -909,6 +922,12 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
+
+
+                                            val tpt = runBlocking{
+                                                getTptDataByTid(receiptDetail?.tid ?: "")
+                                            }
+                                            batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
@@ -1058,6 +1077,11 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                            val tpt = runBlocking{
+                                                getTptDataByTid(receiptDetail?.tid ?: "")
+                                            }
+                                            batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
@@ -1195,6 +1219,11 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                            val tpt = runBlocking{
+                                                getTptDataByTid(receiptDetail?.tid ?: "")
+                                            }
+                                            batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
@@ -1336,6 +1365,11 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             batchReversalData.responseCode =
                                                 ResponseCode.SUCCESS.value
                                             batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                            val tpt = runBlocking{
+                                                getTptDataByTid(receiptDetail?.tid ?: "")
+                                            }
+                                            batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
@@ -1486,6 +1520,11 @@ lifecycleScope.launch(Dispatchers.IO) {
                                     batchReversalData.responseCode =
                                         ResponseCode.SUCCESS.value
                                     batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                    val tpt = runBlocking{
+                                        getTptDataByTid(receiptDetail?.tid ?: "")
+                                    }
+                                    batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
                                     appDatabase.appDao.insertBatchReversalData(
                                         batchReversalData
                                     )
@@ -1635,6 +1674,11 @@ lifecycleScope.launch(Dispatchers.IO) {
                                     batchReversalData.responseCode =
                                         ResponseCode.SUCCESS.value
                                     batchReversalData.roc = receiptDetail?.stan.toString()
+
+                                    val tpt = runBlocking{
+                                        getTptDataByTid(receiptDetail?.tid ?: "")
+                                    }
+                                    batchReversalData.bonushubBatchnumber = tpt?.batchNumber?:""
                                     appDatabase.appDao.insertBatchReversalData(
                                         batchReversalData
                                     )
