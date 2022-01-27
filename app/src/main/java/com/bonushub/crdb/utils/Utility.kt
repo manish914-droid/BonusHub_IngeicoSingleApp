@@ -1143,7 +1143,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         if(pendingTxn.size != 0) {
             for (item in pendingTxn) {
                 val transactionISO =
-                    CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal).createTransactionPacket()
+                    CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal,batchdata = BatchTable()).createTransactionPacket()
 
                 when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
                     is GenericResponse.Success -> {
@@ -1344,7 +1344,7 @@ object Field48ResponseTimestamp {
         runBlocking(Dispatchers.IO) {
             tptData = appDatabase.appDao?.getTerminalParameterTableDataByTid(tid)
             val jsonResp=Gson().toJson(tptData)
-            println(jsonResp)
+            println("Data in tpt ---->"+jsonResp)
         }
         return tptData
     }

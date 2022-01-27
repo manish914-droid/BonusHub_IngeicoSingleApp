@@ -930,10 +930,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
         System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
 
-            if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
-            !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
-            !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())
-        ) {
+            if (/*AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+            AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
+            AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())*/true) {
             transactFragment(fragment.apply {
                 arguments = Bundle().apply {
                     putSerializable("type", action)
@@ -1562,11 +1561,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
         GlobalScope.launch(Dispatchers.IO) {
                 hideProgress()
-            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())){
+            if(!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())){
                 PrintUtil(this@NavigationActivity).printDetailReportupdate(settlementBatchData, this@NavigationActivity) {
                         detailPrintStatus -> }
 
-                ioSope.launch {
+                GlobalScope.launch(Dispatchers.Main) {
 
                     var reversalTid  = checkReversal(dataListReversal)
                     var listofTxnTid =  checkSettlementTid(settlementBatchData)
@@ -1583,35 +1582,52 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     settlementViewModel.settlementResponse(result)
                 }
 
-                settlementViewModel.ingenciosettlement.observe(this@NavigationActivity) { result ->
-                    when (result.status) {
-                        Status.SUCCESS -> {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
-                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+                GlobalScope.launch(Dispatchers.Main) {
 
-                                val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                var settlementByteArray = data.generateIsoByteRequest()
-                                try {
-                                    settleBatch1(settlementByteArray) {}
-                                } catch (ex: Exception) {
-                                    hideProgress()
-                                    ex.printStackTrace()
+                    settlementViewModel.ingenciosettlement.observe(this@NavigationActivity) { result ->
+                        when (result.status) {
+                            Status.SUCCESS -> {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    AppPreference.saveBoolean(
+                                        PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(),
+                                        false
+                                    )
+                                    AppPreference.saveBoolean(
+                                        PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(),
+                                        false
+                                    )
+
+                                    val data =
+                                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                    var settlementByteArray = data.generateIsoByteRequest()
+                                    try {
+                                        settleBatch1(settlementByteArray) {}
+                                    } catch (ex: Exception) {
+                                        hideProgress()
+                                        ex.printStackTrace()
+                                    }
                                 }
+                                //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
-                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
-                        }
-                        Status.ERROR -> {
-                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
-                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
-                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                        }
-                        Status.LOADING -> {
-                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+                            Status.ERROR -> {
+                                AppPreference.saveBoolean(
+                                    PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(),
+                                    true
+                                )
+                                AppPreference.saveBoolean(
+                                    PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(),
+                                    true
+                                )
+                                // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                            }
+                            Status.LOADING -> {
+                                // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
 
 
+                            }
                         }
                     }
+
                 }
 
             }

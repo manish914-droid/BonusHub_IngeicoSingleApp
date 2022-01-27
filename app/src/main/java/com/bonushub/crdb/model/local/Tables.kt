@@ -1110,9 +1110,10 @@ data class BrandEMIAccessDataModalTable(
 // region ====== OnpaymentListner response from ingenico data table ======
 @Entity
 data class BatchTable(var receiptData:ReceiptDetail?=null){
+    @PrimaryKey(autoGenerate = false)
     var invoice: String=""
 
-    @PrimaryKey(autoGenerate = false)  // we make primary key for multiple invoice in void
+     // we make primary key for multiple invoice in void
     var bonushubInvoice: String = ""
 
     var bonushubStan: String = ""

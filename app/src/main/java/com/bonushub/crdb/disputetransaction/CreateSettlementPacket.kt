@@ -260,9 +260,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
 
             }
-            else if(reversaldata.size >0 ){
 
-            }
             else {
                 addFieldByHex(63, addPad(0, "0", 90, toLeft = false))
             }

@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?=null) : ITransactionPacketExchange {
+class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?) : ITransactionPacketExchange {
 
     private var indicator: String? = null
     //  private var brandEMIData: brandEMIData? = null
@@ -31,7 +31,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
    // val receiptDetail: ReceiptDetail =batchTable.receiptData ?: ReceiptDetail(
 
     override fun createTransactionPacket(): IsoDataWriter = IsoDataWriter().apply {
-        val batchListData = runBlocking(Dispatchers.IO) { appDao.getAllBatchData() }
+       // val batchListData = runBlocking(Dispatchers.IO) { appDao.getSinleBatchData() }
          //To get Base Tid
         val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
         //To get base Tid batch Number
@@ -129,7 +129,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                     batchListData[0].receiptData?.cardHolderName
                     batchListData[0].receiptData?.appName
                     val data="02,36|$pan~"*/
-             val data=       cardProcessedData.getPanNumberData()?.let { batchListData[0].receiptData?.let { it1 ->
+             val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
                         getEncryptedDataForSyncing(it,
                             it1
                         )
@@ -146,7 +146,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                     }*/
                 }
                 BhTransactionType.BRAND_EMI.type , BhTransactionType.EMI_SALE.type->{
-                    val data=       cardProcessedData.getPanNumberData()?.let { batchListData[0].receiptData?.let { it1 ->
+                    val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
                         getEncryptedDataForSyncing(it,
                             it1
                         )
@@ -167,13 +167,13 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
 
             val bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
             val emptyString: String= ""
-            val ingenicotid          = addPad(batchListData[0].receiptData?.tid ?: "", "0", 8, true)
-            val ingenibatchnumber    = addPad(batchListData[0].receiptData?.batchNumber ?: "", "0", 6, true)
-            val ingenicostan         = addPad(batchListData[0].receiptData?.stan ?: "", "0", 6, true)
-            val ingenicoInvoice        = addPad(batchListData[0].receiptData?.invoice ?: "", "0", 6, true)
-            val ingenicoaid      = batchListData[0].receiptData?.aid ?: ""
-            val ingenicotc     = batchListData[0].receiptData?.tc ?: ""
-            val ingenicoappName     = batchListData[0].receiptData?.appName ?: ""
+            val ingenicotid          = addPad(batchdata?.receiptData?.tid ?: "", "0", 8, true)
+            val ingenibatchnumber    = addPad(batchdata?.receiptData?.batchNumber ?: "", "0", 6, true)
+            val ingenicostan         = addPad(batchdata?.receiptData?.stan ?: "", "0", 6, true)
+            val ingenicoInvoice        = addPad(batchdata?.receiptData?.invoice ?: "", "0", 6, true)
+            val ingenicoaid           = batchdata?.receiptData?.aid ?: ""
+            val ingenicotc           = batchdata?.receiptData?.tc ?: ""
+            val ingenicoappName     = batchdata?.receiptData?.appName ?: ""
 
             val fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
                               "$ingenibatchnumber|$ingenicostan|$ingenicoInvoice|"+

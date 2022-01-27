@@ -409,6 +409,9 @@ interface AppDao{
     @Query("SELECT * FROM BatchTable")
     suspend fun getAllBatchData(): MutableList<BatchTable>
 
+    @Query("SELECT * FROM BatchTable")
+    suspend fun getSinleBatchData(): BatchTable
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBatchData(brandSubCat: BatchTable): Long?
 

@@ -140,7 +140,7 @@ class VoidMainFragment : Fragment() {
                                             }
                                             createCardProcessingModelData(receiptDetail)
                                             val transactionISO =
-                                                CreateTransactionPacket(appDao,globalCardProcessedModel).createTransactionPacket()
+                                                CreateTransactionPacket(appDao,globalCardProcessedModel,batchTable).createTransactionPacket()
                                             // sync pending transaction
                                             //   Utility().syncPendingTransaction(transactionViewModel)
 

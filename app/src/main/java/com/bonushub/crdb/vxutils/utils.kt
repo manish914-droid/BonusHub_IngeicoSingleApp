@@ -88,7 +88,7 @@ fun getEncryptedDataForSyncing(panNum:String,receiptData: ReceiptDetail):String{
         2
     }
 
-    var  dataDescription = "02,36|$panNum~${receiptData.cardHolderName}~${receiptData.appName}~0356~2~${pinentry}"
+    var  dataDescription = "02,36|$panNum|${receiptData.cardHolderName}~${receiptData.appName}~~2~${pinentry}"
 
    logger("F57_PLAIN",dataDescription,"e")
     val dataLength = dataDescription.length
