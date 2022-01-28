@@ -26,6 +26,17 @@
         android:textSize="@dimen/text_size_xregular" />
 
     <TextView
+        android:id="@+id/version_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:text="@string/versionHint"
+        android:padding="@dimen/pad_4"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/text_size_xregular" />
+
+    <TextView
         android:id="@+id/help_desk_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,6 +46,6 @@
         android:padding="@dimen/pad_4"
         android:textColor="@color/colorPrimary"
         android:textSize="@dimen/text_size_regular"
-       />
+       android:visibility="gone"/>
 
 </LinearLayout>

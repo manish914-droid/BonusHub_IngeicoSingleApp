@@ -45,6 +45,7 @@ import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.serverApi.HitServer
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.checkInternetConnection
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getHDFCTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.performOperation
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.selectAllDigiPosData
@@ -383,7 +384,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
         headerView?.let { footer?.version_name?.text = "App Version :${BuildConfig.VERSION_NAME}"}
-        headerView?.let { footer?.help_desk_number?.text = getString(R.string.help_desk_number_hint)}
+        headerView?.let { footer?.version_id?.text = "Revision Id :${BuildConfig.REVISION_ID}"}
 
         lifecycleScope.launch{
            // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
@@ -415,6 +416,19 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 mainDrawerBinding?.mdTidTv?.text = tid
                 mainDrawerBinding?.mdMidTv?.text = mid
             }
+
+            //region=================Show help Desk Number in Navigation Footer after Init:-
+
+                val hdfcTpt = getHDFCTptData()
+                if (hdfcTpt != null) {
+                    val helplineNumber = "HelpLine: ${hdfcTpt.helpDeskNumber.replace("F", "")}"
+                    //binding?.mainDrawerView?.helpDeskTV?.text = helplineNumber
+                    //binding?.mainDrawerView?.helpDeskTV?.visibility = View.VISIBLE
+                    headerView?.let { footer?.help_desk_number?.text = helplineNumber}
+                    headerView?.let { footer?.help_desk_number?.visibility = View.VISIBLE}
+                }
+
+            //endregion
         }
 
     }
@@ -1296,6 +1310,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                             updatedBatchNumber.toString(),
                                             TableType.TERMINAL_PARAMETER_TABLE.code
                                         )
+
                                     }
                                     //endregion
 
