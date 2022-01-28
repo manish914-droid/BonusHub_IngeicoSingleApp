@@ -1247,6 +1247,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     AppPreference.clearReversal()
                                     AppPreference.saveLastCancelReceiptDetails("")
 
+                                    appDao.deleteDigiPosDataTable()
                                 }
                                 //endregion
 
@@ -1338,6 +1339,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                             TableType.TERMINAL_PARAMETER_TABLE.code
                                         )
 
+                                        appDao.deleteDigiPosDataTable()
                                     }
                                     //endregion
 

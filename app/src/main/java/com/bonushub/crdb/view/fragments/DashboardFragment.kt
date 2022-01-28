@@ -98,7 +98,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Log.d("Dashboard:- ", "onViewCreated")
         isDashboardOpen = true
         Utility().hideSoftKeyboard(requireActivity())
-        //restartHandaling()
+        restartHandaling()
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
         observeDashboardViewModel()
 
@@ -352,6 +352,8 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                         println("Response code = $responseCode")
                         println("Response code = $responseCode")
                     }
+                    AppPreference.clearRestartDataPreference()
+
                     when(txnResponse?.status){
                         RequestStatus.ABORTED,
                         RequestStatus.FAILED ->{
@@ -402,9 +404,13 @@ logger("PFR","Failed","e")
 
                 batchData.invoice = receiptDetail.invoice.toString()
                 println("invoice code = ${receiptDetail.invoice.toString()}")
-                batchData.transactionType =
-                    BhTransactionType.SALE.type
+                // batchData.transactionType = BhTransactionType.SALE.type
                // DBModule.appDatabase.appDao.insertBatchData(batchData)
+
+                if(batchData.receiptData?.txnOtherAmount == null)
+                {
+                    batchData.receiptData?.txnOtherAmount = "0"
+                }
                 AppPreference.saveLastReceiptDetails(batchData)
                 printingSaleData(batchData){
 
@@ -421,32 +427,34 @@ logger("PFR","Failed","e")
         withContext(Dispatchers.Main) {
             (activity as BaseActivityNew). showProgress(getString(R.string.printing))
             var printsts = false
-            if (receiptDetail != null) {
-                PrintUtil(activity as BaseActivityNew).startPrinting(
-                    batchTable,
-                    EPrintCopyType.MERCHANT,
-                   activity as BaseActivityNew
-                ) { printCB, printingFail ->
+                if (receiptDetail != null) {
+                    PrintUtil(activity as BaseActivityNew).startPrinting(
+                        batchTable,
+                        EPrintCopyType.MERCHANT,
+                        activity as BaseActivityNew
+                    ) { printCB, printingFail ->
 
-                    (activity as BaseActivityNew).hideProgress()
-                    if (printCB) {
-                        printsts = printCB
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            showMerchantAlertBox(batchTable, cb)
+                        (activity as BaseActivityNew).hideProgress()
+                        if (printCB) {
+                            printsts = printCB
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                showMerchantAlertBox(batchTable, cb)
+                            }
+
+                        } else {
+                            ToastUtils.showToast(
+                                activity as BaseActivityNew,
+                                getString(R.string.printer_error)
+                            )
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                cb(false)
+                            }
+
                         }
-
-                    } else {
-                        ToastUtils.showToast(
-                            activity as BaseActivityNew,
-                            getString(R.string.printer_error)
-                        )
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            cb(false)
-                        }
-
                     }
                 }
-            }
+
+
         }
     }
 

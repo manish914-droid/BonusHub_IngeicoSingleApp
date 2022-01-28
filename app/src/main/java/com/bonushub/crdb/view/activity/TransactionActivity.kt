@@ -356,7 +356,7 @@ class TransactionActivity : BaseActivityNew() {
                             cardCaptureType = cardCaptureType,
                             track1 = track1,
                             track2 = track2,
-                            transactionUuid = UUID.randomUUID().toString(),
+                            transactionUuid = tranUuid,
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -405,13 +405,13 @@ class TransactionActivity : BaseActivityNew() {
                                                     )
                                                 }
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
                                                 //To increment base invoice
                                                 Utility().incrementUpdateInvoice()
 
-                                                AppPreference.clearRestartDataPreference()
 
                                                 printingSaleData(batchData){
                                                     // region sync transaction
@@ -632,14 +632,21 @@ lifecycleScope.launch(Dispatchers.IO) {
                 var ecrID: String
                 field54Data= amt
                 try {
+                    val tranUuid = UUID.randomUUID().toString().also {
+                        ecrID = it
+
+                    }
+                    val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.CASH_ADVANCE)
+                    restartHandlingList.add(restartHandlingModel)
+                    val jsonResp = Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
+
                     DeviceHelper.doCashAdvanceTxn(
                         CashOnlyRequest(
                             cashAmount = amt,
                             tid = tid,
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
+                            transactionUuid = tranUuid
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -678,6 +685,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
@@ -735,14 +743,20 @@ lifecycleScope.launch(Dispatchers.IO) {
 
 
                                     }
-                                    ResponseCode.FAILED.value,
+
+                                    ResponseCode.FAILED.value -> {
+                                        AppPreference.clearRestartDataPreference()
+                                                                 }
+
                                     ResponseCode.ABORTED.value -> {
+                                    AppPreference.clearRestartDataPreference()
                                         errorFromIngenico(
                                             txnResponse.responseCode,
                                             txnResponse.status.toString()
                                         )
                                     }
                                     ResponseCode.REVERSAL.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         // kushal
                                         // region
                                         //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
@@ -800,15 +814,21 @@ lifecycleScope.launch(Dispatchers.IO) {
                     field54Data=cashBackAmount
                     var ecrID: String
 
+                    val tranUuid = UUID.randomUUID().toString().also {
+                        ecrID = it
+                    }
+                    val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.SALE_WITH_CASH)
+                    restartHandlingList.add(restartHandlingModel)
+                    val jsonResp = Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
+
                     DeviceHelper.doSaleWithCashTxn(
                         SaleCashBackRequest(
                             amount = amt,
                             cashAmount = cashBackAmount,
                             tid = tid,
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
+                            transactionUuid = tranUuid
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -845,6 +865,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
@@ -895,14 +916,18 @@ lifecycleScope.launch(Dispatchers.IO) {
 
 
                                     }
-                                    ResponseCode.FAILED.value,
+                                    ResponseCode.FAILED.value ->{
+                                        AppPreference.clearRestartDataPreference()
+                                    }
                                     ResponseCode.ABORTED.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         errorFromIngenico(
                                             txnResponse.responseCode,
                                             txnResponse.status.toString()
                                         )
                                     }
                                     ResponseCode.REVERSAL.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         // kushal
                                         // region
 
@@ -944,14 +969,21 @@ lifecycleScope.launch(Dispatchers.IO) {
                     //  val cashBackAmount=(cashBackAmt.toFloat() * 100).toLong()
                     var ecrID: String
 
+                    val tranUuid = UUID.randomUUID().toString().also {
+                        ecrID = it
+
+                    }
+                    val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.REFUND)
+                    restartHandlingList.add(restartHandlingModel)
+                    val jsonResp = Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
+
                     DeviceHelper.doRefundTxn(
                         RefundRequest(
                             amount = amt,
                             tid = tid,
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
+                            transactionUuid = tranUuid
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -986,6 +1018,8 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.clearRestartDataPreference()
+
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
                                                 //To increment base invoice
@@ -1043,8 +1077,9 @@ lifecycleScope.launch(Dispatchers.IO) {
 
 
                                     }
-                                    ResponseCode.FAILED.value,
+                                    ResponseCode.FAILED.value -> {  AppPreference.clearRestartDataPreference() }
                                     ResponseCode.ABORTED.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         errorFromIngenico(
                                             txnResponse.responseCode,
                                             txnResponse.status.toString()
@@ -1052,6 +1087,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                     }
                                     ResponseCode.REVERSAL.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         // kushal
                                         // region
 
@@ -1093,14 +1129,20 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                     var ecrID: String
 
+                    val tranUuid = UUID.randomUUID().toString().also {
+                        ecrID = it
+                    }
+                    val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.PREAUTH)
+                    restartHandlingList.add(restartHandlingModel)
+                    val jsonResp = Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
+
                     DeviceHelper.doPreAuthTxn(
                         PreAuthRequest(
                             amount = amt,
                             tid = tid,
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-
-                            }
+                            transactionUuid = tranUuid
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -1136,6 +1178,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
@@ -1193,8 +1236,9 @@ lifecycleScope.launch(Dispatchers.IO) {
 
 
                                     }
-                                    ResponseCode.FAILED.value,
+                                    ResponseCode.FAILED.value ->{ AppPreference.clearRestartDataPreference() }
                                     ResponseCode.ABORTED.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         errorFromIngenico(
                                             txnResponse.responseCode,
                                             txnResponse.status.toString()
@@ -1202,6 +1246,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                     }
                                     ResponseCode.REVERSAL.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         // kushal
                                         // region
 
@@ -1241,6 +1286,15 @@ lifecycleScope.launch(Dispatchers.IO) {
                 val amt = (saleAmt.toFloat() * 100).toLong()
                 var ecrID: String
                 try {
+                    val tranUuid = UUID.randomUUID().toString().also {
+                        ecrID = it
+                    }
+                    val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.PREAUTH_COMPLETE)
+                    restartHandlingList.add(restartHandlingModel)
+                    val jsonResp = Gson().toJson(restartHandlingModel)
+                    println(jsonResp)
+                    AppPreference.saveRestartDataPreference(jsonResp)
+
                     DeviceHelper.doPreAuthCompleteTxn(
                         PreAuthCompleteRequest(
                             amount = amt,
@@ -1251,9 +1305,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                 "0",
                                 6
                             ),
-                            transactionUuid = UUID.randomUUID().toString().also {
-                                ecrID = it
-                            }
+                            transactionUuid = tranUuid
                         ),
                         listener = object : OnPaymentListener.Stub() {
                             override fun onCompleted(result: PaymentResult?) {
@@ -1287,6 +1339,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
@@ -1342,14 +1395,17 @@ lifecycleScope.launch(Dispatchers.IO) {
 
 
                                     }
-                                    ResponseCode.FAILED.value,
+                                    ResponseCode.FAILED.value -> { AppPreference.clearRestartDataPreference() }
                                     ResponseCode.ABORTED.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         errorFromIngenico(
                                             txnResponse.responseCode,
                                             txnResponse.status.toString()
                                         )
                                     }
                                     "03" -> {
+                                        AppPreference.clearRestartDataPreference()
+
                                         errorFromIngenico(
                                             txnResponse.responseCode,
                                             txnResponse.status.toString()
@@ -1357,6 +1413,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                     }
                                     ResponseCode.REVERSAL.value -> {
+                                        AppPreference.clearRestartDataPreference()
                                         // kushal
                                         // region
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
@@ -1451,6 +1508,8 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         batchData.bonushubStan        = tpt?.stan ?: ""
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
+                                        AppPreference.clearRestartDataPreference()
+
                                         //To increment base Stan
                                         Utility().incrementUpdateRoc()
                                         //To increment base invoice
@@ -1462,7 +1521,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             createCardProcessingModelData(receiptDetail)
                                             val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
-                                      //      Utility().syncPendingTransaction(transactionViewModel)
+                                          //  Utility().syncPendingTransaction(transactionViewModel)
 
                                             when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                             {
@@ -1501,14 +1560,16 @@ lifecycleScope.launch(Dispatchers.IO) {
                                     }
                                 }
                             }
-                            ResponseCode.FAILED.value,
+                            ResponseCode.FAILED.value -> { AppPreference.clearRestartDataPreference() }
                             ResponseCode.ABORTED.value -> {
+                                AppPreference.clearRestartDataPreference()
                                 errorFromIngenico(
                                     txnResponse.responseCode,
                                     txnResponse.status.toString()
                                 )
                             }
                             ResponseCode.REVERSAL.value -> {
+                                AppPreference.clearRestartDataPreference()
                                 AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
                                 val batchReversalData = BatchTableReversal(receiptDetail)
