@@ -21,6 +21,7 @@ import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.EmiCatalogueViewModel
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -117,20 +118,27 @@ class EMICatalogue : Fragment() {
     private fun enabledEmiOptions(tpt: TerminalParameterTable, cb: (Boolean, Boolean) -> Unit) {
         var brandEmiOn = false
         var bankEmiOn = false
+      val tpt2= Field48ResponseTimestamp.getTptData()
 
-        when (tpt.reservedValues[6]) {
-            '1' -> {
-                // bank emi on
-                bankEmiOn = true
+
+        if (tpt2 != null) {
+            when (
+                tpt2.reservedValues[6]) {
+                '1' -> {
+                    // bank emi on
+                    bankEmiOn = true
+                }
             }
         }
-        when (tpt.reservedValues[10]) {
-            '1' -> {
-                // brand emi on
-                brandEmiOn = true
+        if (tpt2 != null) {
+            when (tpt2.reservedValues[10]) {
+                '1' -> {
+                    // brand emi on
+                    brandEmiOn = true
+                }
+
+
             }
-
-
         }
         cb(bankEmiOn, brandEmiOn)
 

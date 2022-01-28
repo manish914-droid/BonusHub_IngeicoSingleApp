@@ -213,13 +213,15 @@ class PrintUtil(context: Context?) {
                 printer?.addMixStyleText(textBlockList)
 
                 textBlockList.clear()
-
+                if(!receiptDetail.tvr.equals(""))
                 textBlockList.add(sigleLineformat("TVR:${receiptDetail.tvr}", AlignMode.LEFT))
+                if(!receiptDetail.tsi.equals(""))
                 textBlockList.add(sigleLineformat("TSI:${receiptDetail.tsi}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-
+                if(!receiptDetail.aid.equals(""))
                 textBlockList.add(sigleLineformat("AID:${receiptDetail.aid}", AlignMode.LEFT))
+                if(!receiptDetail.tc.equals(""))
                 textBlockList.add(sigleLineformat("TC:${receiptDetail.tc}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
@@ -2601,8 +2603,9 @@ class PrintUtil(context: Context?) {
                     }
 
                     textBlockList.add(sigleLineformat(txnType, AlignMode.LEFT))
-                    textBlockList.add(sigleLineformat( txnCount.toString() + getCurrencySymbol(tpt), AlignMode.CENTER))
-                    textBlockList.add(sigleLineformat( "%.2f".format(txnTotalAmount), AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat( "%.2f".format(txnTotalAmount), AlignMode.CENTER))
+                    textBlockList.add(sigleLineformat( txnCount.toString() + getCurrencySymbol(tpt), AlignMode.RIGHT))
+
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
                 }

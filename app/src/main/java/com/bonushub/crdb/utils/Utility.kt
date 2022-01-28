@@ -1538,6 +1538,8 @@ fun getBrandTAndCDataByBrandId(brandId : String): String {
     }
 //endregion
 
+
+
     fun maxAmountLimitDialog(iDialog: IDialog?, maxTxnLimit:Double){
         GlobalScope.launch(Dispatchers.Main) {
             val msg=  "Max txn limit Rs ${("%.2f".format((maxTxnLimit)))}"

@@ -484,4 +484,7 @@ interface AppDao{
 
     @Query("SELECT * FROM DigiPosDataTable WHERE txnStatus = :txnStatus")
     fun getDigiPosDataTableByTxnStatus(txnStatus: String): MutableList<DigiPosDataTable>
+
+    @Query("DELETE From DigiPosDataTable")
+    suspend fun deleteDigiPosDataTable()
 }

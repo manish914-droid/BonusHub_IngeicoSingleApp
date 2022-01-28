@@ -36,7 +36,10 @@
     <uses-permission android:name="titan.extperm.PERSIST_SET" />
     <uses-permission android:name="titan.extperm.PERSIST_GET" />
     <uses-permission android:name="titan.extperm.DEVICE_ADMIN" />
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
 
 
     <application
@@ -61,14 +64,14 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".view.activity.TransactionActivity"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity
-            android:name=".utils.PrintingTesting"
-            android:windowSoftInputMode="adjustNothing" />
+
     </application>
 
 </manifest>

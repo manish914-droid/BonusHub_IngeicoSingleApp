@@ -1115,7 +1115,6 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
 
     @PrimaryKey(autoGenerate = false) // we make primary key for multiple invoice in void
     var bonushubInvoice: String = ""
-
     var bonushubStan: String = ""
     var bonushubbatchnumber: String = ""
     var transactionType: Int = 0
