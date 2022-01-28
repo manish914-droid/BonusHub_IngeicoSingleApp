@@ -2,8 +2,12 @@ package com.bonushub.crdb.view.activity
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.graphics.Bitmap
+import android.graphics.PixelFormat
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -82,12 +86,21 @@ import kotlinx.coroutines.*
 import java.io.File
 import java.lang.Runnable
 import javax.inject.Inject
+import android.view.Gravity
+import android.telecom.VideoProfile.isPaused
+
+import android.os.Build
+import java.lang.IllegalArgumentException
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import java.util.HashMap
+import kotlin.jvm.internal.Intrinsics
 
 
 @AndroidEntryPoint
 class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
     ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
-
+    private  var  j : Long = 0
     private var tms: UTMS? = null
     @Inject
     lateinit var appDao: AppDao
@@ -106,7 +119,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private var pinpad: UPinpad? = null
     private var pinpadLimited: PinpadLimited? = null
     private val settlementViewModel : SettlementViewModel by viewModels()
+    var currentFocus = false
 
+    // To keep track of activity's foreground/background status
+    var isPaused = false
+
+    var collapseNotificationHandler: Handler? = null
 
     private val dialog by lazy {   Dialog(this) }
     companion object {
@@ -124,7 +142,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     private val initViewModel : InitViewModel by viewModels()
     // for init`
-
+    private var isFresApp = "true"
+    private var isFresAppStatus = false
     //Below Key is only we get in case of Auto Settlement == 1 after Sale:-
     private val appUpdateFromSale by lazy { intent.getBooleanExtra("appUpdateFromSale", false) }
 
@@ -137,7 +156,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
-
+        lockStatusBar()
+        isFresAppStatus = WifiPrefManager(this).isWifiStatus
+        if (!isFresAppStatus) {
+            isFresApp = WifiPrefManager(this).appStatus
+        }
+        if (isFresApp == "true" && isFresAppStatus) {
+            wifiHandaling()
+        }
+        onWindowFocusChanged(false)
         //region============================Below Logic is to Hide Back Arrow from Toolbar
         navHostFragment?.navController?.addOnDestinationChangedListener { _, _, _ ->
             navigationBinding?.toobar?.dashboardToolbar?.navigationIcon = null
@@ -451,7 +478,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 if (navigationBinding?.mainDl?.isDrawerOpen(GravityCompat.START)!!)
                     navigationBinding?.mainDl?.closeDrawer(GravityCompat.START)
                 else
-                    exitApp()
+                  exitluncher()
             }
         }else if(supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("BankFunctionsFragment",true)
                 ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
@@ -1671,44 +1698,156 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
     }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        currentFocus = hasFocus
+        if (!hasFocus) {
 
-    private fun restartHandaling() {
-        val restatDataList = AppPreference.getRestartDataPreference()
-        if (restatDataList != null) {
-            val uid=restatDataList.transactionUuid
-            println("uid = $uid")
-            DeviceHelper.getTransactionByUId(uid,object: OnOperationListener.Stub(){
-
-                override fun onCompleted(p0: OperationResult?) {
-                    p0?.value?.apply {
-                        println("Status = $status")
-                        println("Response code = $responseCode")
-                        println("Response code = $responseCode")
-                    }
-                    if(p0?.value?.status?.equals("SUCCESS") == true){
-                        val transactionDetail =
-                            ((p0?.value as? TransactionDataResponse)?.transactionDetail)
-                        println("Status = $transactionDetail")
-                    }
-                }
-            })
+            // Method that handles loss of window focus
+            collapseNow()
         }
     }
-    fun restartStubData(transactionDetail: TransactionDetail){
-        val cvmResult: com.ingenico.hdfcpayment.type.CvmAction?=null
-        val cvmRequiredLimit:Long?=null
-     /*   val receiptDetail= ReceiptDetail(transactionDetail.authCode, transactionDetail.aid, transactionDetail.batchNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, transactionDetail.expirationDate, transactionDetail.invoice, transactionDetail.mid, transactionDetail.merAddHeader1, merAddHeader2,  transactionDetail.rrn, transactionDetail. stan, transactionDetail.tc,
-            transactionDetail.tid, transactionDetail.tsi, transactionDetail.tvr, transactionDetail.entryMode, transactionDetail.txnName,
-            transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, transactionDetail.pan,
-            isVerifyPin = true,
-            isSignRequired = false,
-            cvmResult = cvmResult,
-            cvmRequiredLimit = cvmRequiredLimit
-        )*/
-
+    private fun lockStatusBar(){
+        val manager = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val localLayoutParams = WindowManager.LayoutParams()
+        localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
+        localLayoutParams.gravity = Gravity.TOP
+        localLayoutParams.flags =
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or  // this is to enable the notification to recieve touch events
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or  // Draws over status bar
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+        localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+        localLayoutParams.height = (50 * resources
+            .displayMetrics.scaledDensity).toInt()
+        localLayoutParams.format = PixelFormat.TRANSPARENT
+        val view = customViewGroup(this)
+        manager.addView(view, localLayoutParams)
     }
-   
-        
+   open fun collapseNow() {
+
+       // Initialize 'collapseNotificationHandler'
+       if (collapseNotificationHandler == null) {
+           collapseNotificationHandler = Handler()
+       }
+
+       // If window focus has been lost && activity is not in a paused state
+       // Its a valid check because showing of notification panel
+       // steals the focus from current activity's window, but does not
+       // 'pause' the activity
+       if (!currentFocus && !isPaused) {
+
+           // Post a Runnable with some delay - currently set to 300 ms
+           collapseNotificationHandler!!.postDelayed(object : Runnable {
+               @SuppressLint("WrongConstant")
+               override fun run() {
+
+                   // Use reflection to trigger a method from 'StatusBarManager'
+                   val statusBarService = getSystemService("statusbar")
+                   var statusBarManager: Class<*>? = null
+                   try {
+                       statusBarManager = Class.forName("android.app.StatusBarManager")
+                   } catch (e: ClassNotFoundException) {
+                       e.printStackTrace()
+                   }
+                   var collapseStatusBar: Method? = null
+                   try {
+
+                       // Prior to API 17, the method to call is 'collapse()'
+                       // API 17 onwards, the method to call is `collapsePanels()`
+                       collapseStatusBar = if (Build.VERSION.SDK_INT > 16) {
+                           statusBarManager!!.getMethod("collapsePanels")
+                       } else {
+                           statusBarManager!!.getMethod("collapse")
+                       }
+                   } catch (e: NoSuchMethodException) {
+                       e.printStackTrace()
+                   }
+                   if (collapseStatusBar != null) {
+                       collapseStatusBar.setAccessible(true)
+                   }
+                   try {
+                       if (collapseStatusBar != null) {
+                           collapseStatusBar.invoke(statusBarService)
+                       }
+                   } catch (e: IllegalArgumentException) {
+                       e.printStackTrace()
+                   } catch (e: IllegalAccessException) {
+                       e.printStackTrace()
+                   } catch (e: InvocationTargetException) {
+                       e.printStackTrace()
+                   }
+
+                   // Check if the window focus has been returned
+                   // If it hasn't been returned, post this Runnable again
+                   // Currently, the delay is 100 ms. You can change this
+                   // value to suit your needs.
+                   if (!currentFocus && !isPaused) {
+                       collapseNotificationHandler!!.postDelayed(this, 100L)
+                   }
+               }
+           }, 300L)
+       }
+   }
+
+
+    override fun onPause() {
+        super.onPause()
+
+        // Activity's been paused
+        isPaused = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Activity's been resumed
+        isPaused = false
+    }
+
+    private fun exitluncher(){
+        if (!checkingPakage("com.verifone.adc.launcher")) {
+            return;
+        }
+        if (System.currentTimeMillis() - j > 2000) {
+            showToast("Press again to exit the program.")
+            j = System.currentTimeMillis();
+            return;
+        }
+        moveToAnotherApp()
+    }
+    //getting all the application
+    // then checking our package is available or not
+    private fun checkingPakage(str: String?): Boolean {
+        val installedPackages: List<PackageInfo> = this.packageManager.getInstalledPackages(0)
+        for (i in installedPackages.indices) {
+            if (installedPackages[i].packageName.equals(str, ignoreCase = true)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun moveToAnotherApp() {
+        try {
+            val hashMap = HashMap<Any, Any>()
+            customIntent("com.verifone.adc.launcher", "com.verifone.adc.launcher.MainActivity")
+        } catch (e2: java.lang.Exception) {
+            e2.printStackTrace()
+        }
+    }
+    //// this is for moving another application
+    private fun customIntent(str: String?, str2: String?) {
+        val intent = Intent()
+        intent.setClassName(str!!, str2!!)
+        startActivity(intent)
+    }
+    private fun wifiHandaling() {
+        WifiPrefManager(this).saveFreshApps("false")
+        val wifiManager = this.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
+        val wifiEnabled = wifiManager.isWifiEnabled
+        if (wifiEnabled) {
+            wifiManager.isWifiEnabled = false
+        }
+    }
 
 }
 //region=============================Interface to implement Dashboard Show More to Show Less Options:-

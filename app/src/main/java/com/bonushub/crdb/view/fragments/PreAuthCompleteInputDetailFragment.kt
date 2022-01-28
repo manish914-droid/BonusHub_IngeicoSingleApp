@@ -5,13 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentPreAuthCompleteDetailBinding
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.CardProcessedDataModal
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.showToast
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.utils.EDashboardItem
+import com.bonushub.crdb.utils.getBaseTID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.Serializable
 import java.util.*
 
@@ -45,6 +51,9 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+        val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(DBModule.appDatabase.appDao) }
+        binding?.tidEt?.setText(baseTid)
+        binding?.tidEt?.isEnabled = false;
         binding?.authCompleteBtn?.setOnClickListener {
 
             iDiag?.alertBoxWithAction("","Do you want to PreAuth Complete this transaction?",true,"YES",{
