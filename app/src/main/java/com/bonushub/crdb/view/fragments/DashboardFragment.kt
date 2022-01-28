@@ -145,9 +145,10 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                         appDao.getAllWifiCTTableData()
                     }
 
+
                     val resStr = appDao.getAllTerminalParameterTableData()
 
-                  //  sendConfirmationToHost()
+                //   sendConfirmationToHost()
                     if(AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName)=="0" || wifiCTTable?.get(0)?.actionId?.toInt() == 2){
                         val result1 = runBlocking(Dispatchers.IO){
                             doCommsTransaction(appDao)

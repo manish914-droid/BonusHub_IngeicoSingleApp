@@ -944,9 +944,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
         System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
 
-            if (/*AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
-            AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
-            AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())*/true) {
+            if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+            !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
+            !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())) {
             transactFragment(fragment.apply {
                 arguments = Bundle().apply {
                     putSerializable("type", action)
@@ -1576,7 +1576,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
         GlobalScope.launch(Dispatchers.IO) {
                 hideProgress()
-            if(!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())){
+            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString())){
                 PrintUtil(this@NavigationActivity).printDetailReportupdate(settlementBatchData, this@NavigationActivity) {
                         detailPrintStatus -> }
 

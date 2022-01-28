@@ -174,7 +174,7 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
                             responses.tidStatusList      = settlementResponse.tidStatusList
                             responses.tids      = settlementResponse.tids
 
-                            trySend(Result.error(ingencioresponse,"Failed")).isSuccess
+                            trySend(Result.error(ingencioresponse,"Failed")).isFailure
                         }
                         else -> {
 
@@ -189,7 +189,7 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
         }
         catch (ex: Exception){
             ex.printStackTrace()
-            trySend(Result.error(IngenicoSettlementResponse(),ex.message)).isSuccess
+            trySend(Result.error(IngenicoSettlementResponse(),ex.message)).isFailure
         }
         awaitClose {
             listner = null
