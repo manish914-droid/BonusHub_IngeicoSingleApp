@@ -24,7 +24,7 @@ class SyncAppUpdateConfirmation(private var confirmationISOData: ByteArray, cb: 
                 //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
                // Utility().incrementRoc()
                 Utility().incrementUpdateRoc()
-                Utility().incrementUpdateInvoice()
+
 
               //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
 
@@ -39,7 +39,7 @@ class SyncAppUpdateConfirmation(private var confirmationISOData: ByteArray, cb: 
                 val successResponseCode = (responseIsoData.isoMap[39]?.parseRaw2String().toString())
                 isBool = successResponseCode == "00"
             } else {
-              //  Utility().incrementRoc()
+                Utility().incrementRoc()
               //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
                 isBool = false
             }

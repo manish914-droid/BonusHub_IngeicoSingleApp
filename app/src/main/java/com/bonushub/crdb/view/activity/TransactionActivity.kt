@@ -287,9 +287,9 @@ class TransactionActivity : BaseActivityNew() {
                     }else{
                         amt  = (saleAmt.toFloat() * 100).toLong()
                     }
-var track1:Track1? = null
-var track2: Track2? = null
-val cardCaptureType:CardCaptureType
+                   var track1:Track1? = null
+                   var track2: Track2? = null
+                   val cardCaptureType:CardCaptureType
                     if(globalCardProcessedModel.getReadCardType()==DetectCardType.MAG_CARD_TYPE){
                         val tracksData=RawStripe(globalCardProcessedModel.getTrack1Data(),globalCardProcessedModel.getTrack2Data())
                         track1=tracksData.track1
@@ -1119,16 +1119,29 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
+                                            //To get tpt data acccording to tid
+                                            val tpt = runBlocking(Dispatchers.IO) {
+                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                            }
                                             val batchData = BatchTable(receiptDetail)
 
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.PRE_AUTH.type
+                                                batchData.transactionType = BhTransactionType.PRE_AUTH.type
+                                                //To get bonushub batchumber,bonushub invoice,bonushub stan
+                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                                batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                                batchData.bonushubStan        = tpt?.stan ?: ""
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+
+                                                //To increment base Stan
+                                                Utility().incrementUpdateRoc()
+                                                //To increment base invoice
+                                                Utility().incrementUpdateInvoice()
+
                                                 printingSaleData(batchData){
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
@@ -1258,15 +1271,28 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                         if (receiptDetail != null) {
+                                            //To get tpt data acccording to tid
+                                            val tpt = runBlocking(Dispatchers.IO) {
+                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                            }
                                             val batchData = BatchTable(receiptDetail)
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                batchData.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                //To get bonushb batchnumber,bonuhubinvoice,bonuhub stan
+                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                                batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                                batchData.bonushubStan        = tpt?.stan ?: ""
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
+
+                                                //To increment base Stan
+                                                Utility().incrementUpdateRoc()
+                                                //To increment base invoice
+                                                Utility().incrementUpdateInvoice()
+
                                                 printingSaleData(batchData){
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
@@ -1571,13 +1597,28 @@ lifecycleScope.launch(Dispatchers.IO) {
                                 // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
                                 if (receiptDetail != null) {
                                     lifecycleScope.launch(Dispatchers.IO) {
+
+                                        val tpt = runBlocking(Dispatchers.IO) {
+                                            getTptDataByTid(receiptDetail.tid ?: "")
+                                        }
+
                                         val batchData = BatchTable(receiptDetail)
                                         println(jsonResp)
                                         batchData.invoice = receiptDetail.invoice.toString()
-                                        batchData.transactionType =
-                                            BhTransactionType.SALE.type
+                                        batchData.transactionType = BhTransactionType.SALE.type
+                                        //To assign bonushub batchnumber,bonushub invoice,bonuhub stan
+                                        batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                        batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
+                                        batchData.bonushubStan        = tpt?.stan ?: ""
+
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
+
+                                        //To increment base Stan
+                                        Utility().incrementUpdateRoc()
+                                        //To increment base invoice
+                                        Utility().incrementUpdateInvoice()
+
                                         printingSaleData(batchData){
                                             withContext(Dispatchers.Main){
                                                 showProgress(getString(R.string.transaction_syncing_msg))

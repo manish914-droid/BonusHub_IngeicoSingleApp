@@ -244,6 +244,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 if(reversaldata.size > 0){
                     reversaldata.forEach {
                       saletid =  it.receiptData?.tid
+                       bonushubsalebatchNumber = it.bonushubBatchnumber
                         ingenicosalebatchNumber  = it.receiptData?.batchNumber
                     }
 
