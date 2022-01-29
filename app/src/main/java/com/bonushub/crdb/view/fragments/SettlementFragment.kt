@@ -268,6 +268,14 @@ class SettlementFragment : Fragment() {
                                 }else{
                                     logger("sync","failed terminate settlement")
                                     (activity as NavigationActivity).hideProgress()
+                                    (activity as BaseActivityNew).getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
+                                        try {
+                                            (activity as NavigationActivity).decideDashBoardOnBackPress()
+                                        }catch (ex:Exception){
+                                            ex.printStackTrace()
+
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -278,6 +286,7 @@ class SettlementFragment : Fragment() {
             },{})
         }
         //endregion
+
 
     }
     //region====================================SetUp RecyclerView:-
