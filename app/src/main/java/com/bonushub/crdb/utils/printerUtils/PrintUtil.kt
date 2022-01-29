@@ -219,9 +219,9 @@ class PrintUtil(context: Context?) {
                 textBlockList.add(sigleLineformat("TSI:${receiptDetail.tsi}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-                if(!receiptDetail.aid.equals(""))
+
                 textBlockList.add(sigleLineformat("AID:${receiptDetail.aid}", AlignMode.LEFT))
-                if(!receiptDetail.tc.equals(""))
+
                 textBlockList.add(sigleLineformat("TC:${receiptDetail.tc}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
