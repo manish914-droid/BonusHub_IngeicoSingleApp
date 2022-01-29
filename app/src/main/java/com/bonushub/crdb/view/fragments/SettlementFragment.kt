@@ -170,23 +170,6 @@ class SettlementFragment : Fragment() {
 
                         }*/
 
-                        //----------------------
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val data =
-                                CreateSettlementPacket(appDao).createSettlementISOPacket()
-                            settlementByteArray =
-                                data.generateIsoByteRequest()
-                            try {
-                                (activity as NavigationActivity).settleBatch1(
-                                    settlementByteArray
-                                ) {
-                                    logger("zero settlement",it.toString(),"e")
-                                }
-                            } catch (ex: Exception) {
-                                (activity as NavigationActivity).hideProgress()
-                                ex.printStackTrace()
-                            }
-                        }
 
                     }else{
 
@@ -198,7 +181,7 @@ class SettlementFragment : Fragment() {
                         // region digipos data upload
                         // end region
 
-                        ioSope.launch {
+                        GlobalScope.launch(Dispatchers.Main) {
                            var reversalTid  = checkReversal(dataListReversal)
                            var listofTxnTid =  checkSettlementTid(dataList)
 
@@ -211,52 +194,67 @@ class SettlementFragment : Fragment() {
                            System.out.println("Total transaction tid is"+result.forEach {
                                println("Tid are "+it)
                            })
-                           settlementViewModel.settlementResponse(result)
-                        }
 
-                        settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
-
-                        when (result.status) {
-                            Status.SUCCESS -> {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
-                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
-
-                                    // region upload digipos pending txn
-                                    logger("UPLOAD DIGI"," ----------------------->  START","e")
-                                    uploadPendingDigiPosTxn(requireActivity()){
-                                        logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
-                                        CoroutineScope(Dispatchers.IO).launch{
-                                            val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                            settlementByteArray = data.generateIsoByteRequest()
-                                            try {
-                                                (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
-                                            } catch (ex: Exception) {
-                                                (activity as NavigationActivity).hideProgress()
-                                                ex.printStackTrace()
-                                            }
-                                        }
-
+                            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
+                                CoroutineScope(Dispatchers.IO).launch{
+                                    try {
+                                        val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                         val   settlementByteArray = data.generateIsoByteRequest()
+                                        (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
+                                    } catch (ex: Exception) {
+                                        println("Exception is "+ex.printStackTrace())
+                                        (activity as NavigationActivity).hideProgress()
+                                        ex.printStackTrace()
                                     }
-                                    // end region
-
                                 }
-                                //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
                             }
-                            Status.ERROR -> {
-                                println("Error in ingenico settlement")
-                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
-                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
-                                // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                            }
-                            Status.LOADING -> {
-                                // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+                            else {
+                                settlementViewModel.settlementResponse(result)
+                                settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
 
+                                    when (result.status) {
+                                        Status.SUCCESS -> {
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+
+                                                // region upload digipos pending txn
+                                                logger("UPLOAD DIGI"," ----------------------->  START","e")
+                                                uploadPendingDigiPosTxn(requireActivity()){
+                                                    logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
+                                                    CoroutineScope(Dispatchers.IO).launch{
+                                                        val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                                        settlementByteArray = data.generateIsoByteRequest()
+                                                        try {
+                                                            (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
+                                                        } catch (ex: Exception) {
+                                                            (activity as NavigationActivity).hideProgress()
+                                                            ex.printStackTrace()
+                                                        }
+                                                    }
+
+                                                }
+                                                // end region
+
+                                            }
+                                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                                        }
+                                        Status.ERROR -> {
+                                            println("Error in ingenico settlement")
+                                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
+                                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                                        }
+                                        Status.LOADING -> {
+                                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                                        }
+                                    }
+                            }
 
                             }
                         }
-
-                    }
                 }
 
 

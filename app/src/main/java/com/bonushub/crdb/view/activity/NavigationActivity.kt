@@ -156,7 +156,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
-        lockStatusBar()
+       /* lockStatusBar()
         isFresAppStatus = WifiPrefManager(this).isWifiStatus
         if (!isFresAppStatus) {
             isFresApp = WifiPrefManager(this).appStatus
@@ -164,7 +164,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         if (isFresApp == "true" && isFresAppStatus) {
             wifiHandaling()
         }
-        onWindowFocusChanged(false)
+        onWindowFocusChanged(false)*/
         //region============================Below Logic is to Hide Back Arrow from Toolbar
         navHostFragment?.navController?.addOnDestinationChangedListener { _, _, _ ->
             navigationBinding?.toobar?.dashboardToolbar?.navigationIcon = null
@@ -221,9 +221,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         })
 
         //Settle Batch When Auto Settle == 1 After Sale:- kushal -> auto settlement doing in dashboard
-//        if (appUpdateFromSale) {
-//            autoSettleBatchData()
-//        }
+  //      if (appUpdateFromSale) {
+   //         autoSettleBatchData()
+    //    }
     }
 
 
@@ -249,7 +249,20 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             R.id.settlement -> {
                 closeDrawer()
-                transactFragment(SettlementFragment())
+                if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
+                    alertBoxWithAction(
+                        getString(R.string.batch_settle),
+                        getString(R.string.please_settle_batch),
+                        false, getString(R.string.positive_button_ok),
+                        {
+                            autoSettleBatchData()
+                        },
+                        {})
+                   }
+                else {
+                    transactFragment(SettlementFragment())
+                }
+
             }
         }
         return true
@@ -478,7 +491,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 if (navigationBinding?.mainDl?.isDrawerOpen(GravityCompat.START)!!)
                     navigationBinding?.mainDl?.closeDrawer(GravityCompat.START)
                 else
-                  exitluncher()
+                    exitApp()
+                 // exitluncher()
             }
         }else if(supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("BankFunctionsFragment",true)
                 ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
@@ -1449,6 +1463,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 //backToCalled(it, false, true)
             })
         }
+        else
+            hideProgress()
     }
 
     //Below method is used to update App through HTTP/HTTPs:-
@@ -1641,8 +1657,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         false
                                     )
 
-                                    val data =
-                                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                    val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                     var settlementByteArray = data.generateIsoByteRequest()
                                     try {
                                         settleBatch1(settlementByteArray) {}

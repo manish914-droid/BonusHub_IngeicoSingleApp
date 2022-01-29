@@ -2027,8 +2027,7 @@ lifecycleScope.launch(Dispatchers.IO) {
         receiptDetail.maskedPan?.let { globalCardProcessedModel.setPanNumberData(it) }
     }
 
-    fun CardMode(entryMode:String, isPinVerify:Boolean):String
-    {
+    fun CardMode(entryMode:String, isPinVerify:Boolean):String {
         logger("entryMode",""+entryMode,"e")
         when(entryMode){
 

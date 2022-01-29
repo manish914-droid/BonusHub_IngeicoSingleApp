@@ -27,7 +27,12 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
             mti = Mti.SETTLEMENT_MTI.mti
 
             //Processing Code:-
-            addField(3, ProcessingCode.SETTLEMENT.code)
+            val processingCode: String? = if (AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
+                ProcessingCode.FORCE_SETTLEMENT.code
+            } else {
+                ProcessingCode.SETTLEMENT.code
+            }
+            addField(3, processingCode ?: ProcessingCode.SETTLEMENT.code)
 
             //ROC will not go in case of AMEX on all PORT but for HDFC it was mandatory:-
             // Sending ROC in case of HDFC ........
