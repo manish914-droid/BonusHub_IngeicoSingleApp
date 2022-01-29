@@ -470,9 +470,21 @@ logger("PFR","Failed","e")
     fun restartStubData(transactionDetail: TransactionDetail){
         val cvmResult: com.ingenico.hdfcpayment.type.CvmAction?=null
         val cvmRequiredLimit:Long?=null
-           val receiptDetail= ReceiptDetail(transactionDetail.authCode, transactionDetail.aid, transactionDetail.batchNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, "14/01/2022 19:09:18", transactionDetail.invoice, transactionDetail.mid, transactionDetail.merAddHeader1, transactionDetail.merAddHeader2,  transactionDetail.rrn, transactionDetail. stan, transactionDetail.tc,
+        val aid=transactionDetail.aid?.replace(" ", "")
+
+        val batcNumber= transactionDetail.batchNumber?.let { invoiceWithPadding(it) }
+        val roc= transactionDetail.stan?.let { invoiceWithPadding(it) }
+        val invoice=transactionDetail.invoice?.let { invoiceWithPadding(it) }
+         val penmasking = transactionDetail.pan?.let {
+             Field48ResponseTimestamp.panMasking(
+                 it,
+                 "************0000"
+             )
+         }
+
+           val receiptDetail= ReceiptDetail(transactionDetail.authCode, aid, batcNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, transactionDetail.dateTime, invoice, transactionDetail.mid, transactionDetail.merAddHeader1, transactionDetail.merAddHeader2,  transactionDetail.rrn, roc, transactionDetail.tc,
                transactionDetail.tid, transactionDetail.tsi, transactionDetail.tvr, transactionDetail.entryMode, transactionDetail.txnName,
-               transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, transactionDetail.pan,
+               transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, penmasking,
                isVerifyPin = true,
                isSignRequired = false,
                cvmResult = cvmResult,
@@ -482,14 +494,12 @@ logger("PFR","Failed","e")
 
         if (receiptDetail != null) {
             lifecycleScope.launch(Dispatchers.IO) {
-
                 var batchData = BatchTable(null)
                 // here get batch data
                 if(restatDataList?.transactionType == EDashboardItem.BANK_EMI || restatDataList?.transactionType == EDashboardItem.BRAND_EMI || restatDataList?.transactionType == EDashboardItem.TEST_EMI)
                 {
                     restatDataList?.batchData?.receiptData = receiptDetail
                     batchData = restatDataList?.batchData!!
-
                 }else{
                     batchData = BatchTable(receiptDetail)
                 }
