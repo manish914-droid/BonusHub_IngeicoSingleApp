@@ -184,6 +184,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         // endregion
         decideDashBoard()
 
+        observeMainViewModel()
+
 
         // refresh drawer tid and mid
         val mDrawerToggle: ActionBarDrawerToggle = object : ActionBarDrawerToggle(
@@ -1017,17 +1019,20 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             else if (AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString())) {
-                val tpt = runBlocking(Dispatchers.IO) { getTptData() }
-                if (tpt != null) {
-                    val tid = tpt.terminalId?.get(0)?.toLong().toString()
+                CoroutineScope(Dispatchers.Main).launch{
+                    val tid = getBaseTID(appDao)
+                    showProgress()
+                    initViewModel.insertInfo1(tid)
 
                 }
+
             }
             else if (AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())) {
-                val tpt = runBlocking(Dispatchers.IO) { getTptData() }
-                if (tpt != null) {
-                    val tid = tpt.terminalId?.get(0)?.toLong().toString()
-
+                CoroutineScope(Dispatchers.Main).launch{
+                    val tid = getBaseTID(appDao)
+                    showProgress()
+                    initViewModel.insertInfo1(tid)
+                  //  observeMainViewModel()
                 }
             }
             else {
@@ -1315,7 +1320,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                                     val tid = getBaseTID(appDao)
                                                     showProgress()
                                                     initViewModel.insertInfo1(tid)
-                                                    observeMainViewModel()
+                                                  //  observeMainViewModel()
                                                 }
                                             }
 
@@ -1410,7 +1415,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                                         val tid = getBaseTID(appDao)
                                                         showProgress()
                                                         initViewModel.insertInfo1(tid)
-                                                        observeMainViewModel()
+                                                       // observeMainViewModel()
                                                     }
                                                 }
 
@@ -1610,13 +1615,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
         val dataListReversal = runBlocking(Dispatchers.IO) {
             appDao.getAllBatchReversalData()
-        }
-
-
-        val processingCode: String = if (appUpdateFromSale) {
-            ProcessingCode.SETTLEMENT.code
-        } else {
-            ProcessingCode.FORCE_SETTLEMENT.code
         }
 
         GlobalScope.launch(Dispatchers.IO) {

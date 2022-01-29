@@ -233,13 +233,16 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                                         return Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,initList))
                                     }
                                     else{
+                                        AppPreference.saveBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString(), true)
                                         return Result.error(ResponseHandler(Status.ERROR,strResult ?: "",false,false),strResult ?: "")
                                     }
                                 } else {
                                     return  Result.success(ResponseHandler(Status.SUCCESS,"Key Exchange Successful",false,false))
                                 }
                             } else {
-                                AppPreference.saveLogin(false)
+                                AppPreference.saveBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString(), true)
+
+                              //  AppPreference.saveLogin(false)
                                 return Result.error(ResponseHandler(Status.ERROR,"Error in key insertion",false,false),"Error in key insertion")
                             }
 
