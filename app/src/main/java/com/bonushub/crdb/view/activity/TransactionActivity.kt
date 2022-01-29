@@ -420,7 +420,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     }
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     //   sync pending transaction
-                                                   //    Utility().syncPendingTransaction(transactionViewModel)
+                                                    Utility().syncPendingTransaction(transactionViewModel){}
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
@@ -702,7 +702,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
 
                                                     // sync pending transaction
-                                                  //  Utility().syncPendingTransaction(transactionViewModel)
+                                                    Utility().syncPendingTransaction(transactionViewModel){}
 
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
@@ -879,7 +879,9 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
-                                                //    Utility().syncPendingTransaction(transactionViewModel)
+                                                    Utility().syncPendingTransaction(transactionViewModel){
+
+                                                    }
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
@@ -1033,7 +1035,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
-                                                   //   Utility().syncPendingTransaction(transactionViewModel)
+                                                    Utility().syncPendingTransaction(transactionViewModel){}
 
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
@@ -1193,7 +1195,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
-                                                   // Utility().syncPendingTransaction(transactionViewModel)
+                                                    Utility().syncPendingTransaction(transactionViewModel){}
 
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
@@ -1353,7 +1355,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
-                                                 //   Utility().syncPendingTransaction(transactionViewModel)
+                                                    Utility().syncPendingTransaction(transactionViewModel){}
 
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
@@ -1521,7 +1523,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             createCardProcessingModelData(receiptDetail)
                                             val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
-                                          //  Utility().syncPendingTransaction(transactionViewModel)
+                                            Utility().syncPendingTransaction(transactionViewModel){}
 
                                             when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                             {
@@ -1687,7 +1689,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             createCardProcessingModelData(receiptDetail)
                                             val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
-                                            //      Utility().syncPendingTransaction(transactionViewModel)
+                                            Utility().syncPendingTransaction(transactionViewModel){}
 
                                             when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                             {

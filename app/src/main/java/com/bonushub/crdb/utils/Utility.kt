@@ -1136,14 +1136,16 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         }
     }
 
-    suspend fun syncPendingTransaction(transactionViewModel:TransactionViewModel)
+    suspend fun syncPendingTransaction(transactionViewModel:TransactionViewModel,cb:(Boolean) -> Unit)
     {
+        com.bonushub.crdb.utils.logger("syncPendingTransaction", " ----------------------->  START", "e")
+        var txnSync = true
         val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
         if(pendingTxn.size != 0) {
             for (item in pendingTxn) {
                 val transactionISO =
-                    CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal,batchdata = BatchTable()).createTransactionPacket()
+                    CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal,item.batchTable).createTransactionPacket()
 
                 when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
                     is GenericResponse.Success -> {
@@ -1152,6 +1154,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                         appDatabase.appDao.deletePendingSyncTransactionData(item)
                     }
                     is GenericResponse.Error -> {
+                        txnSync = false
                         com.bonushub.crdb.utils.logger("error:- ", "in error ${genericResp.errorMessage}", "e")
                         com.bonushub.crdb.utils.logger("error:- ", "try in next time", "e")
 
@@ -1163,6 +1166,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             }
         }
 
+        cb(txnSync)
     }
 
     /*fun creatCardProcessingModelData(receiptDetail: ReceiptDetail):CardProcessedDataModal {
