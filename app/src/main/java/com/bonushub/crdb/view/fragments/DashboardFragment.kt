@@ -25,6 +25,7 @@ import com.bonushub.crdb.appupdate.SyncAppUpdateConfirmation
 
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
@@ -68,7 +69,6 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     private var counter = 0
     @Inject
     lateinit var appDao: AppDao
-    private val settlementViewModel : SettlementViewModel by viewModels()
     private var ioSope = CoroutineScope(Dispatchers.IO)
     private var defaultSope = CoroutineScope(Dispatchers.Default)
     lateinit var dashboardViewModel : DashboardViewModel
@@ -91,6 +91,9 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
     private val transactionViewModel: TransactionViewModel by viewModels()
 
+    private lateinit var settlementViewModel : SettlementViewModel
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -105,6 +108,8 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Utility().hideSoftKeyboard(requireActivity())
         restartHandaling()
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
+
+        settlementViewModel = ViewModelProvider(this).get(SettlementViewModel::class.java)
         observeDashboardViewModel()
 
         //region======================Change isAutoSettleDone Boolean Value to False if Date is greater then :- written by kushal
@@ -507,7 +512,7 @@ logger("PFR","Failed","e")
                 batchData.invoice = receiptDetail.invoice.toString()
                 println("invoice code = ${receiptDetail.invoice.toString()}")
                 // batchData.transactionType = BhTransactionType.SALE.type
-               // DBModule.appDatabase.appDao.insertBatchData(batchData)
+                DBModule.appDatabase.appDao.insertBatchData(batchData)
 
                 if(batchData.receiptData?.txnOtherAmount == null)
                 {
