@@ -45,7 +45,7 @@
                 android:visibility="gone" />
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_4"
@@ -53,9 +53,8 @@
 
             <TextView
                 android:id="@+id/tv_transaction_amount_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/txn_amount"
@@ -64,16 +63,16 @@
 
             <TextView
                 android:id="@+id/tv_transaction_amount"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/tenure_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,9 +81,8 @@
 
             <TextView
                 android:id="@+id/tv_tenure_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/tenure"
@@ -93,16 +91,16 @@
 
             <TextView
                 android:id="@+id/tv_tenure"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/loan_amt_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -111,9 +109,8 @@
 
             <TextView
                 android:id="@+id/tv_loan_amount_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/loan_amount"
@@ -122,16 +119,16 @@
 
             <TextView
                 android:id="@+id/tv_loan_amount"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/emi_amt_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -140,9 +137,8 @@
 
             <TextView
                 android:id="@+id/tv_emi_amount_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/emi_amount"
@@ -151,16 +147,16 @@
 
             <TextView
                 android:id="@+id/tv_emi_amount"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/discountLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -170,9 +166,8 @@
 
             <TextView
                 android:id="@+id/tv_discount_amount_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/discount_amount"
@@ -181,16 +176,16 @@
 
             <TextView
                 android:id="@+id/tv_discount_amount"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/cashBackLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -200,9 +195,8 @@
 
             <TextView
                 android:id="@+id/tv_cashback_amount_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="center"
                 android:text="@string/cashback"
@@ -211,16 +205,16 @@
 
             <TextView
                 android:id="@+id/tv_cashback_amount"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/interestRateLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -230,9 +224,8 @@
 
             <TextView
                 android:id="@+id/tv_interest_rate_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/interest_rate"
@@ -241,16 +234,16 @@
 
             <TextView
                 android:id="@+id/tv_interest_rate"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/total_int_pay_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -259,9 +252,8 @@
 
             <TextView
                 android:id="@+id/tv_total_interest_pay_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/total_interest_pay"
@@ -270,16 +262,16 @@
 
             <TextView
                 android:id="@+id/tv_total_interest_pay"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/rateofInterestLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -288,9 +280,8 @@
 
             <TextView
                 android:id="@+id/tv_roi_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/roi_pa"
@@ -299,16 +290,16 @@
 
             <TextView
                 android:id="@+id/tv_roi"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/toatalemipayLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -317,9 +308,8 @@
 
             <TextView
                 android:id="@+id/tv_total_emi_pay_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/total_emi_pay"
@@ -328,16 +318,16 @@
 
             <TextView
                 android:id="@+id/tv_total_emi_pay"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/offerLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -347,9 +337,8 @@
 
             <TextView
                 android:id="@+id/tv_offer_header"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:fontFamily="@font/muli_regular"
                 android:gravity="start"
                 android:text="@string/cashback_offer"
@@ -358,14 +347,14 @@
 
             <TextView
                 android:id="@+id/tv_offer"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:fontFamily="@font/muli_light"
                 android:gravity="start"
                 android:textColor="@color/black"
-                android:textSize="@dimen/text_size_small" />
-        </LinearLayout>
+                android:textSize="@dimen/text_size_small"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
 
     </LinearLayout>
 </LinearLayout>
