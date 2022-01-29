@@ -601,7 +601,7 @@ class PrintUtil(context: Context?) {
         var loanamt = bankEMITenureDataModal?.loanAmount?.toInt()?.let { divideAmountBy100(it).toString() }
         roi = "%.2f".format(roi?.toDouble()) + " %"
         loanamt = "%.2f".format(loanamt?.toDouble())
-        textBlockList.add(sigleLineformat("ROI", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("ROI(pa)", AlignMode.LEFT))
         textBlockList.add(
             sigleLineformat(
                 "$roi",
@@ -745,27 +745,13 @@ class PrintUtil(context: Context?) {
                     ?.div(100)
             )
 
-
-            textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
-            textBlockList.add(sigleLineformat(" ", AlignMode.RIGHT))
-            printer?.addMixStyleText(textBlockList)
-            textBlockList.clear()
-
-
-            textBlockList.add(sigleLineformat(nextLineAppendStr, AlignMode.LEFT))
-            textBlockList.add(sigleLineformat(":$currencySymbol $cashBackAmount", AlignMode.RIGHT))
-            printer?.addMixStyleText(textBlockList)
-            textBlockList.clear()
-        } else {
-            println("test-->${bankEMITenureDataModal?.cashBackAmount}")
-            if (bankEMITenureDataModal?.cashBackAmount != "0" && !(bankEMITenureDataModal?.cashBackAmount.isNullOrEmpty())) {
-                val cashBackAmount = "%.2f".format(
-                    bankEMITenureDataModal?.cashBackAmount?.toFloat()
-                        ?.div(100)
-                )
-
-
+            if (islongTextHeading) {
                 textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
+                textBlockList.add(sigleLineformat(" ", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+                textBlockList.add(sigleLineformat(nextLineAppendStr, AlignMode.LEFT))
                 textBlockList.add(
                     sigleLineformat(
                         "$currencySymbol $cashBackAmount",
@@ -774,6 +760,25 @@ class PrintUtil(context: Context?) {
                 )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
+            }else {
+                println("test-->${bankEMITenureDataModal?.cashBackAmount}")
+                if (bankEMITenureDataModal?.cashBackAmount != "0" && !(bankEMITenureDataModal?.cashBackAmount.isNullOrEmpty())) {
+                    val cashBackAmount = "%.2f".format(
+                        bankEMITenureDataModal?.cashBackAmount?.toFloat()
+                            ?.div(100)
+                    )
+
+
+                    textBlockList.add(sigleLineformat(cashBackAmountHeadingText, AlignMode.LEFT))
+                    textBlockList.add(
+                        sigleLineformat(
+                            "$currencySymbol $cashBackAmount",
+                            AlignMode.RIGHT
+                        )
+                    )
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                }
             }
         }
         println("bankid ${bankEMIIssuerTAndCDataModal?.issuerID}")
@@ -1248,7 +1253,7 @@ class PrintUtil(context: Context?) {
 
         }
         printSeperator()
-        if (batchTable.transactionType != BhTransactionType.BRAND_EMI.type)
+        if (batchTable.transactionType != BhTransactionType.BRAND_EMI.type && batchTable.transactionType != BhTransactionType.TEST_EMI.type)
         baseAmounthandling(batchTable)
 
     }
@@ -2380,11 +2385,11 @@ class PrintUtil(context: Context?) {
                     if (it.transactionType == BhTransactionType.PRE_AUTH.type) continue
 
                     if (it.transactionType == BhTransactionType.EMI_SALE.type || it.transactionType == BhTransactionType.BRAND_EMI.type || it.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
-                        it.receiptData?.cardType = it.receiptData?.appName
+                        it.receiptData?.appName = it.emiIssuerDataModel?.issuerName
                         it.transactionType = BhTransactionType.EMI_SALE.type
                     }
                     if (it.transactionType == BhTransactionType.VOID_EMI.type) {
-                        it.receiptData?.cardType = it.receiptData?.appName
+                        it.receiptData?.appName = it.emiIssuerDataModel?.issuerName
                     }
 
                     if (it.transactionType == BhTransactionType.TEST_EMI.type) {
@@ -2402,12 +2407,12 @@ class PrintUtil(context: Context?) {
 
 
                     if (tempTid == it.receiptData?.tid) {
-                        _issuerName = it.receiptData?.cardType
-                        if (map.containsKey(it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.cardType)) {
-                            _issuerName = it.receiptData?.cardType
+                        _issuerName = it.receiptData?.appName
+                        if (map.containsKey(it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.appName)) {
+                            _issuerName = it.receiptData?.appName
 
                             val ma =
-                                map[it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.cardType] as MutableMap<Int, SummeryModel>
+                                map[it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.appName] as MutableMap<Int, SummeryModel>
                             if (ma.containsKey(it.transactionType)) {
                                 val m = ma[it.transactionType] as SummeryModel
                                 m.count += 1
@@ -2437,13 +2442,13 @@ class PrintUtil(context: Context?) {
                                     }
                                 }!!
                             }
-                            map[it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.cardType] =
+                            map[it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.appName] =
                                 hm
                             it.receiptData?.tid?.let { it1 -> list.add(it1) }
                         }
                     } else {
                         tempTid = it.receiptData?.tid
-                        _issuerName = it.receiptData?.cardType
+                        _issuerName = it.receiptData?.appName
                         val hm = HashMap<Int, SummeryModel>().apply {
                             this[it.transactionType] = transAmt?.let { it1 ->
                                 it.receiptData?.txnName?.let { it2 ->
@@ -2458,7 +2463,7 @@ class PrintUtil(context: Context?) {
                                 }
                             }!!
                         }
-                        map[it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.cardType] =
+                        map[it.receiptData?.tid + it.receiptData?.mid + it.receiptData?.batchNumber + it.receiptData?.appName] =
                             hm
                         it.receiptData?.tid?.let { it1 -> list.add(it1) }
                     }
@@ -2540,14 +2545,15 @@ class PrintUtil(context: Context?) {
                         printSeperator()
                        
                         textBlockList.add(sigleLineformat(_issuerNameString, AlignMode.LEFT))
-                        textBlockList.add(sigleLineformat( cardIssuer.toUpperCase(Locale.ROOT), AlignMode.RIGHT))
+                        textBlockList.add(sigleLineformat( "  ${cardIssuer.toUpperCase(Locale.ROOT)}", AlignMode.CENTER))
+                        textBlockList.add(sigleLineformat(" ", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
 
                         // if(ind==0){
                         textBlockList.add(sigleLineformat("TXN TYPE", AlignMode.LEFT))
-                        textBlockList.add(sigleLineformat("TOTAL", AlignMode.CENTER))
-                        textBlockList.add(sigleLineformat("COUNT", AlignMode.RIGHT))
+                        textBlockList.add(sigleLineformat("COUNT", AlignMode.CENTER))
+                        textBlockList.add(sigleLineformat("TOTAL", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
 
@@ -2569,20 +2575,20 @@ class PrintUtil(context: Context?) {
                             }?.let {
                                 textBlockList.add(it)
                             }
-                            //textBlockList.add(sigleLineformat(amt, AlignMode.CENTER)) // old
-                            textBlockList.add(sigleLineformat(amt, AlignMode.CENTER))
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${m.count}",
+                                    AlignMode.CENTER
+                                )
+                            )
+                            textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:$amt", AlignMode.RIGHT))
                             /*textBlockList.add(
                                 sigleLineformat(
                                     "${m.count} ${getCurrencySymbol(tpt)}",
                                     AlignMode.RIGHT
                                 )
                             )*/
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${m.count}",
-                                    AlignMode.RIGHT
-                                )
-                            )
+
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
 

@@ -114,6 +114,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         EDashboardItem.VOID_SALE.title.uppercase(),
                         EDashboardItem.BANK_EMI.title.uppercase(),
                         EDashboardItem.BRAND_EMI.title.uppercase(),
+                        EDashboardItem.TEST_EMI.title.uppercase(),
                         "EMI SALE"-> {
                             //BB
                             logger("print","util")

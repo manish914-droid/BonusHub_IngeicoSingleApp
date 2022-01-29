@@ -236,6 +236,7 @@ class BrandEmiProductFragment : Fragment() {
     ///    ToastUtils.showToast(activity, Gson().toJson(productData))
         (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
             arguments = Bundle().apply {
+                productData.productCategoryName= brandEmiSubCatData?.categoryName.toString()
                 putSerializable("brandEmiProductData", productData)
                 putSerializable("brandEmiSubCat", brandEmiSubCatData)
                 putSerializable("brandEmiCatData", brandEmiCatData)
