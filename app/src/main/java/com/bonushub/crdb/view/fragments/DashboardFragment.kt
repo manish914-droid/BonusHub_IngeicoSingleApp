@@ -25,9 +25,11 @@ import com.bonushub.crdb.appupdate.SyncAppUpdateConfirmation
 
 import com.bonushub.crdb.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.db.AppDao
+import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
+import com.bonushub.crdb.model.local.BatchTableReversal
 import com.bonushub.crdb.model.remote.RestartHandlingModel
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
@@ -40,12 +42,15 @@ import com.bonushub.crdb.view.adapter.DashBoardAdapter
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.viewmodel.DashboardViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
+import com.bonushub.crdb.viewmodel.TransactionViewModel
+import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
+import com.mindorks.example.coroutines.utils.Status
 
 
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,7 +69,6 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     private var counter = 0
     @Inject
     lateinit var appDao: AppDao
-    private val settlementViewModel : SettlementViewModel by viewModels()
     private var ioSope = CoroutineScope(Dispatchers.IO)
     private var defaultSope = CoroutineScope(Dispatchers.Default)
     lateinit var dashboardViewModel : DashboardViewModel
@@ -85,6 +89,10 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     private var runnable: Runnable? = null
     private val handler = Handler(Looper.getMainLooper())
 
+    private val transactionViewModel: TransactionViewModel by viewModels()
+
+    private lateinit var settlementViewModel : SettlementViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -100,6 +108,8 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Utility().hideSoftKeyboard(requireActivity())
         restartHandaling()
         dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
+
+        settlementViewModel = ViewModelProvider(this).get(SettlementViewModel::class.java)
         observeDashboardViewModel()
 
         //region======================Change isAutoSettleDone Boolean Value to False if Date is greater then :- written by kushal
@@ -288,6 +298,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         val tptData = runBlocking(Dispatchers.IO) { getTptData() }
         //val batchData = runBlocking(Dispatchers.IO) { BatchFileDataTable.selectBatchData() }
         val batchData = runBlocking(Dispatchers.IO) { appDao.getAllBatchData() }
+        val dataListReversal =  runBlocking(Dispatchers.IO) { appDao.getAllBatchReversalData() }
         Log.d("HostForceSettle:- ", tptData?.forceSettle ?: "")
         Log.d("HostForceSettleTime:- ", tptData?.forceSettleTime ?: "")
         Log.d(
@@ -309,24 +320,108 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
             ) {
                 if ((tptData.forceSettleTime.toLong() == getSystemTimeIn24Hour().terminalTime().toLong()
                             || getSystemTimeIn24Hour().terminalTime().toLong() > tptData.forceSettleTime.toLong()
-                            ) /*&& batchData.size > 0*/
+                            && batchData.size > 0)
                 ) {
                     logger("Auto Settle:- ", "Auto Settle Available")
-                    val data = runBlocking(Dispatchers.IO) {
-                        /*CreateSettlementPacket(
-                            ProcessingCode.SETTLEMENT.code, batchData
-                        ).createSettlementISOPacket()*/
-                        // this code below converted
+                    lifecycleScope.launch(Dispatchers.Main){
 
-                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                        Utility().syncPendingTransaction(transactionViewModel){
+
+                            if(it){
+                                PrintUtil(activity).printDetailReportupdate(batchData, activity) {
+                                        detailPrintStatus ->
+
+                                }
+
+                                ioSope.launch {
+                                    var reversalTid  = checkReversal(dataListReversal)
+                                    var listofTxnTid =  checkSettlementTid(batchData)
+
+                                    val result: ArrayList<String> = ArrayList()
+                                    result.addAll(listofTxnTid)
+
+                                    for (e in reversalTid) {
+                                        if (!result.contains(e)) result.add(e)
+                                    }
+                                    System.out.println("Total transaction tid is"+result.forEach {
+                                        println("Tid are "+it)
+                                    })
+                                    settlementViewModel.settlementResponse(result)
+                                }
+
+                                settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
+
+                                    when (result.status) {
+                                        Status.SUCCESS -> {
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+
+                                                // region upload digipos pending txn
+                                                logger("UPLOAD DIGI"," ----------------------->  START","e")
+                                                uploadPendingDigiPosTxn(requireActivity()){
+                                                    logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
+                                                    CoroutineScope(Dispatchers.IO).launch{
+                                                        val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                                        val settlementByteArray = data.generateIsoByteRequest()
+                                                        try {
+                                                            (activity as NavigationActivity).settleBatch1(settlementByteArray, SettlementComingFrom.DASHBOARD.screenType) { (activity as NavigationActivity).hideProgress()}
+                                                        } catch (ex: Exception) {
+                                                            (activity as NavigationActivity).hideProgress()
+                                                            ex.printStackTrace()
+                                                        }
+                                                    }
+
+                                                }
+                                                // end region
+
+                                            }
+                                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                                        }
+                                        Status.ERROR -> {
+                                            println("Error in ingenico settlement")
+                                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
+                                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                                        }
+                                        Status.LOADING -> {
+                                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                                        }
+                                    }
+
+                                }
+                            }else{
+                                logger("sync","failed terminate settlement")
+                                (activity as NavigationActivity).hideProgress()
+                                (activity as BaseActivityNew).getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
+                                    try {
+                                        (activity as NavigationActivity).decideDashBoardOnBackPress()
+                                    }catch (ex:Exception){
+                                        ex.printStackTrace()
+
+                                    }
+                                }
+                            }
+                        }
                     }
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val settlementByteArray = data.generateIsoByteRequest()
-                        (activity as NavigationActivity).settleBatch1(
-                            settlementByteArray,
-                            SettlementComingFrom.DASHBOARD.screenType
-                        )
-                    }
+
+//                    val data = runBlocking(Dispatchers.IO) {
+//                        /*CreateSettlementPacket(
+//                            ProcessingCode.SETTLEMENT.code, batchData
+//                        ).createSettlementISOPacket()*/
+//                        // this code below converted
+//
+//                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+//                    }
+//                    lifecycleScope.launch(Dispatchers.IO) {
+//                        val settlementByteArray = data.generateIsoByteRequest()
+//                        (activity as NavigationActivity).settleBatch1(
+//                            settlementByteArray,
+//                            SettlementComingFrom.DASHBOARD.screenType
+//                        )
+//                    }
                 } else
                     logger("Auto Settle:- ", "Auto Settle Mismatch Time")
             } else
@@ -353,7 +448,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                         println("Response code = $responseCode")
                         println("Response code = $responseCode")
                     }
-                    AppPreference.clearRestartDataPreference()
+
 
                     when(txnResponse?.status){
                         RequestStatus.ABORTED,
@@ -380,25 +475,36 @@ logger("PFR","Failed","e")
     fun restartStubData(transactionDetail: TransactionDetail){
         val cvmResult: com.ingenico.hdfcpayment.type.CvmAction?=null
         val cvmRequiredLimit:Long?=null
-           val receiptDetail= ReceiptDetail(transactionDetail.authCode, transactionDetail.aid, transactionDetail.batchNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, "14/01/2022 19:09:18", transactionDetail.invoice, transactionDetail.mid, transactionDetail.merAddHeader1, transactionDetail.merAddHeader2,  transactionDetail.rrn, transactionDetail. stan, transactionDetail.tc,
+        val aid=transactionDetail.aid?.replace(" ", "")
+
+        val batcNumber= transactionDetail.batchNumber?.let { invoiceWithPadding(it) }
+        val roc= transactionDetail.stan?.let { invoiceWithPadding(it) }
+        val invoice=transactionDetail.invoice?.let { invoiceWithPadding(it) }
+         val penmasking = transactionDetail.pan?.let {
+             Field48ResponseTimestamp.panMasking(
+                 it,
+                 "************0000"
+             )
+         }
+
+           val receiptDetail= ReceiptDetail(transactionDetail.authCode, aid, batcNumber, transactionDetail.cardHolderName, transactionDetail.cardType, transactionDetail.appName, transactionDetail.dateTime, invoice, transactionDetail.mid, transactionDetail.merAddHeader1, transactionDetail.merAddHeader2,  transactionDetail.rrn, roc, transactionDetail.tc,
                transactionDetail.tid, transactionDetail.tsi, transactionDetail.tvr, transactionDetail.entryMode, transactionDetail.txnName,
-               transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, transactionDetail.pan,
+               transactionDetail.txnResponseCode, transactionDetail.txnAmount, transactionDetail.txnOtherAmount, penmasking,
                isVerifyPin = true,
                isSignRequired = false,
                cvmResult = cvmResult,
              cvmRequiredLimit=cvmRequiredLimit
            )
 
+
         if (receiptDetail != null) {
             lifecycleScope.launch(Dispatchers.IO) {
-
                 var batchData = BatchTable(null)
                 // here get batch data
                 if(restatDataList?.transactionType == EDashboardItem.BANK_EMI || restatDataList?.transactionType == EDashboardItem.BRAND_EMI || restatDataList?.transactionType == EDashboardItem.TEST_EMI)
                 {
                     restatDataList?.batchData?.receiptData = receiptDetail
                     batchData = restatDataList?.batchData!!
-
                 }else{
                     batchData = BatchTable(receiptDetail)
                 }
@@ -406,16 +512,16 @@ logger("PFR","Failed","e")
                 batchData.invoice = receiptDetail.invoice.toString()
                 println("invoice code = ${receiptDetail.invoice.toString()}")
                 // batchData.transactionType = BhTransactionType.SALE.type
-               // DBModule.appDatabase.appDao.insertBatchData(batchData)
+                DBModule.appDatabase.appDao.insertBatchData(batchData)
 
                 if(batchData.receiptData?.txnOtherAmount == null)
                 {
                     batchData.receiptData?.txnOtherAmount = "0"
                 }
                 AppPreference.saveLastReceiptDetails(batchData)
+
                 printingSaleData(batchData){
-
-
+                    AppPreference.clearRestartDataPreference()
                 }
 
 

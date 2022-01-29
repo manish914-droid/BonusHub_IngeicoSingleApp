@@ -16,6 +16,7 @@ import com.bonushub.crdb.view.base.BaseActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -211,7 +212,7 @@ suspend fun uploadPendingDigiPosTxn(activity: BaseActivity, appDao: AppDao, cb: 
     }
 }
 
-suspend fun uploadPendingDigiPosTxn(activity: Activity,cb: (Boolean) -> Unit){
+fun uploadPendingDigiPosTxn(activity: Activity,cb: (Boolean) -> Unit){
     val digiPosDataList = selectDigiPosDataAccordingToTxnStatus(EDigiPosPaymentStatus.Pending.desciption) as ArrayList<DigiPosDataTable>
     if(digiPosDataList.size==0){
         Log.e("UPLOAD DIGI"," ----------------------->  NO PENDING DIGI POS TXN FOUND ...END")
@@ -269,7 +270,9 @@ suspend fun uploadPendingDigiPosTxn(activity: Activity,cb: (Boolean) -> Unit){
                             EDigiPosPaymentStatus.Pending.desciption -> {
                                 tabledata.txnStatus =
                                     statusRespDataList[5]
-                                ToastUtils.showToast(activity, statusRespDataList[5])
+                                runBlocking(Dispatchers.Main){
+                                    ToastUtils.showToast(activity, statusRespDataList[5])
+                                }
                                 insertOrUpdateDigiposData(
                                     tabledata
                                 )
@@ -285,8 +288,10 @@ suspend fun uploadPendingDigiPosTxn(activity: Activity,cb: (Boolean) -> Unit){
                                 deleteDigiposData(
                                     tabledata.partnerTxnId
                                 )
-                                Log.e("UPLOAD FAIL->>", responsef57)
-                                ToastUtils.showToast(activity,statusRespDataList[5])
+                                runBlocking(Dispatchers.Main) {
+                                    Log.e("UPLOAD FAIL->>", responsef57)
+                                    ToastUtils.showToast(activity, statusRespDataList[5])
+                                }
                             }
                         }
                     }else{

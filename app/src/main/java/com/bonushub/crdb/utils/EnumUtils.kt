@@ -590,18 +590,18 @@ enum class EPrintCopyType(val pName: String) {
 
 // region
 enum class CardEntryMode(val _name: String, val _value: String){
-    EMV_WITH_PIN("INSERT","0553- EMV with pin"), //Done
-    EMV_NO_PIN("INSERT","0552- EMV No pin"),
-    EMV_OFFLINE_PIN("INSERT","0554- EMV offline pin"),
-    EMV_FALLBACK_SWIPE_WITH_PIN("FALLBACK","0623- EMV fallback to swipe with pin"), // Done
-    EMV_FALLBACK_SWIPE_NO_PIN("FALLBACK","0620- Emv fallback to swipe no pin - 620"),
-    SWIPE_WITH_PIN("SWIPE","0524- Swipe with pin"),// Done partial
-    SWIPE_NO_PIN("SWIPE","0523- Swipe No pin"),
-    CTLS_SWIPE_NO_PIN("CLESS_SWIPE","0921- CTLS swipe no pin"),
-    CTLS_SWIPE_WITH_PIN("CLESS_SWIPE","0923- CTLS swipe with pin"),
-    CTLS_EMV_NO_PIN("CLESS_EMV","0911- CTLS emv no pin"), // Done
-    CTLS_EMV_WITH_PIN("CLESS_EMV","0913- ctls emv with pin"), //Done
-    MANUAL("MANUAL","0913- ctls emv with pin")
+    EMV_WITH_PIN("INSERT","0553"), // - EMV with pin //Done
+    EMV_NO_PIN("INSERT","0552"),//- EMV No pin
+    EMV_OFFLINE_PIN("INSERT","0554"), // - EMV offline pin
+    EMV_FALLBACK_SWIPE_WITH_PIN("FALLBACK","0623"),// - EMV fallback to swipe with pin // Done
+    EMV_FALLBACK_SWIPE_NO_PIN("FALLBACK","0620"),  // - Emv fallback to swipe no pin
+    SWIPE_WITH_PIN("SWIPE","0524"), // - Swipe with pin // Done partial
+    SWIPE_NO_PIN("SWIPE","0523"), // - Swipe No pin
+    CTLS_SWIPE_NO_PIN("CLESS_SWIPE","0921"), // - CTLS swipe no pin
+    CTLS_SWIPE_WITH_PIN("CLESS_SWIPE","0923"), // - CTLS swipe with pin
+    CTLS_EMV_NO_PIN("CLESS_EMV","0911"), //- CTLS emv no pin // Done
+    CTLS_EMV_WITH_PIN("CLESS_EMV","0913"), // - ctls emv with pin //Done
+    MANUAL("MANUAL","0913") // - ctls emv with pin
 }
 // end region
 

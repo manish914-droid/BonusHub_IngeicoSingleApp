@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -31,6 +32,8 @@ import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.viewmodel.SettlementViewModel
 import com.bonushub.crdb.utils.PrefConstant
+import com.bonushub.crdb.view.base.BaseActivityNew
+import com.bonushub.crdb.viewmodel.TransactionViewModel
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -56,6 +59,8 @@ class SettlementFragment : Fragment() {
 
     private var ioSope = CoroutineScope(Dispatchers.IO)
 
+    private val transactionViewModel: TransactionViewModel by viewModels()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is IDialog) iDialog = context
@@ -73,7 +78,7 @@ class SettlementFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
-       // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
+        // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
         fragmensettlementBinding.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_settlement)
         fragmensettlementBinding.subHeaderView?.subHeaderText?.text = getString(R.string.settlement)
         fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { /*parentFragmentManager?.popBackStack()*/
@@ -88,17 +93,17 @@ class SettlementFragment : Fragment() {
 
         //region===============Get Batch Data from HDFCViewModal:-
         settlementViewModel.getBatchData()?.observe(requireActivity()) { batchData ->
-                Log.d("TPT Data:- ", batchData.toString())
-                dataList.clear()
-                dataList.addAll(batchData as MutableList<BatchTable>)
-                setUpRecyclerView()
+            Log.d("TPT Data:- ", batchData.toString())
+            dataList.clear()
+            dataList.addAll(batchData as MutableList<BatchTable>)
+            setUpRecyclerView()
 
-            }
+        }
 
         lifecycleScope.launch {
             batchReversalViewModel?.getBatchTableReversalData()?.observe(viewLifecycleOwner) { batchReversalList ->
-              dataListReversal.clear()
-              dataListReversal.addAll(batchReversalList as MutableList<BatchTableReversal>)
+                dataListReversal.clear()
+                dataListReversal.addAll(batchReversalList as MutableList<BatchTableReversal>)
             }
         }
 
@@ -170,103 +175,124 @@ class SettlementFragment : Fragment() {
 
                         }*/
 
+                        //----------------------
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val data =
+                                CreateSettlementPacket(appDao).createSettlementISOPacket()
+                            settlementByteArray =
+                                data.generateIsoByteRequest()
+                            try {
+                                (activity as NavigationActivity).settleBatch1(
+                                    settlementByteArray
+                                ) {
+                                    logger("zero settlement",it.toString(),"e")
+                                }
+                            } catch (ex: Exception) {
+                                (activity as NavigationActivity).hideProgress()
+                                ex.printStackTrace()
+                            }
+                        }
 
                     }else{
 
-                    PrintUtil(activity).printDetailReportupdate(dataList, activity) {
-                            detailPrintStatus ->
+                        lifecycleScope.launch(Dispatchers.Main){
 
-                    }
+                            Utility().syncPendingTransaction(transactionViewModel){
 
-                        // region digipos data upload
-                        // end region
+                                if(it){
+                                    PrintUtil(activity).printDetailReportupdate(dataList, activity) {
+                                            detailPrintStatus ->
 
-                        GlobalScope.launch(Dispatchers.Main) {
-                           var reversalTid  = checkReversal(dataListReversal)
-                           var listofTxnTid =  checkSettlementTid(dataList)
+                                    }
 
-                            val result: ArrayList<String> = ArrayList()
-                            result.addAll(listofTxnTid)
 
-                            for (e in reversalTid) {
-                                if (!result.contains(e)) result.add(e)
-                            }
-                           System.out.println("Total transaction tid is"+result.forEach {
-                               println("Tid are "+it)
-                           })
+                                    ioSope.launch {
+                                        var reversalTid  = checkReversal(dataListReversal)
+                                        var listofTxnTid =  checkSettlementTid(dataList)
 
-                            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
-                                CoroutineScope(Dispatchers.IO).launch{
-                                    try {
-                                        val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                         val   settlementByteArray = data.generateIsoByteRequest()
-                                        (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
-                                    } catch (ex: Exception) {
-                                        println("Exception is "+ex.printStackTrace())
-                                        (activity as NavigationActivity).hideProgress()
-                                        ex.printStackTrace()
+                                        val result: ArrayList<String> = ArrayList()
+                                        result.addAll(listofTxnTid)
+
+                                        for (e in reversalTid) {
+                                            if (!result.contains(e)) result.add(e)
+                                        }
+                                        System.out.println("Total transaction tid is"+result.forEach {
+                                            println("Tid are "+it)
+                                        })
+                                        settlementViewModel.settlementResponse(result)
+                                    }
+
+                                    settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
+
+                                        when (result.status) {
+                                            Status.SUCCESS -> {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+
+                                                    // region upload digipos pending txn
+                                                    logger("UPLOAD DIGI"," ----------------------->  START","e")
+                                                    uploadPendingDigiPosTxn(requireActivity()){
+                                                        logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
+                                                        CoroutineScope(Dispatchers.IO).launch{
+                                                            val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                                            settlementByteArray = data.generateIsoByteRequest()
+                                                            try {
+                                                                (activity as NavigationActivity).settleBatch1(settlementByteArray) { (activity as NavigationActivity).hideProgress()}
+                                                            } catch (ex: Exception) {
+                                                                (activity as NavigationActivity).hideProgress()
+                                                                ex.printStackTrace()
+                                                            }
+                                                        }
+
+                                                    }
+                                                    // end region
+
+                                                }
+                                                //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                                            }
+                                            Status.ERROR -> {
+                                                println("Error in ingenico settlement")
+                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
+                                                // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                                            }
+                                            Status.LOADING -> {
+                                                // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+
+
+                                            }
+                                        }
+
+                                    }
+                                }else{
+                                    logger("sync","failed terminate settlement")
+                                    (activity as NavigationActivity).hideProgress()
+                                    (activity as BaseActivityNew).getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
+                                        try {
+                                            (activity as NavigationActivity).decideDashBoardOnBackPress()
+                                        }catch (ex:Exception){
+                                            ex.printStackTrace()
+
+                                        }
                                     }
                                 }
                             }
-                            else {
-                                settlementViewModel.settlementResponse(result)
-                                settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
-
-                                    when (result.status) {
-                                        Status.SUCCESS -> {
-                                            CoroutineScope(Dispatchers.IO).launch {
-                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
-                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
-
-                                                // region upload digipos pending txn
-                                                logger("UPLOAD DIGI"," ----------------------->  START","e")
-                                                uploadPendingDigiPosTxn(requireActivity()){
-                                                    logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
-                                                    CoroutineScope(Dispatchers.IO).launch{
-                                                        val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                                        settlementByteArray = data.generateIsoByteRequest()
-                                                        try {
-                                                            (activity as NavigationActivity).settleBatch1(settlementByteArray) {}
-                                                        } catch (ex: Exception) {
-                                                            (activity as NavigationActivity).hideProgress()
-                                                            ex.printStackTrace()
-                                                        }
-                                                    }
-
-                                                }
-                                                // end region
-
-                                            }
-                                            //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
-                                        }
-                                        Status.ERROR -> {
-                                            println("Error in ingenico settlement")
-                                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
-                                            AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
-                                            // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                                        }
-                                        Status.LOADING -> {
-                                            // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
-
-
-                                        }
-                                    }
-                            }
-
-                            }
                         }
-                }
+
+                    }
 
 
-            },{})
+                },{})
         }
         //endregion
+
 
     }
     //region====================================SetUp RecyclerView:-
     private fun setUpRecyclerView() {
         if (dataList.size > 0) {
-             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
+            fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.VISIBLE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.VISIBLE
 
@@ -276,7 +302,7 @@ class SettlementFragment : Fragment() {
                 adapter = settlementAdapter
             }
         } else {
-             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE  // visible for zero settlement
+            fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.GONE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
