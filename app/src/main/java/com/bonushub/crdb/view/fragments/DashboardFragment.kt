@@ -360,7 +360,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                                                         val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                                         val settlementByteArray = data.generateIsoByteRequest()
                                                         try {
-                                                            (activity as NavigationActivity).settleBatch1(settlementByteArray) { (activity as NavigationActivity).hideProgress()}
+                                                            (activity as NavigationActivity).settleBatch1(settlementByteArray, SettlementComingFrom.DASHBOARD.screenType) { (activity as NavigationActivity).hideProgress()}
                                                         } catch (ex: Exception) {
                                                             (activity as NavigationActivity).hideProgress()
                                                             ex.printStackTrace()
