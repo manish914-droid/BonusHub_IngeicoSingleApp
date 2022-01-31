@@ -92,43 +92,43 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         brandEmiMasterCategoryViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
 
         brandEmiMasterCategoryViewModel.brandEMIMasterSubCategoryLivedata.observe(
-            viewLifecycleOwner,
-            {
-                (activity as IDialog).hideProgress()
-                when (val genericResp = it) {
-                    is GenericResponse.Success -> {
-                        println(Gson().toJson(genericResp.data))
-                        setUpRecyclerView()
+            viewLifecycleOwner
+        ) {
+            (activity as IDialog).hideProgress()
+            when (val genericResp = it) {
+                is GenericResponse.Success -> {
+                    println(Gson().toJson(genericResp.data))
+                    setUpRecyclerView()
 
-                        brandEmiMasterDataList.clear()
-                        brandMasterBinding?.brandSearchET?.setText("")
-                        brandEmiMasterDataList.addAll(genericResp.data as List<BrandEMIMasterDataModal>)
+                    brandEmiMasterDataList.clear()
+                    brandMasterBinding?.brandSearchET?.setText("")
+                    brandEmiMasterDataList.addAll(genericResp.data as List<BrandEMIMasterDataModal>)
 
-                        brandEMIMasterCategoryAdapter.submitList(genericResp.data)
-                    }
-                    is GenericResponse.Error -> {
-                    //    ToastUtils.showToast(activity, genericResp.errorMessage)
-                        //(activity as MainActivity).show
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            (activity as BaseActivityNew).alertBoxWithAction(
-                                getString(R.string.no_receipt),
-                                genericResp.errorMessage?:"Oops something went wrong",
-                                false,
-                                getString(R.string.positive_button_ok),
-                                {
-                                   /* finish()
-                                    goToDashBoard()*/
-                                parentFragmentManager.popBackStack()
-                                },
-                                {})
-                        }
-                        println(genericResp.errorMessage.toString())
-                    }
-                    is GenericResponse.Loading -> {
-
-                    }
+                    brandEMIMasterCategoryAdapter.submitList(genericResp.data)
                 }
-            })
+                is GenericResponse.Error -> {
+                    //    ToastUtils.showToast(activity, genericResp.errorMessage)
+                    //(activity as MainActivity).show
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        (activity as BaseActivityNew).alertBoxWithAction(
+                            getString(R.string.no_receipt),
+                            genericResp.errorMessage ?: "Oops something went wrong",
+                            false,
+                            getString(R.string.positive_button_ok),
+                            {
+                                /* finish()
+                                 goToDashBoard()*/
+                                parentFragmentManager.popBackStack()
+                            },
+                            {})
+                    }
+                    println(genericResp.errorMessage.toString())
+                }
+                is GenericResponse.Loading -> {
+
+                }
+            }
+        }
 
 
         //local search region

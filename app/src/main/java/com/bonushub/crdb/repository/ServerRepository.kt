@@ -507,6 +507,17 @@ if(!fromBankEmi)
                         {}, {})*//*
                 }*/
                 // todo in case of empty subcatlist
+
+                withContext(Dispatchers.IO) {
+                    saveAllSubCategoryDataInDB(brandEmiMasterSubCategoryDataList)
+                }
+                Log.e(
+                    "Sub Category Data:- ",
+                    Gson().toJson(brandEmiMasterSubCategoryDataList)
+                )
+                brandEMIMasterCategoryMLData.postValue(GenericResponse.Success(brandEmiMasterDataList))
+
+
             }
 
     }
