@@ -1236,6 +1236,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                 appDao.getAllBatchData()
                             }
 
+                        //To increase Roc and Batch number
+                          Utility().incrementUpdateRoc()
+                          Utility().incrementBatchNumber()
                         //Batch and Roc Increment for Settlement:-
                         val settlement_roc = AppPreference.getIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString()) + 1
                         AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc)
@@ -1250,16 +1253,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                     //Delete All BatchFile Data from Table after Settlement:-
                                     appDao.deleteBatchTable()
-
-
-                                    //  resetRoc()
-
-                                    //Here we are updating invoice by 1
-                                    appDao.updateTPTInvoiceNumber("1".padStart(6, '0'), TableType.TERMINAL_PARAMETER_TABLE.code)
-
-                                    //Here we are incrementing sale batch number also for next sale:-
-                                    val updatedBatchNumber = getTptData()?.batchNumber?.toInt()?.plus(1)
-                                    appDao?.updateBatchNumber(updatedBatchNumber.toString(), TableType.TERMINAL_PARAMETER_TABLE.code)
 
                                     // clear reversal table and preference kushal
                                     appDao.deleteBatchReversalTable()
@@ -1276,10 +1269,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                 GlobalScope.launch(Dispatchers.Main) {
                                     alertBoxMsgWithIconOnly(R.drawable.ic_tick,getString(R.string.settlement_success))
-//                                    txnSuccessToast(
-//                                        this@NavigationActivity,
-//                                        getString(R.string.settlement_success)
-//                                    )
+
                                     delay(2000)
                                     if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
                                         val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
@@ -1308,9 +1298,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                                 }
                                             }
                                         } else {
-                                            //VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
+                                            runOnUiThread {
+                                                ToastUtils.showToast(this@NavigationActivity,getString(R.string.something_went_wrong_in_app_update))
+                                            }
 
-                                          //  startTCPIPAppUpdate(ProcessingCode.APP_UPDATE.code, chunkValue = "0", partialName = "0")
                                         }
                                     } else {
                                         onBackPressed()
@@ -1326,7 +1317,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                             "01" -> {
                                                 if (terminalParameterTable != null) {
-
+                                                    val tid = getBaseTID(appDao)
+                                                    showProgress()
+                                                    initViewModel.insertInfo1(tid)
                                                 }
                                             }
                                         }
@@ -1340,23 +1333,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                         //Delete All BatchFile Data from Table after Settlement:-
                                         appDao.deleteBatchTable()
-
-
-                                        //  resetRoc()
-
-                                        //Here we are updating invoice by 1
-                                        appDao.updateTPTInvoiceNumber(
-                                            "1".padStart(6, '0'),
-                                            TableType.TERMINAL_PARAMETER_TABLE.code
-                                        )
-
-                                        //Here we are incrementing sale batch number also for next sale:-
-                                        val updatedBatchNumber =
-                                            getTptData()?.batchNumber?.toInt()?.plus(1)
-                                        appDao?.updateBatchNumber(
-                                            updatedBatchNumber.toString(),
-                                            TableType.TERMINAL_PARAMETER_TABLE.code
-                                        )
 
                                         appDao.deleteDigiPosDataTable()
                                     }
@@ -1372,10 +1348,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                     GlobalScope.launch(Dispatchers.Main) {
                                         alertBoxMsgWithIconOnly(R.drawable.ic_tick,getString(R.string.settlement_success))
-//                                        txnSuccessToast(
-//                                            this@NavigationActivity,
-//                                            getString(R.string.settlement_success)
-//                                        )
+
                                         delay(2000)
                                         if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
                                             val dataList = isAppUpdateAvailableData?.split("|") as MutableList<String>
@@ -1421,7 +1394,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                                 "01" -> {
                                                     if (terminalParameterTable != null) {
-
+                                                        val tid = getBaseTID(appDao)
+                                                        showProgress()
+                                                        initViewModel.insertInfo1(tid)
                                                     }
                                                 }
                                             }

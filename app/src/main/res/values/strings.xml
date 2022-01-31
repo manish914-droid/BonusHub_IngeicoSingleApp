@@ -11,7 +11,7 @@
     <string name="please_wait_downloading_application_update">Please Don’t Turn Off the Device\nApplication Downloading in Progress</string>
     <string name="app_update">Application Update</string>
     <string name="app_update_available_do_you_want_to_update">App updates are available, Do you want to update?</string>
-
+    <string name="something_went_wrong_in_app_update">Something went wrong\n In App Update</string>
 
     <!--TODO: Fallback-->
     <string name="fallback">Fallback</string>

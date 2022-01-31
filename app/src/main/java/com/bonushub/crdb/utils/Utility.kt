@@ -531,7 +531,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             increaseBatch = batch?.toInt()?.plus(1) ?: 0
             if (increaseBatch > 999999) {
                 increaseBatch = 1
-                appDatabase?.appDao?.updatedInvoice(
+                appDatabase?.appDao?.updatedBatchNumber(
                     addPad(increaseBatch, "0", 6, true),
                     TableType.TERMINAL_PARAMETER_TABLE.code,"1"
                 )
