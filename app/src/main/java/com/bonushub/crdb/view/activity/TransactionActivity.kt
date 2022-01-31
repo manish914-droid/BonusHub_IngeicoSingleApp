@@ -1668,9 +1668,7 @@ var f57Data=""
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp = Gson().toJson(receiptDetail)
                                         println(jsonResp)
-
                                         // AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
-
                                         //   detailResponse.forEach { println(it) }
                                         //  uids.add(ecrID)
                                         // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
@@ -2565,6 +2563,8 @@ var f57Data=""
                 "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
                 ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
                 "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
+
+
     }
 
     fun createField58ForBrandEmi(
