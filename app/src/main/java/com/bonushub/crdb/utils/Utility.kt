@@ -1368,6 +1368,18 @@ object Field48ResponseTimestamp {
 //endregion
 
     //region======================Get TPT Data:-
+    fun getBatchDataByInvoice(invoice:String): BatchTable? {
+        var batchTable: BatchTable? = null
+        runBlocking(Dispatchers.IO) {
+            batchTable = appDatabase.appDao?.getBatchDataFromInvoice(invoice)
+            val jsonResp=Gson().toJson(batchTable)
+            println(jsonResp)
+        }
+        return batchTable
+    }
+//endregion
+
+    //region======================Get TPT Data:-
     fun getTptDataByLinkTidType(linkTidType:String): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
