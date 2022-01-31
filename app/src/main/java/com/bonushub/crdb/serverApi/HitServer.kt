@@ -40,7 +40,7 @@ object HitServer  {
                     reset()
                     dialStart = getF48TimeStamp()
                 }
-                openSocket { socket ->
+                openSocket({ socket ->
                     Utility().logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
                     Utility.ConnectionTimeStamps.dialConnected = getF48TimeStamp()
                     progressMsg("Please wait sending data to Bonushub server")
@@ -68,7 +68,7 @@ object HitServer  {
                     //
                     callback(responseStr, true)
                     this@HitServer.callback = null
-                }
+                },isAppUpdate = isAppUpdate)
 
             } else {
                 callback("No internet", false)
@@ -94,7 +94,7 @@ object HitServer  {
                     reset()
                     dialStart = getF48TimeStamp()
                 }
-                openSocket { socket ->
+                openSocket({ socket ->
 
                     Utility().logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
 
@@ -184,7 +184,7 @@ object HitServer  {
                     // ROCProviderV2.resetRoc(AppPreference.getBankCode())
                     callback("Init Succesful", initSuccess, initList)
                     //this@HitServer.callback = null
-                }
+                },isAppUpdate = false)
 
             } else {
                 callback("Offline, No Internet available", false, ArrayList())
@@ -198,14 +198,16 @@ object HitServer  {
     }
 
 
-    suspend fun openSocket(cb: OnSocketComplete) {
+    suspend fun openSocket(cb: OnSocketComplete,isAppUpdate: Boolean = false) {
         Log.d("Socket Start:- " , "Socket Started Here.....")
 
         try {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
 
-                val sAddress = Utility().getIpPort()
+                val sAddress = Utility().getIpPort(isAppUpdate, isPrimaryIpPort = hitCounter)
+                logger("Connection Details:- ", sAddress.toString(), "e")
+                logger("HIT COUNTER", "$hitCounter","e")
 
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
@@ -227,54 +229,51 @@ object HitServer  {
                 socket.connect(sAddress, connTimeOut)//
                 socket.soTimeout = resTimeOut
                 cb(socket)
+                hitCounter = 1
 
             } else callback?.invoke("No Comm Data Found", false)
 
+        }    catch (ex: SocketTimeoutException) {
+            println("SocketTimeoutException -> " + ex.message)
+            //    callback?.invoke(VerifoneApp.appContext.getString(R.string.socket_timeout), false)
+            println("SocketTimeoutException -> " + ex.message)
+            if (hitCounter == 1) {
+                hitCounter = 2
+                openSocket({ hitCounter = 1
+                    cb(it)
+
+                }, isAppUpdate)
+            } else {
+                hitCounter = 1
+                callback?.invoke(
+                    ex.message ?: "Connection Error",
+                    false
+                )
+            }
+
         } catch (ex: Exception) {
             ex.printStackTrace()
-            //  callback?.invoke(ex.message ?: "Connection Error", false)
-            callback?.invoke("Socket Time out", false)
-            Utility().logger("EXCEPTION","SOCKET NOT CONNECTED","e")
+            println("SOCKET CONNECT Parent EXCEPTION")
+            if (hitCounter == 1) {
+                hitCounter = 2
+                openSocket({ hitCounter = 1
+                    cb(it)
+
+                }, isAppUpdate)
+            } else {
+                hitCounter = 1
+                callback?.invoke(
+                    ex.message ?: "Connection Error",
+                    false
+                )
+            }
+
         } finally {
             Log.d("Finally Call:- ", "Final Block Runs Here.....")
         }
     }
 
-    /*  suspend fun openSocket(): Socket? {
-          try {
-              tct = TerminalCommunicationTable.selectFromSchemeTable()  // always get tct it may get refresh meanwhile
-              if (tct != null) {
 
-                  val sAddress = VFService.getIpPort()
-
-                  ServerSocketChannel.open().apply {
-                      configureBlocking(false)
-                  }
-
-                  val socket = Socket()
-
-                  val connTimeOut = try {
-                      (tct as TerminalCommunicationTable).connectTimeOut.toInt() * 1000
-                  } catch (ex: Exception) {
-                      30 * 1000
-                  }
-
-                  val resTimeOut = try {
-                      (tct as TerminalCommunicationTable).responseTimeOut.toInt() * 1000
-                  } catch (ex: Exception) {
-                      30 * 1000
-                  }
-                  socket.connect(sAddress, connTimeOut)
-                  socket.soTimeout = resTimeOut
-                  return socket
-
-              } else return null
-
-          } catch (ex: Exception) {
-              ex.printStackTrace()
-              return null
-          }
-      }*/
 
     suspend fun openSocket(): Socket? {
         try {
@@ -329,7 +328,7 @@ object HitServer  {
                 //   Log.d("OpenSocket:- ", "Socket Start")
                 //    logger("Connection Details:- ", VFService.getIpPort().toString(), "d")
                 // var responseStr : String? = null
-                openSocket { socket ->
+                openSocket({ socket ->
 
                     if (isSaveTransactionAsPending) {
                         val datatosave = isoWriterData.isoMap[57]?.parseRaw2String().toString()
@@ -397,7 +396,7 @@ object HitServer  {
                     socket.close()
                     callback(responseStr, true)
                     this@HitServer.callback = null
-                }
+                },isAppUpdate = false)
 
             } else {
                 callback(HDFCApplication.appContext.getString(R.string.no_internet_error), false)
