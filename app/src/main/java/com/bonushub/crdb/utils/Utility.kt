@@ -1140,35 +1140,40 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
     suspend fun syncPendingTransaction(transactionViewModel:TransactionViewModel,cb:(Boolean) -> Unit)
     {
-        com.bonushub.crdb.utils.logger("syncPendingTransaction", " ----------------------->  START", "e")
         var txnSync = true
-        val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
+        withContext(Dispatchers.IO){
+            com.bonushub.crdb.utils.logger("syncPendingTransaction", " ----------------------->  START", "e")
+            val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
-        if(pendingTxn.size != 0) {
-            for (item in pendingTxn) {
-                val transactionISO =
-                    CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal,item.batchTable).createTransactionPacket()
+            if(pendingTxn.size != 0) {
+                for (item in pendingTxn) {
+                    val transactionISO =
+                        CreateTransactionPacket(appDatabase.appDao,item.cardProcessedDataModal,item.batchTable).createTransactionPacket()
 
-                when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
-                    is GenericResponse.Success -> {
-                        com.bonushub.crdb.utils.logger("success:- ", "in success ${genericResp.errorMessage}", "e")
-                        // to remove transaction after sync
-                        appDatabase.appDao.deletePendingSyncTransactionData(item)
-                    }
-                    is GenericResponse.Error -> {
-                        txnSync = false
-                        com.bonushub.crdb.utils.logger("error:- ", "in error ${genericResp.errorMessage}", "e")
-                        com.bonushub.crdb.utils.logger("error:- ", "try in next time", "e")
+                    when (val genericResp = transactionViewModel.serverCall(transactionISO)) {
+                        is GenericResponse.Success -> {
+                            com.bonushub.crdb.utils.logger("success:- ", "in success ${genericResp.errorMessage}", "e")
+                            // to remove transaction after sync
+                            appDatabase.appDao.deletePendingSyncTransactionData(item)
+                        }
+                        is GenericResponse.Error -> {
+                            txnSync = false
+                            com.bonushub.crdb.utils.logger("error:- ", "in error ${genericResp.errorMessage}", "e")
+                            com.bonushub.crdb.utils.logger("error:- ", "try in next time", "e")
 
-                    }
-                    is GenericResponse.Loading -> {
-                        com.bonushub.crdb.utils.logger("Loading:- ", "in Loading ${genericResp.errorMessage}", "e")
+                        }
+                        is GenericResponse.Loading -> {
+                            com.bonushub.crdb.utils.logger("Loading:- ", "in Loading ${genericResp.errorMessage}", "e")
+                        }
                     }
                 }
             }
         }
 
-        cb(txnSync)
+
+        withContext(Dispatchers.Main){
+            cb(txnSync)
+        }
     }
 
     /*fun creatCardProcessingModelData(receiptDetail: ReceiptDetail):CardProcessedDataModal {

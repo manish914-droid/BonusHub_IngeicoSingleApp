@@ -66,6 +66,8 @@ class PrintUtil(context: Context?) {
             } else {
                 //   throw Exception()
                 logger("PrintUtil", "Error in printer status --->  ${printer?.status}", "e")
+                ToastUtils.showToast(context,getErrorMessage(printer?.status?:0))
+
             }
         } catch (ex: DeadObjectException) {
             ex.printStackTrace()
@@ -3013,5 +3015,32 @@ class PrintUtil(context: Context?) {
         sigleLineText(merchantName, AlignMode.CENTER)
         sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
         sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+    }
+
+    fun getErrorMessage(error: Int): String? {
+        val message: String
+        when (error) {
+            PrinterError.ERROR_NOT_INIT -> message = "ERROR NOT INIT"
+            PrinterError.ERROR_PARAM -> message = "ERROR PARAM"
+            PrinterError.ERROR_BMBLACK -> message = "ERROR BMBLACK"
+            PrinterError.ERROR_BUFOVERFLOW -> message = "ERROR BUFOVERFLOW"
+            PrinterError.ERROR_BUSY -> message = "ERROR BUSY"
+            PrinterError.ERROR_COMMERR -> message = "ERROR COMMERR"
+            PrinterError.ERROR_CUTPOSITIONERR -> message = "ERROR CUTPOSITIONERR"
+            PrinterError.ERROR_HARDERR -> message = "ERROR HARDERR"
+            PrinterError.ERROR_LIFTHEAD -> message = "ERROR LIFTHEAD"
+            PrinterError.ERROR_LOWTEMP -> message = "ERROR LOWTEMP"
+            PrinterError.ERROR_LOWVOL -> message = "ERROR LOWVOL"
+            PrinterError.ERROR_MOTORERR -> message = "ERROR MOTORERR"
+            PrinterError.ERROR_NOBM -> message = "ERROR NOBM"
+            PrinterError.ERROR_OVERHEAT -> message = "ERROR OVERHEAT"
+            PrinterError.ERROR_PAPERENDED -> message = "ERROR PAPERENDED"
+            PrinterError.ERROR_PAPERENDING -> message = "ERROR PAPERENDING"
+            PrinterError.ERROR_PAPERJAM -> message = "ERROR PAPERJAM"
+            PrinterError.ERROR_PENOFOUND -> message = "ERROR PENOFOUND"
+            PrinterError.ERROR_WORKON -> message = "ERROR WORKON"
+            else -> message = "ERROR UNKNOWN"
+        }
+        return message
     }
 }
