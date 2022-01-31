@@ -1543,8 +1543,28 @@ fun getBrandTAndCDataByBrandId(brandId : String): String {
         return issuerData
     }
 //endregion
-
-
+//region======================Get issuer Data:-
+fun getAllIssuerData(): MutableList<IssuerParameterTable?>? {
+    var issuerData: MutableList<IssuerParameterTable?>? = null
+    runBlocking(Dispatchers.IO) {
+          issuerData = DBModule.appDatabase.appDao.getAllIssuerTableData()
+        val jsonResp=Gson().toJson(issuerData)
+        println(jsonResp)
+    }
+    return issuerData
+}
+//endregion
+//region======================Get issuer Data:-
+fun getAllBrandEMIMasterDataTimeStamps(): List<BrandEMIMasterTimeStamps>? {
+    var issuerData: List<BrandEMIMasterTimeStamps>? = null
+    runBlocking(Dispatchers.IO) {
+        issuerData = DBModule.appDatabase.appDao.getBrandEMIDateTimeStamps()
+        val jsonResp=Gson().toJson(issuerData)
+        println(jsonResp)
+    }
+    return issuerData
+}
+//endregion
 
     fun maxAmountLimitDialog(iDialog: IDialog?, maxTxnLimit:Double){
         GlobalScope.launch(Dispatchers.Main) {
