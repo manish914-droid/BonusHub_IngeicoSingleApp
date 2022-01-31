@@ -14,6 +14,8 @@ import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.pax.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import java.lang.Exception
+import java.text.DateFormat
 
 
 import java.text.SimpleDateFormat
@@ -33,25 +35,16 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
     override fun createTransactionPacket(): IsoDataWriter = IsoDataWriter().apply {
        // val batchListData = runBlocking(Dispatchers.IO) { appDao.getSinleBatchData() }
          //To get Base Tid
-        val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
+     //   val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
         //To get base Tid batch Number
-        val tptbaseTiddata = runBlocking(Dispatchers.IO) { Field48ResponseTimestamp.getTptDataByTid(baseTid) }
+        val tptbaseTiddata = runBlocking(Dispatchers.IO) { getTptData() }
 
-        //Condition To Check BhTransactionType == BrandEMIByAccessCode if it is then fetch its value from DB:-
-        /*if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
-            brandEMIByAccessCodeData =
-                runBlocking(Dispatchers.IO) { BrandEMIAccessDataModalTable.getBrandEMIByAccessCodeData() }
-        }*/
-
-        /* if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI.type) {
-           // todo same
-          //  brandEMIData = runBlocking(Dispatchers.IO) { brandEMIData.getAllEMIData() }
-        }*/
         val terminalData = getTptData()
         if (terminalData != null) {
             logger("PINREQUIRED--->  ", cardProcessedData.getIsOnline().toString(), "e")
             mti = when (cardProcessedData.getTransType()) {
                        BhTransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
+                BhTransactionType.PRE_AUTH_COMPLETE.type , BhTransactionType.VOID_PREAUTH.type->Mti.PRE_AUTH_COMPLETE_MTI.mti
                         else -> Mti.DEFAULT_MTI.mti
                     }
 
@@ -61,7 +54,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             //Transaction Amount Field
             //val formattedTransAmount = "%.2f".format(cardProcessedData.getTransactionAmount()?.toDouble()).replace(".", "")
             if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
-
+// todo for brand Emi by code
             } else {
                 addField(
                     4,
@@ -71,7 +64,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
 
             //STAN(ROC) Field 11
            // cardProcessedData?.getAuthRoc()?.let { addField(11, it) }
-            addField(11,tptbaseTiddata?.stan ?: "")
+            addField(11,batchdata?.bonushubStan ?: "")
 
             //Date and Time Field 12 & 13
             val date = cardProcessedData.getTimeStamp()
@@ -82,8 +75,10 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             //println("Pos entry mode is --->" + cardProcessedData.getPosEntryMode().toString())
             //Pos Entry Mode Field 22
             //    if(null !=cardProcessedData.getPosEntryMode().toString() && cardProcessedData.getPosEntryMode().toString().isNotEmpty())
-            addField(22, cardProcessedData.getPosEntryMode().toString())
 
+if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) {
+    addField(22, cardProcessedData.getPosEntryMode().toString())
+}
 
             //NII Field 24
             addField(24, Nii.DEFAULT.nii)
@@ -93,7 +88,11 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
            val authcpdewithpading= cardProcessedData.getAuthCode()?.let { Padding(it) }
             authcpdewithpading?.let { addFieldByHex(38, it) }
             //TID Field 41
-            cardProcessedData.getTid()?.let { addFieldByHex(41, baseTid) } //here will be base tid
+            cardProcessedData.getTid()?.let { tptbaseTiddata?.terminalId?.let { it1 ->
+                addFieldByHex(41,
+                    it1
+                )
+            } } //here will be base tid
 
             //MID Field 42
             terminalData.merchantId?.let { addFieldByHex(42, it) }
@@ -120,16 +119,45 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                 }
             }
 
+            //Below Field56 is used for Void txns.
+            if(cardProcessedData.getTransType()==BhTransactionType.VOID.type){
+           /* old (means main transaction’s BH Base tid)stan 6 digits and then old data time yymmddhhmmss*/
+                try {
+                    val dateTime = batchdata?.oldDateTimeInVoid
+                    val fromFormat: DateFormat =
+                        SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+                    val toFormat: DateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
+                    val reqDate: Date? = fromFormat.parse(dateTime ?: "")
+
+                    val stan = batchdata?.oldStanForVoid
+                    val reqDateString = toFormat.format(reqDate)
+
+                    val field56="${stan}${reqDateString}"
+                    addFieldByHex(56,field56)
+
+                }catch (ex:Exception){
+                    logger("Date Error","Exception in adding field 56","e")
+                }
+            }
+
+            if(cardProcessedData.getTransType()==BhTransactionType.PRE_AUTH_COMPLETE.type){
+              //  TidBatchStanYYMMHHMMSS like 41501121000166000581220127193501
+
+
+            }
+
 
             //Below Field57 is Common for Cases Like CTLS + CTLSMAG + EMV + MAG:-
             when (cardProcessedData.getTransType()) {
-                BhTransactionType.SALE.type -> {
+                BhTransactionType.SALE.type ,BhTransactionType.CASH_AT_POS.type,
+                BhTransactionType.SALE_WITH_CASH.type,BhTransactionType.REFUND.type,BhTransactionType.PRE_AUTH.type,
+                BhTransactionType.PRE_AUTH_COMPLETE.type -> {
                   //  02,36|PAN Number |card holder name~Application label~CardIssuerCountryCode~mode of txn~pin entry type
               /* val pan = cardProcessedData.getPanNumberData()
                     batchListData[0].receiptData?.cardHolderName
                     batchListData[0].receiptData?.appName
                     val data="02,36|$pan~"*/
-             val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
+          /*   val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
                         getEncryptedDataForSyncing(it,
                             it1
                         )
@@ -137,16 +165,18 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
 
                     if (data != null) {
                         addField(57,data)
-                    }
+                    }*/
                    /* cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
                         addField(57,
                             it
                         )
                         logger("field-57",it,"e")
                     }*/
+                    batchdata?.field57EncryptedData?.let { addField(57, it) }
+
                 }
-                BhTransactionType.BRAND_EMI.type , BhTransactionType.EMI_SALE.type->{
-                    val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
+                BhTransactionType.BRAND_EMI.type , BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type->{
+                  /*  val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
                         getEncryptedDataForSyncing(it,
                             it1
                         )
@@ -154,9 +184,15 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
 
                     if (data != null) {
                         addField(57,data)
-                    }
+                    }*/
+
+                    batchdata?.field57EncryptedData?.let { addField(57, it) }
 
                   //  cardProcessedData.getEncryptedPan()?.let { addField(57, it) }
+                }
+
+                BhTransactionType.VOID.type->{
+                    batchdata?.field57EncryptedData?.let { addField(57, it) }
                 }
 
             }
@@ -204,7 +240,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                     indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
                             "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
                             "${emiIssuerDataModel?.issuerID}," +
-                            "${emiIssuerDataModel?.emiSchemeID},1,0,${cardProcessedData.getEmiTransactionAmount()}," +
+                            "${emiIssuerDataModel?.emiSchemeID},1,0,${cardProcessedData.getTransactionAmount()}," +
                             "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
                             "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
                             "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
@@ -270,6 +306,7 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
                     "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
                     addFieldByHex(58, indicator ?: "")
                 }
+
                 else -> {
                   /*  indicator = if( cardProcessedData.getTransType()== TransactionType.TEST_EMI.type ){
                         logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
@@ -355,8 +392,14 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             //adding field 62
          //   cardProcessedData.getInvoice()?.let { addFieldByHex(62, it) }
 
-            addFieldByHex(62, tptbaseTiddata?.invoiceNumber ?: "")
+           //Below Field62 is used for Void txns.
+                if(cardProcessedData.getTransType()==BhTransactionType.VOID.type){
+                 //   Field 62-old invoice [of BH base tid assigned to that main txn] (means main transaction’s BH Base TID)
+                    addFieldByHex(62, batchdata?.bonushubInvoice ?: "")
 
+                }else {
+                    addFieldByHex(62, batchdata?.bonushubInvoice ?: "")
+                }
         }
     }
 

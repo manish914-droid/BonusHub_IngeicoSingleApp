@@ -1127,6 +1127,10 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
     var emiTenureDataModel: BankEMITenureDataModal?=null
     var emiIssuerDataModel: BankEMIIssuerTAndCDataModal?=null
     var mobileNumber: String?=null
+
+    var oldDateTimeInVoid:String=""
+    var oldStanForVoid:String=""
+    var field57EncryptedData:String=""
 }
 // endregion
 

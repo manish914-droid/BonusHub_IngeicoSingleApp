@@ -21,6 +21,7 @@ import com.bonushub.crdb.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.CardProcessedDataModal
+import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.BatchTable
 import com.bonushub.crdb.model.local.PendingSyncTransactionTable
 import com.bonushub.crdb.repository.GenericResponse
@@ -51,6 +52,7 @@ import com.ingenico.hdfcpayment.type.TransactionType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -105,7 +107,7 @@ class VoidMainFragment : Fragment() {
         }
     }
 
-    private fun doVoidTransaction(){
+    private fun doVoidTransaction(oldBatchData:BatchTable){
         var ecrID: String
         try {
             DeviceHelper.doVoidTransaction(
@@ -127,10 +129,33 @@ class VoidMainFragment : Fragment() {
                             ResponseCode.SUCCESS.value -> {
                                 val jsonResp= Gson().toJson(receiptDetail)
                                 println(jsonResp)
-                                val batchTable =BatchTable(receiptDetail)
+                                val tpt = runBlocking(Dispatchers.IO) {
+                                   getTptData()
+                                }
                                 if (receiptDetail != null) {
                                     lifecycleScope.launch(Dispatchers.IO) {
-                                        printingSaleData(batchTable) {
+                                        val batchData =BatchTable(receiptDetail)
+                                        batchData.invoice = receiptDetail.invoice.toString()
+                                        batchData.transactionType = BhTransactionType.VOID.type
+                                        //To assign bonushub batchnumber,bonushub invoice,bonuhub stan
+
+                                     // todo old data update in VOID txn
+                                        batchData.bonushubbatchnumber = oldBatchData.bonushubbatchnumber
+                                            ?: ""
+                                        batchData.bonushubInvoice     = oldBatchData.bonushubInvoice
+                                            ?: ""
+                                        batchData.bonushubStan        = tpt?.stan.toString()
+                                        batchData.oldStanForVoid=oldBatchData.bonushubStan ?: ""
+                                        batchData.oldDateTimeInVoid= oldBatchData.receiptData?.dateTime.toString()
+                                    batchData.field57EncryptedData=oldBatchData.field57EncryptedData
+
+                                        DBModule.appDatabase.appDao.insertBatchData(batchData)
+                                        AppPreference.saveLastReceiptDetails(batchData)
+
+                                        //To increment base Stan
+                                        Utility().incrementUpdateRoc()
+
+                                        printingSaleData(batchData) {
                                             withContext(Dispatchers.Main) {
                                                 (activity as BaseActivityNew).showProgress(
                                                     getString(
@@ -140,16 +165,16 @@ class VoidMainFragment : Fragment() {
                                             }
                                             createCardProcessingModelData(receiptDetail)
                                             val transactionISO =
-                                                CreateTransactionPacket(appDao,globalCardProcessedModel,batchTable).createTransactionPacket()
+                                                CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
-                                            //   Utility().syncPendingTransaction(transactionViewModel)
+                                               Utility().syncPendingTransaction(transactionViewModel){}
 
                                             when (val genericResp =
                                                 transactionViewModel.serverCall(transactionISO)) {
                                                 is GenericResponse.Success -> {
                                                     logger(
                                                         "success:- ",
-                                                        "in success $genericResp",
+                                                        "in success ${genericResp.data}",
                                                         "e"
                                                     )
                                                     withContext(Dispatchers.Main) {
@@ -157,7 +182,7 @@ class VoidMainFragment : Fragment() {
                                                     }
                                                 }
                                                 is GenericResponse.Error -> {
-                                                    logger("error:- ", "in error $genericResp", "e")
+                                                    logger("error:- ", "in error ${genericResp.errorMessage}", "e")
                                                     logger(
                                                         "error:- ",
                                                         "save transaction sync later",
@@ -166,9 +191,9 @@ class VoidMainFragment : Fragment() {
 
                                                     val pendingSyncTransactionTable =
                                                         PendingSyncTransactionTable(
-                                                            invoice = receiptDetail?.invoice.toString(),
-                                                            batchTable = batchTable,
-                                                            responseCode = genericResp?.toString(),
+                                                            invoice = receiptDetail.invoice.toString(),
+                                                            batchTable = batchData,
+                                                            responseCode = genericResp.toString(),
                                                             cardProcessedDataModal = globalCardProcessedModel
                                                         )
 
@@ -335,32 +360,39 @@ class VoidMainFragment : Fragment() {
         }*/
 
         lifecycleScope.launch {
-            batchFileViewModel.getBatchTableDataListByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner, { allbat ->
+            batchFileViewModel.getBatchTableDataListByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner) { allbat ->
 
-                logger("batchTable",allbat.size.toString(),"e")
+                logger("batchTable", allbat.size.toString(), "e")
                 var voidData: BatchTable? = null
-                val bat:ArrayList<BatchTable> = arrayListOf()
+                val bat: ArrayList<BatchTable> = arrayListOf()
                 if (allbat != null) {
                     for (i in allbat) {
-                        if (i?.transactionType== BhTransactionType.SALE.type||
-                            i?.transactionType== BhTransactionType.EMI_SALE.type||
-                            i?.transactionType== BhTransactionType.REFUND.type||
-                            i?.transactionType== BhTransactionType.SALE_WITH_CASH.type||
-                            i?.transactionType== BhTransactionType.CASH_AT_POS.type||
-                            i?.transactionType== BhTransactionType.TIP_SALE.type||
-                            i?.transactionType== BhTransactionType.TEST_EMI.type||
-                            i?.transactionType== BhTransactionType.BRAND_EMI.type||
-                            i?.transactionType==  BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type)
+                        if (i?.transactionType == BhTransactionType.SALE.type ||
+                            i?.transactionType == BhTransactionType.EMI_SALE.type ||
+                            i?.transactionType == BhTransactionType.REFUND.type ||
+                            i?.transactionType == BhTransactionType.SALE_WITH_CASH.type ||
+                            i?.transactionType == BhTransactionType.CASH_AT_POS.type ||
+                            i?.transactionType == BhTransactionType.TIP_SALE.type ||
+                            i?.transactionType == BhTransactionType.TEST_EMI.type ||
+                            i?.transactionType == BhTransactionType.BRAND_EMI.type ||
+                            i?.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type
+                        )
                             bat.add(i)
                     }
 
                     val tpt = getTptData()
                     when (bat.size) {
-                        0 -> ToastUtils.showToast(requireContext(),getString(R.string.no_data_found))
+                        0 -> ToastUtils.showToast(
+                            requireContext(),
+                            getString(R.string.no_data_found)
+                        )
                         1 -> {
                             voidData = bat.first()
                             if (voidData?.transactionType == BhTransactionType.REFUND.type && tpt?.voidRefund != "1") {
-                                ToastUtils.showToast(requireContext(),getString(R.string.void_refund_not_allowed))
+                                ToastUtils.showToast(
+                                    requireContext(),
+                                    getString(R.string.void_refund_not_allowed)
+                                )
                             } else {
 
                                 lifecycleScope.launch(Dispatchers.Main) {
@@ -369,7 +401,6 @@ class VoidMainFragment : Fragment() {
                             }
                         }
                         else -> {
-                            // todo dialog here...
                             lifecycleScope.launch(Dispatchers.Main) {
                                 voidTransInvoicesDialog(bat as ArrayList<BatchTable>)
                             }
@@ -378,20 +409,18 @@ class VoidMainFragment : Fragment() {
 
                 }
 
-            })
+            }
         }
 
     }
 
     private fun voidTransConfirmationDialog(batchTable: BatchTable) {
-
-        if(batchTable?.receiptData != null) {
-
+        if(batchTable.receiptData != null) {
                     val date = batchTable.receiptData?.dateTime ?: ""
                     val parts = date.split(" ")
                     println("Date: " + parts[0])
                     println("Time: " + (parts[1]) )
-                    val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "")?.toDouble())?.div(100)).toString().toDouble())
+                    val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "").toDouble()).div(100)).toString().toDouble())
                     DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
                         parts[0],
@@ -400,7 +429,7 @@ class VoidMainFragment : Fragment() {
                         batchTable.receiptData?.invoice ?: "",
                         amt
                     ) {
-                        doVoidTransaction()
+                        doVoidTransaction(batchTable)
                     }
                 }else{
                     ToastUtils.showToast(requireContext(),"Data not found.")

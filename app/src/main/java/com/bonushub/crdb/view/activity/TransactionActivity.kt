@@ -235,27 +235,27 @@ class TransactionActivity : BaseActivityNew() {
             )
         ).get(TenureSchemeViewModel::class.java)
         tenureSchemeViewModel.emiTenureLiveData.observe(
-            this,
-            {
-                hideProgress()
-                when (val genericResp = it) {
-                    is GenericResponse.Success -> {
-                        println(Gson().toJson(genericResp.data))
-                        val resp= genericResp.data as TenuresWithIssuerTncs
-                        showEMISaleDialog(resp.bankEMIIssuerTAndCList, resp.bankEMISchemesDataList)
-                    }
-                    is GenericResponse.Error -> {
-                       // ToastUtils.showToast(this, genericResp.errorMessage)
-                        println(genericResp.errorMessage.toString())
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            initiateNormalSale()
-                        }
-                    }
-                    is GenericResponse.Loading -> {
-
+            this
+        ) {
+            hideProgress()
+            when (val genericResp = it) {
+                is GenericResponse.Success -> {
+                    println(Gson().toJson(genericResp.data))
+                    val resp = genericResp.data as TenuresWithIssuerTncs
+                    showEMISaleDialog(resp.bankEMIIssuerTAndCList, resp.bankEMISchemesDataList)
+                }
+                is GenericResponse.Error -> {
+                    // ToastUtils.showToast(this, genericResp.errorMessage)
+                    println(genericResp.errorMessage.toString())
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        initiateNormalSale()
                     }
                 }
-            })
+                is GenericResponse.Loading -> {
+
+                }
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -373,7 +373,7 @@ class TransactionActivity : BaseActivityNew() {
                                         if (receiptDetail != null) {
                                             val batchData = BatchTable(receiptDetail)
                                             val tpt = runBlocking(Dispatchers.IO) {
-                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                               getTptData()
                                             }
                                             println("Selected tid id "+tpt?.terminalId)
                                             println("Batch number in emi "+tpt?.batchNumber)
@@ -396,14 +396,42 @@ class TransactionActivity : BaseActivityNew() {
                                                 batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
 
-                                                appDatabase.appDao.insertBatchData(batchData)
                                                 createCardProcessingModelData(receiptDetail)
-                                                // because we did not save pan num in plain
+                                                // because we did not save pan num in plain in batchTable
                                                 cardProcessedDataModal.getPanNumberData()?.let {
                                                     globalCardProcessedModel.setPanNumberData(
                                                         it
                                                     )
                                                 }
+                                                // cardProcessedDataModal.getPanNumberData() --> Containing plain pan
+                                                // globalCardProcessedModel.getPanNumberData() --> Containing masked pan
+
+if(reqCode == BhTransactionType.TEST_EMI.type){
+    val data1=    globalCardProcessedModel.getPanNumberData()?.let { batchData?.receiptData?.let { it1 ->
+        getEncryptedDataForSyncing(it,
+            it1
+        )
+    } }
+
+    if (data1!= null) {
+        batchData.field57EncryptedData=data1
+    }
+}else{
+    val data1=    cardProcessedDataModal.getPanNumberData()?.let { batchData?.receiptData?.let { it1 ->
+        getEncryptedDataForSyncing(it,
+            it1
+        )
+    } }
+
+    if (data1!= null) {
+        batchData.field57EncryptedData=data1
+    }
+
+}
+
+
+                                                appDatabase.appDao.insertBatchData(batchData)
+
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 AppPreference.clearRestartDataPreference()
 
@@ -587,7 +615,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                 // Checking Insta Emi Available or not
                 var hasInstaEmi = false
                 val tpt =
-                    withContext(Dispatchers.IO) { Field48ResponseTimestamp.getTptData() }
+                    withContext(Dispatchers.IO) { getTptData() }
                 var limitAmt = 0f
                 if (tpt?.surChargeValue?.isNotEmpty()!!) {
                     limitAmt = try {
@@ -669,7 +697,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                             //To get tpt data acccording to tid
                                             val tpt = runBlocking(Dispatchers.IO) {
-                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                               getTptData()
                                             }
 
                                             val batchData = BatchTable(receiptDetail)
@@ -682,6 +710,16 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
+
+                                                createCardProcessingModelData(receiptDetail)
+                                                val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                                    getEncryptedDataForSyncing(it,
+                                                        it1
+                                                    )
+                                                } }
+                                                if (data != null) {
+                                                    batchData.field57EncryptedData=data
+                                                }
 
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
@@ -698,7 +736,6 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
 
-                                                    createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
 
                                                     // sync pending transaction
@@ -707,9 +744,10 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
-                                                            logger("success:- ", "in success $genericResp","e")
                                                             withContext(Dispatchers.Main) {
+                                                                logger("success:- ", "in success $genericResp","e")
                                                                 hideProgress()
+                                                                goToDashBoard()
                                                             }
                                                         }
                                                         is GenericResponse.Error -> {
@@ -852,7 +890,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                             //To get tpt data acccording to tid
                                             val tpt = runBlocking(Dispatchers.IO) {
-                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                                getTptData()
                                             }
 
                                             // region print and save data
@@ -862,6 +900,16 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
+
+                                                createCardProcessingModelData(receiptDetail)
+                                                val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                                    getEncryptedDataForSyncing(it,
+                                                        it1
+                                                    )
+                                                } }
+                                                if (data != null) {
+                                                    batchData.field57EncryptedData=data
+                                                }
 
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
@@ -876,7 +924,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    createCardProcessingModelData(receiptDetail)
+
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(transactionViewModel){
@@ -885,9 +933,10 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
-                                                            logger("success:- ", "in success $genericResp","e")
                                                             withContext(Dispatchers.Main) {
+                                                                logger("success:- ", "in success $genericResp","e")
                                                                 hideProgress()
+                                                                goToDashBoard()
                                                             }
                                                         }
                                                         is GenericResponse.Error -> {
@@ -1007,7 +1056,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             val batchData = BatchTable(receiptDetail)
                                             //To get tpt data acccording to tid
                                             val tpt = runBlocking(Dispatchers.IO) {
-                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                                getTptData()
                                             }
 
                                             // region print and save data
@@ -1018,6 +1067,17 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
+
+                                                createCardProcessingModelData(receiptDetail)
+                                                val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                                    getEncryptedDataForSyncing(it,
+                                                        it1
+                                                    )
+                                                } }
+                                                if (data != null) {
+                                                    batchData.field57EncryptedData=data
+                                                }
+
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 AppPreference.clearRestartDataPreference()
@@ -1032,7 +1092,6 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
 
-                                                    createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(transactionViewModel){}
@@ -1040,9 +1099,10 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
-                                                            logger("success:- ", "in success $genericResp","e")
                                                             withContext(Dispatchers.Main) {
+                                                                logger("success:- ", "in success $genericResp","e")
                                                                 hideProgress()
+                                                                goToDashBoard()
                                                             }
                                                         }
                                                         is GenericResponse.Error -> {
@@ -1165,7 +1225,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         if (receiptDetail != null) {
                                             //To get tpt data acccording to tid
                                             val tpt = runBlocking(Dispatchers.IO) {
-                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                           getTptData()
                                             }
                                             val batchData = BatchTable(receiptDetail)
 
@@ -1178,6 +1238,17 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
+
+                                                createCardProcessingModelData(receiptDetail)
+                                                val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                                    getEncryptedDataForSyncing(it,
+                                                        it1
+                                                    )
+                                                } }
+                                                if (data != null) {
+                                                    batchData.field57EncryptedData=data
+                                                }
+
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 AppPreference.clearRestartDataPreference()
@@ -1192,7 +1263,6 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
 
-                                                    createCardProcessingModelData(receiptDetail)
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(transactionViewModel){}
@@ -1200,9 +1270,10 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
-                                                            logger("success:- ", "in success $genericResp","e")
                                                             withContext(Dispatchers.Main) {
+                                                                logger("success:- ", "in success $genericResp","e")
                                                                 hideProgress()
+                                                                goToDashBoard()
                                                             }
                                                         }
                                                         is GenericResponse.Error -> {
@@ -1327,7 +1398,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         if (receiptDetail != null) {
                                             //To get tpt data acccording to tid
                                             val tpt = runBlocking(Dispatchers.IO) {
-                                                getTptDataByTid(receiptDetail.tid ?: "")
+                                             getTptData()
                                             }
                                             val batchData = BatchTable(receiptDetail)
                                             // region print and save data
@@ -1339,6 +1410,16 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan        = tpt?.stan ?: ""
+
+                                                createCardProcessingModelData(receiptDetail)
+                                                val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                                    getEncryptedDataForSyncing(it,
+                                                        it1
+                                                    )
+                                                } }
+                                                if (data != null) {
+                                                    batchData.field57EncryptedData=data
+                                                }
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
                                                 AppPreference.clearRestartDataPreference()
@@ -1352,7 +1433,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
-                                                    createCardProcessingModelData(receiptDetail)
+
                                                     val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(transactionViewModel){}
@@ -1360,9 +1441,10 @@ lifecycleScope.launch(Dispatchers.IO) {
                                                     when(val genericResp = transactionViewModel.serverCall(transactionISO))
                                                     {
                                                         is GenericResponse.Success -> {
-                                                            logger("success:- ", "in success $genericResp","e")
                                                             withContext(Dispatchers.Main) {
+                                                                logger("success:- ", "in success $genericResp","e")
                                                                 hideProgress()
+                                                                goToDashBoard()
                                                             }
                                                         }
                                                         is GenericResponse.Error -> {
@@ -1498,7 +1580,7 @@ lifecycleScope.launch(Dispatchers.IO) {
 
                                         //To get tpt data acccording to tid
                                         val tpt = runBlocking(Dispatchers.IO) {
-                                            getTptDataByTid(receiptDetail.tid ?: "")
+                                            getTptData()
                                         }
                                         val batchData = BatchTable(receiptDetail)
                                         println(jsonResp)
@@ -1508,6 +1590,17 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                         batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                         batchData.bonushubStan        = tpt?.stan ?: ""
+
+                                        createCardProcessingModelData(receiptDetail)
+                                        val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                            getEncryptedDataForSyncing(it,
+                                                it1
+                                            )
+                                        } }
+                                        if (data != null) {
+                                            batchData.field57EncryptedData=data
+                                        }
+
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
                                         AppPreference.clearRestartDataPreference()
@@ -1520,7 +1613,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             withContext(Dispatchers.Main){
                                                 showProgress(getString(R.string.transaction_syncing_msg))
                                             }
-                                            createCardProcessingModelData(receiptDetail)
+
                                             val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
                                             Utility().syncPendingTransaction(transactionViewModel){}
@@ -1662,7 +1755,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                     lifecycleScope.launch(Dispatchers.IO) {
 
                                         val tpt = runBlocking(Dispatchers.IO) {
-                                            getTptDataByTid(receiptDetail.tid ?: "")
+                                          getTptData()
                                         }
 
                                         val batchData = BatchTable(receiptDetail)
@@ -1673,7 +1766,15 @@ lifecycleScope.launch(Dispatchers.IO) {
                                         batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                         batchData.bonushubInvoice     = tpt?.invoiceNumber ?: ""
                                         batchData.bonushubStan        = tpt?.stan ?: ""
-
+                                        createCardProcessingModelData(receiptDetail)
+                                        val data=       globalCardProcessedModel.getPanNumberData()?.let { batchData.receiptData?.let { it1 ->
+                                            getEncryptedDataForSyncing(it,
+                                                it1
+                                            )
+                                        } }
+                                        if (data != null) {
+                                            batchData.field57EncryptedData=data
+                                        }
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
 
@@ -1686,7 +1787,7 @@ lifecycleScope.launch(Dispatchers.IO) {
                                             withContext(Dispatchers.Main){
                                                 showProgress(getString(R.string.transaction_syncing_msg))
                                             }
-                                            createCardProcessingModelData(receiptDetail)
+
                                             val transactionISO = CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
                                             // sync pending transaction
                                             Utility().syncPendingTransaction(transactionViewModel){}
@@ -1980,8 +2081,7 @@ lifecycleScope.launch(Dispatchers.IO) {
         logger("",""+receiptDetail)
         when(globalCardProcessedModel.getTransType()){
             BhTransactionType.SALE.type , BhTransactionType.TEST_EMI.type,
-            BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type,
-            BhTransactionType.PRE_AUTH.type->{
+            BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type->{
                 globalCardProcessedModel.setProcessingCode(ProcessingCode.SALE.code)
             }
             BhTransactionType.CASH_AT_POS.type->{
@@ -2001,6 +2101,9 @@ lifecycleScope.launch(Dispatchers.IO) {
             }
             BhTransactionType.PRE_AUTH_COMPLETE.type->{
             globalCardProcessedModel.setProcessingCode(ProcessingCode.PRE_SALE_COMPLETE.code)
+            }
+            BhTransactionType.PRE_AUTH.type->{
+                globalCardProcessedModel.setProcessingCode(ProcessingCode.PRE_AUTH.code)
             }
         }
 

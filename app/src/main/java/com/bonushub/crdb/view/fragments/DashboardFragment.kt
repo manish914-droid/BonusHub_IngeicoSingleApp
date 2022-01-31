@@ -59,7 +59,7 @@ import kotlinx.coroutines.*
 import java.lang.Runnable
 import javax.inject.Inject
 
-
+var isAutoSettleCodeInitiated=false
 @AndroidEntryPoint
 class DashboardFragment : androidx.fragment.app.Fragment() {
     companion object {
@@ -119,6 +119,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                 if (getSystemTimeIn24Hour().terminalDate().toInt() >
                     AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName).toInt()
                 ) {
+                    isAutoSettleCodeInitiated=false
                     AppPreference.saveBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName, false)
                 }
             }
@@ -148,19 +149,22 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
     private fun observeDashboardViewModel(){
         lifecycleScope.launch(Dispatchers.Main) {
-            dashboardViewModel.eDashboardItem().observe(viewLifecycleOwner,{
+            dashboardViewModel.eDashboardItem().observe(viewLifecycleOwner) {
                 ioSope.launch(Dispatchers.Main) {
-                    val result = async {  setupRecyclerview(it) }.await()
-                    val wifiCTTable = runBlocking(Dispatchers.IO){
+                    val result = async { setupRecyclerview(it) }.await()
+                    val wifiCTTable = runBlocking(Dispatchers.IO) {
                         appDao.getAllWifiCTTableData()
                     }
 
 
                     val resStr = appDao.getAllTerminalParameterTableData()
 
-                //   sendConfirmationToHost()
-                    if(AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName)=="0" || wifiCTTable?.get(0)?.actionId?.toInt() == 2){
-                        val result1 = runBlocking(Dispatchers.IO){
+                    //   sendConfirmationToHost()
+                    if (AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName) == "0" || wifiCTTable?.get(
+                            0
+                        )?.actionId?.toInt() == 2
+                    ) {
+                        val result1 = runBlocking(Dispatchers.IO) {
                             doCommsTransaction(appDao)
                         }
 
@@ -168,14 +172,14 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     delay(1000)
                     val result1 = async {
                         var listofTids = checkBaseTid(appDao)
-                        println("List of tids are"+listofTids)
+                        println("List of tids are" + listofTids)
                         delay(1000)
-                    doInitializtion(appDao,listofTids)
+                        doInitializtion(appDao, listofTids)
                     }.await()
 
                 }
 
-            })
+            }
 
         }
 
@@ -318,10 +322,11 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                 && !TextUtils.isEmpty(tptData?.forceSettleTime)
                 && tptData?.forceSettle == "1"
             ) {
-                if ((tptData.forceSettleTime.toLong() == getSystemTimeIn24Hour().terminalTime().toLong()
-                            || getSystemTimeIn24Hour().terminalTime().toLong() > tptData.forceSettleTime.toLong()
-                            && batchData.size > 0)
-                ) {
+                val conditionForAutoSettle =((tptData.forceSettleTime == getSystemTimeIn24Hour().terminalTime() || getSystemTimeIn24Hour().terminalTime() > tptData.forceSettleTime)) &&  batchData.size > 0
+
+                if (conditionForAutoSettle && !isAutoSettleCodeInitiated)
+                 {
+                     isAutoSettleCodeInitiated=true
                     logger("Auto Settle:- ", "Auto Settle Available")
                     lifecycleScope.launch(Dispatchers.Main){
 
@@ -423,7 +428,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 //                        )
 //                    }
                 } else
-                    logger("Auto Settle:- ", "Auto Settle Mismatch Time")
+                    logger("Auto Settle:- ", "Auto Settle Mismatch Time  , Entered In Checking $isAutoSettleCodeInitiated")
             } else
                 logger("Auto Settle:- ", "Auto Settle Not Available")
         } else {

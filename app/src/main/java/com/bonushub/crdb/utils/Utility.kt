@@ -15,10 +15,12 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.Toast
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.HDFCApplication
 import com.bonushub.crdb.MainActivity
+import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.di.DBModule.appDatabase
@@ -1655,5 +1657,60 @@ fun getBrandTAndCDataByBrandId(brandId : String): String {
         return dataList
     }
 //endregion
+
+
+
+    fun setToolbarLogos(activity: Activity) {
+        //Show Logo of Bank by checking Bank Code:-
+        val tpt = getTptData()
+        val bonushubLogo = activity.findViewById<ImageView>(R.id.main_toolbar_BhLogo)
+        val bankLogoImageView = activity.findViewById<ImageView>(R.id.toolbar_Bank_logo)
+        var bankLogo = 0
+
+        when (AppPreference.getBankCode()) {
+           // "07" -> bankLogo = R.drawable.amex_logo
+            "01" -> bankLogo = R.drawable.ic_hdfcsvg
+            else -> {
+            }
+        }
+
+        //Show Both BonusHub and Bank Logo on base of condition check on tpt.reservedValues 10th Position:-
+        if (tpt != null) {
+            if (!TextUtils.isEmpty(tpt.reservedValues)) {
+                if (tpt.reservedValues.length > 10) {
+                    for (i in tpt.reservedValues.indices) {
+                        if (i == 9) {
+                            if (tpt.reservedValues[i].toString() == "1") {
+                                bonushubLogo?.visibility = View.VISIBLE
+                                bankLogoImageView?.setImageResource(bankLogo)
+                                bankLogoImageView?.visibility = View.VISIBLE
+                                break
+                            } else {
+                                bonushubLogo?.visibility = View.GONE
+                                bankLogoImageView?.setImageResource(bankLogo)
+                                bankLogoImageView?.visibility = View.VISIBLE
+                            }
+                        }
+                    }
+                } else {
+                    bonushubLogo?.visibility = View.GONE
+                    bankLogoImageView?.setImageResource(bankLogo)
+                    bankLogoImageView?.visibility = View.VISIBLE
+                }
+            } else {
+                bonushubLogo?.visibility = View.GONE
+                bankLogoImageView?.setImageResource(bankLogo)
+                bankLogoImageView?.visibility = View.VISIBLE
+            }
+        }
+
+        if (!AppPreference.getLogin()) {
+            bonushubLogo?.visibility = View.VISIBLE
+            //   bankLogoImageView?.setImageResource(bankLogo)
+            bankLogoImageView?.visibility = View.GONE
+
+        }
+    }
+
 
 }

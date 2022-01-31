@@ -112,41 +112,46 @@ private val emiIssuerTAndCDataFromIntent by lazy {
             ).get(TenureSchemeViewModel::class.java)
             //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
             tenureSchemeViewModel.emiTenureLiveData.observe(
-                this,
-                {
-hideProgress()
-                    when (val genericResp = it) {
-                        is GenericResponse.Success -> {
-                            println(Gson().toJson(genericResp.data))
-                            val resp= genericResp.data as TenuresWithIssuerTncs
-                            emiSchemeOfferDataList=resp.bankEMISchemesDataList
-                            emiIssuerTAndCData=resp.bankEMIIssuerTAndCList
-                            setUpRecyclerView()
+                this
+            ) {
+                hideProgress()
+                when (val genericResp = it) {
+                    is GenericResponse.Success -> {
+                        println(Gson().toJson(genericResp.data))
+                        val resp = genericResp.data as TenuresWithIssuerTncs
+                        emiSchemeOfferDataList = resp.bankEMISchemesDataList
+                        emiIssuerTAndCData = resp.bankEMIIssuerTAndCList
+                        setUpRecyclerView()
 
-                        }
-                        is GenericResponse.Error -> {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                alertBoxWithAction(
-                                    getString(R.string.no_receipt),
-                                    genericResp.errorMessage?:"Oops something went wrong",
-                                    false,
-                                    getString(R.string.positive_button_ok),
-                                    {
-                                        finish()
-                                        startActivity(Intent(this@TenureSchemeActivity, NavigationActivity::class.java).apply {
-                                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                        })
-                                    },
-                                    {})
-                            }
-                          //  ToastUtils.showToast(this, genericResp.errorMessage)
-                            println(genericResp.errorMessage.toString())
-                        }
-                        is GenericResponse.Loading -> {
-// currently not in use ....
-                        }
                     }
-                })
+                    is GenericResponse.Error -> {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            alertBoxWithAction(
+                                getString(R.string.no_receipt),
+                                genericResp.errorMessage ?: "Oops something went wrong",
+                                false,
+                                getString(R.string.positive_button_ok),
+                                {
+                                    finish()
+                                    startActivity(
+                                        Intent(
+                                            this@TenureSchemeActivity,
+                                            NavigationActivity::class.java
+                                        ).apply {
+                                            flags =
+                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        })
+                                },
+                                {})
+                        }
+                        //  ToastUtils.showToast(this, genericResp.errorMessage)
+                        println(genericResp.errorMessage.toString())
+                    }
+                    is GenericResponse.Loading -> {
+// currently not in use ....
+                    }
+                }
+            }
 
         }else if (transactionType== BhTransactionType.SALE.type ){
             emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent

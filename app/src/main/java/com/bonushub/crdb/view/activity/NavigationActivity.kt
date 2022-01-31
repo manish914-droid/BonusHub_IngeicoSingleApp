@@ -209,18 +209,21 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         navigationBinding?.mainDl?.addDrawerListener(mDrawerToggle)
 
 
-        bankFunctionsViewModel.adminPassword.observe(this@NavigationActivity,{
+        bankFunctionsViewModel.adminPassword.observe(this@NavigationActivity) {
 
-            if(it.value?:false)
-            {
-                logger("isAdminPassword", (""+it.value?:false) as String)
+            if (it.value == true) {
+                logger("isAdminPassword", ("" + it.value ?: false) as String)
                 dialogAdminPassword?.dismiss()
                 closeDrawer()
                 transactFragment(BankFunctionsFragment())
-            }else{
-                Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    this@NavigationActivity,
+                    R.string.invalid_password,
+                    Toast.LENGTH_LONG
+                ).show()
             }
-        })
+        }
 
         //Settle Batch When Auto Settle == 1 After Sale:- kushal -> auto settlement doing in dashboard
   //      if (appUpdateFromSale) {
@@ -829,7 +832,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PREAUTH_COMPLETE->{
-                transactFragment(PreAuthCompleteInputDetailFragment(),true)
+               transactFragment(PreAuthCompleteInputDetailFragment(),true)
+
+
+
                /* if (checkInternetConnection()) {
                 CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
@@ -927,7 +933,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     }
                 })
             }
-
+EDashboardItem.VOID_PREAUTH->{
+    lifecycleScope.launch(Dispatchers.IO) {
+        appDao.deletePendingSyncTransactionTable()
+    }
+}
             EDashboardItem.PENDING_PREAUTH ->{
 
                 transactFragment(PreAuthPendingFragment(),true)
@@ -1244,6 +1254,22 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc)
                         //region Setting AutoSettle Status and Last Settlement DateTime:-
 
+                        //region Setting AutoSettle Status and Last Settlement DateTime:-
+                        when (settlementFrom) {
+                            SettlementComingFrom.DASHBOARD.screenType -> {
+
+                                AppPreference.saveBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName, true)
+                                AppPreference.saveString(
+                                    PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName,
+                                    getSystemTimeIn24Hour().terminalDate()
+                                )
+
+                            }
+                            else -> {
+                                //AppPreference.saveBoolean(AppPreference.IsAutoSettleDone, false)
+                            }
+                        }
+
                             //Here printing will be there
                         PrintUtil(this).printSettlementReportupdate(this, batchList, true) {
                             if (it) {
@@ -1415,6 +1441,19 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             AppPreference.saveBoolean(
                                 PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
                         }
+                        when (settlementFrom) {
+                            SettlementComingFrom.DASHBOARD.screenType -> {
+                                AppPreference.saveBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName, true)
+                                AppPreference.saveString(
+                                    PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName,
+                                    getSystemTimeIn24Hour().terminalDate()
+                                )
+                            }
+                            else -> {
+                                //AppPreference.saveBoolean(AppPreference.IsAutoSettleDone, false)
+                            }
+                        }
+
                         settlementCB?.invoke(false)
                     }
 
@@ -1437,6 +1476,22 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     AppPreference.saveString(PrefConstant.SETTLEMENT_PROCESSING_CODE.keyName.toString(), ProcessingCode.FORCE_SETTLEMENT.code)
 
                     AppPreference.saveBoolean(PrefConstant.SETTLE_BATCH_SUCCESS.keyName.toString(), true)
+
+                    when (settlementFrom) {
+                        SettlementComingFrom.DASHBOARD.screenType -> {
+
+                            AppPreference.saveBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName, true)
+                            AppPreference.saveString(
+                                PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName,
+                                getSystemTimeIn24Hour().terminalDate()
+                            )
+
+                        }
+                        else -> {
+                            //AppPreference.saveBoolean(AppPreference.IsAutoSettleDone, false)
+                        }
+                    }
+
                     settlementCB?.invoke(false)
                 }
             }, {
