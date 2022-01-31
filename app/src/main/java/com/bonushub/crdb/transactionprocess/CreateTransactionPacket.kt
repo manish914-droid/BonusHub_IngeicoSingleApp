@@ -197,36 +197,15 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
 
             }
 
-          //  Filed 60-
-          //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
-
-
-            val bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
-            val emptyString: String= ""
-            val ingenicotid          = addPad(batchdata?.receiptData?.tid ?: "", "0", 8, true)
-            val ingenibatchnumber    = addPad(batchdata?.receiptData?.batchNumber ?: "", "0", 6, true)
-            val ingenicostan         = addPad(batchdata?.receiptData?.stan ?: "", "0", 6, true)
-            val ingenicoInvoice        = addPad(batchdata?.receiptData?.invoice ?: "", "0", 6, true)
-            val ingenicoaid           = batchdata?.receiptData?.aid ?: ""
-            val ingenicotc           = batchdata?.receiptData?.tc ?: ""
-            val ingenicoappName     = batchdata?.receiptData?.appName ?: ""
-
-            val fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
-                              "$ingenibatchnumber|$ingenicostan|$ingenicoInvoice|"+
-                              "$ingenicoaid|$ingenicotc|$ingenicoappName|"
-
-
-            println("Field 60 value is -> $fielddata60")
-
-            addFieldByHex(60,fielddata60)
 
 
 
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
+
             when (cardProcessedData.getTransType()) {
 
                 BhTransactionType.EMI_SALE.type -> {
-                    val cardIndFirst = "0"
+                  /*  val cardIndFirst = "0"
                     val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
                     val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
                     //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
@@ -247,12 +226,12 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                             ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
                             "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
 
-                    addFieldByHex(58, indicator ?: "")
-
+                    addFieldByHex(58, indicator ?: "")*/
+                    batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
                 }
 
                 BhTransactionType.BRAND_EMI.type -> {
-                    val cardIndFirst = "0"
+       /*             val cardIndFirst = "0"
                     val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
                     val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
                     //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
@@ -275,8 +254,9 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                          "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
                          "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
                          "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
-
-                    addFieldByHex(58, indicator ?: "")
+  addFieldByHex(58, indicator ?: "")
+*/
+                    batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
 
 
      }
@@ -297,14 +277,23 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                 }
 
                 BhTransactionType.TEST_EMI.type->{
-                    val cardIndFirst = "0"
+               /*     val cardIndFirst = "0"
                     val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
                     val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
                     //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
                     val cdtIndex = cardDataTable?.cardTableIndex ?: ""
                     val accSellection ="00"
                     "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
-                    addFieldByHex(58, indicator ?: "")
+                  */
+
+                    batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
+                }
+
+                BhTransactionType.VOID.type->{
+                    if(batchdata?.field58EmiData?.isNotBlank() == true){
+                        batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
+                    }
+
                 }
 
                 else -> {
@@ -315,6 +304,31 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                         "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"*/
                 }
             }
+
+
+            //  Filed 60-
+            //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
+
+
+            val bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
+            val emptyString: String= ""
+            val ingenicotid          = addPad(batchdata?.receiptData?.tid ?: "", "0", 8, true)
+            val ingenibatchnumber    = addPad(batchdata?.receiptData?.batchNumber ?: "", "0", 6, true)
+            val ingenicostan         = addPad(batchdata?.receiptData?.stan ?: "", "0", 6, true)
+            val ingenicoInvoice        = addPad(batchdata?.receiptData?.invoice ?: "", "0", 6, true)
+            val ingenicoaid           = batchdata?.receiptData?.aid ?: ""
+            val ingenicotc           = batchdata?.receiptData?.tc ?: ""
+            val ingenicoappName     = batchdata?.receiptData?.appName ?: ""
+
+            val fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
+                    "$ingenibatchnumber|$ingenicostan|$ingenicoInvoice|"+
+                    "$ingenicoaid|$ingenicotc|$ingenicoappName|"
+
+
+            println("Field 60 value is -> $fielddata60")
+
+            addFieldByHex(60,fielddata60)
+
 
             Log.d("SALE Indicator:- ", indicator.toString())
             additionalData["indicatorF58"] = indicator ?: ""
