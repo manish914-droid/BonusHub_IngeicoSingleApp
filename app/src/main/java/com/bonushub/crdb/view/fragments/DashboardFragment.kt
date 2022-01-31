@@ -155,11 +155,11 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     val wifiCTTable = runBlocking(Dispatchers.IO) {
                         appDao.getAllWifiCTTableData()
                     }
-
+                    sendConfirmationToHost()
 
                     val resStr = appDao.getAllTerminalParameterTableData()
 
-                    //   sendConfirmationToHost()
+
                     if (AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName) == "0" || wifiCTTable?.get(
                             0
                         )?.actionId?.toInt() == 2
@@ -190,7 +190,6 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     private fun sendConfirmationToHost() {
         try {
             context?.let {
-                sendConfirmation()
                 getRevisionIDFromFile(it) { isRevisionIDSame ->
                     if (isRevisionIDSame) {
                         sendConfirmation()
