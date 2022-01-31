@@ -67,8 +67,6 @@ class BrandEmiMasterCategoryFragment : Fragment() {
             BrandEmiListAndSearchUiBinding.inflate(layoutInflater, container, false)
         return brandMasterBinding?.root
     }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
