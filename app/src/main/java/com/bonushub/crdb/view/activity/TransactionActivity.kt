@@ -599,10 +599,18 @@ var f57Data=""
                                     }
                                     ResponseCode.FAILED.value -> {
                                         AppPreference.clearRestartDataPreference()
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     ResponseCode.ABORTED.value -> {
                                         isUnblockingNeeded = true
                                         AppPreference.clearRestartDataPreference()
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     ResponseCode.REVERSAL.value -> {
                                         AppPreference.clearRestartDataPreference()
@@ -623,9 +631,17 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     else -> {
                                         isUnblockingNeeded = true
+                                        errorFromIngenico(
+                                            txnResponse?.responseCode,
+                                            txnResponse?.status.toString()
+                                        )
                                     }
                                 }
 
@@ -940,6 +956,10 @@ var f57Data=""
 
                                     ResponseCode.FAILED.value -> {
                                         AppPreference.clearRestartDataPreference()
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
 
                                     ResponseCode.ABORTED.value -> {
@@ -986,6 +1006,10 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1077,7 +1101,7 @@ var f57Data=""
 
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                                AppPreference.clearRestartDataPreference()
+                                              AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
@@ -1165,6 +1189,10 @@ var f57Data=""
                                     }
                                     ResponseCode.FAILED.value -> {
                                         AppPreference.clearRestartDataPreference()
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     ResponseCode.ABORTED.value -> {
                                         AppPreference.clearRestartDataPreference()
@@ -1195,6 +1223,10 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1375,6 +1407,10 @@ var f57Data=""
                                     }
                                     ResponseCode.FAILED.value -> {
                                         AppPreference.clearRestartDataPreference()
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     ResponseCode.ABORTED.value -> {
                                         AppPreference.clearRestartDataPreference()
@@ -1406,6 +1442,10 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1587,6 +1627,10 @@ var f57Data=""
                                     }
                                     ResponseCode.FAILED.value -> {
                                         AppPreference.clearRestartDataPreference()
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     ResponseCode.ABORTED.value -> {
                                         AppPreference.clearRestartDataPreference()
@@ -1618,6 +1662,10 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
+                                        errorFromIngenico(
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
+                                        )
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1813,10 +1861,8 @@ var f57Data=""
 
 
                                     }
-                                    ResponseCode.FAILED.value -> {
-                                        AppPreference.clearRestartDataPreference()
-                                    }
-                                    ResponseCode.ABORTED.value -> {
+
+                                    ResponseCode.ABORTED.value, ResponseCode.FAILED.value -> {
                                         AppPreference.clearRestartDataPreference()
                                         errorFromIngenico(
                                             txnResponse.responseCode,
@@ -1853,6 +1899,10 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
+                                        errorFromIngenico(
+                                            txnResponse?.responseCode,
+                                            txnResponse?.status.toString()
+                                        )
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1944,7 +1994,7 @@ var f57Data=""
 
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
-                                        AppPreference.clearRestartDataPreference()
+                                       AppPreference.clearRestartDataPreference()
 
                                         //To increment base Stan
                                         Utility().incrementUpdateRoc()
@@ -2016,10 +2066,8 @@ var f57Data=""
                                     }
                                 }
                             }
-                            ResponseCode.FAILED.value -> {
-                                AppPreference.clearRestartDataPreference()
-                            }
-                            ResponseCode.ABORTED.value -> {
+
+                            ResponseCode.ABORTED.value,  ResponseCode.FAILED.value -> {
                                 AppPreference.clearRestartDataPreference()
                                 errorFromIngenico(
                                     txnResponse.responseCode,

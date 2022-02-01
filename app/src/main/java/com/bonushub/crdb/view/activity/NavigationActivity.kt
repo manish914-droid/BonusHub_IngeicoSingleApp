@@ -322,13 +322,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             transactFragment(DashboardFragment())
 
         } else {
-            GlobalScope.launch(Dispatchers.IO) {
+      /*      GlobalScope.launch(Dispatchers.IO) {
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())
                     Log.d("Message ", msg)
                     //    refreshDrawer()
                 }
-            }
+            }*/
 
             transactFragment(InitFragment())
 
@@ -851,6 +851,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
             EDashboardItem.EMI_ENQUIRY -> {
                 if (Field48ResponseTimestamp.checkInternetConnection()) {
+                    CoroutineScope(Dispatchers.IO).launch{
+                        val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                        println("TID LIST --->  $listofTids")
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                        println("RESULT TWO --->  $resultTwo")
+                    }
                     transactFragment(EMICatalogue().apply {
                         arguments = Bundle().apply {
                             putSerializable("type", EDashboardItem.EMI_CATALOGUE)
@@ -863,19 +869,34 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
             }
             EDashboardItem.BRAND_EMI->{
-                transactFragment(BrandEmiMasterCategoryFragment().apply {
-                    arguments = Bundle().apply {
-                        putSerializable("type", action)
-                        putString(
-                            INPUT_SUB_HEADING,
-                            SubHeaderTitle.Brand_EMI_Master_Category.title
-                        )
+                if (Field48ResponseTimestamp.checkInternetConnection()) {
+                    CoroutineScope(Dispatchers.IO).launch{
+                        val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                        println("TID LIST --->  $listofTids")
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                        println("RESULT TWO --->  $resultTwo")
                     }
-                }, true)
+                    transactFragment(BrandEmiMasterCategoryFragment().apply {
+                        arguments = Bundle().apply {
+                            putSerializable("type", action)
+                            putString(
+                                INPUT_SUB_HEADING,
+                                SubHeaderTitle.Brand_EMI_Master_Category.title
+                            )
+                        }
+                    }, true)
 
-
+                }else{
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
             }
             EDashboardItem.VOID_SALE->{
+                CoroutineScope(Dispatchers.IO).launch{
+                    val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                    println("TID LIST --->  $listofTids")
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    println("RESULT TWO --->  $resultTwo")
+                }
                 transactFragment(VoidMainFragment())
                 // todo uncomment below
               /*  lifecycleScope.launch(Dispatchers.IO) {
@@ -897,9 +918,16 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PRE_AUTH_CATAGORY -> {
+
                 if (!action.childList.isNullOrEmpty()) {
                     // dashBoardCatagoryDialog(action.childList!!)
                     if (checkInternetConnection()) {
+                        CoroutineScope(Dispatchers.IO).launch{
+                            val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                            println("TID LIST --->  $listofTids")
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            println("RESULT TWO --->  $resultTwo")
+                        }
                         (transactFragment(
                             PreAuthFragment()
                             .apply {
@@ -923,7 +951,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             EDashboardItem.PREAUTH_VIEW ->{
-
+                CoroutineScope(Dispatchers.IO).launch{
+                    val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                    println("TID LIST --->  $listofTids")
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    println("RESULT TWO --->  $resultTwo")
+                }
                 DeviceHelper.doPreAuthViewTxn(object: OnOperationListener.Stub(){
                     override fun onCompleted(p0: OperationResult?) {
                         p0?.value?.apply {
@@ -962,7 +995,12 @@ EDashboardItem.VOID_PREAUTH->{
                 if (checkInternetConnection()) {
                     transactFragment(DigiPosMenuFragment().apply {
                         //   DigiPosDataTable.clear()
-
+                        CoroutineScope(Dispatchers.IO).launch{
+                            val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                            println("TID LIST --->  $listofTids")
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            println("RESULT TWO --->  $resultTwo")
+                        }
                         val dp = selectAllDigiPosData()
                         val dpObj = Gson().toJson(dp)
                         logger("UPDATEDIGI", dpObj, "e")

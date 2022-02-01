@@ -776,13 +776,15 @@ if(!fromBankEmi)
                         val timeStampsData = getAllBrandEMIMasterDataTimeStamps()
                         val dbTimeStamps = appDB.appDao.getBrandTimeStampFromDB()
 
-                        if (timeStampsData != null) {
-                            if (data?.isEmpty() == true || dbTimeStamps?.issuerTAndCTimeStamp?.isEmpty() == true) {
+                        if (dbTimeStamps != null) {
+                            if (data?.isEmpty() == true || dbTimeStamps?.issuerTAndCTimeStamp?.isEmpty()) {
                                 getIssuerTnc(fromBankEmi = true)
                             }
                             else{
                                 if (bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp ?: "0" != dbTimeStamps?.issuerTAndCTimeStamp) {
                                     bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp?.let {
+                                        dbTimeStamps.issuerTAndCTimeStamp=bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp
+                                        appDB.appDao.insertBrandEMIMasterTimeStamps(dbTimeStamps)
                                         Log.d(
                                             "Emi_update:- ",
                                             it

@@ -312,11 +312,10 @@ internal class SettlementAdapter(private val list: List<BatchTable>) :
         val amount = "%.2f".format(list[p1].receiptData?.txnAmount?.toDouble()?.div(100))
         holder.binding.tvBaseAmount.text = amount
         holder.binding.tvTransactionType.text = getTransactionTypeName(list[p1].transactionType)
+        if(getTransactionTypeName(list[p1].transactionType) == "TEST EMI TXN"){
+            holder.binding.tvTransactionType.text="SALE "
+        }
         holder.binding.tvTransactionDate.text = list[p1].receiptData?.dateTime
-
-
-
-
     }
 
     inner class SettlementHolder(val binding: ItemSettlementBinding) :
