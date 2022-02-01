@@ -142,8 +142,26 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
 
             if(cardProcessedData.getTransType()==BhTransactionType.PRE_AUTH_COMPLETE.type){
               //  TidBatchStanYYMMHHMMSS like 41501121000166000581220127193501
+                try {
+                    val dateTime = batchdata?.oldDateTimeInVoid
+                    val fromFormat: DateFormat =
+                        SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+                    val toFormat: DateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
+                    val reqDate: Date? = fromFormat.parse(dateTime ?: "")
+
+                    val stan = batchdata?.oldStanForVoid
+                    val reqDateString = toFormat.format(reqDate)
+
+                    val field56="${stan}${reqDateString}"
+                    addFieldByHex(56,field56)
+
+                }catch (ex:Exception){
+                    logger("Date Error","Exception in adding field 56","e")
+                }
 
 
+val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldDateTimeInVoid
+                addFieldByHex(56,data)
             }
 
 
