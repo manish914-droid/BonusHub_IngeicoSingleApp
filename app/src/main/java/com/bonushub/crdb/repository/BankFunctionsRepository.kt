@@ -12,10 +12,8 @@ import com.bonushub.crdb.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.model.local.TerminalParameterTable
-import com.bonushub.crdb.utils.PrefConstant
-import com.bonushub.crdb.utils.ToastUtils
-import com.bonushub.crdb.utils.checkBaseTid
-import com.bonushub.crdb.utils.logger
+import com.bonushub.crdb.serverApi.HitServer
+import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.view.fragments.TableEditHelper
 import com.bonushub.crdb.view.fragments.TidsListModel
 import kotlinx.coroutines.Dispatchers
@@ -330,8 +328,7 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
         return dataList
     }
 
-    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context: Context):LiveData<Boolean>
-    {
+    suspend fun updateTerminalCommunicationTable(dataList: ArrayList<TableEditHelper?>, recordType:String, context: Context):LiveData<Boolean> {
         val dataReturn = MutableLiveData<Boolean>()
         dataReturn.value = false
 
@@ -403,8 +400,11 @@ class BankFunctionsRepository @Inject constructor(private val appDao: AppDao) {
                             )
                         }
                     }
-                    //logger("update",""+table.toString())
-                    appDao.updateTerminalCommunicationTable(table as TerminalCommunicationTable)
+                    logger("update",""+table.toString())
+                 val update =   appDao.updateTerminalCommunicationTable(table as TerminalCommunicationTable)
+                    val tct = Utility().getTctData()
+                    logger("update value 1",""+tct.toString())
+                    println("Updated value "+update)
                 } else logger("TAG", "No data to update is found")
             }
 

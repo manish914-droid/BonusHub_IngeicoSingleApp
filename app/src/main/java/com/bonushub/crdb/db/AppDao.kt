@@ -397,7 +397,7 @@ interface AppDao{
     suspend fun getTerminalCommunicationTableByRecordType(redordType:String): TerminalCommunicationTable
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateTerminalCommunicationTable(terminalCommunicationTable: TerminalCommunicationTable)
+    suspend fun updateTerminalCommunicationTable(terminalCommunicationTable: TerminalCommunicationTable): Int
     // end region
 
     // brand emi region
