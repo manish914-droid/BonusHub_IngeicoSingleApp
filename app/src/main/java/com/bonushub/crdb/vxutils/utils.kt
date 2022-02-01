@@ -631,39 +631,44 @@ suspend fun doCommsTransaction(appDao: AppDao){
         password = wifiCommunicationTable?.get(0)?.gprAPNPassword
     )
 
+   try {
+       DeviceHelper.setCommunicationSettings(
+           request = request,
+           listener = object : OnOperationListener.Stub() {
 
-    DeviceHelper.setCommunicationSettings(
-        request = request,
-        listener = object : OnOperationListener.Stub() {
+               override fun onCompleted(result: OperationResult?) {
+                   println("Result: ${result?.value?.status}")
 
-            override fun onCompleted(result: OperationResult?) {
-               println("Result: ${result?.value?.status}")
+                   println("Result responseCode: ${(result?.value)?.responseCode}")
 
-                println("Result responseCode: ${(result?.value)?.responseCode}")
+                   println("Completed transaction...")
 
-                println("Completed transaction...")
+                   val status = result?.value?.status
+                   when (status) {
+                       RequestStatus.SUCCESS -> {
+                           println("Success")
+                           AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "1")
 
-                val status = result?.value?.status
-                when (status) {
-                    RequestStatus.SUCCESS -> {
-                        println("Success")
-                        AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "1")
+                           println("Wifi comm ->"+AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName))
+                       }
+                       RequestStatus.FAILED -> {
+                           AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                           println("Failed")
+                       }
+                       else -> {
+                           AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                           println("Error")
+                       }
+                   }
+               }
 
-                        println("Wifi comm ->"+AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName))
-                    }
-                    RequestStatus.FAILED -> {
-                        AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
-                        println("Failed")
-                    }
-                    else -> {
-                        AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
-                        println("Error")
-                    }
-                }
-            }
+           }
+       )
+      }
+   catch (ex: Exception){
+       ex.printStackTrace()
+   }
 
-        }
-    )
 }
 
 //Do initiaization
