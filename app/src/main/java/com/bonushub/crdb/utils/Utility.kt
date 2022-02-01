@@ -1139,9 +1139,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
 
     suspend fun syncPendingTransaction(transactionViewModel:TransactionViewModel,cb:(Boolean) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            com.bonushub.crdb.utils.logger(
+        com.bonushub.crdb.utils.logger(
                 "syncPendingTransaction",
                 " ----------------------->  START",
                 "e"
@@ -1192,7 +1190,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             withContext(Dispatchers.Main){
                 cb(txnSync)
             }
-        }
+
     }
 
     /*fun creatCardProcessingModelData(receiptDetail: ReceiptDetail):CardProcessedDataModal {

@@ -116,8 +116,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         //last saved Auto Settle Date:-
         if (!TextUtils.isEmpty(AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName))) {
             if (AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName).toInt() > 0) {
-                if (getSystemTimeIn24Hour().terminalDate().toInt() >
-                    AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName).toInt()
+                if (getSystemTimeIn24Hour().terminalDate().toInt() > AppPreference.getString(PreferenceKeyConstant.LAST_SAVED_AUTO_SETTLE_DATE.keyName).toInt()
                 ) {
                     isAutoSettleCodeInitiated=false
                     AppPreference.saveBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName, false)
@@ -128,7 +127,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
         logger("check",""+AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
         //region=======================Check For AutoSettle at regular interval if App is on Dashboard:-
-        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
+        if (isDashboardOpen && AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
             checkForAutoSettle()
         //endregion
     }
@@ -293,7 +292,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         handler.post(runnable as Runnable)
     }
     //endregion
-
+    var txnSyncing: Boolean = false
     //region=======================Check for User IDLE on Dashboard and do auto settle if conditions match:-
     private fun autoSettleBatch() {
         //val tptData = runBlocking(Dispatchers.IO) { TerminalParameterTable.selectFromSchemeTable() }
@@ -313,7 +312,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 //        tptData?.forceSettle = "1"
         // end region
 
-        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName)) {
+        if (isDashboardOpen && AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName)) {
 
             Log.d("Dashboard Open:- ", "Yes")
             if (!TextUtils.isEmpty(tptData?.forceSettle)
@@ -322,96 +321,101 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
             ) {
                 val conditionForAutoSettle =((tptData.forceSettleTime == getSystemTimeIn24Hour().terminalTime() || getSystemTimeIn24Hour().terminalTime() > tptData.forceSettleTime)) &&  batchData.size > 0
 
-                if (conditionForAutoSettle && !isAutoSettleCodeInitiated)
-                 {
+                if (conditionForAutoSettle && !isAutoSettleCodeInitiated) {
                      isAutoSettleCodeInitiated=true
                     logger("Auto Settle:- ", "Auto Settle Available")
                     lifecycleScope.launch(Dispatchers.Main){
 
                         (activity as BaseActivityNew).showProgress("Transaction syncing...")
+                          CoroutineScope(Dispatchers.IO).launch{
+                              Utility().syncPendingTransaction(transactionViewModel){ it
+                                  txnSyncing  = it
+                              }
 
-                        Utility().syncPendingTransaction(transactionViewModel){
+                                  (activity as BaseActivityNew).hideProgress()
 
-                            (activity as BaseActivityNew).hideProgress()
+                                  if(txnSyncing){
+                                      PrintUtil(activity).printDetailReportupdate(batchData, activity) {
+                                              detailPrintStatus ->
 
-                            if(it){
-                                    PrintUtil(activity).printDetailReportupdate(batchData, activity) {
-                                            detailPrintStatus ->
+                                      }
 
-                                    }
+                                      ioSope.launch {
+                                          var reversalTid  = checkReversal(dataListReversal)
+                                          var listofTxnTid =  checkSettlementTid(batchData)
 
-                                    ioSope.launch {
-                                        var reversalTid  = checkReversal(dataListReversal)
-                                        var listofTxnTid =  checkSettlementTid(batchData)
+                                          val result: ArrayList<String> = ArrayList()
+                                          result.addAll(listofTxnTid)
 
-                                        val result: ArrayList<String> = ArrayList()
-                                        result.addAll(listofTxnTid)
+                                          for (e in reversalTid) {
+                                              if (!result.contains(e)) result.add(e)
+                                          }
+                                          System.out.println("Total transaction tid is"+result.forEach {
+                                              println("Tid are "+it)
+                                          })
+                                          settlementViewModel.settlementResponse(result)
+                                      }
 
-                                        for (e in reversalTid) {
-                                            if (!result.contains(e)) result.add(e)
-                                        }
-                                        System.out.println("Total transaction tid is"+result.forEach {
-                                            println("Tid are "+it)
-                                        })
-                                        settlementViewModel.settlementResponse(result)
-                                    }
+                                      settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
 
-                                    settlementViewModel.ingenciosettlement.observe(requireActivity()) { result ->
+                                          when (result.status) {
+                                              Status.SUCCESS -> {
+                                                  CoroutineScope(Dispatchers.IO).launch {
+                                                      AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+                                                      AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
 
-                                        when (result.status) {
-                                            Status.SUCCESS -> {
-                                                CoroutineScope(Dispatchers.IO).launch {
-                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
-                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), false)
+                                                      // region upload digipos pending txn
+                                                      logger("UPLOAD DIGI"," ----------------------->  START","e")
+                                                      uploadPendingDigiPosTxn(requireActivity()){
+                                                          logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
+                                                          CoroutineScope(Dispatchers.IO).launch{
+                                                              val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                                              val settlementByteArray = data.generateIsoByteRequest()
+                                                              try {
+                                                                  (activity as NavigationActivity).settleBatch1(settlementByteArray, SettlementComingFrom.DASHBOARD.screenType) { (activity as NavigationActivity).hideProgress()}
+                                                              } catch (ex: Exception) {
+                                                                  (activity as NavigationActivity).hideProgress()
+                                                                  ex.printStackTrace()
+                                                              }
+                                                          }
 
-                                                    // region upload digipos pending txn
-                                                    logger("UPLOAD DIGI"," ----------------------->  START","e")
-                                                    uploadPendingDigiPosTxn(requireActivity()){
-                                                        logger("UPLOAD DIGI"," ----------------------->   BEFOR PRINT","e")
-                                                        CoroutineScope(Dispatchers.IO).launch{
-                                                            val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                                            val settlementByteArray = data.generateIsoByteRequest()
-                                                            try {
-                                                                (activity as NavigationActivity).settleBatch1(settlementByteArray, SettlementComingFrom.DASHBOARD.screenType) { (activity as NavigationActivity).hideProgress()}
-                                                            } catch (ex: Exception) {
-                                                                (activity as NavigationActivity).hideProgress()
-                                                                ex.printStackTrace()
-                                                            }
-                                                        }
+                                                      }
+                                                      // end region
 
-                                                    }
-                                                    // end region
-
-                                                }
-                                                //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
-                                            }
-                                            Status.ERROR -> {
-                                                println("Error in ingenico settlement")
-                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
-                                                AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
-                                                // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
-                                            }
-                                            Status.LOADING -> {
-                                                // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
+                                                  }
+                                                  //  Toast.makeText(activity,"Sucess called  ${result.message}", Toast.LENGTH_LONG).show()
+                                              }
+                                              Status.ERROR -> {
+                                                  println("Error in ingenico settlement")
+                                                  AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                                                  AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
+                                                  // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
+                                              }
+                                              Status.LOADING -> {
+                                                  // Toast.makeText(activity,"Loading called  ${result.message}", Toast.LENGTH_LONG).show()
 
 
-                                            }
-                                        }
+                                              }
+                                          }
 
-                                    }
-                                }else{
-                                    logger("sync","failed terminate settlement")
-                                    (activity as? NavigationActivity)?.hideProgress()
-                                    (activity as? BaseActivityNew)?.getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
-                                        try {
-                                            (activity as? NavigationActivity)?.decideDashBoardOnBackPress()
-                                        }catch (ex:Exception){
-                                            ex.printStackTrace()
+                                      }
+                                  }else{
+                                      logger("sync","failed terminate settlement")
+                                      (activity as? NavigationActivity)?.hideProgress()
+                                      Handler(Looper.getMainLooper()).postDelayed(Runnable {
+                                          (activity as? BaseActivityNew)?.getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
+                                              try {
+                                                  (activity as? NavigationActivity)?.decideDashBoardOnBackPress()
+                                              }catch (ex:Exception){
+                                                  ex.printStackTrace()
 
-                                        }
-                                    }
-                                }
-                        }
+                                              }
+                                          }
+                                      }
+                                      ,500)
+                                  }
+                          }
+
                     }
 
 //                    val data = runBlocking(Dispatchers.IO) {

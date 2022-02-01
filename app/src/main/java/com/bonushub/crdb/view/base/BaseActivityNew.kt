@@ -108,30 +108,32 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
 
     override fun getInfoDialog(title: String, msg: String, icon: Int,acceptCb: () -> Unit) {
-        val dialog = Dialog(this)
-        dialog.apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.msg_dialog)
-            setCancelable(false)
-            window?.attributes?.windowAnimations = R.style.DialogAnimation
-            val window = dialog.window
-            window?.setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-            findViewById<ImageView>(R.id.img_header).setImageResource(icon)
-            findViewById<TextView>(R.id.msg_dialog_title).text = title
-            findViewById<TextView>(R.id.msg_dialog_msg).text = msg
+            val dialog = Dialog(this)
+            dialog.apply {
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.msg_dialog)
+                setCancelable(false)
+                window?.attributes?.windowAnimations = R.style.DialogAnimation
+                val window = dialog.window
+                window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                findViewById<ImageView>(R.id.img_header).setImageResource(icon)
+                findViewById<TextView>(R.id.msg_dialog_title).text = title
+                findViewById<TextView>(R.id.msg_dialog_msg).text = msg
 
-            with(findViewById<View>(R.id.msg_dialog_ok)) {
-                setOnClickListener {
-                    dismiss()
-                    acceptCb()
+                with(findViewById<View>(R.id.msg_dialog_ok)) {
+                    setOnClickListener {
+                        dismiss()
+                        acceptCb()
+                    }
                 }
-            }
-            findViewById<View>(R.id.msg_dialog_cancel).visibility = View.GONE
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }.show()
+                findViewById<View>(R.id.msg_dialog_cancel).visibility = View.GONE
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+
+
 
     }
 
