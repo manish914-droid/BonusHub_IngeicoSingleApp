@@ -127,7 +127,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 
         logger("check",""+AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
         //region=======================Check For AutoSettle at regular interval if App is on Dashboard:-
-        if (isDashboardOpen && AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
+        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
             checkForAutoSettle()
         //endregion
     }
@@ -312,7 +312,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
 //        tptData?.forceSettle = "1"
         // end region
 
-        if (isDashboardOpen && AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName)) {
+        if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName)) {
 
             Log.d("Dashboard Open:- ", "Yes")
             if (!TextUtils.isEmpty(tptData?.forceSettle)
