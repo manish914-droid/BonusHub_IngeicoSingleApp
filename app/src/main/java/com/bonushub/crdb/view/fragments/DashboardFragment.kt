@@ -157,8 +157,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     }
                     sendConfirmationToHost()
 
-                    val resStr = appDao.getAllTerminalParameterTableData()
-
+                 //   val resStr = appDao.getAllTerminalParameterTableData()
 
                     if (AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName) == "0" || wifiCTTable?.get(
                             0
@@ -398,10 +397,10 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                                     }
                                 }else{
                                     logger("sync","failed terminate settlement")
-                                    (activity as NavigationActivity).hideProgress()
-                                    (activity as BaseActivityNew).getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
+                                    (activity as? NavigationActivity)?.hideProgress()
+                                    (activity as? BaseActivityNew)?.getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
                                         try {
-                                            (activity as NavigationActivity).decideDashBoardOnBackPress()
+                                            (activity as? NavigationActivity)?.decideDashBoardOnBackPress()
                                         }catch (ex:Exception){
                                             ex.printStackTrace()
 

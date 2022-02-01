@@ -322,13 +322,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             transactFragment(DashboardFragment())
 
         } else {
-            GlobalScope.launch(Dispatchers.IO) {
+        /*    GlobalScope.launch(Dispatchers.IO) {
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())
                     Log.d("Message ", msg)
                     //    refreshDrawer()
                 }
-            }
+            }*/
 
             transactFragment(InitFragment())
 
