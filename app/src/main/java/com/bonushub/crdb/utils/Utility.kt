@@ -1188,8 +1188,6 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     }
                 }
             }
-
-
             cb(txnSync)
         }
     }

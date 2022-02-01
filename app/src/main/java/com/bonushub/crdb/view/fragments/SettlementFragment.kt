@@ -154,10 +154,8 @@ class SettlementFragment : Fragment() {
 
                     }else{
 
-                        lifecycleScope.launch(Dispatchers.Main){
-
+                        lifecycleScope.launch(Dispatchers.IO){
                             Utility().syncPendingTransaction(transactionViewModel){
-
                                 if(it){
                                     PrintUtil(activity).printDetailReportupdate(dataList, activity) {
                                             detailPrintStatus ->
@@ -165,9 +163,9 @@ class SettlementFragment : Fragment() {
                                     }
 
 
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        var reversalTid  = checkReversal(dataListReversal)
-                                        var listofTxnTid =  checkSettlementTid(dataList)
+                                    lifecycleScope.launch(Dispatchers.Main) {
+                                        val reversalTid  = checkReversal(dataListReversal)
+                                        val listofTxnTid =  checkSettlementTid(dataList)
 
                                         val result: ArrayList<String> = ArrayList()
                                         result.addAll(listofTxnTid)
@@ -241,17 +239,16 @@ class SettlementFragment : Fragment() {
 
                                         }
                                     }
-
-
                                 }else{
                                     logger("sync","failed terminate settlement")
                                     (activity as? NavigationActivity)?.hideProgress()
-                                    (activity as? BaseActivityNew)?.getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
-                                        try {
-                                            (activity as? NavigationActivity)?.decideDashBoardOnBackPress()
-                                        }catch (ex:Exception){
-                                            ex.printStackTrace()
-
+                                    lifecycleScope.launch(Dispatchers.Main){
+                                        (activity as? BaseActivityNew)?.getInfoDialog("","Syncing failed settlement not allow.",R.drawable.ic_info){
+                                            try {
+                                                (activity as? NavigationActivity)?.decideDashBoardOnBackPress()
+                                            }catch (ex:Exception){
+                                                ex.printStackTrace()
+                                            }
                                         }
                                     }
                                 }

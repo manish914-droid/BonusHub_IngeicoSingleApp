@@ -1716,12 +1716,8 @@ var f57Data=""
                                     ResponseCode.SUCCESS.value -> {
                                         val jsonResp = Gson().toJson(receiptDetail)
                                         println(jsonResp)
-                                        // AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
-                                        //   detailResponse.forEach { println(it) }
-                                        //  uids.add(ecrID)
-                                        // defaultScope.launch { onSaveUId(ecrID, handleLoadingUIdsResult) }
+
                                         if (receiptDetail != null) {
-                                            //To get tpt data acccording to tid
                                             val tpt = runBlocking(Dispatchers.IO) {
                                                 getTptData()
                                             }
@@ -1729,58 +1725,61 @@ var f57Data=""
                                             val oldBatchTable = runBlocking(Dispatchers.IO) {
                                                 getBatchDataByInvoice(receiptDetail.invoice.toString())
                                             }
-                                            val batchData = BatchTable(receiptDetail)
+                                            val newBatchData = BatchTable(receiptDetail)
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
-
                                                 if(oldBatchTable != null){
-                                                    // replcace reciept data if present in our batch data
-                                                    oldBatchTable.receiptData = receiptDetail
-                                                    oldBatchTable.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                    // replace reciept data if present in our batch data
+                                                        val oldDateTime=oldBatchTable.receiptData?.dateTime?:""
 
+                                                    oldBatchTable.receiptData = receiptDetail
+                                                    oldBatchTable.oldDateTimeInVoid=oldDateTime
+
+                                                    oldBatchTable.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                    oldBatchTable.bonushubStan = tpt?.stan.toString()
+                                                    oldBatchTable.bonushubbatchnumber= tpt?.batchNumber.toString()
                                                     appDatabase.appDao.insertBatchData(oldBatchTable)
                                                     AppPreference.saveLastReceiptDetails(oldBatchTable)
-                                                }else{
+                                                    Utility().incrementUpdateRoc()
+                                                }
+                                                else{
                                                     //    appDao.insertBatchData(batchData)
-                                                    batchData.invoice = receiptDetail.invoice.toString()
-                                                    batchData.transactionType =
-                                                        BhTransactionType.PRE_AUTH_COMPLETE.type
+                                                    newBatchData.invoice = receiptDetail.invoice.toString()
+                                                    newBatchData.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
                                                     //To get bonushb batchnumber,bonuhubinvoice,bonuhub stan
-                                                    batchData.bonushubbatchnumber =
-                                                        tpt?.batchNumber ?: ""
-                                                    batchData.bonushubInvoice = tpt?.invoiceNumber ?: ""
-                                                    batchData.bonushubStan = tpt?.stan ?: ""
+                                                    newBatchData.bonushubbatchnumber =
+                                                        tpt?.batchNumber .toString()
+                                                    newBatchData.bonushubInvoice = tpt?.invoiceNumber.toString()
+                                                    newBatchData.bonushubStan = tpt?.stan .toString()
+                                                    newBatchData.oldDateTimeInVoid = receiptDetail.dateTime.toString()
+                                                    appDatabase.appDao.insertBatchData(newBatchData)
+                                                    AppPreference.saveLastReceiptDetails(newBatchData)
 
-                                                    createCardProcessingModelData(receiptDetail)
-                                                    val data =
-                                                        globalCardProcessedModel.getPanNumberData()
-                                                            ?.let {
-                                                                batchData.receiptData?.let { it1 ->
-                                                                    getEncryptedDataForSyncing(
-                                                                        it,
-                                                                        it1
-                                                                    )
-                                                                }
-                                                            }
-                                                    if (data != null) {
-                                                        batchData.field57EncryptedData = data
-                                                    }
-
-                                                    appDatabase.appDao.insertBatchData(batchData)
-                                                    AppPreference.saveLastReceiptDetails(batchData)
+                                                    Utility().incrementUpdateRoc()
+                                                    Utility().incrementUpdateInvoice()
                                                 }
 
+                                                val requiredBatchData :BatchTable= oldBatchTable ?: newBatchData
+                                                requiredBatchData.receiptData?.let {
+                                                    createCardProcessingModelData(
+                                                        it
+                                                    )
+                                                }
+                                                val data =
+                                                    globalCardProcessedModel.getPanNumberData()
+                                                        ?.let {
+                                                            requiredBatchData.receiptData?.let { it1 ->
+                                                                getEncryptedDataForSyncing(
+                                                                    it,
+                                                                    it1
+                                                                )
+                                                            }
+                                                        }
+                                                if (data != null) {
+                                                    requiredBatchData.field57EncryptedData = data
+                                                }
                                                 AppPreference.clearRestartDataPreference()
-
-                                                if(oldBatchTable == null){
-                                                        //To increment base Stan
-                                                        Utility().incrementUpdateRoc()
-                                                        //To increment base invoice
-                                                        Utility().incrementUpdateInvoice()
-                                                    }
-
-
-                                                printingSaleData(batchData) {
+                                                printingSaleData(requiredBatchData) {
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
                                                     }
@@ -1788,7 +1787,7 @@ var f57Data=""
                                                     val transactionISO = CreateTransactionPacket(
                                                         appDao,
                                                         globalCardProcessedModel,
-                                                        batchData
+                                                        requiredBatchData
                                                     ).createTransactionPacket()
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(
@@ -1825,7 +1824,7 @@ var f57Data=""
                                                             val pendingSyncTransactionTable =
                                                                 PendingSyncTransactionTable(
                                                                     invoice = receiptDetail.invoice.toString(),
-                                                                    batchTable = batchData,
+                                                                    batchTable = requiredBatchData,
                                                                     responseCode = genericResp.toString(),
                                                                     cardProcessedDataModal = globalCardProcessedModel
                                                                 )
