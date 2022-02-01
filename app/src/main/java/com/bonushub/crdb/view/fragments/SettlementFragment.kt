@@ -155,8 +155,16 @@ class SettlementFragment : Fragment() {
                     }else{
 
                         lifecycleScope.launch(Dispatchers.IO){
+                            withContext(Dispatchers.Main){
+
+                                (activity as BaseActivityNew).showProgress("Transaction syncing...")
+                            }
                             Utility().syncPendingTransaction(transactionViewModel){
                                 if(it){
+                                       // withContext(Dispatchers.Main){
+                                            (activity as BaseActivityNew).hideProgress()
+                                       // }
+
                                     PrintUtil(activity).printDetailReportupdate(dataList, activity) {
                                             detailPrintStatus ->
 

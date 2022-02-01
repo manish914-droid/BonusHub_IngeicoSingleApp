@@ -328,9 +328,13 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                     logger("Auto Settle:- ", "Auto Settle Available")
                     lifecycleScope.launch(Dispatchers.Main){
 
+                        (activity as BaseActivityNew).showProgress("Transaction syncing...")
+
                         Utility().syncPendingTransaction(transactionViewModel){
 
-                                if(it){
+                            (activity as BaseActivityNew).hideProgress()
+
+                            if(it){
                                     PrintUtil(activity).printDetailReportupdate(batchData, activity) {
                                             detailPrintStatus ->
 

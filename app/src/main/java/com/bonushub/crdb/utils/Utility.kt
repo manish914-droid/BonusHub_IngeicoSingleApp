@@ -1150,6 +1150,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
             if (pendingTxn.size != 0) {
+
                 for (item in pendingTxn) {
                     val transactionISO =
                         CreateTransactionPacket(
@@ -1188,7 +1189,9 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     }
                 }
             }
-            cb(txnSync)
+            withContext(Dispatchers.Main){
+                cb(txnSync)
+            }
         }
     }
 
