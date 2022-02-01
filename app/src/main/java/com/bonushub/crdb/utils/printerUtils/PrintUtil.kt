@@ -614,7 +614,7 @@ class PrintUtil(context: Context?) {
         textBlockList.clear()
 
         textBlockList.add(sigleLineformat("TENURE", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat("${tenureDuration}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat(tenureDuration, AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
         //region===============Processing Fee Changes And Showing On ChargeSlip:-
@@ -707,10 +707,10 @@ class PrintUtil(context: Context?) {
 
             when (bankEMIIssuerTAndCDataModal.issuerID) {
                 "51", "64" -> {
-                    nextLineAppendStr = "Payback Amt"
+                    nextLineAppendStr = "Payback Amount"
                 }
                 "52", "55" ,"54"-> {
-                    nextLineAppendStr = "Cashback Amt"
+                    nextLineAppendStr = "Cashback Amount"
                 }
 
             }
@@ -1255,7 +1255,7 @@ class PrintUtil(context: Context?) {
 
         }
         printSeperator()
-        if (batchTable.transactionType != BhTransactionType.BRAND_EMI.type && batchTable.transactionType != BhTransactionType.TEST_EMI.type)
+        if (batchTable.transactionType != BhTransactionType.BRAND_EMI.type )
         baseAmounthandling(batchTable)
 
     }
@@ -1609,13 +1609,22 @@ class PrintUtil(context: Context?) {
                             b.receiptData?.txnAmount?.toDouble()
                                 ?.div(100)
                         )
-
-                        textBlockList.add(
-                            sigleLineformat(
-                                "${b.receiptData?.txnName}",
-                                AlignMode.LEFT
+                        if(b.receiptData?.txnName.equals("TEST EMI TXN")){
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${"SALE"}",
+                                    AlignMode.LEFT
+                                )
                             )
-                        )
+                        }else{
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${b.receiptData?.txnName}",
+                                    AlignMode.LEFT
+                                )
+                            )
+                        }
+
                         textBlockList.add(sigleLineformat("$transAmount", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
@@ -1886,7 +1895,19 @@ class PrintUtil(context: Context?) {
                 } else {
                     //-----------------------------------------------
                     setLogoAndHeader()
+                    /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
+                      receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
+//                    val ingtpt=getInitdataList()
+//                    val header1= ingtpt?.merAddHeader1
+//                    val header2=ingtpt?.merAddHeader2
+//                    val merchantName=ingtpt?.merchantName.toString().trim()
+//
+//                    sigleLineText(merchantName, AlignMode.CENTER)
+//                    sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+//                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+
                     headerPrinting()
+
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()
                     val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -1945,7 +1966,7 @@ class PrintUtil(context: Context?) {
                     textBlockList.clear()
 
                     textBlockList.add(sigleLineformat("DATE-TIME", AlignMode.LEFT))
-                    textBlockList.add(sigleLineformat("ROC", AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat("INVOICE", AlignMode.RIGHT))
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
                     printSeperator()
@@ -2014,14 +2035,23 @@ class PrintUtil(context: Context?) {
                             b.receiptData?.txnAmount?.toDouble()
                                 ?.div(100)
                         )
-
-                        textBlockList.add(
-                            sigleLineformat(
-                                "${b.receiptData?.txnName}",
-                                AlignMode.LEFT
+                        if(b.receiptData?.txnName.equals("TEST EMI TXN")){
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${"SALE"}",
+                                    AlignMode.LEFT
+                                )
                             )
-                        )
-                        textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:$transAmount", AlignMode.RIGHT))
+                        }else{
+                            textBlockList.add(
+                                sigleLineformat(
+                                    "${b.receiptData?.txnName}",
+                                    AlignMode.LEFT
+                                )
+                            )
+                        }
+
+                        textBlockList.add(sigleLineformat("$transAmount", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
                         if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
@@ -2046,16 +2076,12 @@ class PrintUtil(context: Context?) {
                                     AlignMode.LEFT
                                 )
                             )
-                            b.receiptData?.maskedPan?.let {
+                            textBlockList.add(
                                 sigleLineformat(
-                                    it,
+                                    "${b.receiptData?.maskedPan}",
                                     AlignMode.RIGHT
                                 )
-                            }?.let {
-                                textBlockList.add(
-                                    it
-                                )
-                            }
+                            )
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
                         }
@@ -2110,7 +2136,7 @@ class PrintUtil(context: Context?) {
                         if (hasfrequency) {
 
 
-                            sigleLineText("***TOTAL REVERSAL***", AlignMode.CENTER)
+                            sigleLineText("***TOTAL TRANSACTIONS***", AlignMode.CENTER)
                             val sortedMap = totalMap.toSortedMap(compareByDescending { it })
 
                             for ((k, m) in sortedMap) {
@@ -2122,12 +2148,25 @@ class PrintUtil(context: Context?) {
                                     )
                                 )
                                 textBlockList.add(
-                                    sigleLineformat(
-                                        "= " + m.count, AlignMode.CENTER
-                                    )
+                                    /*sigleLineformat(
+                                        "=" + m.count + " ${
+                                            getCurrencySymbol(
+                                                tpt
+                                            )
+                                        }", AlignMode.CENTER
+                                    )*/
+                                    sigleLineformat("= ${m.count}" , AlignMode.CENTER)
                                 )
-                                textBlockList.add(
-                                    sigleLineformat("${getCurrencySymbol(tpt)}:${"%.2f".format((((m.total).toDouble()).div(100)).toString().toDouble())}", AlignMode.RIGHT)
+                                /*textBlockList.add(
+                                    sigleLineformat(
+                                        "%.2f".format(
+                                            (((m.total).toDouble()).div(
+                                                100
+                                            )).toString().toDouble()
+                                        ), AlignMode.RIGHT
+                                    )
+                                )*/
+                                textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:${"%.2f".format((((m.total).toDouble()).div(100)).toString().toDouble())}", AlignMode.RIGHT)
                                 )
                                 printer?.addMixStyleText(textBlockList)
                                 textBlockList.clear()
@@ -2168,6 +2207,55 @@ class PrintUtil(context: Context?) {
                 }
 
                 //endregion
+                // region === Below code is execute when digi txns are available on POS
+                val digiPosDataList =
+                    selectDigiPosDataAccordingToTxnStatus(EDigiPosPaymentStatus.Approved.desciption) as ArrayList<DigiPosDataTable>
+                if (digiPosDataList.isNotEmpty()) {
+                    printSeperator()
+                    // centerText(textFormatBundle, "---------X-----------X----------")
+
+                    sigleLineText("Digi Pos Detail Report", AlignMode.CENTER)
+
+                    tpt?.terminalId?.let { sigleLineText( "TID : $it",AlignMode.CENTER) }
+                    printSeperator()
+                    // Txn description
+                    textBlockList.add(sigleLineformat("MODE", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("AMOUNT(INR)", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    textBlockList.add(sigleLineformat("PartnetTxnId", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("DATE-TIME", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    textBlockList.add(sigleLineformat("mTxnId", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("pgwTxnId", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+                    printSeperator()
+                    //Txn Detail
+                    for (digiPosData in digiPosDataList) {
+
+                        textBlockList.add(sigleLineformat( digiPosData.paymentMode, AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat( digiPosData.amount, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+                        textBlockList.add(sigleLineformat(digiPosData.partnerTxnId, AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat( digiPosData.txnDate + "  " + digiPosData.txnTime, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+                        textBlockList.add(sigleLineformat(  digiPosData.mTxnId, AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat(  digiPosData.pgwTxnId, AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+
+                        sigleLineText("----------------------------------------", AlignMode.CENTER)
+                    }
+                    //   DigiPosDataTable.deletAllRecordAccToTxnStatus(EDigiPosPaymentStatus.Approved.desciption)
+                }
+                //endregion
+
+
                 if (batch.isNotEmpty()) {
                     printSeperator()
                     sigleLineText("Bonushub", AlignMode.CENTER)
@@ -2570,10 +2658,18 @@ class PrintUtil(context: Context?) {
                         } else {
 
                             m.type?.let {
-                                sigleLineformat(
-                                    it.toUpperCase(Locale.ROOT),
-                                    AlignMode.LEFT
-                                )
+                                if(it == "TEST EMI TXN"){
+                                    sigleLineformat(
+                                        "SALE",
+                                        AlignMode.LEFT
+                                    )
+                                }else{
+                                    sigleLineformat(
+                                        it.toUpperCase(Locale.ROOT),
+                                        AlignMode.LEFT
+                                    )
+                                }
+
                             }?.let {
                                 textBlockList.add(it)
                             }

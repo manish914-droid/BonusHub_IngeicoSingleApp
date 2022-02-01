@@ -11,6 +11,8 @@ import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.Field48ResponseTimestamp
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getAllBrandEMIMasterDataTimeStamps
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getAllIssuerData
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.IssuerBankModal
@@ -770,7 +772,35 @@ if(!fromBankEmi)
                         Log.d("Total BankEMI Data:- ", bankEMISchemesDataList.toString())
                         Log.d("Total BankEMI TAndC:- ", parsingDataWithCurlyBrace[1])
                         val tenuresWithIssuerTncs=TenuresWithIssuerTncs(bankEMIIssuerTAndCList,bankEMISchemesDataList)
-getIssuerTnc(fromBankEmi = true)
+                        val data = runBlocking(Dispatchers.IO) { getAllIssuerData() }
+                        val timeStampsData = getAllBrandEMIMasterDataTimeStamps()
+                        val dbTimeStamps = appDB.appDao.getBrandTimeStampFromDB()
+
+                        if (dbTimeStamps != null) {
+                            if (data?.isEmpty() == true || dbTimeStamps?.issuerTAndCTimeStamp?.isEmpty()) {
+                                getIssuerTnc(fromBankEmi = true)
+                            }
+                            else{
+                                if (bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp ?: "0" != dbTimeStamps?.issuerTAndCTimeStamp) {
+                                    bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp?.let {
+                                        dbTimeStamps.issuerTAndCTimeStamp=bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp
+                                        appDB.appDao.insertBrandEMIMasterTimeStamps(dbTimeStamps)
+                                        Log.d(
+                                            "Emi_update:- ",
+                                            it
+                                        )
+                                    }
+                                    dbTimeStamps?.issuerTAndCTimeStamp?.let {
+                                        Log.d("timeStampsData:- ",
+                                            it
+                                        )
+                                    }
+                                    getIssuerTnc(fromBankEmi = true)
+                                }
+
+
+                            }
+                        }
                         emiTenureMLData.postValue(GenericResponse.Success(tenuresWithIssuerTncs))
 
                     }

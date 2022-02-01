@@ -108,7 +108,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private var navHostFragment: NavHostFragment? = null
     private var isToExit = false
     private var tempSettlementByteArray: ByteArray? = null
-   // private var isoPacketByteArray: ByteArray? = null
+    // private var isoPacketByteArray: ByteArray? = null
     private var headerView: View? = null
     private var mainDrawerBinding: MainDrawerBinding? = null
     private var showLessOnBackPress: ShowLessOnBackPress? = null
@@ -156,15 +156,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
-       /* lockStatusBar()
-        isFresAppStatus = WifiPrefManager(this).isWifiStatus
-        if (!isFresAppStatus) {
-            isFresApp = WifiPrefManager(this).appStatus
-        }
-        if (isFresApp == "true" && isFresAppStatus) {
-            wifiHandaling()
-        }
-        onWindowFocusChanged(false)*/
+        /* lockStatusBar()
+         isFresAppStatus = WifiPrefManager(this).isWifiStatus
+         if (!isFresAppStatus) {
+             isFresApp = WifiPrefManager(this).appStatus
+         }
+         if (isFresApp == "true" && isFresAppStatus) {
+             wifiHandaling()
+         }
+         onWindowFocusChanged(false)*/
         //region============================Below Logic is to Hide Back Arrow from Toolbar
         navHostFragment?.navController?.addOnDestinationChangedListener { _, _, _ ->
             navigationBinding?.toobar?.dashboardToolbar?.navigationIcon = null
@@ -203,7 +203,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 super.onDrawerOpened(drawerView)
                 // Do whatever you want here
                 logger("drawer","open")
-                    refreshDrawer()
+                refreshDrawer()
             }
         }
         navigationBinding?.mainDl?.addDrawerListener(mDrawerToggle)
@@ -226,9 +226,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
 
         //Settle Batch When Auto Settle == 1 After Sale:- kushal -> auto settlement doing in dashboard
-  //      if (appUpdateFromSale) {
-   //         autoSettleBatchData()
-    //    }
+        //      if (appUpdateFromSale) {
+        //         autoSettleBatchData()
+        //    }
     }
 
 
@@ -263,7 +263,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             autoSettleBatchData()
                         },
                         {})
-                   }
+                }
                 else {
                     transactFragment(SettlementFragment())
                 }
@@ -294,7 +294,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     //region  Checked that the terminal is initialized or not.
     private fun decideDashBoard() {
         if (AppPreference.getLogin()) {
-               //refreshDrawer()
+            //refreshDrawer()
             navHostFragment?.navController?.popBackStack()
             Log.e("NAV", "DECIDE HOME")
             navHostFragment?.navController?.navigate(R.id.dashBoardFragment)
@@ -305,7 +305,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 Utility().readLocalInitFile { status, msg ->
                     Log.d("Init File Read Status ", status.toString())
                     Log.d("Message ", msg)
-                 //    refreshDrawer()
+                    //    refreshDrawer()
                 }
             }
             navHostFragment?.navController?.popBackStack()
@@ -322,13 +322,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             transactFragment(DashboardFragment())
 
         } else {
-        /*    GlobalScope.launch(Dispatchers.IO) {
-                Utility().readLocalInitFile { status, msg ->
-                    Log.d("Init File Read Status ", status.toString())
-                    Log.d("Message ", msg)
-                    //    refreshDrawer()
-                }
-            }*/
+            /*      GlobalScope.launch(Dispatchers.IO) {
+                      Utility().readLocalInitFile { status, msg ->
+                          Log.d("Init File Read Status ", status.toString())
+                          Log.d("Message ", msg)
+                          //    refreshDrawer()
+                      }
+                  }*/
 
             transactFragment(InitFragment())
 
@@ -432,7 +432,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         headerView?.let { footer?.version_id?.text = "Revision Id :${BuildConfig.REVISION_ID}"}
 
         lifecycleScope.launch{
-           // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
+            // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
             var tpt:TerminalParameterTable? = null
             if(AppPreference.getLogin()) {
                 tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
@@ -440,18 +440,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 tpt = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
             }
             // old
-           /* var listofTids = ArrayList<String>()
-            tpt?.tidType?.forEachIndexed { index, tidType ->
-                if(tidType.equals("1")){
-                    tpt?.terminalId?.get(index)
-                    //Have to change again done
-                  //  listofTids.add(0,tpt?.terminalId?.get(index) ?: "")
-                }
-                else{
-                    //Have to change again done
-                   // listofTids.add(tpt?.terminalId?.get(index) ?: "")
-                }
-            }*/
+            /* var listofTids = ArrayList<String>()
+             tpt?.tidType?.forEachIndexed { index, tidType ->
+                 if(tidType.equals("1")){
+                     tpt?.terminalId?.get(index)
+                     //Have to change again done
+                   //  listofTids.add(0,tpt?.terminalId?.get(index) ?: "")
+                 }
+                 else{
+                     //Have to change again done
+                    // listofTids.add(tpt?.terminalId?.get(index) ?: "")
+                 }
+             }*/
 
             //tid = getString(R.string.terminal_id) + "   : " + listofTids[0]  // old
             tid = getString(R.string.terminal_id) + "   : " + tpt?.terminalId
@@ -464,14 +464,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             //region=================Show help Desk Number in Navigation Footer after Init:-
 
-                val hdfcTpt = getHDFCTptData()
-                if (hdfcTpt != null) {
-                    val helplineNumber = "HelpLine: ${hdfcTpt.helpDeskNumber.replace("F", "")}"
-                    //binding?.mainDrawerView?.helpDeskTV?.text = helplineNumber
-                    //binding?.mainDrawerView?.helpDeskTV?.visibility = View.VISIBLE
-                    headerView?.let { footer?.help_desk_number?.text = helplineNumber}
-                    headerView?.let { footer?.help_desk_number?.visibility = View.VISIBLE}
-                }
+            val hdfcTpt = getHDFCTptData()
+            if (hdfcTpt != null) {
+                val helplineNumber = "HelpLine: ${hdfcTpt.helpDeskNumber.replace("F", "")}"
+                //binding?.mainDrawerView?.helpDeskTV?.text = helplineNumber
+                //binding?.mainDrawerView?.helpDeskTV?.visibility = View.VISIBLE
+                headerView?.let { footer?.help_desk_number?.text = helplineNumber}
+                headerView?.let { footer?.help_desk_number?.visibility = View.VISIBLE}
+            }
 
             //endregion
         }
@@ -488,7 +488,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         /*logger("current Fragment3",""+supportFragmentManager.fragments.size)
         logger("current Fragment4",""+supportFragmentManager.fragments.toString())
         logger("current Fragment5",""+supportFragmentManager.fragments.get(0)::class.java.simpleName)*/
-            if (supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("NavHostFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("DashboardFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("InitFragment",true)) {
+        if (supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("NavHostFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("DashboardFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("InitFragment",true)) {
             Log.d("Dashboard:- ", "Inflated")
             if (isExpanded)
                 showLessOnBackPress?.showLessDashOptions()
@@ -497,17 +497,17 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     navigationBinding?.mainDl?.closeDrawer(GravityCompat.START)
                 else
                     exitApp()
-                 // exitluncher()
+                // exitluncher()
             }
         }else if(supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("BankFunctionsFragment",true)
-                ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
-                        ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("SettlementFragment",true) ){
+            ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
+            ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("SettlementFragment",true) ){
 
-                    decideDashBoardOnBackPress()
+            decideDashBoardOnBackPress()
 
         }else{
             supportFragmentManager.popBackStackImmediate()
-            }
+        }
     }
 
 
@@ -544,18 +544,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             dialogAdminPassword = dialog
             bankFunctionsViewModel.isAdminPassword(password)
 
-        // convert in above
-        /* bankFunctionsViewModel.isAdminPassword(password)?.observe(this@NavigationActivity,{
+            // convert in above
+            /* bankFunctionsViewModel.isAdminPassword(password)?.observe(this@NavigationActivity,{
 
-                if(it)
-                {
-                    dialog.dismiss()
-                    closeDrawer()
-                    transactFragment(BankFunctionsFragment())
-                }else{
-                    Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
-                }
-            })*/
+                    if(it)
+                    {
+                        dialog.dismiss()
+                        closeDrawer()
+                        transactFragment(BankFunctionsFragment())
+                    }else{
+                        Toast.makeText(this@NavigationActivity,R.string.invalid_password,Toast.LENGTH_LONG).show()
+                    }
+                })*/
         }
 
         override fun onClickCancel() {
@@ -640,9 +640,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             putExtra("saleAmt", formattedTransAmount)
                             putExtra("type", BhTransactionType.CASH_AT_POS.type)
                             putExtra("proc_code", ProcessingCode.CASH_AT_POS.code)
-                      /*      putExtra("mobileNumber", extraPair?.first)
-                            putExtra("billNumber", extraPair?.second)
-                            putExtra("saleWithTipAmt", saleWithTipAmt)*/
+                            /*      putExtra("mobileNumber", extraPair?.first)
+                                  putExtra("billNumber", extraPair?.second)
+                                  putExtra("saleWithTipAmt", saleWithTipAmt)*/
                             putExtra("edashboardItem",  EDashboardItem.CASH_ADVANCE)
                         }, EIntentRequest.TRANSACTION.code
                     )
@@ -788,7 +788,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
         intent.putExtra("edashboardItem", eDashBoardItem)
-       var txnType= BhTransactionType.NONE.type
+        var txnType= BhTransactionType.NONE.type
         if(eDashBoardItem== EDashboardItem.BRAND_EMI){
             txnType=   BhTransactionType.BRAND_EMI.type
         }
@@ -823,7 +823,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
                         println("RESULT TWO --->  $resultTwo")
                     }
-                //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+                    //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
                     inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
@@ -832,25 +832,31 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PREAUTH_COMPLETE->{
-               transactFragment(PreAuthCompleteInputDetailFragment(),true)
+                transactFragment(PreAuthCompleteInputDetailFragment(),true)
 
 
 
-               /* if (checkInternetConnection()) {
-                CoroutineScope(Dispatchers.IO).launch{
-                    val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
-                    println("TID LIST --->  $listofTids")
-                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
-                    println("RESULT TWO --->  $resultTwo")
-                }
-                inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
-            } else {
-                ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
-            }*/
+                /* if (checkInternetConnection()) {
+                 CoroutineScope(Dispatchers.IO).launch{
+                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                     println("TID LIST --->  $listofTids")
+                     val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                     println("RESULT TWO --->  $resultTwo")
+                 }
+                 inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+             } else {
+                 ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+             }*/
 
             }
             EDashboardItem.EMI_ENQUIRY -> {
                 if (Field48ResponseTimestamp.checkInternetConnection()) {
+                    CoroutineScope(Dispatchers.IO).launch{
+                        val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                        println("TID LIST --->  $listofTids")
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                        println("RESULT TWO --->  $resultTwo")
+                    }
                     transactFragment(EMICatalogue().apply {
                         arguments = Bundle().apply {
                             putSerializable("type", EDashboardItem.EMI_CATALOGUE)
@@ -863,54 +869,76 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
             }
             EDashboardItem.BRAND_EMI->{
-                transactFragment(BrandEmiMasterCategoryFragment().apply {
-                    arguments = Bundle().apply {
-                        putSerializable("type", action)
-                        putString(
-                            INPUT_SUB_HEADING,
-                            SubHeaderTitle.Brand_EMI_Master_Category.title
-                        )
+                if (Field48ResponseTimestamp.checkInternetConnection()) {
+                    CoroutineScope(Dispatchers.IO).launch{
+                        val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                        println("TID LIST --->  $listofTids")
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                        println("RESULT TWO --->  $resultTwo")
                     }
-                }, true)
+                    transactFragment(BrandEmiMasterCategoryFragment().apply {
+                        arguments = Bundle().apply {
+                            putSerializable("type", action)
+                            putString(
+                                INPUT_SUB_HEADING,
+                                SubHeaderTitle.Brand_EMI_Master_Category.title
+                            )
+                        }
+                    }, true)
 
-
+                }else{
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
             }
             EDashboardItem.VOID_SALE->{
+                CoroutineScope(Dispatchers.IO).launch{
+                    val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                    println("TID LIST --->  $listofTids")
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    println("RESULT TWO --->  $resultTwo")
+                }
                 transactFragment(VoidMainFragment())
                 // todo uncomment below
-              /*  lifecycleScope.launch(Dispatchers.IO) {
-                    //    appDao.insertBatchData(batchData)
-                    val dd=    DBModule.appDatabase.appDao.getBatchData()
-                    println(dd.toString())
-                }
-                transactFragment(VoidMainFragment())*/
+                /*  lifecycleScope.launch(Dispatchers.IO) {
+                      //    appDao.insertBatchData(batchData)
+                      val dd=    DBModule.appDatabase.appDao.getBatchData()
+                      println(dd.toString())
+                  }
+                  transactFragment(VoidMainFragment())*/
                 val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber("53")
 
                 //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
                 val cdtIndex = cardDataTable?.cardTableIndex ?: ""
-           /*     val accSellection =
-                    addPad(
-                        AppPreference.getString(AppPreference.ACC_SEL_KEY),
-                        "0",
-                        2
-                    )*/
+                /*     val accSellection =
+                         addPad(
+                             AppPreference.getString(AppPreference.ACC_SEL_KEY),
+                             "0",
+                             2
+                         )*/
 
             }
             EDashboardItem.PRE_AUTH_CATAGORY -> {
+
                 if (!action.childList.isNullOrEmpty()) {
                     // dashBoardCatagoryDialog(action.childList!!)
                     if (checkInternetConnection()) {
+                        CoroutineScope(Dispatchers.IO).launch{
+                            val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                            println("TID LIST --->  $listofTids")
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            println("RESULT TWO --->  $resultTwo")
+                        }
                         (transactFragment(
                             PreAuthFragment()
-                            .apply {
-                                arguments = Bundle().apply {
-                                    putSerializable(
-                                        "preAuthOptionList",
-                                        (action.childList) as java.util.ArrayList
-                                    )
-                                    putSerializable("type", EDashboardItem.PRE_AUTH_CATAGORY)
-                                }
-                            }))
+                                .apply {
+                                    arguments = Bundle().apply {
+                                        putSerializable(
+                                            "preAuthOptionList",
+                                            (action.childList) as java.util.ArrayList
+                                        )
+                                        putSerializable("type", EDashboardItem.PRE_AUTH_CATAGORY)
+                                    }
+                                }))
                     } else {
                         ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                     }
@@ -923,7 +951,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
 
             EDashboardItem.PREAUTH_VIEW ->{
-
+                CoroutineScope(Dispatchers.IO).launch{
+                    val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                    println("TID LIST --->  $listofTids")
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    println("RESULT TWO --->  $resultTwo")
+                }
                 DeviceHelper.doPreAuthViewTxn(object: OnOperationListener.Stub(){
                     override fun onCompleted(p0: OperationResult?) {
                         p0?.value?.apply {
@@ -933,25 +966,25 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     }
                 })
             }
-EDashboardItem.VOID_PREAUTH->{
-    lifecycleScope.launch(Dispatchers.IO) {
-        appDao.deletePendingSyncTransactionTable()
-    }
-}
+            EDashboardItem.VOID_PREAUTH->{
+                lifecycleScope.launch(Dispatchers.IO) {
+                    appDao.deletePendingSyncTransactionTable()
+                }
+            }
             EDashboardItem.PENDING_PREAUTH ->{
 
                 transactFragment(PreAuthPendingFragment(),true)
             }
             EDashboardItem.MERCHANT_REFERRAL->{
-             /*   transactFragment(BrandEmiMasterCategoryFragment().apply {
-                    arguments = Bundle().apply {
-                        putSerializable("type", action)
-                        putString(
-                            INPUT_SUB_HEADING,
-                            SubHeaderTitle.Brand_EMI_Master_Category.title
-                        )
-                    }
-                })*/
+                /*   transactFragment(BrandEmiMasterCategoryFragment().apply {
+                       arguments = Bundle().apply {
+                           putSerializable("type", action)
+                           putString(
+                               INPUT_SUB_HEADING,
+                               SubHeaderTitle.Brand_EMI_Master_Category.title
+                           )
+                       }
+                   })*/
 
             }
             EDashboardItem.DIGI_POS -> {
@@ -962,7 +995,12 @@ EDashboardItem.VOID_PREAUTH->{
                 if (checkInternetConnection()) {
                     transactFragment(DigiPosMenuFragment().apply {
                         //   DigiPosDataTable.clear()
-
+                        CoroutineScope(Dispatchers.IO).launch{
+                            val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
+                            println("TID LIST --->  $listofTids")
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            println("RESULT TWO --->  $resultTwo")
+                        }
                         val dp = selectAllDigiPosData()
                         val dpObj = Gson().toJson(dp)
                         logger("UPDATEDIGI", dpObj, "e")
@@ -974,7 +1012,7 @@ EDashboardItem.VOID_PREAUTH->{
                     }, false)
 
                 } else {
-                   showToast(getString(R.string.no_internet_available_please_check_your_internet))
+                    showToast(getString(R.string.no_internet_available_please_check_your_internet))
                 }
                 /*} else {
             checkAndPerformOperation()
@@ -997,7 +1035,7 @@ EDashboardItem.VOID_PREAUTH->{
         System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
         System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
 
-            if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+        if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())) {
             transactFragment(fragment.apply {
@@ -1009,7 +1047,7 @@ EDashboardItem.VOID_PREAUTH->{
             }, false)
         } else {
             if (checkInternetConnection())
-              checkAndPerformOperation()
+                checkAndPerformOperation()
             else  ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
         }
     }
@@ -1042,15 +1080,15 @@ EDashboardItem.VOID_PREAUTH->{
                     val tid = getBaseTID(appDao)
                     showProgress()
                     initViewModel.insertInfo1(tid)
-                  //  observeMainViewModel()
+                    //  observeMainViewModel()
                 }
             }
             else {
-               // VFService.showToast(getString(R.string.something_went_wrong))
+                // VFService.showToast(getString(R.string.something_went_wrong))
             }
 
         } else {
-           // VFService.showToast(getString(R.string.no_internet_available_please_check_your_internet))
+            // VFService.showToast(getString(R.string.no_internet_available_please_check_your_internet))
         }
     }
 
@@ -1180,10 +1218,10 @@ EDashboardItem.VOID_PREAUTH->{
                     CoroutineScope(Dispatchers.Main).launch {
                         getInfoDialog("Error", result.error ?: "") {}
                     }
-                  //  ToastUtils.showToast(this@NavigationActivity,"Error called  ${result.error}")
+                    //  ToastUtils.showToast(this@NavigationActivity,"Error called  ${result.error}")
                 }
                 Status.LOADING -> {
-                   showProgress(getString(R.string.sending_receiving_host))
+                    showProgress(getString(R.string.sending_receiving_host))
 
                 }
             }
@@ -1243,12 +1281,12 @@ EDashboardItem.VOID_PREAUTH->{
                             false
                         )
                         val batchList = runBlocking(Dispatchers.IO) {
-                                appDao.getAllBatchData()
-                            }
+                            appDao.getAllBatchData()
+                        }
 
                         //To increase Roc and Batch number
-                          Utility().incrementUpdateRoc()
-                          Utility().incrementBatchNumber()
+                        Utility().incrementUpdateRoc()
+                        Utility().incrementBatchNumber()
                         //Batch and Roc Increment for Settlement:-
                         val settlement_roc = AppPreference.getIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString()) + 1
                         AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc)
@@ -1270,7 +1308,7 @@ EDashboardItem.VOID_PREAUTH->{
                             }
                         }
 
-                            //Here printing will be there
+                        //Here printing will be there
                         PrintUtil(this).printSettlementReportupdate(this, batchList, true) {
                             if (it) {
 
@@ -1305,7 +1343,7 @@ EDashboardItem.VOID_PREAUTH->{
                                             when (dataList[0]) {
                                                 AppUpdate.MANDATORY_APP_UPDATE.updateCode -> {
                                                     if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
-                                                      //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                    //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
                                                     else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
                                                     //  startHTTPSAppUpdate1(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
                                                         startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
@@ -1313,7 +1351,7 @@ EDashboardItem.VOID_PREAUTH->{
                                                 AppUpdate.OPTIONAL_APP_UPDATE.updateCode -> {
                                                     alertBoxWithAction(getString(R.string.app_update), getString(R.string.app_update_available_do_you_want_to_update), true, getString(R.string.yes), {
                                                         if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
-                                                         //   startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                        //   startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
                                                         else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
                                                             startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
                                                     },
@@ -1337,7 +1375,7 @@ EDashboardItem.VOID_PREAUTH->{
                                                     val tid = getBaseTID(appDao)
                                                     showProgress()
                                                     initViewModel.insertInfo1(tid)
-                                                  //  observeMainViewModel()
+                                                    //  observeMainViewModel()
                                                 }
                                             }
 
@@ -1384,14 +1422,14 @@ EDashboardItem.VOID_PREAUTH->{
                                                 when (dataList[0]) {
                                                     AppUpdate.MANDATORY_APP_UPDATE.updateCode -> {
                                                         if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
-                                                           // startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                        // startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
                                                         else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
                                                             startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8]) //------------>HTTPS App Update not in use currently
                                                     }
                                                     AppUpdate.OPTIONAL_APP_UPDATE.updateCode -> {
                                                         alertBoxWithAction(getString(R.string.app_update), getString(R.string.app_update_available_do_you_want_to_update), true, getString(R.string.yes), {
                                                             if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("1"))
-                                                              //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
+                                                            //  startFTPAppUpdate(dataList[2], dataList[3].toInt(), dataList[4], dataList[5], dataList[7], dataList[8])
                                                             else if (terminalParameterTable?.reservedValues?.length == 20 && terminalParameterTable.reservedValues.endsWith("3"))
                                                                 startHTTPSAppUpdate(dataList[2],dataList[3].toInt(), dataList[7], dataList[8])  //------------>HTTPS App Update not in use currently
                                                         },
@@ -1402,7 +1440,7 @@ EDashboardItem.VOID_PREAUTH->{
                                                     }
                                                 }
                                             } else {
-                                               // VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
+                                                // VFService.showToast(getString(R.string.something_went_wrong_in_app_update))
                                                 onBackPressed()
                                             }
 
@@ -1414,7 +1452,7 @@ EDashboardItem.VOID_PREAUTH->{
                                                         val tid = getBaseTID(appDao)
                                                         showProgress()
                                                         initViewModel.insertInfo1(tid)
-                                                       // observeMainViewModel()
+                                                        // observeMainViewModel()
                                                     }
                                                 }
 
@@ -1536,15 +1574,15 @@ EDashboardItem.VOID_PREAUTH->{
 
                             if (!TextUtils.isEmpty(fileUri.toString())) {
                                 autoInstallApk(fileUri.toString()) { status, packageName, code ->
-                                        GlobalScope.launch(Dispatchers.Main) {
-                                            // VFService.showToast(getString(R.string.app_updated_successfully))
-                                        }
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        // VFService.showToast(getString(R.string.app_updated_successfully))
                                     }
+                                }
                             }
 
                         } else {
                             hideProgress()
-                           // VFService.showToast(getString(R.string.something_went_wrong))
+                            // VFService.showToast(getString(R.string.something_went_wrong))
                         }
                     }
                 }).execute()
@@ -1579,7 +1617,7 @@ EDashboardItem.VOID_PREAUTH->{
                        }).execute()*/
 
         } else {
-          //  VFService.showToast("Download URL Not Found!!!")
+            //  VFService.showToast("Download URL Not Found!!!")
         }
     }
 
@@ -1587,7 +1625,7 @@ EDashboardItem.VOID_PREAUTH->{
     fun autoInstallApk(filePath: String?, apkInstallCB: (Boolean, String, Int) -> Unit) {
         val pInfo = this@NavigationActivity?.packageManager?.getPackageInfo(this@NavigationActivity.packageName, 0)
         tms = DeviceHelper.getTMS()
-         showProgress(getString(R.string.please_wait_aaplication_is_configuring_updates))
+        showProgress(getString(R.string.please_wait_aaplication_is_configuring_updates))
         if (tms != null && !TextUtils.isEmpty(filePath)) {
             try {
                 val param = Bundle()
@@ -1599,18 +1637,18 @@ EDashboardItem.VOID_PREAUTH->{
                 hideProgress()
             }
         }
-       else{
+        else{
             hideProgress()
             runOnUiThread {
-              CoroutineScope(Dispatchers.Main).launch {
-                  Toast.makeText(this@NavigationActivity,"Something went wrong!!!",Toast.LENGTH_SHORT).show()
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(this@NavigationActivity,"Something went wrong!!!",Toast.LENGTH_SHORT).show()
 
-              }
+                }
             }
         }
 
     }
-//endregion
+    //endregion
     private val listener: OnResultListener = object : OnResultListener.Stub() {
         @Throws(RemoteException::class)
         override fun onSuccess() {
@@ -1638,7 +1676,7 @@ EDashboardItem.VOID_PREAUTH->{
 
     //Auto Settle Batch:- kushal
     private fun autoSettleBatchData() {
-       // val settlementBatchData = BatchFileDataTable.selectBatchData()
+        // val settlementBatchData = BatchFileDataTable.selectBatchData()
         val settlementBatchData = runBlocking(Dispatchers.IO) {
             appDao.getAllBatchData()
         }
@@ -1648,7 +1686,7 @@ EDashboardItem.VOID_PREAUTH->{
         }
 
         GlobalScope.launch(Dispatchers.IO) {
-                hideProgress()
+            hideProgress()
             if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString())){
                 PrintUtil(this@NavigationActivity).printDetailReportupdate(settlementBatchData, this@NavigationActivity) {
                         detailPrintStatus -> }
@@ -1767,71 +1805,71 @@ EDashboardItem.VOID_PREAUTH->{
         val view = customViewGroup(this)
         manager.addView(view, localLayoutParams)
     }
-   open fun collapseNow() {
+    open fun collapseNow() {
 
-       // Initialize 'collapseNotificationHandler'
-       if (collapseNotificationHandler == null) {
-           collapseNotificationHandler = Handler()
-       }
+        // Initialize 'collapseNotificationHandler'
+        if (collapseNotificationHandler == null) {
+            collapseNotificationHandler = Handler()
+        }
 
-       // If window focus has been lost && activity is not in a paused state
-       // Its a valid check because showing of notification panel
-       // steals the focus from current activity's window, but does not
-       // 'pause' the activity
-       if (!currentFocus && !isPaused) {
+        // If window focus has been lost && activity is not in a paused state
+        // Its a valid check because showing of notification panel
+        // steals the focus from current activity's window, but does not
+        // 'pause' the activity
+        if (!currentFocus && !isPaused) {
 
-           // Post a Runnable with some delay - currently set to 300 ms
-           collapseNotificationHandler!!.postDelayed(object : Runnable {
-               @SuppressLint("WrongConstant")
-               override fun run() {
+            // Post a Runnable with some delay - currently set to 300 ms
+            collapseNotificationHandler!!.postDelayed(object : Runnable {
+                @SuppressLint("WrongConstant")
+                override fun run() {
 
-                   // Use reflection to trigger a method from 'StatusBarManager'
-                   val statusBarService = getSystemService("statusbar")
-                   var statusBarManager: Class<*>? = null
-                   try {
-                       statusBarManager = Class.forName("android.app.StatusBarManager")
-                   } catch (e: ClassNotFoundException) {
-                       e.printStackTrace()
-                   }
-                   var collapseStatusBar: Method? = null
-                   try {
+                    // Use reflection to trigger a method from 'StatusBarManager'
+                    val statusBarService = getSystemService("statusbar")
+                    var statusBarManager: Class<*>? = null
+                    try {
+                        statusBarManager = Class.forName("android.app.StatusBarManager")
+                    } catch (e: ClassNotFoundException) {
+                        e.printStackTrace()
+                    }
+                    var collapseStatusBar: Method? = null
+                    try {
 
-                       // Prior to API 17, the method to call is 'collapse()'
-                       // API 17 onwards, the method to call is `collapsePanels()`
-                       collapseStatusBar = if (Build.VERSION.SDK_INT > 16) {
-                           statusBarManager!!.getMethod("collapsePanels")
-                       } else {
-                           statusBarManager!!.getMethod("collapse")
-                       }
-                   } catch (e: NoSuchMethodException) {
-                       e.printStackTrace()
-                   }
-                   if (collapseStatusBar != null) {
-                       collapseStatusBar.setAccessible(true)
-                   }
-                   try {
-                       if (collapseStatusBar != null) {
-                           collapseStatusBar.invoke(statusBarService)
-                       }
-                   } catch (e: IllegalArgumentException) {
-                       e.printStackTrace()
-                   } catch (e: IllegalAccessException) {
-                       e.printStackTrace()
-                   } catch (e: InvocationTargetException) {
-                       e.printStackTrace()
-                   }
+                        // Prior to API 17, the method to call is 'collapse()'
+                        // API 17 onwards, the method to call is `collapsePanels()`
+                        collapseStatusBar = if (Build.VERSION.SDK_INT > 16) {
+                            statusBarManager!!.getMethod("collapsePanels")
+                        } else {
+                            statusBarManager!!.getMethod("collapse")
+                        }
+                    } catch (e: NoSuchMethodException) {
+                        e.printStackTrace()
+                    }
+                    if (collapseStatusBar != null) {
+                        collapseStatusBar.setAccessible(true)
+                    }
+                    try {
+                        if (collapseStatusBar != null) {
+                            collapseStatusBar.invoke(statusBarService)
+                        }
+                    } catch (e: IllegalArgumentException) {
+                        e.printStackTrace()
+                    } catch (e: IllegalAccessException) {
+                        e.printStackTrace()
+                    } catch (e: InvocationTargetException) {
+                        e.printStackTrace()
+                    }
 
-                   // Check if the window focus has been returned
-                   // If it hasn't been returned, post this Runnable again
-                   // Currently, the delay is 100 ms. You can change this
-                   // value to suit your needs.
-                   if (!currentFocus && !isPaused) {
-                       collapseNotificationHandler!!.postDelayed(this, 100L)
-                   }
-               }
-           }, 300L)
-       }
-   }
+                    // Check if the window focus has been returned
+                    // If it hasn't been returned, post this Runnable again
+                    // Currently, the delay is 100 ms. You can change this
+                    // value to suit your needs.
+                    if (!currentFocus && !isPaused) {
+                        collapseNotificationHandler!!.postDelayed(this, 100L)
+                    }
+                }
+            }, 300L)
+        }
+    }
 
 
     override fun onPause() {
