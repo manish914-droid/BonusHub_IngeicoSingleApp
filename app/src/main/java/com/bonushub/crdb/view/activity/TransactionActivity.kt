@@ -143,7 +143,15 @@ class TransactionActivity : BaseActivityNew() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
         }
-        emvBinding?.baseAmtTv?.text = saleAmt
+        if(transactionType==BhTransactionType.SALE_WITH_CASH.type){
+            val amt= saleAmt.toFloat() + cashBackAmt.toFloat()
+          val frtAmt=  "%.2f".format(amt)
+            emvBinding?.baseAmtTv?.text =frtAmt
+        }else{
+            val frtAmt=  "%.2f".format(saleAmt.toFloat())
+            emvBinding?.baseAmtTv?.text = frtAmt
+        }
+
         lifecycleScope.launch(Dispatchers.IO) {
             tid = getBaseTID(appDatabase.appDao)
             globalCardProcessedModel.setTransType(transactionType)
@@ -1083,7 +1091,12 @@ var f57Data=""
                                                     tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan = tpt?.stan ?: ""
-
+                                                val txnAmt= batchData.receiptData?.txnOtherAmount?.toLong()
+                                                    ?.let {
+                                                        batchData.receiptData?.txnAmount?.toLong()
+                                                            ?.plus(it)
+                                                    }
+                                                batchData.receiptData?.txnAmount=txnAmt.toString()
                                                 createCardProcessingModelData(receiptDetail)
                                                 val data =
                                                     globalCardProcessedModel.getPanNumberData()
@@ -1723,7 +1736,12 @@ var f57Data=""
                                             }
 
                                             val oldBatchTable = runBlocking(Dispatchers.IO) {
-                                                getBatchDataByInvoice(receiptDetail.invoice.toString())
+                                             val table=   getBatchDataByInvoice(receiptDetail.invoice.toString())
+                                                if(table?.transactionType==BhTransactionType.PRE_AUTH.type){
+                                                    table
+                                                }else{
+                                                    null
+                                                }
                                             }
                                             val newBatchData = BatchTable(receiptDetail)
                                             // region print and save data
@@ -1731,9 +1749,10 @@ var f57Data=""
                                                 if(oldBatchTable != null){
                                                     // replace reciept data if present in our batch data
                                                         val oldDateTime=oldBatchTable.receiptData?.dateTime?:""
-
+val oldstan=oldBatchTable.bonushubStan
                                                     oldBatchTable.receiptData = receiptDetail
                                                     oldBatchTable.oldDateTimeInVoid=oldDateTime
+                                                    oldBatchTable.oldStanForVoid=oldstan
 
                                                     oldBatchTable.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
                                                     oldBatchTable.bonushubStan = tpt?.stan.toString()
@@ -1751,6 +1770,7 @@ var f57Data=""
                                                         tpt?.batchNumber .toString()
                                                     newBatchData.bonushubInvoice = tpt?.invoiceNumber.toString()
                                                     newBatchData.bonushubStan = tpt?.stan .toString()
+                                                    newBatchData.oldStanForVoid=tpt?.stan.toString()
                                                     newBatchData.oldDateTimeInVoid = receiptDetail.dateTime.toString()
                                                     appDatabase.appDao.insertBatchData(newBatchData)
                                                     AppPreference.saveLastReceiptDetails(newBatchData)

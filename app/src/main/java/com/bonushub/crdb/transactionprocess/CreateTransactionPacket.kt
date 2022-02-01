@@ -55,7 +55,16 @@ class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,pri
             //val formattedTransAmount = "%.2f".format(cardProcessedData.getTransactionAmount()?.toDouble()).replace(".", "")
             if (cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
 // todo for brand Emi by code
-            } else {
+            }
+          /*  else if(cardProcessedData.getTransType() == BhTransactionType.SALE_WITH_CASH.type){
+             val txnAmt= batchdata?.receiptData?.txnAmount?.toLong()
+                 ?.plus(batchdata?.receiptData?.txnOtherAmount?.toLong()!!)
+                addField(
+                    4,
+                    addPad(txnAmt.toString(), "0", 12, true)
+                )
+            }*/
+            else {
                 addField(
                     4,
                     addPad(cardProcessedData.getTransactionAmount().toString(), "0", 12, true)
@@ -149,19 +158,20 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                     val toFormat: DateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
                     val reqDate: Date? = fromFormat.parse(dateTime ?: "")
 
-                    val stan = batchdata?.oldStanForVoid
+                  //  val stan = batchdata?.oldStanForVoid
                     val reqDateString = toFormat.format(reqDate)
 
-                    val field56="${stan}${reqDateString}"
-                    addFieldByHex(56,field56)
+                 //   val field56="${stan}${reqDateString}"
+                    val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldStanForVoid+reqDateString
+         addFieldByHex(56,data)
+
 
                 }catch (ex:Exception){
                     logger("Date Error","Exception in adding field 56","e")
                 }
 
 
-val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldDateTimeInVoid
-                addFieldByHex(56,data)
+
             }
 
 

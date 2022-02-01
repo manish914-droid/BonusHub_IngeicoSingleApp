@@ -121,7 +121,7 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
 
                 val tvOffer = holder.binding.tvOffer
 
-                // tvOffer.context.getString(R.string.cashBackOffer)
+               //tvOffer.context.getString(R.string.cashBackOffer)
                 tvOffer.text = modelData.tenureTAndC
                 makeTextViewResizable(tvOffer, 8, "See More", true)
             } else {

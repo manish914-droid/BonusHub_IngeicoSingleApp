@@ -169,7 +169,6 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             }
 
                             BhTransactionType.SALE_WITH_CASH.type -> {
-
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
                                 bonushubsalebatchNumber = m.bonushubbatchNumber
