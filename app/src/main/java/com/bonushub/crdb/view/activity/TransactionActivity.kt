@@ -2158,11 +2158,11 @@ val oldstan=oldBatchTable.bonushubStan
                 //  insert case
                 cardCaptureType = CardCaptureType.EMV_NO_CAPTURING
             }
-
+            val cashBackAmount = (saleWithTipAmt.toFloat() * 100).toLong()
             DeviceHelper.doEMITxn(
                 EMISaleRequest(
                     amount = amt,
-                    tipAmount = 0L,
+                    tipAmount = cashBackAmount,
                     emiTxnName = getTransactionTypeName(globalCardProcessedModel.getTransType()),
                     tid = tid,
                     cardCaptureType = cardCaptureType,
