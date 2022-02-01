@@ -156,7 +156,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
-        /* lockStatusBar()
+         lockStatusBar()
          isFresAppStatus = WifiPrefManager(this).isWifiStatus
          if (!isFresAppStatus) {
              isFresApp = WifiPrefManager(this).appStatus
@@ -164,7 +164,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
          if (isFresApp == "true" && isFresAppStatus) {
              wifiHandaling()
          }
-         onWindowFocusChanged(false)*/
+         onWindowFocusChanged(false)
         //region============================Below Logic is to Hide Back Arrow from Toolbar
         navHostFragment?.navController?.addOnDestinationChangedListener { _, _, _ ->
             navigationBinding?.toobar?.dashboardToolbar?.navigationIcon = null

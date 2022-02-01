@@ -248,8 +248,8 @@ class PrintUtil(context: Context?) {
                 }
 
                 when (batchTable.transactionType) {
-                    BhTransactionType.SALE.type, BhTransactionType.CASH_AT_POS.type -> {
-                        saleTransaction(receiptDetail)
+                    BhTransactionType.SALE.type, BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type -> {
+                        saleTransaction(batchTable)
                     }
                     BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
                         printEMISale(batchTable)
@@ -451,16 +451,19 @@ class PrintUtil(context: Context?) {
         printer?.addText(alignMode, text)
     }
 
-    private fun saleTransaction(receiptDetail: ReceiptDetail) {
-        textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
+    private fun saleTransaction(batchTable: BatchTable) {
+        var currencySymbol: String? = "Rs"
+        val terminalData = getTptData()
+        currencySymbol = terminalData?.currencySymbol
+        val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
         val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
-
         val tipAmount = (((receiptDetail.txnOtherAmount)?.toLong())?.div(100)).toString()
-        textBlockList.add(sigleLineformat("INR:${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
-        printer?.addMixStyleText(textBlockList)
-        textBlockList.clear()
-        if (receiptDetail.txnName.equals("SALE")) {
 
+        if (receiptDetail.txnName.equals("SALE")) {
+            textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
+            textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+            printer?.addMixStyleText(textBlockList)
+            textBlockList.clear()
             if (tipAmount != "0") {
                 textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
                 textBlockList.add(
@@ -474,34 +477,54 @@ class PrintUtil(context: Context?) {
             }
 
         } else {
-            textBlockList.add(sigleLineformat("CASH AMOUNT: ", AlignMode.LEFT))
-            textBlockList.add(
-                sigleLineformat(
-                    "INR:${"%.2f".format(tipAmount.toDouble())}",
-                    AlignMode.RIGHT
+            if(batchTable.transactionType == BhTransactionType.SALE_WITH_CASH.type){
+                val amt1=(((receiptDetail.txnAmount)?.toLong())?.div(100))
+                val otherAmt1=(((receiptDetail.txnOtherAmount)?.toLong())?.div(100))
+                val saleAmount= otherAmt1?.let { amt1?.minus(it) }
+                textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(saleAmount?.toDouble())}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+                textBlockList.add(sigleLineformat("CASH WITHDRAWN AMT: ", AlignMode.LEFT))
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol:${"%.2f".format(tipAmount.toDouble())}",
+                        AlignMode.RIGHT
+                    )
                 )
-            )
-            printer?.addMixStyleText(textBlockList)
-            textBlockList.clear()
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+            }else{
+                textBlockList.add(sigleLineformat("CASH WITHDRAWN AMT:", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+            }
+
         }
         // textBlockList.add(sigleLineformat( "00",AlignMode.RIGHT))
 
         val totalAmount = "%.2f".format((amt.toDouble() + tipAmount.toDouble()))
         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat("INR:${totalAmount}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat("$currencySymbol :${totalAmount}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
     }
 
     private fun voidTransaction(receiptDetail: ReceiptDetail) {
+        var currencySymbol: String? = "Rs"
+        val terminalData = getTptData()
+        currencySymbol = terminalData?.currencySymbol
         textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
         val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
-        textBlockList.add(sigleLineformat("INR:${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
 
         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
-        textBlockList.add(sigleLineformat("INR:${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+        textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
     }
@@ -1418,21 +1441,23 @@ class PrintUtil(context: Context?) {
         val terminalData = getTptData()
         currencySymbol = terminalData?.currencySymbol
         if (!TextUtils.isEmpty(bankEMITenureDataModal?.transactionAmount)) {
-            val baseAmount =  "%.2f".format((((bankEMITenureDataModal?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
+            var baseAmount =  "%.2f".format((((bankEMITenureDataModal?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
+            if (batchTable.transactionType == BhTransactionType.TEST_EMI.type){
+                 baseAmount = "1.00"
 
-            if (batchTable.transactionType == BhTransactionType.TEST_EMI.type) {
+            }
+        /*    if (batchTable.transactionType == BhTransactionType.TEST_EMI.type) {
                 textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
-                if (bankEMIIssuerTAndCDataModal != null) {
-                    textBlockList.add(
+
+                textBlockList.add(
                         sigleLineformat(
                             "$currencySymbol:${ "1.00"}",
                             AlignMode.RIGHT
                         )
-
                     )
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
-                }
+
 
             } else {
                 textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
@@ -1446,6 +1471,17 @@ class PrintUtil(context: Context?) {
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
                 }
+            }*/
+            textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
+            if (bankEMIIssuerTAndCDataModal != null) {
+                textBlockList.add(
+                    sigleLineformat(
+                        "$currencySymbol:${"%.2f".format(baseAmount.toDoubleOrNull())}",
+                        AlignMode.RIGHT
+                    )
+                )
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
             }
         }
     }
