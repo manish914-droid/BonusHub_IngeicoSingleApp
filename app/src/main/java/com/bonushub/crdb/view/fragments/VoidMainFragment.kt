@@ -1,6 +1,7 @@
 package com.bonushub.crdb.view.fragments
 
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -148,7 +149,7 @@ class VoidMainFragment : Fragment() {
                                         batchData.oldStanForVoid=oldBatchData.bonushubStan ?: ""
                                         batchData.oldDateTimeInVoid= oldBatchData.receiptData?.dateTime.toString()
                                     batchData.field57EncryptedData=oldBatchData.field57EncryptedData
-
+batchData.field58EmiData=oldBatchData.field58EmiData
                                         DBModule.appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
 
@@ -172,13 +173,17 @@ class VoidMainFragment : Fragment() {
                                             when (val genericResp =
                                                 transactionViewModel.serverCall(transactionISO)) {
                                                 is GenericResponse.Success -> {
-                                                    logger(
-                                                        "success:- ",
-                                                        "in success ${genericResp.data}",
-                                                        "e"
-                                                    )
                                                     withContext(Dispatchers.Main) {
+                                                        logger(
+                                                            "success:- ",
+                                                            "in success $genericResp",
+                                                            "e"
+                                                        )
                                                         (activity as BaseActivityNew).hideProgress()
+                                                        startActivity(Intent(activity, NavigationActivity::class.java).apply {
+                                                            flags =
+                                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                        })
                                                     }
                                                 }
                                                 is GenericResponse.Error -> {
@@ -228,21 +233,18 @@ class VoidMainFragment : Fragment() {
                             }
                             ResponseCode.FAILED.value,
                             ResponseCode.ABORTED.value -> {
-                                //  detailResponse.forEach { println(it) }
-                                /* if (receiptDetail != null) {
-                                     val jsonstr="{\"aid\":\"A0000000041010\",\"appName\":\"Debit MasterCard\",\"authCode\":\"006538\",\"batchNumber\":\"000001\",\"cardHolderName\":\"INSTA DEBIT CARD         /\",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"24/11/2021 14:49:00\",\"entryMode\":\"INSERT\",\"invoice\":\"000012\",\"isSignRequired\":false,\"isVerifyPin\":true,\"merAddHeader1\":\"INGBH TEST2 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000381\",\"stan\":\"000381\",\"tc\":\"1DF19BD576739835\",\"tid\":\"30160035\",\"tsi\":\"E800\",\"tvr\":\"0840048000\",\"txnAmount\":\"5888\",\"txnName\":\"SALE\",\"txnResponseCode\":\"00\"}"
-                                    val obj=Gson().fromJson(jsonstr,ReceiptDetail::class.java)
-                                    startPrinting(obj)
-                                    *//* val intent=Intent(this@TransactionActivity,PrintingTesting::class.java)
-                                            startActivity(intent)*//*
 
-                                        }*/
+                                startActivity(Intent(activity, NavigationActivity::class.java).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                })
                             }
                             else -> {
-                             /*   val intent = Intent (this, NavigationActivity::class.java)
-                                startActivity(intent)*/
-
-                                println("Error")}
+                                startActivity(Intent(activity, NavigationActivity::class.java).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                })
+                            }
                         }
                     }
                 }
@@ -375,7 +377,8 @@ class VoidMainFragment : Fragment() {
                             i?.transactionType == BhTransactionType.TIP_SALE.type ||
                             i?.transactionType == BhTransactionType.TEST_EMI.type ||
                             i?.transactionType == BhTransactionType.BRAND_EMI.type ||
-                            i?.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type
+                            i?.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type||
+                            i?.transactionType == BhTransactionType.PRE_AUTH.type
                         )
                             bat.add(i)
                     }
