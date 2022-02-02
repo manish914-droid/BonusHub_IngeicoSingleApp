@@ -526,16 +526,18 @@ class NewInputAmountFragment : Fragment() {
                 if (saleTipAmt > 0) {
                     when {
                         !TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> if (binding?.mobNumbr?.text.toString().length in 10..13) {
-                           // validateTIP(trnsAmt, saleAmt, extraPairData)
-                            temproryCheck(trnsAmt,saleAmount)
+                            val extraPairData =
+                                Triple(binding?.mobNumbr?.text.toString(), "", third = true)
+                          validateTIP(trnsAmt, saleAmt, extraPairData)
+                           // temproryCheck(trnsAmt,saleAmount)
                         } else
                             context?.getString(R.string.enter_valid_mobile_number)
                                 ?.let { showToast( it) }
 
                         TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                             val extraPairData = Triple("", "", third = true)
-                      // validateTIP(trnsAmt, saleAmt, extraPairData)
-                            temproryCheck(trnsAmt,saleAmount)
+                      validateTIP(trnsAmt, saleAmt, extraPairData)
+                            //temproryCheck(trnsAmt,saleAmount)
                         }
                     }
 
