@@ -621,54 +621,55 @@ suspend fun doCommsTransaction(appDao: AppDao){
 
     val wifiCommunicationTable = runBlocking(Dispatchers.IO){appDao.getAllWifiCTTableData()}
 
-    val request = CommRequest(
-        gprsIp   = wifiCommunicationTable?.get(0)?.gprPrimaryHostIP,
-        gprsPort = wifiCommunicationTable?.get(0)?.gprPrimaryHostPort,
-        wifiIp   = wifiCommunicationTable?.get(0)?.wifiHostIP,
-        wifiPort = wifiCommunicationTable?.get(0)?.wifiHostPort,
-        apn      = wifiCommunicationTable?.get(0)?.gprAPN,
-        username = wifiCommunicationTable?.get(0)?.gprAPNUserName,
-        password = wifiCommunicationTable?.get(0)?.gprAPNPassword
-    )
+    if(null !=wifiCommunicationTable && wifiCommunicationTable.size > 0){
+        val request = CommRequest(
+            gprsIp   = wifiCommunicationTable.get(0)?.gprPrimaryHostIP,
+            gprsPort = wifiCommunicationTable.get(0)?.gprPrimaryHostPort,
+            wifiIp   = wifiCommunicationTable.get(0)?.wifiHostIP,
+            wifiPort = wifiCommunicationTable.get(0)?.wifiHostPort,
+            apn      = wifiCommunicationTable.get(0)?.gprAPN,
+            username = wifiCommunicationTable.get(0)?.gprAPNUserName,
+            password = wifiCommunicationTable.get(0)?.gprAPNPassword
+        )
 
-   try {
-       DeviceHelper.setCommunicationSettings(
-           request = request,
-           listener = object : OnOperationListener.Stub() {
+        try {
+            DeviceHelper.setCommunicationSettings(
+                request = request,
+                listener = object : OnOperationListener.Stub() {
 
-               override fun onCompleted(result: OperationResult?) {
-                   println("Result: ${result?.value?.status}")
+                    override fun onCompleted(result: OperationResult?) {
+                        println("Result: ${result?.value?.status}")
 
-                   println("Result responseCode: ${(result?.value)?.responseCode}")
+                        println("Result responseCode: ${(result?.value)?.responseCode}")
 
-                   println("Completed transaction...")
+                        println("Completed transaction...")
 
-                   val status = result?.value?.status
-                   when (status) {
-                       RequestStatus.SUCCESS -> {
-                           println("Success")
-                           AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "1")
+                        val status = result?.value?.status
+                        when (status) {
+                            RequestStatus.SUCCESS -> {
+                                println("Success")
+                                AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "1")
 
-                           println("Wifi comm ->"+AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName))
-                       }
-                       RequestStatus.FAILED -> {
-                           AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
-                           println("Failed")
-                       }
-                       else -> {
-                           AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
-                           println("Error")
-                       }
-                   }
-               }
+                                println("Wifi comm ->"+AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName))
+                            }
+                            RequestStatus.FAILED -> {
+                                AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                                println("Failed")
+                            }
+                            else -> {
+                                AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                                println("Error")
+                            }
+                        }
+                    }
 
-           }
-       )
-      }
-   catch (ex: Exception){
-       ex.printStackTrace()
-   }
-
+                }
+            )
+        }
+        catch (ex: Exception){
+            ex.printStackTrace()
+        }
+    }
 }
 
 //Do initiaization

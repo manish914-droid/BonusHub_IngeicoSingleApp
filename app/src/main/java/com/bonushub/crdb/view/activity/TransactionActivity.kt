@@ -1085,10 +1085,8 @@ var f57Data=""
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.SALE_WITH_CASH.type
-                                                batchData.bonushubbatchnumber =
-                                                    tpt?.batchNumber ?: ""
+                                                batchData.transactionType = BhTransactionType.SALE_WITH_CASH.type
+                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan = tpt?.stan ?: ""
                                                 val txnAmt= batchData.receiptData?.txnOtherAmount?.toLong()
