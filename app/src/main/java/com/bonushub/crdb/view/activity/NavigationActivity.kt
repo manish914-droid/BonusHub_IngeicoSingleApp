@@ -157,14 +157,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
          lockStatusBar()
-         isFresAppStatus = WifiPrefManager(this).isWifiStatus
+/*         isFresAppStatus = WifiPrefManager(this).isWifiStatus
          if (!isFresAppStatus) {
              isFresApp = WifiPrefManager(this).appStatus
          }
          if (isFresApp == "true" && isFresAppStatus) {
              wifiHandaling()
          }
-         onWindowFocusChanged(false)
+         onWindowFocusChanged(false)*/
         //region============================Below Logic is to Hide Back Arrow from Toolbar
         navHostFragment?.navController?.addOnDestinationChangedListener { _, _, _ ->
             navigationBinding?.toobar?.dashboardToolbar?.navigationIcon = null
@@ -496,8 +496,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 if (navigationBinding?.mainDl?.isDrawerOpen(GravityCompat.START)!!)
                     navigationBinding?.mainDl?.closeDrawer(GravityCompat.START)
                 else
-                    exitApp()
-                // exitluncher()
+                 exitluncher()
             }
         }else if(supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("BankFunctionsFragment",true)
             ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
@@ -818,13 +817,21 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
                     CoroutineScope(Dispatchers.IO).launch{
+                        var checkinitststus = checkInitializtionStatus(appDao)
                         val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
-                        println("TID LIST --->  $listofTids")
-                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
-                        println("RESULT TWO --->  $resultTwo")
+                        if(!checkinitststus){
+                            println("TID LIST --->  $listofTids")
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            println("RESULT TWO --->  $resultTwo")
+
+                        }
+                        else{
+                            inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
+                        }
+
                     }
-                    //    inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
-                    inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
+                    //inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
