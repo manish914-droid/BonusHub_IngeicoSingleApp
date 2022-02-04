@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentBankFunctionsAdminVasBinding
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.di.DBModule
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.utils.*
@@ -36,9 +37,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemClick{
+    @Inject
+    lateinit var appDao: AppDao
 
     private val adminVasListItem: MutableList<BankFunctionsAdminVasItem> by lazy { mutableListOf<BankFunctionsAdminVasItem>() }
     private var iBankFunctionsAdminVasItemClick:IBankFunctionsAdminVasItemClick? = null
@@ -368,11 +372,19 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                         //}
 
                                     }
-
-
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(R.drawable.ic_tick,
-                                            requireContext().getString(R.string.successfull_init))
+                                    var checkinitstatus = checkInitializationStatus(appDao)
+                                    if(checkinitstatus) {
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
+                                                (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
+                                                    R.drawable.ic_tick,
+                                                    it
+                                                )
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
                                     }
                                 }
 

@@ -821,7 +821,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                         if(!checkinitststus){
                             println("TID LIST --->  $listofTids")
-                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                             println("RESULT TWO --->  $resultTwo")
 
                         }
@@ -861,7 +861,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     CoroutineScope(Dispatchers.IO).launch{
                         val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                         println("TID LIST --->  $listofTids")
-                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                         println("RESULT TWO --->  $resultTwo")
                     }
                     transactFragment(EMICatalogue().apply {
@@ -880,7 +880,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     CoroutineScope(Dispatchers.IO).launch{
                         val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                         println("TID LIST --->  $listofTids")
-                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                        val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                         println("RESULT TWO --->  $resultTwo")
                     }
                     transactFragment(BrandEmiMasterCategoryFragment().apply {
@@ -901,7 +901,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                     println("TID LIST --->  $listofTids")
-                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                     println("RESULT TWO --->  $resultTwo")
                 }
                 transactFragment(VoidMainFragment())
@@ -932,7 +932,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         CoroutineScope(Dispatchers.IO).launch{
                             val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                             println("TID LIST --->  $listofTids")
-                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                             println("RESULT TWO --->  $resultTwo")
                         }
                         (transactFragment(
@@ -961,7 +961,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                     println("TID LIST --->  $listofTids")
-                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                    val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                     println("RESULT TWO --->  $resultTwo")
                 }
                 DeviceHelper.doPreAuthViewTxn(object: OnOperationListener.Stub(){
@@ -1005,7 +1005,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         CoroutineScope(Dispatchers.IO).launch{
                             val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                             println("TID LIST --->  $listofTids")
-                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
+                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                             println("RESULT TWO --->  $resultTwo")
                         }
                         val dp = selectAllDigiPosData()
@@ -1207,12 +1207,19 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                 }
                                 // end region
                                 hideProgress()
-                                Field48ResponseTimestamp.showToast("Navigation")
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    alertBoxMsgWithIconOnly(R.drawable.ic_tick,
-                                        this@NavigationActivity.getString(R.string.successfull_init))
+                                //Field48ResponseTimestamp.showToast("Navigation")
+                                var checkinitstatus = checkInitializationStatus(appDao)
+                                if(checkinitstatus) {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        alertBoxMsgWithIconOnly(
+                                            R.drawable.ic_tick,
+                                            this@NavigationActivity.getString(R.string.successfull_init)
+                                        )
+                                    }
                                 }
-
+                                else{
+                                    transactFragment(DashboardFragment())
+                                }
                             }
 
 

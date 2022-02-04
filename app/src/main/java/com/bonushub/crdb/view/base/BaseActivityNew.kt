@@ -319,7 +319,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             Handler(Looper.getMainLooper()).postDelayed({
                 dialogBuilder.dismiss()
                 dialogBuilder.cancel()
-                if(msg.equals(getString(R.string.successfull_init))){
+               if(msg.equals(getString(R.string.successfull_init))){
                 startActivity(Intent(this, NavigationActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })

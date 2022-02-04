@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.FragmentActivity
 import com.bonushub.crdb.BuildConfig
 import com.bonushub.crdb.R
 import com.bonushub.crdb.db.AppDao
@@ -43,6 +44,8 @@ import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private var listofTids= ArrayList<String>()
 private var listofTxnTids= ArrayList<String>()
@@ -673,8 +676,185 @@ suspend fun doCommsTransaction(appDao: AppDao){
 }
 
 //Do initiaization
- suspend fun doInitializtion(appDao: AppDao,listofTids: ArrayList<String>) {
-   val checkdiffTid = checkTidUpdate(appDao)
+suspend fun doInitializtion1(appDao: AppDao,listofTids: ArrayList<String>) : Boolean = suspendCoroutine { continuation ->
+   CoroutineScope(Dispatchers.IO).launch {
+       val checkdiffTid = checkTidUpdate(appDao)
+       if (!checkdiffTid) {
+           deletInitializtionData(appDao)
+       }
+       var checkinitststus = checkInitializtionStatus(appDao)
+       if (!checkinitststus) {
+           try {
+               DeviceHelper.doTerminalInitialization(
+                   request = TerminalInitializationRequest(
+                       listofTids.size,
+                       listofTids,
+                   ),
+                   listener = object : OnOperationListener.Stub() {
+                       override fun onCompleted(p0: OperationResult?) {
+                           Log.d(
+                               DashboardFragment.TAG,
+                               "OnTerminalInitializationListener.onCompleted"
+                           )
+                           val response = p0?.value as? TerminalInitializationResponse
+                           val initResult =
+                               """
+                                   Response_Code = ${response?.responseCode}
+                                   API_Response_Status = ${response?.status}
+                                   Response_Code = ${response?.responseCode}
+                                   TIDStatusList = [${response?.tidStatusList?.joinToString()}]
+                                   TIDs = [${response?.tidList?.joinToString()}]
+                                   INITDATAList = [${
+                                   response?.initDataList?.firstOrNull().toString()
+                               }]
+                                """.trimIndent()
+
+                           when (response?.status) {
+                               RequestStatus.SUCCESS -> {
+                                   println(initResult)
+                                   val model = IngenicoInitialization()
+                                   var initDataListList = InitDataListList()
+                                   var tidarrayList = ArrayList<String>()
+                                   var tidstatusList = ArrayList<String>()
+                                   CoroutineScope(Dispatchers.IO).launch {
+                                       model.id = 0
+                                       model.responseCode = response?.responseCode
+                                       model.apiresponseCode = response?.status.name
+                                       response?.tidList?.forEach {
+                                           tidarrayList.add(it)
+
+
+                                       }
+                                       response?.tidStatusList?.forEach {
+                                           tidstatusList.add(it)
+                                       }
+                                       model.tidList = tidarrayList
+                                       model.tidStatusList = tidstatusList
+                                       var list = response?.initDataList
+
+                                       list.forEach { it ->
+                                           initDataListList.adminPassword = it.adminPassword
+                                           initDataListList.helpDeskNumber = it.helpDeskNumber
+                                           initDataListList.merAddHeader1 = it.merAddHeader1
+                                           initDataListList.merAddHeader2 = it.merAddHeader2
+                                           initDataListList.merchantName = it.merchantName
+                                           initDataListList.isRefundPasswordEnable =
+                                               it.isRefundPasswordEnable
+                                           initDataListList.isReportPasswordEnable =
+                                               it.isReportPasswordEnable
+                                           initDataListList.isVoidPasswordEnable =
+                                               it.isVoidPasswordEnable
+                                           initDataListList.isTipEnable = it.isTipEnable
+
+                                           model.initdataList = listOf(initDataListList)
+                                       }
+                                       saveInitializtionData(appDao, model)
+                                   }
+                                   continuation.resume(true)
+                               }
+                               RequestStatus.ABORTED,
+                               RequestStatus.FAILED -> {
+                                   println(initResult)
+                                   val model = IngenicoInitialization()
+                                   var initDataListList = InitDataListList()
+                                   var tidarrayList = ArrayList<String>()
+                                   var tidstatusList = ArrayList<String>()
+                                   CoroutineScope(Dispatchers.IO).launch {
+                                       model.id = 0
+                                       model.responseCode = response?.responseCode
+                                       model.apiresponseCode = response?.status.name
+                                       response?.tidList?.forEach {
+                                           tidarrayList.add(it)
+                                       }
+                                       response?.tidStatusList?.forEach {
+                                           tidstatusList.add(it)
+                                       }
+                                       model.tidList = tidarrayList
+                                       model.tidStatusList = tidstatusList
+                                       var list = response?.initDataList
+
+                                       list.forEach { it ->
+                                           initDataListList.adminPassword = it.adminPassword
+                                           initDataListList.helpDeskNumber = it.helpDeskNumber
+                                           initDataListList.merAddHeader1 = it.merAddHeader1
+                                           initDataListList.merAddHeader2 = it.merAddHeader2
+                                           initDataListList.merchantName = it.merchantName
+                                           initDataListList.isRefundPasswordEnable =
+                                               it.isRefundPasswordEnable
+                                           initDataListList.isReportPasswordEnable =
+                                               it.isReportPasswordEnable
+                                           initDataListList.isVoidPasswordEnable =
+                                               it.isVoidPasswordEnable
+                                           initDataListList.isTipEnable = it.isTipEnable
+
+                                           model.initdataList = listOf(initDataListList)
+                                       }
+                                       saveInitializtionData(appDao, model)
+                                   }
+                               }
+                               else -> {
+                                   println(initResult)
+                                   val model = IngenicoInitialization()
+                                   var initDataListList = InitDataListList()
+                                   var tidarrayList = ArrayList<String>()
+                                   var tidstatusList = ArrayList<String>()
+                                   CoroutineScope(Dispatchers.IO).launch {
+                                       model.id = 0
+                                       model.responseCode = response?.responseCode
+                                       model.apiresponseCode = response?.status?.name
+                                       response?.tidList?.forEach {
+                                           tidarrayList.add(it)
+                                       }
+                                       response?.tidStatusList?.forEach {
+                                           tidstatusList.add(it)
+                                       }
+                                       model.tidList = tidarrayList
+                                       model.tidStatusList = tidstatusList
+                                       var list = response?.initDataList
+
+                                       list?.forEach { it ->
+                                           initDataListList.adminPassword = it.adminPassword
+                                           initDataListList.helpDeskNumber = it.helpDeskNumber
+                                           initDataListList.merAddHeader1 = it.merAddHeader1
+                                           initDataListList.merAddHeader2 = it.merAddHeader2
+                                           initDataListList.merchantName = it.merchantName
+                                           initDataListList.isRefundPasswordEnable =
+                                               it.isRefundPasswordEnable
+                                           initDataListList.isReportPasswordEnable =
+                                               it.isReportPasswordEnable
+                                           initDataListList.isVoidPasswordEnable =
+                                               it.isVoidPasswordEnable
+                                           initDataListList.isTipEnable = it.isTipEnable
+
+                                           model.initdataList = listOf(initDataListList)
+                                       }
+                                       saveInitializtionData(appDao, model)
+                                   }
+                               }
+                           }
+                       }
+
+
+                   }
+               )
+           } catch (ex: Exception) {
+               ex.printStackTrace()
+               println("Exception is " + ex.printStackTrace())
+           }
+       }
+   }
+}
+suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
+    val checkdiffTid = checkTidUpdate(appDao)
+    if(!checkdiffTid){
+        deletInitializtionData(appDao)
+    }
+   return  checkInitializtionStatus(appDao)
+}
+
+//Do initiaization
+ suspend fun doInitializtion(appDao: AppDao,listofTids: ArrayList<String>,activity: Context) {
+    val checkdiffTid = checkTidUpdate(appDao)
     if(!checkdiffTid){
         deletInitializtionData(appDao)
     }
@@ -738,7 +918,13 @@ suspend fun doCommsTransaction(appDao: AppDao){
                                     }
                                     saveInitializtionData(appDao,model)
                                 }
-
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    delay(500)
+                                    (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
+                                        R.drawable.ic_tick,
+                                        activity.getString(R.string.successfull_init)
+                                    )
+                                }
                             }
                             RequestStatus.ABORTED,
                             RequestStatus.FAILED -> {

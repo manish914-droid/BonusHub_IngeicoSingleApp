@@ -19,6 +19,7 @@ import com.bonushub.crdb.databinding.FragmentInitBinding
 import com.bonushub.crdb.viewmodel.InitViewModel
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.showToast
 
@@ -30,9 +31,12 @@ import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.ArrayList
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class InitFragment : Fragment() {
+    @Inject
+    lateinit var appDao: AppDao
     private val initViewModel : InitViewModel by viewModels()
     private var progressBar : ProgressBar? = null
     private var iDialog: IDialog? = null
@@ -201,10 +205,20 @@ class InitFragment : Fragment() {
 
                                 }
                                 (activity as NavigationActivity).hideProgress()
-                                Field48ResponseTimestamp.showToast("Navigation")
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    (activity as NavigationActivity).alertBoxMsgWithIconOnly(R.drawable.ic_tick,
-                                        (activity as NavigationActivity).getString(R.string.successfull_init))
+                               //showToast("Navigation")
+                                var checkinitstatus = checkInitializationStatus(appDao)
+                                if(!checkinitstatus) {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
+                                            (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
+                                                R.drawable.ic_tick,
+                                                it
+                                            )
+                                        }
+                                    }
+                                }
+                                else{
+                                    (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
                                 }
                             }
                             // end region

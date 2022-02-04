@@ -172,7 +172,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                         var listofTids = checkBaseTid(appDao)
                         println("List of tids are" + listofTids)
                         delay(1000)
-                        doInitializtion(appDao, listofTids)
+                        doInitializtion(appDao, listofTids,requireActivity())
                     }.await()
 
                 }
