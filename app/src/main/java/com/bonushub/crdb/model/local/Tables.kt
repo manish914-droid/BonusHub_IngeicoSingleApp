@@ -538,7 +538,8 @@ data class TerminalParameterTable(
 
     @field:BHDashboardItem(
         EDashboardItem.PREAUTH,
-        EDashboardItem.PREAUTH_COMPLETE
+        EDashboardItem.PREAUTH_COMPLETE,
+        EDashboardItem.PREAUTH_VIEW
     )
     @field:BHFieldParseIndex(39)
     @field:BHFieldName("Pre Auth")
@@ -547,9 +548,7 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(31)
     var maxAmtEntryDigits: String = "",
 
-    @field:BHDashboardItem(
-        EDashboardItem.BANK_EMI
-    )
+    @field:BHDashboardItem(EDashboardItem.BANK_EMI)
     @field:BHFieldParseIndex(40)
     @field:BHFieldName("Bank Emi")
     var bankEmi: String = "",
@@ -574,9 +573,7 @@ data class TerminalParameterTable(
     @field: BHFieldName("Manual Entry")
     var fManEntry: String = "",
 
-    @field:BHDashboardItem(
-        EDashboardItem.OFFLINE_SALE
-    )
+    @field:BHDashboardItem(EDashboardItem.OFFLINE_SALE)
     @field:BHFieldParseIndex(46)
     @field:BHFieldName("Offline Sale")
     var fManOfflineSale: String = "",

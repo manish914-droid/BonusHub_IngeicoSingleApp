@@ -8,7 +8,8 @@ import com.bonushub.crdb.utils.EDashboardItem
 annotation class BHFieldParseIndex(val index: Int)
 annotation class BHDashboardItem(
     val item: EDashboardItem,
-    val childItem: EDashboardItem = EDashboardItem.NONE
+    val childItem: EDashboardItem = EDashboardItem.NONE,
+    val childItem2:EDashboardItem = EDashboardItem.NONE
 )
 
 @MustBeDocumented

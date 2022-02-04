@@ -417,7 +417,7 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     CROSS_SELL("BNPL", R.drawable.ic_crosssell, 14),
 
     SALE_WITH_CASH("Sale With Cash", R.drawable.ic_salewithcash),
-    CASH_ADVANCE("Cash@Pos", R.drawable.ic_cash_at_pos),
+    CASH_ADVANCE("Cash@pos", R.drawable.ic_cash_at_pos),
 
   ///  PENDING_OFFLINE_SALE("View Offline Sale", R.drawable.ic_pending_preauth),
     PRE_AUTH_CATAGORY("Pre-Auth", R.drawable.ic_preauth, 9),
