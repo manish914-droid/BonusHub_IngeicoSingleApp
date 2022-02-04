@@ -1848,12 +1848,12 @@ var f57Data=""
                                                                     "preAuth $field56",
                                                                     "e"
                                                                 )
-                                                                 preAuthTransactionTable.field56String= field56.toString()
+                                                        /*         preAuthTransactionTable.field56String= field56.toString()
                                                                 withContext(Dispatchers.IO) {
                                                                     appDatabase.appDao.insertOrUpdatePreAuthTransactionTableData(
                                                                         preAuthTransactionTable
                                                                     )
-                                                                }
+                                                                }*/
                                                                 hideProgress()
                                                                 goToDashBoard()
                                                             }
