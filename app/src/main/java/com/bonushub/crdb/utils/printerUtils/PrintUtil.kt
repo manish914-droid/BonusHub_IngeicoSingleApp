@@ -174,13 +174,20 @@ class PrintUtil(context: Context?) {
                 }
 
 
-
+               if(!receiptDetail.appName.isNullOrEmpty()){
                 textBlockList.add(
                     sigleLineformat(
                         "CARD TYPE:${receiptDetail.appName}",
                         AlignMode.LEFT
                     )
-                )
+                )}
+                else{
+                   textBlockList.add(
+                       sigleLineformat(
+                           "CARD TYPE:${receiptDetail.cardType?.trim()}",
+                           AlignMode.LEFT
+                       ))
+               }
                 textBlockList.add(sigleLineformat("EXP:XX/XX", AlignMode.RIGHT))
 
                 printer?.addMixStyleText(textBlockList)
@@ -293,9 +300,21 @@ class PrintUtil(context: Context?) {
                 printer?.setAscSize(ASCSize.DOT16x8)
 
                 if (receiptDetail.entryMode.equals("CLESS_EMV")) {
-                    textBlockList.add(sigleLineformat("PIN NOT REQUIRED FOR CONTACTLESS TRANSACTION UPTO ${receiptDetail?.cvmRequiredLimit}", AlignMode.CENTER))
-                    printer?.addMixStyleText(textBlockList)
-                    textBlockList.clear()
+                    if (receiptDetail.isVerifyPin == true) {
+                        sigleLineText("PIN VERIFIED OK", AlignMode.CENTER)
+                    }
+                    if (receiptDetail.isVerifyPin == true){
+                        sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER)}
+                    else{
+                        textBlockList.add(
+                            sigleLineformat(
+                                "PIN NOT REQUIRED FOR CONTACTLESS TRANSACTION UPTO ${receiptDetail?.cvmRequiredLimit}",
+                                AlignMode.CENTER
+                            )
+                        )
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+                    }
                 } else {
                     if (receiptDetail.isVerifyPin == true){
                         sigleLineText("PIN VERIFIED OK", AlignMode.CENTER)}
