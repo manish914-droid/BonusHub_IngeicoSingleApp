@@ -36,7 +36,9 @@
 >
 
 		<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/txn_amt_ll"
 			android:layout_width="match_parent"
+			android:visibility="gone"
 			android:layout_height="wrap_content"
 			android:background="@color/themeBackground"
 			android:padding="@dimen/pad_6">
@@ -80,6 +82,35 @@
 				app:layout_constraintTop_toBottomOf="@+id/tv_transaction_amount_heading" />
 
 		</androidx.constraintlayout.widget.ConstraintLayout>
+
+		<LinearLayout
+			android:id="@+id/brand_by_code_ll"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:visibility="gone"
+			android:layout_height="wrap_content">
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/emi_code_display_txt"
+				android:textColor="@color/white"
+				android:padding="@dimen/pad_8"
+				android:gravity="center"
+				android:background="@color/themeBackground"
+				/>
+
+			<TextView
+				android:id="@+id/accessCode_tv"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_size_xregular"
+android:textColor="@color/black"
+				android:gravity="center"
+				android:padding="@dimen/pad_8"
+				android:text="Access Code :- 78960090"
+				/>
+
+		</LinearLayout>
 
 	</androidx.cardview.widget.CardView>
 

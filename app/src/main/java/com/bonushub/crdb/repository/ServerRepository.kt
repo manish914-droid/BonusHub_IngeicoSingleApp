@@ -10,9 +10,9 @@ import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
-import com.bonushub.crdb.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getAllBrandEMIMasterDataTimeStamps
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getAllIssuerData
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.parseDataListWithSplitter
 import com.bonushub.crdb.utils.Utility
 import com.bonushub.crdb.utils.logger
 import com.bonushub.crdb.view.fragments.IssuerBankModal
@@ -37,9 +37,18 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     val emiTenureLiveData: LiveData<GenericResponse<TenuresWithIssuerTncs?>>
         get() = emiTenureMLData
 
+    private val brandEMIAccessCodeMLData = MutableLiveData<GenericResponse<BrandEMIbyCodeDataModal?>>()
+    val brandEMIAccessCodeLiveData: LiveData<GenericResponse<BrandEMIbyCodeDataModal?>>
+        get() = brandEMIAccessCodeMLData
+
 
     private var moreDataFlag = "0"
     private var totalRecord= "0"
+
+    // Getting brands
+    private var brandTotalRecord= "0"
+    private var brandCategoryTotalRecord= "0"
+
 
     // region ====== TIME STAMPS =========
     private var brandTimeStamp: String? = null
@@ -171,14 +180,14 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     }
      suspend fun getBrandEmiProductData(dataCounter: String="0",brandID:String?,categoryID:String?,searchedProductName:String = "", isSearchData:Boolean = false,callFromViewModel:Boolean = false){
          var field57 = ""
-         if(isSearchData){
-//             field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
-//             field57RequestData = "${EMIRequestType.BRAND_EMI_Product.requestType}^0^${brandEMIDataModal?.brandID}^${brandEMIDataModal?.categoryID}"
-//             field57RequestData = "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$totalRecord^${brandEMIDataModal?.brandID}^^$searchedProductName"
-             field57 = "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$dataCounter^${brandID}^^$searchedProductName"
+         field57 = if(isSearchData){
+     //             field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
+     //             field57RequestData = "${EMIRequestType.BRAND_EMI_Product.requestType}^0^${brandEMIDataModal?.brandID}^${brandEMIDataModal?.categoryID}"
+     //             field57RequestData = "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$totalRecord^${brandEMIDataModal?.brandID}^^$searchedProductName"
+             "${EMIRequestType.BRAND_EMI_Product_WithCategory.requestType}^$dataCounter^${brandID}^^$searchedProductName"
 
          }else {
-             field57 = "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
+             "${EMIRequestType.BRAND_EMI_Product.requestType}^$dataCounter^${brandID}^${categoryID}"
          }
 
          if(callFromViewModel)
@@ -265,16 +274,37 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
     }
 
 
+    suspend fun getBrandEmiByCodeData(field56Pan:String="0",field57:String,counter:String="0") {
+
+        when(val genericResp = remoteService.getEMITenureService(field56Pan,field57)){
+            is GenericResponse.Success->{
+                val isoDataReader=genericResp.data
+                val brandByCodeDataStr = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
+                Log.e("Brand By Code :- ",brandByCodeDataStr)
+                stubbingBrandEMIAccessCodeDataToList(brandByCodeDataStr)
+            }
+            is GenericResponse.Error->{
+                brandEMIAccessCodeMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
+            }
+            is GenericResponse.Loading->{
+
+            }
+        }
+    }
+
     //region=================================Stubbing BrandEMI Master Data to List:-
     private suspend fun stubbingBrandEMIMasterDataToList(brandEMIMasterData: String) {
                 val dataList = Utility().parseDataListWithSplitter("|", brandEMIMasterData)
                 if (dataList.isNotEmpty()) {
                     moreDataFlag = dataList[0]
-                    totalRecord = dataList[1]
+                    perPageRecord = dataList[1]
                     brandTimeStamp = dataList[2]
                     brandCategoryUpdatedTimeStamp = dataList[3]
                     issuerTAndCTimeStamp = dataList[4]
                     brandTAndCTimeStamp = dataList[5]
+                    brandTotalRecord =
+                        (brandTotalRecord.toInt().plus(perPageRecord?.toInt() ?: 0)).toString()
+
                     //Store DataList in Temporary List and remove first 5 index values to get sublist from 5th index till dataList size
                     // and iterate further on record data only:-
                     val tempDataList: MutableList<String> = dataList.subList(6, dataList.size)
@@ -293,7 +323,7 @@ class ServerRepository( val appDB: AppDatabase, private val remoteService: Remot
                     }
                     //Refresh Field57 request value for Pagination if More Record Flag is True:-
                     if (moreDataFlag == "1") {
-                        getBrandData(totalRecord)
+                        getBrandData(brandTotalRecord)
                     } else {
                         withContext(Dispatchers.IO){
                             if (matchHostAndDBTimeStamp()) {
@@ -405,7 +435,6 @@ if(!fromBankEmi)
                                     brandModel.brandId = splitData[0]
                                     brandModel.brandTAndC = splitData[1]
                                     // saving data to db
-                                    //appDB.appDao.insertBrandTAndCData(brandModel) // kushal
                                     DBModule.appDatabase.appDao.insertBrandTAndCData(brandModel)
 
 
@@ -425,13 +454,13 @@ if(!fromBankEmi)
     private suspend fun stubbingBrandEMIMasterSubCategoryDataToList(
         brandEMIMasterSubCategoryData: String
     ) {
-        var counter="0"
+       // var counter="0"
             if (!TextUtils.isEmpty(brandEMIMasterSubCategoryData)) {
                 val dataList = Utility().parseDataListWithSplitter("|", brandEMIMasterSubCategoryData)
                 if (dataList.isNotEmpty()) {
                     moreDataFlag = dataList[0]
                     perPageRecord = dataList[1]
-                    counter = (totalRecord?.toInt()?.plus(perPageRecord?.toInt() ?: 0)).toString()
+                    brandCategoryTotalRecord = (brandCategoryTotalRecord.toInt().plus(perPageRecord?.toInt() ?: 0)).toString()
                     //Store DataList in Temporary List and remove first 2 index values to get sublist from 2nd index till dataList size
                     // and iterate further on record data only:-
                     var tempDataList = mutableListOf<String>()
@@ -458,17 +487,11 @@ if(!fromBankEmi)
 
                     //Refresh Field57 request value for Pagination if More Record Flag is True:-
                     if (moreDataFlag == "1") {
-                      /*  field57RequestData =
-                            "${EMIRequestType.BRAND_SUB_CATEGORY.requestType}^$totalRecord^${brandEmiMasterDataList[0].brandID}"
-                        fetchBrandEMIMasterSubCategoryDataFromHost()*/
-                        getBrandSubCategoryData(counter)
+
+                        getBrandSubCategoryData(brandCategoryTotalRecord)
                         Log.d("FullDataList:- ", brandEmiMasterSubCategoryDataList.toString())
                     } else {
                         withContext(Dispatchers.Main) {
-                        //    if (brandEmiMasterSubCategoryDataList.isEmpty()) {
-                         //       navigateToProductPage(isSubCategoryItem = false, -1)
-                                // todo navigate product page
-                        //    } else {
                                 withContext(Dispatchers.IO) {
                                     saveAllSubCategoryDataInDB(brandEmiMasterSubCategoryDataList)
                                 }
@@ -478,36 +501,10 @@ if(!fromBankEmi)
                                 )
                                 brandEMIMasterCategoryMLData.postValue(GenericResponse.Success(brandEmiMasterDataList))
 
-
-
-                                /*  brandEMIAllDataList = brandEmiMasterSubCategoryDataList
-
-                                  //region=====================Line added to resolve category only issue===================== By Manish
-                                  brandEmiMasterSubCategoryDataList =
-                                      brandEmiMasterSubCategoryDataList.filter {
-                                          it.brandID == brandEMIDataModal?.brandID && it.parentCategoryID == "0"
-                                      } as MutableList<BrandEMIMasterSubCategoryDataModal>
-                                  brandEmiMasterSubCategoryDataListUpdate = brandEmiMasterSubCategoryDataList
-                                  //region=====================Line added to resolve category only issue end=====================
-
-                                  brandEMIMasterSubCategoryAdapter.refreshAdapterList(
-                                      brandEmiMasterSubCategoryDataList
-                                  )*/
-                        //    }
-                           // iDialog?.hideProgress()
                         }
                     }
                 }
             } else {
-               /* withContext(Dispatchers.Main) {
-                    iDialog?.hideProgress()
-                    *//*iDialog?.alertBoxWithAction(null, null,
-                        getString(R.string.error), hostMsg,
-                        false, getString(R.string.positive_button_ok),
-                        {}, {})*//*
-                }*/
-                // todo in case of empty subcatlist
-
                 withContext(Dispatchers.IO) {
                     saveAllSubCategoryDataInDB(brandEmiMasterSubCategoryDataList)
                 }
@@ -768,7 +765,8 @@ if(!fromBankEmi)
                             }*/
                         getEMITenureData(field56Pan,field57,counter = totalRecord)
 
-                    } else {
+                    }
+                    else {
                         Log.d("Total BankEMI Data:- ", bankEMISchemesDataList.toString())
                         Log.d("Total BankEMI TAndC:- ", parsingDataWithCurlyBrace[1])
                         val tenuresWithIssuerTncs=TenuresWithIssuerTncs(bankEMIIssuerTAndCList,bankEMISchemesDataList)
@@ -822,6 +820,7 @@ if(!fromBankEmi)
         model.brandCategoryUpdatedTimeStamp = brandCategoryUpdatedTimeStamp ?: ""
         model.issuerTAndCTimeStamp = issuerTAndCTimeStamp ?: ""
         model.brandTAndCTimeStamp = brandTAndCTimeStamp ?: ""
+        appDB.appDao.deleteBrandEMIMasterTimeStamps()
         appDB.appDao.insertBrandEMIMasterTimeStamps(model)
     }
     //endregion
@@ -869,6 +868,46 @@ if(!fromBankEmi)
     }
     //endregion
 
+    //region=================================Stubbing BrandEMI Access Code Data and Display in List:-
+    private suspend fun stubbingBrandEMIAccessCodeDataToList(brandEMIAccessData: String) {
+     var brandEmiByCodeData:BrandEMIbyCodeDataModal?=null
+            if (!TextUtils.isEmpty(brandEMIAccessData)) {
+                val dataList = parseDataListWithSplitter("|", brandEMIAccessData)
+                if (dataList.isNotEmpty()) {
+                    // and iterate further on record data only:-
+                    var tempDataList = mutableListOf<String>()
+                    tempDataList = dataList.subList(2, dataList.size)
+                    if (!TextUtils.isEmpty(tempDataList[0])) {
+                        val splitData = parseDataListWithSplitter(
+                            SplitterTypes.CARET.splitter, tempDataList[0]
+                        )
 
+                        brandEmiByCodeData=         BrandEMIbyCodeDataModal(
+                                splitData[0], splitData[1],
+                                splitData[2], splitData[3],
+                                splitData[4], splitData[5],
+                                splitData[6], splitData[7],
+                                splitData[8], splitData[9],
+                                splitData[10], splitData[11],
+                                splitData[12], splitData[13],
+                                splitData[14], splitData[15],
+                                splitData[16], splitData[17],
+                                splitData[18], splitData[19],
+                                splitData[20], splitData[21],
+                                splitData[22], splitData[23],
+                                splitData[24], splitData[25],
+                                splitData[26], splitData[27],
+                                splitData[28], splitData[29],
+                                splitData[30], splitData[31],splitData[32],splitData[33],splitData[34],splitData[35],splitData[36],splitData[37],splitData[38],splitData[39],splitData[40]
+                            )
+                    }
+
+                    if (brandEmiByCodeData!=null)
+                        brandEMIAccessCodeMLData.postValue(GenericResponse.Success(brandEmiByCodeData))
+                }
+            }
+
+    }
+    //endregion
 
 }

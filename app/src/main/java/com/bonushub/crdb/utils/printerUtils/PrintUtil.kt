@@ -371,6 +371,7 @@ class PrintUtil(context: Context?) {
                                             printer?.setAscSize(ASCSize.DOT24x8)
                                             printer?.addText( AlignMode.LEFT, st)
                                         }
+                                        printer?.setAscSize(ASCSize.DOT24x12)
                                     }
                                 }
                             } else {
@@ -543,8 +544,8 @@ class PrintUtil(context: Context?) {
 
 
         textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
-        val txnAmount =
-            (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+        val txnAmount = (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+
         logger("txnAmount",""+txnAmount)
         textBlockList.add(
             sigleLineformat(
@@ -1133,6 +1134,8 @@ class PrintUtil(context: Context?) {
 
         }
         //endregion
+
+
         if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
             //region ======================Brand terms and Condition=========================
 
@@ -1257,17 +1260,25 @@ class PrintUtil(context: Context?) {
                     ) == '1')
                 ) {
                     if (!TextUtils.isEmpty(bankEMITenureDataModal?.tenureWiseDBDTAndC)) {
-                        val tenureWiseTAndC: List<String>? =
-                            bankEMITenureDataModal?.tenureWiseDBDTAndC?.let { chunkTnC(it) }
+                        val tenureWiseTAndC: String? = bankEMITenureDataModal?.tenureWiseDBDTAndC
                         if (tenureWiseTAndC != null) {
-                            for (st in tenureWiseTAndC) {
-                                logger("tenureWiseDBDTAndC", st, "e")
-                                textBlockList.add(sigleLineformat(st, AlignMode.LEFT))
-                                printer?.addMixStyleText(textBlockList)
-                                textBlockList.clear()
+                            logger("Brand Tnc", tenureWiseTAndC, "e")
+                            val chunk: List<String> = chunkTnC(tenureWiseTAndC,48)
+                            if (tenureWiseTAndC != null) {
+                                printer?.setAscScale(ASCScale.SC1x1)
+                                printer?.setAscSize(ASCSize.DOT24x8)
+                                for (st in chunk) {
+                                    logger("tenureWiseDBDTAndC", st, "e")
+                                    textBlockList.add(sigleLineformat(st, AlignMode.LEFT))
+                                    printer?.addMixStyleText(textBlockList)
+                                    textBlockList.clear()
 
+                                }
                             }
                         }
+
+                        //val tenureWiseTAndC: List<String>? = bankEMITenureDataModal?.tenureWiseDBDTAndC?.let { chunkTnC(it) }
+
                     }
 
                     // reset printer font
@@ -1409,25 +1420,25 @@ class PrintUtil(context: Context?) {
             //region====================Printing Tenure TAndC==================
             if (!TextUtils.isEmpty(bankEMITenureDataModal?.tenureTAndC)) {
                 printSeperator()
-                val tenureTAndC: List<String>? = bankEMITenureDataModal?.tenureTAndC?.let {
-                    chunkTnC(
-                        it
-                    )
-                }
+                val tenureTAndC: String? = bankEMITenureDataModal?.tenureTAndC
+                val chunk: List<String>? = tenureTAndC?.let { chunkTnC(it,48) }
                 if (tenureTAndC != null) {
-                    for (st in tenureTAndC) {
-                        logger("TNC", st, "e")
-          /*              textBlockList.add(sigleLineformat(st, AlignMode.CENTER))
+                    if (chunk != null) {
+                        for (st in chunk) {
+                            logger("TNC", st, "e")
+                            /*              textBlockList.add(sigleLineformat(st, AlignMode.CENTER))
 
-                        printer?.addMixStyleText(textBlockList)
-                        textBlockList.clear()
-*/
-                        printer?.setHzScale(HZScale.SC1x1)
-                        printer?.setHzSize(HZSize.DOT24x16)
-                        printer?.addText( AlignMode.LEFT,  st)
+                                        printer?.addMixStyleText(textBlockList)
+                                        textBlockList.clear()
+                */
+                            printer?.setAscScale(ASCScale.SC1x1)
+                            printer?.setAscSize(ASCSize.DOT24x8)
+                            printer?.addText( AlignMode.LEFT,  st)
+                        }
                     }
                 }
-                printSeperator()
+                printer?.setAscSize(ASCSize.DOT24x12)
+
 
             }
             //endregion

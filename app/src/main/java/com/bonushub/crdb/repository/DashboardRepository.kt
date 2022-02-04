@@ -45,6 +45,7 @@ class DashboardRepository {
                                 itemList.add(ann.item)
                                 if (ann.childItem != EDashboardItem.NONE) {
                                     itemList.add(ann.childItem)
+                                    itemList.add(ann.childItem2)
                                 }
                             }
                         }
@@ -57,6 +58,7 @@ class DashboardRepository {
                 //itemList.add(EDashboardItem.MERCHANT_REFERRAL)  // disable MRP
 
                 ///65655655555555555555555555555555itemList.add(EDashboardItem.PREAUTH_VIEW)
+
                 Log.d("itemList===>:- ", Gson().toJson(itemList))
                 // This list is a list where all types of preath available which was enable by backend
                 val totalPreAuthItem = mutableListOf<EDashboardItem>()

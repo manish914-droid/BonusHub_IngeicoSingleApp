@@ -321,6 +321,9 @@ interface AppDao{
     suspend fun insertBrandEMIMasterTimeStamps(timestamps: BrandEMIMasterTimeStamps): Long?
     // endregion
 
+    @Query("DELETE FROM BrandEMIMasterTimeStamps")
+    suspend fun deleteBrandEMIMasterTimeStamps(): Int?
+
     // region =========== Saving Brand TimeStamps method========
     @Query("SELECT * FROM BrandEMIMasterTimeStamps")
     suspend fun getBrandEMIDateTimeStamps():List<BrandEMIMasterTimeStamps>?
@@ -504,4 +507,7 @@ interface AppDao{
 
     @Query("DELETE From PreAuthTransactionTable")
     suspend fun deletePreAuthTransactionTableDataTable()
+
+    @Query("DELETE From  PreAuthTransactionTable WHERE invoice = :invoice")
+    suspend fun deletePreAuthTransactionTableDataFromInvoice(invoice: String?)
 }

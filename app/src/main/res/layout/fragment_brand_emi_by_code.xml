@@ -16,17 +16,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/sub_header_view"
         android:layout_marginStart="@dimen/pad_20"
-        android:layout_marginEnd="@dimen/pad_20"
         android:layout_marginTop="@dimen/pad_30"
+        android:layout_marginEnd="@dimen/pad_20"
         android:background="@drawable/edge_blue_bg_blue_transparent"
-        android:hint="ENTER CODE"
-        android:padding="14dp"
-        android:inputType="number"
         android:digits="1234567890"
-        android:singleLine="true"
         android:fontFamily="@font/muli_regular"
+        android:hint="ENTER CODE"
+        android:inputType="number"
+        android:padding="14dp"
+        android:singleLine="true"
         android:textColor="@color/txt_color"
-        android:textSize="@dimen/text_size_small"/>
+        android:textSize="@dimen/text_size_small" />
 
     <TextView
         android:id="@+id/txtViewSubmit"
