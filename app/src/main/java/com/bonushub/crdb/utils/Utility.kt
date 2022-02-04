@@ -240,7 +240,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                                     }
                             }
                             "3" -> appDatabase?.appDao
-                                ?.deleteTerminalParameterTable(terminalParameterTable)
+                                .deleteTerminalParameterTable(terminalParameterTable)
                         }
                         Log.d("TPT Insert:- ", insertStatus.toString())
                     }

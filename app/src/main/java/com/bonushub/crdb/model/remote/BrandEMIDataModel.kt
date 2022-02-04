@@ -112,3 +112,51 @@ data class TenuresWithIssuerTncs(  var bankEMIIssuerTAndCList: BankEMIIssuerTAnd
 )
 
 
+data class BrandEMIbyCodeDataModal(
+    var emiCode: String,
+    var bankID: String,
+    var bankTID: String,
+    var issuerID: String,
+    var tenure: String,
+    var brandID: String,
+    var productID: String,
+    var emiSchemeID: String,
+    var transactionAmount: String,
+    var discountAmount: String,
+    var loanAmount: String,
+    var interestAmount: String,
+    var emiAmount: String,
+    var cashBackAmount: String,
+    var netPayAmount: String,
+    var processingFee: String,
+    var processingFeeRate: String,
+    var totalProcessingFee: String,
+    var brandName: String,
+    var issuerName: String,
+    var productName: String,
+    var productCode: String,
+    var productModal: String,
+    var productCategoryName: String,
+    var productSerialCode: String,
+    var skuCode: String,
+    var totalInterest: String,
+    var schemeTAndC: String,
+    var schemeTenureTAndC: String,
+    var schemeDBDTAndC: String,
+    var discountCalculatedValue: String,
+    var cashBackCalculatedValue: String,
+    var orignalTxnAmt:String,
+    var mobileNo:String,
+    var brandReservField:String,
+    var productBaseCat:String,
+    var issuerTimeStamp:String,
+    var brandTimeStamp:String,
+    var instaDiscount:String,
+    var tenureLabel:String ,
+    var txnTID :String
+
+) : Serializable{
+    var billNumberInvoiceNo:String=""
+    var hostInvoice:String=""
+}
+

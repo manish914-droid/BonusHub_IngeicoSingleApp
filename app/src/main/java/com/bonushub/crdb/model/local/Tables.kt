@@ -559,6 +559,7 @@ data class TerminalParameterTable(
     @field:BHFieldName("Brand Emi")
     var brandEmi: String = "",
 
+    @field:BHDashboardItem(EDashboardItem.EMI_PRO)
     @field:BHFieldParseIndex(42)
     @field:BHFieldName("Brand Emi By Access Code")
     var emiPro: String = "",
@@ -1126,6 +1127,7 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
     var emiTenureDataModel: BankEMITenureDataModal?=null
     var emiIssuerDataModel: BankEMIIssuerTAndCDataModal?=null
     var mobileNumber: String?=null
+
 
     var oldDateTimeInVoid:String=""
     var oldStanForVoid:String=""

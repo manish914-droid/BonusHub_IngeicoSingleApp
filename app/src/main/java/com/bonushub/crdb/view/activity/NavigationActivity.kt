@@ -841,8 +841,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PREAUTH_COMPLETE->{
-                transactFragment(PreAuthCompleteInputDetailFragment(),true)
-
+                if (checkInternetConnection()) {
+                    transactFragment(PreAuthCompleteInputDetailFragment(), true)
+                }else{
+                    ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+                }
 
 
                 /* if (checkInternetConnection()) {
@@ -1029,6 +1032,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
 
+            EDashboardItem.EMI_PRO->{
+                if (checkInternetConnection()) {
+                    transactFragment(BrandEmiByCodeFragment(), true)
+                }else{
+                    ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+                }
+            }
             else->{
 
 

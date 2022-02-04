@@ -321,6 +321,9 @@ interface AppDao{
     suspend fun insertBrandEMIMasterTimeStamps(timestamps: BrandEMIMasterTimeStamps): Long?
     // endregion
 
+    @Query("DELETE FROM BrandEMIMasterTimeStamps")
+    suspend fun deleteBrandEMIMasterTimeStamps(): Int?
+
     // region =========== Saving Brand TimeStamps method========
     @Query("SELECT * FROM BrandEMIMasterTimeStamps")
     suspend fun getBrandEMIDateTimeStamps():List<BrandEMIMasterTimeStamps>?

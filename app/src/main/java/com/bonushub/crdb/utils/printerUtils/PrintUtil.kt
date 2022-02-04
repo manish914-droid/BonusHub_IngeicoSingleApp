@@ -543,8 +543,8 @@ class PrintUtil(context: Context?) {
 
 
         textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
-        val txnAmount =
-            (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+        val txnAmount = (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+
         logger("txnAmount",""+txnAmount)
         textBlockList.add(
             sigleLineformat(

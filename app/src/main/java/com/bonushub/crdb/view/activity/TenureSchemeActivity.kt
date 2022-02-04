@@ -83,8 +83,6 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         )
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentTenureSchemeBinding.inflate(layoutInflater)

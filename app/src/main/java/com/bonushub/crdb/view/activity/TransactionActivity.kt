@@ -31,6 +31,7 @@ import com.bonushub.crdb.model.local.*
 import com.bonushub.crdb.model.remote.*
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
+import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
@@ -38,14 +39,13 @@ import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBatchDataByInvoice
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getPreAuthByInvoice
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.utils.ingenico.RawStripe
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.crdb.view.fragments.AuthCompletionData
-import com.bonushub.crdb.viewmodel.PendingSyncTransactionViewModel
-import com.bonushub.crdb.viewmodel.SearchViewModel
-import com.bonushub.crdb.viewmodel.TenureSchemeViewModel
-import com.bonushub.crdb.viewmodel.TransactionViewModel
+import com.bonushub.crdb.viewmodel.*
+import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiByCodeVMFactory
 import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -103,6 +103,7 @@ class TransactionActivity : BaseActivityNew() {
     private val authCompletionData by lazy { intent.getSerializableExtra("authCompletionData") as AuthCompletionData }
 
     private val mobileNumber by lazy { intent.getStringExtra("mobileNumber") ?: "" }
+    private val brandAccessCode by lazy { intent.getStringExtra("brandAccessCode") ?: "" }
 
     private val billNumber by lazy { intent.getStringExtra("billNumber") ?: "0" }
     private val saleWithTipAmt by lazy { intent.getStringExtra("saleWithTipAmt") ?: "0" }
@@ -133,11 +134,24 @@ class TransactionActivity : BaseActivityNew() {
         if (transactionTypeEDashboardItem == EDashboardItem.BRAND_EMI || transactionTypeEDashboardItem == EDashboardItem.BANK_EMI || transactionTypeEDashboardItem == EDashboardItem.TEST_EMI) {
             emvBinding?.cardDetectImg?.visibility = View.VISIBLE
             emvBinding?.tvInsertCard?.visibility = View.VISIBLE
+            emvBinding?.txnAmtLl?.visibility = View.VISIBLE
+            emvBinding?.brandByCodeLl?.visibility = View.GONE
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
-        } else {
+        } else if(transactionTypeEDashboardItem == EDashboardItem.EMI_PRO ){
+            emvBinding?.cardDetectImg?.visibility = View.VISIBLE
+            emvBinding?.tvInsertCard?.visibility = View.VISIBLE
+            emvBinding?.txnAmtLl?.visibility = View.GONE
+            emvBinding?.brandByCodeLl?.visibility = View.VISIBLE
+            emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
+            emvBinding?.accessCodeTv?.text="Access Code : - $brandAccessCode"
+
+        }
+        else {
             emvBinding?.cardDetectImg?.visibility = View.GONE
             emvBinding?.tvInsertCard?.visibility = View.GONE
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
+            emvBinding?.txnAmtLl?.visibility = View.VISIBLE
+            emvBinding?.brandByCodeLl?.visibility = View.GONE
 
         }
         emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
@@ -225,6 +239,10 @@ class TransactionActivity : BaseActivityNew() {
                                         globalCardProcessedModel.getTransType()
                                     )
 
+                                }
+
+                                BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type->{
+                                    initiateBrandEmiByCode()
                                 }
 
                             }
@@ -436,9 +454,7 @@ class TransactionActivity : BaseActivityNew() {
                                                         it
                                                     )
                                                 }
-                                                // cardProcessedDataModal.getPanNumberData() --> Containing plain pan
-                                                // globalCardProcessedModel.getPanNumberData() --> Containing masked pan
-var f57Data=""
+
 
                                                 when(reqCode){
 
@@ -609,19 +625,14 @@ var f57Data=""
                                         }
                                     }
                                     ResponseCode.FAILED.value -> {
+                                        isUnblockingNeeded = true
                                         AppPreference.clearRestartDataPreference()
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     ResponseCode.ABORTED.value -> {
                                         isUnblockingNeeded = true
                                         AppPreference.clearRestartDataPreference()
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     ResponseCode.REVERSAL.value -> {
                                         AppPreference.clearRestartDataPreference()
@@ -642,17 +653,11 @@ var f57Data=""
                                                 batchReversalData
                                             )
                                         }
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     else -> {
                                         isUnblockingNeeded = true
-                                        errorFromIngenico(
-                                            txnResponse?.responseCode,
-                                            txnResponse?.status.toString()
-                                        )
+
                                     }
                                 }
 
@@ -711,6 +716,10 @@ var f57Data=""
                     withContext(Dispatchers.Main) {
                         showToast(isBlockUnblockSuccess.second)
                     }
+                    errorFromIngenico(
+                        txnRespCode,
+                        txnResponseMsg
+                    )
                 }
 
             }
@@ -745,7 +754,7 @@ var f57Data=""
 
     private suspend fun setupFlow() {
         when (transactionTypeEDashboardItem) {
-            EDashboardItem.BRAND_EMI, EDashboardItem.BANK_EMI, EDashboardItem.TEST_EMI -> {
+            EDashboardItem.BRAND_EMI, EDashboardItem.BANK_EMI, EDashboardItem.TEST_EMI ,EDashboardItem.EMI_PRO-> {
                 searchCardViewModel.fetchCardTypeData(
                     globalCardProcessedModel,
                     CardOption.create().apply {
@@ -2442,6 +2451,66 @@ var f57Data=""
     }
 
 
+    private lateinit var emiByCodeViewModel: BrandEmiByCodeViewModel
+    private var brandEMIbyCodeDataModal:BrandEMIbyCodeDataModal?=null
+
+    private fun initiateBrandEmiByCode(){
+        val field57= "${EMIRequestType.BRAND_EMI_BY_ACCESS_CODE.requestType}^0^$brandAccessCode"
+        showProgress()
+        emiByCodeViewModel = ViewModelProvider(
+            this, BrandEmiByCodeVMFactory(
+                serverRepository,
+                globalCardProcessedModel.getPanNumberData() ?: "",
+                field57
+            )
+        ).get(BrandEmiByCodeViewModel::class.java)
+        emiByCodeViewModel.getBrandEmiByCodeDatafromVM()
+        emiByCodeViewModel.brandEmiLiveData.observe(
+            this
+        ) {
+            hideProgress()
+            when (val genericResp = it) {
+                is GenericResponse.Success -> {
+                    println(Gson().toJson(genericResp.data))
+                    brandEMIbyCodeDataModal = genericResp.data as BrandEMIbyCodeDataModal
+                    //setUpRecyclerView()
+                    DialogUtilsNew1.showBrandEmiByCodeDetailsDialog(this,brandEMIbyCodeDataModal!!.brandName,
+                        "FX-A7s/1545KIT-EElH","APS-C Low","6 months","2565.00","2565.00","2565.00"){
+
+                    }
+                }
+                is GenericResponse.Error -> {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                      alertBoxWithAction(
+                            getString(R.string.no_receipt),
+                            genericResp.errorMessage ?: "Oops something went wrong",
+                            false,
+                            getString(R.string.positive_button_ok),
+                            {
+                                finish()
+                                startActivity(
+                                    Intent(
+                                        this@TransactionActivity,
+                                        NavigationActivity::class.java
+                                    ).apply {
+                                        flags =
+                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    })
+                            },
+                            {})
+                    }
+                    //  ToastUtils.showToast(this, genericResp.errorMessage)
+                    println(genericResp.errorMessage.toString())
+                }
+                is GenericResponse.Loading -> {
+// currently not in use ....
+                }
+            }
+        }
+
+
+
+    }
     suspend fun printingSaleData(batchTable: BatchTable, cb: suspend (Boolean) -> Unit) {
         val receiptDetail = batchTable.receiptData
         withContext(Dispatchers.Main) {
@@ -2547,6 +2616,7 @@ var f57Data=""
 
 
     }
+
 
     suspend fun errorOnSyncing(msg: String) {
         withContext(Dispatchers.Main) {
