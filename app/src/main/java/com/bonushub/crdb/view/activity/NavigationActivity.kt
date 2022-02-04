@@ -826,7 +826,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                         }
                         else{
-                            inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
+                            CoroutineScope(Dispatchers.Main).launch {
+                                inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
+                            }
                         }
 
                     }
