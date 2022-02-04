@@ -207,7 +207,7 @@ class InitFragment : Fragment() {
                                 (activity as NavigationActivity).hideProgress()
                                //showToast("Navigation")
                                 var checkinitstatus = checkInitializationStatus(appDao)
-                                if(!checkinitstatus) {
+                                if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(

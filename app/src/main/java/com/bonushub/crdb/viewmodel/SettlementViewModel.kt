@@ -31,7 +31,7 @@ class SettlementViewModel @ViewModelInject constructor(private val settlementRep
     fun settlementResponse(distinctbytid: ArrayList<String>) {
         viewModelScope.launch {
             logger("baseTID",listOf(getBaseTID(appDao)).toString())
-            val settlementRequest = SettlementRequest(distinctbytid.size, distinctbytid)
+            val settlementRequest = SettlementRequest(distinctbytid.size,distinctbytid) //listOf("30160031")
             settlementRepository.fetchSettlementResponseData(settlementRequest).collect { result ->
                 withContext(Dispatchers.IO){
                     result.data?.let { it ->

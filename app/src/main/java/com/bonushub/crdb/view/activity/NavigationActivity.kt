@@ -1041,10 +1041,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     fun inflateInputFragment(fragment: Fragment, subHeading: String, action: EDashboardItem, testEmiOption: String = "0") {
 
         System.out.println("Insert Block option "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
-        System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
-        System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
+        System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()))
+        System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString()))
 
         if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
+            !AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString())) {
             transactFragment(fragment.apply {

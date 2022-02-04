@@ -236,7 +236,7 @@ class SettlementFragment : Fragment() {
                                                     }
                                                     Status.ERROR -> {
                                                         println("Error in ingenico settlement")
-                                                        AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
+                                                        AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
                                                         AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString(), true)
                                                         // Toast.makeText(activity,"Error called  ${result.error}", Toast.LENGTH_LONG).show()
                                                     }
