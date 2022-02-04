@@ -36,6 +36,7 @@ import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.deletePreAuthByInvoice
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBatchDataByInvoice
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getPreAuthByInvoice
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
@@ -1598,9 +1599,22 @@ class TransactionActivity : BaseActivityNew() {
                                                             withContext(Dispatchers.Main) {
                                                                 logger(
                                                                     "success:- ",
-                                                                    "in success $genericResp",
+                                                                    "in success ${genericResp.data}",
                                                                     "e"
                                                                 )
+
+                                                                val isoPacket=genericResp.data
+                                                               val field56= isoPacket?.isoMap?.get(60)?.rawData?.hexStr2ByteArr()?.byteArr2Str()
+                                                                logger(
+                                                                    "field56:- ",
+                                                                    "preAuth $field56",
+                                                                    "e"
+                                                                )
+                                                               preAuthTransactionTable.field56String= field56.toString()
+                                                                withContext(Dispatchers.IO) {
+                                                                    appDatabase.appDao.insertOrUpdatePreAuthTransactionTableData(preAuthTransactionTable)
+                                                                }
+                                                              //
                                                                 hideProgress()
                                                                 goToDashBoard()
                                                             }
@@ -1767,7 +1781,7 @@ class TransactionActivity : BaseActivityNew() {
                                             val newBatchData = BatchTable(receiptDetail)
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                                field56PreAuthComplete(receiptDetail.invoice.toString())
+
                                                 if(oldBatchTable != null){
 
                                                     // replace reciept data if present in our batch data
@@ -1783,8 +1797,10 @@ class TransactionActivity : BaseActivityNew() {
                                                     appDatabase.appDao.insertBatchData(oldBatchTable)
                                                     AppPreference.saveLastReceiptDetails(oldBatchTable)
                                                     Utility().incrementUpdateRoc()
+
                                                 }
                                                 else{
+
                                                     //    appDao.insertBatchData(batchData)
                                                     newBatchData.invoice = receiptDetail.invoice.toString()
                                                     newBatchData.transactionType = BhTransactionType.PRE_AUTH_COMPLETE.type
@@ -1857,12 +1873,7 @@ class TransactionActivity : BaseActivityNew() {
                                                                     "preAuth $field56",
                                                                     "e"
                                                                 )
-                                                        /*         preAuthTransactionTable.field56String= field56.toString()
-                                                                withContext(Dispatchers.IO) {
-                                                                    appDatabase.appDao.insertOrUpdatePreAuthTransactionTableData(
-                                                                        preAuthTransactionTable
-                                                                    )
-                                                                }*/
+                                                                deletePreAuthByInvoice(receiptDetail.invoice.toString())
                                                                 hideProgress()
                                                                 goToDashBoard()
                                                             }
@@ -2845,24 +2856,7 @@ class TransactionActivity : BaseActivityNew() {
         }
 
     }
-    fun field56PreAuthComplete(invoice:String){
-        val preAuthData=getPreAuthByInvoice(invoice)
-        val field56RawData=preAuthData?.field56String
-     /*   val dateTime = preAuthData?.oldDateTimeInVoid
-        val fromFormat: DateFormat =
-            SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-        val toFormat: DateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
-        val reqDate: Date? = fromFormat.parse(dateTime ?: "")
 
-        val reqDateString = toFormat.format(reqDate)
-        val data=preAuthData?.receiptData?.tid+preAuthData?.bonushubbatchnumber+preAuthData?.oldStanForVoid+reqDateString
-*/
-        logger(
-            "field56:- ",
-            "preAuth $field56RawData",
-            "e"
-        )
-    }
 
 
 }

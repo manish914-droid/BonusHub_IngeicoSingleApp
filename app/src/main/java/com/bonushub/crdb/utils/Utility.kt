@@ -1146,6 +1146,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                 "e"
             )
             var txnSync = true
+        withContext(Dispatchers.IO) {
             val pendingTxn = appDatabase.appDao.getAllPendingSyncTransactionData()
 
             if (pendingTxn.size != 0) {
@@ -1188,10 +1189,10 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     }
                 }
             }
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 cb(txnSync)
             }
-
+        }
     }
 
     /*fun creatCardProcessingModelData(receiptDetail: ReceiptDetail):CardProcessedDataModal {
@@ -1389,6 +1390,18 @@ object Field48ResponseTimestamp {
         }
         return batchTable
     }
+
+//endregion
+//region====================== PreAuthTransactionTable Data-- delete on invoice:-
+fun deletePreAuthByInvoice(invoice:String) {
+    var batchTable: PreAuthTransactionTable? = null
+    runBlocking(Dispatchers.IO) {
+       appDatabase.appDao?.deletePreAuthTransactionTableDataFromInvoice(invoice)
+        val jsonResp=Gson().toJson(batchTable)
+        println(jsonResp)
+    }
+
+}
 
 //endregion
 

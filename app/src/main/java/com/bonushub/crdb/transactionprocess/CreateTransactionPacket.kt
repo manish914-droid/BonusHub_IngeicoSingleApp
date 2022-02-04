@@ -151,6 +151,15 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
 
             if(cardProcessedData.getTransType()==BhTransactionType.PRE_AUTH_COMPLETE.type){
               //  TidBatchStanYYMMHHMMSS like 41501121000166000581220127193501
+                val preAuthData= batchdata?.receiptData?.invoice?.let {
+                    Field48ResponseTimestamp.getPreAuthByInvoice(
+                        it
+                    )
+                }
+                val dataList =
+                    preAuthData?.field56String?.let { Utility().parseDataListWithSplitter("|", it) }
+                //preAuth 0|10|50|000000000VZ0001|30160031|000066|000236|000236||
+               /// TidBatchStanYYMMHHMMSS
                 try {
                     val dateTime = batchdata?.oldDateTimeInVoid
                     val fromFormat: DateFormat =
@@ -162,8 +171,10 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                     val reqDateString = toFormat.format(reqDate)
 
                  //   val field56="${stan}${reqDateString}"
-                    val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldStanForVoid+reqDateString
-                     addFieldByHex(56,data)
+
+                    val data1=dataList?.get(4)+dataList?.get(5)+dataList?.get(6)+reqDateString
+                   val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldStanForVoid+reqDateString
+                     addFieldByHex(56,data1)
 
 
                 }catch (ex:Exception){

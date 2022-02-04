@@ -507,4 +507,7 @@ interface AppDao{
 
     @Query("DELETE From PreAuthTransactionTable")
     suspend fun deletePreAuthTransactionTableDataTable()
+
+    @Query("DELETE From  PreAuthTransactionTable WHERE invoice = :invoice")
+    suspend fun deletePreAuthTransactionTableDataFromInvoice(invoice: String?)
 }
