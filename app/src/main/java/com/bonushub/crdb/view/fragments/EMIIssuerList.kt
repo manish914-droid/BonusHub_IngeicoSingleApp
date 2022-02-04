@@ -1,40 +1,41 @@
 package com.bonushub.crdb.view.fragments
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.HDFCApplication
-
 import com.bonushub.crdb.R
 import com.bonushub.crdb.databinding.FragmentEmiIssuerListBinding
 import com.bonushub.crdb.databinding.ItemEmiIssuerListBinding
 import com.bonushub.crdb.db.AppDatabase
 import com.bonushub.crdb.model.local.AppPreference
 import com.bonushub.crdb.model.remote.BrandEMIProductDataModal
-
 import com.bonushub.crdb.repository.GenericResponse
 import com.bonushub.crdb.repository.ServerRepository
 import com.bonushub.crdb.serverApi.EMIRequestType
 import com.bonushub.crdb.serverApi.RemoteService
 import com.bonushub.crdb.utils.ToastUtils
+import com.bonushub.crdb.utils.UiAction
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.adapter.IssuerTenureListAdapter
 import com.bonushub.crdb.view.base.IDialog
 import com.bonushub.crdb.viewmodel.EmiissuerListViewModel
 import com.bonushub.crdb.viewmodel.viewModelFactory.IssuerListEmiViewModelFactory
-import com.bonushub.crdb.utils.UiAction
 import com.google.gson.Gson
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.Serializable
 import java.util.*
+
 
 class EMIIssuerList : Fragment() {
 
@@ -64,6 +66,18 @@ class EMIIssuerList : Fragment() {
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
     private var enquiryAmount : Long? =null
 
+    var states = arrayOf(
+        intArrayOf(android.R.attr.state_enabled),
+        intArrayOf(-android.R.attr.state_enabled),
+        )
+
+    var colors = intArrayOf(
+        Color.BLACK,
+        Color.RED,
+        Color.GREEN,
+        Color.BLUE
+    )
+    var mycolorList = ColorStateList(states, colors)
   private val brandEMIData by lazy { arguments?.getSerializable("brandEMIDataModal") as BrandEMIProductDataModal
   ? }
 
@@ -152,23 +166,22 @@ class EMIIssuerList : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             emiissuerListViewModel.getIssuerListData(field57RequestData)
         }
-        emiissuerListViewModel.emiIssuerListLivedata.observe(viewLifecycleOwner, {
+        emiissuerListViewModel.emiIssuerListLivedata.observe(viewLifecycleOwner) {
             (activity as IDialog).hideProgress()
             when (val genericResp = it) {
                 is GenericResponse.Success -> {
                     println(Gson().toJson(genericResp.data))
                     setUpRecyclerViews()
                     Log.d("genericResp.data:- ", genericResp.data.toString())
-                    allIssuerBankList= genericResp.data as MutableList<IssuerBankModal>
-                    Log.d("allIssuerBankList:- ",allIssuerBankList.toString())
-                  //  brandEMIMasterCategoryAdapter.submitList(genericResp.data)
+                    allIssuerBankList = genericResp.data as MutableList<IssuerBankModal>
+                    Log.d("allIssuerBankList:- ", allIssuerBankList.toString())
+                    //  brandEMIMasterCategoryAdapter.submitList(genericResp.data)
                 }
                 is GenericResponse.Error -> {
                     lifecycleScope.launch(Dispatchers.Main) {
                         iDialog?.hideProgress()
-                        iDialog?.alertBoxWithAction( getString(R.string.info),  "No record found",
-                          false
-                            , getString(R.string.positive_button_ok),
+                        iDialog?.alertBoxWithAction(getString(R.string.info), "No record found",
+                            false, getString(R.string.positive_button_ok),
                             {
                                 parentFragmentManager.popBackStackImmediate()
                             }, {})
@@ -178,7 +191,7 @@ class EMIIssuerList : Fragment() {
 
                 }
             }
-        })
+        }
         emiissuerListViewModel.emiIssuerTenureListLiveData.observe(viewLifecycleOwner, {
             when (val genericResp = it) {
                 is GenericResponse.Success -> {
@@ -247,6 +260,7 @@ class EMIIssuerList : Fragment() {
 
         //region==============OnClick event of Compare By Tenure CardView:-
         binding?.compareByTenure?.setOnClickListener {
+
             compareByTenureSelectEventMethod()
         }
         //endregion

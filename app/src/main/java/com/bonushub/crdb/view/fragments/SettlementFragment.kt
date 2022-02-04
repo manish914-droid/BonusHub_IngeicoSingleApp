@@ -54,7 +54,7 @@ class SettlementFragment : Fragment() {
     private var settlementByteArray: ByteArray? = null
     private var navController: NavController? = null
     private var iDialog: IDialog? = null
-
+    private var onlyPreAuthFlag: Boolean? = true
     private val batchReversalViewModel : BatchReversalViewModel by viewModels()
 
     private var ioSope = CoroutineScope(Dispatchers.IO)
@@ -96,9 +96,12 @@ class SettlementFragment : Fragment() {
             Log.d("TPT Data:- ", batchData.toString())
             dataList.clear()
             dataList.addAll(batchData as MutableList<BatchTable>)
+            onlyPreAuthCheck(dataList)
             setUpRecyclerView()
 
         }
+
+
 
         lifecycleScope.launch {
             batchReversalViewModel?.getBatchTableReversalData()?.observe(viewLifecycleOwner) { batchReversalList ->
@@ -272,13 +275,25 @@ class SettlementFragment : Fragment() {
 
 
     }
+    private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
+        for (i in 0 until dataList.size) {
+            if(dataList[i].transactionType != BhTransactionType.PRE_AUTH.type){
+                onlyPreAuthFlag=false
+                break
+            }
+
+        }
+    }
     //region====================================SetUp RecyclerView:-
     private fun setUpRecyclerView() {
-        if (dataList.size > 0) {
+
+        if (dataList.size > 0  ) {
             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.VISIBLE
             fragmensettlementBinding?.lvHeadingView?.visibility = View.VISIBLE
-
+            if(onlyPreAuthFlag==true){
+                fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE
+            }
             fragmensettlementBinding?.settlementRv?.apply {
                 layoutManager = LinearLayoutManager(context)
                 itemAnimator = DefaultItemAnimator()

@@ -73,7 +73,10 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         if (eDashBoardItem == EDashboardItem.BRAND_EMI_CATALOGUE) {
             brandMasterBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
-
+            brandMasterBinding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
+            brandMasterBinding?.subHeaderView?.headerHome?.setOnClickListener {   (activity as NavigationActivity).transactFragment(
+                DashboardFragment()
+            ) }
         }else {
             brandMasterBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
             brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)

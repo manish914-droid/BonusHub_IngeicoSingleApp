@@ -772,19 +772,21 @@ if(!fromBankEmi)
                         Log.d("Total BankEMI Data:- ", bankEMISchemesDataList.toString())
                         Log.d("Total BankEMI TAndC:- ", parsingDataWithCurlyBrace[1])
                         val tenuresWithIssuerTncs=TenuresWithIssuerTncs(bankEMIIssuerTAndCList,bankEMISchemesDataList)
-                        val data = runBlocking(Dispatchers.IO) { getAllIssuerData() }
+                        val data =  getAllIssuerData()
                         val timeStampsData = getAllBrandEMIMasterDataTimeStamps()
                         val dbTimeStamps = appDB.appDao.getBrandTimeStampFromDB()
 
-                        if (dbTimeStamps != null) {
-                            if (data?.isEmpty() == true || dbTimeStamps?.issuerTAndCTimeStamp?.isEmpty()) {
+
+                            if (data?.isEmpty() == true || dbTimeStamps?.issuerTAndCTimeStamp?.isEmpty() == true) {
                                 getIssuerTnc(fromBankEmi = true)
                             }
                             else{
                                 if (bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp ?: "0" != dbTimeStamps?.issuerTAndCTimeStamp) {
                                     bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp?.let {
-                                        dbTimeStamps.issuerTAndCTimeStamp=bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp
-                                        appDB.appDao.insertBrandEMIMasterTimeStamps(dbTimeStamps)
+                                        dbTimeStamps?.issuerTAndCTimeStamp=bankEMIIssuerTAndCList?.updateIssuerTAndCTimeStamp
+                                        if (dbTimeStamps != null) {
+                                            appDB.appDao.insertBrandEMIMasterTimeStamps(dbTimeStamps)
+                                        }
                                         Log.d(
                                             "Emi_update:- ",
                                             it
@@ -800,7 +802,7 @@ if(!fromBankEmi)
 
 
                             }
-                        }
+
                         emiTenureMLData.postValue(GenericResponse.Success(tenuresWithIssuerTncs))
 
                     }

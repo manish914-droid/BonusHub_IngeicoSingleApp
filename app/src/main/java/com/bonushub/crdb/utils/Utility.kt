@@ -229,6 +229,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                                             terminalParameterTable.reservedValues[7].toString().toInt() == 1
                                     }
 
+
                                 } catch (ex: Exception) {
                                     //ex.printStackTrace()
                                     println("Exception in brand catalogue display on dashboard")
@@ -1376,6 +1377,19 @@ object Field48ResponseTimestamp {
         }
         return batchTable
     }
+
+//endregion
+//region======================Get PreAuthTransactionTable Data:-
+    fun getPreAuthByInvoice(invoice:String): PreAuthTransactionTable? {
+        var batchTable: PreAuthTransactionTable? = null
+        runBlocking(Dispatchers.IO) {
+            batchTable = appDatabase.appDao?.getPreAuthTransactionTableDataFromInvoice(invoice)
+            val jsonResp=Gson().toJson(batchTable)
+            println(jsonResp)
+        }
+        return batchTable
+    }
+
 //endregion
 
     //region======================Get TPT Data:-

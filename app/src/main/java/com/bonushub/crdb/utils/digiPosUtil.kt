@@ -332,6 +332,8 @@ fun getCurrentDateInDisplayFormatDigipos(): String {
     return fttt.format(dNow)
 }
 
+
+
 object BitmapUtils {
     /**
      * Converts bitmap to byte array in PNG format

@@ -23,7 +23,7 @@
         android:background="@drawable/edge_blue_bg_white_off"
         android:cursorVisible="false"
         android:fontFamily="@font/muli_regular"
-        android:hint="@string/search_transaction"
+        android:hint="@string/enter_invoice"
         android:inputType="number"
         android:lines="1"
         android:padding="14dp"

@@ -16,6 +16,7 @@ import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.view.activity.NavigationActivity
 import com.bonushub.crdb.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -159,7 +160,10 @@ class DigiPosTXNListDetailFragment : Fragment() {
                                 binding?.printButton?.text = getString(R.string.print)
                             }
                             if (txnStatus.toLowerCase(Locale.ROOT).equals("InProgress", true)) {
-                                ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                              //  ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.no_data_found) ?: "") {}
+                                }
                             }
                             if(txnStatus.isBlank() || statusRespDataList[1].toLowerCase(Locale.ROOT).equals("Failed", true)){
                                 (activity as BaseActivityNew)?.alertBoxWithAction(

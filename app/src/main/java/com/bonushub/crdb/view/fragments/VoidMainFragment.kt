@@ -51,10 +51,7 @@ import com.ingenico.hdfcpayment.response.TransactionResponse
 import com.ingenico.hdfcpayment.type.ResponseCode
 import com.ingenico.hdfcpayment.type.TransactionType
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
@@ -335,31 +332,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
     private fun searchTransaction()
     {
         val invoice = binding?.edtTextSearchTransaction?.text.toString()
-        /*lifecycleScope.launch {
-            batchFileViewModel.getBatchTableDataByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner, { batchTable ->
 
-                if(batchTable?.receiptData != null) {
-
-                    val date = batchTable.receiptData?.dateTime ?: ""
-                    val parts = date.split(" ")
-                    println("Date: " + parts[0])
-                    println("Time: " + (parts[1]) )
-                    val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "")?.toDouble())?.div(100)).toString().toDouble())
-                    DialogUtilsNew1.showVoidSaleDetailsDialog(
-                        requireContext(),
-                        parts[0],
-                        parts[1],
-                        batchTable.receiptData?.tid ?: "",
-                        batchTable.receiptData?.invoice ?: "",
-                        amt
-                    ) {
-                        doVoidTransaction()
-                    }
-                }else{
-                    ToastUtils.showToast(requireContext(),"Data not found.")
-                }
-            })
-        }*/
 
         lifecycleScope.launch {
             batchFileViewModel.getBatchTableDataListByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner) { allbat ->
@@ -385,10 +358,12 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
                     val tpt = getTptData()
                     when (bat.size) {
-                        0 -> ToastUtils.showToast(
-                            requireContext(),
-                            getString(R.string.no_data_found)
-                        )
+                        0 -> {
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.no_data_found) ?: "") {}
+                            }
+                        }
                         1 -> {
                             voidData = bat.first()
                             if (voidData?.transactionType == BhTransactionType.REFUND.type && tpt?.voidRefund != "1") {

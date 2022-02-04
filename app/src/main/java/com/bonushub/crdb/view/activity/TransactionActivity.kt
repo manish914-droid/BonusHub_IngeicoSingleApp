@@ -36,6 +36,7 @@ import com.bonushub.crdb.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.utils.*
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getBatchDataByInvoice
+import com.bonushub.crdb.utils.Field48ResponseTimestamp.getPreAuthByInvoice
 import com.bonushub.crdb.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.utils.ingenico.RawStripe
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
@@ -62,6 +63,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -1516,18 +1519,27 @@ var f57Data=""
                                                 getTptData()
                                             }
                                             val batchData = BatchTable(receiptDetail)
+                                             val preAuthTransactionTable=PreAuthTransactionTable(receiptDetail)
 
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 //    appDao.insertBatchData(batchData)
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType =
-                                                    BhTransactionType.PRE_AUTH.type
+                                                batchData.transactionType = BhTransactionType.PRE_AUTH.type
                                                 //To get bonushub batchumber,bonushub invoice,bonushub stan
                                                 batchData.bonushubbatchnumber =
                                                     tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan = tpt?.stan ?: ""
+
+                                                //preAuthdata save
+                                                preAuthTransactionTable.invoice = receiptDetail.invoice.toString()
+                                                preAuthTransactionTable.transactionType = BhTransactionType.PRE_AUTH.type
+                                                //To get bonushub batchumber,bonushub invoice,bonushub stan
+                                                preAuthTransactionTable.bonushubbatchnumber =
+                                                    tpt?.batchNumber ?: ""
+                                                preAuthTransactionTable.bonushubInvoice = tpt?.invoiceNumber ?: ""
+                                                preAuthTransactionTable.bonushubStan = tpt?.stan ?: ""
 
                                                 createCardProcessingModelData(receiptDetail)
                                                 val data =
@@ -1542,6 +1554,7 @@ var f57Data=""
                                                         }
                                                 if (data != null) {
                                                     batchData.field57EncryptedData = data
+                                                    preAuthTransactionTable.field57EncryptedData = data
                                                 }
 
                                                 appDatabase.appDao.insertBatchData(batchData)
@@ -1735,6 +1748,7 @@ var f57Data=""
 
                                             val oldBatchTable = runBlocking(Dispatchers.IO) {
                                              val table=   getBatchDataByInvoice(receiptDetail.invoice.toString())
+
                                                 if(table?.transactionType==BhTransactionType.PRE_AUTH.type){
                                                     table
                                                 }else{
@@ -1744,10 +1758,12 @@ var f57Data=""
                                             val newBatchData = BatchTable(receiptDetail)
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
+                                                field56PreAuthComplete(receiptDetail.invoice.toString())
                                                 if(oldBatchTable != null){
+
                                                     // replace reciept data if present in our batch data
-                                                        val oldDateTime=oldBatchTable.receiptData?.dateTime?:""
-val oldstan=oldBatchTable.bonushubStan
+                                                    val oldDateTime=oldBatchTable.receiptData?.dateTime?:""
+                                                    val oldstan=oldBatchTable.bonushubStan
                                                     oldBatchTable.receiptData = receiptDetail
                                                     oldBatchTable.oldDateTimeInVoid=oldDateTime
                                                     oldBatchTable.oldStanForVoid=oldstan
@@ -1807,6 +1823,7 @@ val oldstan=oldBatchTable.bonushubStan
                                                         globalCardProcessedModel,
                                                         requiredBatchData
                                                     ).createTransactionPacket()
+                                                   // transactionISO.map[56]=
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(
                                                         transactionViewModel
@@ -1823,6 +1840,20 @@ val oldstan=oldBatchTable.bonushubStan
                                                                     "in success $genericResp",
                                                                     "e"
                                                                 )
+
+                                                                val isoPacket=genericResp.data
+                                                               val field56= isoPacket?.isoMap?.get(60)
+                                                                logger(
+                                                                    "field56:- ",
+                                                                    "preAuth $field56",
+                                                                    "e"
+                                                                )
+                                                                 preAuthTransactionTable.field56String= field56.toString()
+                                                                withContext(Dispatchers.IO) {
+                                                                    appDatabase.appDao.insertOrUpdatePreAuthTransactionTableData(
+                                                                        preAuthTransactionTable
+                                                                    )
+                                                                }
                                                                 hideProgress()
                                                                 goToDashBoard()
                                                             }
@@ -1954,6 +1985,7 @@ val oldstan=oldBatchTable.bonushubStan
             val restartHandlingModel = RestartHandlingModel(tranUuid, EDashboardItem.SALE)
             restartHandlingList.add(restartHandlingModel)
             val jsonResp = Gson().toJson(restartHandlingModel)
+
             println(jsonResp)
             AppPreference.saveRestartDataPreference(jsonResp)
             DeviceHelper.doSaleTransaction(
@@ -2742,6 +2774,24 @@ val oldstan=oldBatchTable.bonushubStan
             }
         }
 
+    }
+    fun field56PreAuthComplete(invoice:String){
+        val preAuthData=getPreAuthByInvoice(invoice)
+        val field56RawData=preAuthData?.field56String
+     /*   val dateTime = preAuthData?.oldDateTimeInVoid
+        val fromFormat: DateFormat =
+            SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+        val toFormat: DateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
+        val reqDate: Date? = fromFormat.parse(dateTime ?: "")
+
+        val reqDateString = toFormat.format(reqDate)
+        val data=preAuthData?.receiptData?.tid+preAuthData?.bonushubbatchnumber+preAuthData?.oldStanForVoid+reqDateString
+*/
+        logger(
+            "field56:- ",
+            "preAuth $field56RawData",
+            "e"
+        )
     }
 
 

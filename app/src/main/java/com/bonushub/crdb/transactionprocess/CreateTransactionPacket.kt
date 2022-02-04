@@ -163,7 +163,7 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
 
                  //   val field56="${stan}${reqDateString}"
                     val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldStanForVoid+reqDateString
-         addFieldByHex(56,data)
+                     addFieldByHex(56,data)
 
 
                 }catch (ex:Exception){

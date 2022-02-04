@@ -487,4 +487,21 @@ interface AppDao{
 
     @Query("DELETE From DigiPosDataTable")
     suspend fun deleteDigiPosDataTable()
+
+
+    // region ========== PreAuthTransactionTable Table dao ======
+    @Query("SELECT * FROM PreAuthTransactionTable")
+    suspend fun getAllPreAuthTransactionTableData(): MutableList<PreAuthTransactionTable>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdatePreAuthTransactionTableData(preAuthTransactionTable: PreAuthTransactionTable): Long?
+
+    @Delete
+    suspend fun deletePreAuthTransactionTableData(preAuthTransactionTable: PreAuthTransactionTable)
+
+    @Query("SELECT * FROM PreAuthTransactionTable WHERE invoice = :invoice")// AND transactionType != :transType")
+    fun getPreAuthTransactionTableDataFromInvoice(invoice: String?): PreAuthTransactionTable?
+
+    @Query("DELETE From PreAuthTransactionTable")
+    suspend fun deletePreAuthTransactionTableDataTable()
 }

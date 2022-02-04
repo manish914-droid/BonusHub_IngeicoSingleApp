@@ -245,8 +245,9 @@
 
 
     <!--void sale-->
-    <string name="search_transaction">SEARCH TRANSACTION</string>
-    <string name="void_sale">VOID SALE</string>
+    <string name="search_transaction">VOID TRANSACTION</string>
+
+    <string name="void_sale">VOID</string>
     <string name="date_colon">Date:</string>
     <string name="time_colon">Time:</string>
     <string name="tid_colon">TID:</string>

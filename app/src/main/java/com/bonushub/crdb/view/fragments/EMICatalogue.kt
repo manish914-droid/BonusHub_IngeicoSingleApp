@@ -94,7 +94,7 @@ class EMICatalogue : Fragment() {
 
      private fun getTptData(){
          lifecycleScope.launch(Dispatchers.Main) {
-             emiCatalogueViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner, {
+             emiCatalogueViewModel.getTerminalParameterTable()?.observe(viewLifecycleOwner) {
                  //11111011000000000000
                  //region================Brand and Bank EMI Catalogue Button Hide/Show Conditions:-
                  it?.let {
@@ -112,7 +112,7 @@ class EMICatalogue : Fragment() {
 
                  //endregion
 
-             })
+             }
          }
     }
     private fun enabledEmiOptions(tpt: TerminalParameterTable, cb: (Boolean, Boolean) -> Unit) {

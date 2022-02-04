@@ -15,7 +15,7 @@ import com.bonushub.crdb.model.local.*
     BrandEMISubCategoryTable::class,
     IngenicoInitialization::class,BatchTable::class,
     IngenicoSettlementResponse::class, BatchTableReversal::class,
-    PendingSyncTransactionTable::class, DigiPosDataTable::class, WifiCommunicationTable::class], version = 3, exportSchema = false)
+    PendingSyncTransactionTable::class, DigiPosDataTable::class, WifiCommunicationTable::class,PreAuthTransactionTable::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     /**

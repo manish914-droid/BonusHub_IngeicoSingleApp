@@ -548,8 +548,7 @@ data class TerminalParameterTable(
     var maxAmtEntryDigits: String = "",
 
     @field:BHDashboardItem(
-        EDashboardItem.BANK_EMI,
-        EDashboardItem.EMI_ENQUIRY
+        EDashboardItem.BANK_EMI
     )
     @field:BHFieldParseIndex(40)
     @field:BHFieldName("Bank Emi")
@@ -587,7 +586,7 @@ data class TerminalParameterTable(
     @field:BHFieldName("roc")
     var stan: String = "",
 
-    @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
+
     @field:BHFieldParseIndex(48)
     @field:BHFieldName("Void Preauth")
     var fVoidPreauth: String = "",
@@ -597,7 +596,7 @@ data class TerminalParameterTable(
     @field:BHFieldName("Void Offline Sale")
     var fVoidOfflineSale: String = "",
 
-    @field:BHDashboardItem(EDashboardItem.PENDING_PREAUTH)
+
     @field:BHFieldParseIndex(50)
     @field:BHFieldName("Pending Preauth")
     var fPendingPreauthTrans: String = "",
@@ -1216,6 +1215,36 @@ data class PendingSyncTransactionTable(
     var responseCode: String?="",
     var cardProcessedDataModal:CardProcessedDataModal
     )
+// end region
+
+
+
+@Entity
+data class PreAuthTransactionTable(var receiptData:ReceiptDetail?=null){
+
+    var invoice: String=""
+
+    @PrimaryKey(autoGenerate = false) // we make primary key for multiple invoice in void
+    var bonushubInvoice: String = ""
+    var bonushubStan: String = ""
+    var bonushubbatchnumber: String = ""
+    var transactionType: Int = 0
+    var imeiOrSerialNum: String?=null
+    var billNumber: String?=null
+    var emiBrandData: BrandEMIMasterDataModal?=null
+    var emiSubCategoryData: BrandEMISubCategoryTable?=null
+    var emiCategoryData: BrandEMISubCategoryTable?=null
+    var emiProductData: BrandEMIProductDataModal?=null
+    var emiTenureDataModel: BankEMITenureDataModal?=null
+    var emiIssuerDataModel: BankEMIIssuerTAndCDataModal?=null
+    var mobileNumber: String?=null
+
+    var oldDateTimeInVoid:String=""
+    var oldStanForVoid:String=""
+    var field57EncryptedData:String=""
+    var field56String:String=""
+    var field58EmiData:String=""
+}
 // end region
 
 //region == digipos
