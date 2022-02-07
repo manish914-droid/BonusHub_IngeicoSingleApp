@@ -419,38 +419,40 @@ class TransactionActivity : BaseActivityNew() {
                                         println(jsonResp)
                                         // AppPreference.saveLastReceiptDetails(jsonResp) // save last sale receipt11
                                         if (receiptDetail != null) {
-                                            val batchData = BatchTable(receiptDetail)
+                                            val batchDataAfterSuccess = BatchTable(receiptDetail)
                                             val tpt = runBlocking(Dispatchers.IO) {
                                                 getTptData()
                                             }
                                             println("Selected tid id " + tpt?.terminalId)
                                             println("Batch number in emi " + tpt?.batchNumber)
                                             lifecycleScope.launch(Dispatchers.IO) {
-                                                batchData.emiIssuerDataModel = emiIssuerData
-                                                batchData.invoice = receiptDetail.invoice.toString()
+                                                batchDataAfterSuccess.emiIssuerDataModel = emiIssuerData
+                                                batchDataAfterSuccess.invoice = receiptDetail.invoice.toString()
                                                 if (requestCode == BhTransactionType.BRAND_EMI.type) {
-                                                    batchData.emiBrandData = brandDataMaster
-                                                    batchData.emiSubCategoryData =
+                                                    batchDataAfterSuccess.emiBrandData = brandDataMaster
+                                                    batchDataAfterSuccess.emiSubCategoryData =
                                                         brandEmiSubCatData
-                                                    batchData.emiCategoryData = brandEmiCatData
-                                                    batchData.emiProductData = brandEmiProductData
+                                                    batchDataAfterSuccess.emiCategoryData = brandEmiCatData
+                                                    batchDataAfterSuccess.emiProductData = brandEmiProductData
                                                 }
-                                                batchData.imeiOrSerialNum = imeiOrSerialNum
-                                                batchData.mobileNumber = mobileNumber
-                                                batchData.billNumber = billNumber
-                                                batchData.emiTenureDataModel = emiTenureData
-                                                batchData.transactionType =
+                                                batchDataAfterSuccess.imeiOrSerialNum = imeiOrSerialNum
+                                                batchDataAfterSuccess.mobileNumber = mobileNumber
+                                                batchDataAfterSuccess.billNumber = billNumber
+                                                batchDataAfterSuccess.emiTenureDataModel = emiTenureData
+                                                batchDataAfterSuccess.transactionType =
                                                     globalCardProcessedModel.getTransType()
                                                 //To assign bonushub batchnumber,bonushub invoice,bonuhub stan
-                                                batchData.bonushubbatchnumber =
+                                                batchDataAfterSuccess.bonushubbatchnumber =
                                                     tpt?.batchNumber ?: ""
-                                                batchData.bonushubInvoice = tpt?.invoiceNumber ?: ""
-                                                batchData.bonushubStan = tpt?.stan ?: ""
+                                                batchDataAfterSuccess.bonushubInvoice = tpt?.invoiceNumber ?: ""
+                                                batchDataAfterSuccess.bonushubStan = tpt?.stan ?: ""
 
                                                 createCardProcessingModelData(receiptDetail)
                                                 if (requestCode == BhTransactionType.BRAND_EMI.type
                                                     || requestCode== BhTransactionType.EMI_SALE.type) {
-                                                    globalCardProcessedModel.setTransactionAmount(emiTenureData?.loanAmount?.toLong()?:0L)
+                                                    globalCardProcessedModel.setTransactionAmount((saleAmt.toFloat() * 100).toLong()?:0L)
+                                                    batchDataAfterSuccess.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
+
                                                 }
 
                                                 // because we did not save pan num in plain in batchTable
@@ -464,10 +466,10 @@ class TransactionActivity : BaseActivityNew() {
                                                 when (reqCode) {
 
                                                     BhTransactionType.TEST_EMI.type -> {
-                                                        batchData.field57EncryptedData =
+                                                        batchDataAfterSuccess.field57EncryptedData =
                                                             globalCardProcessedModel.getPanNumberData()
                                                                 ?.let {
-                                                                    batchData.receiptData?.let { it1 ->
+                                                                    batchDataAfterSuccess.receiptData?.let { it1 ->
                                                                         getEncryptedDataForSyncing(
                                                                             it,
                                                                             it1
@@ -475,27 +477,27 @@ class TransactionActivity : BaseActivityNew() {
                                                                     }
                                                                 }.toString()
 
-                                                        batchData.field58EmiData =
+                                                        batchDataAfterSuccess.field58EmiData =
                                                             createField58ForTestEmi(
                                                                 globalCardProcessedModel
                                                             )
 
                                                     }
                                                     BhTransactionType.EMI_SALE.type -> {
-                                                        batchData.field57EncryptedData =
+                                                        batchDataAfterSuccess.field57EncryptedData =
                                                             cardProcessedDataModal.getPanNumberData()
                                                                 ?.let {
-                                                                    batchData.receiptData?.let { it1 ->
+                                                                    batchDataAfterSuccess.receiptData?.let { it1 ->
                                                                         getEncryptedDataForSyncing(
                                                                             it,
                                                                             it1
                                                                         )
                                                                     }
                                                                 }.toString()
-                                                        batchData.field58EmiData =
+                                                        batchDataAfterSuccess.field58EmiData =
                                                             createField58ForBankEmi(
                                                                 globalCardProcessedModel,
-                                                                batchData
+                                                                batchDataAfterSuccess
                                                             )
 
                                                     }
@@ -503,28 +505,28 @@ class TransactionActivity : BaseActivityNew() {
 
                                                     BhTransactionType.BRAND_EMI.type -> {
 
-                                                        batchData.field57EncryptedData =
+                                                        batchDataAfterSuccess.field57EncryptedData =
                                                             cardProcessedDataModal.getPanNumberData()
                                                                 ?.let {
-                                                                    batchData.receiptData?.let { it1 ->
+                                                                    batchDataAfterSuccess.receiptData?.let { it1 ->
                                                                         getEncryptedDataForSyncing(
                                                                             it,
                                                                             it1
                                                                         )
                                                                     }
                                                                 }.toString()
-                                                        batchData.field58EmiData =
+                                                        batchDataAfterSuccess.field58EmiData =
                                                             createField58ForBrandEmi(
                                                                 globalCardProcessedModel,
-                                                                batchData
+                                                                batchDataAfterSuccess
                                                             )
                                                     }
 
 
                                                 }
-                                                appDatabase.appDao.insertBatchData(batchData)
+                                                appDatabase.appDao.insertBatchData(batchDataAfterSuccess)
 
-                                                AppPreference.saveLastReceiptDetails(batchData)
+                                                AppPreference.saveLastReceiptDetails(batchDataAfterSuccess)
                                                 AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
@@ -532,7 +534,7 @@ class TransactionActivity : BaseActivityNew() {
                                                 //To increment base invoice
                                                 Utility().incrementUpdateInvoice()
 
-                                                printingSaleData(batchData) {
+                                                printingSaleData(batchDataAfterSuccess) {
                                                     // region sync transaction
                                                     withContext(Dispatchers.Main) {
                                                         showProgress(getString(R.string.transaction_syncing_msg))
@@ -540,7 +542,7 @@ class TransactionActivity : BaseActivityNew() {
                                                     val transactionISO = CreateTransactionPacket(
                                                         appDao,
                                                         globalCardProcessedModel,
-                                                        batchData
+                                                        batchDataAfterSuccess
                                                     ).createTransactionPacket()
                                                     //   sync pending transaction
                                                     Utility().syncPendingTransaction(
@@ -577,7 +579,7 @@ class TransactionActivity : BaseActivityNew() {
                                                             val pendingSyncTransactionTable =
                                                                 PendingSyncTransactionTable(
                                                                     invoice = receiptDetail.invoice.toString(),
-                                                                    batchTable = batchData,
+                                                                    batchTable = batchDataAfterSuccess,
                                                                     responseCode = genericResp.toString(),
                                                                     cardProcessedDataModal = globalCardProcessedModel
                                                                 )
