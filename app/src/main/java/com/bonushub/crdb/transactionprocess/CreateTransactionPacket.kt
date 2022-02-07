@@ -244,60 +244,11 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
             when (cardProcessedData.getTransType()) {
 
                 BhTransactionType.EMI_SALE.type -> {
-                  /*  val cardIndFirst = "0"
-                    val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
-                    val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
-                    //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
-                    val cdtIndex = cardDataTable?.cardTableIndex ?: ""
-                    val accSellection ="00"
-
-
-                    val tenureData=batchdata?.emiTenureDataModel
-                    val imeiOrSerialNo=batchdata?.imeiOrSerialNum
-                    val emiIssuerDataModel=batchdata?.emiIssuerDataModel
-                    indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
-                            "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
-                            "${emiIssuerDataModel?.issuerID}," +
-                            "${emiIssuerDataModel?.emiSchemeID},1,0,${cardProcessedData.getTransactionAmount()}," +
-                            "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
-                            "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
-                            "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
-                            ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
-                            "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
-
-                    addFieldByHex(58, indicator ?: "")*/
                     batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
                 }
 
                 BhTransactionType.BRAND_EMI.type -> {
-       /*             val cardIndFirst = "0"
-                    val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
-                    val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
-                    //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
-                    val cdtIndex = cardDataTable?.cardTableIndex ?: ""
-                    val accSellection ="00"
-
-                    val brandData=batchdata?.emiBrandData
-                    val productData=batchdata?.emiProductData
-                    val categoryData=batchdata?.emiSubCategoryData
-                    val tenureData=batchdata?.emiTenureDataModel
-                    val imeiOrSerialNo=batchdata?.imeiOrSerialNum
-                    val emiIssuerDataModel=batchdata?.emiIssuerDataModel
-
-                 val  indicator =   "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
-                         "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
-                         "${emiIssuerDataModel?.issuerID},${emiIssuerDataModel?.emiSchemeID},${brandData?.brandID}," +
-                         "${productData?.productID},${cardProcessedData.getTransactionAmount()}," +
-                         "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
-                         "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
-                         "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
-                         "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
-                         "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
-  addFieldByHex(58, indicator ?: "")
-*/
                     batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
-
-
      }
 
                 BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
@@ -316,14 +267,6 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                 }
 
                 BhTransactionType.TEST_EMI.type->{
-               /*     val cardIndFirst = "0"
-                    val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
-                    val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber(cardProcessedData.getPanNumberData().toString())
-                    //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
-                    val cdtIndex = cardDataTable?.cardTableIndex ?: ""
-                    val accSellection ="00"
-                    "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
-                  */
 
                     batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
                 }
@@ -336,18 +279,11 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                 }
 
                 else -> {
-                  /*  indicator = if( cardProcessedData.getTransType()== TransactionType.TEST_EMI.type ){
-                        logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
-                        "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
-                    }else
-                        "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"*/
-                }
+                     }
             }
-
 
             //  Filed 60-
             //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
-
 
             val bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
             val emptyString: String= ""

@@ -1131,6 +1131,8 @@ data class BatchTable(var receiptData:ReceiptDetail?=null){
     var field57EncryptedData:String=""
 
     var field58EmiData:String=""
+
+    var emiEnteredAmt:Long=0L
 }
 // endregion
 

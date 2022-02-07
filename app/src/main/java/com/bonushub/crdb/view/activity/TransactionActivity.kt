@@ -64,8 +64,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -138,16 +136,15 @@ class TransactionActivity : BaseActivityNew() {
             emvBinding?.txnAmtLl?.visibility = View.VISIBLE
             emvBinding?.brandByCodeLl?.visibility = View.GONE
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
-        } else if(transactionTypeEDashboardItem == EDashboardItem.EMI_PRO ){
+        } else if (transactionTypeEDashboardItem == EDashboardItem.EMI_PRO) {
             emvBinding?.cardDetectImg?.visibility = View.VISIBLE
             emvBinding?.tvInsertCard?.visibility = View.VISIBLE
             emvBinding?.txnAmtLl?.visibility = View.GONE
             emvBinding?.brandByCodeLl?.visibility = View.VISIBLE
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
-            emvBinding?.accessCodeTv?.text="Access Code : - $brandAccessCode"
+            emvBinding?.accessCodeTv?.text = "Access Code : - $brandAccessCode"
 
-        }
-        else {
+        } else {
             emvBinding?.cardDetectImg?.visibility = View.GONE
             emvBinding?.tvInsertCard?.visibility = View.GONE
             emvBinding?.subHeaderView?.backImageButton?.visibility = View.VISIBLE
@@ -161,12 +158,12 @@ class TransactionActivity : BaseActivityNew() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
         }
-        if(transactionType==BhTransactionType.SALE_WITH_CASH.type){
-            val amt= saleAmt.toFloat() + cashBackAmt.toFloat()
-          val frtAmt=  "%.2f".format(amt)
-            emvBinding?.baseAmtTv?.text =frtAmt
-        }else{
-            val frtAmt=  "%.2f".format(saleAmt.toFloat())
+        if (transactionType == BhTransactionType.SALE_WITH_CASH.type) {
+            val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
+            val frtAmt = "%.2f".format(amt)
+            emvBinding?.baseAmtTv?.text = frtAmt
+        } else {
+            val frtAmt = "%.2f".format(saleAmt.toFloat())
             emvBinding?.baseAmtTv?.text = frtAmt
         }
 
@@ -242,7 +239,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                 }
 
-                                BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type->{
+                                BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
                                     initiateBrandEmiByCode()
                                 }
 
@@ -325,7 +322,7 @@ class TransactionActivity : BaseActivityNew() {
                         emiTenureData?.txnTID = getTidForTestTxn(testEmiOption)
                         amt = 100L
                     } else {
-                        amt = (saleAmt.toFloat() * 100).toLong()
+                        amt = emiTenureData?.transactionAmount?.toLong()?:0L//(saleAmt.toFloat() * 100).toLong()
                     }
                     var track1: Track1? = null
                     var track2: Track2? = null
@@ -371,18 +368,21 @@ class TransactionActivity : BaseActivityNew() {
                     when (reqCode) {
 
                         BhTransactionType.BRAND_EMI.type -> {
+                            batchData.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
                             restartHandlingModel =
                                 RestartHandlingModel(tranUuid, EDashboardItem.BANK_EMI, batchData)
                         }
 
 
                         BhTransactionType.EMI_SALE.type -> {
+                            batchData.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
                             restartHandlingModel =
                                 RestartHandlingModel(tranUuid, EDashboardItem.BRAND_EMI, batchData)
                         }
 
 
                         BhTransactionType.TEST_EMI.type -> {
+                            batchData.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
                             restartHandlingModel =
                                 RestartHandlingModel(tranUuid, EDashboardItem.TEST_EMI, batchData)
                         }
@@ -448,6 +448,10 @@ class TransactionActivity : BaseActivityNew() {
                                                 batchData.bonushubStan = tpt?.stan ?: ""
 
                                                 createCardProcessingModelData(receiptDetail)
+                                                if (requestCode == BhTransactionType.BRAND_EMI.type
+                                                    || requestCode== BhTransactionType.EMI_SALE.type) {
+                                                    globalCardProcessedModel.setTransactionAmount(emiTenureData?.loanAmount?.toLong()?:0L)
+                                                }
 
                                                 // because we did not save pan num in plain in batchTable
                                                 cardProcessedDataModal.getPanNumberData()?.let {
@@ -457,88 +461,67 @@ class TransactionActivity : BaseActivityNew() {
                                                 }
 
 
-                                                when(reqCode){
+                                                when (reqCode) {
 
-    BhTransactionType.TEST_EMI.type->{
-        batchData.field57EncryptedData= globalCardProcessedModel.getPanNumberData()
-            ?.let {
-                batchData.receiptData?.let { it1 ->
-                    getEncryptedDataForSyncing(
-                        it,
-                        it1
-                    )
-                }
-            }.toString()
+                                                    BhTransactionType.TEST_EMI.type -> {
+                                                        batchData.field57EncryptedData =
+                                                            globalCardProcessedModel.getPanNumberData()
+                                                                ?.let {
+                                                                    batchData.receiptData?.let { it1 ->
+                                                                        getEncryptedDataForSyncing(
+                                                                            it,
+                                                                            it1
+                                                                        )
+                                                                    }
+                                                                }.toString()
 
-        batchData.field58EmiData=createField58ForTestEmi(globalCardProcessedModel)
+                                                        batchData.field58EmiData =
+                                                            createField58ForTestEmi(
+                                                                globalCardProcessedModel
+                                                            )
 
-    }
-    BhTransactionType.EMI_SALE.type->{
-        batchData.field57EncryptedData= cardProcessedDataModal.getPanNumberData()
-            ?.let {
-                batchData.receiptData?.let { it1 ->
-                    getEncryptedDataForSyncing(
-                        it,
-                        it1
-                    )
-                }
-            }.toString()
-        batchData.field58EmiData=createField58ForBankEmi(globalCardProcessedModel,batchData)
-
-    }
-
-
-    BhTransactionType.BRAND_EMI.type->{
-
-        batchData.field57EncryptedData=  cardProcessedDataModal.getPanNumberData()
-            ?.let {
-                batchData.receiptData?.let { it1 ->
-                    getEncryptedDataForSyncing(
-                        it,
-                        it1
-                    )
-                }
-            }.toString()
-        batchData.field58EmiData=createField58ForBrandEmi(globalCardProcessedModel,batchData)
-    }
-
-
-}
-             /*                                   if (reqCode == BhTransactionType.TEST_EMI.type) {
-                                                    val data1 =
-                                                        globalCardProcessedModel.getPanNumberData()
-                                                            ?.let {
-                                                                batchData.receiptData?.let { it1 ->
-                                                                    getEncryptedDataForSyncing(
-                                                                        it,
-                                                                        it1
-                                                                    )
-                                                                }
-                                                            }
-
-                                                    if (data1 != null) {
-                                                        batchData.field57EncryptedData = data1
                                                     }
-                                                } else {
-                                                    val data1 =
-                                                        cardProcessedDataModal.getPanNumberData()
-                                                            ?.let {
-                                                                batchData.receiptData?.let { it1 ->
-                                                                    getEncryptedDataForSyncing(
-                                                                        it,
-                                                                        it1
-                                                                    )
-                                                                }
-                                                            }
+                                                    BhTransactionType.EMI_SALE.type -> {
+                                                        batchData.field57EncryptedData =
+                                                            cardProcessedDataModal.getPanNumberData()
+                                                                ?.let {
+                                                                    batchData.receiptData?.let { it1 ->
+                                                                        getEncryptedDataForSyncing(
+                                                                            it,
+                                                                            it1
+                                                                        )
+                                                                    }
+                                                                }.toString()
+                                                        batchData.field58EmiData =
+                                                            createField58ForBankEmi(
+                                                                globalCardProcessedModel,
+                                                                batchData
+                                                            )
 
-                                                    if (data1 != null) {
-                                                        batchData.field57EncryptedData = data1
                                                     }
-                                                }*/
 
 
+                                                    BhTransactionType.BRAND_EMI.type -> {
+
+                                                        batchData.field57EncryptedData =
+                                                            cardProcessedDataModal.getPanNumberData()
+                                                                ?.let {
+                                                                    batchData.receiptData?.let { it1 ->
+                                                                        getEncryptedDataForSyncing(
+                                                                            it,
+                                                                            it1
+                                                                        )
+                                                                    }
+                                                                }.toString()
+                                                        batchData.field58EmiData =
+                                                            createField58ForBrandEmi(
+                                                                globalCardProcessedModel,
+                                                                batchData
+                                                            )
+                                                    }
 
 
+                                                }
                                                 appDatabase.appDao.insertBatchData(batchData)
 
                                                 AppPreference.saveLastReceiptDetails(batchData)
@@ -755,7 +738,7 @@ class TransactionActivity : BaseActivityNew() {
 
     private suspend fun setupFlow() {
         when (transactionTypeEDashboardItem) {
-            EDashboardItem.BRAND_EMI, EDashboardItem.BANK_EMI, EDashboardItem.TEST_EMI ,EDashboardItem.EMI_PRO-> {
+            EDashboardItem.BRAND_EMI, EDashboardItem.BANK_EMI, EDashboardItem.TEST_EMI, EDashboardItem.EMI_PRO -> {
                 searchCardViewModel.fetchCardTypeData(
                     globalCardProcessedModel,
                     CardOption.create().apply {
@@ -1098,16 +1081,19 @@ class TransactionActivity : BaseActivityNew() {
                                             // region print and save data
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchData.invoice = receiptDetail.invoice.toString()
-                                                batchData.transactionType = BhTransactionType.SALE_WITH_CASH.type
-                                                batchData.bonushubbatchnumber = tpt?.batchNumber ?: ""
+                                                batchData.transactionType =
+                                                    BhTransactionType.SALE_WITH_CASH.type
+                                                batchData.bonushubbatchnumber =
+                                                    tpt?.batchNumber ?: ""
                                                 batchData.bonushubInvoice = tpt?.invoiceNumber ?: ""
                                                 batchData.bonushubStan = tpt?.stan ?: ""
-                                                val txnAmt= batchData.receiptData?.txnOtherAmount?.toLong()
-                                                    ?.let {
-                                                        batchData.receiptData?.txnAmount?.toLong()
-                                                            ?.plus(it)
-                                                    }
-                                                batchData.receiptData?.txnAmount=txnAmt.toString()
+                                                val txnAmt =
+                                                    batchData.receiptData?.txnOtherAmount?.toLong()
+                                                        ?.let {
+                                                            batchData.receiptData?.txnAmount?.toLong()
+                                                                ?.plus(it)
+                                                        }
+                                                batchData.receiptData?.txnAmount = txnAmt.toString()
                                                 createCardProcessingModelData(receiptDetail)
                                                 val data =
                                                     globalCardProcessedModel.getPanNumberData()
@@ -1125,7 +1111,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                                 appDatabase.appDao.insertBatchData(batchData)
                                                 AppPreference.saveLastReceiptDetails(batchData)
-                                              AppPreference.clearRestartDataPreference()
+                                                AppPreference.clearRestartDataPreference()
 
                                                 //To increment base Stan
                                                 Utility().incrementUpdateRoc()
@@ -1564,7 +1550,8 @@ class TransactionActivity : BaseActivityNew() {
                                                         }
                                                 if (data != null) {
                                                     batchData.field57EncryptedData = data
-                                                    preAuthTransactionTable.field57EncryptedData = data
+                                                    preAuthTransactionTable.field57EncryptedData =
+                                                        data
                                                 }
 
                                                 appDatabase.appDao.insertBatchData(batchData)
@@ -1770,11 +1757,12 @@ class TransactionActivity : BaseActivityNew() {
                                             }
 
                                             val oldBatchTable = runBlocking(Dispatchers.IO) {
-                                             val table=   getBatchDataByInvoice(receiptDetail.invoice.toString())
+                                                val table =
+                                                    getBatchDataByInvoice(receiptDetail.invoice.toString())
 
-                                                if(table?.transactionType==BhTransactionType.PRE_AUTH.type){
+                                                if (table?.transactionType == BhTransactionType.PRE_AUTH.type) {
                                                     table
-                                                }else{
+                                                } else {
                                                     null
                                                 }
                                             }
@@ -1848,7 +1836,7 @@ class TransactionActivity : BaseActivityNew() {
                                                         globalCardProcessedModel,
                                                         requiredBatchData
                                                     ).createTransactionPacket()
-                                                   // transactionISO.map[56]=
+                                                    // transactionISO.map[56]=
                                                     // sync pending transaction
                                                     Utility().syncPendingTransaction(
                                                         transactionViewModel
@@ -1968,8 +1956,8 @@ class TransactionActivity : BaseActivityNew() {
                                             )
                                         }
                                         errorFromIngenico(
-                                            txnResponse?.responseCode,
-                                            txnResponse?.status.toString()
+                                            txnResponse.responseCode,
+                                            txnResponse.status.toString()
                                         )
                                     }
                                     else -> {
@@ -2063,7 +2051,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                         appDatabase.appDao.insertBatchData(batchData)
                                         AppPreference.saveLastReceiptDetails(batchData)
-                                       AppPreference.clearRestartDataPreference()
+                                        AppPreference.clearRestartDataPreference()
 
                                         //To increment base Stan
                                         Utility().incrementUpdateRoc()
@@ -2136,7 +2124,7 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                             }
 
-                            ResponseCode.ABORTED.value,  ResponseCode.FAILED.value -> {
+                            ResponseCode.ABORTED.value, ResponseCode.FAILED.value -> {
                                 AppPreference.clearRestartDataPreference()
                                 errorFromIngenico(
                                     txnResponse.responseCode,
@@ -2463,10 +2451,10 @@ class TransactionActivity : BaseActivityNew() {
 
 
     private lateinit var emiByCodeViewModel: BrandEmiByCodeViewModel
-    private var brandEMIbyCodeDataModal:BrandEMIbyCodeDataModal?=null
+    private var brandEMIbyCodeDataModal: BrandEMIbyCodeDataModal? = null
 
-    private fun initiateBrandEmiByCode(){
-        val field57= "${EMIRequestType.BRAND_EMI_BY_ACCESS_CODE.requestType}^0^$brandAccessCode"
+    private fun initiateBrandEmiByCode() {
+        val field57 = "${EMIRequestType.BRAND_EMI_BY_ACCESS_CODE.requestType}^0^$brandAccessCode"
         showProgress()
         emiByCodeViewModel = ViewModelProvider(
             this, BrandEmiByCodeVMFactory(
@@ -2492,7 +2480,7 @@ class TransactionActivity : BaseActivityNew() {
                 }
                 is GenericResponse.Error -> {
                     lifecycleScope.launch(Dispatchers.Main) {
-                      alertBoxWithAction(
+                        alertBoxWithAction(
                             getString(R.string.no_receipt),
                             genericResp.errorMessage ?: "Oops something went wrong",
                             false,
@@ -2520,8 +2508,8 @@ class TransactionActivity : BaseActivityNew() {
         }
 
 
-
     }
+
     suspend fun printingSaleData(batchTable: BatchTable, cb: suspend (Boolean) -> Unit) {
         val receiptDetail = batchTable.receiptData
         withContext(Dispatchers.Main) {
@@ -2742,7 +2730,8 @@ class TransactionActivity : BaseActivityNew() {
                 ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
                 "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
 
-
+//"0|53|2|00,53468000,64,340,1,0,100,0,58000,3,1800,19916,0,79648,,,,,,0,19900,0,19900,,0"
+//"0|53|2|00,53468000,64,340,1,0,100,0,589,3,1800,202,0,20506,,,,,,0,19900,0,19900,,0"
     }
 
     fun createField58ForBrandEmi(
@@ -2856,7 +2845,24 @@ class TransactionActivity : BaseActivityNew() {
         }
 
     }
+    fun field56PreAuthComplete(invoice:String){
+        val preAuthData=getPreAuthByInvoice(invoice)
+        val field56RawData=preAuthData?.field56String
+     /*   val dateTime = preAuthData?.oldDateTimeInVoid
+        val fromFormat: DateFormat =
+            SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+        val toFormat: DateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
+        val reqDate: Date? = fromFormat.parse(dateTime ?: "")
 
+        val reqDateString = toFormat.format(reqDate)
+        val data=preAuthData?.receiptData?.tid+preAuthData?.bonushubbatchnumber+preAuthData?.oldStanForVoid+reqDateString
+*/
+        logger(
+            "field56:- ",
+            "preAuth $field56RawData",
+            "e"
+        )
+    }
 
 
 }

@@ -841,24 +841,16 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PREAUTH_COMPLETE->{
-                if (checkInternetConnection()) {
+               /* if (checkInternetConnection()) {
                     transactFragment(PreAuthCompleteInputDetailFragment(), true)
                 }else{
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+                }*/
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    appDao.deletePendingSyncTransactionTable()
                 }
 
-
-                /* if (checkInternetConnection()) {
-                 CoroutineScope(Dispatchers.IO).launch{
-                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
-                     println("TID LIST --->  $listofTids")
-                     val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids) }
-                     println("RESULT TWO --->  $resultTwo")
-                 }
-                 inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
-             } else {
-                 ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
-             }*/
 
             }
             EDashboardItem.EMI_ENQUIRY -> {
@@ -979,9 +971,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 })
             }
             EDashboardItem.VOID_PREAUTH->{
-                lifecycleScope.launch(Dispatchers.IO) {
+              /*  lifecycleScope.launch(Dispatchers.IO) {
                     appDao.deletePendingSyncTransactionTable()
-                }
+                }*/
             }
             EDashboardItem.PENDING_PREAUTH ->{
 

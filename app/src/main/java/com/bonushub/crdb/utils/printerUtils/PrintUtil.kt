@@ -563,7 +563,9 @@ class PrintUtil(context: Context?) {
 
 
         textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
-        val txnAmount = (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+
+     //   val txnAmount = (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+        val txnAmount = (((batchTable.emiEnteredAmt).toLong()).div(100)).toString()
 
         logger("txnAmount",""+txnAmount)
         textBlockList.add(
@@ -577,7 +579,7 @@ class PrintUtil(context: Context?) {
 
         logger("INSTA DISCOUNT", "  ${bankEMITenureDataModal?.instantDiscount}")
         if (bankEMITenureDataModal?.instantDiscount?.toIntOrNull() != null) {
-            if (bankEMITenureDataModal?.instantDiscount.isNotBlank() && bankEMITenureDataModal?.instantDiscount.toInt() > 0) {
+            if (bankEMITenureDataModal.instantDiscount.isNotBlank() && bankEMITenureDataModal.instantDiscount.toInt() > 0) {
                 val instantDis =
                     "%.2f".format(
                         (((bankEMITenureDataModal.instantDiscount).toDouble()).div(
@@ -587,7 +589,7 @@ class PrintUtil(context: Context?) {
 
                 textBlockList.add(sigleLineformat("INSTA DISCOUNT", AlignMode.LEFT))
                 val authAmount =
-                    (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+                    (((bankEMITenureDataModal.transactionAmount)?.toLong())?.div(100)).toString()
                 textBlockList.add(
                     sigleLineformat(
                         "$currencySymbol:${instantDis}",
