@@ -449,7 +449,10 @@ class TransactionActivity : BaseActivityNew() {
                                                 createCardProcessingModelData(receiptDetail)
                                                 if (requestCode == BhTransactionType.BRAND_EMI.type
                                                     || requestCode== BhTransactionType.EMI_SALE.type  || requestCode== BhTransactionType.TEST_EMI.type) {
-                                                    globalCardProcessedModel.setTransactionAmount((saleAmt.toFloat() * 100).toLong()?:0L)
+                                                  if( requestCode== BhTransactionType.TEST_EMI.type)
+                                                      globalCardProcessedModel.setTransactionAmount(100L?:0L)
+                                                      else
+                                                    globalCardProcessedModel.setTransactionAmount(amt?:0L)
                                                     batchDataAfterSuccess.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
 
                                                 }
@@ -2886,7 +2889,7 @@ class TransactionActivity : BaseActivityNew() {
         return "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
                 "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
                 "${emiIssuerDataModel?.issuerID}," +
-                "${emiIssuerDataModel?.emiSchemeID},1,0,${cardProcessedData.getTransactionAmount()}," +
+                "${emiIssuerDataModel?.emiSchemeID},1,0,${batchdata.emiEnteredAmt}," +
                 "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
                 "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
                 "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
@@ -2920,7 +2923,7 @@ class TransactionActivity : BaseActivityNew() {
         return "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
                 "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
                 "${emiIssuerDataModel?.issuerID},${emiIssuerDataModel?.emiSchemeID},${brandData?.brandID}," +
-                "${productData?.productID},${cardProcessedData.getTransactionAmount()}," +
+                "${productData?.productID},${batchdata.emiEnteredAmt}," +
                 "${tenureData?.discountAmount},${tenureData?.loanAmount},${tenureData?.tenure}," +
                 "${tenureData?.tenureInterestRate},${tenureData?.emiAmount},${tenureData?.cashBackAmount}," +
                 "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
