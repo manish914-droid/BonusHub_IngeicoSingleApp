@@ -841,15 +841,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             }
             EDashboardItem.PREAUTH_COMPLETE->{
-               /* if (checkInternetConnection()) {
+                if (checkInternetConnection()) {
                     transactFragment(PreAuthCompleteInputDetailFragment(), true)
                 }else{
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
-                }*/
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    appDao.deletePendingSyncTransactionTable()
                 }
+
+               /* lifecycleScope.launch(Dispatchers.IO) {
+                    appDao.deletePendingSyncTransactionTable()
+                }*/
 
 
             }

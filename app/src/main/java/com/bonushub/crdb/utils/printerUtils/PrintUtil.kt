@@ -1462,8 +1462,6 @@ class PrintUtil(context: Context?) {
 
                 printer?.setAscScale(ASCScale.SC1x1)
                 printer?.setAscSize(ASCSize.DOT24x8)
-                printer?.addText( AlignMode.LEFT,  " if 2 % on")
-                printer?.addText( AlignMode.LEFT,  " then 2% on")
             }
             //endregion
 
