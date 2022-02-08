@@ -8,13 +8,14 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.ImageView
+import android.widget.*
 import androidx.activity.viewModels
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -48,6 +49,7 @@ import com.bonushub.crdb.view.fragments.AuthCompletionData
 import com.bonushub.crdb.viewmodel.*
 import com.bonushub.crdb.viewmodel.viewModelFactory.BrandEmiByCodeVMFactory
 import com.bonushub.crdb.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
+import com.bonushub.crdb.vxutils.BHTextView
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -60,10 +62,7 @@ import com.ingenico.hdfcpayment.type.CardCaptureType
 import com.ingenico.hdfcpayment.type.ResponseCode
 import com.ingenico.hdfcpayment.type.TransactionType
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
@@ -449,7 +448,7 @@ class TransactionActivity : BaseActivityNew() {
 
                                                 createCardProcessingModelData(receiptDetail)
                                                 if (requestCode == BhTransactionType.BRAND_EMI.type
-                                                    || requestCode== BhTransactionType.EMI_SALE.type) {
+                                                    || requestCode== BhTransactionType.EMI_SALE.type  || requestCode== BhTransactionType.TEST_EMI.type) {
                                                     globalCardProcessedModel.setTransactionAmount((saleAmt.toFloat() * 100).toLong()?:0L)
                                                     batchDataAfterSuccess.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
 
@@ -647,16 +646,26 @@ class TransactionActivity : BaseActivityNew() {
                                     }
                                 }
 
-                                if (emiTenureData != null && isUnblockingNeeded) {
-                                    if (emiIssuerData != null) {
-                                        txnResponse?.responseCode?.let {
-                                            txnResponse.status.toString().let { it1 ->
-                                                unBlockingImeiSerialNum(
-                                                    emiTenureData, emiIssuerData,
-                                                    it, it1
-                                                )
+                                when(reqCode) {
+                                    BhTransactionType.BRAND_EMI.type-> {
+                                        if (emiTenureData != null && isUnblockingNeeded) {
+                                            if (emiIssuerData != null) {
+                                                txnResponse?.responseCode?.let {
+                                                    txnResponse.status.toString().let { it1 ->
+                                                        unBlockingImeiSerialNum(
+                                                            emiTenureData, emiIssuerData,
+                                                            it, it1
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
+                                    }
+                                    else->{
+                                        errorFromIngenico(
+                                            txnResponse?.responseCode,
+                                            txnResponse?.status.toString()
+                                        )
                                     }
                                 }
                             }
@@ -977,23 +986,7 @@ class TransactionActivity : BaseActivityNew() {
                                     }
                                     ResponseCode.REVERSAL.value -> {
                                         AppPreference.clearRestartDataPreference()
-                                        // kushal
-                                        // region
-                                        //val jsonResp=Gson().toJson("{\"aid\":\"A0000000041010\",\"appName\":\"Mastercard\",\"authCode\":\"005352\",\"batchNumber\":\"000008\",\"cardHolderName\":\"SANDEEP SARASWAT          \",\"cardType\":\"UP        \",\"cvmRequiredLimit\":0,\"cvmResult\":\"NO_CVM\",\"dateTime\":\"20/12/2021 11:07:26\",\"entryMode\":\"INSERT\",\"invoice\":\"000001\",\"isSignRequired\":false,\"isVerifyPin\":true,\"maskedPan\":\"** ** ** 4892\",\"merAddHeader1\":\"INGBH TEST1 TID\",\"merAddHeader2\":\"NOIDA\",\"mid\":\"               \",\"rrn\":\"000000000035\",\"stan\":\"000035\",\"tc\":\"3BAC31335BDB3383\",\"tid\":\"30160031\",\"tsi\":\"E800\",\"tvr\":\"0400048000\",\"txnAmount\":\"50000\",\"txnName\":\"SALE\",\"txnOtherAmount\":\"0\",\"txnResponseCode\":\"00\"}")
-                                        /*val jsonResp=Gson().toJson(ReceiptDetail)
-                                        println(jsonResp)
 
-                                        try {
-                                            val str = jsonResp
-                                            if (!str.isNullOrEmpty()) {
-                                                Gson().fromJson<ReceiptDetail>(
-                                                    str,
-                                                    object : TypeToken<ReceiptDetail>() {}.type
-                                                )
-                                            } else null
-                                        } catch (ex: Exception) {
-                                            ex.printStackTrace()
-                                        }*/
 
                                         AppPreference.saveLastCancelReceiptDetails(receiptDetail)
 
@@ -1011,11 +1004,12 @@ class TransactionActivity : BaseActivityNew() {
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
+                                            errorFromIngenico(
+                                                txnResponse.responseCode,
+                                                txnResponse.status.toString()
+                                            )
                                         }
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1234,11 +1228,12 @@ class TransactionActivity : BaseActivityNew() {
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
+                                            errorFromIngenico(
+                                                txnResponse.responseCode,
+                                                txnResponse.status.toString()
+                                            )
                                         }
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1453,11 +1448,12 @@ class TransactionActivity : BaseActivityNew() {
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
+                                            errorFromIngenico(
+                                                txnResponse.responseCode,
+                                                txnResponse.status.toString()
+                                            )
                                         }
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1697,11 +1693,12 @@ class TransactionActivity : BaseActivityNew() {
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
+                                            errorFromIngenico(
+                                                txnResponse.responseCode,
+                                                txnResponse.status.toString()
+                                            )
                                         }
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -1956,11 +1953,12 @@ class TransactionActivity : BaseActivityNew() {
                                             appDatabase.appDao.insertBatchReversalData(
                                                 batchReversalData
                                             )
+                                            errorFromIngenico(
+                                                txnResponse.responseCode,
+                                                txnResponse.status.toString()
+                                            )
                                         }
-                                        errorFromIngenico(
-                                            txnResponse.responseCode,
-                                            txnResponse.status.toString()
-                                        )
+
                                     }
                                     else -> {
                                         errorFromIngenico(
@@ -2150,6 +2148,10 @@ class TransactionActivity : BaseActivityNew() {
                                     batchReversalData.roc = receiptDetail?.stan.toString()
                                     appDatabase.appDao.insertBatchReversalData(
                                         batchReversalData
+                                    )
+                                    errorFromIngenico(
+                                        txnResponse.responseCode,
+                                        txnResponse.status.toString()
                                     )
                                 }
                             }
@@ -2351,6 +2353,10 @@ class TransactionActivity : BaseActivityNew() {
                                     appDatabase.appDao.insertBatchReversalData(
                                         batchReversalData
                                     )
+                                    errorFromIngenico(
+                                        txnResponse.responseCode,
+                                        txnResponse.status.toString()
+                                    )
                                 }
                             }
 
@@ -2511,6 +2517,161 @@ class TransactionActivity : BaseActivityNew() {
 
 
     }
+
+    //region========================BrandEMIBy Access Code Confirmation Data Dialog:-
+    private fun showConfirmationDataDialog(brandEMIAccessData: BrandEMIbyCodeDataModal) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val dialog = Dialog(this@TransactionActivity)
+            dialog.setCancelable(false)
+            dialog.setContentView(R.layout.brand_emi_by_access_code_dialog_view)
+
+            dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+            val window = dialog.window
+            window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT)
+            dialog.findViewById<Button>(R.id.cancelButton).setOnClickListener {
+            //todo    brandEmiAccessCodeList.clear()
+                dialog.dismiss()
+            }
+            val productName = dialog.findViewById<BHTextView>(R.id.productNameET)
+            val categoryName = dialog.findViewById<BHTextView>(R.id.categoryNameET)
+            val tenureTime = dialog.findViewById<BHTextView>(R.id.tenureET)
+            val transactionAmountET = dialog.findViewById<BHTextView>(R.id.transactionAmountET)
+            val discountPercentageET = dialog.findViewById<BHTextView>(R.id.discountPercentageET)
+            val discountAmountET = dialog.findViewById<BHTextView>(R.id.discountAmountET)
+            val cashBackPercentageET = dialog.findViewById<BHTextView>(R.id.cashBackPercentageET)
+            val cashBackAmountET = dialog.findViewById<BHTextView>(R.id.cashBackAmountET)
+            val emiAmountET = dialog.findViewById<BHTextView>(R.id.emiAmountET)
+            val netPayAmountET = dialog.findViewById<BHTextView>(R.id.netPayAmountET)
+            val issuerName = dialog.findViewById<BHTextView>(R.id.issuerName)
+            val brandNameTV = dialog.findViewById<BHTextView>(R.id.productBrandNameET)
+
+            val discountPercentageLL = dialog.findViewById<LinearLayout>(R.id.discountPercentageLL)
+            val discountAmountLL = dialog.findViewById<LinearLayout>(R.id.discountAmountLL)
+            val cashBackPercentageLL = dialog.findViewById<LinearLayout>(R.id.cashBackPercentageLL)
+            val cashBackAmountLL = dialog.findViewById<LinearLayout>(R.id.cashBackAmountLL)
+            val netPayAmountLL= dialog.findViewById<LinearLayout>(R.id.netPayAmountLL)
+            val emiAmtLL= dialog.findViewById<LinearLayout>(R.id.emiAmtLL)
+            val offerLL= dialog.findViewById<LinearLayout>(R.id.offerLL)
+
+            val tenureTv= dialog.findViewById<BHTextView>(R.id.tenureTv)
+
+            val billNoCrdView = dialog.findViewById<CardView>(R.id.billno_crd_view)
+            val billNoet = dialog.findViewById<EditText>(R.id.billNum_et)
+            val rupeeSymbol= getString(R.string.rupees_symbol)
+
+            val tvOffer = dialog.findViewById<TextView>(R.id.tv_offer)
+
+            if (brandEMIAccessData.brandReservField[2]=='1' || brandEMIAccessData.brandReservField[2]=='2' ) {
+                billNoCrdView?.visibility = View.VISIBLE
+            // todo     showEditTextSelected(billNoet, billNoCrdView, requireContext())
+           // todo      billNoet?.setMaxLength( 16)
+            } else {
+                billNoCrdView?.visibility = View.GONE
+            }
+
+            val txnAmt= rupeeSymbol+"%.2f".format(brandEMIAccessData.transactionAmount.toFloat() / 100)
+            transactionAmountET.text =txnAmt
+
+
+            productName.text = brandEMIAccessData.productName
+            categoryName.text = brandEMIAccessData.productBaseCat
+            issuerName.text = brandEMIAccessData.issuerName
+            val tenureMonths = "${brandEMIAccessData.tenure} Months"
+            tenureTime.text =  brandEMIAccessData.tenureLabel
+            brandNameTV.text=brandEMIAccessData.brandName
+            if (!TextUtils.isEmpty(brandEMIAccessData.discountCalculatedValue)) {
+                discountPercentageET.text = brandEMIAccessData.discountCalculatedValue
+                discountPercentageLL.visibility = View.VISIBLE
+            }
+            if (!TextUtils.isEmpty(brandEMIAccessData.discountAmount) && brandEMIAccessData.discountAmount != "0") {
+                val disAmount= rupeeSymbol+"%.2f".format(brandEMIAccessData.discountAmount.toFloat() / 100)
+                discountAmountET.text = disAmount
+                discountAmountLL.visibility = View.VISIBLE
+            }
+            if (!TextUtils.isEmpty(brandEMIAccessData.cashBackCalculatedValue)) {
+                cashBackPercentageET.text = brandEMIAccessData.cashBackCalculatedValue
+                cashBackPercentageLL.visibility = View.VISIBLE
+            }
+            if (!TextUtils.isEmpty(brandEMIAccessData.cashBackAmount) && brandEMIAccessData.cashBackAmount != "0") {
+                cashBackAmountET.text = brandEMIAccessData.cashBackAmount
+                cashBackAmountLL.visibility = View.VISIBLE
+            }
+            val emiAmt=rupeeSymbol+"%.2f".format(brandEMIAccessData.emiAmount.toFloat() / 100)
+            val netPayAmt=rupeeSymbol+ "%.2f".format(brandEMIAccessData.netPayAmount.toFloat() / 100)
+            emiAmountET.text = emiAmt
+            netPayAmountET.text =netPayAmt
+
+            if(brandEMIAccessData.tenure=="1"){
+                cashBackAmountLL.visibility=View.GONE
+                netPayAmountLL.visibility=View.GONE
+                emiAmtLL.visibility=View.GONE
+                discountPercentageLL.visibility=View.GONE
+                discountAmountLL.visibility=View.GONE
+                cashBackPercentageLL.visibility=View.GONE
+                offerLL.visibility=View.VISIBLE
+                tvOffer.text= brandEMIAccessData.schemeTenureTAndC
+                // makeTextViewResizable(tvOffer, 8, "See More", true)
+                tenureTv.text="Scheme"
+
+            }else{
+                offerLL.visibility=View.GONE
+            }
+            dialog.findViewById<Button>(R.id.submitButton).setOnClickListener {
+                if(brandEMIAccessData.brandReservField[2]=='2' && billNoet.text.isNullOrBlank()){
+                    showToast("Enter bill number")
+                    return@setOnClickListener
+                }
+                // todo below code
+              /*  val issuerTAndCData = runBlocking(Dispatchers.IO) { IssuerTAndCTable.getAllIssuerTAndCData() }
+                val brandTAndCData = runBlocking(Dispatchers.IO) { BrandTAndCTable.getAllBrandTAndCData() }
+                iDialog?.showProgress()
+                if (issuerTAndCData?.isEmpty() == true || brandTAndCData.isEmpty() || !matchHostAndDBData(brandEMIAccessData)) {
+                    getIssuerTAndCData { issuerTCDataSaved ->
+                        if (issuerTCDataSaved) {
+                            getBrandTAndCData { brandTCDataSaved ->
+                                if (brandTCDataSaved) {
+                                    saveBrandMasterTimeStampsData("","",brandEMIAccessData.issuerTimeStamp,brandEMIAccessData.brandTimeStamp) {
+                                        lifecycleScope.launch(Dispatchers.Main) {
+                                            iDialog?.hideProgress()
+                                            navigateToVFTransactionActivity(
+                                                brandEMIAccessData,
+                                                billNoet.text.toString()
+                                            )
+                                        }
+                                    }
+
+                                } else {
+                                    lifecycleScope.launch(Dispatchers.Main) {
+                                        iDialog?.hideProgress()
+                                        showSomethingWrongPopUp()
+                                    }
+                                }
+                            }
+                        } else {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                iDialog?.hideProgress()
+                                showSomethingWrongPopUp()
+                            }
+                        }
+                    }
+                } else {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        iDialog?.hideProgress()
+                        navigateToVFTransactionActivity(brandEMIAccessData,billNoet.text.toString())
+                    }
+                }
+*/
+                dialog.dismiss()
+
+            }
+            dialog.show()
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+    }
+    //endregion
+
 
     suspend fun printingSaleData(batchTable: BatchTable, cb: suspend (Boolean) -> Unit) {
         val receiptDetail = batchTable.receiptData

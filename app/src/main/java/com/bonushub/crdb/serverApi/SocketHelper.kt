@@ -132,7 +132,9 @@ object SocketHelper {
 
             } else {
                 hitCounter = 1
-                RespMessageStatusData(ex.message ?: "Connection Error", isSuccess = false)
+
+              //  RespMessageStatusData(ex.message ?: "Connection Error", isSuccess = false)
+            RespMessageStatusData("Connection Error \n Unable to connect host" ?: "Connection Error", isSuccess = false)
             }
         }
     }

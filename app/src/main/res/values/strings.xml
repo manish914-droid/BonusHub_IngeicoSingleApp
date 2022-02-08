@@ -306,7 +306,18 @@
     <string name="failed">Failed!!!</string>
     <string name="txn_detail_page">TXN Detail Page</string>
     <string name="void_refund_not_allowed">Void of Refund not allowed</string>
-    <string name="please_enter_access_code">Please Enter Access Code</string>
+
     <string name="emi_code_display_txt">Please use same Issuer’s card which used while generating Brand EMI Access Code</string>
+
+    <string name="brand_emi_by_access_code">Brand EMI By Code</string>
+    <string name="submit">SUBMIT</string>
+    <string name="please_enter_access_code">Please Enter Access Code</string>
+    <string name="productName">Product Name</string>
+    <string name="categoryName">Category Name</string>
+    <string name="transactionAmount">Transaction Amount</string>
+    <string name="discountPercentage">Discount %</string>
+    <string name="cashbackPercentage">CashBack %</string>
+    <string name="cashback_amount">CashBack Amount</string>
+    <string name="netPayAmount">Net Pay Amount</string>
 
 </resources>
