@@ -23,8 +23,8 @@ android {
         targetSdkVersion 30
         versionCode 1
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
-        buildConfigField "long", "REVISION_ID", "210105"
-        versionName "02.03.04"
+        buildConfigField "long", "REVISION_ID", "210107"
+        versionName "02.03.07"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
