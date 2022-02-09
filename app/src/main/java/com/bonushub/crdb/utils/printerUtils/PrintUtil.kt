@@ -508,7 +508,7 @@ class PrintUtil(context: Context?) {
         val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
         val tipAmount = (((receiptDetail.txnOtherAmount)?.toLong())?.div(100)).toString()
         var totalAmount: String? = null
-        if (receiptDetail.txnName.equals("SALE")) {
+        if (batchTable.transactionType == BhTransactionType.SALE.type) {
             textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
             textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
             printer?.addMixStyleText(textBlockList)
@@ -544,7 +544,7 @@ class PrintUtil(context: Context?) {
                 )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-                totalAmount = "%.2f".format((amt.toDouble() - tipAmount.toDouble()))
+                totalAmount = amt1.toString()
             }else{
                 textBlockList.add(sigleLineformat("CASH WITHDRAWN AMT:", AlignMode.LEFT))
                 textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))

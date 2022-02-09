@@ -173,7 +173,7 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                  //   val field56="${stan}${reqDateString}"
 
                     val data1=dataList?.get(4)+dataList?.get(5)+dataList?.get(6)+reqDateString
-                   val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldStanForVoid+reqDateString
+                  // val data=batchdata?.receiptData?.tid+batchdata?.bonushubbatchnumber+batchdata?.oldStanForVoid+reqDateString
                      addFieldByHex(56,data1)
 
 
@@ -191,43 +191,10 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                 BhTransactionType.SALE.type ,BhTransactionType.CASH_AT_POS.type,
                 BhTransactionType.SALE_WITH_CASH.type,BhTransactionType.REFUND.type,BhTransactionType.PRE_AUTH.type,
                 BhTransactionType.PRE_AUTH_COMPLETE.type -> {
-                  //  02,36|PAN Number |card holder name~Application label~CardIssuerCountryCode~mode of txn~pin entry type
-              /* val pan = cardProcessedData.getPanNumberData()
-                    batchListData[0].receiptData?.cardHolderName
-                    batchListData[0].receiptData?.appName
-                    val data="02,36|$pan~"*/
-          /*   val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
-                        getEncryptedDataForSyncing(it,
-                            it1
-                        )
-                    } }
-
-                    if (data != null) {
-                        addField(57,data)
-                    }*/
-                   /* cardProcessedData.getPanNumberData()?.let { getEncryptedPanorTrackData(it,false) }?.let {
-                        addField(57,
-                            it
-                        )
-                        logger("field-57",it,"e")
-                    }*/
                     batchdata?.field57EncryptedData?.let { addField(57, it) }
-
                 }
                 BhTransactionType.BRAND_EMI.type , BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type->{
-                  /*  val data=       cardProcessedData.getPanNumberData()?.let { batchdata?.receiptData?.let { it1 ->
-                        getEncryptedDataForSyncing(it,
-                            it1
-                        )
-                    } }
-
-                    if (data != null) {
-                        addField(57,data)
-                    }*/
-
                     batchdata?.field57EncryptedData?.let { addField(57, it) }
-
-                  //  cardProcessedData.getEncryptedPan()?.let { addField(57, it) }
                 }
 
                 BhTransactionType.VOID.type->{
@@ -235,9 +202,6 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                 }
 
             }
-
-
-
 
             //region===============Check If Transaction Type is EMI_SALE , Brand_EMI or Other then Field would be appended with Bank EMI Scheme Offer Values:-
 
@@ -275,7 +239,6 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                     if(batchdata?.field58EmiData?.isNotBlank() == true){
                         batchdata?.field58EmiData?.let { addFieldByHex(58, it) }
                     }
-
                 }
 
                 else -> {
@@ -284,16 +247,19 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
 
             //  Filed 60-
             //  6 digit batch number BH(OF Base  tid)|mob|coupon code |ing tid|ING batch|Ing stan |Ing invoice |Aid|TC|app name|
-
             val bonushubbatch = addPad(tptbaseTiddata?.batchNumber ?: "", "0", 6, true)
             val emptyString: String= ""
-            val ingenicotid          = addPad(batchdata?.receiptData?.tid ?: "", "0", 8, true)
+            var ingenicotid          = addPad(batchdata?.receiptData?.tid ?: "", "0", 8, true)
             val ingenibatchnumber    = addPad(batchdata?.receiptData?.batchNumber ?: "", "0", 6, true)
             val ingenicostan         = addPad(batchdata?.receiptData?.stan ?: "", "0", 6, true)
             val ingenicoInvoice        = addPad(batchdata?.receiptData?.invoice ?: "", "0", 6, true)
             val ingenicoaid           = batchdata?.receiptData?.aid ?: ""
             val ingenicotc           = batchdata?.receiptData?.tc ?: ""
             val ingenicoappName     = batchdata?.receiptData?.appName ?: ""
+
+            if(batchdata?.transactionType==BhTransactionType.VOID.type){
+               // ingenicoaid=
+            }
 
             val fielddata60 = "$bonushubbatch|$emptyString|$emptyString|$ingenicotid|"+
                     "$ingenibatchnumber|$ingenicostan|$ingenicoInvoice|"+
