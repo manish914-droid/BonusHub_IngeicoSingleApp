@@ -293,11 +293,11 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode1: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode1, resultCode, data)
         // conversion of sale to Bank emi
-        var reqCode = requestCode
-        if (requestCode == BhTransactionType.SALE.type) {
+        var reqCode = requestCode1
+        if (requestCode1 == BhTransactionType.SALE.type) {
             reqCode = BhTransactionType.EMI_SALE.type
             globalCardProcessedModel.setTransType(BhTransactionType.EMI_SALE.type)
         }
@@ -350,7 +350,7 @@ class TransactionActivity : BaseActivityNew() {
                     val batchData = BatchTable(null)
                     batchData.emiIssuerDataModel = emiIssuerData
                     batchData.invoice = ""
-                    if (requestCode == BhTransactionType.BRAND_EMI.type) {
+                    if (reqCode == BhTransactionType.BRAND_EMI.type) {
                         batchData.emiBrandData = brandDataMaster
                         batchData.emiSubCategoryData = brandEmiSubCatData
                         batchData.emiCategoryData = brandEmiCatData
@@ -427,7 +427,7 @@ class TransactionActivity : BaseActivityNew() {
                                             lifecycleScope.launch(Dispatchers.IO) {
                                                 batchDataAfterSuccess.emiIssuerDataModel = emiIssuerData
                                                 batchDataAfterSuccess.invoice = receiptDetail.invoice.toString()
-                                                if (requestCode == BhTransactionType.BRAND_EMI.type) {
+                                                if (reqCode == BhTransactionType.BRAND_EMI.type) {
                                                     batchDataAfterSuccess.emiBrandData = brandDataMaster
                                                     batchDataAfterSuccess.emiSubCategoryData =
                                                         brandEmiSubCatData
@@ -447,9 +447,9 @@ class TransactionActivity : BaseActivityNew() {
                                                 batchDataAfterSuccess.bonushubStan = tpt?.stan ?: ""
 
                                                 createCardProcessingModelData(receiptDetail)
-                                                if (requestCode == BhTransactionType.BRAND_EMI.type
-                                                    || requestCode== BhTransactionType.EMI_SALE.type  || requestCode== BhTransactionType.TEST_EMI.type) {
-                                                  if( requestCode== BhTransactionType.TEST_EMI.type)
+                                                if (reqCode == BhTransactionType.BRAND_EMI.type
+                                                    || reqCode== BhTransactionType.EMI_SALE.type  || reqCode== BhTransactionType.TEST_EMI.type) {
+                                                  if( reqCode== BhTransactionType.TEST_EMI.type)
                                                       globalCardProcessedModel.setTransactionAmount(100L?:0L)
                                                       else
                                                     globalCardProcessedModel.setTransactionAmount(amt?:0L)
@@ -463,7 +463,6 @@ class TransactionActivity : BaseActivityNew() {
                                                         it
                                                     )
                                                 }
-
 
                                                 when (reqCode) {
 
@@ -665,10 +664,13 @@ class TransactionActivity : BaseActivityNew() {
                                         }
                                     }
                                     else->{
-                                        errorFromIngenico(
-                                            txnResponse?.responseCode,
-                                            txnResponse?.status.toString()
-                                        )
+                                        if(isUnblockingNeeded){
+                                            errorFromIngenico(
+                                                txnResponse?.responseCode,
+                                                txnResponse?.status.toString()
+                                            )
+
+                                        }
                                     }
                                 }
                             }
@@ -786,7 +788,7 @@ class TransactionActivity : BaseActivityNew() {
                     hasInstaEmi = false
                 }
                 // Condition executes, If insta EMI is Available on card
-                if ((saleAmt.toFloat() * 100).toLong() >= limitAmt && hasInstaEmi) {
+                if ((saleAmt.toFloat() ) >= limitAmt && hasInstaEmi) {
                     withContext(Dispatchers.Main) {
                         emvBinding?.cardDetectImg?.visibility = View.VISIBLE
                         emvBinding?.tvInsertCard?.visibility = View.VISIBLE
@@ -1986,6 +1988,7 @@ class TransactionActivity : BaseActivityNew() {
         val amt = (saleAmt.toFloat() * 100).toLong()
         val cashBackAmount = (saleWithTipAmt.toFloat() * 100).toLong()
         field54Data = cashBackAmount
+
         Log.d(TAG, "tip amount: ${cashBackAmount}")
         var ecrID: String
         try {
@@ -1999,9 +2002,16 @@ class TransactionActivity : BaseActivityNew() {
 
             println(jsonResp)
             AppPreference.saveRestartDataPreference(jsonResp)
+          var txnAmount=0L
+            txnAmount = if(cashBackAmount!=0L){
+                amt-cashBackAmount
+            }else{
+                amt
+            }
+
             DeviceHelper.doSaleTransaction(
                 SaleRequest(
-                    amount = amt,
+                    amount = txnAmount,
                     tipAmount = cashBackAmount,
                     transactionType = TransactionType.SALE,
                     tid = tid,
@@ -2204,9 +2214,15 @@ class TransactionActivity : BaseActivityNew() {
                 cardCaptureType = CardCaptureType.EMV_NO_CAPTURING
             }
             val cashBackAmount = (saleWithTipAmt.toFloat() * 100).toLong()
+            var txnAmount=0L
+            txnAmount = if(cashBackAmount!=0L){
+                amt-cashBackAmount
+            }else{
+                amt
+            }
             DeviceHelper.doEMITxn(
                 EMISaleRequest(
-                    amount = amt,
+                    amount = txnAmount,
                     tipAmount = cashBackAmount,
                     emiTxnName = getTransactionTypeName(globalCardProcessedModel.getTransType()),
                     tid = tid,

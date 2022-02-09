@@ -972,7 +972,7 @@ class NewInputAmountFragment : Fragment() {
         extraPair: Triple<String, String, Boolean>
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
-            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner,{
+            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner) {
                 tpt = it
                 if (tpt != null) {
                     val tipAmount = try {
@@ -991,7 +991,7 @@ class NewInputAmountFragment : Fragment() {
                     if (maxTipLimit != 0f) { // flat tip check is applied
                         if (tipAmount <= maxTipLimit!!) {
                             // iDialog?.showProgress()
-                            lifecycleScope.launch(Dispatchers.IO){
+                            lifecycleScope.launch(Dispatchers.IO) {
 
                                 iFrReq?.onFragmentRequest(
                                     EDashboardItem.SALE,
@@ -1008,7 +1008,7 @@ class NewInputAmountFragment : Fragment() {
                                         maxTipLimit
                                     )
                                 }."
-                             lifecycleScope.launch(Dispatchers.Main) {
+                            lifecycleScope.launch(Dispatchers.Main) {
                                 iDialog?.getInfoDialog("Tip Sale Error", msg) {}
                             }
                         }
@@ -1018,7 +1018,7 @@ class NewInputAmountFragment : Fragment() {
                         if (maxAmountTip != null) {
                             if (tipAmount <= maxAmountTip.toFloat()) {
                                 //   iDialog?.showProgress()
-                                 lifecycleScope.launch(Dispatchers.IO) {
+                                lifecycleScope.launch(Dispatchers.IO) {
 
                                     iFrReq?.onFragmentRequest(
                                         EDashboardItem.SALE,
@@ -1049,7 +1049,7 @@ class NewInputAmountFragment : Fragment() {
                 } else {
                     showToast("TPT not fount")
                 }
-            })
+            }
 
         }
 

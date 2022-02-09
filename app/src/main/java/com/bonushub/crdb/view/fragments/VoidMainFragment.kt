@@ -110,7 +110,7 @@ class VoidMainFragment : Fragment() {
         try {
             DeviceHelper.doVoidTransaction(
                 VoidRequest(
-                    tid = tid,
+                    tid = oldBatchData.receiptData?.tid,
                     invoice =  binding?.edtTextSearchTransaction?.text.toString(),
                     transactionUuid = UUID.randomUUID().toString().also {
                         ecrID = it
