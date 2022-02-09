@@ -1447,14 +1447,15 @@ class PrintUtil(context: Context?) {
                     if (chunk != null) {
                         for (st in chunk) {
                             logger("TNC", st, "e")
-                            /*              textBlockList.add(sigleLineformat(st, AlignMode.CENTER))
-
-                                        printer?.addMixStyleText(textBlockList)
-                                        textBlockList.clear()
-                */
                             printer?.setAscScale(ASCScale.SC1x1)
                             printer?.setAscSize(ASCSize.DOT24x8)
-                            printer?.addText( AlignMode.LEFT,  st)
+
+                            textBlockList.add(
+                                sigleLineformat(st, AlignMode.LEFT
+                                )
+                            )
+                            printer?.addMixStyleText(textBlockList)
+                            textBlockList.clear()
                         }
                     }
                 }
@@ -1464,6 +1465,9 @@ class PrintUtil(context: Context?) {
                 printer?.setAscSize(ASCSize.DOT24x8)
             }
             //endregion
+
+
+
 
 
         }
@@ -1482,34 +1486,9 @@ class PrintUtil(context: Context?) {
                  baseAmount = "1.00"
 
             }
-        /*    if (batchTable.transactionType == BhTransactionType.TEST_EMI.type) {
-                textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
 
-                textBlockList.add(
-                        sigleLineformat(
-                            "$currencySymbol:${ "1.00"}",
-                            AlignMode.RIGHT
-                        )
-                    )
-                    printer?.addMixStyleText(textBlockList)
-                    textBlockList.clear()
-
-
-            } else {
-                textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
-                if (bankEMIIssuerTAndCDataModal != null) {
-                    textBlockList.add(
-                        sigleLineformat(
-                            "$currencySymbol:${"%.2f".format(baseAmount.toDoubleOrNull())}",
-                            AlignMode.RIGHT
-                        )
-                    )
-                    printer?.addMixStyleText(textBlockList)
-                    textBlockList.clear()
-                }
-            }*/
             textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
-            if (bankEMIIssuerTAndCDataModal != null) {
+
                 textBlockList.add(
                     sigleLineformat(
                         "$currencySymbol:${"%.2f".format(baseAmount.toDoubleOrNull())}",
@@ -1518,7 +1497,7 @@ class PrintUtil(context: Context?) {
                 )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-            }
+
         }
     }
 

@@ -23,6 +23,7 @@ import com.bonushub.crdb.utils.IsoDataReader
 import com.bonushub.crdb.utils.printerUtils.PrintUtil
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.bonushub.crdb.utils.readIso
+import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -78,7 +79,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                 binding?.enterAmountCrdView?.visibility = View.VISIBLE
                 binding?.vpaCrdView?.visibility = View.VISIBLE
                 binding?.mobileNumberCrdView?.visibility = View.VISIBLE
-                binding?.enterDescriptionCrdView?.visibility = View.GONE
+                binding?.enterDescriptionCrdView?.visibility = View.VISIBLE
             }
 
             EDashboardItem.BHARAT_QR, EDashboardItem.SMS_PAY ->{
@@ -123,16 +124,17 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                     if(isVerify()){
 
 
-                        (activity as NavigationActivity).transactFragment(UpiCollectFragment().apply {
+           /*             (activity as NavigationActivity).transactFragment(UpiCollectFragment().apply {
                             arguments = Bundle().apply {
                                 putSerializable("type", EDashboardItem.UPI)
                                 putSerializable("amount", amount_)
                                 putSerializable("vpa", vpa_)
                                 putSerializable("mobile", mobile_)
                             }
-                        }, false)
+                        }, false)*/
 
-                       // DialogUtilsNew1.showUpiCollectDialog(requireContext(),amount_,vpa_,mobile_,{},{})
+                 ///   DialogUtilsNew1.showUpiCollectDialog(requireContext(),amount_,vpa_,mobile_,{},{})
+                        validateAndSyncRequestToServer(binding?.amountEt?.text.toString().trim())
                     }
 
                 }
@@ -529,4 +531,6 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
             }
         }
     }
+
+
 }

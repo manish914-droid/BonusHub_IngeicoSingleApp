@@ -198,7 +198,8 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                                         EDigiPosPaymentStatus.Pending.desciption -> {
                                             tabledata.txnStatus = statusRespDataList[5]
                                             lifecycleScope.launch(Dispatchers.Main){
-                                                ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                               // ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                                (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.txn_status_still_pending) ?: "") {}
                                             }
 
                                         }

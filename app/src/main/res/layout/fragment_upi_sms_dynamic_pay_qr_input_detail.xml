@@ -30,7 +30,9 @@
                 android:layout_marginStart="@dimen/pad_16"
                 android:layout_marginEnd="@dimen/pad_16"
                 android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone">
+                android:visibility="gone"
+              >
+
 
                 <com.bonushub.crdb.vxutils.AmountEditText
                     android:id="@+id/amount_et"
@@ -46,7 +48,7 @@
                     android:imeOptions="actionDone"
                     android:inputType="number"
                     android:lines="1"
-                    android:maxLength="8"
+                    android:maxLength="11"
                     android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
@@ -64,7 +66,8 @@
                 android:layout_marginStart="@dimen/pad_16"
                 android:layout_marginEnd="@dimen/pad_16"
                 android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone">
+                android:visibility="gone"
+                >
 
                 <EditText
                     android:id="@+id/vpa_et"
@@ -80,7 +83,7 @@
                     android:imeOptions="actionDone"
                     android:inputType="text"
                     android:lines="1"
-                    android:maxLength="15"
+
                     android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
@@ -97,7 +100,8 @@
                 android:layout_marginStart="@dimen/pad_16"
                 android:layout_marginEnd="@dimen/pad_16"
                 android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone">
+                android:visibility="gone"
+               >
 
                 <EditText
                     android:id="@+id/mobile_number_et"
@@ -129,7 +133,8 @@
                 android:layout_marginStart="@dimen/pad_16"
                 android:layout_marginEnd="@dimen/pad_16"
                 android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone">
+                android:visibility="gone"
+              >
 
                 <EditText
                     android:id="@+id/enter_description_et"
@@ -144,7 +149,7 @@
                     android:hint="ENTER DESCRIPTION (OPTIONAL)"
                     android:imeOptions="actionDone"
                     android:inputType="text"
-                    android:lines="1"
+                    android:maxLines="4"
                     android:maxLength="20"
                     android:padding="@dimen/pad_16"
                     android:textColor="@color/txt_color"

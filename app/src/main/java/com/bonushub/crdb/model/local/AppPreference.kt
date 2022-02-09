@@ -143,13 +143,20 @@ object AppPreference {
 
     //region Below method is used to Save Batch File Data in App Preference:-
     fun saveBatchInPreference(batchList: MutableList<BatchTable?>) {
+        logger(TAG, "========saveLastSuccessReceipt=========", "e")
+        logger(TAG, Gson().toJson(batchList), "e")
         val tempBatchDataList = Gson().toJson(
             batchList,
             object : TypeToken<List<BatchTable>>() {}.type
         ) ?: ""
-        saveString(LAST_BATCH, tempBatchDataList)
+       val v= HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(LAST_BATCH,tempBatchDataList)?.apply()
+       // saveString(LAST_BATCH, tempBatchDataList)
     }
     //endregion
+
+
+
 
     // region
     fun getLastBatch(): List<BatchTable>? {
@@ -164,6 +171,7 @@ object AppPreference {
                         str,
                         object : TypeToken<List<BatchTable>>() {}.type
                     )
+                    logger(TAG, Gson().toJson(batList), "e")
                     return batList
                 } else null
             } catch (ex: Exception) {
@@ -290,7 +298,16 @@ object AppPreference {
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         v?.edit()?.putString(RESTART_HANDLING, restartData?:"")?.apply()
     }
+
     //endregion
+    @JvmStatic
+    fun clearRestartDataPreference(){
+        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        v?.edit()?.putString(RESTART_HANDLING, "")?.apply()
+    }
+
+    // end region
+
 
     // region
     @JvmStatic
@@ -316,10 +333,8 @@ object AppPreference {
 
     // end reegion
 
+
     // region
-    fun clearRestartDataPreference() {
-        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-        v?.edit()?.putString(RESTART_HANDLING, "")?.apply()
-    }
-    //endregion
+
+
 }

@@ -135,9 +135,7 @@ class TxnListFragment : Fragment() {
 
         //region======================Filter Apply Button onclick event:-
         binding?.bottomSheet?.applyFilter?.setOnClickListener {
-
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
-
             val amtStr = binding?.bottomSheet?.amountBottomET?.text?.toString() ?: "0.0"
             bottomSheetAmountData = if (amtStr == "0.0") "" else amtStr
             if (binding?.bottomSheet?.ptxnIDBottomRB?.isChecked == true)
@@ -153,6 +151,8 @@ class TxnListFragment : Fragment() {
         }
         //endregion
 
+
+
         // region bottom sheet
         binding?.bottomSheet?.closeIconBottom?.setOnClickListener {
             closeBottomSheet()
@@ -163,7 +163,7 @@ class TxnListFragment : Fragment() {
 
             selectedFilterTransactionType =
                 binding?.bottomSheet?.upiCollectBottomRB?.text?.toString() ?: ""
-            //filterTransactionType = EnumDigiPosProcess.UPIDigiPOS.code
+           filterTransactionType = EnumDigiPosProcess.UPIDigiPOS.code
             binding?.bottomSheet?.upiCollectBottomRB?.setTextColor(Color.parseColor("#001F79"))
             binding?.bottomSheet?.upiCollectBottomRB?.buttonTintList =
                 ColorStateList.valueOf(Color.parseColor("#001F79"))
@@ -189,7 +189,7 @@ class TxnListFragment : Fragment() {
         binding?.bottomSheet?.dynamicQRBottomRB?.setOnClickListener {
             selectedFilterTransactionType =
                 binding?.bottomSheet?.dynamicQRBottomRB?.text?.toString() ?: ""
-            //filterTransactionType = EnumDigiPosProcess.DYNAMIC_QR.code
+            filterTransactionType = EnumDigiPosProcess.DYNAMIC_QR.code
             binding?.bottomSheet?.dynamicQRBottomRB?.setTextColor(Color.parseColor("#001F79"))
             binding?.bottomSheet?.dynamicQRBottomRB?.buttonTintList =
                 ColorStateList.valueOf(Color.parseColor("#001F79"))
@@ -214,7 +214,7 @@ class TxnListFragment : Fragment() {
         binding?.bottomSheet?.smsPayBottomRB?.setOnClickListener {
             selectedFilterTransactionType =
                 binding?.bottomSheet?.smsPayBottomRB?.text?.toString() ?: ""
-            //filterTransactionType = EnumDigiPosProcess.SMS_PAYDigiPOS.code
+           filterTransactionType = EnumDigiPosProcess.SMS_PAYDigiPOS.code
             binding?.bottomSheet?.smsPayBottomRB?.setTextColor(Color.parseColor("#001F79"))
             binding?.bottomSheet?.smsPayBottomRB?.buttonTintList =
                 ColorStateList.valueOf(Color.parseColor("#001F79"))
@@ -239,7 +239,7 @@ class TxnListFragment : Fragment() {
         binding?.bottomSheet?.staticQRBottomRB?.setOnClickListener {
             selectedFilterTransactionType =
                 binding?.bottomSheet?.staticQRBottomRB?.text?.toString() ?: ""
-           // filterTransactionType = EnumDigiPosProcess.STATIC_QR.code
+          filterTransactionType = EnumDigiPosProcess.STATIC_QR.code
             binding?.bottomSheet?.staticQRBottomRB?.setTextColor(Color.parseColor("#001F79"))
             binding?.bottomSheet?.staticQRBottomRB?.buttonTintList =
                 ColorStateList.valueOf(Color.parseColor("#001F79"))

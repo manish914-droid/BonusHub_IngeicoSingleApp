@@ -277,7 +277,7 @@
             android:lines="1"
             android:maxLength="11"
             android:paddingStart="0dp"
-            android:text="@string/_0_0"
+            android:text=""
             android:textColor="@color/themeBackground"
             android:textColorHint="@color/text_gray2"
             android:textSize="@dimen/text_size_small"

@@ -69,8 +69,8 @@
         android:layout_height="35dp"
         android:scaleType="fitXY"
         android:src="@drawable/ic_home"
-
-        android:visibility="invisible"
+android:tint="#013480"
+          android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
 
