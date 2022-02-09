@@ -78,11 +78,9 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                     + version + pcNumber + addPad("0", "0", 9)
             )
             //adding field 63
-
-
             //SEQUENCE-------> sale, emi sale ,sale with cash, cash only,auth comp,and tip transaction type will be included.
             //Manipulating Data based on condition for Field 63:-
-            if (batchListData?.size > 0) {
+            if (batchListData.size > 0) {
 
 
                 val map = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
@@ -96,7 +94,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                     }
                     if (map.containsKey(it.receiptData?.tid!!)) {
                         val ma = map[it.receiptData?.tid!!] as MutableMap<Int, SummeryModel>
-                        if (ma!!.containsKey(it.transactionType)) {
+                        if (ma.containsKey(it.transactionType)) {
                             val m = ma[it.transactionType] as SummeryModel
                             m.count += 1
                             m.total += transAmt!!
@@ -128,9 +126,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 var field63: String? = null
 
                 for ((key, _map) in map) {
-
                     println("Key value in map "+key)
-
                     for ((k, m) in _map) {
                         println("key value in _map "+ k)
                         println("Value value in _map "+ m)
@@ -205,44 +201,46 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             }
                         }
 
-
-
-                        val sCount = addPad(saleCount, "0", 3, true)
+                 /*       val sCount = addPad(saleCount, "0", 3, true)
                         val sAmount = addPad(saleAmount.toString(), "0", 12, true)
-
                         val rCount = addPad(refundCount, "0", 3, true)
-                        val rAmount = addPad(refundAmount.toString(), "0", 12, true)
-
+                        val rAmount = addPad(refundAmount.toString(), "0", 12, true)*/
                         //   sale,sale with cash, cash only,auth comp,and tip transaction
 
-                        if(null !=field63) {
-
-                            field63 += addPad(saletid ?: "", "0", 8, true) +
-                                    addPad(bonushubsalebatchNumber ?: "", "0", 6, true) +
-                                    addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
-                                    addPad(
-                                        sCount + sAmount + rCount + rAmount, "0", 30,
-                                        toLeft = false
-                                    )
-                        }
-                        else{
-                            field63 = addPad(saletid ?: "", "0", 8, true) +
-                                    addPad(bonushubsalebatchNumber ?: "", "0", 6, true) +
-                                    addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
-                                    addPad(
-                                        sCount + sAmount + rCount + rAmount, "0", 30,
-                                        toLeft = false
-                                    )
-                        }
 
 
-
-                        saleCount = 0;
-                        saleAmount = 0;
-                        refundCount = 0;
-                        refundAmount = 0;
 
                     }
+                    val sCount = addPad(saleCount, "0", 3, true)
+                    val sAmount = addPad(saleAmount.toString(), "0", 12, true)
+                    val rCount = addPad(refundCount, "0", 3, true)
+                    val rAmount = addPad(refundAmount.toString(), "0", 12, true)
+
+                    if(null !=field63) {
+                        field63 += addPad(saletid ?: "", "0", 8, true) +
+                                addPad(bonushubsalebatchNumber ?: "", "0", 6, true) +
+                                addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
+                                addPad(
+                                    sCount + sAmount + rCount + rAmount, "0", 30,
+                                    toLeft = false
+                                )
+                    }
+                    else{
+                        field63 = addPad(saletid ?: "", "0", 8, true) +
+                                addPad(bonushubsalebatchNumber ?: "", "0", 6, true) +
+                                addPad(ingenicosalebatchNumber ?: "", "0", 6, true) +
+                                addPad(
+                                    sCount + sAmount + rCount + rAmount, "0", 30,
+                                    toLeft = false
+                                )
+                    }
+
+                    saleCount = 0
+                    saleAmount = 0
+                    refundCount = 0
+                    refundAmount = 0
+
+
                 }
 
                 if(reversaldata.size > 0){
