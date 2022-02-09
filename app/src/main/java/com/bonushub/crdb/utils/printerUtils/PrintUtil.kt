@@ -544,7 +544,7 @@ class PrintUtil(context: Context?) {
                 )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
-                totalAmount = amt1.toString()
+                totalAmount = "%.2f".format((amt.toDouble())).toString()
             }else{
                 textBlockList.add(sigleLineformat("CASH WITHDRAWN AMT:", AlignMode.LEFT))
                 textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))

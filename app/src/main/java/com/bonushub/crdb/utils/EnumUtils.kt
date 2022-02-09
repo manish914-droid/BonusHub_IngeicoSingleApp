@@ -478,6 +478,7 @@ enum class BankFunctionsAdminVasItem(val _name: String){
     COMM_PARAM("COMM PARAM"),
     //ENV_PARAM("ENV PARAM"),
     INIT_PAYMENT_APP("INIT PAYMENT APP"),
+    CLEAR_SYNCING_DATA("Clear Pending Syncing"),
 }
 // end region
 

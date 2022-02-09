@@ -179,18 +179,23 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
                                 logger("password",password)
 
-                                bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{
+                                bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner) {
 
-                                    if(it)
-                                    {
+                                    if (it) {
                                         dialog.dismiss()
-                                        (activity as NavigationActivity).transactFragment(TestEmiFragment(), true)
+                                        (activity as NavigationActivity).transactFragment(
+                                            TestEmiFragment(),
+                                            true
+                                        )
 
 
-                                    }else{
-                                        ToastUtils.showToast(requireContext(),R.string.invalid_password)
+                                    } else {
+                                        ToastUtils.showToast(
+                                            requireContext(),
+                                            R.string.invalid_password
+                                        )
                                     }
-                                })
+                                }
 
 
                             }
@@ -232,6 +237,14 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                     ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
                 }
             }
+
+
+            BankFunctionsAdminVasItem.CLEAR_SYNCING_DATA->{
+                lifecycleScope.launch(Dispatchers.IO) {
+                    appDao.deletePendingSyncTransactionTable()
+                }
+            }
+
         }
     }
 

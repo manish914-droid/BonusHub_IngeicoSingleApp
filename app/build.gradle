@@ -10,7 +10,7 @@ android {
     compileSdkVersion 30
     signingConfigs {
         release {
-            storeFile file('/home/sandeep.saraswat/Desktop/bonushdfc.jks')
+            storeFile file('/home/manishkumar/Documents/app_release_keys/bonushdfc.jks')
             storePassword 'Bonus@123'
             keyAlias 'Android'
             keyPassword "Bonus@123"
@@ -24,7 +24,7 @@ android {
         versionCode 1
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
         buildConfigField "long", "REVISION_ID", "210107"
-        versionName "02.03.06"
+        versionName "02.03.07"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

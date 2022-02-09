@@ -743,6 +743,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                 }
 
+
             }
 
             EDashboardItem.EMI_ENQUIRY -> {
@@ -847,7 +848,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
 
-               /* lifecycleScope.launch(Dispatchers.IO) {
+              /*  lifecycleScope.launch(Dispatchers.IO) {
                     appDao.deletePendingSyncTransactionTable()
                 }*/
 
