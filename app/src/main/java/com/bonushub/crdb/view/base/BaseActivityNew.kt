@@ -443,6 +443,8 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         hideProgress()
         super.onDestroy()
     }
+
+
 }
 
 interface IDialog {

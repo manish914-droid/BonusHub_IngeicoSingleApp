@@ -140,6 +140,10 @@ class InitFragment : Fragment() {
                                         tpt1?.digiPosCardCallBackRequired =
                                             responsF57List[9].toString()
 
+                                        logger(
+                                            LOG_TAG.DIGIPOS.tag,
+                                            "statcic      $responsF57List[8].toString() "
+                                        )
                                         if ((tpt1?.digiPosTerminalStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) && (tpt1?.digiPosUPIStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
                                                     || tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
                                                     || tpt1.digiPosSMSpayStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) ){

@@ -60,10 +60,7 @@ class UpiCollectFragment : Fragment() {
         binding?.txtViewVpa?.text = vpa
         binding?.txtViewMobile?.text = mobile
 
-        // temp for text
-//        binding?.txtViewAmount?.text = "1,999.00"
-//        binding?.txtViewVpa?.text = "ABC@YBL"
-//        binding?.txtViewMobile?.text = "9942424299"
+
 
 
         binding?.subHeaderView?.subHeaderText?.text = "UPI COLLECT"
@@ -84,32 +81,6 @@ class UpiCollectFragment : Fragment() {
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
 
             validateAndSyncRequestToServer(amount)
-
-            // progress dialog
-           // (activity as NavigationActivity).showProgress("Sending/Receiving from Host")
-
-            // payment dialog
-//            (activity as NavigationActivity).alertBoxWithAction("","Payment link has been sent.\nWould you like to check payment status now.",
-//                true,"Yes",{
-//
-//                }, {
-//
-//                },R.drawable.ic_link_circle)
-
-            // Printer Dialog
-//            (activity as NavigationActivity).alertBoxWithAction(
-//                getString(R.string.print_customer_copy),
-//                getString(R.string.print_customer_copy),
-//                true, getString(R.string.positive_button_yes), {
-//
-//                }, {
-//
-//                })
-
-
-            // Transaction Approved dialog
-           // (activity as NavigationActivity).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
-            //(activity as NavigationActivity).hideProgress()
 
 
         }
@@ -136,7 +107,6 @@ class UpiCollectFragment : Fragment() {
         println("uniqueID -->  $uniqueID")
         var f56 = ""
         f56 = EnumDigiPosProcess.UPIDigiPOS.code + "^" + formattedAmt + "^" + binding?.enterDescriptionEt?.text?.toString() + "^" + mobile + "^" + vpa + "^" + uniqueID
-
         sendReceiveDataFromHost(f56)
 
     }

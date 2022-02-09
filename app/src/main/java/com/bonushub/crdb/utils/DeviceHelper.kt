@@ -279,6 +279,7 @@ object DeviceHelper   {
     }
     fun doSettlementtxn(request: SettlementRequest, listener:OnOperationListener ){
         iRemoteService?.doSettlement(request,listener)
+
     }
 
     @JvmStatic

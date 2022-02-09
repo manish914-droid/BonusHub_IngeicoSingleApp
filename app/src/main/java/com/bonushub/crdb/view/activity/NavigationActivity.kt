@@ -1416,7 +1416,6 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                         AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                         //Delete All BatchFile Data from Table after Settlement:-
                                         appDao.deleteBatchTable()
-
                                         appDao.deleteDigiPosDataTable()
                                     }
                                     //endregion
@@ -1822,7 +1821,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             .displayMetrics.scaledDensity).toInt()
         localLayoutParams.format = PixelFormat.TRANSPARENT
         val view = customViewGroup(this)
-        manager.addView(view, localLayoutParams)
+
+            manager.addView(view, localLayoutParams)
+
     }
     open fun collapseNow() {
 
