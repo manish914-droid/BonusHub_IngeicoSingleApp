@@ -809,7 +809,7 @@ class TransactionActivity : BaseActivityNew() {
                 }
             }
             EDashboardItem.CASH_ADVANCE -> {
-                val amt = (saleAmt.toFloat() * 100).toLong()
+                val amt = (saleAmt.toDouble() * 100).toLong()
                 var ecrID: String
                 field54Data = amt
                 try {
@@ -1032,7 +1032,7 @@ class TransactionActivity : BaseActivityNew() {
             }
             EDashboardItem.SALE_WITH_CASH -> {
                 try {
-                    val amt = (saleAmt.toFloat() * 100).toLong()
+                    val amt = (saleAmt.toDouble() * 100).toLong()
                     val cashBackAmount = (cashBackAmt.toFloat() * 100).toLong()
                     field54Data = cashBackAmount
                     var ecrID: String
@@ -1256,7 +1256,7 @@ class TransactionActivity : BaseActivityNew() {
             }
             EDashboardItem.REFUND -> {
                 try {
-                    val amt = (saleAmt.toFloat() * 100).toLong()
+                    val amt = (saleAmt.toDouble() * 100).toLong()
                     //  val cashBackAmount=(cashBackAmt.toFloat() * 100).toLong()
                     var ecrID: String
 
@@ -1476,7 +1476,7 @@ class TransactionActivity : BaseActivityNew() {
             }
             EDashboardItem.PREAUTH -> {
                 try {
-                    val amt = (saleAmt.toFloat() * 100).toLong()
+                    val amt = (saleAmt.toDouble() * 100).toLong()
 
                     var ecrID: String
 
@@ -1720,7 +1720,7 @@ class TransactionActivity : BaseActivityNew() {
                 }
             }
             EDashboardItem.PREAUTH_COMPLETE -> {
-                val amt = (saleAmt.toFloat() * 100).toLong()
+                val amt = (saleAmt.toDouble() * 100).toLong()
                 var ecrID: String
                 try {
                     val tranUuid = UUID.randomUUID().toString().also {
@@ -1985,7 +1985,7 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     private suspend fun initiateNormalSale() {
-        val amt = (saleAmt.toFloat() * 100).toLong()
+        val amt = (saleAmt.toDouble() * 100).toLong()
         val cashBackAmount = (saleWithTipAmt.toFloat() * 100).toLong()
         field54Data = cashBackAmount
 
@@ -2189,7 +2189,7 @@ class TransactionActivity : BaseActivityNew() {
 
     private suspend fun initiateSaleFromInstaEMiOption() {
         try {
-            val amt = (saleAmt.toFloat() * 100).toLong()
+            val amt = (saleAmt.toDouble() * 100).toLong()
             var track1: Track1? = null
             var track2: Track2? = null
             val cardCaptureType: CardCaptureType

@@ -569,7 +569,7 @@ class PrintUtil(context: Context?) {
         val terminalData = getTptData()
         currencySymbol = terminalData?.currencySymbol
         textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
-        val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
+        val amt = (((receiptDetail.txnAmount)?.toDouble())?.div(100)).toString()
         textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()
