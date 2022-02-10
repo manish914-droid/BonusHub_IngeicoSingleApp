@@ -506,14 +506,15 @@ class PrintUtil(context: Context?) {
         currencySymbol = terminalData?.currencySymbol
         val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
         val amt = (((receiptDetail.txnAmount)?.toDouble())?.div(100)).toString()
-        val tipAmount = (((receiptDetail.txnOtherAmount)?.toDouble())?.div(100)).toString()
+        var tipAmount = (((receiptDetail.txnOtherAmount)?.toLong())?.div(100)).toString()
         var totalAmount: String? = null
         if (batchTable.transactionType == BhTransactionType.SALE.type) {
             textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
             textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
             printer?.addMixStyleText(textBlockList)
             textBlockList.clear()
-            if (tipAmount != "0.00") {
+            if (tipAmount != "0") {
+                tipAmount = (((receiptDetail.txnOtherAmount)?.toDouble())?.div(100)).toString()
                 textBlockList.add(sigleLineformat("TIP AMOUNT:", AlignMode.LEFT))
                 textBlockList.add(
                     sigleLineformat(
