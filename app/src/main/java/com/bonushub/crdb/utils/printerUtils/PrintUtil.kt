@@ -2566,6 +2566,8 @@ class PrintUtil(context: Context?) {
             try {
                 val map = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
                 val map1 = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
+                //to hold the tid for which tid mid printed
+                val listTidPrinted = mutableListOf<String>()
                 val tpt = getTptData()
 
                 setLogoAndHeader()
@@ -2753,7 +2755,11 @@ class PrintUtil(context: Context?) {
 
                         val tpt= getTptData()
                         val mid=tpt?.merchantId
-                        if (ietration > 0) {
+                      //  if (ietration > 0) {
+                        // if hostid is not avialable in this or list is blanck then print this line
+                        if((listTidPrinted.size==0) || !(listTidPrinted.contains(hostTid)))
+                        {
+                            listTidPrinted.add(hostTid)// add the tid for which this code is printed
                             printSeperator()
 
                             textBlockList.add(sigleLineformat("MID:${mid}", AlignMode.LEFT))
@@ -2769,8 +2775,12 @@ class PrintUtil(context: Context?) {
                             )
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
-                            ietration--
+                            // take a mutable list here
+
+
+                            //   ietration--
                         }
+                       // }
                         if (cardIssuer.isNullOrEmpty()) {
                             cardIssuer = _issuerName.toString()
                             _issuerNameString = "CARD ISSUER"
@@ -2899,6 +2909,7 @@ class PrintUtil(context: Context?) {
 
                         totalMap.clear()
                     }
+
                     //  sb.appendln()
                 }
 
