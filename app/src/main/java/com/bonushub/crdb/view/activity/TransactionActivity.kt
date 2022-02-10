@@ -367,21 +367,21 @@ class TransactionActivity : BaseActivityNew() {
                     when (reqCode) {
 
                         BhTransactionType.BRAND_EMI.type -> {
-                            batchData.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
+                            batchData.emiEnteredAmt=(saleAmt.toDouble() * 100).toLong()
                             restartHandlingModel =
                                 RestartHandlingModel(tranUuid, EDashboardItem.BANK_EMI, batchData)
                         }
 
 
                         BhTransactionType.EMI_SALE.type -> {
-                            batchData.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
+                            batchData.emiEnteredAmt=(saleAmt.toDouble() * 100).toLong()
                             restartHandlingModel =
                                 RestartHandlingModel(tranUuid, EDashboardItem.BRAND_EMI, batchData)
                         }
 
 
                         BhTransactionType.TEST_EMI.type -> {
-                            batchData.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
+                            batchData.emiEnteredAmt=(saleAmt.toDouble() * 100).toLong()
                             restartHandlingModel =
                                 RestartHandlingModel(tranUuid, EDashboardItem.TEST_EMI, batchData)
                         }
@@ -453,7 +453,7 @@ class TransactionActivity : BaseActivityNew() {
                                                       globalCardProcessedModel.setTransactionAmount(100L?:0L)
                                                       else
                                                     globalCardProcessedModel.setTransactionAmount(amt?:0L)
-                                                    batchDataAfterSuccess.emiEnteredAmt=(saleAmt.toFloat() * 100).toLong()
+                                                    batchDataAfterSuccess.emiEnteredAmt=(saleAmt.toDouble() * 100).toLong()
 
                                                 }
 
@@ -2945,8 +2945,6 @@ class TransactionActivity : BaseActivityNew() {
                 "${tenureData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
                 "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${tenureData?.processingFee},${tenureData?.processingRate}," +
                 "${tenureData?.totalProcessingFee},,${tenureData?.instantDiscount}"
-
-
     }
 
     fun createField58ForTestEmi(cardProcessedData: CardProcessedDataModal): String {

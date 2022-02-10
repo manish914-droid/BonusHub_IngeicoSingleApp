@@ -514,6 +514,10 @@ class NewInputAmountFragment : Fragment() {
         if (saleAmountStr != "") {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
+        if (saleAmount < 1) {
+           showToast(getString(R.string.sale_amount_should_greater_then_1))
+            return
+        }
         when (eDashBoardItem) {
           EDashboardItem.SALE -> {
                 val saleAmt = saleAmount.toString().trim().toDouble()

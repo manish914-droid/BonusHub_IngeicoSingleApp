@@ -593,7 +593,7 @@ class PrintUtil(context: Context?) {
            textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
 
            //   val txnAmount = (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
-           val txnAmount = (((batchTable.emiEnteredAmt).toLong()).div(100)).toString()
+           val txnAmount = (((batchTable.emiEnteredAmt).toDouble()).div(100)).toString()
 
            logger("txnAmount", "" + txnAmount)
            textBlockList.add(
@@ -640,7 +640,7 @@ class PrintUtil(context: Context?) {
                )
            } else {
                val authAmount =
-                   (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
+                   (((bankEMITenureDataModal?.transactionAmount)?.toDouble())?.div(100)).toString()
                textBlockList.add(
                    sigleLineformat(
                        "$currencySymbol:${"%.2f".format(authAmount.toDouble())}",
@@ -1772,7 +1772,7 @@ class PrintUtil(context: Context?) {
                             )
                         }
 
-                        textBlockList.add(sigleLineformat("$transAmount", AlignMode.RIGHT))
+                        textBlockList.add(sigleLineformat(transAmount, AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
                         if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {

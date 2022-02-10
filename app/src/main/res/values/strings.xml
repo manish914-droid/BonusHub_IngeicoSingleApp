@@ -319,5 +319,6 @@
     <string name="cashbackPercentage">CashBack %</string>
     <string name="cashback_amount">CashBack Amount</string>
     <string name="netPayAmount">Net Pay Amount</string>
+    <string name="sale_amount_should_greater_then_1">Sale amount should be greater than Rs 1</string>
 
 </resources>
