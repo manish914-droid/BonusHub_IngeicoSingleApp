@@ -107,15 +107,15 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     }
 
 
-                    when (batchData.receiptData?.txnName) {
-                        EDashboardItem.SALE.title.uppercase(), EDashboardItem.CASH_ADVANCE.title.uppercase(),
-                        EDashboardItem.SALE_WITH_CASH.title.uppercase(), EDashboardItem.REFUND.title.uppercase(),
-                        "PREAUTH", "PREAUTH COMPLETION",
-                        EDashboardItem.VOID_SALE.title.uppercase(),
-                        EDashboardItem.BANK_EMI.title.uppercase(),
-                        EDashboardItem.BRAND_EMI.title.uppercase(),
-                        EDashboardItem.TEST_EMI.title.uppercase(),
-                        "EMI SALE"-> {
+                    when (batchData.transactionType) {
+                        BhTransactionType.SALE.type, BhTransactionType.CASH_AT_POS.type,
+                        BhTransactionType.SALE_WITH_CASH.type, BhTransactionType.REFUND.type,
+                            BhTransactionType.PRE_AUTH.type,
+                            BhTransactionType.PRE_AUTH_COMPLETE.type,
+                        BhTransactionType.VOID.type,
+                        BhTransactionType.EMI_SALE.type,
+                        BhTransactionType.BRAND_EMI.type,
+                        BhTransactionType.TEST_EMI.type -> {
                             //BB
                             logger("print","util")
 
@@ -145,10 +145,10 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 }*/
                         }
 
-                        EDashboardItem.BANK_EMI.title.uppercase() -> {
+                /*        EDashboardItem.BANK_EMI.title.uppercase() -> {
                             //BB
                             logger("print","util")
-                            /*PrintUtil(activity).printEMISale(
+                            *//*PrintUtil(activity).printEMISale(
                                     lastReceiptData,
                                     EPrintCopyType.DUPLICATE,
                                     activity
@@ -159,8 +159,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     } else {
                                         iDiag?.hideProgress()
                                     }
-                                }*/
-                        }
+                                }*//*
+                        }*/
 //                        TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
 //
 //                            runBlocking(Dispatchers.IO){
@@ -396,7 +396,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     }
                     //endregion*/
 
-                    settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batchData ->
+                    settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batchData ->
 
                         if (batchData.isNotEmpty()) {
                             iDiag?.getMsgDialog(
@@ -406,7 +406,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 getString(R.string.no),
                                 {
                                     lifecycleScope.launch {
-                                       // val bat = BatchFileDataTable.selectBatchData() // already fetch data in above
+                                        // val bat = BatchFileDataTable.selectBatchData() // already fetch data in above
                                         if (batchData.isNotEmpty()) {
                                             try {
                                                 lifecycleScope.launch(Dispatchers.Main) {
@@ -462,7 +462,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                         }
 
-                    })
+                    }
                 }
 
 
@@ -475,78 +475,82 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 lifecycleScope.launch{
 
-                        settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner,{ batList ->
+                        settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batList ->
 
-                        if (batList.isNotEmpty()) {
-                            iDiag?.getMsgDialog(
-                                getString(R.string.confirmation),
-                                "Do you want to print summary Report",
-                                "Yes",
-                                "No",
-                                {
+                            if (batList.isNotEmpty()) {
+                                iDiag?.getMsgDialog(
+                                    getString(R.string.confirmation),
+                                    "Do you want to print summary Report",
+                                    "Yes",
+                                    "No",
+                                    {
 
-                                    GlobalScope.launch {
-                                        if (batList.isNotEmpty()) {
-                                            GlobalScope.launch(Dispatchers.Main) {
-                                                iDiag?.showProgress(
-                                                    getString(R.string.printing_summary_report)
-                                                )
-                                            }
-                                            Log.d("TPT Data:- ", batList.toString())
-                                            dataList.clear()
-                                            dataList.addAll(batList as MutableList<BatchTable>)
-                                            try {
-                                                PrintUtil(activity).printSettlementReportupdate(activity, dataList, true) {
-
+                                        GlobalScope.launch {
+                                            if (batList.isNotEmpty()) {
+                                                GlobalScope.launch(Dispatchers.Main) {
+                                                    iDiag?.showProgress(
+                                                        getString(R.string.printing_summary_report)
+                                                    )
                                                 }
-                                            // region BB
-                                            /*PrintUtil(context).printSettlementReportupdate( context, batList) {
-                                                    iDiag?.hideProgress()
-                                                }*/
-                                                // end region
-                                                //  printSummery(batList)
-                                                //  getString(R.string.summery_report_printed)
+                                                Log.d("TPT Data:- ", batList.toString())
+                                                dataList.clear()
+                                                dataList.addAll(batList as MutableList<BatchTable>)
+                                                try {
+                                                    PrintUtil(activity).printSettlementReportupdate(
+                                                        activity,
+                                                        dataList,
+                                                        false
+                                                    ) {
 
-                                            } catch (ex: java.lang.Exception) {
-                                                //  ex.message ?: getString(R.string.error_in_printing)
-                                                ex.printStackTrace()
-                                            } finally {
+                                                    }
+                                                    // region BB
+                                                    /*PrintUtil(context).printSettlementReportupdate( context, batList) {
+                                                            iDiag?.hideProgress()
+                                                        }*/
+                                                    // end region
+                                                    //  printSummery(batList)
+                                                    //  getString(R.string.summery_report_printed)
+
+                                                } catch (ex: java.lang.Exception) {
+                                                    //  ex.message ?: getString(R.string.error_in_printing)
+                                                    ex.printStackTrace()
+                                                } finally {
+                                                    launch(Dispatchers.Main) {
+                                                        iDiag?.hideProgress()
+                                                        // iDiag?.showToast(msg)
+                                                    }
+                                                }
+
+                                            } else {
                                                 launch(Dispatchers.Main) {
                                                     iDiag?.hideProgress()
-                                                    // iDiag?.showToast(msg)
+                                                    iDiag?.getInfoDialog(
+                                                        "Error",
+                                                        " Summery is not available."
+                                                    ) {}
                                                 }
                                             }
 
-                                        } else {
-                                            launch(Dispatchers.Main) {
-                                                iDiag?.hideProgress()
-                                                iDiag?.getInfoDialog(
-                                                    "Error",
-                                                    " Summery is not available."
-                                                ) {}
-                                            }
                                         }
+                                    },
+                                    {
+                                        //Cancel handle here
 
-                                    }
-                                },
-                                {
-                                    //Cancel handle here
+                                    })
+                            } else {
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    iDiag?.alertBoxWithAction(
+                                        getString(R.string.empty_batch),
+                                        getString(R.string.summary_report_not_available),
+                                        false,
+                                        getString(R.string.positive_button_ok),
+                                        {},
+                                        {})
+                                }
 
-                                })
-                        } else {
-                            GlobalScope.launch(Dispatchers.Main) {
-                                iDiag?.alertBoxWithAction(
-                                    getString(R.string.empty_batch),
-                                    getString(R.string.summary_report_not_available),
-                                    false,
-                                    getString(R.string.positive_button_ok),
-                                    {},
-                                    {})
                             }
 
                         }
-
-                    })
                 }
 
 
@@ -577,7 +581,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, true,true) {
+                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, false,true) {
 
                                         }
                                     } catch (ex: java.lang.Exception) {

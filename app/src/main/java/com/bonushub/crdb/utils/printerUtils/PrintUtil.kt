@@ -1611,7 +1611,8 @@ class PrintUtil(context: Context?) {
 
                 if (batch.isEmpty()) {
                     // alignLeftRightText(textInLineFormatBundle, "MID : ${tpt?.merchantId}", "TID : ${tpt?.terminalId}")
-                } else {
+                }
+                else {
                     //-----------------------------------------------
                     setLogoAndHeader()
                   /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
@@ -2462,20 +2463,7 @@ class PrintUtil(context: Context?) {
             try {
                 val tpt = getTptData()
                 setLogoAndHeader()
-               /* receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
-                receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
 
-//                val ingtpt=getInitdataList()
-//                val header1= ingtpt?.merAddHeader1
-//                val header2=ingtpt?.merAddHeader2
-//                val merchantName=ingtpt?.merchantName.toString().trim()
-//
-//                logger("header1",header1?:"")
-//                logger("header2",header2?:"")
-//                logger("merchantName",merchantName?:"")
-//                sigleLineText(merchantName, AlignMode.CENTER)
-//                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
-//                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
                 headerPrinting()
 
@@ -2571,18 +2559,6 @@ class PrintUtil(context: Context?) {
                 val tpt = getTptData()
 
                 setLogoAndHeader()
-
-//                val ingtpt=getInitdataList()
-//                val header1= ingtpt?.merAddHeader1
-//                val header2=ingtpt?.merAddHeader2
-//                val merchantName=ingtpt?.merchantName.toString().trim()
-//
-//                logger("header1",header1?:"")
-//                logger("header2",header2?:"")
-//                logger("merchantName",merchantName?:"")
-//                sigleLineText(merchantName, AlignMode.CENTER)
-//                sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
-//                sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
                 headerPrinting()
 
@@ -2726,6 +2702,7 @@ class PrintUtil(context: Context?) {
 
                 for ((key, _map) in map.onEachIndexed { index, entry -> curentIndex = index }) {
 
+
                     count++
                     if (updatedindex <= frequencylist.size - 1)
                         frequency = frequencylist.get(updatedindex).toInt() + lastfrequecny
@@ -2754,25 +2731,18 @@ class PrintUtil(context: Context?) {
                         }
 
                         val tpt= getTptData()
-                        val mid=tpt?.merchantId
+                       val mid=tpt?.merchantId
                       //  if (ietration > 0) {
                         // if hostid is not avialable in this or list is blanck then print this line
                         if((listTidPrinted.size==0) || !(listTidPrinted.contains(hostTid)))
                         {
                             listTidPrinted.add(hostTid)// add the tid for which this code is printed
                             printSeperator()
-
                             textBlockList.add(sigleLineformat("MID:${mid}", AlignMode.LEFT))
                             textBlockList.add(sigleLineformat("TID:${hostTid}", AlignMode.RIGHT))
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
-
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "BATCH NO:${hostBatchNumber}",
-                                    AlignMode.LEFT
-                                )
-                            )
+                            textBlockList.add(sigleLineformat("BATCH NO:${hostBatchNumber}", AlignMode.LEFT))
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
                             // take a mutable list here
@@ -2781,20 +2751,16 @@ class PrintUtil(context: Context?) {
                             //   ietration--
                         }
                        // }
-                        if (cardIssuer.isNullOrEmpty()) {
+                        if (cardIssuer.isEmpty()) {
                             cardIssuer = _issuerName.toString()
                             _issuerNameString = "CARD ISSUER"
-
                         }
-
                         printSeperator()
-                       
                         textBlockList.add(sigleLineformat(_issuerNameString, AlignMode.LEFT))
                         textBlockList.add(sigleLineformat( "  ${cardIssuer.toUpperCase(Locale.ROOT)}", AlignMode.CENTER))
                         textBlockList.add(sigleLineformat(" ", AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
-
                         // if(ind==0){
                         textBlockList.add(sigleLineformat("TXN TYPE", AlignMode.LEFT))
                         textBlockList.add(sigleLineformat("COUNT", AlignMode.CENTER))
@@ -2802,16 +2768,13 @@ class PrintUtil(context: Context?) {
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
 
-
                     }
                     for ((k, m) in _map) {
-
                         val amt =
                             "%.2f".format((((m.total)?.toDouble())?.div(100)).toString().toDouble())
                         if (k == BhTransactionType.PRE_AUTH_COMPLETE.type || k == BhTransactionType.VOID_PREAUTH.type) {
                             // need Not to show
                         } else {
-
                             m.type?.let {
                                 if(it == "TEST EMI TXN"){
                                     sigleLineformat(
@@ -2820,7 +2783,7 @@ class PrintUtil(context: Context?) {
                                     )
                                 }else{
                                     sigleLineformat(
-                                        it.toUpperCase(Locale.ROOT),
+                                        transactionType2Name(k).toUpperCase(Locale.ROOT),
                                         AlignMode.LEFT
                                     )
                                 }
@@ -2835,16 +2798,8 @@ class PrintUtil(context: Context?) {
                                 )
                             )
                             textBlockList.add(sigleLineformat("${getCurrencySymbol(tpt)}:$amt", AlignMode.RIGHT))
-                            /*textBlockList.add(
-                                sigleLineformat(
-                                    "${m.count} ${getCurrencySymbol(tpt)}",
-                                    AlignMode.RIGHT
-                                )
-                            )*/
-
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
-
                         }
 
                         if (totalMap.containsKey(k)) {
@@ -2856,7 +2811,6 @@ class PrintUtil(context: Context?) {
                         } else {
                             totalMap[k] = m.total?.let { SummeryTotalType(m.count, it) }!!
                         }
-
                     }
 
                     if (frequency == count) {
@@ -2872,13 +2826,6 @@ class PrintUtil(context: Context?) {
 
                         val sortedMap = totalMap.toSortedMap(compareByDescending { it })
                         for ((k, m) in sortedMap) {
-                            /* alignLeftRightText(
-                                 textInLineFormatBundle,
-                                 "${transactionType2Name(k).toUpperCase(Locale.ROOT)}${"     =" + m.count}",
-                                 "Rs.     ${"%.2f".format(((m.total).toDouble() / 100))}"
-
-                             )*/
-
 
                             textBlockList.add(
                                 sigleLineformat(
@@ -2907,6 +2854,8 @@ class PrintUtil(context: Context?) {
 
                         }
 
+
+
                         totalMap.clear()
                     }
 
@@ -2927,10 +2876,8 @@ class PrintUtil(context: Context?) {
                 sigleLineText("Bonushub", AlignMode.CENTER)
                 sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
 
-
                 ///  centerText(textFormatBundle, "---------X-----------X----------")
                 printer?.feedLine(4)
-
 
                 // start print here
                 printer?.startPrint(object : OnPrintListener.Stub() {

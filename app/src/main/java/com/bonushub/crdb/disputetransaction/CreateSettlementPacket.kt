@@ -240,7 +240,6 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                     refundCount = 0
                     refundAmount = 0
 
-
                 }
 
                 if(reversaldata.size > 0){
