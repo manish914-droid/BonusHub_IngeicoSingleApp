@@ -1722,55 +1722,66 @@ class PrintUtil(context: Context?) {
                     }
 
                     iteration = tidlist.distinct().size - 1
+                    var pre_authLastItem:Boolean=false
 
                     for (b in batch) {
                         //  || b.transactionType == TransactionType.VOID_PREAUTH.type
-                        if (b.transactionType == BhTransactionType.PRE_AUTH.type) continue  // Do not add pre auth transactions
-
-                        if (b.transactionType == BhTransactionType.EMI_SALE.type || b.transactionType == BhTransactionType.BRAND_EMI.type || b.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
-                            b.transactionType = BhTransactionType.EMI_SALE.type
-                        }
-
-                        if (b.transactionType == BhTransactionType.TEST_EMI.type) {
-                            b.transactionType = BhTransactionType.SALE.type
-                        }
-
-                        count++
                         if (updatedindex <= frequencylist.size - 1)
                             frequency = frequencylist[updatedindex].toInt() + lastfrequecny
+                        count++
+                        if (b.transactionType == BhTransactionType.PRE_AUTH.type) {
 
-
-                        if (totalMap.containsKey(b.transactionType)) {
-                            val x = totalMap[b.transactionType]
-                            if (x != null) {
-                                x.count += 1
-                                x.total += b.receiptData?.txnAmount?.toLong()!!
+                            if(count<frequency || count==1)
+                                continue  // Do not add pre auth transactions
+                            else {
+                                pre_authLastItem = true // just to hanlde if pre-auth is last item
                             }
-                        } else {
 
-                            totalMap[b.transactionType] =
-                                b.receiptData?.txnAmount?.toLong()
-                                    ?.let { SummeryTotalType(1, it) }!!
                         }
-                        val transAmount = "%.2f".format(
-                            b.receiptData?.txnAmount?.toDouble()
-                                ?.div(100)
-                        )
-                        if(b.receiptData?.txnName.equals("TEST EMI TXN")){
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${"SALE"}",
-                                    AlignMode.LEFT
-                                )
+                        if(!pre_authLastItem) {
+                            if (b.transactionType == BhTransactionType.EMI_SALE.type || b.transactionType == BhTransactionType.BRAND_EMI.type || b.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+                                b.transactionType = BhTransactionType.EMI_SALE.type
+                            }
+
+                            if (b.transactionType == BhTransactionType.TEST_EMI.type) {
+                                b.transactionType = BhTransactionType.SALE.type
+                            }
+
+
+
+
+
+                            if (totalMap.containsKey(b.transactionType)) {
+                                val x = totalMap[b.transactionType]
+                                if (x != null) {
+                                    x.count += 1
+                                    x.total += b.receiptData?.txnAmount?.toLong()!!
+                                }
+                            } else {
+
+                                totalMap[b.transactionType] =
+                                    b.receiptData?.txnAmount?.toLong()
+                                        ?.let { SummeryTotalType(1, it) }!!
+                            }
+                            val transAmount = "%.2f".format(
+                                b.receiptData?.txnAmount?.toDouble()
+                                    ?.div(100)
                             )
-                        }else{
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${b.receiptData?.txnName}",
-                                    AlignMode.LEFT
+                            if (b.receiptData?.txnName.equals("TEST EMI TXN")) {
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "${"SALE"}",
+                                        AlignMode.LEFT
+                                    )
                                 )
-                            )
-                        }
+                            } else {
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "${b.receiptData?.txnName}",
+                                        AlignMode.LEFT
+                                    )
+                                )
+                            }
 
                         textBlockList.add(sigleLineformat(transAmount, AlignMode.RIGHT))
                         printer?.addMixStyleText(textBlockList)
@@ -1809,44 +1820,45 @@ class PrintUtil(context: Context?) {
                         if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
                             try {
 
-                                val dat = "${b.receiptData?.dateTime}"
-                                textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
-                                b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
-                                    sigleLineformat(
-                                        it, AlignMode.RIGHT
-                                    )
-                                }?.let { textBlockList.add(it) }
-                                printer?.addMixStyleText(textBlockList)
-                                textBlockList.clear()
+                                    val dat = "${b.receiptData?.dateTime}"
+                                    textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
+                                    b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
+                                        sigleLineformat(
+                                            it, AlignMode.RIGHT
+                                        )
+                                    }?.let { textBlockList.add(it) }
+                                    printer?.addMixStyleText(textBlockList)
+                                    textBlockList.clear()
 
 
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                }
+
+                            } else {
+                                val date = b.receiptData?.dateTime
+                                val parts = date?.split(" ")
+                                println("Date: " + parts!![0])
+                                println("Time: " + (parts[1]))
+                                try {
+
+                                    val dat = "${parts!![0]} - ${parts[1]}"
+                                    textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
+                                    b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
+                                        sigleLineformat(
+                                            it, AlignMode.RIGHT
+                                        )
+                                    }?.let { textBlockList.add(it) }
+                                    printer?.addMixStyleText(textBlockList)
+                                    textBlockList.clear()
+                                    //alignLeftRightText(textInLineFormatBundle," "," ")
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                }
                             }
 
-                        } else {
-                            val date = b.receiptData?.dateTime
-                            val parts = date?.split(" ")
-                            println("Date: " + parts!![0])
-                            println("Time: " + (parts[1]))
-                            try {
-
-                                val dat = "${parts!![0]} - ${parts[1]}"
-                                textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
-                                b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
-                                    sigleLineformat(
-                                        it, AlignMode.RIGHT
-                                    )
-                                }?.let { textBlockList.add(it) }
-                                printer?.addMixStyleText(textBlockList)
-                                textBlockList.clear()
-                                //alignLeftRightText(textInLineFormatBundle," "," ")
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                            }
+                            printSeperator()
                         }
-
-                        printSeperator()
                         if (frequency == count) {
                             lastfrequecny = frequency
                             hasfrequency = true
@@ -2198,42 +2210,42 @@ class PrintUtil(context: Context?) {
                             )
                         }
 
-                        textBlockList.add(sigleLineformat("$transAmount", AlignMode.RIGHT))
-                        printer?.addMixStyleText(textBlockList)
-                        textBlockList.clear()
-                        if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${b.receiptData?.appName}",
-                                    AlignMode.LEFT
-                                )
-                            )
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${b.receiptData?.maskedPan}",
-                                    AlignMode.RIGHT
-                                )
-                            )
+                            textBlockList.add(sigleLineformat("$transAmount", AlignMode.RIGHT))
                             printer?.addMixStyleText(textBlockList)
                             textBlockList.clear()
-                        } else {
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${b.receiptData?.appName}",
-                                    AlignMode.LEFT
+                            if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "${b.receiptData?.appName}",
+                                        AlignMode.LEFT
+                                    )
                                 )
-                            )
-                            textBlockList.add(
-                                sigleLineformat(
-                                    "${b.receiptData?.maskedPan}",
-                                    AlignMode.RIGHT
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "${b.receiptData?.maskedPan}",
+                                        AlignMode.RIGHT
+                                    )
                                 )
-                            )
-                            printer?.addMixStyleText(textBlockList)
-                            textBlockList.clear()
-                        }
-                        if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
-                            try {
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+                            } else {
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "${b.receiptData?.appName}",
+                                        AlignMode.LEFT
+                                    )
+                                )
+                                textBlockList.add(
+                                    sigleLineformat(
+                                        "${b.receiptData?.maskedPan}",
+                                        AlignMode.RIGHT
+                                    )
+                                )
+                                printer?.addMixStyleText(textBlockList)
+                                textBlockList.clear()
+                            }
+                            if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
+                                try {
 
                                 val dat = "${b.receiptData?.dateTime}"
                                 textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
@@ -2598,7 +2610,9 @@ class PrintUtil(context: Context?) {
 // || it.transactionType == TransactionType.VOID_PREAUTH.type
                     if (it.transactionType == BhTransactionType.PRE_AUTH.type) continue
 
-                    if (it.transactionType == BhTransactionType.EMI_SALE.type || it.transactionType == BhTransactionType.BRAND_EMI.type || it.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+                    if (it.transactionType == BhTransactionType.EMI_SALE.type ||
+                        it.transactionType == BhTransactionType.BRAND_EMI.type ||
+                        it.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
                         it.receiptData?.appName = it.emiIssuerDataModel?.issuerName
                         it.transactionType = BhTransactionType.EMI_SALE.type
                     }
@@ -2773,7 +2787,7 @@ class PrintUtil(context: Context?) {
                     for ((k, m) in _map) {
                         val amt =
                             "%.2f".format((((m.total)?.toDouble())?.div(100)).toString().toDouble())
-                        if (k == BhTransactionType.PRE_AUTH_COMPLETE.type || k == BhTransactionType.VOID_PREAUTH.type) {
+                        if (/*k == BhTransactionType.PRE_AUTH_COMPLETE.type ||*/ k == BhTransactionType.VOID_PREAUTH.type) {
                             // need Not to show
                         } else {
                             m.type?.let {
