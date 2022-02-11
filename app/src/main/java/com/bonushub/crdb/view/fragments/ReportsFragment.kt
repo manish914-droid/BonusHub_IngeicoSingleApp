@@ -34,7 +34,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     private var iReportsFragmentItemClick: IReportsFragmentItemClick? = null
     private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }
     var binding: FragmentReportsBinding? = null
-
+    private var onlyPreAuthFlag: Boolean? = true
     private var iDiag: IDialog? = null
 
     private val batchFileViewModel:BatchFileViewModel by viewModels()
@@ -397,8 +397,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     //endregion*/
 
                     settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batchData ->
-
-                        if (batchData.isNotEmpty()) {
+                        onlyPreAuthCheck(batchData as MutableList<BatchTable>)
+                        if (batchData.isNotEmpty()  && onlyPreAuthFlag == false) {
                             iDiag?.getMsgDialog(
                                 getString(R.string.confirmation),
                                 getString(R.string.want_print_detail),
@@ -476,8 +476,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 lifecycleScope.launch{
 
                         settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batList ->
-
-                            if (batList.isNotEmpty()) {
+                            onlyPreAuthCheck(batList as MutableList<BatchTable>)
+                            if (batList.isNotEmpty() && onlyPreAuthFlag == false) {
                                 iDiag?.getMsgDialog(
                                     getString(R.string.confirmation),
                                     "Do you want to print summary Report",
@@ -701,6 +701,15 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             }
         }
 
+    }
+    private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
+        for (i in 0 until dataList.size) {
+            if(dataList[i].transactionType != BhTransactionType.PRE_AUTH.type){
+                onlyPreAuthFlag=false
+                break
+            }
+
+        }
     }
 }
 
