@@ -11,30 +11,30 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.ConnectException
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-class AppUpdateDownloadManager(var context: Context,
-                               private var appHostDownloadURL: String,
-                               private var onDownloadCompleteListener: OnDownloadCompleteListener
+class AppUpdateDownloadManager(
+    var context: Context,
+    private var appHostDownloadURL: String,
+    downloadAppFileName: String,
+    private var onDownloadCompleteListener: OnDownloadCompleteListener
 ) : AsyncTask<String, Int, String>() {
 
     private val appName = "BonusHub.apk"
-   // private var fileUri: Uri? = null
-   val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk/"
-    private val downloadedFilePath = File(PATH, appName)
+    // private var fileUri: Uri? = null
+    private val downloadedFilePath = File("/sdcard/", appName)
 
     override fun doInBackground(vararg params: String?): String {
         var input: InputStream? = null
         var output: OutputStream? = null
-        val PATH = Environment.getExternalStorageDirectory().toString() + "/usdk/"
+        val PATH = "/sdcard/"
         val connection: HttpsURLConnection
         try {
             val url = URL(appHostDownloadURL)
             Log.d("HTTPS Download URL:- ", appHostDownloadURL)
             Log.e("HTTPS Download URL:- ", appHostDownloadURL)
-            HttpsTrustManager.allowAllSSL();
+            HttpsTrustManager.allowAllSSL()
             connection = url.openConnection() as HttpsURLConnection
 
             connection.readTimeout = 100000
@@ -62,7 +62,7 @@ class AppUpdateDownloadManager(var context: Context,
                 publishProgress((total * 100 / fileLength).toInt())
                 output.write(data, 0, length)
             }
-           // throw ConnectException("")
+
             // fileUri = downloadedFilePath
             return outputFile.toString()
         } catch (e: Exception) {
@@ -76,7 +76,7 @@ class AppUpdateDownloadManager(var context: Context,
     override fun onProgressUpdate(vararg values: Int?) {
         super.onProgressUpdate(*values)
         logger("APP UPDATE",values[0].toString())
-        values[0]?.let { (context as? NavigationActivity)?.updatePercentProgress(it) }
+        values[0]?.let { (context as NavigationActivity).updatePercentProgress(it) }
     }
 
     override fun onCancelled() {
@@ -97,4 +97,3 @@ interface OnDownloadCompleteListener {
     fun onError(msg: String)
 }
 
-// commit test........
