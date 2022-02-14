@@ -34,7 +34,6 @@ import com.bonushub.crdb.appupdate.AppUpdateDownloadManager
 import com.bonushub.crdb.appupdate.OnDownloadCompleteListener
 
 import com.bonushub.crdb.databinding.ActivityNavigationBinding
-import com.bonushub.crdb.databinding.FooterAppBinding
 import com.bonushub.crdb.databinding.MainDrawerBinding
 import com.bonushub.crdb.db.AppDao
 import com.bonushub.crdb.db.AppDatabase
@@ -68,9 +67,7 @@ import com.bonushub.pax.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
-import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
-import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.mindorks.example.coroutines.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -87,14 +84,12 @@ import java.io.File
 import java.lang.Runnable
 import javax.inject.Inject
 import android.view.Gravity
-import android.telecom.VideoProfile.isPaused
 
 import android.os.Build
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.HashMap
-import kotlin.jvm.internal.Intrinsics
 
 
 @AndroidEntryPoint
@@ -156,7 +151,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         setupNavigationDrawerLayout()
-   lockStatusBar()
+         lockStatusBar()
 /*         isFresAppStatus = WifiPrefManager(this).isWifiStatus
          if (!isFresAppStatus) {
              isFresApp = WifiPrefManager(this).appStatus
@@ -1811,14 +1806,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private fun lockStatusBar(){
         val manager = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val localLayoutParams = WindowManager.LayoutParams()
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            localLayoutParams.type =   WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
-        }
-        else
-        {
-            localLayoutParams.type =  WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        }
+        localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
         localLayoutParams.gravity = Gravity.TOP
         localLayoutParams.flags =
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or  // this is to enable the notification to recieve touch events

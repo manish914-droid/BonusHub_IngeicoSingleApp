@@ -17,7 +17,6 @@ import javax.net.ssl.HttpsURLConnection
 class AppUpdateDownloadManager(
     var context: Context,
     private var appHostDownloadURL: String,
-    downloadAppFileName: String,
     private var onDownloadCompleteListener: OnDownloadCompleteListener
 ) : AsyncTask<String, Int, String>() {
 
