@@ -1806,7 +1806,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private fun lockStatusBar(){
         val manager = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val localLayoutParams = WindowManager.LayoutParams()
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
         localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR
+        }
+        else
+        {
+            localLayoutParams.type =  WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        }
         localLayoutParams.gravity = Gravity.TOP
         localLayoutParams.flags =
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or  // this is to enable the notification to recieve touch events
