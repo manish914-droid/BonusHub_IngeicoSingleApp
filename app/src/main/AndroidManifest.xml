@@ -44,6 +44,7 @@
 
 
     <application
+        android:requestLegacyExternalStorage="true"
         android:name=".HDFCApplication"
         android:allowBackup="true"
         android:icon="@drawable/app_icon2"
@@ -65,7 +66,7 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-               <!-- <category android:name="android.intent.category.HOME"/>
+                <!--<category android:name="android.intent.category.HOME"/>
                 <category android:name="android.intent.category.DEFAULT"/>-->
             </intent-filter>
         </activity>
