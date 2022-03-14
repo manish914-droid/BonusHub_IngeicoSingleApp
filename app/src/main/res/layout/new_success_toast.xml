@@ -40,7 +40,7 @@
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-            <com.bonushub.crdb.vxutils.BHTextView
+            <com.bonushub.crdb.india.vxutils.BHTextView
                 android:id="@+id/txtvw"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

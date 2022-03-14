@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/initFragment"
-        android:name="com.bonushub.crdb.view.fragments.InitFragment"
+        android:name="com.bonushub.crdb.india.view.fragments.InitFragment"
         android:label="fragment_init"
         tools:layout="@layout/fragment_init">
 
@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/dashBoardFragment"
-        android:name="com.bonushub.crdb.view.fragments.DashboardFragment"
+        android:name="com.bonushub.crdb.india.view.fragments.DashboardFragment"
         android:label="fragment_dash_board"
         tools:layout="@layout/fragment_dashboard">
 
@@ -23,19 +23,19 @@
 
     <fragment
         android:id="@+id/brandEmiMasterCategoryFragment"
-        android:name="com.bonushub.crdb.view.fragments.BrandEmiMasterCategoryFragment"
+        android:name="com.bonushub.crdb.india.view.fragments.BrandEmiMasterCategoryFragment"
         android:label="brand_Emi_MasterCategory_Fragment"
         tools:layout="@layout/brand_emi_list_and_search_ui">
 
     </fragment>
     <fragment
         android:id="@+id/bankFunctionsFragment"
-        android:name="com.bonushub.crdb.view.fragments.BankFunctionsFragment"
+        android:name="com.bonushub.crdb.india.view.fragments.BankFunctionsFragment"
         android:label="fragment_bank_functions"
         tools:layout="@layout/fragment_bank_functions" />
     <fragment
         android:id="@+id/billNumSerialNumEntryFragment"
-        android:name="com.bonushub.crdb.view.fragments.BillNumSerialNumEntryFragment"
+        android:name="com.bonushub.crdb.india.view.fragments.BillNumSerialNumEntryFragment"
         android:label="fragment_bank_functions"
         tools:layout="@layout/fragment_bank_functions" />
 

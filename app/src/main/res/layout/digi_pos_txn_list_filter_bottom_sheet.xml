@@ -9,7 +9,7 @@
     android:clickable="true"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
-    app:layout_behavior="com.bonushub.crdb.utils.LockableBottomSheetBehavior">
+    app:layout_behavior="com.bonushub.india.crdb.utils.LockableBottomSheetBehavior">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -256,7 +256,7 @@
             android:textSize="@dimen/text_size_small" />
 
 
-        <com.bonushub.crdb.vxutils.AmountEditText
+        <com.bonushub.crdb.india.vxutils.AmountEditText
             android:id="@+id/amountBottomET"
             android:layout_width="220dp"
             android:layout_height="40dp"

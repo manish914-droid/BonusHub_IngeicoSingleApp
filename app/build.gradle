@@ -18,7 +18,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.bonushub.crdb"
+        applicationId "com.bonushub.india.crdb"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1

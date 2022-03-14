@@ -111,7 +111,7 @@
                 android:visibility="visible"
               >
 
-                <com.bonushub.crdb.vxutils.AmountEditText
+                <com.bonushub.crdb.india.vxutils.AmountEditText
                     android:id="@+id/amount_et"
                   android:layout_width="match_parent"
                     android:layout_height="wrap_content"
