@@ -10,16 +10,13 @@ import com.bonushub.crdb.india.di.USDKScope
 import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.entity.EMVOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.utils.BytesUtil
-import com.bonushub.crdb.india.utils.getEncryptedPanorTrackData
+import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.DemoConfig
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
-import com.bonushub.crdb.india.utils.logger
 import com.bonushub.crdb.india.view.activity.TransactionActivity
 import com.bonushub.crdb.india.view.activity.TransactionActivity.*
-import com.bonushub.crdb.india.utils.EFallbackCode
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.algorithm.AlgError
 import com.usdk.apiservice.aidl.algorithm.AlgMode
@@ -78,8 +75,8 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                 override fun onCardInsert() {
                     logger(TAG, "=> onCardInsert")
                       cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
-                   //  _insertCardStatus.postValue(cardProcessedDataModal)
-                    startemv(EMVOption.create(), cardProcessedDataModal)
+                    _insertCardStatus.postValue(cardProcessedDataModal)
+                  //  startemv(EMVOption.create(), cardProcessedDataModal)
                    // emv?.stopSearch()
 
                 }
@@ -122,7 +119,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
                     if (cardProcessedDataModal.getFallbackType() != EFallbackCode.EMV_fallback.fallBackCode){
                              //Checking Fallback
                         if (scFirstByte == '2' || scFirstByte == '6') {
-                            doEndProcess(EFallbackCode.Swipe_fallback.fallBackCode, cardProcessedDataModal)
+                            //doEndProcess(EFallbackCode.Swipe_fallback.fallBackCode, cardProcessedDataModal)
                         }else{
                             cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
                             cardProcessedDataModal.setTrack2Data(track.getString(EMVData.TRACK2)?:"")
@@ -222,7 +219,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
 
             @Throws(RemoteException::class)
             override fun onEndProcess(result: Int, transData: TransData) {
-                doEndProcess(result,cardProcessedDataModal)
+                //doEndProcess(result,cardProcessedDataModal)
             }
 
             @Throws(RemoteException::class)
@@ -250,56 +247,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
 
     }
 
-    /**
-     * Inform the application that the EMV transaction is completed and the kernel exits.
-     */
-    fun doEndProcess(result: Int,cardProcessedDataModal: CardProcessedDataModal) {
-        println("Fallbackcode is "+result)
-        when (result) {
-            //Swipe fallabck case when cip and swipe card used
-            EFallbackCode.Swipe_fallback.fallBackCode -> {
-                cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
-                //_insertCardStatus.postValue(cardProcessedDataModal)
-                (context as? TransactionActivity)?.handleEMVFallbackFromError(context.getString(R.string.fallback),
-                    context.getString(R.string.please_use_another_option), false) {
-                    cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
-                    detectCard(cardProcessedDataModal, CardOption.create().apply {
-                        supportICCard(true)
-                        supportMagCard(false)
-                        supportRFCard(false)
-                    })
-                }
-            }
 
-            CardErrorCode.EMV_FALLBACK_ERROR_CODE.errorCode -> {
-                //EMV Fallback case when we insert card from other side then chip side:-
-                cardProcessedDataModal.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
-                cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
-                (context as? TransactionActivity)?.handleEMVFallbackFromError(context.getString(R.string.fallback), context.getString(R.string.please_use_another_option), false) {
-                    cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
-                    detectCard(cardProcessedDataModal, CardOption.create().apply {
-                        supportICCard(false)
-                        supportMagCard(true)
-                        supportRFCard(false)
-                    })
-                }
-            // _insertCardStatus.postValue(cardProcessedDataModal)
-            }
-
-            else -> {
-
-            }
-
-        }
-
-
-        /*    if (result != EMVError.SUCCESS) {
-                println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
-            } else {
-                println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
-            }
-            println("\n")*/
-    }
 
 
     @Throws(RemoteException::class)

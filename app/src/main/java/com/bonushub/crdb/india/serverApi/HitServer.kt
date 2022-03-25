@@ -7,13 +7,16 @@ import com.bonushub.crdb.india.model.local.DigiPosDataTable
 import com.bonushub.crdb.india.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.india.repository.keyexchangeDataSource
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.pax.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getF48TimeStamp
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 
 import java.io.DataInputStream
 import java.io.FileOutputStream
+import java.net.ConnectException
 import java.net.Socket
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.nio.channels.ServerSocketChannel
 
@@ -79,6 +82,100 @@ object HitServer  {
             callback("NO RESPONSE...", false)
             Utility().logger("EXCEPTION","NO RESPONSE...","e")
             this@HitServer.callback = null
+        }
+    }
+
+    @Synchronized
+    suspend fun hitServersale(data: ByteArray, callbackSale: ServerMessageCallbackSale, progressMsg: ProgressCallback) {
+        this@HitServer.callbackSale = callbackSale
+        try {
+            if (checkInternetConnection()) {
+                with(Utility.ConnectionTimeStamps) {
+                    reset()
+                    dialStart = getF48TimeStamp()
+                }
+                // Log.d("OpenSocket:- ", "Socket Start")
+
+                var responseStr: String? = null
+                openSocketSale { socket ->
+                    try {
+                        // irh?.saveReversal()
+                        logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
+                        Utility.ConnectionTimeStamps.dialConnected = getF48TimeStamp()
+                        progressMsg(HDFCApplication.appContext.getString(R.string.sending_reciving_data))
+                        //println("Data send" + data.byteArr2HexStr())
+                        logger(TAG, "Data Send = ${data.byteArr2HexStr()}")
+                        Utility.ConnectionTimeStamps.startTransaction = getF48TimeStamp()
+                        val sos = socket.getOutputStream()
+                        sos?.write(data)
+                        sos.flush()
+                        progressMsg(HDFCApplication.appContext.getString(R.string.sending_reciving_data))
+                        val dis = DataInputStream(socket.getInputStream())
+
+                        //   throw SocketTimeoutException("Reversal generated") // please check
+
+                        val len = dis.readShort().toInt()
+                        val response = ByteArray(len)
+                        dis.readFully(response)
+                        Utility.ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
+                        responseStr = response.byteArr2HexStr()
+                        //   ConnectionTimeStamps.recieveTransaction = getF48TimeStamp()
+                        if (responseStr != null) {
+                            val reader = readIso(responseStr!!, false)
+                            Field48ResponseTimestamp.saveF48IdentifierAndTxnDate(reader.isoMap[48]?.parseRaw2String() ?: "")
+                        }
+                        //println("Data Recieve"+response.byteArr2HexStr())
+                        logger(TAG, "len=$len, data = $responseStr")
+                        socket.close()
+                        //   irh?.clearReversal()
+
+                        println("Outside the Readtimeout error5")
+                        callbackSale(responseStr ?: "", true, "")
+                        //  this@HitServer.callback = null
+
+                    } catch (ex: SocketTimeoutException) {
+                        println("Read Time out error1" + ex.message)
+                        socket.close()
+                        ex.printStackTrace()
+                        callbackSale(ex.message ?: "Socket Timeout Error", true, ConnectionError.ReadTimeout.errorCode.toString())
+                        //   this@HitServer.callback = null
+                        return@openSocketSale
+                    } catch (ex: ConnectException) {
+                        ex.printStackTrace()
+                        socket.close()
+                        println("Read Time out error2" + ex.message)
+                        callbackSale(ex.message ?: "Connection Error", true, ConnectionError.ReadTimeout.errorCode.toString())
+                        //  this@HitServer.callback = null
+                        return@openSocketSale
+                    } catch (ex: SocketException) {
+                        ex.printStackTrace()
+                        println("Read Time out error3" + ex.message)
+                        socket.close()
+                        callbackSale(ex.message ?: "Connection Error", true, ConnectionError.ReadTimeout.errorCode.toString())
+                        this@HitServer.callback = null
+                        return@openSocketSale
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        println("Read Time out error4" + ex.message)
+                        socket.close()
+                        callbackSale(ex.message ?: "Connection Error", true, ConnectionError.ReadTimeout.errorCode.toString())
+                        //  this@HitServer.callback = null
+                        return@openSocketSale
+
+                    }
+
+                }
+
+            } else {
+                callbackSale(
+                    HDFCApplication.appContext.getString(R.string.no_internet_error), false, ConnectionError.NetworkError.errorCode.toString())
+                // this@HitServer.callback = null
+            }
+
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            callbackSale(HDFCApplication.appContext.getString(R.string.connection_error), false, "")
+            //  this@HitServer.callback = null
         }
     }
 
@@ -197,6 +294,103 @@ object HitServer  {
         }
     }
 
+    private suspend fun openSocketSale(cb: OnSocketComplete) {
+        Log.d("Socket Start:- ", "Sale Socket Started Here.....")
+        try {
+
+            tct = Utility().getTctData()// always get tct it may get refresh meanwhile// always get tct it may get refresh meanwhile
+            if (tct != null) {
+
+                val sAddress = Utility().getIpPort(false, isPrimaryIpPort = hitCounter)
+                logger("Connection Details:- ", sAddress.toString(), "e")
+                logger("HIT COUNTER", "$hitCounter","e")
+                Log.d("HIT COUNTER", "$hitCounter")
+                ServerSocketChannel.open().apply {
+                    configureBlocking(false)
+                }
+
+                val socket = Socket()
+
+                val connTimeOut = try {
+                    (tct as TerminalCommunicationTable).connectTimeOut.toInt() * 1000
+                } catch (ex: Exception) {
+                    30 * 1000
+                }
+
+                val resTimeOut = try {
+                    (tct as TerminalCommunicationTable).responseTimeOut.toInt() * 1000
+                } catch (ex: Exception) {
+                    30 * 1000
+                }
+                socket.connect(sAddress, connTimeOut)//creating connection
+                socket.soTimeout = resTimeOut
+                cb(socket)
+
+            } else callbackSale?.invoke("No Comm Data Found", false, "")
+
+        } catch (ex: SocketTimeoutException) {
+            println("SocketTimeoutException -> " + ex.message)
+            if (hitCounter == 1) {
+                hitCounter = 2
+                openSocketSale {
+                    hitCounter = 1
+                    cb(it)
+                }
+            } else {
+                hitCounter = 1
+                callbackSale?.invoke(
+                    ex.message ?: "Connection Error",
+                    false,
+                    ConnectionError.ConnectionTimeout.errorCode.toString()
+                )
+            }
+
+        } catch (ex: ConnectException) {
+            println("ConnectException ->" + ex.message)
+            /*   callbackSale?.invoke(
+                   ex.message ?: "Connection Error",
+                   false,
+                   ConnectionError.ConnectionRefusedorOtherError.errorCode.toString()
+               )*/
+            if (hitCounter == 1) {
+                hitCounter = 2
+                openSocketSale {
+                    hitCounter = 1
+                    cb(it)
+                }
+            } else {
+                hitCounter = 1
+                callbackSale?.invoke(
+                    ex.message ?: "Connection Error",
+                    false,
+                    ConnectionError.ConnectionTimeout.errorCode.toString()
+                )
+            }
+        } catch (ex: Exception) {
+            println("Parent Exception-> " + ex.message)
+            /*   callbackSale?.invoke(
+                   ex.message ?: "Connection Error",
+                   false,
+                   ConnectionError.ConnectionRefusedorOtherError.errorCode.toString()
+               )*/
+            if (hitCounter == 1) {
+                hitCounter = 2
+                openSocketSale {
+                    hitCounter = 1
+                    cb(it)
+                }
+            } else {
+                hitCounter = 1
+                callbackSale?.invoke(
+                    ex.message ?: "Connection Error",
+                    false,
+                    ConnectionError.ConnectionTimeout.errorCode.toString()
+                )
+            }
+        } finally {
+            Log.d("Finally Call:- ", "HIT SERVER SALE --> Final Block Runs Here.....")
+        }
+    }
 
     suspend fun openSocket(cb: OnSocketComplete,isAppUpdate: Boolean = false) {
         Log.d("Socket Start:- " , "Socket Started Here.....")

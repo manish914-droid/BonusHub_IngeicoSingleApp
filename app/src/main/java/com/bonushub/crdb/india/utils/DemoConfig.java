@@ -13,11 +13,11 @@ public class DemoConfig {
     public static int REGION_ID = 0;
     public static int KAP_NUM = 0;
 
-    public static final int KEYID_MAIN = 11;
-    public static final int KEYID_PIN = 12;
+    public static final int KEYID_MAIN = 15;
+    public static final int KEYID_PIN = 16;
  //   public static final int KEYID_PIN = DemoConfig.KEYID_PIN;
-    public static final int KEYID_DES = 13;
-    public static final int KEYID_TRACK = 14;
+    public static final int KEYID_DES = 17;
+    public static final int KEYID_TRACK = 18;
 
 
 

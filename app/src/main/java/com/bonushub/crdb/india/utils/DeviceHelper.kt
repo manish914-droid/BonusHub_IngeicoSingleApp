@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.bonushub.crdb.india.HDFCApplication.Companion.appContext
 import com.ingenico.hdfcpayment.IPaymentService
 import com.ingenico.hdfcpayment.listener.OnOperationListener
@@ -22,6 +23,10 @@ import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.aidl.printer.UPrinter
 import com.usdk.apiservice.aidl.tms.UTMS
 import com.usdk.apiservice.limited.DeviceServiceLimited
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 object DeviceHelper   {
 
@@ -279,6 +284,21 @@ object DeviceHelper   {
     fun doSettlementtxn(request: SettlementRequest, listener:OnOperationListener ){
         iRemoteService?.doSettlement(request,listener)
 
+    }
+
+    @JvmStatic
+    //@RequiresApi(Build.VERSION_CODES.O)
+    fun getCurentDateTime() : String{
+       // val current = LocalDateTime.now()
+
+        val currentTime = SimpleDateFormat("yyMMdd HHmmss", Locale.getDefault()).format(Date())
+
+        //val formatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss")
+       // val formatted = current.format(formatter)
+
+        println("Current Date and Time is: $currentTime")
+
+        return currentTime
     }
 
     @JvmStatic

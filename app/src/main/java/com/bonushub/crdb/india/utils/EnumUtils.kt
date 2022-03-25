@@ -191,6 +191,14 @@ enum class UiAction(val title: String = "Not Declared", val res: Int = R.drawabl
     //DYNAMIC_QR("Dynamic QR", R.drawable.ic_qr_code)
 }
 
+enum class ConnectionError(val errorCode: Int) {
+    ReadTimeout(500),
+    ConnectionTimeout(408),
+    ConnectionRefusedorOtherError(409),
+    NetworkError(504),
+    Success(200)
+}
+
 
 //Below Enum Class is used to detect different card Types:-
 enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {

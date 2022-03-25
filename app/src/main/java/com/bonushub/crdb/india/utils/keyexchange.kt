@@ -28,6 +28,10 @@ interface ITransactionPacketExchange {
     fun createTransactionPacket(): IWriter
 }
 
+interface ITransactionPacketExchangeNew {
+    fun createTransactionPacketNew(): IWriter
+}
+
 interface IKeyExchangeInit {
     suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean): IWriter
 }

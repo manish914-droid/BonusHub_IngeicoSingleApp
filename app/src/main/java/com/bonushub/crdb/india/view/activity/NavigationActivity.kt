@@ -491,7 +491,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 if (navigationBinding?.mainDl?.isDrawerOpen(GravityCompat.START)!!)
                     navigationBinding?.mainDl?.closeDrawer(GravityCompat.START)
                 else
-                 exitluncher()
+                 exitApp()
             }
         }else if(supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("BankFunctionsFragment",true)
             ||supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("ReportsFragment",true)
@@ -558,11 +558,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
     }
 
-    override fun onFragmentRequest(
-        action: EDashboardItem,
-        data: Any,
-        extraPair: Triple<String, String, Boolean>?
-    ) {
+    override fun onFragmentRequest(action: EDashboardItem, data: Any, extraPair: Triple<String, String, Boolean>?) {
         when (action) {
             EDashboardItem.SALE -> {
                 if (checkInternetConnection()) {
@@ -570,10 +566,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     val amt = (data as Pair<*, *>).first.toString()
                     val saleWithTipAmt = data.second.toString()
                     startActivityForResult(
-                        Intent(
-                            this,
-                            TransactionActivity::class.java
-                        ).apply {
+                        Intent(this, TransactionActivity::class.java).apply {
                             val formattedTransAmount = "%.2f".format(amt.toDouble())
                             putExtra("saleAmt", formattedTransAmount)
                             putExtra("type", BhTransactionType.SALE.type)
@@ -812,24 +805,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
-                    CoroutineScope(Dispatchers.IO).launch{
-                        var checkinitststus = checkInitializtionStatus(appDao)
-                        val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
-                        if(!checkinitststus){
-                            println("TID LIST --->  $listofTids")
-                            val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
-                            println("RESULT TWO --->  $resultTwo")
+                    CoroutineScope(Dispatchers.Default).launch {
+                        startActivityForResult(Intent(this@NavigationActivity, TransactionActivity::class.java).apply {
+                            //  putExtra("amt", amt)
+                            //  putExtra("type", transType)
+                        },1000)
 
-                        }
-                        else{
-                            CoroutineScope(Dispatchers.Main).launch {
-                                inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
-                            }
-                        }
-
+                        //inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
                     }
-                    //inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
-
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }

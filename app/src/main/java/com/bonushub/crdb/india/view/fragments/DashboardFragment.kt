@@ -149,29 +149,6 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
             dashboardViewModel.eDashboardItem().observe(viewLifecycleOwner) {
                 ioSope.launch(Dispatchers.Main) {
                     val result = async { setupRecyclerview(it) }.await()
-                    val wifiCTTable = runBlocking(Dispatchers.IO) {
-                        appDao.getAllWifiCTTableData()
-                    }
-                    sendConfirmationToHost()
-
-                 //   val resStr = appDao.getAllTerminalParameterTableData()
-
-                    if (AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName) == "0" || wifiCTTable?.get(
-                            0
-                        )?.actionId?.toInt() == 2
-                    ) {
-                        val result1 = runBlocking(Dispatchers.IO) {
-                            doCommsTransaction(appDao)
-                        }
-
-                    }
-                    delay(1000)
-                    val result1 = async {
-                        var listofTids = checkBaseTid(appDao)
-                        println("List of tids are" + listofTids)
-                        delay(1000)
-                        doInitializtion(appDao, listofTids,requireActivity())
-                    }.await()
 
                 }
 

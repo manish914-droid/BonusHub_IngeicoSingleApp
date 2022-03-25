@@ -23,6 +23,11 @@ import javax.inject.Inject
 
 class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?) : ITransactionPacketExchange {
 
+
+
+
+
+
     private var indicator: String? = null
     //  private var brandEMIData: brandEMIData? = null
     //  private var brandEMIByAccessCodeData: BrandEMIAccessDataModalTable? = null
@@ -298,8 +303,7 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
 
             //adding field 61
             //adding field 61
-            val issuerParameterTable =
-                getIssuerData(AppPreference.WALLET_ISSUER_ID)
+            val issuerParameterTable = getIssuerData(AppPreference.WALLET_ISSUER_ID)
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val pcNumbers = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)+addPad(AppPreference.getString(
                 PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
@@ -313,8 +317,7 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
                  issuerParameterTable?.customerIdentifierFiledType,
                  2
              )*/
-            val customerID =
-                issuerParameterTable?.customerIdentifierFiledType?.let { addPad(it, "0", 2) } ?: 0
+            val customerID = issuerParameterTable?.customerIdentifierFiledType?.let { addPad(it, "0", 2) } ?: 0
 
             //  val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
 

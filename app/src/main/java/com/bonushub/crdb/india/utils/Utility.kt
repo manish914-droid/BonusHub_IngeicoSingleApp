@@ -1359,13 +1359,18 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData = appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+            tptData = appDatabase.appDao?.getTerminalDataByBankCode("2")
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }
         return tptData
     }
 //endregion
+
+    @Synchronized
+    fun getMaskedPan(terminalParameterTable: TerminalParameterTable?, panNumber: String): String{
+        return panMasking(panNumber, terminalParameterTable?.panMaskFormate ?: "0000********0000")
+    }
 
     //region======================Get TPT Data:-
     fun getBatchDataByInvoice(invoice:String): BatchTable? {
