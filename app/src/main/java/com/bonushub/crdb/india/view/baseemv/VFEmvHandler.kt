@@ -7,6 +7,7 @@ import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.transactionprocess.CompleteSecondGenAc
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
@@ -96,6 +97,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onEndProcess(result: Int, transData: TransData?) {
+
+        CompleteSecondGenAc().getEndProcessData(result,transData)
         doEndProcess(result, transData)
     }
 

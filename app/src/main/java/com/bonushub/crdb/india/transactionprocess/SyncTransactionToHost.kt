@@ -160,7 +160,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
 
                                                     CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
-                                                    }
+                                                    }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
 
                                                 } else {
                                                    // clearReversal()

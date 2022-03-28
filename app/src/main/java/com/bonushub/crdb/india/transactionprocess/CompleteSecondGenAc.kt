@@ -18,19 +18,32 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class CompleteSecondGenAc(var cardProcessedDataModal: CardProcessedDataModal?,
-                          var data: IsoDataReader, var isoData: IsoDataWriter? = null,
-                          var printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):
-    VFEmvHandler() {
+class CompleteSecondGenAc constructor() {
+
+    var cardProcessedDataModal: CardProcessedDataModal? = null
+    lateinit var data: IsoDataReader
+    var isoData: IsoDataWriter? = null
+    lateinit var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit
 
     val iemv: UEMV? = DeviceHelper.getEMV()
 
-    init {
+    constructor(cardProcessedDataModal: CardProcessedDataModal?,
+                data: IsoDataReader, isoData: IsoDataWriter? = null,
+                printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this()
+    {
+                    this.cardProcessedDataModal = cardProcessedDataModal
+                    this.data = data
+                    this.isoData = isoData
+                    this.printExtraDataSB = printExtraDataSB
+
+                }
+
+    /*init {
         performSecondGenAc(cardProcessedDataModal,data)
-    }
+    }*/
 
     //Below method is used to complete second gen ac in case of EMV Card Type:-
-    private fun performSecondGenAc(cardProcessedDataModal: CardProcessedDataModal?,data: IsoDataReader) {
+    fun performSecondGenAc(cardProcessedDataModal: CardProcessedDataModal?,data: IsoDataReader) {
 
         var field56data: String? = null
         var aidstr = cardProcessedDataModal?.getAID() ?: ""
@@ -201,9 +214,17 @@ class CompleteSecondGenAc(var cardProcessedDataModal: CardProcessedDataModal?,
     }
 
 
-    override fun onEndProcess(result: Int, transData: TransData?) {
+    /*override fun onEndProcess(result: Int, transData: TransData?) {
         logger("end txn","call")
         doEndProcess(result,transData)
+    }*/
+
+    fun getEndProcessData(result: Int, transData: TransData?)
+    {
+        logger("end txn","call","e")
+        logger("end txn","result"+result+"transData"+transData.toString(),"e")
     }
+
+
 }
 
