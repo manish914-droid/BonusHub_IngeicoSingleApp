@@ -9,8 +9,10 @@ import android.util.Log
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.TLV
+import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.usdk.apiservice.aidl.emv.EMVTag
+import com.usdk.apiservice.aidl.emv.TransData
 import com.usdk.apiservice.aidl.emv.UEMV
 import java.util.*
 import kotlin.collections.ArrayList
@@ -18,7 +20,8 @@ import kotlin.collections.HashMap
 
 class CompleteSecondGenAc(var cardProcessedDataModal: CardProcessedDataModal?,
                           var data: IsoDataReader, var isoData: IsoDataWriter? = null,
-                          var printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit) {
+                          var printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):
+    VFEmvHandler() {
 
     val iemv: UEMV? = DeviceHelper.getEMV()
 
@@ -195,6 +198,12 @@ class CompleteSecondGenAc(var cardProcessedDataModal: CardProcessedDataModal?,
             printData = Triple("", "", "")
             printExtraDataSB(printData,de55)
         }
+    }
+
+
+    override fun onEndProcess(result: Int, transData: TransData?) {
+        logger("end txn","call")
+        doEndProcess(result,transData)
     }
 }
 

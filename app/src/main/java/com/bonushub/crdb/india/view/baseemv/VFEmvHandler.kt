@@ -23,10 +23,27 @@ import java.lang.StringBuilder
 import java.util.*
 
 
-open class VFEmvHandler  constructor( var pinPad: UPinpad?,var emv: UEMV?, var activity: TransactionActivity, var cardProcessedDataModal: CardProcessedDataModal,
-                                     var vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit) : EMVEventHandler.Stub() {
+open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     private var lastCardRecord: CardRecord? = null
+
+    private var pinPad: UPinpad? = null
+    private var emv: UEMV? = null
+    private lateinit var activity: TransactionActivity
+    private lateinit var cardProcessedDataModal: CardProcessedDataModal
+    private lateinit var vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit
+
+    constructor(
+        pinPad: UPinpad?,
+        emv: UEMV?, activity: TransactionActivity, cardProcessedDataModal: CardProcessedDataModal,
+        vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit):this()
+    {
+            this.pinPad = pinPad
+            this.emv = emv
+            this.activity = activity
+            this.cardProcessedDataModal = cardProcessedDataModal
+            this.vfEmvHandlerCallback = vfEmvHandlerCallback
+        }
 
     @Throws(RemoteException::class)
     override fun onInitEMV() {
