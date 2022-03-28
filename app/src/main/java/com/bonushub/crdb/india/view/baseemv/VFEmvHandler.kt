@@ -39,12 +39,12 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         emv: UEMV?, activity: TransactionActivity, cardProcessedDataModal: CardProcessedDataModal,
         vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit):this()
     {
-            this.pinPad = pinPad
-            this.emv = emv
-            this.activity = activity
-            this.cardProcessedDataModal = cardProcessedDataModal
-            this.vfEmvHandlerCallback = vfEmvHandlerCallback
-        }
+        this.pinPad = pinPad
+        this.emv = emv
+        this.activity = activity
+        this.cardProcessedDataModal = cardProcessedDataModal
+        this.vfEmvHandlerCallback = vfEmvHandlerCallback
+    }
 
     @Throws(RemoteException::class)
     override fun onInitEMV() {
@@ -118,7 +118,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     override fun onSendOut(ins: Int, data: ByteArray?) {
         doSendOut(ins, data!!)
 
-            }
+    }
 
     @Throws(RemoteException::class)
     fun doInitEMV() {
@@ -207,7 +207,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                 capKey.hashFlag = 0x00.toByte()
             }
             val ret = emv!!.manageCAPubKey(ActionFlag.ADD, capKey)
-           println("=> add CAPKey rid = : " + BytesUtil.bytes2HexString(rid).toString() + ", index = " + index+ "return type "+ret)
+            println("=> add CAPKey rid = : " + BytesUtil.bytes2HexString(rid).toString() + ", index = " + index+ "return type "+ret)
         }
     }
 
@@ -412,9 +412,9 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
         cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
 
-       // val onlineResult: String = doOnlineProcess()
-       // val ret = emv!!.respondEvent(onlineResult)
-       // println("...onOnlineProcess: respondEvent" + ret)
+        // val onlineResult: String = doOnlineProcess()
+        // val ret = emv!!.respondEvent(onlineResult)
+        // println("...onOnlineProcess: respondEvent" + ret)
         tagOfF55.toString()
 
         val field55: String = getFields55()
@@ -425,7 +425,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
 
     @Throws(RemoteException::class)
-     open fun getFields55(): String {
+    open fun getFields55(): String {
         val tagList = arrayOf(
             0x5F2A,
             0x5F34,
@@ -439,7 +439,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F03,
             0x9F06,
             0x9F1A,
-      /*      0x9F6E,*/
+            /*      0x9F6E,*/
             0x9F26,
             0x9F27,
             0x9F33,
@@ -529,8 +529,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     open fun doVerifyOfflinePin(flag: Int, random: ByteArray?, capKey: CAPublicKey?, result: OfflinePinVerifyResult) {
         println("=> onVerifyOfflinePin")
         try {
-           // * 内置插卡- 0；内置挥卡 – 6；外置设备接USB - 7；外置设备接COM口 -8
-           // * inside insert card - 0；inside swing card – 6；External device is connected to the USB port - 7；External device is connected to the COM port -8
+            // * 内置插卡- 0；内置挥卡 – 6；外置设备接USB - 7；外置设备接COM口 -8
+            // * inside insert card - 0；inside swing card – 6；External device is connected to the USB port - 7；External device is connected to the COM port -8
             val icToken = 0
             //Specify the type of "PIN check APDU message" that will be sent to the IC card.Currently only support VCF_DEFAULT.
             val cmdFmt = OfflinePinVerify.VCF_DEFAULT
@@ -571,7 +571,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         try {
             System.out.println("Select aid: " + BytesUtil.bytes2HexString(aid))
             val tmAid = TLV.fromData(EMVTag.EMV_TAG_TM_AID, aid)
-             println(""+ emv!!.respondEvent(tmAid.toString())+ "...onAppSelect: respondEvent")
+            println(""+ emv!!.respondEvent(tmAid.toString())+ "...onAppSelect: respondEvent")
         } catch (e: Exception) {
             //handleException(e);
         }
@@ -626,7 +626,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         cardProcessedDataModal.setPanNumberData(EMVInfoUtil.getRecordDataDesc(record))
         System.out.println("Card pannumber data"+EMVInfoUtil.getRecordDataDesc(record))
         //val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
-       // cardProcessedDataModal.setEncryptedPan(encrptedPan)
+        // cardProcessedDataModal.setEncryptedPan(encrptedPan)
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
 

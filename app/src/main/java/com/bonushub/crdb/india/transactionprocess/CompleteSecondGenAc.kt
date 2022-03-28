@@ -25,12 +25,13 @@ class CompleteSecondGenAc constructor() {
     var isoData: IsoDataWriter? = null
     lateinit var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit
 
+    var printData: Triple<String, String, String>? = null
+
     val iemv: UEMV? = DeviceHelper.getEMV()
 
     constructor(cardProcessedDataModal: CardProcessedDataModal?,
                 data: IsoDataReader, isoData: IsoDataWriter? = null,
-                printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this()
-    {
+                printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this() {
                     this.cardProcessedDataModal = cardProcessedDataModal
                     this.data = data
                     this.isoData = isoData
@@ -51,8 +52,8 @@ class CompleteSecondGenAc constructor() {
         val finalaidstr = if(aidstr.isNotBlank()) { aidstr.subSequence(0,10).toString() } else { aidstr = ""}
 
         try {
-         //   var  cardStatus =  VFService.vfsmartReader?.checkCardStatus()
-         //   VFService.showToast("Card status is"+VFService.vfsmartReader?.checkCardStatus())
+            //   var  cardStatus =  VFService.vfsmartReader?.checkCardStatus()
+            //   VFService.showToast("Card status is"+VFService.vfsmartReader?.checkCardStatus())
         }
         catch (ex: DeadObjectException){
             ex.printStackTrace()
@@ -93,9 +94,9 @@ class CompleteSecondGenAc constructor() {
             //val dateTime: Long = Calendar.getInstance().timeInMillis
             //val formatedDate = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault()).format(dateTime)
             //In reversal we have to send Old date and old time means trnsaction date and trnsaction time
-           // val OldformatedDateTime = AppPreference.getString("OldCurrentDate")+AppPreference.getString("OldCurrentTime")
+            // val OldformatedDateTime = AppPreference.getString("OldCurrentDate")+AppPreference.getString("OldCurrentTime")
 
-        //    field56data = "${hostTID}${hostBatchNumber}${hostRoc}${OldformatedDateTime}${""}${hostInvoice}"
+            //    field56data = "${hostTID}${hostBatchNumber}${hostRoc}${OldformatedDateTime}${""}${hostInvoice}"
 
 
 
@@ -117,10 +118,10 @@ class CompleteSecondGenAc constructor() {
             if (tagData8a.isNotEmpty()) {
                 val ba = tagData8a.hexStr2ByteArr()
                 // rtn = EMVCallback.EMVSetTLVData(ta.toShort(), ba, ba.size)
-               // logger(VFTransactionActivity.TAG, "On setting ${Integer.toHexString(ta8A)} tag status = $", "e")
+                // logger(VFTransactionActivity.TAG, "On setting ${Integer.toHexString(ta8A)} tag status = $", "e")
             }
         } catch (ex: Exception) {
-          //  logger(VFTransactionActivity.TAG, ex.message ?: "", "e")
+            //  logger(VFTransactionActivity.TAG, ex.message ?: "", "e")
         }
 
         val tagDatatag91 = f55Hash[ta91] ?: ""
@@ -173,30 +174,30 @@ class CompleteSecondGenAc constructor() {
 
         try {
 
-                if (field55 != null ) {
-                    println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+            if (field55 != null ) {
+                println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
 
-                    var field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
+                var field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
 
-                    val onlineResult = StringBuffer()
-                    onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
+                val onlineResult = StringBuffer()
+                onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
 
-                    val hostRespCode = "3030"
-                    onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
+                val hostRespCode = "3030"
+                onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
 
-                    val onlineApproved = true
-                    onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
+                val onlineApproved = true
+                onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
 
-                    val hostTlvData = field55
-                    onlineResult.append(
-                        TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
-                    )
+                val hostTlvData = field55
+                onlineResult.append(
+                    TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
+                )
 
 
-                      iemv?.respondEvent(onlineResult.toString())
+                iemv?.respondEvent(onlineResult.toString())
 
-                   // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
-                }
+                // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+            }
 
 
 
@@ -205,24 +206,40 @@ class CompleteSecondGenAc constructor() {
             ex.printStackTrace()
             //println("Exception is" + ex.printStackTrace())
         }
-        if (tc)
+
+    /*    if (tc)
             printExtraDataSB(printData,de55)
         else {
             printData = Triple("", "", "")
             printExtraDataSB(printData,de55)
-        }
+        }*/
     }
 
 
-    /*override fun onEndProcess(result: Int, transData: TransData?) {
-        logger("end txn","call")
-        doEndProcess(result,transData)
-    }*/
-
-    fun getEndProcessData(result: Int, transData: TransData?)
-    {
+    fun getEndProcessData(result: Int, transData: TransData?) {
         logger("end txn","call","e")
         logger("end txn","result"+result+"transData"+transData.toString(),"e")
+
+        val aidArray = arrayOf("0x9F06")
+        val aidData = iemv!!.getTLV(Integer.toHexString(0x9F06).toUpperCase(Locale.ROOT))
+        println("Aid Data is ----> $aidData")
+
+        val tvrArray = arrayOf("0x95")
+        val tvrData = iemv!!.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
+        println("TVR Data is ----> $tvrData")
+
+
+        val tsiArray = arrayOf("0x9B")
+        val tsiData = iemv!!.getTLV(Integer.toHexString(0x9B).toUpperCase(Locale.ROOT))
+        println("TSI Data is ----> $tsiData")
+
+
+        val tcvalue = arrayOf("0x9F26")
+        val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
+         println("TC Data is ----> $tcData")
+
+        printData = Triple("", "", "")
+        printExtraDataSB(printData,"")
     }
 
 
