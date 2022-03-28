@@ -805,14 +805,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
-                    CoroutineScope(Dispatchers.Default).launch {
+                    /*CoroutineScope(Dispatchers.Default).launch {
                         startActivityForResult(Intent(this@NavigationActivity, TransactionActivity::class.java).apply {
                             //  putExtra("amt", amt)
                             //  putExtra("type", transType)
                         },1000)
 
                         //inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
+                    }*/
+                    CoroutineScope(Dispatchers.Main).launch {
+                        inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
                     }
+
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }

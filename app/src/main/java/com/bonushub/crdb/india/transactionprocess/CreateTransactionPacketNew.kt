@@ -56,7 +56,9 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
 
             //Transaction Amount Field
             //val formattedTransAmount = "%.2f".format(cardProcessedData.getTransactionAmount()?.toDouble()).replace(".", "")
-            addField(4, addPad("3100".toString(), "0", 12, true))
+           // addField(4, addPad("5500".toString(), "0", 12, true))
+            addField(4, addPad(cardProcessedData.getTransactionAmount().toString(), "0", 12, true))
+
 
             //STAN(ROC) Field 11
             addField(11, Utility().getROC().toString())

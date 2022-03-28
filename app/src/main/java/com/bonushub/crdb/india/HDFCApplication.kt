@@ -91,9 +91,9 @@ class HDFCApplication : Application() {
 
                 }
 
-                operatorName = mTelephonyManager.networkOperatorName
-                simNo = mTelephonyManager.simSerialNumber ?: ""
-                imeiNo = mTelephonyManager.deviceId
+//                operatorName = mTelephonyManager.networkOperatorName
+//                simNo = mTelephonyManager.simSerialNumber ?: ""
+//                imeiNo = mTelephonyManager.deviceId
 
              /*   if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
                     operatorName = mTelephonyManager.networkOperatorName

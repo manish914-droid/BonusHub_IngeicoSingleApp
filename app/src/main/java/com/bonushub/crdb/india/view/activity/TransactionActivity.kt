@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ActivityEmvBinding
 import com.bonushub.crdb.india.db.AppDao
@@ -43,10 +44,37 @@ class TransactionActivity : BaseActivityNew() {
     private var defaultScope = CoroutineScope(Dispatchers.Default)
     private var globalCardProcessedModel = CardProcessedDataModal()
 
+    private val saleAmt by lazy { intent.getStringExtra("saleAmt") ?: "0" }
+    private val transactionType by lazy { intent.getIntExtra("type", -1947) }
+    private val mobileNumber by lazy { intent.getStringExtra("mobileNumber") ?: "" }
+    private val billNumber by lazy { intent.getStringExtra("billNumber") ?: "0" }
+    private val saleWithTipAmt by lazy { intent.getStringExtra("saleWithTipAmt") ?: "0" }
+    private val transactionTypeEDashboardItem by lazy {
+        (intent.getSerializableExtra("edashboardItem") ?: EDashboardItem.NONE) as EDashboardItem
+    }
+    private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-      //  emvBinding = ActivityEmvBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_emv)
+        emvBinding = ActivityEmvBinding.inflate(layoutInflater)
+        //setContentView(R.layout.activity_emv)
+        setContentView(emvBinding?.root)
+        emvBinding?.subHeaderView?.subHeaderText?.text = transactionTypeEDashboardItem.title
+        emvBinding?.txnAmtLl?.visibility = View.VISIBLE
+
+        globalCardProcessedModel.setTransType(transactionType)
+        globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
+
+
+        if (transactionType == BhTransactionType.SALE_WITH_CASH.type) {
+            val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
+            val frtAmt = "%.2f".format(amt)
+            emvBinding?.baseAmtTv?.text = frtAmt
+        } else {
+            val frtAmt = "%.2f".format(saleAmt.toFloat())
+            emvBinding?.baseAmtTv?.text = frtAmt
+        }
+
         defaultScope.launch {
             // uemv = deviceService!!.getEMV()
             SearchCard(DeviceHelper.getEMV(), globalCardProcessedModel) { localCardProcessedData ->
@@ -55,7 +83,9 @@ class TransactionActivity : BaseActivityNew() {
             }
         }
 
+
     }
+
 
     private fun processAccordingToCardType(cardProcessedData: CardProcessedDataModal) {
         when (cardProcessedData.getReadCardType()) {
@@ -125,6 +155,7 @@ class TransactionActivity : BaseActivityNew() {
             runOnUiThread { showProgress(msg) }
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
                 hideProgress()
+
                 if (syncStatus) {
                     val responseIsoData: IsoDataReader = readIso(transactionMsg.toString(), false)
                     val autoSettlementCheck = responseIsoData.isoMap[60]?.parseRaw2String().toString()
