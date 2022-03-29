@@ -263,12 +263,14 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         val datetime: String = DeviceHelper.getCurentDateTime()
         val splitStr = datetime.split("\\s+".toRegex()).toTypedArray()
 
+       var txnAmount = addPad(cardProcessedDataModal.getTransactionAmount().toString(), "0", 12, true)
+
         var tlvList: String? = null
         when (finalData.kernelID) {
 
             KernelID.EMV.toByte() ->                // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
                 // For reference only below
-                tlvList = "9F0206000000003100" +  //amount
+                tlvList = "9F0206"+txnAmount+  //amount
                         "9F0306000000000000" +  // other amount
                         "9A03"+splitStr[0] +  //Txn Date - M
                         "9F2103"+splitStr[1]+ //Txn Time - M

@@ -1,31 +1,28 @@
 
 package com.bonushub.crdb.india.transactionprocess
 
-import android.os.Bundle
 import android.os.DeadObjectException
 import android.os.RemoteException
-import android.text.TextUtils
-import android.util.Log
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
-import com.usdk.apiservice.aidl.emv.EMVTag
-import com.usdk.apiservice.aidl.emv.TransData
-import com.usdk.apiservice.aidl.emv.UEMV
+import com.usdk.apiservice.aidl.emv.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, String, String>?, String?) -> Unit) {
+class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit) {
+
+    companion object {
+        val TAG = CompleteSecondGenAc::class.java.simpleName
+    }
 
     var cardProcessedDataModal: CardProcessedDataModal? = null
     lateinit var data: IsoDataReader
     var isoData: IsoDataWriter? = null
-    //lateinit var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit
-
-   // private var printExtraDataSB2: (Triple<String, String, String>?, String?) -> Unit
 
     var printData: Triple<String, String, String>? = null
 
@@ -79,14 +76,17 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
             val ac = authCode.byteArr2Str().replace(" ", "").str2ByteArr()
         }
         val responseCode = (data.isoMap[39]?.parseRaw2String().toString())
-        val field55 = data.isoMap[55]?.rawData ?: ""//910A16F462F8DCDBD7400012720F860D84240000088417ADCFE4D04B81
-        //  910A55A52CC220D48AEC0014722C9F180430303030860E84DA00CB090767BED29D791A7B70861384DA00C80E0000000000009039CED44D2F36E5
-        println("Filed55 value is --> $field55")//910ADE930EAD11D6F1720014
-        //  VFService.showToast("Field 55 value is"+field55)
+        val field55 = data.isoMap[55]?.rawData ?: ""
+     // ===================== Dummy field 55 start ===========================
+        //910A16F462F8DCDBD7400012720F860D84240000088417ADCFE4D04B81
+        //910A55A52CC220D48AEC0014722C9F180430303030860E84DA00CB090767BED29D791A7B70861384DA00C80E0000000000009039CED44D2F36E5
+        //910ADE930EAD11D6F1720014
+        // ===================== Dummy field 55 end ===========================
+        println("Filed55 value is --> $field55")
         val field60Data = data.isoMap[60]?.parseRaw2String().toString()
         val f60DataList = field60Data.split('|')
         //   Auto settle flag | Bank id| Issuer id | MID | TID | Batch No | Stan | Invoice | Card Type
-//0|1|51|000000041501002|41501369|000150|260|000260|RUPAY|
+        //0|1|51|000000041501002|41501369|000150|260|000260|RUPAY|
         try {
             var hostBankID = f60DataList[1]
             var hostIssuerID = f60DataList[2]
@@ -118,35 +118,33 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
         val ta8A = 0x8A
         val ta91 = 0x91
         val resCode = data.isoMap[39]?.rawData ?: "05"
-        //  VFService.showToast("Response code is"+responseCode)
-        val tagData8a = f55Hash[ta8A] ?: responseCode
+        //responseCode changed to response code by Manish
+        //In X990 its responsecode instead of resCode
+        val tagData8a = f55Hash[ta8A] ?: resCode
         try {
             if (tagData8a.isNotEmpty()) {
                 val ba = tagData8a.hexStr2ByteArr()
-                // rtn = EMVCallback.EMVSetTLVData(ta.toShort(), ba, ba.size)
-                // logger(VFTransactionActivity.TAG, "On setting ${Integer.toHexString(ta8A)} tag status = $", "e")
+                logger(TAG, "On setting ${Integer.toHexString(ta8A)} tag status = $ba.", "e")
             }
         } catch (ex: Exception) {
-            //  logger(VFTransactionActivity.TAG, ex.message ?: "", "e")
+                logger(TAG, ex.message ?: "", "e")
         }
 
         val tagDatatag91 = f55Hash[ta91] ?: ""
-        //  mDevCltr.mEmvState.tc = tagDatatag91.hexStr2ByteArr()
         val mba = ArrayList<Byte>()
-        val mba1 = ArrayList<Byte>()
+        val mbaCheckSize = ArrayList<Byte>()
         try {
             if (tagDatatag91.isNotEmpty()) {
                 val ba = tagDatatag91.hexStr2ByteArr()
                 mba.addAll(ba.asList())
-                mba1.addAll(ba.asList())
-                //
+                mbaCheckSize.addAll(ba.asList())
+
                 mba.addAll(tagData8a.str2ByteArr().asList())
 
-                //rtn = EMVCallback.EMVSetTLVData(ta.toShort(), mba.toByteArray(), mba.size)
-                logger("Data:- ", "On setting ${Integer.toHexString(ta91)} tag status = $", "e")
+                logger(TAG, "On setting ${Integer.toHexString(ta91)} tag status = $", "e")
             }
         } catch (ex: Exception) {
-            logger("Exception:- ", ex.message ?: "")
+            logger(TAG, ex.message ?: "")
         }
 
         var f71 = f55Hash[0x71] ?: ""
@@ -159,7 +157,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
 
                 f71= "${Integer.toHexString(0x71)}$lenStr$f71"
                 f71.hexStr2ByteArr()
-                //     rtn = EMVCallback.EMVSetTLVData(ta.toShort(), ba, ba.size)
+
                 logger("Exception:- ", "On setting ${Integer.toHexString(0x71)} tag status = $")
             }
             else byteArrayOf()
@@ -176,7 +174,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
             f72.hexStr2ByteArr()
         } else byteArrayOf()
 
-        //   val finalRet = EMVCallback.EMVCompleteTrans(resResult, script, script.size, acType)
+
 
         try {
 
@@ -214,16 +212,11 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
             //println("Exception is" + ex.printStackTrace())
         }
 
-    /*    if (tc)
-            printExtraDataSB(printData,de55)
-        else {
-            printData = Triple("", "", "")
-            printExtraDataSB(printData,de55)
-        }*/
     }
 
 
     fun getEndProcessData(result: Int, transData: TransData?) {
+
         logger("end txn","call","e")
         logger("end txn","result"+result+"transData"+transData.toString(),"e")
 
@@ -231,25 +224,38 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
         val aidData = iemv!!.getTLV(Integer.toHexString(0x9F06).toUpperCase(Locale.ROOT))
         println("Aid Data is ----> $aidData")
 
-        val tvrArray = arrayOf("0x95")
-        val tvrData = iemv!!.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
-        println("TVR Data is ----> $tvrData")
+        if (result != EMVError.SUCCESS) {
+            System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
+        } else {
+            System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
+            val getAcType: String = EMVInfoUtil.getACTypeDesc(transData!!.acType)
+
+            if(getAcType == "TC[0x01]"){
+
+                val tvrArray = arrayOf("0x95")
+                val tvrData = iemv!!.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
+                println("TVR Data is ----> $tvrData")
 
 
-        val tsiArray = arrayOf("0x9B")
-        val tsiData = iemv!!.getTLV(Integer.toHexString(0x9B).toUpperCase(Locale.ROOT))
-        println("TSI Data is ----> $tsiData")
+                val tsiArray = arrayOf("0x9B")
+                val tsiData = iemv!!.getTLV(Integer.toHexString(0x9B).toUpperCase(Locale.ROOT))
+                println("TSI Data is ----> $tsiData")
 
 
-        val tcvalue = arrayOf("0x9F26")
-        val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
-         println("TC Data is ----> $tcData")
+                val tcvalue = arrayOf("0x9F26")
+                val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
+                println("TC Data is ----> $tcData")
 
-        printData = Triple("", "", "")
-        printExtraDataSB2(printData,"")
+                printData = Triple(tvrData, tsiData, tcData)
+                printExtraDataSB(printData,"")
+            }
+            else{
+                printData = Triple("", "", "")
+                printExtraDataSB(printData,"")
+            }
+        }
 
     }
-
 
 }
 
