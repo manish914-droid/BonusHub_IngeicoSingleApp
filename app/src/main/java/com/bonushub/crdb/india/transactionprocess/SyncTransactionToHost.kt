@@ -11,6 +11,7 @@ import com.bonushub.crdb.india.model.local.AppPreference.GENERIC_REVERSAL_KEY
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.activity.TransactionActivity
+import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.TransactionType
 import com.google.gson.Gson
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 
 class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                             var cardProcessedDataModal: CardProcessedDataModal? = null,
+                            var testVFEmvHandler:VFEmvHandler,
                             var syncTransactionCallback: (Boolean, String, String?, Triple<String, String, String>?,String?,String?) -> Unit) {
 
     val iemv: UEMV? = DeviceHelper.getEMV()
@@ -159,7 +161,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                   var respond = iemv?.respondEvent(field55)
                                                     System.out.println("Second gen Ac "+respond)*/
 
-                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData) { printExtraData, de55 ->
+                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testVFEmvHandler) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
                                                     }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
 

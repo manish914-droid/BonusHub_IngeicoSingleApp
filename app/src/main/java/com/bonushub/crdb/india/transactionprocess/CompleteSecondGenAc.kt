@@ -18,24 +18,30 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class CompleteSecondGenAc constructor() {
+class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, String, String>?, String?) -> Unit) {
 
     var cardProcessedDataModal: CardProcessedDataModal? = null
     lateinit var data: IsoDataReader
     var isoData: IsoDataWriter? = null
-    lateinit var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit
+    //lateinit var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit
+
+   // private var printExtraDataSB2: (Triple<String, String, String>?, String?) -> Unit
 
     var printData: Triple<String, String, String>? = null
 
     val iemv: UEMV? = DeviceHelper.getEMV()
 
+    lateinit var testVFEmvHandler:VFEmvHandler
+
     constructor(cardProcessedDataModal: CardProcessedDataModal?,
                 data: IsoDataReader, isoData: IsoDataWriter? = null,
-                printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this() {
+                testVFEmvHandler:VFEmvHandler,
+                printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this(printExtraDataSB) {
                     this.cardProcessedDataModal = cardProcessedDataModal
                     this.data = data
                     this.isoData = isoData
-                    this.printExtraDataSB = printExtraDataSB
+                    //this.printExtraDataSB = printExtraDataSB
+                    this.testVFEmvHandler = testVFEmvHandler
 
                 }
 
@@ -194,6 +200,7 @@ class CompleteSecondGenAc constructor() {
                 )
 
 
+                testVFEmvHandler.getCompleteSecondGenAc(this)
                 iemv?.respondEvent(onlineResult.toString())
 
                 // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
@@ -239,7 +246,8 @@ class CompleteSecondGenAc constructor() {
          println("TC Data is ----> $tcData")
 
         printData = Triple("", "", "")
-        printExtraDataSB(printData,"")
+        printExtraDataSB2(printData,"")
+
     }
 
 

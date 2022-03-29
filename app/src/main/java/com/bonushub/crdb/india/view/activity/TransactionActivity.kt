@@ -1,6 +1,5 @@
 package com.bonushub.crdb.india.view.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,10 +18,12 @@ import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacketNew
 import com.bonushub.crdb.india.transactionprocess.SyncTransactionToHost
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.SearchCard
 import com.bonushub.crdb.india.viewmodel.*
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
+import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.*
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -53,6 +54,8 @@ class TransactionActivity : BaseActivityNew() {
         (intent.getSerializableExtra("edashboardItem") ?: EDashboardItem.NONE) as EDashboardItem
     }
     private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
+
+    lateinit var testVFEmvHandler:VFEmvHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,7 +105,8 @@ class TransactionActivity : BaseActivityNew() {
                     val emvOption = EmvOption.create().apply {
                         flagPSE(0x00.toByte())
                     }
-                    DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), emvHandler())
+                    testVFEmvHandler = emvHandler()
+                    DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
 
                 }
 
@@ -153,7 +157,7 @@ class TransactionActivity : BaseActivityNew() {
         if (true) {
             val msg: String = getString(R.string.sale_data_sync)
             runOnUiThread { showProgress(msg) }
-            SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
+            SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
                 hideProgress()
 
                 if (syncStatus) {

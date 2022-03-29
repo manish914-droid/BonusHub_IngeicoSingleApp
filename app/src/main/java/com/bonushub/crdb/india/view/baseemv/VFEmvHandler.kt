@@ -98,7 +98,14 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     @Throws(RemoteException::class)
     override fun onEndProcess(result: Int, transData: TransData?) {
 
-        CompleteSecondGenAc().getEndProcessData(result,transData)
+        if(this::testCompleteSecondGenAc.isInitialized){
+            testCompleteSecondGenAc.getEndProcessData(result,transData)
+        }
+
+        /*CompleteSecondGenAc { printExtraData, de55 ->
+           // syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
+            logger("complete","VFEmvHandle call back","e")
+        }.getEndProcessData(result,transData)*/
         doEndProcess(result, transData)
     }
 
@@ -663,6 +670,11 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                 )
             )
         }
+    }
+
+    lateinit var testCompleteSecondGenAc:CompleteSecondGenAc
+    fun getCompleteSecondGenAc(testCompleteSecondGenAc:CompleteSecondGenAc){
+        this.testCompleteSecondGenAc = testCompleteSecondGenAc
     }
 }
 
