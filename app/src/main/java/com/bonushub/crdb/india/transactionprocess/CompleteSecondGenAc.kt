@@ -245,7 +245,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB2: (Triple<String, Str
         val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
          println("TC Data is ----> $tcData")
 
-        printData = Triple("", "", "")
+        printData = Triple(tvrData, aidData, tsiData)
         printExtraDataSB2(printData,"")
 
     }
