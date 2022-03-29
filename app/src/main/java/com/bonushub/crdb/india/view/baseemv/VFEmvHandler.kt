@@ -260,6 +260,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     open fun doFinalSelect(finalData: FinalData) {
         println("=> onFinalSelect | " + EMVInfoUtil.getFinalSelectDesc(finalData))
 
+        //KernalID = EMV[0x00], AID = A000000025010801
+
         val datetime: String = DeviceHelper.getCurentDateTime()
         val splitStr = datetime.split("\\s+".toRegex()).toTypedArray()
 
@@ -268,19 +270,26 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         var tlvList: String? = null
         when (finalData.kernelID) {
 
-            KernelID.EMV.toByte() ->                // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
-                // For reference only below
-                tlvList = "9F0206"+txnAmount+  //amount
-                        "9F0306000000000000" +  // other amount
-                        "9A03"+splitStr[0] +  //Txn Date - M
-                        "9F2103"+splitStr[1]+ //Txn Time - M
-                        "9F410400000001" +  // Transaction squence counter
-                        "9F350122" +  // Terminal type
-                        "9F3303E0F8C8" +  //Terminal capability
-                        "9F40056000F0A001" +  //additional terminal capability
-                        "9F1A020356" +  //Terminal country code
-                        "5F2A020356" +  //Transaction coutry code
-                        "9C0100" //Transaction Type
+            KernelID.EMV.toByte() ->
+
+               if(BytesUtil.bytes2HexString(finalData.aid) == "A000000025010801"){
+                   // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
+                   // For reference only below
+                       tlvList = StringBuilder()
+                       .append("9F0206").append(txnAmount) //Txn Amount
+                       .append("9F0306000000000000")       //Other Amount
+                       .append("9A03").append(splitStr[0])   //Txn Date - M
+                       .append("9F2103").append(splitStr[1]) //Txn Time - M
+                       .append("9F410400000001") //Transaction Sequence Counter - 0
+                       .append("9F350122")     //Terminal type
+                       .append("9F3303E0F8C8")     //Terminal capability
+                       .append("9F40056000F0A001")   //additional terminal capability
+                       .append("9F1A020356")  //Terminal country code - M
+                       .append("5F2A020356") //Terminal currency code - M*/
+                       .append("9C0100")       //Transaction type - o
+                       .toString();
+               }
+
             KernelID.PBOC.toByte() ->                // if suport PBOC Ecash，see transaction parameters of PBOC Ecash in《UEMV develop guide》.
                 // If support qPBOC, see transaction parameters of QuickPass in《UEMV develop guide》.
                 // For reference only below
