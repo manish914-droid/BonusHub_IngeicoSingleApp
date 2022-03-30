@@ -52,11 +52,9 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                 }
 
             //Processing Code Field 3
-            addField(3, "920001".toString())
+            addField(3, cardProcessedData.getProcessingCode().toString())
 
             //Transaction Amount Field
-            //val formattedTransAmount = "%.2f".format(cardProcessedData.getTransactionAmount()?.toDouble()).replace(".", "")
-           // addField(4, addPad("5500".toString(), "0", 12, true))
             addField(4, addPad(cardProcessedData.getTransactionAmount().toString(), "0", 12, true))
 
 
