@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.view.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,6 +16,7 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.*
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacketNew
+import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.transactionprocess.SyncTransactionToHost
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
@@ -170,6 +172,173 @@ class TransactionActivity : BaseActivityNew() {
                                   Toast.makeText(this@TransactionActivity,"TXn approved",Toast.LENGTH_SHORT).show()
                               }
 
+                        StubBatchData(
+                            de55,
+                            cardProcessedDataModal.getTransType(),
+                            cardProcessedDataModal,
+                            printExtraData,
+                            autoSettlementCheck
+                        ) { stubbedData ->
+                            /*if (cardProcessedDataModal.getTransType() == TransactionType.EMI_SALE.type ||
+                                cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI.type ||
+                                cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type ||
+                                cardProcessedDataModal.getTransType() == TransactionType.FLEXI_PAY.type ||
+                                cardProcessedDataModal.getTransType() == TransactionType.TEST_EMI.type
+
+                            ) {
+
+                                stubEMI(stubbedData, emiSelectedData, emiTAndCData, brandEMIAccessData,flexiPayemiSelectedData) { data ->
+                                    Log.d("StubbedEMIData:- ", data.toString())
+
+                                    modal=  saveBrandEMIDataToDB(brandEMIData, data.hostInvoice,data.hostTID)
+                                    saveBrandEMIbyCodeDataInDB(
+                                        brandEMIAccessData,
+                                        data.hostInvoice,data.hostTID
+                                    )
+                                    val modal2=runBlocking(Dispatchers.IO) {
+                                        BrandEMIDataTable.getBrandEMIDataByInvoiceAndTid(data.hostInvoice,data.hostTID)
+                                    }
+                                    if (modal2 != null) {
+                                        modal=modal2
+                                    }
+
+                                    printSaveSaleEmiDataInBatch(data) { printCB ->
+                                        if (!printCB) {
+                                            Log.e("EMI FIRST ", "COMMENT ******")
+                                            // Here we are Syncing Txn CallBack to server
+                                            if(tpt?.digiPosCardCallBackRequired=="1") {
+                                                lifecycleScope.launch(Dispatchers.IO) {
+                                                    withContext(Dispatchers.Main) {
+                                                        showProgress(
+                                                            getString(
+                                                                R.string.txn_syn
+                                                            )
+                                                        )
+                                                    }
+
+                                                    val amount = MoneyUtil.fen2yuan(
+                                                        stubbedData.totalAmmount.toDouble()
+                                                            .toLong()
+                                                    )
+                                                    val txnCbReqData = TxnCallBackRequestTable()
+                                                    txnCbReqData.reqtype =
+                                                        EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+                                                    txnCbReqData.tid = stubbedData.hostTID
+                                                    txnCbReqData.batchnum =
+                                                        stubbedData.hostBatchNumber
+                                                    txnCbReqData.roc = stubbedData.hostRoc
+                                                    txnCbReqData.amount = amount
+
+                                                    txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
+                                                    txnCbReqData.txnTime = stubbedData.time
+                                                    txnCbReqData.txnDate = stubbedData.transactionDate
+                                                    TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
+                                                        txnCbReqData
+                                                    )
+                                                    syncTxnCallBackToHost {
+                                                        Log.e(
+                                                            "TXN CB ",
+                                                            "SYNCED TO SERVER  --> $it"
+                                                        )
+                                                        hideProgress()
+                                                    }
+                                                    Log.e("EMI LAST", "COMMENT ******")
+
+                                                    //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
+                                                    //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+
+                                                    if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                        withContext(Dispatchers.Main) {
+                                                            syncOfflineSaleAndAskAutoSettlement(
+                                                                autoSettlementCheck.substring(
+                                                                    0,
+                                                                    1
+                                                                )
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                    GlobalScope.launch(Dispatchers.Main) {
+                                                        syncOfflineSaleAndAskAutoSettlement(
+                                                            autoSettlementCheck.substring(0, 1)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else {*/
+                                printAndSaveBatchDataInDB(stubbedData) { printCB ->
+                                    if (printCB) {
+                                        Log.e("FIRST ", "COMMENT ******")
+                                        goToDashBoard()
+                                        // Here we are Syncing Txn CallBack to server
+
+                                        /*if(tpt?.digiPosCardCallBackRequired=="1" || AppPreference.getBoolean(AppPreference.IsECRon)) {
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                withContext(Dispatchers.Main) {
+                                                    showProgress(
+                                                        getString(
+                                                            R.string.txn_syn
+                                                        )
+                                                    )
+                                                }
+                                                val amount = MoneyUtil.fen2yuan(
+                                                    stubbedData.totalAmmount.toDouble().toLong()
+                                                )
+                                                val txnCbReqData = TxnCallBackRequestTable()
+                                                txnCbReqData.reqtype = EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+                                                txnCbReqData.tid = stubbedData.hostTID
+                                                txnCbReqData.batchnum = stubbedData.hostBatchNumber
+                                                txnCbReqData.roc = stubbedData.hostRoc
+                                                txnCbReqData.amount = amount
+                                                txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
+                                                txnCbReqData.txnTime = stubbedData.time
+                                                txnCbReqData.txnDate = stubbedData.transactionDate
+                                                //    20220302 145902
+
+                                                TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(txnCbReqData)
+
+                                                syncTxnCallBackToHost {
+                                                    Log.e(
+                                                        "TXN CB ",
+                                                        "SYNCED TO SERVER  --> $it"
+                                                    )
+                                                    hideProgress()
+                                                }
+                                                Log.e("LAST ", "COMMENT ******")
+
+                                                //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
+                                                //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+
+                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                    withContext(Dispatchers.Main) {
+                                                        syncOfflineSaleAndAskAutoSettlement(
+                                                            autoSettlementCheck.substring(0, 1)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }else{
+                                            if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                GlobalScope.launch(Dispatchers.Main) {
+                                                    syncOfflineSaleAndAskAutoSettlement(
+                                                        autoSettlementCheck.substring(0, 1)
+                                                    )
+                                                }
+                                            }
+                                        }*/
+                                    }
+                                }
+                          //  }
+
+
+                        }
 
                     } else if (syncStatus && responseCode != "00") {
                         GlobalScope.launch(Dispatchers.Main) {
@@ -213,5 +382,125 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
     //endregion
+
+
+    //Below method is used to save sale data in batch file data table and print the receipt of it:-
+    private fun printAndSaveBatchDataInDB(
+        stubbedData: TempBatchFileDataTable,
+        cb: suspend (Boolean) -> Unit
+    ) {
+        // printerReceiptData will not be saved in Batch if transaction is pre auth
+       // if (transactionType != TransactionTypeValues.PRE_AUTH) {
+            //Here we are saving printerReceiptData in BatchFileData Table:-
+        Utility().saveTempBatchFileDataTable(stubbedData)
+       // } //kushal
+
+       /* PrintUtil(this).startPrinting(
+            stubbedData,
+            EPrintCopyType.MERCHANT,
+            this
+        ) { dialogCB, printingFail ->
+            Log.d("Sale Printer Status:- ", printingFail.toString())
+            if (printingFail == 0)
+                runOnUiThread {
+                    alertBoxWithAction(
+                        getString(R.string.printer_error),
+                        getString(R.string.printing_roll_empty_msg),
+                        false,
+                        getString(R.string.positive_button_ok),
+                        {
+                            cb(dialogCB, false)
+                            *//* startActivity(
+                                 Intent(
+                                     this@VFTransactionActivity,
+                                     MainActivity::class.java
+                                 ).apply {
+                                     flags =
+                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                 })*//*
+                        },
+                        {})
+                }
+            else
+                cb(dialogCB, true)
+        }*/
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            showProgress(getString(R.string.printing))
+            var printsts = false
+            if (stubbedData != null) {
+                PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                    stubbedData,
+                    EPrintCopyType.MERCHANT,
+                    this@TransactionActivity as BaseActivityNew
+                ) { printCB, printingFail ->
+
+                    (this@TransactionActivity as BaseActivityNew).hideProgress()
+                    if (printCB) {
+                        printsts = printCB
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            showMerchantAlertBox(stubbedData, cb)
+                        }
+
+                    } else {
+                        ToastUtils.showToast(
+                            this@TransactionActivity as BaseActivityNew,
+                            getString(R.string.printer_error)
+                        )
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            cb(false)
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun showMerchantAlertBox(
+        batchTable: TempBatchFileDataTable,
+        cb: suspend (Boolean) -> Unit
+    ) {
+        withContext(Dispatchers.Main) {
+            val printerUtil: PrintUtil? = null
+            (this@TransactionActivity as BaseActivityNew).alertBoxWithAction(
+                getString(R.string.print_customer_copy),
+                getString(R.string.print_customer_copy),
+                true, getString(R.string.positive_button_yes), { status ->
+                    showProgress(getString(R.string.printing))
+                    PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                        batchTable,
+                        EPrintCopyType.CUSTOMER,
+                        this@TransactionActivity as BaseActivityNew
+                    ) { printCB, printingFail ->
+                        (this@TransactionActivity as BaseActivityNew).hideProgress()
+                        if (printCB) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                cb(printCB)
+                            }
+                            (this@TransactionActivity as BaseActivityNew).hideProgress()
+
+//                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                            startActivity(intent)
+                        }
+
+                    }
+                }, {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        cb(true)
+                    }
+                    (this@TransactionActivity as BaseActivityNew).hideProgress()
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
+                })
+        }
+    }
+
+    private fun goToDashBoard() {
+        startActivity(Intent(this@TransactionActivity, NavigationActivity::class.java).apply {
+            flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
+    }
 
    }

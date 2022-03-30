@@ -510,4 +510,11 @@ interface AppDao{
 
     @Query("DELETE From  PreAuthTransactionTable WHERE invoice = :invoice")
     suspend fun deletePreAuthTransactionTableDataFromInvoice(invoice: String?)
+
+    // region =================== TempBatchFileDataTable table dao =============
+    @Query("SELECT * FROM TempBatchFileDataTable")
+    suspend fun getAllTempBatchFileDataTableData(): MutableList<TempBatchFileDataTable>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateTempBatchFileDataTableData(tempBatchFileDataTable: TempBatchFileDataTable): Long?
 }

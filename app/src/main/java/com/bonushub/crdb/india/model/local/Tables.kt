@@ -11,6 +11,7 @@ import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.india.utils.EAccountType
 import com.bonushub.crdb.india.utils.EDigiPosPaymentStatus
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -143,6 +144,176 @@ data class BatchFileDataTable(
     var hostInvoice: String? = null,
     var hostCardType: String? = null
 ) : Serializable
+
+@Entity
+data class TempBatchFileDataTable(
+    var  instantDiscount: String = "",
+
+    var authCode: String = "",
+    var isChecked: Boolean = false,
+    var cashBackAmount: String = "",
+    var panMaskFormate: String = "",
+    var panMaskConfig: String = "",
+    var panMask: String = "",
+    var terminalSerialNumber: String = "",
+    var responseCode: String = "",
+    var tid: String = "",
+    var mid: String = "",
+    var batchNumber: String = "",
+    var baseAmmount: String = "",
+    var roc: String = "",
+    var ecrTxnSaleRequestId: String ="",
+    @PrimaryKey
+    var invoiceNumber: String = "",
+    var panNumber: String = "",
+    var time: String = "",
+    var date: String = "",
+    var printDate: String = "",
+    var currentYear: String = "",
+    var currentTime: String = "",
+    var expiryDate: String = "",
+    var cardHolderName: String = "",
+    var timeStamp: Long = 0,
+    var genratedPinBlock: String = "",
+    var field55Data: String = "",
+    var track2Data: String = "",
+    var transactionType: Int = 0,
+    var applicationPanSequenceNumber: String = "",
+    var nii: String = "",
+    var indicator: String = "",
+    var bankCode: String = "",
+    var customerId: String = "",
+    var walletIssuerId: String = "",
+    var connectionType: String = "",
+    var modelName: String = "",
+    var appName: String = "",
+    var appVersion: String = "",
+    var pcNumber: String = "",
+    var posEntryValue: String = "",
+    var transactionalAmmount: String = "",
+    var mti: String = "",
+    var serialNumber: String = "",
+    var sourceNII: String = "",
+    var destinationNII: String = "",
+    var processingCode: String = "",
+    var merchantName: String = "",
+    var merchantAddress1: String = "",
+    var merchantAddress2: String = "",
+    var transactionDate: String = "",
+    var transactionTime: String = "",
+    var transationName: String = "",
+    var cardType: String = "",
+    var expiry: String = "",
+    var cardNumber: String = "",
+    var de55: String = "",
+
+    //    var autthCode: String = ""
+    var referenceNumber: String = "",
+    var aid: String = "",
+    var tc: String = "",
+    var tipAmmount: String = "",
+    var totalAmmount: String = "",
+    var isPinverified: Boolean = false,
+    var nocvm: Boolean = false,
+    var discaimerMessage: String = "",
+    var isMerchantCoppy: Boolean = true,
+    var message: String = "",
+    var isTimeOut: Boolean = false,
+
+    var operationType: String = "",
+
+    var isVoid: Boolean = false,
+
+    var f48IdentifierWithTS: String = "",
+
+    var tvr: String = "",
+    var tsi: String = "",
+
+    var aqrRefNo: String = "",
+
+    var hasPromo: Boolean = false,
+
+    var gccMsg: String = "",
+    var isOfflineSale: Boolean = false,
+    var cdtIndex: String = "",
+    var isRefundSale: Boolean = false,
+
+    // var emiData: RealmList<EmiCustomerDetails>? = null
+
+    //EmiCustomerDetails
+    var accountType: String = EAccountType.DEFAULT.code,
+    var merchantBillNo: String = "",
+    var serialNo: String = "",
+    var customerName: String = "",
+    var phoneNo: String = "",
+    var email: String = "",
+    var emiTransactionAmount: String = "",
+
+    //EMITRANSDETAIL
+    var emiBin: String = "",
+    var issuerId: String = "",
+    var emiSchemeId: String = "",
+    var transactionAmt: String = "",
+    var cashDiscountAmt: String = "",
+    var loanAmt: String = "",
+    var tenure: String = "",
+    var roi: String = "",
+    var monthlyEmi: String = "",
+    var cashback: String = "",
+    var netPay: String = "",
+    var processingFee: String = "",
+    var totalInterest: String = "",
+    var issuerName: String = "",
+    var bankEmiTAndC: String = "",
+    var tenureTAndC: String = "",
+    var tenureWiseDBDTAndC: String = "",
+    var discountCalculatedValue: String = "",
+    var cashBackCalculatedValue: String = "",
+    var processingFeeRate: String = "",
+    var totalProcessingFee: String = "",
+
+    //EMI BrandDetail
+    var brandId: String = "01",
+    var productId: String = "0",
+
+    //Status for Server Hit in Sale:-
+    var isServerHit: Boolean = false,
+
+    var merchantMobileNumber: String = "",
+    var merchantBillNumber: String = "",
+
+    //EMIAMOUNTS
+    var cashBackPercent: String = "",
+    var isCashBackInPercent: Boolean = false,
+
+    // below is added for nocashback scheme
+
+    var tenureLabel:String =  "",
+    var txnTID :String = "",
+    var txnType2:Int=0,
+
+    var authROC: String = "",
+    var authTID: String = "",
+    var authBatchNO: String = "",
+    var encryptPan: String = "",
+    var amountInResponse: String = "",
+    var isVoidPreAuth: Boolean = false,
+    var isPreAuthComplete: Boolean = false,
+
+    //Host Response Fields:-
+    var hostAutoSettleFlag: String = "",
+
+    var hostBankID: String = "",
+    var hostIssuerID: String = "",
+    var hostMID: String = "",
+    var hostTID: String = "",
+    var hostBatchNumber: String = "",
+    var hostRoc: String = "",
+    var hostInvoice: String = "",
+    var hostCardType: String = "",
+    var ctlsCaption:String="",
+    var orignalTxnAmt:String="",
+):Serializable
 
 @Entity
 data class TerminalCommunicationTable(

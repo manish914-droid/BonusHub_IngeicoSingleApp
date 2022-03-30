@@ -1275,3 +1275,10 @@ fun getTidForTestTxn(testEmiItem: String):String{
     val requiredTpt = runBlocking(Dispatchers.IO) { getTptDataByLinkTidType(testEmiItem) }
    return requiredTpt?.terminalId ?: "000000"
 }
+
+fun dateFormater(date: Long): String =
+    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+
+fun timeFormater(date: Long): String =
+    SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(date)
+

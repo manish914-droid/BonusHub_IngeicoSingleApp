@@ -324,4 +324,6 @@
     <string name="netPayAmount">Net Pay Amount</string>
     <string name="sale_amount_should_greater_then_1">Sale amount should be greater than Rs 1</string>
 
+    <string name="printing_roll_empty_msg">Transaction success Please Check Printing roll not available</string>
+
 </resources>

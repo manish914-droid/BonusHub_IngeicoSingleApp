@@ -678,11 +678,39 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData = appDatabase?.appDao?.getAllTerminalParameterTableData()?.get(0)
+            //tptData = appDatabase?.appDao?.getAllTerminalParameterTableData()?.get(0)
+            if(AppPreference.getLogin()){
+                tptData = appDatabase?.appDao?.getTerminalParameterTableDataByTidType("1")
+            }else{
+                tptData = appDatabase?.appDao?.getTerminalParameterTableDataByTidType("-1")
+            }
         }
         return tptData
     }
 //endregion
+
+    // region =================== get TempBatchFileDataTable
+    fun getTempBatchFileDataTable():List<TempBatchFileDataTable>{
+
+        var result: List<TempBatchFileDataTable>
+        runBlocking(Dispatchers.IO) {
+            result = appDatabase.appDao.getAllTempBatchFileDataTableData()
+        }
+        return result
+
+    }
+    // end region
+
+    // region =================== save TempBatchFileDataTable
+    fun saveTempBatchFileDataTable(tempBatchFileDataTable:TempBatchFileDataTable){
+
+        runBlocking(Dispatchers.IO) {
+            appDatabase.appDao.insertOrUpdateTempBatchFileDataTableData(tempBatchFileDataTable)
+        }
+
+
+    }
+    // end region
 
     //region===========================Get HDFCTPT Data:-
     fun getHDFCTptData(): HDFCTpt? {
@@ -1606,6 +1634,18 @@ fun getBrandTAndCDataByBrandId(brandId : String): String {
             println(jsonResp)
         }
         return issuerData
+    }
+//endregion
+//
+// region======================Get CardDataTable Data:-
+    fun getCardDataTable(panNumber: String): CardDataTable? {
+        var result: CardDataTable? = null
+        runBlocking(Dispatchers.IO) {
+            result = DBModule.appDatabase.appDao.getCardDataByPanNumber(panNumber)
+            val jsonResp=Gson().toJson(result)
+            println(jsonResp)
+        }
+        return result
     }
 //endregion
 //region======================Get issuer Data:-
