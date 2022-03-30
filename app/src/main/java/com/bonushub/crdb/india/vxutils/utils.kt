@@ -431,13 +431,23 @@ suspend fun checkReversal(batchData: MutableList<BatchTableReversal>): ArrayList
     return listofReversalTids
 }
 
-//To check Initiaization Status
-suspend fun checkSettlementTid(batchData: MutableList<BatchTable>): ArrayList<String> {
+//To check Initiaization Status // old
+/*suspend fun checkSettlementTid(batchData: MutableList<BatchTable>): ArrayList<String> {
     listofTxnTids.clear()
 
     val distinctByNameCusts = batchData.distinctBy{it -> it.receiptData?.tid}
     distinctByNameCusts.forEach{ it ->
         listofTxnTids.add(it.receiptData?.tid ?: "")
+    }
+    return listofTxnTids
+}*/
+
+suspend fun checkSettlementTid(batchData: MutableList<TempBatchFileDataTable>): ArrayList<String> {
+    listofTxnTids.clear()
+
+    val distinctByNameCusts = batchData.distinctBy{it -> it.tid}
+    distinctByNameCusts.forEach{ it ->
+        listofTxnTids.add(it?.tid ?: "")
     }
     return listofTxnTids
 }

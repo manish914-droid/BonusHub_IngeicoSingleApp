@@ -32,6 +32,10 @@ class SettlementRepository @Inject constructor(private val appDao: AppDao){
     fun getBatchDataList() = appDao.getBatchData()
     //endregion
 
+    // region===============Get Data For getTempBatchDataList:-
+    fun getTempBatchDataList() = appDao.getAllTempBatchFileDataTableData()
+    //endregion
+
 /*    suspend fun fetchSettlementResponse(){
          flow {
            // emit(Result.loading())

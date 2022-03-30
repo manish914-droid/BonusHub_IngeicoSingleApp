@@ -689,7 +689,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
 //endregion
 
-    // region =================== get TempBatchFileDataTable
+    /*// region =================== get TempBatchFileDataTable
     fun getTempBatchFileDataTable():List<TempBatchFileDataTable>{
 
         var result: List<TempBatchFileDataTable>
@@ -699,7 +699,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         return result
 
     }
-    // end region
+    // end region*/
 
     // region =================== save TempBatchFileDataTable
     fun saveTempBatchFileDataTable(tempBatchFileDataTable:TempBatchFileDataTable){
