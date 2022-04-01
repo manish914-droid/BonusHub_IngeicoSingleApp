@@ -12,8 +12,11 @@ import android.telephony.SignalStrength
 import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
 import com.bonushub.crdb.india.model.local.AppPreference.initializeEncryptedSharedPreferences
+import com.bonushub.crdb.india.utils.DemoConfig
 
 import com.bonushub.crdb.india.utils.DeviceHelper
+import com.usdk.apiservice.aidl.constants.RFDeviceName
+import com.usdk.apiservice.aidl.pinpad.DeviceName
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -69,11 +72,11 @@ class HDFCApplication : Application() {
 
     private fun initDefaultConfig() {
         if (Build.MODEL.startsWith("AECR")) {
-            //DemoConfig.PINPAD_DEVICE_NAME = DeviceName.COM_EPP
-           // DemoConfig.RF_DEVICE_NAME = RFDeviceName.EXTERNAL
+            DemoConfig.PINPAD_DEVICE_NAME = DeviceName.COM_EPP
+            DemoConfig.RF_DEVICE_NAME = RFDeviceName.EXTERNAL
         } else {
-          //  DemoConfig.PINPAD_DEVICE_NAME = DeviceName.IPP
-          //  DemoConfig.RF_DEVICE_NAME = RFDeviceName.INNER
+            DemoConfig.PINPAD_DEVICE_NAME = DeviceName.IPP
+            DemoConfig.RF_DEVICE_NAME = RFDeviceName.INNER
         }
     }
 

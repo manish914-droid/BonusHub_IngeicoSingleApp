@@ -181,6 +181,12 @@ public class EMVInfoUtil {
             case FlowType.EMV_FLOWTYPE_WAVE2:
                 desc = "WAVE2";
                 break;
+            case FlowType.EMV_FLOWTYPE_A_XP2_MS:
+                desc = "AMEX_MS";
+                break;
+            case FlowType.EMV_FLOWTYPE_A_XP2_EMV:
+                desc = "AMEX_EMV";
+                break;
 
             default:
                 desc = "未知流程";

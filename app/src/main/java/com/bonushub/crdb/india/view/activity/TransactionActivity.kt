@@ -44,6 +44,10 @@ class TransactionActivity : BaseActivityNew() {
 
     private var emvBinding: ActivityEmvBinding? = null
 
+    private val transactionProcessingCode by lazy {
+        intent.getStringExtra("proc_code") ?: "92001"
+    } //Just for checking purpose
+
     private var defaultScope = CoroutineScope(Dispatchers.Default)
     private var globalCardProcessedModel = CardProcessedDataModal()
 
@@ -69,6 +73,7 @@ class TransactionActivity : BaseActivityNew() {
 
         globalCardProcessedModel.setTransType(transactionType)
         globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
+        globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
 
 
         if (transactionType == BhTransactionType.SALE_WITH_CASH.type) {
@@ -117,6 +122,12 @@ class TransactionActivity : BaseActivityNew() {
             DetectCardType.CONTACT_LESS_CARD_TYPE -> {
                 CoroutineScope(Dispatchers.Main).launch {
                     Toast.makeText(applicationContext,"Contactless detected", Toast.LENGTH_LONG).show()
+                    val emvOption = EmvOption.create().apply {
+                        flagPSE(0x01.toByte())
+                    }
+
+                    testVFEmvHandler = emvHandler()
+                    DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), emvHandler())
                 }
             }
 
