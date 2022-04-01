@@ -97,8 +97,8 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         batchFileData.appVersion = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
         batchFileData.pcNumber = AppPreference.getString(AppPreference.PC_NUMBER_KEY)
         //batchFileData.operationType = isoPackageWriter.operationType(Need to Discuss by Ajay)
-//        batchFileData.transationName =
-//            TransactionTypeValues.getTransactionStringType(transactionType) // please check sir //kushal
+        batchFileData.transationName =
+            TransactionTypeValues.getTransactionStringType(transactionType)
 
         val f60DataLists = field60Data.split('|')
 

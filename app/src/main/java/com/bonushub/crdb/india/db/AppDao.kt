@@ -513,8 +513,14 @@ interface AppDao{
 
     // region =================== TempBatchFileDataTable table dao =============
     @Query("SELECT * FROM TempBatchFileDataTable")
-    suspend fun getAllTempBatchFileDataTableData(): MutableList<TempBatchFileDataTable>
+    fun getAllTempBatchFileDataTableData(): LiveData<MutableList<TempBatchFileDataTable?>>?
+
+    @Query("SELECT * FROM TempBatchFileDataTable")
+    suspend fun getAllTempBatchFileDataTableDataForSettlement(): MutableList<TempBatchFileDataTable>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateTempBatchFileDataTableData(tempBatchFileDataTable: TempBatchFileDataTable): Long?
+
+    @Query("DELETE From TempBatchFileDataTable")
+    suspend fun deleteTempBatchFileDataTable()
 }

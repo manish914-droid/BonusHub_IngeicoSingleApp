@@ -8,6 +8,7 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptDataByTid
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.transactionType2Name
+import com.bonushub.crdb.india.vxutils.TransactionType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.util.HashMap
@@ -15,7 +16,9 @@ import javax.inject.Inject
 
 
 class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : ISettlementPacketExchange {
-    val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() }
+    val tempbatchListData = runBlocking(Dispatchers.IO) { appDao?.getAllTempBatchFileDataTableDataForSettlement() }
+    val batchListData = tempbatchListData
+    //val batchListData = runBlocking(Dispatchers.IO) { appDao?.getAllBatchData() } // old
     val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDao) }
     val reversaldata = runBlocking(Dispatchers.IO) { appDao.getAllBatchReversalData() }
     override fun createSettlementISOPacket(): IWriter = IsoDataWriter().apply {
@@ -80,7 +83,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
             //adding field 63
             //SEQUENCE-------> sale, emi sale ,sale with cash, cash only,auth comp,and tip transaction type will be included.
             //Manipulating Data based on condition for Field 63:-
-            if (batchListData.size > 0) {
+            /*if (batchListData.size > 0) {
 
 
                 val map = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
@@ -201,10 +204,10 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                             }
                         }
 
-                 /*       val sCount = addPad(saleCount, "0", 3, true)
+                 *//*       val sCount = addPad(saleCount, "0", 3, true)
                         val sAmount = addPad(saleAmount.toString(), "0", 12, true)
                         val rCount = addPad(refundCount, "0", 3, true)
-                        val rAmount = addPad(refundAmount.toString(), "0", 12, true)*/
+                        val rAmount = addPad(refundAmount.toString(), "0", 12, true)*//*
                         //   sale,sale with cash, cash only,auth comp,and tip transaction
 
 
@@ -262,7 +265,88 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
 
             }
+*/
 
+            //adding field 63
+            var saleCount = 0
+            var saleAmount = 0L
+
+            var refundCount = 0
+            var refundAmount = "0"
+
+            if(batchListData.size > 0){
+
+                for (i in 0 until batchListData.size) {
+                    when (batchListData[i]?.transactionType) {
+                        TransactionType.SALE.type -> {
+                            if(batchListData[i]?.tenure=="1"){
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.emiTransactionAmount?.toLong()?:0L)
+                            }else{
+                                saleCount = saleCount.plus(1)
+                                saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
+                            }
+                        }
+                        TransactionType.EMI_SALE.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.emiTransactionAmount?.toLong()?:0L)
+                        }
+                        TransactionType.BRAND_EMI.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.emiTransactionAmount?.toLong()?:0L)
+                        }
+                        TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
+                        }
+                        TransactionType.SALE_WITH_CASH.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
+                        }
+                        TransactionType.CASH_AT_POS.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
+                        }
+                        TransactionType.PRE_AUTH_COMPLETE.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
+                        }
+                        TransactionType.TIP_SALE.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(batchListData[i]?.totalAmmount?.toLong()?:0L)
+                        }
+                        TransactionType.TEST_EMI.type -> {
+                            saleCount = saleCount.plus(1)
+                            saleAmount = saleAmount.plus(100.toLong())
+                        }
+                        TransactionType.REFUND.type -> {
+                            refundCount = refundCount.plus(1)
+                            refundAmount =
+                                refundAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
+                        }
+                    }
+                }
+
+                val sCount = addPad(saleCount, "0", 3, true)
+                val sAmount = addPad(saleAmount.toString(), "0", 12, true)
+
+                val rCount = addPad(refundCount, "0", 3, true)
+                val rAmount = addPad(refundAmount, "0", 12, true)
+
+                //   sale, emi sale ,sale with cash, cash only,auth comp,and tip transaction
+
+
+                addFieldByHex(
+                    63,
+                    addPad(
+                        sCount + sAmount + rCount + rAmount,
+                        "0",
+                        90,
+                        toLeft = false
+                    )
+                )
+
+            }
             else {
                 addFieldByHex(63, addPad(0, "0", 90, toLeft = false))
             }

@@ -255,7 +255,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                         getString(R.string.please_settle_batch),
                         false, getString(R.string.positive_button_ok),
                         {
-                            autoSettleBatchData()
+                            //autoSettleBatchData()
                         },
                         {})
                 }
@@ -1056,7 +1056,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                     getString(R.string.please_settle_batch),
                     false, getString(R.string.positive_button_ok),
                     {
-                        autoSettleBatchData()
+                        //autoSettleBatchData()
                     },
                     {})
 
@@ -1236,7 +1236,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
     //Settle Batch and Do the Init:-
-    suspend fun settleBatch1(settlementByteArray: ByteArray?, settlementFrom: String? = null, settlementCB: ((Boolean) -> Unit)? = null) {
+    suspend fun settleBatch(settlementByteArray: ByteArray?, settlementFrom: String? = null, settlementCB: ((Boolean) -> Unit)? = null) {
         runOnUiThread {
             showProgress()
         }
@@ -1318,7 +1318,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                 runBlocking(Dispatchers.IO) {
                                     AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                     //Delete All BatchFile Data from Table after Settlement:-
-                                    appDao.deleteBatchTable()
+                                    //appDao.deleteBatchTable() // old
+                                    appDao.deleteTempBatchFileDataTable()
 
                                     // clear reversal table and preference kushal
                                     appDao.deleteBatchReversalTable()
@@ -1398,7 +1399,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     runBlocking(Dispatchers.IO) {
                                         AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
                                         //Delete All BatchFile Data from Table after Settlement:-
-                                        appDao.deleteBatchTable()
+                                        //appDao.deleteBatchTable() // old
+                                        appDao.deleteTempBatchFileDataTable()
                                         appDao.deleteDigiPosDataTable()
                                     }
                                     //endregion
@@ -1676,7 +1678,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
 
     //Auto Settle Batch:- kushal
-    private fun autoSettleBatchData() {
+    /*private fun autoSettleBatchData() {
         // val settlementBatchData = BatchFileDataTable.selectBatchData()
         val settlementBatchData = runBlocking(Dispatchers.IO) {
             appDao.getAllBatchData()
@@ -1727,7 +1729,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                     var settlementByteArray = data.generateIsoByteRequest()
                                     try {
-                                        settleBatch1(settlementByteArray) {}
+                                        settleBatch(settlementByteArray) {}
                                     } catch (ex: Exception) {
                                         hideProgress()
                                         ex.printStackTrace()
@@ -1766,7 +1768,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                         val isoByteArray = settlementPacket.generateIsoByteRequest()
                         GlobalScope.launch(Dispatchers.IO) {
-                            settleBatch1(isoByteArray)
+                            settleBatch(isoByteArray)
                         }
                     } else
                         alertBoxWithAction(getString(R.string.printing_error),
@@ -1781,7 +1783,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         }
 
 
-    }
+    }*/
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         currentFocus = hasFocus
         if (!hasFocus) {

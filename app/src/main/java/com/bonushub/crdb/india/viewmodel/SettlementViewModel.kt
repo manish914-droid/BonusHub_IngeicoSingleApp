@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.india.model.local.IngenicoSettlementResponse
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.repository.SettlementRepository
 import com.bonushub.crdb.india.utils.Result
 import com.bonushub.crdb.india.utils.getBaseTID
@@ -26,6 +27,9 @@ class SettlementViewModel @ViewModelInject constructor(private val settlementRep
      fun getBatchData() = settlementRepository.getBatchDataList()
     //endregion
 
+    // region ======== getTempBatchFileData
+    fun getTempBatchFileData() = settlementRepository.getTempBatchDataList()
+    // end region
 
     fun settlementResponse(distinctbytid: ArrayList<String>) {
         viewModelScope.launch {
