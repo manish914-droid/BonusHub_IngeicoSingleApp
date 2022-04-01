@@ -141,8 +141,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
 
                                         }
                                         DetectCardType.EMV_CARD_TYPE -> {
-                                            if (TextUtils.isEmpty(
-                                                            AppPreference.getString(GENERIC_REVERSAL_KEY))) {
+                                            if (true/*TextUtils.isEmpty(AppPreference.getString(GENERIC_REVERSAL_KEY))*/) {
 
                                                 if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type
                                           /*          && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&
@@ -154,12 +153,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                         cardProcessedDataModal?.getTransType() != TransactionType.CASH_AT_POS.type &&
                                                         cardProcessedDataModal?.getTransType() != TransactionType.TEST_EMI.type*/) {
 
-                                             /*       val field55 = responseIsoData.isoMap[55]?.rawData ?: ""
-                                                    System.out.println("Field 55 is "+field55)
 
-
-                                                  var respond = iemv?.respondEvent(field55)
-                                                    System.out.println("Second gen Ac "+respond)*/
 
                                                     CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testVFEmvHandler) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)

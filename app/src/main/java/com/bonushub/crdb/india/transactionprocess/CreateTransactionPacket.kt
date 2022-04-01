@@ -24,10 +24,6 @@ import javax.inject.Inject
 class CreateTransactionPacket @Inject constructor(private var appDao: AppDao,private var cardProcessedData: CardProcessedDataModal,private var batchdata:BatchTable?) : ITransactionPacketExchange {
 
 
-
-
-
-
     private var indicator: String? = null
     //  private var brandEMIData: brandEMIData? = null
     //  private var brandEMIByAccessCodeData: BrandEMIAccessDataModalTable? = null
