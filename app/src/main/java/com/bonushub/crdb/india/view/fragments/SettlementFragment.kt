@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,7 +21,6 @@ import com.bonushub.crdb.india.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.india.databinding.ItemSettlementBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
-import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.local.BatchTableReversal
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
@@ -31,10 +31,8 @@ import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
-import com.bonushub.crdb.india.utils.PrefConstant
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
-import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -156,7 +154,7 @@ class SettlementFragment : Fragment() {
                             settlementByteArray =
                                 data.generateIsoByteRequest()
                             try {
-                                (activity as NavigationActivity).settleBatch1(
+                                (activity as NavigationActivity).settleBatch(
                                     settlementByteArray
                                 ) {
                                     logger("zero settlement",it.toString(),"e")
@@ -174,17 +172,90 @@ class SettlementFragment : Fragment() {
 
                                 (activity as BaseActivityNew).showProgress("Transaction syncing...")
                             }
-                            Utility().syncPendingTransaction(transactionViewModel){
+//                            (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+                            PrintUtil(activity).printDetailReportupdate(tempDataList, activity){ detailPrintStatus ->
+
+                                    if (detailPrintStatus) {
+                                        GlobalScope.launch(
+                                            Dispatchers.IO
+                                        ) {
+                                            val data =
+                                                CreateSettlementPacket(appDao).createSettlementISOPacket()
+                                            settlementByteArray =
+                                                data.generateIsoByteRequest()
+                                            try {
+                                                (activity as NavigationActivity).settleBatch(
+                                                    settlementByteArray
+                                                ) {
+                                                    if (!it)
+                                                        enableDisableSettlementButton(
+                                                            true
+                                                        )
+                                                }
+                                            } catch (ex: Exception) {
+                                                (activity as NavigationActivity).hideProgress()
+                                                enableDisableSettlementButton(
+                                                    true
+                                                )
+                                                ex.printStackTrace()
+                                            }
+                                        }
+                                    } else {
+                                        (activity as NavigationActivity).hideProgress()
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            (activity as NavigationActivity).alertBoxWithAction(
+                                                getString(R.string.printer_error),
+                                                getString(R.string.please_check_printing_roll),
+                                                true,
+                                                getString(R.string.yes),
+                                                {
+                                                    /*val data =
+                                                        CreateSettlementPacket(
+                                                            ProcessingCode.SETTLEMENT.code,
+                                                            batchList
+                                                        ).createSettlementISOPacket()
+                                                    settlementByteArray =
+                                                        data.generateIsoByteRequest()
+                                                    try {
+                                                        (activity as MainActivity).hideProgress()
+                                                        GlobalScope.launch(
+                                                            Dispatchers.IO
+                                                        ) {
+                                                            (activity as MainActivity).settleBatch(
+                                                                settlementByteArray
+                                                            ) {
+                                                                if (!it)
+                                                                    enableDisableSettlementButton(
+                                                                        true
+                                                                    )
+                                                            }
+                                                        }
+                                                    } catch (ex: Exception) {
+                                                        (activity as MainActivity).hideProgress()
+                                                        enableDisableSettlementButton(
+                                                            true
+                                                        )
+                                                        ex.printStackTrace()
+                                                    }*/
+                                                },
+                                                {})
+                                        }
+                                    }
+                            }
+
+
+                            /*Utility().syncPendingTransaction(transactionViewModel){
                                 if(it){
                                        // withContext(Dispatchers.Main){
                                             (activity as BaseActivityNew).hideProgress()
                                        // }
 
                                     // kushal
-                                    /*PrintUtil(activity).printDetailReportupdate(tempDataList, activity) {
+                                    *//*PrintUtil(activity).printDetailReportupdate(tempDataList, activity) {
                                             detailPrintStatus ->
 
-                                    }*/
+                                    }*//*
 
 
                                     lifecycleScope.launch(Dispatchers.Main) {
@@ -276,7 +347,7 @@ class SettlementFragment : Fragment() {
                                         }
                                     }
                                 }
-                            }
+                            }*/
                         }
 
                     }
@@ -321,6 +392,14 @@ class SettlementFragment : Fragment() {
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
         }
 
+
+    }
+    //endregion
+
+    //region==============================method to enable/disable settlement Floating button:-
+    private  fun enableDisableSettlementButton(isEnable: Boolean) {
+
+        fragmensettlementBinding.settlementFloatingButton.isEnabled = isEnable
 
     }
     //endregion

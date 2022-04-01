@@ -255,7 +255,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
             override fun run() {
                 try {
                     logger("AutoSettle:- ", "Checking....")
-                    autoSettleBatch()
+                    //autoSettleBatch()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {
@@ -269,7 +269,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     //endregion
     var txnSyncing: Boolean = false
     //region=======================Check for User IDLE on Dashboard and do auto settle if conditions match:-
-    private fun autoSettleBatch() {
+    /*private fun autoSettleBatch() {
         //val tptData = runBlocking(Dispatchers.IO) { TerminalParameterTable.selectFromSchemeTable() }
         val tptData = runBlocking(Dispatchers.IO) { getTptData() }
         //val batchData = runBlocking(Dispatchers.IO) { BatchFileDataTable.selectBatchData() }
@@ -348,7 +348,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
                                                                   val data = CreateSettlementPacket(appDao).createSettlementISOPacket()
                                                                   val settlementByteArray = data.generateIsoByteRequest()
                                                                   try {
-                                                                      (activity as NavigationActivity).settleBatch1(settlementByteArray, SettlementComingFrom.DASHBOARD.screenType) { (activity as NavigationActivity).hideProgress()}
+                                                                      (activity as NavigationActivity).settleBatch(settlementByteArray, SettlementComingFrom.DASHBOARD.screenType) { (activity as NavigationActivity).hideProgress()}
                                                                   } catch (ex: Exception) {
                                                                       (activity as NavigationActivity).hideProgress()
                                                                       ex.printStackTrace()
@@ -419,7 +419,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         } else {
             Log.d("Dashboard Close:- ", "Yes")
         }
-    }
+    } */
     //endregion
 
     var restatDataList:RestartHandlingModel? = null

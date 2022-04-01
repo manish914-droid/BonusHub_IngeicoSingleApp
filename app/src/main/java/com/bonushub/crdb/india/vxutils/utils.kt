@@ -442,7 +442,7 @@ suspend fun checkReversal(batchData: MutableList<BatchTableReversal>): ArrayList
     return listofTxnTids
 }*/
 
-suspend fun checkSettlementTid(batchData: MutableList<TempBatchFileDataTable>): ArrayList<String> {
+suspend fun checkSettlementTid(batchData: MutableList<BatchFileDataTable>): ArrayList<String> {
     listofTxnTids.clear()
 
     val distinctByNameCusts = batchData.distinctBy{it -> it.tid}

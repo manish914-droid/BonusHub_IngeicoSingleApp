@@ -415,12 +415,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 Log.d("TPT Data:- ", batchData.toString())
                                                 dataList.clear()
                                                 dataList.addAll(batchData as MutableList<BatchTable>)
-                                                PrintUtil(activity).printDetailReportupdate(
+                                                // kushal enble later
+                                               /* PrintUtil(activity).printDetailReportupdate(
                                                     dataList,
                                                     activity
                                                 ) { detailPrintStatus ->
 
-                                                }
+                                                }*/
                                                 //BB
 //                                                PrintUtil(activity).printDetailReportupdate(batchData, activity) {
 //                                                    iDiag?.hideProgress()

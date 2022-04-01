@@ -2090,25 +2090,26 @@ class PrintUtil(context: Context?) {
     }
 
     fun printDetailReportupdate(
-        batch: MutableList<BatchTable>,
+        batch: MutableList<TempBatchFileDataTable>,
         context: Context?,
         printCB: (Boolean) -> Unit
     ) {
         try {
+            var isFirstTimeForAmxLogo = true
             val pp = printer?.status
             Log.e("Printer Status", pp.toString())
             if (pp == 0) {
 
                 val appVersion = BuildConfig.VERSION_NAME
                 val tpt = getTptData()
-                batch.sortBy { it.receiptData?.tid }
+                batch.sortBy { it.tid }
 
                 if (batch.isEmpty()) {
                     // alignLeftRightText(textInLineFormatBundle, "MID : ${tpt?.merchantId}", "TID : ${tpt?.terminalId}")
                 }
                 else {
                     //-----------------------------------------------
-                    setLogoAndHeader()
+                    // setLogoAndHeader() // handel in headerPrintiong methid
                   /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
                     receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
 //                    val ingtpt=getInitdataList()
@@ -2120,7 +2121,20 @@ class PrintUtil(context: Context?) {
 //                    sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
 //                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
-                    headerPrinting()
+                    // headerPrinting()
+                    val isHdfcPresent = batch.find{ it.hostBankID.equals("01") || it.hostBankID.equals("1")}
+                    val isAmexPresent = batch.find{ it.hostBankID.equals(AMEX_BANK_CODE) || it.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)}
+                    if(isHdfcPresent?.hostBankID.equals("01") || isHdfcPresent?.hostBankID.equals("1")){
+                        headerPrinting(HDFC_BANK_CODE)}
+                    else if(isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE) || isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)){
+                        headerPrinting(AMEX_BANK_CODE)
+                        isFirstTimeForAmxLogo = false
+                    }else{
+                        headerPrinting(DEFAULT_BANK_CODE)
+                    }
+
+
+
 
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()
@@ -2147,7 +2161,7 @@ class PrintUtil(context: Context?) {
                     )
                     textBlockList.add(
                         sigleLineformat(
-                            "TID:${batch[0].receiptData?.tid}",
+                            "TID:${batch[0].tid}",
                             AlignMode.RIGHT
                         )
                     )
@@ -2156,7 +2170,7 @@ class PrintUtil(context: Context?) {
 
                     textBlockList.add(
                         sigleLineformat(
-                            "BATCH NO:${batch[0].receiptData?.batchNumber}",
+                            "BATCH NO:${batch[0].batchNumber}",
                             AlignMode.LEFT
                         )
                     )
@@ -2198,7 +2212,7 @@ class PrintUtil(context: Context?) {
                     val tidlist = mutableListOf<String>()
 
                     for (item in batch) {
-                        item.receiptData?.tid.let {
+                        item.tid.let {
                             if (it != null) {
                                 tidlist.add(it)
                             }
@@ -2248,19 +2262,19 @@ class PrintUtil(context: Context?) {
                                 val x = totalMap[b.transactionType]
                                 if (x != null) {
                                     x.count += 1
-                                    x.total += b.receiptData?.txnAmount?.toLong()!!
+                                    x.total += b.transactionalAmmount?.toLong()!!
                                 }
                             } else {
 
                                 totalMap[b.transactionType] =
-                                    b.receiptData?.txnAmount?.toLong()
+                                    b.transactionalAmmount?.toLong()
                                         ?.let { SummeryTotalType(1, it) }!!
                             }
                             val transAmount = "%.2f".format(
-                                b.receiptData?.txnAmount?.toDouble()
+                                b.transactionalAmmount?.toDouble()
                                     ?.div(100)
                             )
-                            if (b.receiptData?.txnName.equals("TEST EMI TXN")) {
+                            if (b.transationName.equals("TEST EMI TXN")) {
                                 textBlockList.add(
                                     sigleLineformat(
                                         "${"SALE"}",
@@ -2270,7 +2284,7 @@ class PrintUtil(context: Context?) {
                             } else {
                                 textBlockList.add(
                                     sigleLineformat(
-                                        "${b.receiptData?.txnName}",
+                                        "${b.transationName}",
                                         AlignMode.LEFT
                                     )
                                 )
@@ -2282,13 +2296,13 @@ class PrintUtil(context: Context?) {
                         if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
                             textBlockList.add(
                                 sigleLineformat(
-                                    "${b.receiptData?.appName}",
+                                    "${b.appName}",
                                     AlignMode.LEFT
                                 )
                             )
                             textBlockList.add(
                                 sigleLineformat(
-                                    "${b.receiptData?.maskedPan}",
+                                    "${b.panMask}",
                                     AlignMode.RIGHT
                                 )
                             )
@@ -2297,13 +2311,13 @@ class PrintUtil(context: Context?) {
                         } else {
                             textBlockList.add(
                                 sigleLineformat(
-                                    "${b.receiptData?.appName}",
+                                    "${b.cardType}",
                                     AlignMode.LEFT
                                 )
                             )
                             textBlockList.add(
                                 sigleLineformat(
-                                    "${b.receiptData?.maskedPan}",
+                                    "${b.panMask}",
                                     AlignMode.RIGHT
                                 )
                             )
@@ -2313,9 +2327,10 @@ class PrintUtil(context: Context?) {
                         if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
                             try {
 
-                                    val dat = "${b.receiptData?.dateTime}"
+                                    //val dat = "${b.dateTime}"
+                                    val dat = "${b.printDate} - ${b.time}"
                                     textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
-                                    b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
+                                    b.hostInvoice?.let { invoiceWithPadding(it) }?.let {
                                         sigleLineformat(
                                             it, AlignMode.RIGHT
                                         )
@@ -2329,15 +2344,28 @@ class PrintUtil(context: Context?) {
                                 }
 
                             } else {
-                                val date = b.receiptData?.dateTime
-                                val parts = date?.split(" ")
-                                println("Date: " + parts!![0])
-                                println("Time: " + (parts[1]))
+//                                val date = b.dateTime
+//                                val parts = date?.split(" ")
+//                                println("Date: " + parts!![0])
+//                                println("Time: " + (parts[1]))
+
+                                val timee = b.time
+                                val timeFormat = SimpleDateFormat("HHmmss", Locale.getDefault())
+                                val timeFormat2 = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                                var formattedTime = ""
+
                                 try {
 
-                                    val dat = "${parts!![0]} - ${parts[1]}"
+                                    //val dat = "${parts!![0]} - ${parts[1]}"
+
+                                    val t1 = timeFormat.parse(timee)
+                                    formattedTime = timeFormat2.format(t1)
+                                    Log.e("Time", formattedTime)
+                                    val dat = "${b.transactionDate} - $formattedTime"
+
                                     textBlockList.add(sigleLineformat(dat, AlignMode.LEFT))
-                                    b.receiptData?.invoice?.let { invoiceWithPadding(it) }?.let {
+
+                                    b.hostInvoice?.let { invoiceWithPadding(it) }?.let {
                                         sigleLineformat(
                                             it, AlignMode.RIGHT
                                         )
@@ -2408,7 +2436,7 @@ class PrintUtil(context: Context?) {
                                 )
                                 textBlockList.add(
                                     sigleLineformat(
-                                        "TID:${batch[frequency].receiptData?.tid}",
+                                        "TID:${batch[frequency].tid}",
                                         AlignMode.RIGHT
                                     )
                                 )
@@ -2416,7 +2444,7 @@ class PrintUtil(context: Context?) {
                                 textBlockList.clear()
                                 textBlockList.add(
                                     sigleLineformat(
-                                        "BATCH NO:${batch[frequency].receiptData?.batchNumber}",
+                                        "BATCH NO:${batch[frequency].batchNumber}",
                                         AlignMode.LEFT
                                     )
                                 )
@@ -2968,7 +2996,7 @@ class PrintUtil(context: Context?) {
         if (batch.size <= 0) {
             try {
                 val tpt = getTptData()
-                setLogoAndHeader()
+               // setLogoAndHeader()
 
 
                 headerPrinting()
@@ -3064,7 +3092,7 @@ class PrintUtil(context: Context?) {
                 val listTidPrinted = mutableListOf<String>()
                 val tpt = getTptData()
 
-                setLogoAndHeader()
+               // setLogoAndHeader()
 
                 headerPrinting()
 
