@@ -523,4 +523,10 @@ interface AppDao{
 
     @Query("DELETE From TempBatchFileDataTable")
     suspend fun deleteTempBatchFileDataTable()
+
+    @Query("SELECT * FROM TempBatchFileDataTable WHERE invoiceNumber = :invoice")
+    suspend fun getTempBatchTableDataListByInvoice(invoice: String?): MutableList<TempBatchFileDataTable?>?
+
+    @Query("DELETE From  TempBatchFileDataTable WHERE invoiceNumber = :invoice and hostTID = :hostTid")
+    suspend fun deleteTempBatchFileDataTableFromInvoice(invoice: String?, hostTid:String?)
 }

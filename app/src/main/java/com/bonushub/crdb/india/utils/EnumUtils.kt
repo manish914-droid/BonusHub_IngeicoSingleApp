@@ -136,7 +136,7 @@ enum class Nii(val nii: String) {
 
 //region=======================ConnectionType==============
 enum class ConnectionType(val code: String) {
-    PSTN("1"), ETHERNET("2"), GPRS("3")
+    PSTN("1"), ETHERNET("2"), GPRS("3"), WIFI("4")
 }
 //endregion
 
@@ -637,3 +637,14 @@ enum class DigiPosItem(val title: String, val res: Int, val rank: Int = 15, var 
     /*BHARAT_QR("Bharat QR", R.drawable.ic_qr_code, 905),*/
 }
 // end region
+
+//region======================ENUM FOR CARD AID=================
+enum class CardAid(val aid: String) {
+    Rupay("A000000524"),
+    Diners("A000000152"),
+    Jcb("A000000065"),
+    UnionPay("A000000333"),
+    AMEX("A000000025"),
+    Master("A000000004")
+}
+//endregion

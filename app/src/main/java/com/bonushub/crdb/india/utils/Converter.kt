@@ -1,6 +1,7 @@
 @file:JvmName("Converter")
 package com.bonushub.crdb.india.utils
 
+import android.text.TextUtils
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -283,3 +284,20 @@ private fun intCharMap(int: Int): Char {
 
 }
 
+//Below we are manipulating Field55 and get TC Data through TAG91 data of Field55:-
+fun tcDataFromField55(data: IsoDataReader): String {
+    val field55 = data.isoMap[55]?.rawData ?: ""
+    //println("Filed55 value is --> $field55")
+    val f55Hash = HashMap<Int, String>()
+    tlvParser(field55, f55Hash)
+    val tag8A = 0x8A
+    val tag91 = 0x91   //71,72
+
+    var tcData = f55Hash[tag91] ?: ""
+    return if (!TextUtils.isEmpty(tcData)) {
+        tcData
+    } else {
+        tcData = ""
+        tcData
+    }
+}

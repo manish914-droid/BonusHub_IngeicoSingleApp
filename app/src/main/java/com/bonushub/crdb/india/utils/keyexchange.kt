@@ -40,6 +40,9 @@ interface IKeyExchange : IKeyExchangeInit {
     suspend fun createKeyExchangeIso(): IWriter
 }
 
+interface IVoidExchange {
+    fun createVoidISOPacket(): IWriter
+}
 
 /**
  * KCV matching part is remaining, KCV extraction is done [18-07-2019]

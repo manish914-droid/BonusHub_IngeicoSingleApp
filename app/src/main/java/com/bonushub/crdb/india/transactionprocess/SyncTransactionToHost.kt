@@ -141,8 +141,8 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
 
                                         }
                                         DetectCardType.EMV_CARD_TYPE -> {
-                                            if (TextUtils.isEmpty(
-                                                            AppPreference.getString(GENERIC_REVERSAL_KEY))) {
+                                            if (true/*TextUtils.isEmpty(
+                                                            AppPreference.getString(GENERIC_REVERSAL_KEY))*/) {
 
                                                 if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type
                                           /*          && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&

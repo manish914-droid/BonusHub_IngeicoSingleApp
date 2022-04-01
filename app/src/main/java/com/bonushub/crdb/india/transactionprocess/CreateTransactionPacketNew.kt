@@ -52,7 +52,8 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                 }
 
             //Processing Code Field 3
-            addField(3, cardProcessedData.getProcessingCode().toString())
+           // addField(3, cardProcessedData.getProcessingCode().toString())
+            addField(3, "920001")
 
             //Transaction Amount Field
             addField(4, addPad(cardProcessedData.getTransactionAmount().toString(), "0", 12, true))

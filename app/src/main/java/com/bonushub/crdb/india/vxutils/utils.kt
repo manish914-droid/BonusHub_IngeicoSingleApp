@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -15,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.bonushub.crdb.india.BuildConfig
+import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.model.local.*
@@ -1292,3 +1294,17 @@ fun dateFormater(date: Long): String =
 fun timeFormater(date: Long): String =
     SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(date)
 
+fun getConnectionType():String{
+
+    val connManager = HDFCApplication.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    val networkInfo = connManager!!.getActiveNetworkInfo()//connManager!!.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+    // println("" + networkInfo!!.typeName)
+    // textView.setText("" + networkInfo!!.typeName)
+    return if (networkInfo?.getType() == ConnectivityManager.TYPE_WIFI)
+        ConnectionType.WIFI.code
+    /*if (networkInfo?.getType() == ConnectivityManager.TYPE_MOBILE)
+        return  ConnectionType.WIFI*/
+    else{
+        ConnectionType.GPRS.code
+    }
+}

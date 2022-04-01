@@ -878,12 +878,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
             }
             EDashboardItem.VOID_SALE->{
-                CoroutineScope(Dispatchers.IO).launch{
+                /*CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                     println("TID LIST --->  $listofTids")
                     val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                     println("RESULT TWO --->  $resultTwo")
-                }
+                }*/
                 transactFragment(VoidMainFragment())
                 // todo uncomment below
                 /*  lifecycleScope.launch(Dispatchers.IO) {
@@ -892,10 +892,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                       println(dd.toString())
                   }
                   transactFragment(VoidMainFragment())*/
-                val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber("53")
+               // val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber("53")
 
                 //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
-                val cdtIndex = cardDataTable?.cardTableIndex ?: ""
+              //  val cdtIndex = cardDataTable?.cardTableIndex ?: ""
                 /*     val accSellection =
                          addPad(
                              AppPreference.getString(AppPreference.ACC_SEL_KEY),

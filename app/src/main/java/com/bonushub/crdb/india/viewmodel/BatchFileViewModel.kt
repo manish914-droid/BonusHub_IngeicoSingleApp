@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.bonushub.crdb.india.model.local.BatchFileDataTable
 import com.bonushub.crdb.india.model.local.BatchTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.repository.BatchFilesRepository
 
 class BatchFileViewModel@ViewModelInject constructor(private val batchFilesRepository: BatchFilesRepository):ViewModel() {
@@ -31,6 +32,26 @@ class BatchFileViewModel@ViewModelInject constructor(private val batchFilesRepos
     {
         batchTableDataListByInvoice = batchFilesRepository.getBatchTableDataListByInvoice(invoice)
         return batchTableDataListByInvoice as LiveData<MutableList<BatchTable?>>
+
+    }
+
+    private var tempBatchTableDataListByInvoice : LiveData<MutableList<TempBatchFileDataTable?>>? = null
+    suspend fun getTempBatchTableDataListByInvoice(invoice: String?) : LiveData<MutableList<TempBatchFileDataTable?>>
+    {
+        tempBatchTableDataListByInvoice = batchFilesRepository.getTempBatchTableDataListByInvoice(invoice)
+        return tempBatchTableDataListByInvoice as LiveData<MutableList<TempBatchFileDataTable?>>
+
+    }
+
+    suspend fun deleteTempBatchFileDataTableFromInvoice(invoice: String?, tid: String?)
+    {
+        batchFilesRepository.deleteTempBatchFileDataTableFromInvoice(invoice, tid)
+
+    }
+
+    suspend fun insertTempBatchFileDataTable(data: TempBatchFileDataTable)
+    {
+        batchFilesRepository.insertTempBatchFileDataTable(data)
 
     }
 
