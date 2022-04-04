@@ -125,6 +125,9 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                 "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"//used for visa// used for ruppay//"0|54|2|00"
             addFieldByHex(58, indicator)
 
+            Log.d("SALE Indicator:- ", indicator.toString())
+            additionalData["indicatorF58"] = indicator ?: ""
+
             //Adding Field 60 value on basis of Condition Whether it consist Mobile Number Data , Bill Number Data or not:-
             val gcc = "0"
             var field60 : String? = null

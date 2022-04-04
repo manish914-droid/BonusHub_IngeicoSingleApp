@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.method.DigitsKeyListener
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -17,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.view.fragments.getEditorActionListener
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DialogUtilsNew1 {
 
@@ -195,7 +199,20 @@ class DialogUtilsNew1 {
                 val okbtn = findViewById<TextView>(R.id.txtViewOk)
 
                 txtViewDate.text = date
-                txtViewTime.text = time
+
+                val timeFormat = SimpleDateFormat("HHmmss", Locale.getDefault())
+                val timeFormat2 = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                var formattedTime = ""
+                try {
+                    val t1 = timeFormat.parse(time)
+                    formattedTime = timeFormat2.format(t1)
+                    Log.e("Time", formattedTime)
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                }
+
+                txtViewTime.text = formattedTime
+
                 txtViewTid.text = tid
                 txtViewInvoiceNumber.text = invoiceNumber
                 txtViewTotalAmount.text = totalAmount

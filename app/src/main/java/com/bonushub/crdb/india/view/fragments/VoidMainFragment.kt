@@ -427,7 +427,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
     private fun onContinueClicked(voidData: TempBatchFileDataTable) {
         //Sync Reversal
-        if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+        if (false/*!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))*/) {
             logger("goto ","Sync Reversal","e")
             /*activity?.runOnUiThread { (activity as MainActivity).showProgress(getString(R.string.reversal_data_sync)) }
             SyncReversalToHost(AppPreference.getReversal()) { isSyncToHost, transMsg ->
@@ -443,7 +443,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
             }*/
         } else {
             //Sync Main Transaction(VOID transaction)
-            if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+            if (true/*TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))*/) {
                 GlobalScope.launch {
                     delay(1000)
                     //**** Creating void packet and send to server ****
@@ -491,7 +491,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
                                     startActivity(
                                         Intent(
-                                            (activity as BaseActivity),
+                                            requireActivity(),
                                             NavigationActivity::class.java
                                         ).apply {
                                             flags =
@@ -687,7 +687,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
         private fun sendVoidTransToHost(transactionISOByteArray: IsoDataWriter) {
 
-            if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+            if (true/*TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))*/) {
                 //  (context as MainActivity).showProgress((context).getString(R.string.please_wait_offline_sale_sync))
                 SyncVoidTransactionToHost(
                     transactionISOByteArray,
@@ -877,7 +877,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                         }
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
-                                //voidTransInvoicesDialog(bat as ArrayList<TempBatchFileDataTable>) // kushal
+                                voidTransInvoicesDialog(bat as ArrayList<TempBatchFileDataTable>) // kushal
                             }
                         }
                     }
@@ -968,15 +968,15 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
     private fun voidTransConfirmationDialog(batchTable: TempBatchFileDataTable) {
         if(batchTable != null) {
-                    val date = batchTable?.time ?: ""
+                   // val date = batchTable?.time ?: ""
                     /*val parts = date.split(" ")
                     println("Date: " + parts[0])
                     println("Time: " + (parts[1]) )*/
                     val amt ="%.2f".format((((batchTable?.transactionalAmmount ?: "").toDouble()).div(100)).toString().toDouble())
                     DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
-                        date,
-                        date,
+                        batchTable.transactionDate,
+                        batchTable.time,
                         batchTable.tid ?: "",
                         batchTable.invoiceNumber ?: "",
                         amt
@@ -1123,7 +1123,8 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
     }
 
-    private fun voidTransInvoicesDialog(voidData: ArrayList<BatchTable>) {
+    // old
+    /*private fun voidTransInvoicesDialog(voidData: ArrayList<BatchTable>) {
         val dialog = Dialog(requireActivity())
         dialog.setCancelable(true)
         dialog.setContentView(R.layout.recyclerview_layout)
@@ -1146,9 +1147,70 @@ batchData.field58EmiData=oldBatchData.field58EmiData
         }
         dialog.show()
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }*/
+
+    private fun voidTransInvoicesDialog(voidData: ArrayList<TempBatchFileDataTable>) {
+        val dialog = Dialog(requireActivity())
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.recyclerview_layout)
+
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+        val window = dialog.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        val rv = dialog.findViewById<RecyclerView>(R.id.recycler_view)
+        val adptr = VoidTxnAdapter(voidData) {
+            dialog.hide()
+            voidTransConfirmationDialog(it) // kushal
+        }
+        rv.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = adptr
+        }
+        dialog.show()
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 }
 
+class VoidTxnAdapter(
+    var batchData: ArrayList<TempBatchFileDataTable>,
+    var cb: (TempBatchFileDataTable) -> Unit
+) :
+    RecyclerView.Adapter<VoidTxnAdapter.VoidTxnViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VoidTxnViewHolder {
+        return VoidTxnViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_void_invoices_data, parent, false)
+        )
+    }
+
+    override fun onBindViewHolder(holder: VoidTxnViewHolder, position: Int) {
+        val voidData = batchData[position]
+        holder.tidView.text = "TID : " + voidData?.tid
+        holder.invoiceView.text = "INVOICE : " + voidData.hostInvoice
+        holder.voidView.setOnClickListener {
+            //  VFService.showToast("CLICKED  $position")
+            cb(voidData)
+        }
+    }
+
+    override fun getItemCount(): Int = batchData.size
+
+
+    class VoidTxnViewHolder(var v: View) : RecyclerView.ViewHolder(v) {
+        var tidView = v.findViewById<TextView>(R.id.txn_tid_tv)
+        var invoiceView = v.findViewById<TextView>(R.id.txn_invoice_tv)
+        var voidView = v.findViewById<CardView>(R.id.voidTxnLL)
+
+    }
+}
+
+// old
+/*
 class VoidTxnAdapter(
     var batchData: ArrayList<BatchTable>,
     var cb: (BatchTable) -> Unit
@@ -1181,4 +1243,4 @@ class VoidTxnAdapter(
         var voidView = v.findViewById<CardView>(R.id.voidTxnLL)
 
     }
-}
+}*/

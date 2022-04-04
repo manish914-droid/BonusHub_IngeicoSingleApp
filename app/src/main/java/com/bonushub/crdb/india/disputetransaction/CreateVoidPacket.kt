@@ -108,7 +108,7 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
 
         addFieldByHex(58,batch.indicator)
 
-        addFieldByHex(60, batch.batchNumber)
+        addFieldByHex(60, batch.hostBatchNumber)
 
         //adding field 61
         //val issuerParameterTable = IssuerParameterTable.selectFromIssuerParameterTable(AppPreference.WALLET_ISSUER_ID) // old
@@ -139,7 +139,7 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
 
         //   addFieldByHex(61, batch.getField61())
 
-        addFieldByHex(62, batch.invoiceNumber)
+        addFieldByHex(62, batch.hostInvoice)
         var year: String = "Year"
         try {
             val date: Long = Calendar.getInstance().timeInMillis

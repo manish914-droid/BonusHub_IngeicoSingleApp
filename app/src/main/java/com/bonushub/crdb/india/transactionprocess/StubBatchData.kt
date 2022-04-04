@@ -78,12 +78,13 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         // ROCProviderV2.getRoc(AppPreference.getBankCode()).toString()
         //      batchFileData.invoiceNumber = invoiceIncrementValue.toString()
 
-        /*batchFileData.track2Data =
+        batchFileData.track2Data =
             if (transactionType != TransactionTypeValues.PRE_AUTH_COMPLETE) {
-                cardProcessedDataModal.getTrack2Data() ?: ""
+                //cardProcessedDataModal.getTrack2Data() ?: ""
+                cardProcessedDataModal.getEncryptedPan() ?: ""
             } else {
                 ""//isoPackageReader.field57 (Need to Check by Ajay)
-            }*/ //
+            } //
 
         batchFileData.terminalSerialNumber = AppPreference.getString("serialNumber")
         batchFileData.bankCode = AppPreference.getBankCode()
