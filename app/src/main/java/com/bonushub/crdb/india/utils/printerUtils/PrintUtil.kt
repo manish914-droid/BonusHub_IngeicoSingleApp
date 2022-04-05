@@ -2170,7 +2170,7 @@ class PrintUtil(context: Context?) {
 
                     textBlockList.add(
                         sigleLineformat(
-                            "BATCH NO:${batch[0].batchNumber}",
+                            "BATCH NO:${batch[0].hostBatchNumber}",
                             AlignMode.LEFT
                         )
                     )

@@ -266,12 +266,12 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         batchFileData.indicator=cardProcessedDataModal.indicatorF58
 
 
-        var innvoice = terminalData?.invoiceNumber?.toInt()
+        /*var innvoice = terminalData?.invoiceNumber?.toInt()
         if (innvoice != null) {
             innvoice += 1
-        }
+        }*/
 
-        batchFileData.invoiceNumber = terminalData?.invoiceNumber.toString()
+        //batchFileData.invoiceNumber = terminalData?.invoiceNumber.toString()
 
         /*  terminalData?.invoiceNumber = innvoice?.let { addPad(it, "0", 6, true) }.toString()
 
@@ -280,7 +280,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
           }
           */
         //TerminalParameterTable.updateTerminalDataInvoiceNumber(terminalData?.invoiceNumber.toString())//
-        Utility().incrementUpdateInvoice()
+       // Utility().incrementUpdateInvoice() // no need to increment here use field 60 data
 
         //Here we are putting Refund Transaction Status in Batch Table:-
         if (cardProcessedDataModal.getProcessingCode() == ProcessingCode.REFUND.code) {
@@ -319,6 +319,8 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
                 val lastSuccessReceiptData = Gson().toJson(batchFileData)
                 AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, lastSuccessReceiptData)
             }
+
+            batchFileData.invoiceNumber = batchFileData.hostInvoice
 
             batchFileData
         } catch (ex: Exception) {
