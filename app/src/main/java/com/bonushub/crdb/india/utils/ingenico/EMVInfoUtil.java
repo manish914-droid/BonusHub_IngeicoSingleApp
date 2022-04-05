@@ -189,7 +189,7 @@ public class EMVInfoUtil {
                 break;
 
             default:
-                desc = "未知流程";
+                desc = "Unkown Type";
         }
         return desc + String.format("[0x%02X]", flowType);
     }

@@ -105,7 +105,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         }
 
 
-        doEndProcess(result, transData)
+      //  doEndProcess(result, transData)
     }
 
     @Throws(RemoteException::class)
@@ -219,7 +219,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             } else {
                 capKey.hashFlag = 0x00.toByte()
             }
-            val ret = emv!!.manageCAPubKey(ActionFlag.ADD, capKey)
+            val ret = emv!!.manageCAPubKey(ActionFlag.ADD,capKey)
             println("=> add CAPKey rid = : " + BytesUtil.bytes2HexString(rid).toString() + ", index = " + index+ "return type "+ret)
         }
     }
@@ -265,21 +265,61 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     @Throws(RemoteException::class)
     open fun doFinalSelect(finalData: FinalData) {
         println("=> onFinalSelect | " + EMVInfoUtil.getFinalSelectDesc(finalData))
+
+        val datetime: String = DeviceHelper.getCurentDateTime()
+        val splitStr = datetime.split("\\s+".toRegex()).toTypedArray()
+        var txnAmount = addPad(cardProcessedDataModal.getTransactionAmount().toString(), "0", 12, true)
+
+        var aidstr = BytesUtil.bytes2HexString(finalData.aid).subSequence(0, 10).toString()
+
         var tlvList: String? = null
         when (finalData.kernelID) {
-            KernelID.EMV.toByte() ->                // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
+            KernelID.EMV.toByte() ->
+
+                if(aidstr == "A000000025"){
+                // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
                 // For reference only below
-                tlvList = "9F0206000002000000" +  //amount
-                        "9F0306000000000000" +  // other amount
-                        "9A03171020" +  // Transaction Date
-                        "9F2103150512" +  // Transaction Time
-                        "9F410400000001" +  // Transaction squence counter
-                        "9F350122" +  // Terminal type
-                        "9F3303E0F8C8" +  //Terminal capability
-                        "9F40056000F0A001" +  //additional terminal capability
-                        "9F1A020356" +  //Terminal country code
-                        "5F2A020356" +  //Transaction coutry code
-                        "9C0100" //Transaction Type
+                tlvList = StringBuilder()
+                    .append("9F0206").append(txnAmount) //Txn Amount
+                    .append("9F0306000000000000")       //Other Amount
+                    .append("9A03").append(splitStr[0])   //Txn Date - M
+                    .append("9F2103").append(splitStr[1]) //Txn Time - M
+                    .append("9F410400000001") //Transaction Sequence Counter - 0
+                    .append("9F350122")     //Terminal type
+                    .append("9F3303E0F8C8")     //Terminal capability
+                    .append("9F40056000F0A001")   //additional terminal capability
+                    .append("9F1A020356")  //Terminal country code - M
+                    .append("5F2A020356") //Terminal currency code - M*/
+                    .append("9C0100")       //Transaction type - o
+                    .toString();
+            }
+
+            KernelID.AMEX.toByte() ->
+                tlvList = StringBuilder()
+                    .append("9F350122")
+                    .append("9F3303E0E8C8")
+                    .append("9F40056000F0B001")
+                    .append("9F1A020356")
+                    .append("5F2A020356")
+                    .append("9F09020001")
+                    .append("9C0100")
+                    .append("9F0206").append(txnAmount) //Txn Amount
+                    .append("9F0306000000000000")
+                    .append("9A03").append(splitStr[0])   //Txn Date - M
+                    .append("9F2103").append(splitStr[1]) //Txn Time - M
+                    .append("9F410400000001")
+                    .append("DF918111050000000000") // Terminal action code(decline)
+                    .append("DF918112050000000000") // Terminal action code(online)
+                    .append("DF918110050000000000")  // Terminal action code(default)
+                    .append("9F6D01C0")              // Contactless Reader Capabilities
+                    .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
+                    .append("DF812406000000010000") //Terminal Contactless Transaction Limit
+                    .append("DF812606000000010000") // Terminal CVM Required Limit
+                    .append("DF812306000000010000")  //Terminal Contactless Floor Limit
+                    .append("DF81300100")            //Try Again Flag
+                    .toString()
+
+
             KernelID.PBOC.toByte() ->                // if suport PBOC Ecash，see transaction parameters of PBOC Ecash in《UEMV develop guide》.
                 // If support qPBOC, see transaction parameters of QuickPass in《UEMV develop guide》.
                 // For reference only below
@@ -527,8 +567,76 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
         } else {
             System.out.println(
-                "=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData)
+                "=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
+
+            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_MSD_POS_ENTRY_CODE.posEntry.toString())
+            cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE)
+
+            println("EMV Balance is" + emv!!.balance)
+            println("TLV data is" + emv!!.getTLV("9F02"))
+            val tagList = arrayOf(
+                0x5F2A,
+                0x5F34,
+                0x82,
+                0x84,
+                0x95,
+                0x9A,
+                0x9B,
+                0x9C,
+                0x9F02,
+                0x9F03,
+                0x9F06,
+                0x9F1A,
+                0x9F6E,
+                0x9F26,
+                0x9F27,
+                0x9F33,
+                0x9F34,
+                0x9F35,
+                0x9F36,
+                0x9F37,
+                0x9F10,
+                0x57,
+                0xDF45,
+                0xDF46
             )
+            val out = BytesValue()
+            val tagOfF55 = SparseArray<String>()
+            for (tag in tagList) {
+                //  System.out.println("TLV data is "+emv.getTLV(Integer.toHexString(tag)));
+                val tlv = emv!!.getTLV(Integer.toHexString(tag!!))
+                if (null != tlv && !tlv.isEmpty()) {
+                    Log.d("EmvHelper -> " + Integer.toHexString(tag!!), tlv)
+                    //   String length = Integer.toHexString(tlv.size);
+                    tagOfF55.put(tag!!, tlv)
+                    if (null != tag && "84" == Integer.toHexString(tag)) {
+                        println("Aid value with Tag is ---> " + Integer.toHexString(tag) + tlv)
+                        //  cardProcessedDataModal.setAID(Utility.byte2HexStr(tlv))
+                    }
+                } else {
+                    Log.e("EmvHelper", "getEmvData:" + Integer.toHexString(tag!!) + ", fails")
+                }
+            }
+
+            val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
+
+            cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+
+            val track2data = emv!!.getTLV(Integer.toHexString(0x57))
+            var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
+            println("Field 57 data is"+field57)
+            val encrptedPan = getEncryptedPanorTrackData("35|374245001751006=210370213074053400943",true)
+            cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+            // val onlineResult: String = doOnlineProcess()
+            // val ret = emv!!.respondEvent(onlineResult)
+            // println("...onOnlineProcess: respondEvent" + ret)
+            tagOfF55.toString()
+
+            val field55: String = getFields55()
+            println("Field 55 is $field55")
+            cardProcessedDataModal.setField55(field55)
+            vfEmvHandlerCallback(cardProcessedDataModal)
         }
         println("\n")
     }
@@ -674,6 +782,10 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         System.out.println("Card pannumber data"+EMVInfoUtil.getRecordDataDesc(record))
         //val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
         // cardProcessedDataModal.setEncryptedPan(encrptedPan)
+        manageCAPKey()
+
+
+
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
 

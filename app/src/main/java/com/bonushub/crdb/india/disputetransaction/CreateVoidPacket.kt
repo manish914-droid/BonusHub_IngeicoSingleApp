@@ -129,12 +129,7 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
         val walletIssuerID = HexStringConverter.addPreFixer(issuerParameterTable?.issuerId, 2)
         addFieldByHex(
             61,
-            addPad(
-                AppPreference.getString("serialNumber"),
-                " ",
-                15,
-                false
-            ) + AppPreference.getBankCode() + customerID + walletIssuerID + data
+            addPad(DeviceHelper.getDeviceSerialNo() ?: "", " ", 15, false)  + AppPreference.getBankCode() + customerID + walletIssuerID + data
         )
 
         //   addFieldByHex(61, batch.getField61())
