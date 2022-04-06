@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -31,35 +29,20 @@ import com.bonushub.crdb.india.disputetransaction.CreateVoidPacket
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
-import com.bonushub.crdb.india.model.local.PendingSyncTransactionTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
-import com.bonushub.crdb.india.repository.GenericResponse
-import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.india.transactionprocess.SyncVoidTransactionToHost
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
-
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
-import com.bonushub.crdb.india.view.activity.NavigationActivity.Companion.TAG
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.india.viewmodel.PendingSyncTransactionViewModel
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
-import com.bonushub.crdb.india.utils.BhTransactionType
-import com.bonushub.crdb.india.utils.CardEntryMode
-import com.bonushub.crdb.india.utils.EPrintCopyType
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
-import com.bonushub.crdb.india.utils.ProcessingCode
-import com.bonushub.crdb.india.view.base.BaseActivity
 import com.bonushub.crdb.india.vxutils.TransactionType
 import com.google.gson.Gson
-import com.ingenico.hdfcpayment.listener.OnPaymentListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
-import com.ingenico.hdfcpayment.request.VoidRequest
-import com.ingenico.hdfcpayment.response.PaymentResult
-import com.ingenico.hdfcpayment.response.TransactionResponse
-import com.ingenico.hdfcpayment.type.ResponseCode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -501,9 +484,9 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                 //  Success case
                                 1 -> {
                                     //   println("Index and batchListsize is" + index + " and " + " batch " + (batchList.size - 1))
-                                    activity?.runOnUiThread {
-                                        txnSuccessToast(activity as NavigationActivity)
-                                    }
+//                                    activity?.runOnUiThread {
+//                                        txnSuccessToast(activity as NavigationActivity)
+//                                    }
 
                                     if (respnosedatareader != null) {
                                         // respnosedatareader.isoMap[62]?.parseRaw2String()?.let {
@@ -540,16 +523,20 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         }
 
                                         if (voidData.transactionType == TransactionType.REFUND.type) {
-                                            voidData.transactionType =
-                                                TransactionType.VOID_REFUND.type
+                                            voidData.transactionType = TransactionType.VOID_REFUND.type
+                                            voidData.transationName = getTransactionTypeName(TransactionType.VOID_REFUND.type)?:""
                                         } else if (voidData.transactionType == TransactionType.EMI_SALE.type || voidData.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type || voidData.transactionType == TransactionType.BRAND_EMI.type) {
                                             voidData.transactionType = TransactionType.VOID_EMI.type
+                                            voidData.transationName = getTransactionTypeName(TransactionType.VOID_EMI.type)?:""
                                         } else {
                                             if(voidData.tenure=="1"&& voidData.transactionType==TransactionType.SALE.type){
                                                 voidData.transactionType = TransactionType.VOID.type
                                                 voidData.txnType2=TransactionType.VOID.type
-                                            }else
+                                                voidData.transationName = getTransactionTypeName(TransactionType.VOID.type)?:""
+                                            }else{
                                                 voidData.transactionType = TransactionType.VOID.type
+                                                voidData.transationName = getTransactionTypeName(TransactionType.VOID.type)?:""
+                                                }
                                         }
 
                                         voidData.referenceNumber =
@@ -576,73 +563,118 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         )
 
                                         // kushal
-                                        /*PrintUtil(activity).startPrinting(
+
+                                        (activity as NavigationActivity).showProgress(getString(R.string.printing))
+
+                                        PrintUtil(activity).startPrinting(
                                             voidData,
                                             EPrintCopyType.MERCHANT,
-                                            activity as BaseActivity
+                                            requireContext()
                                         ) { printCB, printingFail ->
-                                            if (!printCB) {
-                                                val tpt=TerminalParameterTable.selectFromSchemeTable()
-                                                if(tpt?.digiPosCardCallBackRequired=="1") {
-                                                    lifecycleScope.launch(Dispatchers.IO) {
-                                                        withContext(Dispatchers.Main) {
-                                                            (activity as MainActivity).showProgress(
-                                                                getString(
-                                                                    R.string.txn_syn
-                                                                )
-                                                            )
-                                                        }
-                                                        val amount = MoneyUtil.fen2yuan(
-                                                            voidData.totalAmmount.toDouble().toLong()
-                                                        )
-                                                        val txnCbReqData = TxnCallBackRequestTable()
-                                                        txnCbReqData.reqtype =
-                                                            EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
-                                                        txnCbReqData.tid = voidData.hostTID
-                                                        txnCbReqData.batchnum = voidData.hostBatchNumber
-                                                        txnCbReqData.roc = voidData.hostRoc
-                                                        txnCbReqData.amount = amount
 
-                                                        txnCbReqData.ecrSaleReqId=voidData.ecrTxnSaleRequestId
-                                                        txnCbReqData.txnTime = voidData.time
-                                                        txnCbReqData.txnDate = voidData.transactionDate
-                                                        txnCbReqData.txnType= TransactionType.VOID.type
+                                            (activity as NavigationActivity).hideProgress()
 
-                                                        TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
-                                                            txnCbReqData
-                                                        )
-                                                        syncTxnCallBackToHost {
-                                                            Log.e(
-                                                                "TXN CB ",
-                                                                "SYNCED TO SERVER  --> $it"
-                                                            )
-                                                            (activity as MainActivity).hideProgress()
-                                                        }
-                                                        Log.e("VOID LAST", "COMMENT ******")
+                                            lifecycleScope.launch(Dispatchers.Main){
+                                                if (printCB) {
 
-                                                        //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
-                                                        //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+                                                    DialogUtilsNew1.alertBoxWithAction( requireContext(),
+                                                        getString(R.string.print_customer_copy),
+                                                        "",
+                                                        "yes", "no", R.drawable.ic_printer ,{
 
-                                                        if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                            (activity as NavigationActivity).showProgress(getString(R.string.printing))
+
+                                                            PrintUtil(activity).startPrinting(
+                                                                voidData,
+                                                                EPrintCopyType.CUSTOMER,
+                                                                requireContext()
+                                                            ) { printCB, printingFail ->
+                                                                (activity as NavigationActivity).hideProgress()
+                                                                // go to dashboard
+                                                                startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
+                                                                    flags =
+                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                })
+
+
+                                                            }
+                                                        }, {
+
+                                                            (activity as NavigationActivity).hideProgress()
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
+                                                            // go to dashboard
+                                                            startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
+                                                                flags =
+                                                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                            })
+
+                                                        })
+
+                                                    // not need now
+                                                    /*val tpt=TerminalParameterTable.selectFromSchemeTable()
+                                                    if(tpt?.digiPosCardCallBackRequired=="1") {
+                                                        lifecycleScope.launch(Dispatchers.IO) {
                                                             withContext(Dispatchers.Main) {
+                                                                (activity as MainActivity).showProgress(
+                                                                    getString(
+                                                                        R.string.txn_syn
+                                                                    )
+                                                                )
+                                                            }
+                                                            val amount = MoneyUtil.fen2yuan(
+                                                                voidData.totalAmmount.toDouble().toLong()
+                                                            )
+                                                            val txnCbReqData = TxnCallBackRequestTable()
+                                                            txnCbReqData.reqtype =
+                                                                EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+                                                            txnCbReqData.tid = voidData.hostTID
+                                                            txnCbReqData.batchnum = voidData.hostBatchNumber
+                                                            txnCbReqData.roc = voidData.hostRoc
+                                                            txnCbReqData.amount = amount
+
+                                                            txnCbReqData.ecrSaleReqId=voidData.ecrTxnSaleRequestId
+                                                            txnCbReqData.txnTime = voidData.time
+                                                            txnCbReqData.txnDate = voidData.transactionDate
+                                                            txnCbReqData.txnType= TransactionType.VOID.type
+
+                                                            TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
+                                                                txnCbReqData
+                                                            )
+                                                            syncTxnCallBackToHost {
+                                                                Log.e(
+                                                                    "TXN CB ",
+                                                                    "SYNCED TO SERVER  --> $it"
+                                                                )
+                                                                (activity as MainActivity).hideProgress()
+                                                            }
+                                                            Log.e("VOID LAST", "COMMENT ******")
+
+                                                            //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
+                                                            //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+
+                                                            if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                                withContext(Dispatchers.Main) {
+                                                                    syncOfflineSaleAndAskAutoSettlement(
+                                                                        autoSettlementCheck.substring(0, 1)
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }else{
+                                                        if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                            GlobalScope.launch(Dispatchers.Main) {
                                                                 syncOfflineSaleAndAskAutoSettlement(
                                                                     autoSettlementCheck.substring(0, 1)
                                                                 )
                                                             }
                                                         }
-                                                    }
-                                                }else{
-                                                    if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                        GlobalScope.launch(Dispatchers.Main) {
-                                                            syncOfflineSaleAndAskAutoSettlement(
-                                                                autoSettlementCheck.substring(0, 1)
-                                                            )
-                                                        }
-                                                    }
 
+                                                    }*/
                                                 }
                                             }
-                                        }*/
+
+                                        }
                                     }
                                 }
                                 2 -> {

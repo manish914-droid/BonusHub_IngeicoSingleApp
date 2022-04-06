@@ -13,6 +13,7 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentReportsBinding
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
@@ -32,7 +33,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
     private val reportsItemList: MutableList<ReportsItem> by lazy { mutableListOf<ReportsItem>() }
     private var iReportsFragmentItemClick: IReportsFragmentItemClick? = null
-    private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }
+    private val dataList: MutableList<TempBatchFileDataTable> by lazy { mutableListOf<TempBatchFileDataTable>() }
     var binding: FragmentReportsBinding? = null
     private var onlyPreAuthFlag: Boolean? = true
     private var iDiag: IDialog? = null
@@ -396,9 +397,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     }
                     //endregion*/
 
-                    settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batchData ->
-                        onlyPreAuthCheck(batchData as MutableList<BatchTable>)
-                        if (batchData.isNotEmpty()  && onlyPreAuthFlag == false) {
+                    settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batchData ->
+                        //onlyPreAuthCheck(batchData as MutableList<BatchTable>) // do later
+                        if (batchData.isNotEmpty()  /*&& onlyPreAuthFlag == false*/) {
                             iDiag?.getMsgDialog(
                                 getString(R.string.confirmation),
                                 getString(R.string.want_print_detail),
@@ -414,14 +415,14 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 }
                                                 Log.d("TPT Data:- ", batchData.toString())
                                                 dataList.clear()
-                                                dataList.addAll(batchData as MutableList<BatchTable>)
+                                                dataList.addAll(batchData as MutableList<TempBatchFileDataTable>)
                                                 // kushal enble later
-                                               /* PrintUtil(activity).printDetailReportupdate(
+                                                PrintUtil(activity).printDetailReportupdate(
                                                     dataList,
                                                     activity
                                                 ) { detailPrintStatus ->
-
-                                                }*/
+                                                    iDiag?.hideProgress()
+                                                }
                                                 //BB
 //                                                PrintUtil(activity).printDetailReportupdate(batchData, activity) {
 //                                                    iDiag?.hideProgress()
@@ -476,9 +477,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 lifecycleScope.launch{
 
-                        settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batList ->
-                            onlyPreAuthCheck(batList as MutableList<BatchTable>)
-                            if (batList.isNotEmpty() && onlyPreAuthFlag == false) {
+                        settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batList ->
+                            //onlyPreAuthCheck(batList as MutableList<BatchTable>) // do later
+                            if (batList.isNotEmpty() /*&& onlyPreAuthFlag == false*/) {
                                 iDiag?.getMsgDialog(
                                     getString(R.string.confirmation),
                                     "Do you want to print summary Report",
@@ -495,8 +496,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 }
                                                 Log.d("TPT Data:- ", batList.toString())
                                                 dataList.clear()
-                                                dataList.addAll(batList as MutableList<BatchTable>)
+                                                dataList.addAll(batList as MutableList<TempBatchFileDataTable>)
                                                 try {
+
                                                     PrintUtil(activity).printSettlementReportupdate(
                                                         activity,
                                                         dataList,
@@ -504,13 +506,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                     ) {
 
                                                     }
-                                                    // region BB
-                                                    /*PrintUtil(context).printSettlementReportupdate( context, batList) {
-                                                            iDiag?.hideProgress()
-                                                        }*/
-                                                    // end region
-                                                    //  printSummery(batList)
-                                                    //  getString(R.string.summery_report_printed)
+
 
                                                 } catch (ex: java.lang.Exception) {
                                                     //  ex.message ?: getString(R.string.error_in_printing)
@@ -582,9 +578,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, false,true) {
+                                        //PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, false,true) {
 
-                                        }
+                                       // }
                                     } catch (ex: java.lang.Exception) {
                                         ex.message ?: getString(R.string.error_in_printing)
                                     } finally {
@@ -703,7 +699,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
         }
 
     }
-    private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
+    /*private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
         for (i in 0 until dataList.size) {
             if(dataList[i].transactionType != BhTransactionType.PRE_AUTH.type){
                 onlyPreAuthFlag=false
@@ -711,7 +707,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             }
 
         }
-    }
+    }*/
 }
 
 interface IReportsFragmentItemClick {

@@ -89,7 +89,9 @@ import android.os.Build
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
-import java.util.HashMap
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 @AndroidEntryPoint
@@ -1283,15 +1285,17 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                             false
                         )
                         val batchList = runBlocking(Dispatchers.IO) {
-                            appDao.getAllBatchData()
+                           // appDao.getAllBatchData()
+                            appDao.getAllTempBatchFileDataTableDataForSettlement()
                         }
 
                         //To increase Roc and Batch number
-                        Utility().incrementUpdateRoc()
-                        Utility().incrementBatchNumber()
+//                        Utility().incrementUpdateRoc()//
+//                        Utility().incrementBatchNumber()//
+                        // no need we are use host roc and batchNumber
                         //Batch and Roc Increment for Settlement:-
-                        val settlement_roc = AppPreference.getIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString()) + 1
-                        AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc)
+//                        val settlement_roc = AppPreference.getIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString()) + 1 //
+//                        AppPreference.setIntData(PrefConstant.SETTLEMENT_ROC_INCREMENT.keyName.toString(), settlement_roc) //
                         //region Setting AutoSettle Status and Last Settlement DateTime:-
 
                         //region Setting AutoSettle Status and Last Settlement DateTime:-
