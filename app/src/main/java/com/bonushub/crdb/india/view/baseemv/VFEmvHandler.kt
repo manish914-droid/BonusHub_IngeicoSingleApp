@@ -565,7 +565,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             if (transData != null) {
                 getFlowTypeDesc(transData.flowType,result, transData)
             }
-            vfEmvHandlerCallback(cardProcessedDataModal)
+
         }
         println("\n")
     }
@@ -599,6 +599,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                 println("Field 55 is $field55")
                 cardProcessedDataModal.setField55(field55)
 
+                vfEmvHandlerCallback(cardProcessedDataModal)
             }
 
 
@@ -624,6 +625,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                 val encrptedPan = getEncryptedPanorTrackData(field57,true)
                 cardProcessedDataModal.setEncryptedPan(encrptedPan)
 
+                vfEmvHandlerCallback(cardProcessedDataModal)
+
             }
             FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte() -> {
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
@@ -640,6 +643,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
                 val field55: String = getFields55()
                 println("Field 55 is $field55")
+
                 cardProcessedDataModal.setField55(field55)
             }
             else -> "Unkown Type"
