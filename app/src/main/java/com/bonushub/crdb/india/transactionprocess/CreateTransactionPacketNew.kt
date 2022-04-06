@@ -109,11 +109,11 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
 
             //Indicator Data Field 58
             val cardIndFirst = "0"
-            val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2)
+            val firstTwoDigitFoCard = cardProcessedData.getPanNumberData()?.substring(0, 2) ?: "37"
             val cardDataTable = appDao.getCardDataByPanNumber(cardProcessedData?.getPanNumberData().toString())
            // val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getPanNumberData().toString())
             //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
-            val cdtIndex = "2"/*cardDataTable?.cardTableIndex ?: "4"*/
+            val cdtIndex = cardDataTable?.cardTableIndex ?: "4"
             val accSellection =
                 addPad(
                     AppPreference.getString(AppPreference.ACC_SEL_KEY),

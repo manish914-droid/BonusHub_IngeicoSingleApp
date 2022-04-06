@@ -14,7 +14,6 @@ import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.ingenico.TLVList
 import com.bonushub.crdb.india.view.activity.TransactionActivity
-import com.bonushub.crdb.india.vxutils.Utility
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.usdk.apiservice.aidl.data.BytesValue
 
@@ -99,13 +98,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onEndProcess(result: Int, transData: TransData?) {
-
-        if(this::testCompleteSecondGenAc.isInitialized){
-            testCompleteSecondGenAc.getEndProcessData(result,transData)
-        }
-
-
-      //  doEndProcess(result, transData)
+        doEndProcess(result, transData)
     }
 
     @Throws(RemoteException::class)
@@ -569,77 +562,91 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             System.out.println(
                 "=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
 
-            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_MSD_POS_ENTRY_CODE.posEntry.toString())
-            cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE)
-
-            println("EMV Balance is" + emv!!.balance)
-            println("TLV data is" + emv!!.getTLV("9F02"))
-            val tagList = arrayOf(
-                0x5F2A,
-                0x5F34,
-                0x82,
-                0x84,
-                0x95,
-                0x9A,
-                0x9B,
-                0x9C,
-                0x9F02,
-                0x9F03,
-                0x9F06,
-                0x9F1A,
-                0x9F6E,
-                0x9F26,
-                0x9F27,
-                0x9F33,
-                0x9F34,
-                0x9F35,
-                0x9F36,
-                0x9F37,
-                0x9F10,
-                0x57,
-                0xDF45,
-                0xDF46
-            )
-            val out = BytesValue()
-            val tagOfF55 = SparseArray<String>()
-            for (tag in tagList) {
-                //  System.out.println("TLV data is "+emv.getTLV(Integer.toHexString(tag)));
-                val tlv = emv!!.getTLV(Integer.toHexString(tag!!))
-                if (null != tlv && !tlv.isEmpty()) {
-                    Log.d("EmvHelper -> " + Integer.toHexString(tag!!), tlv)
-                    //   String length = Integer.toHexString(tlv.size);
-                    tagOfF55.put(tag!!, tlv)
-                    if (null != tag && "84" == Integer.toHexString(tag)) {
-                        println("Aid value with Tag is ---> " + Integer.toHexString(tag) + tlv)
-                        //  cardProcessedDataModal.setAID(Utility.byte2HexStr(tlv))
-                    }
-                } else {
-                    Log.e("EmvHelper", "getEmvData:" + Integer.toHexString(tag!!) + ", fails")
-                }
+            if (transData != null) {
+                getFlowTypeDesc(transData.flowType,result, transData)
             }
-
-            val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
-
-            cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
-
-            val track2data = emv!!.getTLV(Integer.toHexString(0x57))
-            var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
-            println("Field 57 data is"+field57)
-            val encrptedPan = getEncryptedPanorTrackData("35|374245001751006=210370213074053400943",true)
-            cardProcessedDataModal.setEncryptedPan(encrptedPan)
-
-            // val onlineResult: String = doOnlineProcess()
-            // val ret = emv!!.respondEvent(onlineResult)
-            // println("...onOnlineProcess: respondEvent" + ret)
-            tagOfF55.toString()
-
-            val field55: String = getFields55()
-            println("Field 55 is $field55")
-            cardProcessedDataModal.setField55(field55)
             vfEmvHandlerCallback(cardProcessedDataModal)
         }
         println("\n")
     }
+
+    fun getFlowTypeDesc(flowType: Byte, result: Int, transData: TransData) {
+        val desc: String
+          when (flowType) {
+            FlowType.EMV_FLOWTYPE_EMV.toByte() -> {
+                if(this::testCompleteSecondGenAc.isInitialized){
+                    testCompleteSecondGenAc.getEndProcessData(result,transData)
+                }
+
+            }
+            FlowType.EMV_FLOWTYPE_ECASH.toByte() -> "ECASH"
+            FlowType.EMV_FLOWTYPE_QPBOC.toByte() -> "QPBOC"
+            FlowType.EMV_FLOWTYPE_QVSDC.toByte() -> {
+
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
+                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+
+                val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
+                cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+
+                val track2data = emv!!.getTLV(Integer.toHexString(0x57))
+                var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
+                println("Field 57 data is"+field57)
+                val encrptedPan = getEncryptedPanorTrackData(field57,true)
+                cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+                val field55: String = getFields55()
+                println("Field 55 is $field55")
+                cardProcessedDataModal.setField55(field55)
+
+            }
+
+
+            FlowType.EMV_FLOWTYPE_PBOC_CTLESS.toByte() -> "PBOC_CTLESS"
+            FlowType.EMV_FLOWTYPE_M_CHIP.toByte() -> "M_CHIP"
+            FlowType.EMV_FLOWTYPE_M_STRIPE.toByte() -> "M_STRIPE"
+            FlowType.EMV_FLOWTYPE_MSD.toByte() -> "MSD"
+            FlowType.EMV_FLOWTYPE_MSD_LEGACY.toByte() -> "MSD_LEGACY"
+            FlowType.EMV_FLOWTYPE_WAVE2.toByte() -> "WAVE2"
+            FlowType.EMV_FLOWTYPE_A_XP2_MS.toByte() -> {
+
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_MSD_POS_ENTRY_CODE.posEntry.toString())
+                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE)
+
+                val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
+                cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+
+                val tagDF46 = emv!!.getTLV(Integer.toHexString(0xDF46))
+                var tagDf46Str = hexString2String(tagDF46)
+                var track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
+                var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
+                println("Field 57 data is"+field57)
+                val encrptedPan = getEncryptedPanorTrackData(field57,true)
+                cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+            }
+            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte() -> {
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
+                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+
+                val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
+                cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+
+                val track2data = emv!!.getTLV(Integer.toHexString(0x57))
+                var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
+                println("Field 57 data is"+field57)
+                val encrptedPan = getEncryptedPanorTrackData(field57,true)
+                cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+                val field55: String = getFields55()
+                println("Field 55 is $field55")
+                cardProcessedDataModal.setField55(field55)
+            }
+            else -> "Unkown Type"
+        }
+        //return desc + String.format("[0x%02X]", flowType)
+    }
+
 
     open fun doVerifyOfflinePin(flag: Int, random: ByteArray?, capKey: CAPublicKey?, result: OfflinePinVerifyResult) {
         println("=> onVerifyOfflinePin")

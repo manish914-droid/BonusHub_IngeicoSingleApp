@@ -139,6 +139,9 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE,
                                         DetectCardType.MANUAL_ENTRY_TYPE -> {
 
+                                          //  clearReversal()
+                                            syncTransactionCallback(true, successResponseCode.toString(), result, null,null,secondTap)
+
                                         }
                                         DetectCardType.EMV_CARD_TYPE -> {
                                             if (true/*TextUtils.isEmpty(AppPreference.getString(GENERIC_REVERSAL_KEY))*/) {
