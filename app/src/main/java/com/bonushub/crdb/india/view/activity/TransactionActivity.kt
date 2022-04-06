@@ -127,7 +127,7 @@ class TransactionActivity : BaseActivityNew() {
                     }
 
                     testVFEmvHandler = emvHandler()
-                    DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), emvHandler())
+                    DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
                 }
             }
 
