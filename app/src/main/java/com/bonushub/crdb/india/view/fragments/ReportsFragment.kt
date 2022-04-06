@@ -13,6 +13,7 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentReportsBinding
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
@@ -32,7 +33,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
     private val reportsItemList: MutableList<ReportsItem> by lazy { mutableListOf<ReportsItem>() }
     private var iReportsFragmentItemClick: IReportsFragmentItemClick? = null
-    private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }
+    private val dataList: MutableList<TempBatchFileDataTable> by lazy { mutableListOf<TempBatchFileDataTable>() }
     var binding: FragmentReportsBinding? = null
     private var onlyPreAuthFlag: Boolean? = true
     private var iDiag: IDialog? = null
@@ -145,94 +146,6 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 }*/
                         }
 
-                /*        EDashboardItem.BANK_EMI.title.uppercase() -> {
-                            //BB
-                            logger("print","util")
-                            *//*PrintUtil(activity).printEMISale(
-                                    lastReceiptData,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity
-                                ) { printCB, printingFail ->
-                                    if (printCB) {
-                                        iDiag?.hideProgress()
-                                        Log.e("PRINTING", "LAST_RECEIPT")
-                                    } else {
-                                        iDiag?.hideProgress()
-                                    }
-                                }*//*
-                        }*/
-//                        TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
-//
-//                            runBlocking(Dispatchers.IO){
-                                //batchFileViewModel?.getBrandEMIDataTable(lastReceiptData.hostInvoice, lastReceiptData.hostTID?:"")?.observe(viewLifecycleOwner,{ brandEmiData ->
-
-                                // BB
-                                /*PrintUtil(activity).printEMISale(
-                                    lastReceiptData,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity,
-                                    brandEmiData
-                                ) { printCB, printingFail ->
-                                    if (printCB) {
-                                        iDiag?.hideProgress()
-                                        Log.e("PRINTING", "LAST_RECEIPT")
-                                    } else {
-                                        iDiag?.hideProgress()
-                                    }
-                                }*/
-
-                                //  })
-                            /*}
-
-
-                        }*/
-                       // TransactionType.PRE_AUTH_COMPLETE.type -> {
-                            //BB
-                            /*PrintUtil(activity).printAuthCompleteChargeSlip(
-                                lastReceiptData,
-                                EPrintCopyType.DUPLICATE,
-                                activity
-                            ) {
-                                if (it) {
-                                    iDiag?.hideProgress()
-                                    Log.e("PRINTING", "LAST_RECEIPT")
-                                } else {
-                                    iDiag?.hideProgress()
-                                }
-                            }*/
-                      //  }
-                        //TransactionType.VOID_PREAUTH.type -> {
-                            //BB
-                            /* PrintUtil(activity).printAuthCompleteChargeSlip(
-                                 lastReceiptData,
-                                 EPrintCopyType.DUPLICATE,
-                                 activity
-                             ) {
-                                 if (it) {
-                                     iDiag?.hideProgress()
-                                     Log.e("PRINTING", "LAST_RECEIPT")
-                                 } else {
-                                     iDiag?.hideProgress()
-                                 }
-                             }*/
-                       // }
-                       // TransactionType.OFFLINE_SALE.type -> {
-                           // activity?.let {
-                                //BB
-                                /* OfflineSalePrintReceipt().offlineSalePrint(
-                                        lastReceiptData, EPrintCopyType.DUPLICATE,
-                                        it
-                                    ) { printCB, printingFail ->
-                                        if (printCB) {
-                                            iDiag?.hideProgress()
-                                            Log.e("PRINTING", "LAST_RECEIPT")
-                                        } else {
-                                            iDiag?.hideProgress()
-                                        }
-                                    }*/
-                           // }
-                       // }
-
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.hideProgress()
@@ -327,12 +240,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         lifecycleScope.launch {
                             try {
 
-                                batchFileViewModel?.getBatchTableDataByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
+                                // old
+                                /*batchFileViewModel?.getBatchTableDataByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
 
                                     if(bat?.receiptData != null)
                                     {
                                         // please uncomment this code to use with batch data for printing
-                                        /*PrintUtil(activity).startPrinting(
+                                        *//*PrintUtil(activity).startPrinting(
                                             bat,
                                             EPrintCopyType.DUPLICATE,
                                             activity
@@ -343,10 +257,36 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             } else {
                                                 iDiag?.hideProgress()
                                             }
-                                        }*/
+                                        }*//*
 
                                         PrintUtil(activity).startPrinting(
                                             bat,
+                                            EPrintCopyType.DUPLICATE,
+                                            activity
+                                        ) { printCB, printingFail ->
+                                            if (printCB) {
+                                                iDiag?.hideProgress()
+                                                logger("PRINTING", "LAST_RECEIPT")
+                                            } else {
+                                                iDiag?.hideProgress()
+                                            }
+                                        }
+                                    }else{
+                                       // launch(Dispatchers.Main) {
+                                            iDiag?.hideProgress()
+                                            //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
+                                            iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
+                                     //   }
+                                    }
+
+                                })*/
+
+                                batchFileViewModel?.getTempBatchTableDataListByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
+
+                                    if(bat != null && bat.size > 0)
+                                    {
+                                        PrintUtil(activity).startPrinting(
+                                            bat.get(0)!!,
                                             EPrintCopyType.DUPLICATE,
                                             activity
                                         ) { printCB, printingFail ->
@@ -396,9 +336,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     }
                     //endregion*/
 
-                    settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batchData ->
-                        onlyPreAuthCheck(batchData as MutableList<BatchTable>)
-                        if (batchData.isNotEmpty()  && onlyPreAuthFlag == false) {
+                    settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batchData ->
+                        //onlyPreAuthCheck(batchData as MutableList<BatchTable>) // do later
+                        if (batchData.isNotEmpty()  /*&& onlyPreAuthFlag == false*/) {
                             iDiag?.getMsgDialog(
                                 getString(R.string.confirmation),
                                 getString(R.string.want_print_detail),
@@ -414,14 +354,14 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 }
                                                 Log.d("TPT Data:- ", batchData.toString())
                                                 dataList.clear()
-                                                dataList.addAll(batchData as MutableList<BatchTable>)
+                                                dataList.addAll(batchData as MutableList<TempBatchFileDataTable>)
                                                 // kushal enble later
-                                               /* PrintUtil(activity).printDetailReportupdate(
+                                                PrintUtil(activity).printDetailReportupdate(
                                                     dataList,
                                                     activity
                                                 ) { detailPrintStatus ->
-
-                                                }*/
+                                                    iDiag?.hideProgress()
+                                                }
                                                 //BB
 //                                                PrintUtil(activity).printDetailReportupdate(batchData, activity) {
 //                                                    iDiag?.hideProgress()
@@ -476,9 +416,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 lifecycleScope.launch{
 
-                        settlementViewModel?.getBatchData()?.observe(viewLifecycleOwner) { batList ->
-                            onlyPreAuthCheck(batList as MutableList<BatchTable>)
-                            if (batList.isNotEmpty() && onlyPreAuthFlag == false) {
+                        settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batList ->
+                            //onlyPreAuthCheck(batList as MutableList<BatchTable>) // do later
+                            if (batList.isNotEmpty() /*&& onlyPreAuthFlag == false*/) {
                                 iDiag?.getMsgDialog(
                                     getString(R.string.confirmation),
                                     "Do you want to print summary Report",
@@ -495,8 +435,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 }
                                                 Log.d("TPT Data:- ", batList.toString())
                                                 dataList.clear()
-                                                dataList.addAll(batList as MutableList<BatchTable>)
+                                                dataList.addAll(batList as MutableList<TempBatchFileDataTable>)
                                                 try {
+
                                                     PrintUtil(activity).printSettlementReportupdate(
                                                         activity,
                                                         dataList,
@@ -504,13 +445,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                     ) {
 
                                                     }
-                                                    // region BB
-                                                    /*PrintUtil(context).printSettlementReportupdate( context, batList) {
-                                                            iDiag?.hideProgress()
-                                                        }*/
-                                                    // end region
-                                                    //  printSummery(batList)
-                                                    //  getString(R.string.summery_report_printed)
+
 
                                                 } catch (ex: java.lang.Exception) {
                                                     //  ex.message ?: getString(R.string.error_in_printing)
@@ -563,7 +498,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 val batList = AppPreference.getLastBatch()
 
-                if (batList != null) {
+                if (batList != null && batList.size > 0) {
                     iDiag?.getMsgDialog(
                         getString(R.string.confirmation),
                         getString(R.string.last_summary_confirmation),
@@ -582,7 +517,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, false,true) {
+                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<TempBatchFileDataTable>, false,true) {
 
                                         }
                                     } catch (ex: java.lang.Exception) {
@@ -703,7 +638,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
         }
 
     }
-    private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
+    /*private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
         for (i in 0 until dataList.size) {
             if(dataList[i].transactionType != BhTransactionType.PRE_AUTH.type){
                 onlyPreAuthFlag=false
@@ -711,7 +646,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             }
 
         }
-    }
+    }*/
 }
 
 interface IReportsFragmentItemClick {
