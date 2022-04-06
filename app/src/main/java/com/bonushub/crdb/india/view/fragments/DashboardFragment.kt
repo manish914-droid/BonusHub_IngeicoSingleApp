@@ -508,7 +508,7 @@ logger("PFR","Failed","e")
                 {
                     batchData.receiptData?.txnOtherAmount = "0"
                 }
-                AppPreference.saveLastReceiptDetails(batchData)
+//                AppPreference.saveLastReceiptDetails(batchData)
 
                 printingSaleData(batchData){
                     AppPreference.clearRestartDataPreference()

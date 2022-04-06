@@ -142,12 +142,12 @@ object AppPreference {
 
 
     //region Below method is used to Save Batch File Data in App Preference:-
-    fun saveBatchInPreference(batchList: MutableList<BatchTable?>) {
+    fun saveBatchInPreference(batchList: MutableList<TempBatchFileDataTable?>) {
         logger(TAG, "========saveLastSuccessReceipt=========", "e")
         logger(TAG, Gson().toJson(batchList), "e")
         val tempBatchDataList = Gson().toJson(
             batchList,
-            object : TypeToken<List<BatchTable>>() {}.type
+            object : TypeToken<List<TempBatchFileDataTable>>() {}.type
         ) ?: ""
        val v= HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         v?.edit()?.putString(LAST_BATCH,tempBatchDataList)?.apply()
@@ -159,7 +159,7 @@ object AppPreference {
 
 
     // region
-    fun getLastBatch(): List<BatchTable>? {
+    fun getLastBatch(): List<TempBatchFileDataTable>? {
         logger(TAG, "========getLastSuccessReceipt=========", "e")
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 
@@ -167,9 +167,9 @@ object AppPreference {
             try {
                 val str = v.getString(LAST_BATCH, "")
                 if (!str.isNullOrEmpty()) {
-                    val batList = Gson().fromJson<List<BatchTable>>(
+                    val batList = Gson().fromJson<List<TempBatchFileDataTable>>(
                         str,
-                        object : TypeToken<List<BatchTable>>() {}.type
+                        object : TypeToken<List<TempBatchFileDataTable>>() {}.type
                     )
                     logger(TAG, Gson().toJson(batList), "e")
                     return batList
@@ -189,7 +189,7 @@ object AppPreference {
         v?.edit()?.putString(LAST_SUCCESS_RECEIPT_KEY, receiptDetail?:"")?.apply()
     }
 
-    fun saveLastReceiptDetails(receiptDetail:BatchTable?){
+    fun saveLastReceiptDetails(receiptDetail:TempBatchFileDataTable?){
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         val jsonResp=Gson().toJson(receiptDetail)
         v?.edit()?.putString(LAST_SUCCESS_RECEIPT_KEY, jsonResp?:"")?.apply()
@@ -198,7 +198,7 @@ object AppPreference {
 
     //region kushal
     @JvmStatic
-    fun getLastSuccessReceipt(): BatchTable? {
+    fun getLastSuccessReceipt(): TempBatchFileDataTable? {
         logger(TAG, "========getLastSuccessReceipt=========", "e")
         val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
 
@@ -206,9 +206,9 @@ object AppPreference {
             try {
                 val str = v.getString(LAST_SUCCESS_RECEIPT_KEY, "")
                 if (!str.isNullOrEmpty()) {
-                    Gson().fromJson<BatchTable>(
+                    Gson().fromJson<TempBatchFileDataTable>(
                         str,
-                        object : TypeToken<BatchTable>() {}.type
+                        object : TypeToken<TempBatchFileDataTable>() {}.type
                     )
                 } else null
             } catch (ex: Exception) {

@@ -557,10 +557,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
                                         // Saving for Last Success Receipt
                                         val lastSuccessReceiptData = Gson().toJson(voidData)
-                                        AppPreference.saveString(
-                                            AppPreference.LAST_SUCCESS_RECEIPT_KEY,
-                                            lastSuccessReceiptData
-                                        )
+                                        AppPreference.saveLastReceiptDetails(lastSuccessReceiptData)
 
                                         // kushal
 

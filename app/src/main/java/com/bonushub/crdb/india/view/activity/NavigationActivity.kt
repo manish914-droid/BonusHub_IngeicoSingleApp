@@ -39,10 +39,6 @@ import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
-import com.bonushub.crdb.india.model.local.AppPreference
-import com.bonushub.crdb.india.model.local.BatchTable
-import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
-import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.serverApi.HitServer
@@ -86,6 +82,7 @@ import javax.inject.Inject
 import android.view.Gravity
 
 import android.os.Build
+import com.bonushub.crdb.india.model.local.*
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -1320,7 +1317,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
                                 //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                 runBlocking(Dispatchers.IO) {
-                                    AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
+                                    AppPreference.saveBatchInPreference(batchList as MutableList<TempBatchFileDataTable?>)
                                     //Delete All BatchFile Data from Table after Settlement:-
                                     //appDao.deleteBatchTable() // old
                                     appDao.deleteTempBatchFileDataTable()
@@ -1334,9 +1331,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                 }
                                 //endregion
 
-                                //Added by Lucky Singh.
+
                                 //Delete Last Success Receipt From App Preference.
-                                AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, "")
+                                AppPreference.saveLastReceiptDetails("")
 
                                 GlobalScope.launch(Dispatchers.Main) {
                                     alertBoxMsgWithIconOnly(R.drawable.ic_tick,getString(R.string.settlement_success))
@@ -1401,7 +1398,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     hideProgress()
                                     //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-
                                     runBlocking(Dispatchers.IO) {
-                                        AppPreference.saveBatchInPreference(batchList as MutableList<BatchTable?>)
+                                        AppPreference.saveBatchInPreference(batchList as MutableList<TempBatchFileDataTable?>)
                                         //Delete All BatchFile Data from Table after Settlement:-
                                         //appDao.deleteBatchTable() // old
                                         appDao.deleteTempBatchFileDataTable()
@@ -1409,12 +1406,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                                     }
                                     //endregion
 
-                                    //Added by Lucky Singh.
                                     //Delete Last Success Receipt From App Preference.
-                                    AppPreference.saveString(
-                                        AppPreference.LAST_SUCCESS_RECEIPT_KEY,
-                                        ""
-                                    )
+                                    AppPreference.saveLastReceiptDetails("")
 
 
                                     GlobalScope.launch(Dispatchers.Main) {

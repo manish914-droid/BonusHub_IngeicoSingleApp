@@ -96,7 +96,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                     val responseIsoData: IsoDataReader = readIso(result, false)
                                 } catch (ex: Exception) {
                                     ex.printStackTrace()
-                                    //   syncTransactionCallback(false, "", result, null)
+                                       syncTransactionCallback(false, "", result, null, null,null)
                                 }
 
                                 //   println("Number format problem")
@@ -156,7 +156,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                         cardProcessedDataModal?.getTransType() != TransactionType.CASH_AT_POS.type &&
                                                         cardProcessedDataModal?.getTransType() != TransactionType.TEST_EMI.type*/) {
 
-
+                                                    logger("CompleteSecondGenAc","yes")
 
                                                     CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testVFEmvHandler) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
@@ -164,6 +164,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
 
                                                 } else {
                                                    // clearReversal()
+                                                       logger("CompleteSecondGenAc","no")
                                                     syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
 
                                                 }

@@ -146,94 +146,6 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 }*/
                         }
 
-                /*        EDashboardItem.BANK_EMI.title.uppercase() -> {
-                            //BB
-                            logger("print","util")
-                            *//*PrintUtil(activity).printEMISale(
-                                    lastReceiptData,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity
-                                ) { printCB, printingFail ->
-                                    if (printCB) {
-                                        iDiag?.hideProgress()
-                                        Log.e("PRINTING", "LAST_RECEIPT")
-                                    } else {
-                                        iDiag?.hideProgress()
-                                    }
-                                }*//*
-                        }*/
-//                        TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
-//
-//                            runBlocking(Dispatchers.IO){
-                                //batchFileViewModel?.getBrandEMIDataTable(lastReceiptData.hostInvoice, lastReceiptData.hostTID?:"")?.observe(viewLifecycleOwner,{ brandEmiData ->
-
-                                // BB
-                                /*PrintUtil(activity).printEMISale(
-                                    lastReceiptData,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity,
-                                    brandEmiData
-                                ) { printCB, printingFail ->
-                                    if (printCB) {
-                                        iDiag?.hideProgress()
-                                        Log.e("PRINTING", "LAST_RECEIPT")
-                                    } else {
-                                        iDiag?.hideProgress()
-                                    }
-                                }*/
-
-                                //  })
-                            /*}
-
-
-                        }*/
-                       // TransactionType.PRE_AUTH_COMPLETE.type -> {
-                            //BB
-                            /*PrintUtil(activity).printAuthCompleteChargeSlip(
-                                lastReceiptData,
-                                EPrintCopyType.DUPLICATE,
-                                activity
-                            ) {
-                                if (it) {
-                                    iDiag?.hideProgress()
-                                    Log.e("PRINTING", "LAST_RECEIPT")
-                                } else {
-                                    iDiag?.hideProgress()
-                                }
-                            }*/
-                      //  }
-                        //TransactionType.VOID_PREAUTH.type -> {
-                            //BB
-                            /* PrintUtil(activity).printAuthCompleteChargeSlip(
-                                 lastReceiptData,
-                                 EPrintCopyType.DUPLICATE,
-                                 activity
-                             ) {
-                                 if (it) {
-                                     iDiag?.hideProgress()
-                                     Log.e("PRINTING", "LAST_RECEIPT")
-                                 } else {
-                                     iDiag?.hideProgress()
-                                 }
-                             }*/
-                       // }
-                       // TransactionType.OFFLINE_SALE.type -> {
-                           // activity?.let {
-                                //BB
-                                /* OfflineSalePrintReceipt().offlineSalePrint(
-                                        lastReceiptData, EPrintCopyType.DUPLICATE,
-                                        it
-                                    ) { printCB, printingFail ->
-                                        if (printCB) {
-                                            iDiag?.hideProgress()
-                                            Log.e("PRINTING", "LAST_RECEIPT")
-                                        } else {
-                                            iDiag?.hideProgress()
-                                        }
-                                    }*/
-                           // }
-                       // }
-
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.hideProgress()
@@ -328,12 +240,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         lifecycleScope.launch {
                             try {
 
-                                batchFileViewModel?.getBatchTableDataByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
+                                // old
+                                /*batchFileViewModel?.getBatchTableDataByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
 
                                     if(bat?.receiptData != null)
                                     {
                                         // please uncomment this code to use with batch data for printing
-                                        /*PrintUtil(activity).startPrinting(
+                                        *//*PrintUtil(activity).startPrinting(
                                             bat,
                                             EPrintCopyType.DUPLICATE,
                                             activity
@@ -344,10 +257,36 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             } else {
                                                 iDiag?.hideProgress()
                                             }
-                                        }*/
+                                        }*//*
 
                                         PrintUtil(activity).startPrinting(
                                             bat,
+                                            EPrintCopyType.DUPLICATE,
+                                            activity
+                                        ) { printCB, printingFail ->
+                                            if (printCB) {
+                                                iDiag?.hideProgress()
+                                                logger("PRINTING", "LAST_RECEIPT")
+                                            } else {
+                                                iDiag?.hideProgress()
+                                            }
+                                        }
+                                    }else{
+                                       // launch(Dispatchers.Main) {
+                                            iDiag?.hideProgress()
+                                            //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
+                                            iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
+                                     //   }
+                                    }
+
+                                })*/
+
+                                batchFileViewModel?.getTempBatchTableDataListByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
+
+                                    if(bat != null && bat.size > 0)
+                                    {
+                                        PrintUtil(activity).startPrinting(
+                                            bat.get(0)!!,
                                             EPrintCopyType.DUPLICATE,
                                             activity
                                         ) { printCB, printingFail ->
@@ -559,7 +498,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 val batList = AppPreference.getLastBatch()
 
-                if (batList != null) {
+                if (batList != null && batList.size > 0) {
                     iDiag?.getMsgDialog(
                         getString(R.string.confirmation),
                         getString(R.string.last_summary_confirmation),
@@ -578,9 +517,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        //PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<BatchTable>, false,true) {
+                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<TempBatchFileDataTable>, false,true) {
 
-                                       // }
+                                        }
                                     } catch (ex: java.lang.Exception) {
                                         ex.message ?: getString(R.string.error_in_printing)
                                     } finally {

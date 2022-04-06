@@ -286,6 +286,7 @@ class TransactionActivity : BaseActivityNew() {
                             else {*/
                                 printAndSaveBatchDataInDB(stubbedData) { printCB ->
                                     if (printCB) {
+                                        AppPreference.saveLastReceiptDetails(stubbedData)
                                         Log.e("FIRST ", "COMMENT ******")
                                         goToDashBoard()
                                         // Here we are Syncing Txn CallBack to server
