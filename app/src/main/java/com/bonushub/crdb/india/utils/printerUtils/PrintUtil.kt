@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 const val HDFC_BANK_CODE = "01"
+const val HDFC_BANK_CODE_SINGLE_DIGIT = "1"
 const val AMEX_BANK_CODE_SINGLE_DIGIT = "2"
 const val AMEX_BANK_CODE = "02"
 const val DEFAULT_BANK_CODE = HDFC_BANK_CODE
@@ -2125,9 +2126,9 @@ class PrintUtil(context: Context?) {
 //                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
 
                     // headerPrinting()
-                    val isHdfcPresent = batch.find{ it.hostBankID.equals("01") || it.hostBankID.equals("1")}
+                    val isHdfcPresent = batch.find{ it.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT) || it.hostBankID.equals(HDFC_BANK_CODE)}
                     val isAmexPresent = batch.find{ it.hostBankID.equals(AMEX_BANK_CODE) || it.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)}
-                    if(isHdfcPresent?.hostBankID.equals("01") || isHdfcPresent?.hostBankID.equals("1")){
+                    if(isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE) || isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT)){
                         headerPrinting(HDFC_BANK_CODE)}
                     else if(isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE) || isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)){
                         headerPrinting(AMEX_BANK_CODE)
@@ -2431,6 +2432,25 @@ class PrintUtil(context: Context?) {
                             val terminalData = getTptData()
                             if (iteration > 0) {
                                 printSeperator()
+
+                                // handling printing logo
+                                val bankId = batch[frequency].hostBankID
+                                var logo = ""
+                                if (bankId == AMEX_BANK_CODE_SINGLE_DIGIT || bankId == AMEX_BANK_CODE) {
+                                    AMEX_LOGO
+                                } else if (bankId == HDFC_BANK_CODE_SINGLE_DIGIT || bankId == HDFC_BANK_CODE){
+                                    logo = HDFC_LOGO
+                                }else{
+                                    logo = ""
+                                }
+
+                                if (isFirstTimeForAmxLogo && logo != null && !logo.equals("")) {
+                                    isFirstTimeForAmxLogo = false
+                                    printLogo(context!!,logo)
+                                    printSeperator()
+                                }
+                                // end region
+
                                 textBlockList.add(
                                     sigleLineformat(
                                         "MID:${terminalData?.merchantId}",
@@ -3465,6 +3485,8 @@ class PrintUtil(context: Context?) {
         isLastSummary: Boolean = false,
         callBack: (Boolean) -> Unit
     ) {
+        var isFirstTimeForAmxLogo = true
+
 //  val format = Bundle()
 //   val fmtAddTextInLine = Bundle()
 
@@ -3475,7 +3497,7 @@ class PrintUtil(context: Context?) {
                // setLogoAndHeader()
 
 
-                headerPrinting()
+                headerPrinting(DEFAULT_BANK_CODE)
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -3562,6 +3584,8 @@ class PrintUtil(context: Context?) {
 ////below if condition is for settlement(Other than zero settlement)
         else {
             try {
+                val mapTidToBankId = mutableMapOf<String, String>()
+
                 val map = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
                 val map1 = mutableMapOf<String, MutableMap<Int, SummeryModel>>()
                 //to hold the tid for which tid mid printed
@@ -3570,7 +3594,18 @@ class PrintUtil(context: Context?) {
 
                // setLogoAndHeader()
 
-                headerPrinting()
+                //headerPrinting()
+                val isHdfcPresent = batch.find{ it.hostBankID.equals(HDFC_BANK_CODE) || it.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT)}
+                val isAmexPresent = batch.find{ it.hostBankID.equals(AMEX_BANK_CODE) || it.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)}
+                if(isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE) || isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT)){
+                    headerPrinting(HDFC_BANK_CODE)}
+                else if(isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE) || isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)){
+                    headerPrinting(AMEX_BANK_CODE)
+                    isFirstTimeForAmxLogo = false
+                }else{
+                    headerPrinting(DEFAULT_BANK_CODE)
+                }
+
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -3605,6 +3640,9 @@ class PrintUtil(context: Context?) {
 
                 for (it in batch) {  // Do not count preauth transaction
 // || it.transactionType == TransactionType.VOID_PREAUTH.type
+
+                    mapTidToBankId[it.hostTID] = it.hostBankID
+
                     if (it.transactionType == BhTransactionType.PRE_AUTH.type) continue
 
                     if (it.transactionType == BhTransactionType.EMI_SALE.type ||
@@ -3748,6 +3786,24 @@ class PrintUtil(context: Context?) {
                         // if hostid is not avialable in this or list is blanck then print this line
                         if((listTidPrinted.size==0) || !(listTidPrinted.contains(hostTid)))
                         {
+                            // handle logo printing
+                            var bankId = mapTidToBankId[hostTid]
+                            var logo = ""
+                            if (bankId.equals(AMEX_BANK_CODE_SINGLE_DIGIT) || bankId.equals(AMEX_BANK_CODE)) {
+                                logo = AMEX_LOGO
+                            } else if(bankId.equals(HDFC_BANK_CODE_SINGLE_DIGIT)  || bankId.equals(HDFC_BANK_CODE)){
+                                logo = HDFC_LOGO
+                            }else{
+                                logo = ""
+                            }
+
+                            if (isFirstTimeForAmxLogo && logo != null && !logo.equals("")) {
+                                isFirstTimeForAmxLogo = false
+                                printSeperator()
+                                printLogo(context!!,logo)
+                            }
+                            // end region
+
                             listTidPrinted.add(hostTid)// add the tid for which this code is printed
                             printSeperator()
                             textBlockList.add(sigleLineformat("MID:${mid}", AlignMode.LEFT))
