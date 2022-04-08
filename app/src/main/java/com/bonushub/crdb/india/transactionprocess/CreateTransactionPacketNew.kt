@@ -187,8 +187,16 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             val f56Roc = Utility().getROC()?.let { addPad(it, "0", 6) }
             val f56Date=this.isoMap[13]?.rawData
             val f56Time=this.isoMap[12]?.rawData
+
+            val tid = terminalData.terminalId
+            val batchNumbers = terminalData.batchNumber
+            //tid and batch number are latest change in no response reversal
             additionalData["F56reversal"] =
-                f56Roc + year + f56Date + f56Time
+                tid+batchNumbers+f56Roc + year + f56Date + f56Time
+
+            //here we are saving txn date time for 2nd gen ac reversal
+            AppPreference.saveString("OldCurrentDate",f56Date)
+            AppPreference.saveString("OldCurrentTime",f56Time)
 
             additionalData["pan"]= getMaskedPan(
                 getTptData(), cardProcessedData.getPanNumberData() ?: "")

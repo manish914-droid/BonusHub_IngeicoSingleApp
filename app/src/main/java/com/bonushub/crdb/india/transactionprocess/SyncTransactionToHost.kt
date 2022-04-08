@@ -8,6 +8,7 @@ import android.util.Log
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.AppPreference.GENERIC_REVERSAL_KEY
+import com.bonushub.crdb.india.model.local.AppPreference.clearReversal
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.activity.TransactionActivity
@@ -47,15 +48,15 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
             }
         }
         //Setting ROC again because if reversal send first and then transaction packet goes to host the ROC is similar in that case because we are creating Trans packet at initial stage
-        //transactionISOData?.addField(11,ROCProviderV2.getRoc(AppPreference.getBankCode()).toString())
+        transactionISOData?.addField(11,Utility().getROC() ?: "")
         val transactionISOByteArray = transactionISOData?.generateIsoByteRequest()
         if (transactionISOData != null) {
             logger("Transaction REQUEST PACKET --->>", transactionISOData.isoMap, "e")
         }
         if (cardProcessedDataModal?.getReadCardType() != DetectCardType.EMV_CARD_TYPE) {
             val reversalPacket = Gson().toJson(transactionISOData)
-            AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
-            //  transactionISOByteArray?.byteArr2HexStr()?.let { logger("PACKET-->", it) }
+            AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+            transactionISOByteArray?.byteArr2HexStr()?.let { logger("PACKET-->", it) }
         }
 
         if (transactionISOByteArray != null) {
@@ -67,6 +68,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                     if (success) {
                         //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
                     //    ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                        Utility().incrementRoc()
                         Log.d("Success Data:- ", result)
                         //if(!result.isNullOrBlank())
                         if (!TextUtils.isEmpty(result)) {
@@ -81,7 +83,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                             }
                                             DetectCardType.EMV_CARD_TYPE -> {
                                                 val reversalPacket = Gson().toJson(transactionISOData)
-                                                AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
+                                                AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
                                             }
 
                                             else -> {
@@ -123,15 +125,16 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         "e"
                                 )
 
-//                                val encrptedPan = responseIsoData.isoMap[57]?.parseRaw2String().toString()
-//                                cardProcessedDataModal?.setEncryptedPan(encrptedPan)
+                               val encrptedPan = responseIsoData.isoMap[57]?.parseRaw2String().toString()
+                                cardProcessedDataModal?.setEncryptedPan(encrptedPan)
 
                                 val f55 = responseIsoData.isoMap[55]?.rawData
 
 
                                 if (successResponseCode == "00") {
+                                    cardProcessedDataModal?.setSucessResponseCode(successResponseCode)
 
-
+                                    AppPreference.saveBoolean(AppPreference.ONLINE_EMV_DECLINED, false)
 
                                     when (cardProcessedDataModal?.getReadCardType()) {
 
@@ -139,12 +142,12 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE,
                                         DetectCardType.MANUAL_ENTRY_TYPE -> {
 
-                                          //  clearReversal()
+                                             clearReversal()
                                             syncTransactionCallback(true, successResponseCode.toString(), result, null,null,secondTap)
 
                                         }
                                         DetectCardType.EMV_CARD_TYPE -> {
-                                            if (true/*TextUtils.isEmpty(AppPreference.getString(GENERIC_REVERSAL_KEY))*/) {
+                                            if (TextUtils.isEmpty(AppPreference.getString(GENERIC_REVERSAL_KEY))) {
 
                                                 if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type
                                           /*          && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&
@@ -163,7 +166,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                     }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
 
                                                 } else {
-                                                   // clearReversal()
+                                                       clearReversal()
                                                        logger("CompleteSecondGenAc","no")
                                                     syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
 
@@ -171,7 +174,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
 
 
                                             } else {
-                                              //  clearReversal()
+                                                clearReversal()
                                                 syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
                                             }
                                         }
@@ -221,27 +224,37 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                     AppPreference.saveBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString(), false)
                                     ConnectionError.NetworkError.errorCode
                                     //Clear reversal
-                                   // clearReversal()
+                                    clearReversal()
                                     //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
-                                  //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                                    //ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                                    Utility().incrementRoc()
+                                    SecondGenAcOnNetworkError(result.toString(), cardProcessedDataModal) { secondGenAcErrorStatus ->
+                                        if (secondGenAcErrorStatus) {
+                                            syncTransactionCallback(false, successResponseCode.toString(), result, null, null, null)
+                                        } else {
+                                            syncTransactionCallback(false, ConnectionError.NetworkError.errorCode.toString(), result, null, null, null)
+                                        }
+                                    }
 
                                 }
 
                                 else -> {
 
                                     //Clear reversal
-                                   // clearReversal()
+                                    clearReversal()
                                     //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
-                                  //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                                    //ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                                    Utility().incrementRoc()
                                     syncTransactionCallback(false, ConnectionError.ConnectionTimeout.errorCode.toString(), result, null, null, null)
                                     Log.d("Failure Data:- ", result)
                                 }
                             }
                         } else {
                             //Clear reversal
-                          //  clearReversal()
+                            clearReversal()
                             //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
-                          //  ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                            //ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
+                            Utility().incrementRoc()
                             syncTransactionCallback(false, ConnectionError.ConnectionTimeout.errorCode.toString(), result, null, null, null)
                             Log.d("Failure Data:- ", result)
                         }

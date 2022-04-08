@@ -7,11 +7,14 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.model.remote.RestartHandlingModel
+import com.bonushub.crdb.india.utils.IsoDataWriter
 import com.bonushub.crdb.india.utils.addPad
 import com.bonushub.crdb.india.utils.logger
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ingenico.hdfcpayment.model.ReceiptDetail
+import org.json.JSONArray
+import org.json.JSONObject
 
 //region========EMV=======
 
@@ -49,6 +52,7 @@ object AppPreference {
     const val LAST_BATCH = "last_batch"
     const val RESTART_HANDLING = "restart_handling"
     const val LAST_CANCEL_RECEIPT_KEY = "Last_Cancel_Receipt"
+    const val ONLINE_EMV_DECLINED = "online_emv_Declined"
 
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
@@ -67,6 +71,68 @@ object AppPreference {
 
         val endTs = System.currentTimeMillis()
         Log.d("Time Difference:- ", ((endTs - startTs).toString()))
+    }
+
+    @JvmStatic
+    fun saveString(prefName: String, content: String?) {
+        var newContent = content
+        if (prefName == GENERIC_REVERSAL_KEY) {
+            val jj = JSONObject(content)
+            val activeFieldArr = jj.get("activeField") as JSONArray
+            // var loopIterator=
+            if (activeFieldArr.length() > 0) {
+                for (i in 0 until activeFieldArr.length() - 1) {
+                    if (i == activeFieldArr.length() - 1) {
+                        break
+                    } else {
+                        if (activeFieldArr[i].toString() == "52" || activeFieldArr[i].toString() == "31" || activeFieldArr[i].toString() == "54") {
+                            activeFieldArr.remove(i)
+                            //  loopIterator -= 1
+                        }
+                    }
+                }
+
+            }
+            val isoMap = jj.get("isoMap") as JSONObject
+            isoMap.remove("52")
+            newContent = jj.toString()
+        }
+
+        val p = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val edit = p?.edit()
+        edit?.putString(prefName, newContent)
+        edit?.apply()
+    }
+
+    @JvmStatic
+    fun saveStringReversal(prefName: String, content: String?) {
+        var newContent = content
+        if (prefName == GENERIC_REVERSAL_KEY) {
+            val jj = JSONObject(content)
+            val activeFieldArr = jj.get("activeField") as JSONArray
+            // var loopIterator=
+            if (activeFieldArr.length() > 0) {
+                for (i in 0 until activeFieldArr.length() - 1) {
+                    if (i == activeFieldArr.length() - 1) {
+                        break
+                    } else {
+                        if (activeFieldArr[i].toString() == "52" || activeFieldArr[i].toString() == "31" || activeFieldArr[i].toString() == "54") {
+                            activeFieldArr.remove(i)
+                            //  loopIterator -= 1
+                        }
+                    }
+                }
+
+            }
+            val isoMap = jj.get("isoMap") as JSONObject
+            isoMap.remove("52")
+            newContent = jj.toString()
+        }
+
+        val p = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        val edit = p?.edit()
+        edit?.putString(prefName, newContent)
+        edit?.apply()
     }
 
     //region==================================Below methods is used to save/retrieve string values in shared preference:-
@@ -278,6 +344,25 @@ object AppPreference {
         } else
             null
     }
+
+
+    @JvmStatic
+    fun getReversalNew(): IsoDataWriter? {
+        logger(TAG, "========getReversal=========", "e")
+        val v =HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        return if (v != null) {
+            try {
+                val str = v.getString(GENERIC_REVERSAL_KEY, "")
+                if (!str.isNullOrEmpty()) {
+                    Gson().fromJson<IsoDataWriter>(str, object : TypeToken<IsoDataWriter>() {}.type)
+                } else null
+            } catch (ex: Exception) {
+                throw Exception("Reversal error!!!")
+            }
+        } else
+            null
+    }
+
 
     @JvmStatic
     fun saveReversal(){

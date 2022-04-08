@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">BonusHub</string>
 
+    <string name="reversal_data_sync">Uploading reversal</string>
+    <string name="reversal_upload_fail">Reversal Upload Fail</string>
+
     <string name="sending_reciving_data">Sending/Receiving data from host</string>
     <string name="sale_data_sync">Sending/Receiving From Host</string>
 

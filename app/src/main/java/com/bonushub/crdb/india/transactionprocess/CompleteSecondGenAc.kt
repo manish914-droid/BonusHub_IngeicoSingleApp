@@ -4,11 +4,15 @@ package com.bonushub.crdb.india.transactionprocess
 import android.os.DeadObjectException
 import android.os.RemoteException
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.AppPreference.GENERIC_REVERSAL_KEY
+import com.bonushub.crdb.india.model.local.AppPreference.ONLINE_EMV_DECLINED
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
+import com.google.gson.Gson
 import com.usdk.apiservice.aidl.emv.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -29,6 +33,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
     val iemv: UEMV? = DeviceHelper.getEMV()
 
     lateinit var testVFEmvHandler:VFEmvHandler
+    var field56data: String? = null
 
     constructor(cardProcessedDataModal: CardProcessedDataModal?,
                 data: IsoDataReader, isoData: IsoDataWriter? = null,
@@ -49,7 +54,6 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
     //Below method is used to complete second gen ac in case of EMV Card Type:-
     fun performSecondGenAc(cardProcessedDataModal: CardProcessedDataModal?,data: IsoDataReader) {
 
-        var field56data: String? = null
         var aidstr = cardProcessedDataModal?.getAID() ?: ""
 
         val finalaidstr = if(aidstr.isNotBlank()) { aidstr.subSequence(0,10).toString() } else { aidstr = ""}
@@ -100,9 +104,10 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             //val dateTime: Long = Calendar.getInstance().timeInMillis
             //val formatedDate = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault()).format(dateTime)
             //In reversal we have to send Old date and old time means trnsaction date and trnsaction time
-            // val OldformatedDateTime = AppPreference.getString("OldCurrentDate")+AppPreference.getString("OldCurrentTime")
 
-            //    field56data = "${hostTID}${hostBatchNumber}${hostRoc}${OldformatedDateTime}${""}${hostInvoice}"
+             val OldformatedDateTime = AppPreference.getString("OldCurrentDate")+AppPreference.getString("OldCurrentTime")
+
+            field56data = "${hostTID}${hostBatchNumber}${hostRoc}${OldformatedDateTime}${""}${hostInvoice}"
 
 
 
@@ -198,7 +203,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                 )
 
 
-                testVFEmvHandler.getCompleteSecondGenAc(this)
+                testVFEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
                 iemv?.respondEvent(onlineResult.toString())
 
                 // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
@@ -225,36 +230,146 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
         println("Aid Data is ----> $aidData")
 
         if (result != EMVError.SUCCESS) {
-            System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
+
+             when (result) {
+                EMVError.ERROR_POWERUP_FAIL -> "ERROR_POWERUP_FAIL"
+                EMVError.ERROR_ACTIVATE_FAIL -> "ERROR_ACTIVATE_FAIL"
+                EMVError.ERROR_WAITCARD_TIMEOUT -> "ERROR_WAITCARD_TIMEOUT"
+                EMVError.ERROR_NOT_START_PROCESS -> "ERROR_NOT_START_PROCESS"
+                EMVError.ERROR_PARAMERR -> "ERROR_PARAMERR"
+                EMVError.ERROR_MULTIERR -> "ERROR_MULTIERR"
+                EMVError.ERROR_CARD_NOT_SUPPORT -> "ERROR_CARD_NOT_SUPPORT"
+                EMVError.ERROR_EMV_RESULT_BUSY -> "ERROR_EMV_RESULT_BUSY"
+                EMVError.ERROR_EMV_RESULT_NOAPP -> "ERROR_EMV_RESULT_NOAPP"
+                EMVError.ERROR_EMV_RESULT_NOPUBKEY -> "ERROR_EMV_RESULT_NOPUBKEY"
+                EMVError.ERROR_EMV_RESULT_EXPIRY -> "ERROR_EMV_RESULT_EXPIRY"
+                EMVError.ERROR_EMV_RESULT_FLASHCARD -> "ERROR_EMV_RESULT_FLASHCARD"
+                EMVError.ERROR_EMV_RESULT_STOP -> "ERROR_EMV_RESULT_STOP"
+                EMVError.ERROR_EMV_RESULT_REPOWERICC -> "ERROR_EMV_RESULT_REPOWERICC"
+                EMVError.ERROR_EMV_RESULT_REFUSESERVICE -> "ERROR_EMV_RESULT_REFUSESERVICE"
+                EMVError.ERROR_EMV_RESULT_CARDLOCK -> "ERROR_EMV_RESULT_CARDLOCK"
+                EMVError.ERROR_EMV_RESULT_APPLOCK -> "ERROR_EMV_RESULT_APPLOCK"
+                EMVError.ERROR_EMV_RESULT_EXCEED_CTLMT -> "ERROR_EMV_RESULT_EXCEED_CTLMT"
+                EMVError.ERROR_EMV_RESULT_APDU_ERROR -> {
+                    //Reversal save To Preference code here.............
+                    isoData?.mti = "0400"
+
+                    println("Field56 data in reversal in second ac $field56data")
+                    isoData?.apply {
+                        additionalData["F56reversal"] = field56data ?: ""
+                    }
+
+                    val reversalPacket = Gson().toJson(isoData)
+                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
+
+                    printData = Triple("", "", "")
+                    printExtraDataSB(printData,"")
+                }
+                EMVError.ERROR_EMV_RESULT_APDU_STATUS_ERROR -> {
+                    //Reversal save To Preference code here.............
+                    isoData?.mti = "0400"
+
+                    println("Field56 data in reversal in second ac $field56data")
+                    isoData?.apply {
+                        additionalData["F56reversal"] = field56data ?: ""
+                    }
+
+                    val reversalPacket = Gson().toJson(isoData)
+                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
+
+                    printData = Triple("", "", "")
+                    printExtraDataSB(printData,"")
+                }
+                EMVError.ERROR_EMV_RESULT_ALL_FLASH_CARD -> "ERROR_EMV_RESULT_ALL_FLASH_CARD"
+                EMVError.EMV_RESULT_AMOUNT_EMPTY -> "EMV_RESULT_AMOUNT_EMPTY"
+                else -> "unknow error"
+            }
+
+           // System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
         } else {
             System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
             val getAcType: String = EMVInfoUtil.getACTypeDesc(transData!!.acType)
 
-            if(getAcType == "TC[0x01]"){
-
-                val tvrArray = arrayOf("0x95")
-                val tvrData = iemv!!.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
-                println("TVR Data is ----> $tvrData")
-
-
-                val tsiArray = arrayOf("0x9B")
-                val tsiData = iemv!!.getTLV(Integer.toHexString(0x9B).toUpperCase(Locale.ROOT))
-                println("TSI Data is ----> $tsiData")
+            when (transData.acType) {
+                ACType.EMV_ACTION_TC.toByte() -> {
+                    val tvrArray = arrayOf("0x95")
+                    val tvrData = iemv!!.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
+                    println("TVR Data is ----> $tvrData")
 
 
-                val tcvalue = arrayOf("0x9F26")
-                val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
-                println("TC Data is ----> $tcData")
+                    val tsiArray = arrayOf("0x9B")
+                    val tsiData = iemv!!.getTLV(Integer.toHexString(0x9B).toUpperCase(Locale.ROOT))
+                    println("TSI Data is ----> $tsiData")
 
-                printData = Triple(tvrData, tsiData, tcData)
-                printExtraDataSB(printData,"")
+
+                    val tcvalue = arrayOf("0x9F26")
+                    val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
+                    println("TC Data is ----> $tcData")
+
+                    val reversalPacket = Gson().toJson(isoData)
+                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
+
+                    printData = Triple(tvrData, tsiData, tcData)
+                    printExtraDataSB(printData,"")
+                }
+                ACType.EMV_ACTION_AAC.toByte() -> {
+                    //Reversal save To Preference code here.............
+                    isoData?.mti = "0400"
+
+                    println("Field56 data in reversal in second ac $field56data")
+                    isoData?.apply {
+                        additionalData["F56reversal"] = field56data ?: ""
+                    }
+
+                    val reversalPacket = Gson().toJson(isoData)
+                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
+
+                    printData = Triple("", "", "")
+                    printExtraDataSB(printData,"")
+                }
+                else -> {
+                    printData = Triple("", "", "")
+                    printExtraDataSB(printData,"")
+                }
             }
-            else{
-                printData = Triple("", "", "")
-                printExtraDataSB(printData,"")
-            }
+
+
         }
 
+    }
+
+    fun getErrorMessage(error: Int): String? {
+        val message: String
+        message = when (error) {
+            EMVError.ERROR_POWERUP_FAIL -> "ERROR_POWERUP_FAIL"
+            EMVError.ERROR_ACTIVATE_FAIL -> "ERROR_ACTIVATE_FAIL"
+            EMVError.ERROR_WAITCARD_TIMEOUT -> "ERROR_WAITCARD_TIMEOUT"
+            EMVError.ERROR_NOT_START_PROCESS -> "ERROR_NOT_START_PROCESS"
+            EMVError.ERROR_PARAMERR -> "ERROR_PARAMERR"
+            EMVError.ERROR_MULTIERR -> "ERROR_MULTIERR"
+            EMVError.ERROR_CARD_NOT_SUPPORT -> "ERROR_CARD_NOT_SUPPORT"
+            EMVError.ERROR_EMV_RESULT_BUSY -> "ERROR_EMV_RESULT_BUSY"
+            EMVError.ERROR_EMV_RESULT_NOAPP -> "ERROR_EMV_RESULT_NOAPP"
+            EMVError.ERROR_EMV_RESULT_NOPUBKEY -> "ERROR_EMV_RESULT_NOPUBKEY"
+            EMVError.ERROR_EMV_RESULT_EXPIRY -> "ERROR_EMV_RESULT_EXPIRY"
+            EMVError.ERROR_EMV_RESULT_FLASHCARD -> "ERROR_EMV_RESULT_FLASHCARD"
+            EMVError.ERROR_EMV_RESULT_STOP -> "ERROR_EMV_RESULT_STOP"
+            EMVError.ERROR_EMV_RESULT_REPOWERICC -> "ERROR_EMV_RESULT_REPOWERICC"
+            EMVError.ERROR_EMV_RESULT_REFUSESERVICE -> "ERROR_EMV_RESULT_REFUSESERVICE"
+            EMVError.ERROR_EMV_RESULT_CARDLOCK -> "ERROR_EMV_RESULT_CARDLOCK"
+            EMVError.ERROR_EMV_RESULT_APPLOCK -> "ERROR_EMV_RESULT_APPLOCK"
+            EMVError.ERROR_EMV_RESULT_EXCEED_CTLMT -> "ERROR_EMV_RESULT_EXCEED_CTLMT"
+            EMVError.ERROR_EMV_RESULT_APDU_ERROR -> "ERROR_EMV_RESULT_APDU_ERROR"
+            EMVError.ERROR_EMV_RESULT_APDU_STATUS_ERROR -> "ERROR_EMV_RESULT_APDU_STATUS_ERROR"
+            EMVError.ERROR_EMV_RESULT_ALL_FLASH_CARD -> "ERROR_EMV_RESULT_ALL_FLASH_CARD"
+            EMVError.EMV_RESULT_AMOUNT_EMPTY -> "EMV_RESULT_AMOUNT_EMPTY"
+            else -> "unknow error"
+        }
+        return message + String.format("[0x%02X]", error)
     }
 
 }

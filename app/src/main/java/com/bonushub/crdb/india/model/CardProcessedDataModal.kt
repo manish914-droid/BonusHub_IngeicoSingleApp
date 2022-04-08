@@ -8,6 +8,7 @@ import java.io.Serializable
 //Below Modal class is for holding Card Returning Data Fields:-
 
 class CardProcessedDataModal : Serializable {
+    private var successResponseCode: String? = null
     private var track1Data: String? = null
     private var track2Data: String? = null
     private var track3Data: String? = null
@@ -515,5 +516,13 @@ class CardProcessedDataModal : Serializable {
 
     fun getCardMode(): String? {
         return cardMode
+    }
+
+    fun setSucessResponseCode(successResponseCode: String?) {
+       this.successResponseCode = successResponseCode
+    }
+
+    fun getSuccessResponseCode(): String?{
+        return successResponseCode
     }
 }

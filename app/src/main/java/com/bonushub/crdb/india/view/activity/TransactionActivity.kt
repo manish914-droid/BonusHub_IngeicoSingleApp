@@ -17,6 +17,7 @@ import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.*
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacketNew
 import com.bonushub.crdb.india.transactionprocess.StubBatchData
+import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.transactionprocess.SyncTransactionToHost
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
@@ -167,7 +168,7 @@ class TransactionActivity : BaseActivityNew() {
            // cardView_l.visibility = View.GONE
         }
         // If case Sale data sync to server
-        if (true) {
+        if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             val msg: String = getString(R.string.sale_data_sync)
             runOnUiThread { showProgress(msg) }
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
@@ -176,7 +177,7 @@ class TransactionActivity : BaseActivityNew() {
                 if (syncStatus) {
                     val responseIsoData: IsoDataReader = readIso(transactionMsg.toString(), false)
                     val autoSettlementCheck = responseIsoData.isoMap[60]?.parseRaw2String().toString()
-                    if (syncStatus && responseCode == "00") {
+                    if (syncStatus && responseCode == "00" && !AppPreference.getBoolean(AppPreference.ONLINE_EMV_DECLINED)) {
                         //Below we are saving batch data and print the receipt of transaction:-
 
                               GlobalScope.launch(Dispatchers.Main) {
@@ -352,26 +353,79 @@ class TransactionActivity : BaseActivityNew() {
 
                         }
 
-                    } else if (syncStatus && responseCode != "00") {
+                    }
+                    else{
                         GlobalScope.launch(Dispatchers.Main) {
-                            alertBoxWithAction(getString(R.string.transaction_delined_msg), responseIsoData.isoMap[58]?.parseRaw2String().toString(), false, getString(R.string.positive_button_ok), { alertPositiveCallback ->
+                            alertBoxWithAction(
+                                getString(R.string.transaction_delined_msg),
+                                responseIsoData.isoMap[58]?.parseRaw2String().toString(),
+                                false,
+                                getString(R.string.positive_button_ok),
+                                { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
+                                        if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                            // syncOfflineSaleAndAskAutoSettlement(autoSettlementCheck.substring(0, 1))
+                                        } else {
 
+                                        }
                                     }
                                 },
                                 {})
                         }
+                        //Condition for having a reversal(EMV CASE)
                     }
-                    //Condition for having a reversal(EMV CASE)
-                    else if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
 
-                    }
+
                 }
 
             }
         }
+        else {
+            if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+                runOnUiThread { showProgress(getString(R.string.reversal_data_sync)) }
+                SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
+                    hideProgress()
+                    if (isSyncToHost) {
+                        AppPreference.clearReversal()
+                        checkReversal(transactionISOByteArray, cardProcessedDataModal)
+                    } else {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            //  VFService.showToast(transMsg)
+                            alertBoxWithAction(
+                                getString(R.string.reversal_upload_fail),
+                                getString(R.string.transaction_delined_msg),
+                                false,
+                                getString(R.string.positive_button_ok),
+                                { alertPositiveCallback ->
+                                    if (alertPositiveCallback)
+                                        declinedTransaction()
+                                },
+                                {})
+
+
+                        }
+                    }
+                }
+            }
+        }
         //Else case is to Sync Reversal data Packet to Host:-
 
+    }
+
+    //Below method is used to handle Transaction Declined case:-
+    fun declinedTransaction() {
+        try {
+            DeviceHelper.getEMV()?.stopSearch()
+            finish()
+            startActivity(Intent(this, NavigationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        } catch (ex: java.lang.Exception) {
+            finish()
+            startActivity(Intent(this, NavigationActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
     }
 
 

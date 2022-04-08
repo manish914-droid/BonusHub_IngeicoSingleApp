@@ -557,10 +557,20 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     open fun doEndProcess(result: Int, transData: TransData?) {
         if (result != EMVError.SUCCESS) {
+
+             if(cardProcessedDataModal.getSuccessResponseCode() == "00"){
+                 if(this::testCompleteSecondGenAc.isInitialized){
+                     testCompleteSecondGenAc.getEndProcessData(result,transData)
+                 }
+             }
+            else{
+                 vfEmvHandlerCallback(cardProcessedDataModal)
+             }
+
+
             System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
         } else {
-            System.out.println(
-                "=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
+            System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
 
             if (transData != null) {
                 getFlowTypeDesc(transData.flowType,result, transData)
@@ -835,8 +845,11 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     }
 
     lateinit var testCompleteSecondGenAc:CompleteSecondGenAc
-    fun getCompleteSecondGenAc(testCompleteSecondGenAc:CompleteSecondGenAc){
+    fun getCompleteSecondGenAc(testCompleteSecondGenAc: CompleteSecondGenAc, cardProcessedDataModal: CardProcessedDataModal?){
         this.testCompleteSecondGenAc = testCompleteSecondGenAc
+        if (cardProcessedDataModal != null) {
+            this.cardProcessedDataModal  = cardProcessedDataModal
+        }
     }
 }
 
