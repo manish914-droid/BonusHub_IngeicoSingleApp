@@ -370,19 +370,19 @@ data class TerminalCommunicationTable(
     var apnPassword: String = "",
 
     @field:BHFieldParseIndex(17)
-    @field:BHFieldName("Host Primary IP")
+    @field:BHFieldName("GPRS Primary IP")
     var hostPrimaryIp: String = "",
 
     @field:BHFieldParseIndex(18)
-    @field:BHFieldName("Host Primary Port")
+    @field:BHFieldName("GPRS Primary Port")
     var hostPrimaryPortNo: String = "",
 
     @field:BHFieldParseIndex(19)
-    @field:BHFieldName("Host Secondary IP")
+    @field:BHFieldName("GPRS Secondary IP")
     var hostSecIp: String = "",
 
     @field:BHFieldParseIndex(20)
-    @field:BHFieldName("Host Secondary Port")
+    @field:BHFieldName("GPRS Secondary Port")
     var hostSecPortNo: String = "",
 
     @field:BHFieldParseIndex(21)
@@ -395,9 +395,11 @@ data class TerminalCommunicationTable(
     var primarySubnet: String = "",
 
     @field:BHFieldParseIndex(24)
+    @field:BHFieldName("WIFI PRIMARY IP")
     var hostEthPrimaryIp: String = "",
 
     @field:BHFieldParseIndex(25)
+    @field:BHFieldName("WIFI PRIMARY PORT")
     var hostPrimaryEthPort: String = "",
 
     @field:BHFieldParseIndex(26)
@@ -410,9 +412,11 @@ data class TerminalCommunicationTable(
     var secondarySubnet: String = "",
 
     @field:BHFieldParseIndex(29)
+    @field:BHFieldName("WIFI SECONDARY IP")
     var hostEthSecondaryIp: String = "",
 
     @field:BHFieldParseIndex(30)
+    @field:BHFieldName("WIFI SECONDARY PORT")
     var hostSecondaryEthPort: String = "",
 
     @field:BHFieldParseIndex(31)
