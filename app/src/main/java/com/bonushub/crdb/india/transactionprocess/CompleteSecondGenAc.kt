@@ -261,7 +261,8 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     }
 
                     val reversalPacket = Gson().toJson(isoData)
-                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+              //      AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
 
                     printData = Triple("", "", "")
@@ -277,7 +278,8 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     }
 
                     val reversalPacket = Gson().toJson(isoData)
-                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                //    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
 
                     printData = Triple("", "", "")
@@ -313,7 +315,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     Log.e("2REVERSAL obj ->",""+isoData.toString())
                     val reversalPacket = Gson().toJson(isoData)
                     Log.e("3REVERSAL obj ->",""+reversalPacket)
-                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+               //     AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, false)
                     Log.e("4REVERSAL obj ->",""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
                     println(""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
@@ -331,7 +333,8 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     }
 
                     val reversalPacket = Gson().toJson(isoData)
-                    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                //    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
 
                     printData = Triple("", "", "")

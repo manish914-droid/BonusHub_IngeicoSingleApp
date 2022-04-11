@@ -55,7 +55,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
         }
         if (cardProcessedDataModal?.getReadCardType() != DetectCardType.EMV_CARD_TYPE) {
             val reversalPacket = Gson().toJson(transactionISOData)
-            AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+            AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
             transactionISOByteArray?.byteArr2HexStr()?.let { logger("PACKET-->", it) }
         }
 
@@ -83,7 +83,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                             }
                                             DetectCardType.EMV_CARD_TYPE -> {
                                                 val reversalPacket = Gson().toJson(transactionISOData)
-                                                AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                                                AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                                             }
 
                                             else -> {

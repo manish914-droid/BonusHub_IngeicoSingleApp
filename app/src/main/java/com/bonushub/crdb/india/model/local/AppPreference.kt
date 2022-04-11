@@ -135,12 +135,15 @@ object AppPreference {
         edit?.apply()
     }
 
-    //region==================================Below methods is used to save/retrieve string values in shared preference:-
+  /*  //region==================================Below methods is used to save/retrieve string values in shared preference:-
     fun saveString(keyName: String, value: String) =
-        sharedPreference?.edit()?.putString(keyName, value)?.apply()
+        sharedPreference?.edit()?.putString(keyName, value)?.apply()*/
 
-    fun getString(keyName: String) = sharedPreference?.getString(keyName, null) ?: ""
-    //endregion
+    @JvmStatic
+    fun getString(prefName: String): String {
+        val p = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+        return p?.getString(prefName, null) ?: ""
+    }
 
     //region==================================Below methods is used to save/retrieve int values in shared preference:-
     fun saveInt(keyName: String, value: Int) =
@@ -370,10 +373,16 @@ object AppPreference {
         v?.edit()?.putString(GENERIC_REVERSAL_KEY, "true")?.apply()
     }
 
+    //Edited by Lucky
     @JvmStatic
-    fun clearReversal(){
-        val v = HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
-        v?.edit()?.putString(GENERIC_REVERSAL_KEY, "")?.apply()
+    fun clearReversal() {
+        logger(TAG, "========clearReversal=========", "e")
+        HDFCApplication.appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE).apply {
+            val ed = edit()
+            ed?.putString(GENERIC_REVERSAL_KEY, "")
+            ed?.apply()
+            Log.e("REVERSAL", "CLEAR REVERSAL")
+        }
     }
 
     // end region

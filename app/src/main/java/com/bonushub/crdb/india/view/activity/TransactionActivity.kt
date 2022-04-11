@@ -193,8 +193,8 @@ class TransactionActivity : BaseActivityNew() {
         println(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
         val reversalObj = AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)
         println(reversalObj)
-        println("AppPreference.getReversal()"+AppPreference.getReversal())
-        if (TextUtils.isEmpty(AppPreference.getReversal())) {
+        println("AppPreference.getReversal()"+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
+        if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             println("sale_data_sync")
             val msg: String = getString(R.string.sale_data_sync)
             runOnUiThread { showProgress(msg) }
@@ -409,7 +409,7 @@ class TransactionActivity : BaseActivityNew() {
         }
         else {
             println("410")
-            if (!TextUtils.isEmpty(AppPreference.getReversal())) {
+            if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
                 println("412")
                 runOnUiThread { showProgress(getString(R.string.reversal_data_sync)) }
                 SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
