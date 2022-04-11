@@ -616,7 +616,7 @@ enum class CardEntryMode(val _name: String, val _value: String){
 
 // region
 enum class TestEmiItem(val id:String, val _name: String){
-    AMEX_TID("0", "AMEX TID"),
+    /*AMEX_TID("0", "AMEX TID"),*/
     BASE_TID("1", "Base TID"),
     OFFUS_TID("2", "OFFUS TID"),
     _3_M_TID("3", "3 M TID"),

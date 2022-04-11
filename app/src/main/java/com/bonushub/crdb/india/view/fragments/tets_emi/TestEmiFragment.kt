@@ -54,7 +54,8 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
         iTestEmiItemClick = this
         testEmiItem.clear()
-        //val tpt=Field48ResponseTimestamp.getTptData() // old
+       // linked tid logic
+        /* //val tpt=Field48ResponseTimestamp.getTptData() // old
         val tpt=Field48ResponseTimestamp.getAllTptData()
        // val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String> // old
         val linkedTid = ArrayList<String>()
@@ -98,8 +99,10 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
                 }
 
             }
-        }
-        val sortedList = testEmiItem.sortedWith(compareBy { it.id })
+        }*/
+
+        testEmiItem.addAll(TestEmiItem.values())
+        val sortedList = testEmiItem.sortedWith(compareBy { it.id.toInt() })
         testEmiItem=sortedList as MutableList<TestEmiItem>
 
         setupRecyclerview()
