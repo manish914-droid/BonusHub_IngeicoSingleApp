@@ -22,6 +22,7 @@ import com.bonushub.crdb.india.transactionprocess.SyncTransactionToHost
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.SearchCard
 import com.bonushub.crdb.india.viewmodel.*
@@ -381,7 +382,8 @@ class TransactionActivity : BaseActivityNew() {
                         }
 
                     }
-                    else{
+                    else if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+
                         GlobalScope.launch(Dispatchers.Main) {
                             alertBoxWithAction(
                                 getString(R.string.transaction_delined_msg),
@@ -391,6 +393,8 @@ class TransactionActivity : BaseActivityNew() {
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                            checkForPrintReversalReceipt(this@TransactionActivity,
+                                                autoSettlementCheck){}
                                             // syncOfflineSaleAndAskAutoSettlement(autoSettlementCheck.substring(0, 1))
                                         } else {
 
