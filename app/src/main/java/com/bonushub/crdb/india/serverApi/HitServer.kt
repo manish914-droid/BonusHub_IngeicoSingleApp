@@ -130,6 +130,7 @@ object HitServer  {
                         //   irh?.clearReversal()
 
                         println("Outside the Readtimeout error5")
+                       // throw SocketTimeoutException("test reversal")
                         callbackSale(responseStr ?: "", true, "")
                         //  this@HitServer.callback = null
 
