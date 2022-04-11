@@ -3,6 +3,7 @@ package com.bonushub.crdb.india.transactionprocess
 
 import android.os.DeadObjectException
 import android.os.RemoteException
+import android.util.Log
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.AppPreference.GENERIC_REVERSAL_KEY
@@ -254,7 +255,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     //Reversal save To Preference code here.............
                     isoData?.mti = "0400"
 
-                    println("Field56 data in reversal in second ac $field56data")
+                    println("1Field56 data in reversal in second ac $field56data")
                     isoData?.apply {
                         additionalData["F56reversal"] = field56data ?: ""
                     }
@@ -270,7 +271,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     //Reversal save To Preference code here.............
                     isoData?.mti = "0400"
 
-                    println("Field56 data in reversal in second ac $field56data")
+                    println("2Field56 data in reversal in second ac $field56data")
                     isoData?.apply {
                         additionalData["F56reversal"] = field56data ?: ""
                     }
@@ -308,9 +309,14 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     val tcData = iemv!!.getTLV(Integer.toHexString(0x9F26).toUpperCase(Locale.ROOT))
                     println("TC Data is ----> $tcData")
 
+
+                    Log.e("2REVERSAL obj ->",""+isoData.toString())
                     val reversalPacket = Gson().toJson(isoData)
+                    Log.e("3REVERSAL obj ->",""+reversalPacket)
                     AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
-                    AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
+                    AppPreference.saveBoolean(ONLINE_EMV_DECLINED, false)
+                    Log.e("4REVERSAL obj ->",""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
+                    println(""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
 
                     printData = Triple(tvrData, tsiData, tcData)
                     printExtraDataSB(printData,"")
@@ -319,7 +325,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     //Reversal save To Preference code here.............
                     isoData?.mti = "0400"
 
-                    println("Field56 data in reversal in second ac $field56data")
+                    println("4Field56 data in reversal in second ac $field56data")
                     isoData?.apply {
                         additionalData["F56reversal"] = field56data ?: ""
                     }

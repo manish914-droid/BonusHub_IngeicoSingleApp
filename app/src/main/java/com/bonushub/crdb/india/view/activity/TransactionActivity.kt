@@ -26,6 +26,7 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.SearchCard
 import com.bonushub.crdb.india.viewmodel.*
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
+import com.bonushub.crdb.india.vxutils.TransactionType
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.*
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -105,6 +106,26 @@ class TransactionActivity : BaseActivityNew() {
                     Toast.makeText(applicationContext,"Mag Card  detected", Toast.LENGTH_LONG).show()
                 }
 
+                //region============Below When Condition is used to check Transaction Types Based Process Execution:-
+                when (cardProcessedData.getTransType()) {
+                    TransactionType.SALE.type, TransactionType.PRE_AUTH.type,
+                    TransactionType.REFUND.type, TransactionType.CASH_AT_POS.type,
+                    TransactionType.SALE_WITH_CASH.type, TransactionType.EMI_SALE.type,
+                    TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type,
+                    TransactionType.FLEXI_PAY.type,
+                    TransactionType.TEST_EMI.type -> {
+                        emvProcessNext(cardProcessedData)
+//                        val emvOption = EmvOption.create().apply {
+//                            flagPSE(0x00.toByte())
+//                        }
+//                        testVFEmvHandler = emvHandler()
+//                        DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
+                    }
+                    else -> {
+                    }
+                }
+                //endregion
+
             }
 
             DetectCardType.EMV_CARD_TYPE-> {
@@ -168,7 +189,13 @@ class TransactionActivity : BaseActivityNew() {
            // cardView_l.visibility = View.GONE
         }
         // If case Sale data sync to server
-        if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+        Log.e("1REVERSAL obj ->",""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
+        println(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
+        val reversalObj = AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)
+        println(reversalObj)
+        println("AppPreference.getReversal()"+AppPreference.getReversal())
+        if (TextUtils.isEmpty(AppPreference.getReversal())) {
+            println("sale_data_sync")
             val msg: String = getString(R.string.sale_data_sync)
             runOnUiThread { showProgress(msg) }
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
@@ -381,13 +408,16 @@ class TransactionActivity : BaseActivityNew() {
             }
         }
         else {
-            if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+            println("410")
+            if (!TextUtils.isEmpty(AppPreference.getReversal())) {
+                println("412")
                 runOnUiThread { showProgress(getString(R.string.reversal_data_sync)) }
                 SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
                     hideProgress()
                     if (isSyncToHost) {
                         AppPreference.clearReversal()
                         checkReversal(transactionISOByteArray, cardProcessedDataModal)
+                        println("clearReversal -> check again")
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             //  VFService.showToast(transMsg)
@@ -406,6 +436,8 @@ class TransactionActivity : BaseActivityNew() {
                         }
                     }
                 }
+            }else{
+                println("442")
             }
         }
         //Else case is to Sync Reversal data Packet to Host:-

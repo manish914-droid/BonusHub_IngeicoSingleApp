@@ -25,16 +25,19 @@ import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.di.DBModule.appDatabase
 import com.bonushub.crdb.india.di.scope.BHFieldParseIndex
+import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacket
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
+import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -1838,4 +1841,91 @@ fun getAllBrandEMIMasterDataTimeStamps(): List<BrandEMIMasterTimeStamps>? {
     }
 
 
+}
+
+fun getCurrentDateforMag(): String {
+    val sdf = SimpleDateFormat("yyMM")
+    val d = Date()
+    val currDt = sdf.format(d)
+
+    return currDt
+}
+
+/* // kushal do later
+fun getEncryptedTrackData(
+    track2Data: String?,
+    cardProcessedData: CardProcessedDataModal?
+): String? {
+    var encryptedbyteArrrays: ByteArray? = null
+    if (null != track2Data) {
+        //  var track21 = "35|" + track2Data.replace("D", "=").replace("F", "")
+
+        var track21 = "35,36|${
+            track2Data.replace("D", "=").replace("F", "")
+        }" + "|" + cardProcessedData?.getCardHolderName() + "~~~" +
+                cardProcessedData?.getTypeOfTxnFlag() + "~" + cardProcessedData?.getPinEntryFlag()
+
+        //println("Track 2 data is$track21")
+        val DIGIT_8 = 8
+
+        val mod = track21.length % DIGIT_8
+        if (mod != 0) {
+            track21 = getEncryptedField57DataForVisa(track21.length, track21)
+        }
+
+        val byteArray = track21.toByteArray(StandardCharsets.ISO_8859_1)
+        encryptedbyteArrrays = VFService.vfPinPad?.encryptTrackData(0, 2, byteArray)
+
+        */
+/*println(
+            "Track 2 with encyption is --->" + Utility.byte2HexStr(encryptedbyteArrrays)
+        )*//*
+
+    }
+
+    return byte2HexStr(encryptedbyteArrrays)
+}
+*/
+
+//Below code is to check and validate Credit Card Number using Luhn Check Algorithm:-
+fun cardLuhnCheck(cardNo: String): Boolean {
+    try {
+        val nDigits = cardNo.length
+        var nSum = 0
+        var isSecond = false
+        for (i in nDigits - 1 downTo 0) {
+            var d = cardNo[i] - '0'
+            if (isSecond) d *= 2
+
+            // We add two digits to handle
+            // cases that make two digits
+            // after doubling
+            nSum += d / 10
+            nSum += d % 10
+            isSecond = !isSecond
+        }
+        return nSum % 10 == 0
+    } catch (ex: java.lang.Exception) {
+        ex.printStackTrace()
+        return false
+    }
+}
+
+fun getEncryptedField57DataForVisa(dataLength: Int, dataDescription: String): String {
+    var dataDescription = dataDescription
+    val encryptedByteArray: ByteArray?
+    val DIGIT_8 = 8
+    if (dataLength > DIGIT_8) {
+        val mod = dataLength % DIGIT_8
+        if (mod != 0) {
+            val padding = DIGIT_8 - mod
+            val totalLength = dataLength + padding
+            dataDescription = addPad(dataDescription, " ", totalLength, false)
+        }
+        //     logger("Field57_Visa", " -->$dataDescription", "e")
+        //      val byteArray = dataDescription.toByteArray(StandardCharsets.ISO_8859_1)
+        //     encryptedByteArray = VFService.vfPinPad?.encryptTrackData(0, 2, byteArray)
+        //    println("Track 2 with encryption in Visa sale is --->" + Utility.byte2HexStr(encryptedByteArray))
+        return dataDescription/*Utility.byte2HexStr(encryptedByteArray)*/
+    } else return "TRACK57_LENGTH<8"
 }

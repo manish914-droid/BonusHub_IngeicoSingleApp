@@ -648,3 +648,21 @@ enum class CardAid(val aid: String) {
     Master("A000000004")
 }
 //endregion
+
+enum class DetectError(val errorCode: Int) {
+    SeePhone(150),
+    DynamicLimit(208),
+    TransactionReject(202),
+    RefuseTrans(202),
+    Terminalcapability(204),
+    EMVFallBack(12),
+    NoCoOwnedApp(8),
+    NeedContact(205),
+    ReadCardFail(24),
+    Muticarderror(26),
+    IncorrectPAN(2007),
+    OtherErrorTransactionterminated(11),
+    CTLS_CARD_READ_FAILED_ERROR(29),
+    TransactionDeclined(1),
+    SecondTap_Approved(209)
+}

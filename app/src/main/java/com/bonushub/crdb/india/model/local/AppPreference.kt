@@ -337,7 +337,7 @@ object AppPreference {
                 if (!str.isNullOrEmpty()) {
                    // Gson().fromJson<IsoDataWriter>(str, object : TypeToken<IsoDataWriter>() {}.type)
                     return str
-                } else null
+                } else ""
             } catch (ex: Exception) {
                 throw Exception("Reversal error!!!")
             }
