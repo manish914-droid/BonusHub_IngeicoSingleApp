@@ -385,9 +385,13 @@ class TransactionActivity : BaseActivityNew() {
                     else if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
 
                         GlobalScope.launch(Dispatchers.Main) {
+                            var hostMsg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                            if(hostMsg.isNullOrEmpty()){
+                                hostMsg = getString(R.string.transaction_delined_msg)
+                            }
                             alertBoxWithAction(
                                 getString(R.string.transaction_delined_msg),
-                                responseIsoData.isoMap[58]?.parseRaw2String().toString(),
+                                hostMsg,
                                 false,
                                 getString(R.string.positive_button_ok),
                                 { alertPositiveCallback ->
