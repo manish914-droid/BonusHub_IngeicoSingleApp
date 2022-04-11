@@ -1066,13 +1066,14 @@ class PrintUtil(context: Context?) {
                     //printer?.addText(textFormatBundle, "--------------------------------")
                     printSeperator()
 
-                    /*if (tsi.isNotEmpty() && tvr.isNotEmpty()) {
-                        alignLeftRightText(textInLineFormatBundle, "TVR:${tvr}", "TSI:${tsi}")
-                    }*/
-                    textBlockList.add(sigleLineformat("TVR:${tvr}", AlignMode.LEFT))
-                    textBlockList.add(sigleLineformat("TSI:${tsi}", AlignMode.RIGHT))
-                    printer?.addMixStyleText(textBlockList)
-                    textBlockList.clear()
+                    if (tsi.isNotEmpty() && tvr.isNotEmpty()) {
+                       // alignLeftRightText(textInLineFormatBundle, "TVR:${tvr}", "TSI:${tsi}")
+                        textBlockList.add(sigleLineformat("TVR:${tvr}", AlignMode.LEFT))
+                        textBlockList.add(sigleLineformat("TSI:${tsi}", AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+                        textBlockList.clear()
+                    }
+
 
                     if (aid.isNotEmpty()) {
                         aid = "AID:$aid"

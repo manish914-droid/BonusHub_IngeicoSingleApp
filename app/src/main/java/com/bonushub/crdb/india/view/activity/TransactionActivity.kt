@@ -394,7 +394,9 @@ class TransactionActivity : BaseActivityNew() {
                                     if (alertPositiveCallback) {
                                         if (!TextUtils.isEmpty(autoSettlementCheck)) {
                                             checkForPrintReversalReceipt(this@TransactionActivity,
-                                                autoSettlementCheck){}
+                                                autoSettlementCheck){
+                                                goToDashBoard()
+                                            }
                                             // syncOfflineSaleAndAskAutoSettlement(autoSettlementCheck.substring(0, 1))
                                         } else {
 
