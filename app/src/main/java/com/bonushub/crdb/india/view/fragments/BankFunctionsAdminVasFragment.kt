@@ -19,6 +19,7 @@ import com.bonushub.crdb.india.databinding.FragmentBankFunctionsAdminVasBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
@@ -273,6 +274,73 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                         }
                                     }
 
+                                    BankFunctionsAdminVasItem.CLEAR_BATCH ->{
+                                       // val batchList = BatchFileDataTable.selectBatchData()
+                                        var batchList:MutableList<TempBatchFileDataTable>
+                                        runBlocking {
+                                            batchList = appDao.getAllTempBatchFileDataTableDataForSettlement()
+                                        }
+                                        if (batchList.size > 0) {
+                                            iDialog?.alertBoxWithAction(
+                                                "Delete",
+                                                "Do you want to delete batch data?",
+                                                true,
+                                                "YES", {
+                                                    val batchNumber =
+                                                        AppPreference.getIntData(PrefConstant.SETTLEMENT_BATCH_INCREMENT.keyName.toString()) + 1
+                                                    AppPreference.setIntData(
+                                                        PrefConstant.SETTLEMENT_BATCH_INCREMENT.keyName.toString(),
+                                                        batchNumber
+                                                    )
+//                                                    TerminalParameterTable.updateSaleBatchNumber(
+//                                                        batchNumber.toString()
+//                                                    )
+                                                    // Added by MKK for automatic FBatch value zero in case of Clear Batch
+                                                    AppPreference.saveBoolean(
+                                                        PrefConstant.SERVER_HIT_STATUS.keyName.toString(),
+                                                        false
+                                                    )
+                                                    // Added By MKK
+                                                    //After settlement failure and clearing the batch and clearing batch from  host
+                                                    //After that doing init transaction was not happening so I mainatin this boolean here
+                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+
+                                                    // Added By MKK
+                                                    //After settlement failure and clearing the batch and clearing batch from  host
+                                                    //After that doing init transaction was not happening so I mainatin this boolean here
+                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+
+                                                   // ROCProviderV2.saveBatchInPreference(batchList)
+                                                    //Delete All BatchFile Data from Table after Settlement:-
+                                                    lifecycleScope.launch(Dispatchers.IO) {
+                                                        appDao.deleteTempBatchFileDataTable()
+//                                                        BrandEMIDataTable.brandEmiDataclear()
+//                                                        BrandEMIAccessDataModalTable.brandEmiByCodeclear()
+                                                        withContext(Dispatchers.Main) {
+                                                            ToastUtils.showToast(requireContext(),"Batch Deleted Successfully")
+                                                        }
+                                                    }
+                                                }, {
+
+                                                }
+                                            )
+                                        } else {
+                                            iDialog?.alertBoxWithAction(
+                                                "Empty",
+                                                "Batch is empty",
+                                                false,
+                                                "OK", {
+                                                }, {
+                                                    // Added by MKK for automatic FBatch value zero in case of Clear Batch
+                                                    AppPreference.saveBoolean(
+                                                        PrefConstant.SERVER_HIT_STATUS.keyName.toString(),
+                                                        false
+                                                    )
+                                                    //
+                                                }
+                                            )
+                                        }
+                                    }
                                     else -> {}
                                 }
                             } else {
