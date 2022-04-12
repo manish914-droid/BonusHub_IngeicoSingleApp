@@ -347,4 +347,9 @@
     <string name="minimum_amt_msg">Enter minimum amount  \u20B9 1 </string>
     <string name="invalid_amt_msg">Invalid Amount</string>
     <string name="_41501002">50006873</string>
+
+    <string name="reversal">Reversal</string>
+    <string name="reversal_clear">Do you want to clear reversal</string>
+    <string name="no_reversal_found">No Reversal Found</string>
+
 </resources>
