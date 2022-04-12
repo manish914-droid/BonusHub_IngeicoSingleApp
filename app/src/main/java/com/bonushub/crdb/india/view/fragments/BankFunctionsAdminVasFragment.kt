@@ -5,10 +5,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
+import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -339,6 +336,52 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                     //
                                                 }
                                             )
+                                        }
+                                    }
+
+                                    BankFunctionsAdminVasItem.TMK_DOWNLOAD ->{
+                                        iDialog?.alertBoxWithAction(
+                                            getString(R.string.download_tmk),
+                                            getString(R.string.do_you_want_to_download_tmk),
+                                            true,
+                                            getString(R.string.yes),
+                                            {
+                                                (activity as NavigationActivity).window.addFlags(
+                                                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                                /*iDialog?.onEvents(VxEvent.DownloadTMKForHDFC) */ }, // please check
+                                            { Log.d("NO:- ", "Clicked")
+                                                (activity as NavigationActivity).getWindow().clearFlags(
+                                                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                                            })
+
+                                    }
+
+                                    BankFunctionsAdminVasItem.APPLICATION_UPDATE ->{
+                                        (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                       // iDialog?.onEvents(VxEvent.AppUpdate)  // please check
+
+                                    }
+
+                                    BankFunctionsAdminVasItem.SYNC_TRANSACTION ->{
+                                        lifecycleScope.launch(Dispatchers.Main) {
+
+                                            iDialog?.alertBoxWithAction(
+                                                getString(R.string.reversal),
+                                                getString(R.string.sync_transaction),
+                                                true,
+                                                getString(R.string.yes),
+                                                { alertPositiveCallback ->
+                                                    if (alertPositiveCallback) {
+                                                        //TxnCallBackRequestTable.clear() // please check
+                                                        iDialog?.showToast("Sync Transaction clear successfully")
+                                                    }
+
+                                                    //    declinedTransaction()
+                                                },
+                                                {})
+
+
+
                                         }
                                     }
                                     else -> {}

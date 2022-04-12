@@ -351,5 +351,8 @@
     <string name="reversal">Reversal</string>
     <string name="reversal_clear">Do you want to clear reversal</string>
     <string name="no_reversal_found">No Reversal Found</string>
+    <string name="download_tmk">TMK Download</string>
+    <string name="do_you_want_to_download_tmk">Do You Want To Download TMK?</string>
+    <string name="sync_transaction">Do you want to clear Sync Transaction</string>
 
 </resources>
