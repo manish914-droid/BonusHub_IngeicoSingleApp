@@ -30,6 +30,7 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
+import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.transactionprocess.SyncVoidTransactionToHost
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
@@ -410,23 +411,28 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
     private fun onContinueClicked(voidData: TempBatchFileDataTable) {
         //Sync Reversal
-        if (false/*!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))*/) {
+        if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             logger("goto ","Sync Reversal","e")
-            /*activity?.runOnUiThread { (activity as MainActivity).showProgress(getString(R.string.reversal_data_sync)) }
-            SyncReversalToHost(AppPreference.getReversal()) { isSyncToHost, transMsg ->
-                (activity as MainActivity).hideProgress()
+            activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.reversal_data_sync)) }
+            SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
+                (activity as NavigationActivity).hideProgress()
                 if (isSyncToHost) {
                     AppPreference.clearReversal()
                     onContinueClicked(voidData)
                 } else {
                     activity?.runOnUiThread {
-                        // VFService.showToast(transMsg)
+                         ToastUtils.showToast(requireContext(),transMsg)
+
+                        startActivity(Intent(requireContext(), NavigationActivity::class.java).apply {
+                            flags =
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        })
                     }
                 }
-            }*/
+            }
         } else {
             //Sync Main Transaction(VOID transaction)
-            if (true/*TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))*/) {
+            if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
                 GlobalScope.launch {
                     delay(1000)
                     //**** Creating void packet and send to server ****
