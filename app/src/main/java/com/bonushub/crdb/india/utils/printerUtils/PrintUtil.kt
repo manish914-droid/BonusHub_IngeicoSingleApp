@@ -964,32 +964,39 @@ class PrintUtil(context: Context?) {
                     val mid = isoW.isoMap[42]?.parseRaw2String() ?: ""
                     val batchdata = isoW.isoMap[60]?.parseRaw2String() ?: ""
                     val batch = batchdata.split("|")[0]
+                    val bankID = batchdata.split("|")[1]
                     val cardType = isoW.additionalData["cardType"] ?: ""
+
+                    if (hostBankID?.isNotBlank() == true) {
+                        hostBankID
+                    } else {
+                        hostBankID =  bankID
+                    }
 
                     if (hostMID?.isNotBlank() == true) {
                         hostMID
                     } else {
-                        mid
+                        hostMID =  mid
                     }
                     if (hostTID?.isNotBlank() == true) {
                         hostTID
                     } else {
-                        tid
+                        hostTID = tid
                     }
                     if (hostBatchNumber?.isNotBlank() == true) {
                         hostBatchNumber
                     } else {
-                        batch
+                        hostBatchNumber =  batch
                     }
                     if (hostRoc?.isNotBlank() == true) {
                         hostRoc
                     } else {
-                        roc
+                        hostRoc = roc
                     }
                     if (hostCardType?.isNotBlank() == true) {
                         hostCardType
                     } else {
-                        cardType
+                        hostCardType = cardType
                     }
 
 

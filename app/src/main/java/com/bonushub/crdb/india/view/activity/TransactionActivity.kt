@@ -385,9 +385,11 @@ class TransactionActivity : BaseActivityNew() {
                     else if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
 
                         GlobalScope.launch(Dispatchers.Main) {
-                            var hostMsg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                            var hostMsg = responseIsoData.isoMap[58]?.parseRaw2String()
+                            Log.e("hostMsg",""+hostMsg)
                             if(hostMsg.isNullOrEmpty()){
                                 hostMsg = getString(R.string.transaction_delined_msg)
+                                Log.e("hostMsgModify",""+hostMsg)
                             }
                             alertBoxWithAction(
                                 getString(R.string.transaction_delined_msg),
