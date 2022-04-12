@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -32,10 +34,7 @@ import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
@@ -69,7 +68,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.admin_vas_header)
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
 
         try {
             iDialog = (activity as NavigationActivity)
@@ -225,25 +224,54 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
             }
 
-//            BankFunctionsAdminVasItem.ENV_PARAM ->{
-//                // ENV PARAM
-//            }
+            BankFunctionsAdminVasItem.ENV_PARAM ->{
+                // ENV PARAM
+                DialogUtilsNew1.showDialog(activity,getString(R.string.super_admin_password),getString(R.string.hint_enter_super_admin_password),object:OnClickDialogOkCancel{
+                    override fun onClickOk(dialog: Dialog, password: String) {
 
-            BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
+                        logger("password",password)
+
+                        bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner) {
+
+                            if (it) {
+                                dialog.dismiss()
+
+                                changeEnvParam()
+
+                            } else {
+                                ToastUtils.showToast(
+                                    requireContext(),
+                                    R.string.invalid_password
+                                )
+                            }
+                        }
+
+
+                    }
+
+                    override fun onClickCancel() {
+
+                    }
+
+                }, false)
+            }
+
+
+            /*BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
                 // INIT PAYMENT APP
                 if(AppPreference.getLogin()){
                 (activity as NavigationActivity).transactFragment(BankFunctionsInitPaymentAppFragment(), true)
                 }else{
                     ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
                 }
-            }
+            }*/
 
 
-            BankFunctionsAdminVasItem.CLEAR_SYNCING_DATA->{
+            /*BankFunctionsAdminVasItem.CLEAR_SYNCING_DATA->{
                 lifecycleScope.launch(Dispatchers.IO) {
                     appDao.deletePendingSyncTransactionTable()
                 }
-            }
+            }*/
 
         }
     }
@@ -434,6 +462,138 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         super.onStop()
         logger("kush","rem")
         isFromStop = true
+    }
+
+    private fun changeEnvParam() {
+        GlobalScope.launch {
+
+            // not need
+            /*val list = arrayListOf<TableEditHelper>()
+            val i = IssuerParameterTable.selectFromIssuerParameterTable()
+            for (e in i) {
+                list.add(TableEditHelper(e.issuerName, e.issuerId))
+            }*/
+
+            launch(Dispatchers.Main) {
+                var isEdit = false
+                context?.let {
+                    Dialog(it).apply {
+                        requestWindowFeature(Window.FEATURE_NO_TITLE)
+                        setContentView(R.layout.dialog_emv)
+                        setCancelable(false)
+
+
+                        val pcEt = findViewById<EditText>(R.id.emv_pcno_et)
+                        val bankEt = findViewById<EditText>(R.id.emv_bankcode_et)
+
+                        findViewById<View>(R.id.env_save_btn).setOnClickListener {
+                            AppPreference.saveString(
+                                PreferenceKeyConstant.PC_NUMBER_ONE.keyName,
+                                pcEt.text.toString()
+
+                            )
+                            AppPreference.setBankCode(bankEt.text.toString())
+                            dismiss()
+                        }
+                        findViewById<View>(R.id.env_cancel_btn).setOnClickListener {
+
+                            dismiss()
+                        }
+
+
+                        /*  val issuerEt = findViewById<EditText>(R.id.emv_issuerid_et)
+                          val accEt = findViewById<EditText>(R.id.emv_ac_selection_et)*/
+
+                       // pcEt.setText(AppPreference.getString(AppPreference.PC_NUMBER_KEY))
+                        pcEt.setText(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName))
+                        pcEt.setSelection(pcEt.text.length)
+                        bankEt.setText(AppPreference.getBankCode())
+                        bankEt.setSelection(bankEt.text.length)
+                        /*  if (AppPreference.getString(AppPreference.CRDB_ISSUER_ID_KEY).isEmpty()) {
+                              val issuerId = addPad(AppPreference.WALLET_ISSUER_ID, "0", 2)
+                              issuerEt.setText(issuerId)
+                          } else {
+                              issuerEt.setText(AppPreference.getString(AppPreference.CRDB_ISSUER_ID_KEY))
+                              //  issuerEt.setText(AppPreference.getString(AppPreference.WALLET_ISSUER_ID))
+                          }
+                          accEt.setText(AppPreference.getString(AppPreference.ACC_SEL_KEY))*/
+
+                        //   val rg = findViewById<RadioGroup>(R.id.emv_radio_grp_btn)
+
+                        /* rg.setOnCheckedChangeListener { _rbg, id ->
+                             val rb = _rbg.findViewById<RadioButton>(id)
+                             val value = rb.tag as String
+                             if (value.isNotEmpty()) {
+                                 GlobalScope.launch {
+                                     val data =
+                                         IssuerParameterTable.selectFromIssuerParameterTable(value)
+                                     if (data != null) {
+                                         val issuerName = data.issuerId
+                                        *//* launch(Dispatchers.Main) {
+                                            issuerEt.setText(issuerName)
+                                        }*//*
+                                        AppPreference.saveString(
+                                            AppPreference.CRDB_ISSUER_ID_KEY,
+                                            issuerName
+                                        )
+
+                                    }
+                                }
+                            }
+                        }*/
+
+                        /* list.forEach {
+                             val rBtn = RadioButton(context).apply {
+                                 text = it.titleName
+                                 tag = it.titleValue
+                                 setPadding(5, 20, 5, 20)
+                             }
+                             rg.addView(rBtn)
+                             if (it.titleValue == issuerEt.text.toString()) {
+                                 rBtn.isChecked = true
+                             }
+
+                         }*/
+
+
+
+                        /* findViewById<TextView>(R.id.emv_edit).setOnClickListener {
+                             isEdit = !isEdit
+                             val tv = it as TextView
+                             if (isEdit) {
+                                 hh(
+                                     arrayOf( sep),
+                                     arrayOf(pcEt, bankEt),
+                                     View.GONE
+                                 )
+                                 tv.text = getString(R.string.save)
+                             } else {
+                                 GlobalScope.launch {
+                                     AppPreference.saveString(
+                                         AppPreference.PC_NUMBER_KEY,
+                                         pcEt.text.toString()
+                                     )
+                                     AppPreference.setBankCode(bankEt.text.toString())
+                                    *//* AppPreference.saveString(
+                                        AppPreference.ACC_SEL_KEY,
+                                        accEt.text.toString()
+                                    )
+                                    AppPreference.saveString(
+                                        AppPreference.CRDB_ISSUER_ID_KEY,
+                                        issuerEt.text.toString()
+                                    )*//*
+
+                                }
+                                hh(arrayOf( sep), arrayOf(pcEt, bankEt), View.GONE)
+                                activity?.let { it1 -> ROCProviderV2.refreshToolbarLogos(it1) }
+                                tv.text = getString(R.string.edit)
+                            }
+                        }*/
+
+                    }.show()
+                }
+            }
+        }
     }
 }
 
