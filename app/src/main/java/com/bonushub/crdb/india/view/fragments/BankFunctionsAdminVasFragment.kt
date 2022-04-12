@@ -222,6 +222,13 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
             }
 
+
+            BankFunctionsAdminVasItem.APPLICATION_UPDATE ->{
+                (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                // iDialog?.onEvents(VxEvent.AppUpdate)  // please check
+
+            }
+
             else ->{
                 DialogUtilsNew1.showDialog(activity,getString(R.string.super_admin_password),getString(R.string.hint_enter_super_admin_password),object:OnClickDialogOkCancel{
                     override fun onClickOk(dialog: Dialog, password: String) {
@@ -353,12 +360,6 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                 (activity as NavigationActivity).getWindow().clearFlags(
                                                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                                             })
-
-                                    }
-
-                                    BankFunctionsAdminVasItem.APPLICATION_UPDATE ->{
-                                        (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                       // iDialog?.onEvents(VxEvent.AppUpdate)  // please check
 
                                     }
 
