@@ -190,17 +190,21 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         DetectCardType.MAG_CARD_TYPE, DetectCardType.CONTACT_LESS_CARD_TYPE,
                                         DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE,
                                         DetectCardType.MANUAL_ENTRY_TYPE -> {
-                                           // clearReversal()
+                                            clearReversal()
                                             syncTransactionCallback(true, successResponseCode.toString(), result, null, null, secondTap)
                                         }
                                         DetectCardType.EMV_CARD_TYPE -> {
-                                          //  clearReversal()
+                                            clearReversal()
                                             if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type
                                              /*   && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&
                                                     cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI.type &&
                                                     cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI_BY_ACCESS_CODE.type &&
                                                     cardProcessedDataModal?.getTransType() != TransactionType.TEST_EMI.type &&
                                                     cardProcessedDataModal?.getTransType() != TransactionType.SALE.type*/) {
+                                                logger("blank if block","true","e")
+
+                                                syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
+
 
                                             } else {
                                                 syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)

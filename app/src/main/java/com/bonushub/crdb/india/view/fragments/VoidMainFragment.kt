@@ -722,7 +722,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
         private fun sendVoidTransToHost(transactionISOByteArray: IsoDataWriter) {
 
-            if (true/*TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))*/) {
+            if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
                 //  (context as MainActivity).showProgress((context).getString(R.string.please_wait_offline_sale_sync))
                 SyncVoidTransactionToHost(
                     transactionISOByteArray,

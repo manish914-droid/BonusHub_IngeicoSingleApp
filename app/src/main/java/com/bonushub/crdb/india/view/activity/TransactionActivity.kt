@@ -482,6 +482,34 @@ class TransactionActivity : BaseActivityNew() {
                         }
 
                     }
+                    else if (syncStatus && responseCode != "00") {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            alertBoxWithAction(
+                                getString(R.string.transaction_delined_msg),
+                                responseIsoData.isoMap[58]?.parseRaw2String().toString(),
+                                false,
+                                getString(R.string.positive_button_ok),
+                                { alertPositiveCallback ->
+                                    if (alertPositiveCallback) {
+                                        /*if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                            syncOfflineSaleAndAskAutoSettlement(
+                                                autoSettlementCheck.substring(0, 1)
+                                            )
+                                        } else {*/
+                                            startActivity(
+                                                Intent(
+                                                    this@TransactionActivity,
+                                                    NavigationActivity::class.java
+                                                ).apply {
+                                                    flags =
+                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                })
+                                     //   }
+                                    }
+                                },
+                                {})
+                        }
+                    }
                     else if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
 
                         GlobalScope.launch(Dispatchers.Main) {
