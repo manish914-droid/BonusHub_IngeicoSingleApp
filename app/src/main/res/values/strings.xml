@@ -331,4 +331,28 @@
     <string name="please_check_printing_roll">Want to Settle without settlement reports?</string>
     <string name="invoice_number_should_not_be_empty">Please Enter invoice number</string>
 
+    <!--Edit env-->
+    <string name="env_params">ENV Params</string>
+    <string name="pc_no">PC No</string>
+    <string name="bank_code">Bank Code</string>
+    <string name="a_c_selection">A/c Selection</string>
+    <string name="close">Close</string>
+    <string name="save">save</string>
+    <string name="edit">edit</string>
+    <string name="issuer_id">Issuer Id</string>
+    <string name="select_option">Select Option</string>
+    <string name="done">Done</string>
+    <string name="proceed_to_pay">Proceed To Pay</string>
+    <string name="enter_the_amount">Enter Amount (\u20B9)</string>
+    <string name="minimum_amt_msg">Enter minimum amount  \u20B9 1 </string>
+    <string name="invalid_amt_msg">Invalid Amount</string>
+    <string name="_41501002">50006873</string>
+
+    <string name="reversal">Reversal</string>
+    <string name="reversal_clear">Do you want to clear reversal</string>
+    <string name="no_reversal_found">No Reversal Found</string>
+    <string name="download_tmk">TMK Download</string>
+    <string name="do_you_want_to_download_tmk">Do You Want To Download TMK?</string>
+    <string name="sync_transaction">Do you want to clear Sync Transaction</string>
+
 </resources>

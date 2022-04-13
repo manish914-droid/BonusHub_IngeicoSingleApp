@@ -5,9 +5,8 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +16,7 @@ import com.bonushub.crdb.india.databinding.FragmentBankFunctionsAdminVasBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
@@ -32,10 +32,7 @@ import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
 import com.mindorks.example.coroutines.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
@@ -69,7 +66,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.admin_vas_header)
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
 
         try {
             iDialog = (activity as NavigationActivity)
@@ -225,25 +222,204 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                 (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
             }
 
-//            BankFunctionsAdminVasItem.ENV_PARAM ->{
-//                // ENV PARAM
-//            }
 
-            BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
+            BankFunctionsAdminVasItem.APPLICATION_UPDATE ->{
+                (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                // iDialog?.onEvents(VxEvent.AppUpdate)  // please check
+
+            }
+
+            else ->{
+                DialogUtilsNew1.showDialog(activity,getString(R.string.super_admin_password),getString(R.string.hint_enter_super_admin_password),object:OnClickDialogOkCancel{
+                    override fun onClickOk(dialog: Dialog, password: String) {
+
+                        logger("password",password)
+
+                        bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner) {
+
+                            if (it) {
+                                dialog.dismiss()
+
+                                // check other option
+                                when(bankFunctionsAdminVasItem){
+
+                                    BankFunctionsAdminVasItem.ENV_PARAM ->{
+                                        changeEnvParam()
+                                    }
+
+                                    BankFunctionsAdminVasItem.CLEAR_REVERSAL ->{
+                                        logger("CLEAR_REVERSAL","click","e")
+                                        lifecycleScope.launch(Dispatchers.Main) {
+                                            if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)))
+                                                iDialog?.alertBoxWithAction(
+                                                    getString(R.string.reversal),
+                                                    getString(R.string.reversal_clear),
+                                                    true,
+                                                    getString(R.string.yes),
+                                                    { alertPositiveCallback ->
+                                                        if (alertPositiveCallback) {
+                                                            AppPreference.clearReversal()
+                                                            iDialog?.showToast("Reversal clear successfully")
+                                                        }
+
+                                                        //    declinedTransaction()
+                                                    },
+                                                    {})
+                                            else
+                                                iDialog?.alertBoxWithAction(
+                                                    getString(R.string.reversal),
+                                                    getString(R.string.no_reversal_found),
+                                                    false,
+                                                    getString(R.string.positive_button_ok),
+                                                    {},
+                                                    {})
+
+
+                                        }
+                                    }
+
+                                    BankFunctionsAdminVasItem.CLEAR_BATCH ->{
+                                       // val batchList = BatchFileDataTable.selectBatchData()
+                                        var batchList:MutableList<TempBatchFileDataTable>
+                                        runBlocking {
+                                            batchList = appDao.getAllTempBatchFileDataTableDataForSettlement()
+                                        }
+                                        if (batchList.size > 0) {
+                                            iDialog?.alertBoxWithAction(
+                                                "Delete",
+                                                "Do you want to delete batch data?",
+                                                true,
+                                                "YES", {
+                                                    val batchNumber =
+                                                        AppPreference.getIntData(PrefConstant.SETTLEMENT_BATCH_INCREMENT.keyName.toString()) + 1
+                                                    AppPreference.setIntData(
+                                                        PrefConstant.SETTLEMENT_BATCH_INCREMENT.keyName.toString(),
+                                                        batchNumber
+                                                    )
+//                                                    TerminalParameterTable.updateSaleBatchNumber(
+//                                                        batchNumber.toString()
+//                                                    )
+                                                    // Added by MKK for automatic FBatch value zero in case of Clear Batch
+                                                    AppPreference.saveBoolean(
+                                                        PrefConstant.SERVER_HIT_STATUS.keyName.toString(),
+                                                        false
+                                                    )
+                                                    // Added By MKK
+                                                    //After settlement failure and clearing the batch and clearing batch from  host
+                                                    //After that doing init transaction was not happening so I mainatin this boolean here
+                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+
+                                                    // Added By MKK
+                                                    //After settlement failure and clearing the batch and clearing batch from  host
+                                                    //After that doing init transaction was not happening so I mainatin this boolean here
+                                                    AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
+
+                                                   // ROCProviderV2.saveBatchInPreference(batchList)
+                                                    //Delete All BatchFile Data from Table after Settlement:-
+                                                    lifecycleScope.launch(Dispatchers.IO) {
+                                                        appDao.deleteTempBatchFileDataTable()
+//                                                        BrandEMIDataTable.brandEmiDataclear()
+//                                                        BrandEMIAccessDataModalTable.brandEmiByCodeclear()
+                                                        withContext(Dispatchers.Main) {
+                                                            ToastUtils.showToast(requireContext(),"Batch Deleted Successfully")
+                                                        }
+                                                    }
+                                                }, {
+
+                                                }
+                                            )
+                                        } else {
+                                            iDialog?.alertBoxWithAction(
+                                                "Empty",
+                                                "Batch is empty",
+                                                false,
+                                                "OK", {
+                                                }, {
+                                                    // Added by MKK for automatic FBatch value zero in case of Clear Batch
+                                                    AppPreference.saveBoolean(
+                                                        PrefConstant.SERVER_HIT_STATUS.keyName.toString(),
+                                                        false
+                                                    )
+                                                    //
+                                                }
+                                            )
+                                        }
+                                    }
+
+                                    BankFunctionsAdminVasItem.TMK_DOWNLOAD ->{
+                                        iDialog?.alertBoxWithAction(
+                                            getString(R.string.download_tmk),
+                                            getString(R.string.do_you_want_to_download_tmk),
+                                            true,
+                                            getString(R.string.yes),
+                                            {
+                                                (activity as NavigationActivity).window.addFlags(
+                                                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                                /*iDialog?.onEvents(VxEvent.DownloadTMKForHDFC) */ }, // please check
+                                            { Log.d("NO:- ", "Clicked")
+                                                (activity as NavigationActivity).getWindow().clearFlags(
+                                                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                                            })
+
+                                    }
+
+                                    BankFunctionsAdminVasItem.SYNC_TRANSACTION ->{
+                                        lifecycleScope.launch(Dispatchers.Main) {
+
+                                            iDialog?.alertBoxWithAction(
+                                                getString(R.string.reversal),
+                                                getString(R.string.sync_transaction),
+                                                true,
+                                                getString(R.string.yes),
+                                                { alertPositiveCallback ->
+                                                    if (alertPositiveCallback) {
+                                                        //TxnCallBackRequestTable.clear() // please check
+                                                        iDialog?.showToast("Sync Transaction clear successfully")
+                                                    }
+
+                                                    //    declinedTransaction()
+                                                },
+                                                {})
+
+
+
+                                        }
+                                    }
+                                    else -> {}
+                                }
+                            } else {
+                                ToastUtils.showToast(
+                                    requireContext(),
+                                    R.string.invalid_password
+                                )
+                            }
+                        }
+
+
+                    }
+
+                    override fun onClickCancel() {
+
+                    }
+
+                }, false)
+
+            }
+            /*BankFunctionsAdminVasItem.INIT_PAYMENT_APP ->{
                 // INIT PAYMENT APP
                 if(AppPreference.getLogin()){
                 (activity as NavigationActivity).transactFragment(BankFunctionsInitPaymentAppFragment(), true)
                 }else{
                     ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
                 }
-            }
+            }*/
 
 
-            BankFunctionsAdminVasItem.CLEAR_SYNCING_DATA->{
+            /*BankFunctionsAdminVasItem.CLEAR_SYNCING_DATA->{
                 lifecycleScope.launch(Dispatchers.IO) {
                     appDao.deletePendingSyncTransactionTable()
                 }
-            }
+            }*/
 
         }
     }
@@ -434,6 +610,135 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         super.onStop()
         logger("kush","rem")
         isFromStop = true
+    }
+
+    private fun changeEnvParam() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            // not need
+            /*val list = arrayListOf<TableEditHelper>()
+            val i = IssuerParameterTable.selectFromIssuerParameterTable()
+            for (e in i) {
+                list.add(TableEditHelper(e.issuerName, e.issuerId))
+            }*/
+
+            var isEdit = false
+            context?.let {
+                Dialog(it).apply {
+                    requestWindowFeature(Window.FEATURE_NO_TITLE)
+                    setContentView(R.layout.dialog_emv)
+                    setCancelable(false)
+
+
+                    val pcEt = findViewById<EditText>(R.id.emv_pcno_et)
+                    val bankEt = findViewById<EditText>(R.id.emv_bankcode_et)
+
+                    findViewById<View>(R.id.env_save_btn).setOnClickListener {
+                        AppPreference.saveString(
+                            PreferenceKeyConstant.PC_NUMBER_ONE.keyName,
+                            pcEt.text.toString()
+
+                        )
+                        AppPreference.setBankCode(bankEt.text.toString())
+                        dismiss()
+                    }
+                    findViewById<View>(R.id.env_cancel_btn).setOnClickListener {
+
+                        dismiss()
+                    }
+
+
+                    /*  val issuerEt = findViewById<EditText>(R.id.emv_issuerid_et)
+                      val accEt = findViewById<EditText>(R.id.emv_ac_selection_et)*/
+
+                    // pcEt.setText(AppPreference.getString(AppPreference.PC_NUMBER_KEY))
+                    pcEt.setText(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName))
+                    pcEt.setSelection(pcEt.text.length)
+                    bankEt.setText(AppPreference.getBankCode())
+                    bankEt.setSelection(bankEt.text.length)
+                    /*  if (AppPreference.getString(AppPreference.CRDB_ISSUER_ID_KEY).isEmpty()) {
+                          val issuerId = addPad(AppPreference.WALLET_ISSUER_ID, "0", 2)
+                          issuerEt.setText(issuerId)
+                      } else {
+                          issuerEt.setText(AppPreference.getString(AppPreference.CRDB_ISSUER_ID_KEY))
+                          //  issuerEt.setText(AppPreference.getString(AppPreference.WALLET_ISSUER_ID))
+                      }
+                      accEt.setText(AppPreference.getString(AppPreference.ACC_SEL_KEY))*/
+
+                    //   val rg = findViewById<RadioGroup>(R.id.emv_radio_grp_btn)
+
+                    /* rg.setOnCheckedChangeListener { _rbg, id ->
+                         val rb = _rbg.findViewById<RadioButton>(id)
+                         val value = rb.tag as String
+                         if (value.isNotEmpty()) {
+                             GlobalScope.launch {
+                                 val data =
+                                     IssuerParameterTable.selectFromIssuerParameterTable(value)
+                                 if (data != null) {
+                                     val issuerName = data.issuerId
+                                    *//* launch(Dispatchers.Main) {
+                                            issuerEt.setText(issuerName)
+                                        }*//*
+                                        AppPreference.saveString(
+                                            AppPreference.CRDB_ISSUER_ID_KEY,
+                                            issuerName
+                                        )
+
+                                    }
+                                }
+                            }
+                        }*/
+
+                    /* list.forEach {
+                         val rBtn = RadioButton(context).apply {
+                             text = it.titleName
+                             tag = it.titleValue
+                             setPadding(5, 20, 5, 20)
+                         }
+                         rg.addView(rBtn)
+                         if (it.titleValue == issuerEt.text.toString()) {
+                             rBtn.isChecked = true
+                         }
+
+                     }*/
+
+
+
+                    /* findViewById<TextView>(R.id.emv_edit).setOnClickListener {
+                         isEdit = !isEdit
+                         val tv = it as TextView
+                         if (isEdit) {
+                             hh(
+                                 arrayOf( sep),
+                                 arrayOf(pcEt, bankEt),
+                                 View.GONE
+                             )
+                             tv.text = getString(R.string.save)
+                         } else {
+                             GlobalScope.launch {
+                                 AppPreference.saveString(
+                                     AppPreference.PC_NUMBER_KEY,
+                                     pcEt.text.toString()
+                                 )
+                                 AppPreference.setBankCode(bankEt.text.toString())
+                                *//* AppPreference.saveString(
+                                        AppPreference.ACC_SEL_KEY,
+                                        accEt.text.toString()
+                                    )
+                                    AppPreference.saveString(
+                                        AppPreference.CRDB_ISSUER_ID_KEY,
+                                        issuerEt.text.toString()
+                                    )*//*
+
+                                }
+                                hh(arrayOf( sep), arrayOf(pcEt, bankEt), View.GONE)
+                                activity?.let { it1 -> ROCProviderV2.refreshToolbarLogos(it1) }
+                                tv.text = getString(R.string.edit)
+                            }
+                        }*/
+
+                }.show()
+            }
+        }
     }
 }
 

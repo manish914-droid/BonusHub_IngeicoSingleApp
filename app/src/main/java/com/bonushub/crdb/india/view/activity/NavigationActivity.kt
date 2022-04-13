@@ -209,7 +209,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 logger("isAdminPassword", ("" + it.value ?: false) as String)
                 dialogAdminPassword?.dismiss()
                 closeDrawer()
-                transactFragment(BankFunctionsFragment())
+                //transactFragment(BankFunctionsFragment())
+                transactFragment(BankFunctionsAdminVasFragment())
+
             } else {
                 Toast.makeText(
                     this@NavigationActivity,

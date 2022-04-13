@@ -41,4 +41,6 @@
     <color name="bg_color">#F4F4F4</color>
     <color name="trans_black">#6A000000</color>
 
+    <color name="colorAccentO">#77683992</color>
+
 </resources>

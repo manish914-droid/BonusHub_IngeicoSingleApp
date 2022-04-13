@@ -168,7 +168,50 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.LAST_CANCEL_RECEIPT -> {
                 logger("repost", ReportsItem.LAST_CANCEL_RECEIPT._name)
 
-                val lastCancelReceiptData = AppPreference.getLastCancelReceipt()
+                val isoW = AppPreference.getReversalNew()
+                if (isoW != null) {
+                    iDiag?.getMsgDialog(
+                        getString(R.string.confirmation),
+                        getString(R.string.last_cancel_report_confirmation),
+                        "Yes",
+                        "No",
+                        {
+
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                iDiag?.showProgress(getString(R.string.printing_last_cancel_receipt))
+                            }
+                            lifecycleScope.launch {
+                                try {
+                                    PrintUtil(context).printReversal(context, "") {
+                                        //  VFService.showToast(it)
+                                        iDiag?.hideProgress()
+                                    }
+                                } catch (ex: java.lang.Exception) {
+                                    ex.printStackTrace()
+                                    iDiag?.hideProgress()
+                                }
+
+                            }
+                        },
+                        {
+                            //Cancel Handling
+                        })
+                } else {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        iDiag?.alertBoxWithAction(
+                            getString(R.string.no_receipt),
+                            getString(R.string.no_cancel_receipt_found),
+                            false,
+                            getString(R.string.positive_button_ok),
+                            {},
+                            {})
+                    }
+
+
+                }
+
+                // old
+                /*val lastCancelReceiptData = AppPreference.getLastCancelReceipt()
 
                 val batchData = BatchTable(lastCancelReceiptData)
 
@@ -226,7 +269,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     }
 
 
-                }
+                }*/
 
             }
 // End of last cancel receipt
@@ -558,7 +601,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             }
 // End of last Summery Report receipt
 
-            ReportsItem.PRINT_REVERSAL_REPORT -> {
+            /*ReportsItem.PRINT_REVERSAL_REPORT -> {
                // ToastUtils.showToast(requireContext(), "Not implemented yet.") // batchReversalViewModel
                 lifecycleScope.launch{
 
@@ -634,7 +677,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                     }
                 }
-            }
+            }*/
         }
 
     }

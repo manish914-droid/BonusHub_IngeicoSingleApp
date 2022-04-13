@@ -482,12 +482,17 @@ enum class BankFunctionsItem(val _name: String){
 // region for bank functions admin vas
 enum class BankFunctionsAdminVasItem(val _name: String){
     INIT("INIT"),
-    TEST_EMI("TEST EMI"),
     TERMINAL_PARAM("TERMINAL PARAM"),
     COMM_PARAM("COMM PARAM"),
-    //ENV_PARAM("ENV PARAM"),
-    INIT_PAYMENT_APP("INIT PAYMENT APP"),
-    CLEAR_SYNCING_DATA("Clear Pending Syncing"),
+    TEST_EMI("TEST EMI"),
+    ENV_PARAM("ENV PARAM"),
+    CLEAR_REVERSAL("CLEAR REVERSAL"),
+    CLEAR_BATCH("CLEAR BATCH"),
+    TMK_DOWNLOAD("TMK DOWNLOAD"),
+    APPLICATION_UPDATE("APPLICATION UPDATE"),
+    SYNC_TRANSACTION("SYNC TRANSACTION"),
+    /*INIT_PAYMENT_APP("INIT PAYMENT APP"),
+    CLEAR_SYNCING_DATA("Clear Pending Syncing"),*/
 }
 // end region
 
@@ -590,7 +595,7 @@ enum class ReportsItem(val _name: String){
     DETAIL_REPORT("Detail Report"),
     SUMMERY_REPORT("Summary Report"),
     LAST_SUMMERY_REPORT("Last Summary Report"),
-    PRINT_REVERSAL_REPORT("Print Reversal Report")
+    /*PRINT_REVERSAL_REPORT("Print Reversal Report")*/
 }
 
 enum class EPrintCopyType(val pName: String) {
@@ -617,7 +622,7 @@ enum class CardEntryMode(val _name: String, val _value: String){
 
 // region
 enum class TestEmiItem(val id:String, val _name: String){
-    AMEX_TID("0", "AMEX TID"),
+    /*AMEX_TID("0", "AMEX TID"),*/
     BASE_TID("1", "Base TID"),
     OFFUS_TID("2", "OFFUS TID"),
     _3_M_TID("3", "3 M TID"),
