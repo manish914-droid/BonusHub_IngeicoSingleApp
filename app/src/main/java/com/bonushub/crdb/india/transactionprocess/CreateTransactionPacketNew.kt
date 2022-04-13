@@ -32,12 +32,15 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                                                      private var batchdata:BatchTable?) : ITransactionPacketExchangeNew {
 
     //Below method is used to create Transaction Packet in all cases:-
-    init {
+    // this method call two times. 1st when create a object. 2nd when call method to get IsoDataWriter object.
+    // and In init block we can hold the return object 'IsoDataWriter' value so it's extra call.
+   /* init {
         createTransactionPacketNew()
-    }
+    }*/
 
     override fun createTransactionPacketNew(): IsoDataWriter = IsoDataWriter().apply {
         //     val batchFileDataTable = BatchFileDataTable.selectBatchData()
+        logger("kushal","createTransactionPacketNew","e")
         val terminalData = getTptData()
         if (terminalData != null) {
             logger("PINREQUIRED--->  ", cardProcessedData.getIsOnline().toString(), "e")
