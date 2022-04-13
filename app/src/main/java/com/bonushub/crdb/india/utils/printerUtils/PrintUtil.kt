@@ -671,7 +671,7 @@ class PrintUtil(context: Context?) {
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
-                if (!isReversal) {
+                /*if (!isReversal) {
                     textBlockList.add(
                         sigleLineformat(
                             "AID:${batchTable.aid}",
@@ -681,7 +681,7 @@ class PrintUtil(context: Context?) {
                     printer?.addMixStyleText(textBlockList)
 
                     textBlockList.clear()
-                }
+                }*/
 
                 printSeperator()
                 var txnName = batchTable.transationName
