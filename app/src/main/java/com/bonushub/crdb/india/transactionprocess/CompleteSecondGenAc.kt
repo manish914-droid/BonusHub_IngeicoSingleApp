@@ -320,7 +320,8 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                     Log.e("4REVERSAL obj ->",""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
                     println(""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
 
-                    printData = Triple(tvrData, tsiData, tcData)
+                    cardProcessedDataModal?.setTC(tcData)
+                    printData = Triple(tvrData, aidData,tsiData)
                     printExtraDataSB(printData,"")
                 }
                 ACType.EMV_ACTION_AAC.toByte() -> {
