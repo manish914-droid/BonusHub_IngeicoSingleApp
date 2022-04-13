@@ -55,6 +55,8 @@ var PORT2 = 4124
 val NEW_IP_ADDRESS ="203.112.151.169"//"192.168.250.10"/*"192.168.250.10"*/ //"203.112.151.169"//
 var PORT =8109//4124//// /*9101*//*4124*/8109
 
+val NEWAMEXHDFC = "192.168.250.10"
+val NEWAMEXHDFCPort = 4124
  //val appDatabase by lazy { AppDatabase.getDatabase(HDFCApplication.appContext) }
 
 var isExpanded = false
@@ -823,6 +825,85 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
     }
 
 //endregion
+
+//region=====================================Get IP Port based on connection type:-
+    fun getIpPort2(isAppUpdate:Boolean=false,isPrimaryIpPort:Int=1): InetSocketAddress? {
+        val txnCpt = getCDTData("1")
+        val appUpdateCpt=getCDTData("2")
+        var connectionType = getConnectionType()
+        var isWiFiEnable = when(connectionType){
+            ConnectionType.WIFI.code -> {
+                true
+            }
+            else ->{
+                false
+            }
+        }
+
+        if(isAppUpdate){
+            return when {
+                appUpdateCpt!=null -> {
+                    if(isPrimaryIpPort==1) {
+                        InetSocketAddress(
+                            InetAddress.getByName(appUpdateCpt.hostPrimaryIp),
+                            appUpdateCpt.hostPrimaryPortNo.toInt()
+                        )
+                    }
+                    else{
+                        InetSocketAddress(
+                            InetAddress.getByName(appUpdateCpt.hostSecIp),
+                            appUpdateCpt.hostSecPortNo.toInt()
+                        )
+                    }
+                }
+                else -> {
+                    if (txnCpt != null) {
+                        if(isPrimaryIpPort==1) {
+                            InetSocketAddress(
+                                InetAddress.getByName(txnCpt.hostPrimaryIp),
+                                txnCpt.hostPrimaryPortNo.toInt()
+                            )
+                        }else{
+                            InetSocketAddress(
+                                InetAddress.getByName(txnCpt.hostSecIp),
+                                txnCpt.hostSecPortNo.toInt()
+                            )
+                        }
+                    } else {
+                        InetSocketAddress(InetAddress.getByName(NEWAMEXHDFC), NEWAMEXHDFCPort)
+                    }
+                }
+            }
+        }else{
+            return if (txnCpt != null && !isWiFiEnable) {
+                if(isPrimaryIpPort==1) {
+                    InetSocketAddress(
+                        InetAddress.getByName(txnCpt.hostPrimaryIp),
+                        txnCpt.hostPrimaryPortNo.toInt()
+                    )
+                }else{
+                    InetSocketAddress(
+                        InetAddress.getByName(txnCpt.hostSecIp),
+                        txnCpt.hostSecPortNo.toInt()
+                    )
+                }
+            } else {
+                if (txnCpt != null && isWiFiEnable) {
+                    if (isPrimaryIpPort == 1) {
+                        InetSocketAddress(InetAddress.getByName(txnCpt.hostEthPrimaryIp), txnCpt.hostPrimaryEthPort.toInt())
+                    } else {
+                        InetSocketAddress(InetAddress.getByName(txnCpt.hostEthSecondaryIp), txnCpt.hostSecondaryEthPort.toInt())
+                    }
+                }
+                else {
+                    InetSocketAddress(InetAddress.getByName(NEWAMEXHDFC), NEWAMEXHDFCPort)
+                }
+            }
+
+        }
+
+    }
+// end region
 
     open class OnTextChange(private val cb: (String) -> Unit) : TextWatcher {
 

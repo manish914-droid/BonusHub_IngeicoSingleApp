@@ -207,7 +207,7 @@ object HitServernew  {
         try {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
-                val sAddress = Utility().getIpPort()
+                val sAddress = Utility().getIpPort2()
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
                 }

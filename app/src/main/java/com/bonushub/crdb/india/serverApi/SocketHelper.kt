@@ -97,7 +97,7 @@ object SocketHelper {
         try {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
-                val sAddress = Utility().getIpPort(socketForAppUpdate, isPrimaryIpPort = hitCounter)
+                val sAddress = Utility().getIpPort2(socketForAppUpdate, isPrimaryIpPort = hitCounter)
                 logger("Connection Details:- ", sAddress.toString(), "e")
                 logger("HIT COUNTER", "$hitCounter","e")
 

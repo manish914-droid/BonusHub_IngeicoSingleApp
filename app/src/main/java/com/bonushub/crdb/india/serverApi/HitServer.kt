@@ -302,7 +302,7 @@ object HitServer  {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile// always get tct it may get refresh meanwhile
             if (tct != null) {
 
-                val sAddress = Utility().getIpPort(false, isPrimaryIpPort = hitCounter)
+                val sAddress = Utility().getIpPort2(false, isPrimaryIpPort = hitCounter)
                 logger("Connection Details:- ", sAddress.toString(), "e")
                 logger("HIT COUNTER", "$hitCounter","e")
                 Log.d("HIT COUNTER", "$hitCounter")
@@ -400,7 +400,7 @@ object HitServer  {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
             if (tct != null) {
 
-                val sAddress = Utility().getIpPort(isAppUpdate, isPrimaryIpPort = hitCounter)
+                val sAddress = Utility().getIpPort2(isAppUpdate, isPrimaryIpPort = hitCounter)
                 logger("Connection Details:- ", sAddress.toString(), "e")
                 logger("HIT COUNTER", "$hitCounter","e")
 
@@ -475,7 +475,7 @@ object HitServer  {
             tct = Utility().getTctData()
             if (tct != null) {
 
-                val sAddress = Utility().getIpPort()
+                val sAddress = Utility().getIpPort2()
 
                 ServerSocketChannel.open().apply {
                     configureBlocking(false)
