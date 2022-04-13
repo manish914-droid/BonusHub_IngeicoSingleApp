@@ -126,7 +126,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                 )
 
                                val encrptedPan = responseIsoData.isoMap[57]?.parseRaw2String().toString()
-                                cardProcessedDataModal?.setEncryptedPan(encrptedPan)
+                              //  cardProcessedDataModal?.setEncryptedPan(encrptedPan)
 
                                 val f55 = responseIsoData.isoMap[55]?.rawData
 

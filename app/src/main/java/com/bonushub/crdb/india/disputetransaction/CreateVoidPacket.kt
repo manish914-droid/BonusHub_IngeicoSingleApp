@@ -50,7 +50,12 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
         if (batch.transactionType == TransactionType.TIP_SALE.type)
             addFieldByHex(54, addPad(batch.tipAmmount, "0", 12))
 
-        var  aidstr = ""  //kushal check later //if(batch.aid.isNotBlank()) { batch.aid.subSequence(0,10).toString() } else { batch.aid = ""}
+        var aidstr = ""
+        try {
+            aidstr = if(batch.aid.isNotBlank()) { batch.aid.subSequence(0,10).toString() } else ""
+        }catch (ex:Exception){
+            aidstr = ""
+        }
 
         println("DE55 value in void is"+"${batch.field55Data}${batch.de55}")
         if(batch.operationType == "Chip" && (CardAid.Rupay.aid == aidstr || CardAid.Diners.aid == aidstr || CardAid.Jcb.aid == aidstr)){
