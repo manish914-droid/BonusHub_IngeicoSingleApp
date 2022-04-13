@@ -212,17 +212,6 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
             }
 
-            BankFunctionsAdminVasItem.TERMINAL_PARAM ->{
-                // TERMINAL PARAM
-                (activity as NavigationActivity).transactFragment(BankFunctionsTerminalFragment(), true)
-            }
-
-            BankFunctionsAdminVasItem.COMM_PARAM ->{
-                // COMM PARAM
-                (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
-            }
-
-
             BankFunctionsAdminVasItem.APPLICATION_UPDATE ->{
                 (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 // iDialog?.onEvents(VxEvent.AppUpdate)  // please check
@@ -242,6 +231,17 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
                                 // check other option
                                 when(bankFunctionsAdminVasItem){
+
+
+                                    BankFunctionsAdminVasItem.TERMINAL_PARAM ->{
+                                        // TERMINAL PARAM
+                                        (activity as NavigationActivity).transactFragment(BankFunctionsTerminalFragment(), true)
+                                    }
+
+                                    BankFunctionsAdminVasItem.COMM_PARAM ->{
+                                        // COMM PARAM
+                                        (activity as NavigationActivity).transactFragment(CommunicationOptionFragment(), true)
+                                    }
 
                                     BankFunctionsAdminVasItem.ENV_PARAM ->{
                                         changeEnvParam()
