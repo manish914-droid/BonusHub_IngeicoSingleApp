@@ -303,7 +303,7 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val pcNumbers = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)+addPad(AppPreference.getString(
                 PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
-            val data = ConnectionType.GPRS.code + addPad(
+            val data = getConnectionType() + addPad(
                 deviceModel(), "*",
                 6,
                 false
@@ -373,7 +373,7 @@ if(cardProcessedData.getTransType()!= BhTransactionType.PRE_AUTH_COMPLETE.type) 
         val appName = addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
         val deviceModel = addPad(deviceModel(), "*", 6, false)
         val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-        val connectionType = ConnectionType.GPRS.code
+        val connectionType = getConnectionType()
         val pccNo = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
         val pcNo2 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
         return "$serialNo$connectionType$deviceModel$appName$version$pccNo$pcNo2"

@@ -35,7 +35,7 @@ class keyexchangeDataSourcenew @Inject constructor(private val appDao: AppDao) :
             val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
             //   val version1 = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val version = "${BuildConfig.VERSION_NAME}.$buildDate"
-            val connectionType = ConnectionType.GPRS.code
+            val connectionType = getConnectionType()
             val pccNo =
                     addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
             val pcNo2 =

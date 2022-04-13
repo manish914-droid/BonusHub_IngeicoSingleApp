@@ -153,7 +153,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
            // val issuerParameterTable = IssuerParameterTable.selectFromIssuerParameterTable(AppPreference.WALLET_ISSUER_ID)
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val pcNumbers= addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)+addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
-            val data = ConnectionType.GPRS.code + addPad(
+            val data = getConnectionType() + addPad(
                 deviceModel(),
                 " ",
                 6,

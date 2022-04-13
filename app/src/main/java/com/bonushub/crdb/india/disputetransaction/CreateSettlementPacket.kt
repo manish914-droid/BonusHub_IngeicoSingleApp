@@ -75,7 +75,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val pcNumber = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
             //adding field 62
-            addFieldByHex(62, ConnectionType.GPRS.code +
+            addFieldByHex(62, getConnectionType() +
                     addPad(deviceModel(), " ", 6, false)
                     + addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
                     + version + pcNumber + addPad("0", "0", 9)

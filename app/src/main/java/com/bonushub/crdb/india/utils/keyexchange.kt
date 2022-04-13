@@ -72,7 +72,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
             val buildDate: String = addPad("210105", "0", 15, false)/*SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))*/
          //   val version1 = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
             val version = "${BuildConfig.VERSION_NAME}.$buildDate"
-            val connectionType = ConnectionType.GPRS.code
+            val connectionType = getConnectionType()
             val pccNo =
                 addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
             val pcNo2 =
@@ -116,7 +116,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
                     val pcNumber = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
                     val pcNumber2 =
                         addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
-                    val f61 = ConnectionType.GPRS.code + addPad(
+                    val f61 = getConnectionType() + addPad(
                         deviceModel(),
                         " ",
                         6,
@@ -434,7 +434,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
 
             val buildDate: String = SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
             val version = "${BuildConfig.VERSION_NAME}.$buildDate"
-            val connectionType = ConnectionType.GPRS.code
+            val connectionType = getConnectionType()
             val pccNo =
                 addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
             val pcNo2 =

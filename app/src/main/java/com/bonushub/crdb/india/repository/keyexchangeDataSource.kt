@@ -51,7 +51,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             val appName = addPad(HDFCApplication.appContext.getString(R.string.app_name), " ", 10, false)
             val deviceModel = addPad(deviceModel(), "*", 6, false)
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-            val connectionType = ConnectionType.GPRS.code
+            val connectionType = getConnectionType()
             val pccNo = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
             val pcNo2 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
             return "$connectionType$deviceModel$appName$version$pccNo$pcNo2"
@@ -146,7 +146,7 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
         val deviceModel = addPad(deviceModel(), "*", 6, true)
         val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-        val connectionType = ConnectionType.GPRS.code
+        val connectionType = getConnectionType()
         val pccNo = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
         val pcNo2 = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
         println("PC No is -> "+pccNo)

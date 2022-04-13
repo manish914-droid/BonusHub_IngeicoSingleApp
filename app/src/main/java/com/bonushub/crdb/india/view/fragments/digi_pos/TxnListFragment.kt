@@ -513,7 +513,7 @@ class TxnListFragment : Fragment() {
                         addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
                     val pcNumber2 =
                         addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
-                    val f61 = ConnectionType.GPRS.code + addPad(
+                    val f61 = getConnectionType()+ addPad(
                         AppPreference.getString("deviceModel"),
                         " ",
                         6,

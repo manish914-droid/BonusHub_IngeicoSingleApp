@@ -90,7 +90,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         batchFileData.bankCode = AppPreference.getBankCode()
         batchFileData.customerId = issuerParameterTable?.customerIdentifierFiledType ?: "" //
         batchFileData.walletIssuerId = AppPreference.WALLET_ISSUER_ID
-        batchFileData.connectionType = ConnectionType.GPRS.code // getConnectionType()
+        batchFileData.connectionType = getConnectionType()
         batchFileData.modelName = addPad(AppPreference.getString("deviceModel"), " ", 6, false)//AppPreference.getString("deviceModel")
         batchFileData.appName = HDFCApplication.appContext.getString(R.string.app_name)
         val buildDate: String =
