@@ -202,6 +202,7 @@ enum class ConnectionError(val errorCode: Int) {
 
 //Below Enum Class is used to detect different card Types:-
 enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {
+    EMV_Fallback_TYPE(-1, "Chip Fallabck"),
     NONE(-1,"None"),
     REMOVE(-2,"Remove"),
     CARD_ERROR_TYPE(0),

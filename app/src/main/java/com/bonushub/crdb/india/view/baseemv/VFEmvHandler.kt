@@ -6,14 +6,20 @@ import android.os.RemoteException
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
+import com.bonushub.crdb.india.R
+import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.repository.SearchCardDefaultRepository
 import com.bonushub.crdb.india.transactionprocess.CompleteSecondGenAc
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.DetectCardType
+import com.bonushub.crdb.india.utils.EFallbackCode
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.ingenico.TLVList
 import com.bonushub.crdb.india.view.activity.TransactionActivity
+import com.bonushub.crdb.india.view.activity.TransactionActivity.*
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.usdk.apiservice.aidl.data.BytesValue
 
@@ -26,6 +32,8 @@ import java.util.*
 
 
 open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
+//result: Int, transData: TransData?
+    lateinit var onEndProcessCallback: (Int,CardProcessedDataModal) -> Unit
 
     private var lastCardRecord: CardRecord? = null
 
@@ -33,7 +41,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     private var emv: UEMV? = null
     private lateinit var activity: TransactionActivity
     private lateinit var cardProcessedDataModal: CardProcessedDataModal
-    private lateinit var vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit
+    lateinit var vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit
+    lateinit var vfFallbackCallback: (CardProcessedDataModal) -> Unit
 
     constructor(
         pinPad: UPinpad?,
@@ -45,6 +54,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         this.activity = activity
         this.cardProcessedDataModal = cardProcessedDataModal
         this.vfEmvHandlerCallback = vfEmvHandlerCallback
+        this.vfFallbackCallback   = vfEmvHandlerCallback
     }
 
     @Throws(RemoteException::class)
@@ -564,7 +574,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                  }
              }
             else{
-                 vfEmvHandlerCallback(cardProcessedDataModal)
+                 onEndProcessCallback(result,cardProcessedDataModal)
+
              }
 
 

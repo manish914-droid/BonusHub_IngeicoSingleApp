@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ActivityEmvBinding
 import com.bonushub.crdb.india.db.AppDao
+import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.*
@@ -27,9 +28,8 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.SearchCard
 import com.bonushub.crdb.india.viewmodel.*
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
-import com.bonushub.crdb.india.vxutils.TransactionType
-import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.request.*
+import com.usdk.apiservice.aidl.emv.EMVData
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,7 +64,16 @@ class TransactionActivity : BaseActivityNew() {
     }
     private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
 
+    private  var vfEmvHandlerCallback1: (CardProcessedDataModal) -> Unit = ::onDeviceControllerAction
+
+    private fun onDeviceControllerAction(cardProcessedDataModal: CardProcessedDataModal) {
+        println("Emvhandler called")
+        processAccordingToCardType(cardProcessedDataModal)
+    }
+
+
     lateinit var testVFEmvHandler:VFEmvHandler
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,44 +97,71 @@ class TransactionActivity : BaseActivityNew() {
             emvBinding?.baseAmtTv?.text = frtAmt
         }
 
-        defaultScope.launch {
-            // uemv = deviceService!!.getEMV()
-            SearchCard(DeviceHelper.getEMV(), globalCardProcessedModel) { localCardProcessedData ->
-                processAccordingToCardType(localCardProcessedData)
 
-            }
+        val cardOption = CardOption.create().apply {
+            supportICCard(true)
+            supportMagCard(true)
+            supportRFCard(true)
         }
 
+        detectCard(globalCardProcessedModel,cardOption)
 
     }
 
 
-    private fun processAccordingToCardType(cardProcessedData: CardProcessedDataModal) {
-        when (cardProcessedData.getReadCardType()) {
+    private fun processAccordingToCardType(cardProcessedDataModal: CardProcessedDataModal) {
+        when (cardProcessedDataModal.getReadCardType()) {
             DetectCardType.MAG_CARD_TYPE-> {
                 CoroutineScope(Dispatchers.Main).launch {
                     Toast.makeText(applicationContext,"Mag Card  detected", Toast.LENGTH_LONG).show()
                 }
 
-                //region============Below When Condition is used to check Transaction Types Based Process Execution:-
-                when (cardProcessedData.getTransType()) {
-                    TransactionType.SALE.type, TransactionType.PRE_AUTH.type,
-                    TransactionType.REFUND.type, TransactionType.CASH_AT_POS.type,
-                    TransactionType.SALE_WITH_CASH.type, TransactionType.EMI_SALE.type,
-                    TransactionType.BRAND_EMI.type, TransactionType.BRAND_EMI_BY_ACCESS_CODE.type,
-                    TransactionType.FLEXI_PAY.type,
-                    TransactionType.TEST_EMI.type -> {
-                        emvProcessNext(cardProcessedData)
-//                        val emvOption = EmvOption.create().apply {
-//                            flagPSE(0x00.toByte())
-//                        }
-//                        testVFEmvHandler = emvHandler()
-//                        DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
-                    }
-                    else -> {
+              /*  logger(TAG, "=> onCardSwiped")
+                logger(TAG, "==> Pan: " + track.getString(EMVData.PAN))
+                logger(TAG, "==> Track 1: " + track.getString(EMVData.TRACK1))
+                logger(TAG, "==> Track 2: " + track.getString(EMVData.TRACK2))
+                logger(TAG, "==> Track 3: " + track.getString(EMVData.TRACK3))
+                logger(TAG, "==> Service code: " + track.getString(EMVData.SERVICE_CODE))
+                logger(TAG, "==> Card exprited date: " + track.getString(EMVData.EXPIRED_DATE))
+
+                val trackStates = track.getIntArray(EMVData.TRACK_STATES)
+                for (i in trackStates!!.indices) {
+                    logger(
+                        TAG,
+                        "=> onCardSwiped" + String.format(
+                            "==> Track %s state: %d",
+                            i + 1,
+                            trackStates[i]
+                        )
+                    )
+                }*/
+
+                val sc = cardProcessedDataModal.getServiceCodeData()
+                // val sc: String? = ""
+                var scFirstByte: Char? = null
+                var scLastbyte: Char? = null
+                if (null != sc) {
+                    scFirstByte = sc.first()
+                    scLastbyte = sc.last()
+
+                }
+                if (cardProcessedDataModal.getFallbackType() != EFallbackCode.EMV_fallback.fallBackCode){
+                    //Checking Fallback
+                    if (scFirstByte == '2' || scFirstByte == '6') {
+                        onEndProcessCalled(EFallbackCode.Swipe_fallback.fallBackCode, cardProcessedDataModal)
+                    }else{
+
                     }
                 }
-                //endregion
+                else {
+
+                    cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
+
+                }
+
+
+              //  onEndProcessCalled(EFallbackCode.Swipe_fallback.fallBackCode,cardProcessedData)
+
 
             }
 
@@ -164,14 +200,78 @@ class TransactionActivity : BaseActivityNew() {
     private fun emvHandler(): VFEmvHandler {
         println("DoEmv VfEmvHandler is calling")
         println("IEmv value is" + DeviceHelper.getEMV().toString())
-        return VFEmvHandler(DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP),DeviceHelper.getEMV(),this@TransactionActivity,globalCardProcessedModel) { cardProcessedData ->
-          //  transactionCallback(cardProcessedData)
-            emvProcessNext(cardProcessedData)
-            Log.d("Track2Data:- ", cardProcessedData.getTrack2Data() ?: "")
-            Log.d("PanNumber:- ", cardProcessedData.getPanNumberData() ?: "")
+
+        return  VFEmvHandler(DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP),
+            DeviceHelper.getEMV(),this@TransactionActivity,globalCardProcessedModel,vfEmvHandlerCallback1).also { ei ->
+            ei.onEndProcessCallback = ::onEndProcessCalled
+            ei.vfEmvHandlerCallback = ::onEmvprocessnext
+
+
         }
+
+    }
+
+    private fun onEmvprocessnext(cardProcessedDataModal: CardProcessedDataModal) {
+        println("processflow called")
+        emvProcessNext(cardProcessedDataModal)
+    }
+
+    private fun onEndProcessCalled(result: Int,cardProcessedDataModal: CardProcessedDataModal) {
+        println("Fallback called")
+
+              when(result){
+
+                  //Swipe fallabck case when chip and swipe card used
+                   EFallbackCode.Swipe_fallback.fallBackCode -> {
+                       cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
+                       //_insertCardStatus.postValue(cardProcessedDataModal)
+                       handleEMVFallbackFromError(getString(R.string.fallback),
+                           getString(R.string.please_use_another_option), false) {
+                           cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
+
+                           detectCard(cardProcessedDataModal, CardOption.create().apply {
+                               supportICCard(false)
+                               supportMagCard(true)
+                               supportRFCard(false)
+                           })
+
+                       }
+                   }
+
+                  CardErrorCode.EMV_FALLBACK_ERROR_CODE.errorCode -> {
+                      //EMV Fallback case when we insert card from other side then chip side:-
+                      cardProcessedDataModal.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
+                      cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
+                      handleEMVFallbackFromError(getString(R.string.fallback),
+                          getString(R.string.please_use_another_option), false) {
+                          cardProcessedDataModal.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
+
+                          detectCard(cardProcessedDataModal, CardOption.create().apply {
+                              supportICCard(false)
+                              supportMagCard(true)
+                              supportRFCard(false)
+                          })
+
+                      }
+
+                  }
+
+                  else -> {
+
+                  }
+
+
+               }
+
     }
     //endregion
+
+    private fun detectCard(cardProcessedDataModal: CardProcessedDataModal,cardOption: CardOption){
+        defaultScope.launch {
+            SearchCard(DeviceHelper.getEMV(), cardProcessedDataModal,vfEmvHandlerCallback1).detectCard(cardOption)
+        }
+
+    }
 
     // Creating transaction packet and
     private fun emvProcessNext(cardProcessedData: CardProcessedDataModal) {
@@ -607,4 +707,29 @@ class TransactionActivity : BaseActivityNew() {
         })
     }
 
-   }
+    fun handleEMVFallbackFromError(title: String, msg: String, showCancelButton: Boolean, emvFromError: (Boolean) -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            alertBoxWithAction(title,
+                msg, showCancelButton, getString(R.string.positive_button_ok), { alertCallback ->
+                    if (alertCallback) {
+                        emvFromError(true)
+                    }
+                }, {})
+        }
+    }
+
+    enum class CardErrorCode(var errorCode: Int) {
+        EMV_FALLBACK_ERROR_CODE(40961),
+        CTLS_ERROR_CODE(6)
+    }
+
+    enum class EFallbackCode(var fallBackCode: Int) {
+        Swipe_fallback(111),
+        EMV_fallback(8),
+        NO_fallback(0),
+        EMV_fallbackNew(12),
+        CTLS_fallback(333)
+    }
+
+
+}

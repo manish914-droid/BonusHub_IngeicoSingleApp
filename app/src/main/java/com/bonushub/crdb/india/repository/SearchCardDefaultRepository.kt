@@ -11,6 +11,7 @@ import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.entity.EMVOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.EFallbackCode
 import com.bonushub.crdb.india.utils.ingenico.DemoConfig
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
@@ -59,7 +60,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
     }
 
     // Detecting the card type ie(emv,cls,mag...)
-    private fun detectCard(cardProcessedDataModal: CardProcessedDataModal,cardOption: CardOption){
+    open fun detectCard(cardProcessedDataModal: CardProcessedDataModal,cardOption: CardOption){
 
         try {
             emv?.searchCard(cardOption.toBundle(), DemoConfig.TIMEOUT, object : SearchCardListener.Stub() {
@@ -92,14 +93,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
 
                     val trackStates = track.getIntArray(EMVData.TRACK_STATES)
                     for (i in trackStates!!.indices) {
-                        logger(
-                            TAG,
-                            "=> onCardSwiped" + String.format(
-                                "==> Track %s state: %d",
-                                i + 1,
-                                trackStates[i]
-                            )
-                        )
+                        logger(TAG, "=> onCardSwiped" + String.format("==> Track %s state: %d", i + 1, trackStates[i]))
                     }
 
                     val serviceCode = track.getString(EMVData.SERVICE_CODE)
