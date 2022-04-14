@@ -355,10 +355,22 @@ object DeviceHelper   {
         return getDeviceManager()!!.deviceInfo?.serialNo
     }
 
+    fun getSimNumber(): String?{
+        Log.d(TAG, "=> Device Sim no (${getDeviceManager()?.deviceInfo?.iccid})")
+        // System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.serialNo)
+        return getDeviceManager()?.deviceInfo?.iccid
+    }
+
     fun getDeviceModel(): String?{
         Log.d(TAG, "=> Device Model no (${getDeviceManager()!!.deviceInfo?.model})")
         //   System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.mode)
         return getDeviceManager()!!.deviceInfo?.model
+    }
+
+    fun getImeiNumber(): String?{
+        Log.d(TAG, "=> Device Imei no (${getDeviceManager()?.deviceInfo?.imei})")
+        // System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.serialNo)
+        return getDeviceManager()?.deviceInfo?.imei
     }
 
     @Throws(java.lang.IllegalStateException::class)

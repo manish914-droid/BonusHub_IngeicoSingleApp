@@ -653,7 +653,23 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
         fun getStamp(): String = if (stamp.isNotEmpty()) stamp else "~~~~"
 
         fun getOtherInfo(): String {
-            return "~${HDFCApplication.networkStrength}~${""}~${HDFCApplication.imeiNo}~${HDFCApplication.simNo}~${HDFCApplication.operatorName}"
+            return try {
+                val imei = DeviceHelper.getImeiNumber()
+                //Have to findout battery level
+                // val batteryStrength = DeviceHelper
+                val simNo = DeviceHelper.getSimNumber()
+                Log.e("[1] iemi,battry,simNo", "$imei ,${HDFCApplication.batteryStrength} -----> ${simNo}  ")
+                "~${HDFCApplication.networkStrength}~${HDFCApplication.batteryStrength}~${imei}~${simNo}~${HDFCApplication.operatorName}"
+            } catch (ex: java.lang.Exception) {
+                Log.e(
+                    "[2]iemi,battry,simNo",
+                    "${HDFCApplication.imeiNo} ,${HDFCApplication.batteryStrength} -----> ${HDFCApplication.simNo}  "
+                )
+                "~${HDFCApplication.networkStrength}~${HDFCApplication.batteryStrength}~${HDFCApplication.imeiNo}~${HDFCApplication.simNo}~${HDFCApplication.operatorName}"
+            }
+
+            // old
+           // return "~${HDFCApplication.networkStrength}~${""}~${HDFCApplication.imeiNo}~${HDFCApplication.simNo}~${HDFCApplication.operatorName}"
         }
     }
 //endregion
@@ -1342,11 +1358,14 @@ object Field48ResponseTimestamp {
     var oldSuccessTransDate = ""
 
     fun saveF48IdentifierAndTxnDate(f48: String): String {
-        identifier = f48.split("~")[0]
-        oldSuccessTransDate = getF48TimeStamp()
-        val value = "$identifier~$oldSuccessTransDate"
-        AppPreference.saveString(AppPreference.F48IdentifierAndSuccesssTxn, value)
-        Log.e("IDTXNDATE", value)
+        var value: String = ""
+        if(f48.isNotBlank()) {
+            identifier = f48.split("~")[0]
+            oldSuccessTransDate = getF48TimeStamp()
+            val value = "$identifier~$oldSuccessTransDate"
+            AppPreference.saveString(AppPreference.F48IdentifierAndSuccesssTxn, value)
+            Log.e("IDTXNDATE", value)
+        }
         return value
     }
 
