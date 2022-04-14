@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.di.scope.BHDashboardItem
+import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.view.fragments.DashboardFragment
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.google.gson.Gson
@@ -25,7 +27,13 @@ class DashboardRepository {
          val list1 = arrayListOf<EDashboardItem>()
          val list2 = arrayListOf<EDashboardItem>()
 
-        var table =  DBModule.appDatabase.appDao.getTerminalParameterTableData()[0]
+        var table: TerminalParameterTable? = null
+        if(AppPreference.getLogin()) {
+            table = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("1")
+        }else{
+            table = DBModule.appDatabase.appDao?.getTerminalParameterTableDataByTidType("-1")
+        }
+//        var table =  DBModule.appDatabase.appDao.getTerminalParameterTableData()
         if (table != null) {
             if (DashboardFragment.toRefresh || itemList.isEmpty()) {
                 itemList.clear()
