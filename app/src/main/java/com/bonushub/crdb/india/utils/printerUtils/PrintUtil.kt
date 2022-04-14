@@ -2583,7 +2583,7 @@ class PrintUtil(context: Context?) {
                             )
                             textBlockList.add(
                                 sigleLineformat(
-                                    "${b.panMask}",
+                                    "${b.cardNumber}",
                                     AlignMode.RIGHT
                                 )
                             )
