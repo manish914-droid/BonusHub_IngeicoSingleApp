@@ -857,13 +857,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 }
             }
             EDashboardItem.BRAND_EMI->{
-                if (Field48ResponseTimestamp.checkInternetConnection()) {
-                    CoroutineScope(Dispatchers.IO).launch{
+                if (checkInternetConnection()) {
+                   /* CoroutineScope(Dispatchers.IO).launch{
                         val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                         println("TID LIST --->  $listofTids")
                         val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                         println("RESULT TWO --->  $resultTwo")
-                    }
+                    }*/
                     transactFragment(BrandEmiMasterCategoryFragment().apply {
                         arguments = Bundle().apply {
                             putSerializable("type", action)
