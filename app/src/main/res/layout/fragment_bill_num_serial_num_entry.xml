@@ -66,7 +66,7 @@ android:layout_marginStart="@dimen/pad_24"
         android:layout_marginEnd="@dimen/pad_24"
         >
 
-        <EditText
+       <!-- <EditText
             android:id="@+id/serialNum_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +84,45 @@ android:padding="@dimen/pad_16"
             android:textColor="@color/black"
             android:textColorHint="@color/hint_color"
             android:textSize="@dimen/text_size_regular"
-          />
+          />-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_edge">
+
+            <EditText
+                android:id="@+id/serialNum_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/imgViewScanCode"
+
+                android:background="@drawable/card_edge_transparent"
+
+                android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="@string/enter_serial_number"
+                android:imeOptions="actionDone"
+                android:inputType="textEmailAddress"
+                android:lines="1"
+                android:padding="@dimen/pad_16"
+                android:textColor="@color/black"
+                android:textColorHint="@color/hint_color"
+                android:textSize="@dimen/text_size_regular" />
+
+            <ImageView
+                android:id="@+id/imgViewScanCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:elevation="@dimen/pad_5"
+                android:src="@drawable/ic_imei_scan"
+                android:visibility="visible" />
+
+        </RelativeLayout>
 
 
     </com.google.android.material.card.MaterialCardView>

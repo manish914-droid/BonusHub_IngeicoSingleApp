@@ -3,6 +3,8 @@
 package com.bonushub.crdb.india.view.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.InputType
@@ -19,9 +21,11 @@ import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.model.remote.BrandEmiBillSerialMobileValidationModel
+import com.bonushub.crdb.india.utils.DeviceHelper
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.utils.EDashboardItem
+import com.bonushub.crdb.india.utils.logger
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -131,6 +135,24 @@ class BillNumSerialNumEntryFragment : Fragment() {
                 (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt= txnAmount,mobileNum = mobileNumber,billNum =binding?.billNumEt?.text.toString(), testEmiTxnType = testEmiType?:"")
             } else if (eDashBoardItem == EDashboardItem.BRAND_EMI) {
                 navigateToTransaction()
+
+            }
+        }
+
+        binding?.imgViewScanCode?.setOnClickListener {
+            DeviceHelper.openScanner{ status, msg, barcode ->
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    logger("barcode",barcode,"e")
+                    logger("status",status.toString(),"e")
+                    if(status){
+                        binding?.serialNumEt?.setText(barcode)
+                        binding?.serialNumEt?.setSelection(binding?.serialNumEt?.length()?:0)
+                    }else{
+                        ToastUtils.showToast(requireContext(),msg)
+                    }
+
+                }, 1000)
 
             }
         }

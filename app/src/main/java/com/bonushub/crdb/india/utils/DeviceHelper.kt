@@ -21,6 +21,9 @@ import com.usdk.apiservice.aidl.emv.UEMV
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
 import com.usdk.apiservice.aidl.printer.UPrinter
+import com.usdk.apiservice.aidl.scanner.OnScanListener
+import com.usdk.apiservice.aidl.scanner.ScannerData
+import com.usdk.apiservice.aidl.scanner.UScanner
 import com.usdk.apiservice.aidl.tms.UTMS
 import com.usdk.apiservice.limited.DeviceServiceLimited
 import java.text.SimpleDateFormat
@@ -384,6 +387,69 @@ object DeviceHelper   {
         return UPrinter.Stub.asInterface(iBinder)
     }
 
+    @JvmStatic
+    @Throws(IllegalStateException::class)
+    fun getUScanner(): UScanner? {
+        val iBinder = object : IBinderCreator() {
+            override fun create(): IBinder {
+                return vfDeviceService!!.getScanner(1)
+            }
+
+        }.start()
+        return UScanner.Stub.asInterface(iBinder)
+    }
+
+    fun openScanner(cb:(status:Boolean,message:String, barcode:String) -> Unit){
+
+        try {
+            val bundle = Bundle()
+            bundle.putInt(ScannerData.TIMEOUT,50)
+            logger("start scan","open","e")
+            getUScanner()!!.startScan(bundle,object : OnScanListener.Stub(){
+                override fun onSuccess(p0: String?) {
+                    logger("start scan"," -> on Success","e")
+                    cb(true, "success",p0?:"")
+                }
+
+                override fun onError(p0: Int) {
+                    logger("start scan"," -> on Error","e")
+                    getErrorDetail(p0)
+                    cb(false,getErrorDetail(p0),"")
+
+                }
+
+                override fun onTimeout() {
+                    logger("start scan"," -> on Timeout","e")
+                    cb(false,"time out","")
+
+                }
+
+                override fun onCancel() {
+                    logger("start scan"," -> on cancel","e")
+                    cb(false,"cancel","")
+
+                }
+            })
+        }catch (ex:RemoteException)
+        {
+            ex.printStackTrace()
+            cb(false,"Something went wrong!!", "")
+
+        }catch (ex:DeadObjectException)
+        {
+            ex.printStackTrace()
+            cb(false,"Something went wrong!!", "")
+
+        }catch (ex:Exception)
+        {
+            ex.printStackTrace()
+            cb(false,"Something went wrong!!", "")
+
+        }
+
+
+
+    }
 
     @JvmStatic
     @Throws(IllegalStateException::class)
