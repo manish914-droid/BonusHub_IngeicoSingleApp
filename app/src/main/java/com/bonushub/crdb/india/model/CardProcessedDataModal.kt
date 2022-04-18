@@ -8,6 +8,7 @@ import java.io.Serializable
 //Below Modal class is for holding Card Returning Data Fields:-
 
 class CardProcessedDataModal : Serializable {
+    private var expiryDate: String? = null
     private var successResponseCode: String? = null
     private var track1Data: String? = null
     private var track2Data: String? = null
@@ -524,5 +525,12 @@ class CardProcessedDataModal : Serializable {
 
     fun getSuccessResponseCode(): String?{
         return successResponseCode
+    }
+
+    fun setExpiredDate(cardexpiryDate: String?) {
+        this.expiryDate = cardexpiryDate
+    }
+    fun getExPiryDate(): String?{
+        return expiryDate
     }
 }
