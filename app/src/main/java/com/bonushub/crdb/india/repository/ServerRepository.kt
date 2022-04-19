@@ -20,8 +20,10 @@ import com.bonushub.crdb.india.view.fragments.TenureBankModal
 import com.bonushub.crdb.india.utils.SplitterTypes
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class ServerRepository( val appDB: AppDatabase, private val remoteService: RemoteService) {
+
+class ServerRepository @Inject constructor(val appDB: AppDatabase, val remoteService: RemoteService) {
 
     // Live objs for
     private val brandEMIMasterCategoryMLData = MutableLiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>()

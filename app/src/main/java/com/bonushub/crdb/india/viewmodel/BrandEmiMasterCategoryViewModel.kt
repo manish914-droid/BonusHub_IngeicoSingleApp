@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.viewmodel
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +12,7 @@ import com.bonushub.crdb.india.utils.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class BrandEmiMasterCategoryViewModel(private val serverRepository: ServerRepository) : ViewModel() {
+class BrandEmiMasterCategoryViewModel @ViewModelInject constructor(private val serverRepository: ServerRepository) : ViewModel() {
 
    val brandEMIMasterSubCategoryLivedata: LiveData<GenericResponse<List<BrandEMIMasterDataModal?>>>
         get() = serverRepository.brandLiveEMIMasterCategoryData

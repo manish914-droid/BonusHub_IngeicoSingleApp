@@ -4,24 +4,22 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.BrandEmiListAndSearchUiBinding
-import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.repository.GenericResponse
-import com.bonushub.crdb.india.repository.ServerRepository
-import com.bonushub.crdb.india.serverApi.RemoteService
+import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.logger
@@ -29,21 +27,28 @@ import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BrandEmiProductAdapter
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.BrandEmiProductViewModel
-import com.bonushub.crdb.india.viewmodel.viewModelFactory.BrandEmiViewModelFactory
-import com.bonushub.crdb.india.utils.EDashboardItem
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class BrandEmiProductFragment : Fragment() {
-    /** need to use Hilt for instance initializing here..*/
-    private val remoteService: RemoteService = RemoteService()
+
+//    @Inject
+//    lateinit var brandEmiProductViewModel: BrandEmiProductViewModel //by viewModels()
+
+    // old
+  /*  private val remoteService: RemoteService = RemoteService()
     private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
     private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+    private lateinit var brandEmiProductViewModel: BrandEmiProductViewModel*/
+
+    private lateinit var brandEmiProductViewModel: BrandEmiProductViewModel
+
     private lateinit var eDashBoardItem: EDashboardItem
     private val action by lazy { arguments?.getSerializable("type") ?: "" }
-    private lateinit var brandEmiProductViewModel: BrandEmiProductViewModel
     private var brandEmiProductBinding: BrandEmiListAndSearchUiBinding? = null
 
     private var brandDataMaster: BrandEMIMasterDataModal? = null
@@ -82,9 +87,16 @@ class BrandEmiProductFragment : Fragment() {
 
         logger("callInit","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID}","e")
         (activity as IDialog).showProgress()
-        brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
+
+        brandEmiProductViewModel= ViewModelProvider(this).get(BrandEmiProductViewModel::class.java)
+        lifecycleScope.launch(Dispatchers.IO){
+            brandEmiProductViewModel.getBrandData("0",brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")
+        }
+        // old
+       /* brandEmiProductViewModel= ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository,brandEmiSubCatData?.brandID?:"",brandEmiSubCatData?.categoryID?:"")).get(
             BrandEmiProductViewModel::class.java
-        )
+        )*/
+
         if (eDashBoardItem  == EDashboardItem.BRAND_EMI_CATALOGUE) {
             brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
             brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)

@@ -8,7 +8,7 @@ import com.bonushub.crdb.india.viewmodel.BrandEmiMasterCategoryViewModel
 import com.bonushub.crdb.india.viewmodel.BrandEmiProductViewModel
 import com.bonushub.crdb.india.viewmodel.TenureSchemeViewModel
 
-class BrandEmiViewModelFactory
+/*class BrandEmiViewModelFactory
     (private val serverRepository: ServerRepository,private val brandId:String="",private val subCatId : String=""):ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if(brandId.isNotBlank()&&subCatId.isNotBlank()){
@@ -16,7 +16,7 @@ class BrandEmiViewModelFactory
         }else
             BrandEmiMasterCategoryViewModel(serverRepository) as T
     }
-}
+}*/
 
 class TenureSchemeActivityVMFactory
     (private val serverRepository: ServerRepository, private val field56Pan:String, private val field57Data:String):ViewModelProvider.Factory {

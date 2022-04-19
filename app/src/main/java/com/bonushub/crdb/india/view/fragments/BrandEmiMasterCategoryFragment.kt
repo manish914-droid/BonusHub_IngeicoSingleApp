@@ -9,46 +9,50 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.BrandEmiListAndSearchUiBinding
-import com.bonushub.crdb.india.db.AppDatabase
+import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.repository.GenericResponse
-import com.bonushub.crdb.india.repository.ServerRepository
-import com.bonushub.crdb.india.serverApi.RemoteService
+import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.logger
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BrandEMIMasterCategoryAdapter
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.BrandEmiMasterCategoryViewModel
-import com.bonushub.crdb.india.viewmodel.viewModelFactory.BrandEmiViewModelFactory
-import com.bonushub.crdb.india.utils.EDashboardItem
-import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.ArrayList
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class BrandEmiMasterCategoryFragment : Fragment() {
 
-    /** need to use Hilt for instance initializing here..*/
-    private val remoteService: RemoteService = RemoteService()
-    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
-    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
-    //private val action by lazy { arguments?.getSerializable("type") ?: "" }
+
+    @Inject
+    lateinit var appDao:AppDao
+
+    private val brandEmiMasterCategoryViewModel: BrandEmiMasterCategoryViewModel by viewModels()
+
+    // old
+//    private val remoteService: RemoteService = RemoteService()//
+//    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)//
+   // private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)//
+    ////private val action by lazy { arguments?.getSerializable("type") ?: "" }
+   // private lateinit var brandEmiMasterCategoryViewModel: BrandEmiMasterCategoryViewModel//
+
     private lateinit var eDashBoardItem: EDashboardItem
-    private lateinit var brandEmiMasterCategoryViewModel: BrandEmiMasterCategoryViewModel
+
     private var brandMasterBinding: BrandEmiListAndSearchUiBinding? = null
     private val brandEMIMasterCategoryAdapter by lazy {
         BrandEMIMasterCategoryAdapter(::onItemClick)
@@ -90,7 +94,8 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         brandMasterBinding?.brandSearchET?.setText("")
 
         (activity as IDialog).showProgress()
-        brandEmiMasterCategoryViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
+        // old
+        //brandEmiMasterCategoryViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(BrandEmiMasterCategoryViewModel::class.java)
 
         brandEmiMasterCategoryViewModel.brandEMIMasterSubCategoryLivedata.observe(
             viewLifecycleOwner
@@ -174,7 +179,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val brandSubCatList: ArrayList<BrandEMISubCategoryTable> =
-                dbObj.appDao.getBrandEMISubCategoryData() as ArrayList<BrandEMISubCategoryTable>
+                appDao.getBrandEMISubCategoryData() as ArrayList<BrandEMISubCategoryTable>
             val  filteredSubCat =
                 brandSubCatList.filter {
                     it.brandID == brandDataMaster.brandID && it.parentCategoryID == "0"
