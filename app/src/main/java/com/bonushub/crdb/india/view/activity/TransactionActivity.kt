@@ -210,7 +210,7 @@ class TransactionActivity : BaseActivityNew() {
                 if (cardProcessedDataModal.getFallbackType() != EFallbackCode.Swipe_fallback.fallBackCode) {
 
                     val currDate = getCurrentDateforMag()
-                    if (currDate.compareTo(cardProcessedDataModal.getExPiryDate()!!) <= 0) {
+                    if (/*currDate.compareTo(cardProcessedDataModal.getExPiryDate()!!) <= 0*/true) {
                         println("Correct Date")
                         Log.d(TAG, "onCardSwiped ...1")
                         //  val bytes: ByteArray = ROCProviderV2.hexStr2Byte(track2)
@@ -275,8 +275,8 @@ class TransactionActivity : BaseActivityNew() {
 
                                 //Checking the card has a PIN or WITHOUTPIN
                                 // Here the changes are , Now we have to ask pin for all swipe txns ...
-                                val isPin =
-                                    scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7' //true //
+                                val isPin = true
+                                   /* scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7'*/ //true //
                                 //Here we are bypassing the pin condition for test case ANSI_MAG_001.
                                 //  isPin = false
                                 if (isPin) {
