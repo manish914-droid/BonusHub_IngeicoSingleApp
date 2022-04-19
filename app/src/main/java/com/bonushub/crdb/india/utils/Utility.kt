@@ -2028,4 +2028,6 @@ fun getEncryptedField57DataForVisa(dataLength: Int, dataDescription: String): St
         //    println("Track 2 with encryption in Visa sale is --->" + Utility.byte2HexStr(encryptedByteArray))
         return dataDescription/*Utility.byte2HexStr(encryptedByteArray)*/
     } else return "TRACK57_LENGTH<8"
+
+
 }

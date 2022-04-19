@@ -80,6 +80,10 @@ class SearchCard constructor(){
                             track3?.let { cardProcessedDataModal.setTrack3Data(it) }
                             serviceCode?.let { cardProcessedDataModal.setServiceCodeData(it) }
 
+
+                            //Expiry Date
+                            serviceCode?.let { cardProcessedDataModal.setExpiredDate(track.getString(EMVData.EXPIRED_DATE)) }
+
                             transactionCallback(cardProcessedDataModal)
 
 
