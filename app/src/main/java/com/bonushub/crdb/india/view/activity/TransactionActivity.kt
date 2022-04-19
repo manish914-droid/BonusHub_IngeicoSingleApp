@@ -168,7 +168,7 @@ class TransactionActivity : BaseActivityNew() {
                                     }
                                     DetectCardType.MAG_CARD_TYPE -> {
                                         //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
-                                        cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+                                       // cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
 
                                         if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
                                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
@@ -182,6 +182,7 @@ class TransactionActivity : BaseActivityNew() {
                                 }
 
 
+                                emvProcessNext(cardProcessedDataModal)
                             }
 
                             override fun onCancel() {
@@ -196,6 +197,13 @@ class TransactionActivity : BaseActivityNew() {
                         param.putByteArray(PinpadData.PAN_BLOCK, panBlock?.str2ByteArr())
                         DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
 
+                    }else{
+                        if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
+                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
+                        else
+                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+                        cardProcessedDataModal.setApplicationPanSequenceValue("00")
+                        emvProcessNext(cardProcessedDataModal)
                     }
                 }
 
@@ -218,6 +226,21 @@ class TransactionActivity : BaseActivityNew() {
                         cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
 
                         cardProcessedDataModal.getTrack2Data()
+
+                        //region----------- sir please check
+                        val track2 = cardProcessedDataModal.getTrack2Data()
+
+                        /*var track21 = "35,36|${
+                            track2?.replace("D", "=")?.replace("F", "")
+                        }" + "|" + cardProcessedDataModal?.getCardHolderName() + "~~~" +
+                                cardProcessedDataModal?.getTypeOfTxnFlag() + "~" + cardProcessedDataModal?.getPinEntryFlag()*/
+
+                        var field57 =   "35|"+track2?.replace("D", "=")?.replace("F", "")
+                        println("Field 57 data is"+field57)
+                        val encrptedPan = getEncryptedPanorTrackData(field57,true)
+                        cardProcessedDataModal.setEncryptedPan(encrptedPan)
+                        // end region--------
+
                         cardProcessedDataModal.getTrack1Data()
                         cardProcessedDataModal.getTrack3Data()
                         cardProcessedDataModal.getPanNumberData()
@@ -253,7 +276,7 @@ class TransactionActivity : BaseActivityNew() {
                                 //Checking the card has a PIN or WITHOUTPIN
                                 // Here the changes are , Now we have to ask pin for all swipe txns ...
                                 val isPin =
-                                    true //scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7'
+                                    scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7' //true //
                                 //Here we are bypassing the pin condition for test case ANSI_MAG_001.
                                 //  isPin = false
                                 if (isPin) {
