@@ -298,10 +298,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         } else {
             AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
             GlobalScope.launch(Dispatchers.IO) {
-                Utility().readLocalInitFile { status, msg ->
-                    Log.d("Init File Read Status ", status.toString())
-                    Log.d("Message ", msg)
-                    //    refreshDrawer()
+
+                val tct = appDao.getTerminalCommunicationTableData()
+                if(tct == null || tct.size == 0) {
+                    Utility().readLocalInitFile { status, msg ->
+                        Log.d("Init File Read Status ", status.toString())
+                        Log.d("Message ", msg)
+                        //    refreshDrawer()
+                    }
                 }
             }
             navHostFragment?.navController?.popBackStack()

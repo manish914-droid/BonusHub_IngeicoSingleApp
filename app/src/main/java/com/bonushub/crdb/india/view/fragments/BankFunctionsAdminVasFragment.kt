@@ -84,7 +84,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
-                parentFragmentManager.popBackStackImmediate()
+               // parentFragmentManager.popBackStackImmediate()
+                (activity as NavigationActivity).decideDashBoardOnBackPress()
             }catch (ex:Exception)
             {
                 ex.printStackTrace()
