@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,6 +65,7 @@ class BrandEmiProductFragment : Fragment() {
     // for backpress manage
     var isFirstTime = true
     var firstTimeData : ArrayList<BrandEMIProductDataModal?>? = null
+    var latestData : ArrayList<BrandEMIProductDataModal?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +86,8 @@ class BrandEmiProductFragment : Fragment() {
         brandEmiSubCatData = arguments?.getSerializable("brandEmiSubCat") as? BrandEMISubCategoryTable
        brandEmiCatData = arguments?.getSerializable("brandEmiCat") as? BrandEMISubCategoryTable
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
+
+        firstTimeData = ArrayList()
 
         logger("callInit","0 + ${brandEmiSubCatData?.brandID} + ${brandEmiSubCatData?.categoryID}","e")
         (activity as IDialog).showProgress()
@@ -133,6 +137,8 @@ class BrandEmiProductFragment : Fragment() {
                             println("dataListSize" + Gson().toJson(genericResp.data?.size))
                             setUpRecyclerView()
                             brandEMIProductAdapter.submitList(genericResp.data)
+                            latestData = ArrayList()
+                            latestData!!.addAll(genericResp.data!!)
                             if (isFirstTime) {
                                 firstTimeData = ArrayList()
                                 firstTimeData!!.addAll(genericResp.data!!)
@@ -144,13 +150,18 @@ class BrandEmiProductFragment : Fragment() {
                         }
                         is GenericResponse.Error -> {
                             ToastUtils.showToast(activity, genericResp.errorMessage)
-                            println(genericResp.errorMessage.toString())
+                            println("GenericResponse"+genericResp.errorMessage.toString())
+                            println("firstTimeData"+firstTimeData?.size)
+                            println("GenericResponse"+genericResp.data?.size)
+                            println("latestData"+latestData?.size)
+                            brandEMIProductAdapter.submitList(latestData)
                         }
                         is GenericResponse.Loading -> {
 
                         }
                     }
                 }else{
+                    Log.e("set","recyclerview")
                     isdataChange = false
                     setUpRecyclerView()
                     brandEMIProductAdapter.submitList(firstTimeData)
@@ -177,6 +188,7 @@ class BrandEmiProductFragment : Fragment() {
 
                     if(firstTimeData != null){
                         logger("kushal","brandSearchET2","e")
+                        logger("firstTimeData",""+firstTimeData?.size,"e")
                         brandEMIProductAdapter.submitList(firstTimeData)
                     }
                 }else{
@@ -190,6 +202,10 @@ class BrandEmiProductFragment : Fragment() {
             brandEmiProductBinding?.emptyTxt?.visibility = View.GONE
             var searchText = brandEmiProductBinding?.brandSearchET?.text.toString().trim()
 
+            if(searchText.length == 0)
+            {
+                return@setOnClickListener
+            }
             isObserve = false
 
             (activity as IDialog).showProgress()
@@ -266,10 +282,12 @@ class BrandEmiProductFragment : Fragment() {
         if(!isEditTextBlank) {
             brandEmiProductBinding?.brandSearchET?.setText("")
             isdataChange = true
+            isFirstTime = true
         }else{
             //isdataChange = false
             brandEmiProductBinding?.brandSearchET?.setText("")
             isdataChange = true
+            isFirstTime = true
         }
     }
 
