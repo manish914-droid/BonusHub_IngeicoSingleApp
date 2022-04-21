@@ -30,15 +30,19 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.math.pow
 
 
 @AndroidEntryPoint
 class TenureSchemeActivity : BaseActivityNew() {
     /** need to use Hilt for instance initializing here..*/
-    private val remoteService: RemoteService = RemoteService()
-    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
-    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+//    private val remoteService: RemoteService = RemoteService()
+//    private val dbObj: AppDatabase = AppDatabase.getInstance(HDFCApplication.appContext)
+//    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
+
+    @Inject
+    lateinit var serverRepository: ServerRepository
 
     private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
     var binding: FragmentTenureSchemeBinding? = null

@@ -14,12 +14,15 @@ import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.*
+import com.bonushub.crdb.india.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacketNew
 import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.transactionprocess.SyncTransactionToHost
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
@@ -86,6 +89,12 @@ class TransactionActivity : BaseActivityNew() {
 
     lateinit var testVFEmvHandler:VFEmvHandler
 
+    private val brandDataMaster by lazy { (intent.getSerializableExtra("brandDataMaster") ?: null) as BrandEMIMasterDataModal}
+    private val brandEmiProductData by lazy { (intent.getSerializableExtra("brandEmiProductData") ?: null) as BrandEMIProductDataModal}
+    private val imeiOrSerialNum by lazy { intent.getStringExtra("imeiOrSerialNum") ?: "" }
+
+    private var emiSelectedData: BankEMITenureDataModal? = null // BankEMIDataModal
+    private var emiTAndCData: BankEMIIssuerTAndCDataModal? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,14 +108,41 @@ class TransactionActivity : BaseActivityNew() {
         globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
         globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
 
-
-        if (transactionType == BhTransactionType.SALE_WITH_CASH.type) {
+        // now below converted to when
+       /* if (transactionType == BhTransactionType.SALE_WITH_CASH.type) {
             val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
             val frtAmt = "%.2f".format(amt)
             emvBinding?.baseAmtTv?.text = frtAmt
+            emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
         } else {
             val frtAmt = "%.2f".format(saleAmt.toFloat())
             emvBinding?.baseAmtTv?.text = frtAmt
+            emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+
+        }*/
+        when(transactionType){
+
+            BhTransactionType.SALE_WITH_CASH.type ->{
+                val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
+                val frtAmt = "%.2f".format(amt)
+                emvBinding?.baseAmtTv?.text = frtAmt
+                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+            }
+
+            BhTransactionType.BRAND_EMI.type ->{
+                val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
+                val frtAmt = "%.2f".format(amt)
+                emvBinding?.baseAmtTv?.text = frtAmt
+                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+                globalCardProcessedModel.setEmiTransactionAmount((saleAmt.toDouble() * 100).toLong())
+            }
+
+            else ->{
+                val frtAmt = "%.2f".format(saleAmt.toFloat())
+                emvBinding?.baseAmtTv?.text = frtAmt
+                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+
+            }
         }
 
 
@@ -118,6 +154,9 @@ class TransactionActivity : BaseActivityNew() {
 
         detectCard(globalCardProcessedModel,cardOption)
 
+        emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
+            declinedTransaction()
+        }
     }
 
 
@@ -394,10 +433,147 @@ class TransactionActivity : BaseActivityNew() {
 
     private fun onEmvprocessnext(cardProcessedDataModal: CardProcessedDataModal) {
         println("processflow called")
-        emvProcessNext(cardProcessedDataModal)
+        if(transactionType == BhTransactionType.BRAND_EMI.type)
+        {
+            val intent = Intent(
+                this@TransactionActivity,
+                TenureSchemeActivity::class.java
+            ).apply {
+                val field57 =
+                    "$bankEMIRequestCode^0^${brandDataMaster.brandID}^${brandEmiProductData.productID}^${imeiOrSerialNum}" +
+                            "^${/*cardBinValue.substring(0, 8)*/""}^${globalCardProcessedModel.getTransactionAmount()}"
+                putExtra("cardProcessedData", globalCardProcessedModel)
+                putExtra("brandID", brandDataMaster.brandID)
+                putExtra("productID", brandEmiProductData.productID)
+                putExtra("imeiOrSerialNum", imeiOrSerialNum)
+                putExtra(
+                    "transactionType",
+                    globalCardProcessedModel.getTransType()
+                )
+                putExtra("mobileNumber", mobileNumber)
+            }
+            startActivityForResult(intent, BhTransactionType.BRAND_EMI.type)
+        }else{
+            emvProcessNext(cardProcessedDataModal)
+
+        }
     }
 
-    private fun onEndProcessCalled(result: Int,cardProcessedDataModal: CardProcessedDataModal) {
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode){
+
+            BhTransactionType.BRAND_EMI.type ->{
+                val cardProcessedData = data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
+                val maskedPan = cardProcessedData.getPanNumberData()?.let {
+                    getMaskedPan(getTptData(), it)
+                }
+               // emiSelectedData = data.getParcelableExtra("emiSchemeDataList")
+                emiSelectedData = data.getParcelableExtra("EMITenureDataModal")
+                emiTAndCData = data.getParcelableExtra("emiIssuerTAndCDataList")
+                Log.d("SelectedEMI Data:- ", emiSelectedData.toString())
+                Log.d("emiTAndCData Data:- ", emiTAndCData.toString())
+
+                runOnUiThread {
+                    emvBinding?.atCardNoTv?.text = maskedPan
+                    emvBinding?.cardViewL?.visibility = View.VISIBLE
+                    // tv_card_number_heading.visibility = View.VISIBLE
+                    Log.e("CHANGED ", "NEW LAUNCH")
+                    //    binding?.paymentGif?.loadUrl("file:///android_asset/cardprocess.html")
+                    //todo Processing dialog in case of EMI
+                    emvBinding?.manualEntryButton?.visibility = View.GONE
+                    emvBinding?.tvInsertCard?.visibility = View.GONE
+                    if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
+                       /* val baseAmountValue = getString(R.string.rupees_symbol) + "1.00"
+                        binding?.baseAmtTv?.text = baseAmountValue*/
+                    } else {
+                        val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
+                        emvBinding?.baseAmtTv?.text = baseAmountValue
+                    }
+                }
+
+
+                //region===============Check Transaction Type and Perform Action Accordingly:-
+                if (cardProcessedData.getReadCardType() == DetectCardType.MAG_CARD_TYPE && cardProcessedData.getTransType() != TransactionType.TEST_EMI.type) {
+                    /*val isPin = cardProcessedData.getIsOnline() == 1
+                    cardProcessedData.setProcessingCode(transactionProcessingCode)
+                    processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedData)*/
+                } else {
+                    if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
+                        //VFService.showToast("Connect to BH_HOST1...")
+                        Log.e("WWW", "-----")
+                       /* cardProcessedData.setTransactionAmount(100)
+
+                        DoEmv(issuerUpdateHandler, this, pinHandler, cardProcessedData, ConstIPBOC.startEMV.intent.VALUE_cardType_smart_card) { cardProcessedDataModal ->
+                            cardProcessedDataModal.setProcessingCode(transactionProcessingCode)
+                            cardProcessedDataModal.setTransactionAmount(100)
+                            cardProcessedDataModal.setOtherAmount(otherTransAmount)
+                            cardProcessedDataModal.setMobileBillExtraData(
+                                Pair(mobileNumber, billNumber))
+                            //    localCardProcessedData.setTransType(transactionType)
+                            globalCardProcessedModel = cardProcessedDataModal
+                            Log.d("CardProcessedData:- ", Gson().toJson(cardProcessedDataModal))
+                            val maskedPan = cardProcessedDataModal.getPanNumberData()?.let {
+                                getMaskedPan(TerminalParameterTable.selectFromSchemeTable(), it)
+                            }
+                            runOnUiThread {
+                                binding?.atCardNoTv?.text = maskedPan
+                                cardView_l.visibility = View.VISIBLE
+                                //    tv_card_number_heading.visibility = View.VISIBLE
+                                tv_insert_card.visibility = View.INVISIBLE
+                                //  binding?.paymentGif?.visibility = View.INVISIBLE
+                            }
+                            //Below Different Type of Transaction check Based ISO Packet Generation happening:-
+                            processAccordingToCardType(cardProcessedDataModal)
+                        }*/
+                    } else {
+                        /*DoEmv(
+                            issuerUpdateHandler,
+                            this, pinHandler, cardProcessedData,
+                            ConstIPBOC.startEMV.intent.VALUE_cardType_smart_card
+                        ) { cardProcessedDataModal ->
+                            Log.d("CardEMIData:- ", cardProcessedDataModal.toString())
+                            cardProcessedDataModal.setProcessingCode(transactionProcessingCode)
+                            cardProcessedDataModal.setTransactionAmount(
+                                emiSelectedTransactionAmount ?: 0L
+                            )
+                            cardProcessedDataModal.setOtherAmount(otherTransAmount)
+                            cardProcessedDataModal.setMobileBillExtraData(
+                                Pair(
+                                    mobileNumber,
+                                    billNumber
+                                )
+                            )
+                            globalCardProcessedModel = cardProcessedDataModal
+                            Log.d("CardProcessedData:- ", Gson().toJson(cardProcessedDataModal))
+                            val maskedPan = cardProcessedDataModal.getPanNumberData()?.let {
+                                getMaskedPan(TerminalParameterTable.selectFromSchemeTable(), it)
+                            }
+                            runOnUiThread {
+                                binding?.atCardNoTv?.text = maskedPan
+                                cardView_l.visibility = View.VISIBLE
+                                //   tv_card_number_heading.visibility = View.VISIBLE
+                                tv_insert_card.visibility = View.INVISIBLE
+                                //  binding?.paymentGif?.visibility = View.INVISIBLE
+                            }
+                            //Below Different Type of Transaction check Based ISO Packet Generation happening:-
+                            processAccordingToCardType(cardProcessedDataModal)
+                        }*/
+                    }
+                }
+
+
+            }
+
+            else ->{
+
+            }
+        }
+    }
+
+    private fun onEndProcessCalled(result: Int, cardProcessedDataModal: CardProcessedDataModal) {
         println("Fallback called")
 
               when(result){
