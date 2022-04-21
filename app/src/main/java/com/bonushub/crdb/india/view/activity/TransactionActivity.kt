@@ -529,6 +529,7 @@ class TransactionActivity : BaseActivityNew() {
                             processAccordingToCardType(cardProcessedDataModal)
                         }*/
                     } else {
+                        // sir please check emv call
                         /*DoEmv(
                             issuerUpdateHandler,
                             this, pinHandler, cardProcessedData,
