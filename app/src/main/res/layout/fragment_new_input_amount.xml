@@ -20,160 +20,252 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.card.MaterialCardView
+        <!--amount-->
+        <!-- <com.google.android.material.card.MaterialCardView
+             android:id="@+id/sale_amt_crdView"
+              android:theme="@style/Theme.MaterialComponents.Light"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
+             android:layout_marginRight="@dimen/pad_20"
+             android:layout_marginLeft="@dimen/pad_20"
+
+            >
+
+             <EditText
+                 android:id="@+id/saleAmount"
+
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:cursorVisible="false"
+                 android:focusable="false"
+                 android:focusableInTouchMode="false"
+                 android:gravity="end"
+                 android:inputType="none"
+                 android:maxLength="12"
+                 android:maxLines="1"
+                 android:paddingStart="@dimen/pad_16"
+                 android:paddingEnd="@dimen/pad_16"
+                 android:paddingTop="@dimen/pad_8"
+                 android:paddingBottom="@dimen/pad_8"
+                 android:hint="@string/enter_amount"
+                 android:textSize="@dimen/key_text_size"
+                 android:textColorHint="@color/colorGrey"
+                 android:textColor="@color/txt_color"
+                 android:background="@drawable/card_edge"
+                />
+
+         </com.google.android.material.card.MaterialCardView>-->
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/sale_amt_crdView"
-             android:theme="@style/Theme.MaterialComponents.Light"
+            style="@style/TextInputEditTextAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
-            android:layout_marginRight="@dimen/pad_20"
             android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_amount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
 
-           >
-
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/saleAmount"
-
+                style="@style/TextInputEditTextAmount"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:cursorVisible="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:gravity="end"
-                android:inputType="none"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_rupay_circle_new"
                 android:maxLength="12"
-                android:maxLines="1"
-                android:paddingStart="@dimen/pad_16"
-                android:paddingEnd="@dimen/pad_16"
-                android:paddingTop="@dimen/pad_8"
-                android:paddingBottom="@dimen/pad_8"
-                android:hint="@string/enter_amount"
-                android:textSize="@dimen/key_text_size"
-                android:textColorHint="@color/colorGrey"
-                android:textColor="@color/txt_color"
-                android:background="@drawable/card_edge"
-               />
+                android:padding="@dimen/pad_8"/>
 
-        </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-        <com.google.android.material.card.MaterialCardView
+        <!--tip amount-->
+        <!-- <com.google.android.material.card.MaterialCardView
+             android:id="@+id/cash_amt_crdView"
+              android:theme="@style/Theme.MaterialComponents.Light"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             app:layout_constraintTop_toBottomOf="@+id/sale_amt_crdView"
+             app:layout_constraintStart_toStartOf="parent"
+             android:layout_marginRight="@dimen/pad_20"
+             android:layout_marginLeft="@dimen/pad_20"
+             android:layout_marginTop="@dimen/pad_10"
+             android:visibility="gone"
+
+             >
+
+             <EditText
+                 android:id="@+id/cashAmount"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:background="@drawable/card_edge"
+                 android:cursorVisible="false"
+                 android:ems="9"
+                 android:focusable="false"
+                 android:focusableInTouchMode="false"
+                 android:gravity="end"
+                 android:inputType="none"
+                 android:maxLength="15"
+                 android:maxLines="1"
+                 android:paddingStart="@dimen/pad_16"
+                 android:paddingTop="@dimen/pad_8"
+                 android:paddingEnd="@dimen/pad_16"
+                 android:hint="@string/enter_cash_amount"
+                 android:textSize="@dimen/key_text_size"
+                 android:paddingBottom="@dimen/pad_8"
+                 android:textColor="@color/txt_color"
+                 android:textColorHint="@color/colorGrey"
+                 />
+         </com.google.android.material.card.MaterialCardView>-->
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/cash_amt_crdView"
-             android:theme="@style/Theme.MaterialComponents.Light"
+            style="@style/TextInputEditTextAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/sale_amt_crdView"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_8"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_cash_amount"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginRight="@dimen/pad_20"
-            android:layout_marginLeft="@dimen/pad_20"
-            android:layout_marginTop="@dimen/pad_10"
-            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/sale_amt_crdView">
 
-            >
-
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/cashAmount"
+                style="@style/TextInputEditTextAmount"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/card_edge"
-                android:cursorVisible="false"
-                android:ems="9"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:gravity="end"
-                android:inputType="none"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_tip_amount"
                 android:maxLength="15"
-                android:maxLines="1"
-                android:paddingStart="@dimen/pad_16"
-                android:paddingTop="@dimen/pad_8"
-                android:paddingEnd="@dimen/pad_16"
-                android:hint="@string/enter_cash_amount"
-                android:textSize="@dimen/key_text_size"
-                android:paddingBottom="@dimen/pad_8"
-                android:textColor="@color/txt_color"
-                android:textColorHint="@color/colorGrey"
-                />
-        </com.google.android.material.card.MaterialCardView>
+                android:padding="@dimen/pad_8"/>
 
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.card.MaterialCardView
+        <!--mobile-->
+        <!-- <com.google.android.material.card.MaterialCardView
+             android:id="@+id/mob_no_crdView"
+              android:theme="@style/Theme.MaterialComponents.Light"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
+             android:layout_marginRight="@dimen/pad_20"
+             android:layout_marginLeft="@dimen/pad_20"
+             android:layout_marginTop="@dimen/pad_10"
+             android:visibility="gone"
+             >
+
+             <EditText
+                 android:id="@+id/mobNumbr"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:paddingStart="@dimen/pad_16"
+
+                 android:paddingTop="@dimen/pad_8"
+                 android:paddingEnd="@dimen/pad_16"
+
+                 android:background="@drawable/card_edge"
+                 android:cursorVisible="false"
+                 android:focusable="false"
+                 android:focusableInTouchMode="false"
+                 android:inputType="none"
+                 android:maxLength="10"
+                 android:maxLines="1"
+                 android:gravity="end"
+                 android:paddingBottom="@dimen/pad_8"
+                 android:textColorHint="@color/colorGrey"
+                 android:textSize="@dimen/key_text_size"
+                 android:hint="@string/enter_mobile_number"
+                 android:textColor="@color/txt_color"
+
+                 />
+         </com.google.android.material.card.MaterialCardView>-->
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/mob_no_crdView"
-             android:theme="@style/Theme.MaterialComponents.Light"
+            style="@style/TextInputEditTextAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
-            android:layout_marginRight="@dimen/pad_20"
             android:layout_marginLeft="@dimen/pad_20"
-            android:layout_marginTop="@dimen/pad_10"
-            android:visibility="gone"
-            >
+            android:layout_marginTop="@dimen/pad_8"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_mobile_number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/mobNumbr"
+                style="@style/TextInputEditTextAmount"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/pad_16"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_mobile_new"
+                android:maxLength="12"
+                android:padding="@dimen/pad_8" />
 
-                android:paddingTop="@dimen/pad_8"
-                android:paddingEnd="@dimen/pad_16"
+        </com.google.android.material.textfield.TextInputLayout>
 
-                android:background="@drawable/card_edge"
-                android:cursorVisible="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="none"
-                android:maxLength="10"
-                android:maxLines="1"
-                android:gravity="end"
-                android:paddingBottom="@dimen/pad_8"
-                android:textColorHint="@color/colorGrey"
-                android:textSize="@dimen/key_text_size"
-                android:hint="@string/enter_mobile_number"
-                android:textColor="@color/txt_color"
-
-                />
-        </com.google.android.material.card.MaterialCardView>
         <!--Description-->
-        <com.google.android.material.card.MaterialCardView
+        <!-- <com.google.android.material.card.MaterialCardView
+             android:id="@+id/descr_crd_view"
+             android:visibility="gone"
+              android:theme="@style/Theme.MaterialComponents.Light"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+
+             android:layout_marginRight="@dimen/pad_20"
+             android:layout_marginLeft="@dimen/pad_20"
+             android:layout_marginTop="@dimen/pad_10"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintStart_toStartOf="parent"
+             app:layout_constraintTop_toBottomOf="@+id/mob_no_crdView"
+
+             >
+             <EditText
+                 android:id="@+id/description_et"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+
+                 android:background="@drawable/card_edge"
+                 android:cursorVisible="false"
+
+                 android:focusable="false"
+                 android:focusableInTouchMode="false"
+
+                 android:paddingStart="@dimen/pad_16"
+                 android:paddingBottom="@dimen/pad_8"
+                 android:paddingTop="@dimen/pad_8"
+                 android:paddingEnd="@dimen/pad_16"
+                 android:inputType="none"
+                 android:maxLength="13"
+                 android:maxLines="1"
+                 android:gravity="end"
+                 android:textColorHint="@color/colorGrey"
+                 android:textSize="@dimen/key_text_size"
+                 android:hint="@string/enter_description_optional"
+                 android:textColor="@color/txt_color"/>
+         </com.google.android.material.card.MaterialCardView>-->
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/descr_crd_view"
-            android:visibility="gone"
-             android:theme="@style/Theme.MaterialComponents.Light"
+            style="@style/TextInputEditTextAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:layout_marginRight="@dimen/pad_20"
             android:layout_marginLeft="@dimen/pad_20"
             android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_description_optional"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mob_no_crdView"
+            app:layout_constraintTop_toBottomOf="@+id/mob_no_crdView">
 
-            >
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/description_et"
+                style="@style/TextInputEditTextAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_rupay_circle_new"
+                android:maxLength="13" />
 
-                android:background="@drawable/card_edge"
-                android:cursorVisible="false"
+        </com.google.android.material.textfield.TextInputLayout>
 
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-
-                android:paddingStart="@dimen/pad_16"
-                android:paddingBottom="@dimen/pad_8"
-                android:paddingTop="@dimen/pad_8"
-                android:paddingEnd="@dimen/pad_16"
-                android:inputType="none"
-                android:maxLength="13"
-                android:maxLines="1"
-                android:gravity="end"
-                android:textColorHint="@color/colorGrey"
-                android:textSize="@dimen/key_text_size"
-                android:hint="@string/enter_description_optional"
-                android:textColor="@color/txt_color"/>
-        </com.google.android.material.card.MaterialCardView>
         <include
             android:id="@+id/main_keyBoard"
             layout="@layout/new_enter_amount_keyboard"
@@ -183,8 +275,7 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

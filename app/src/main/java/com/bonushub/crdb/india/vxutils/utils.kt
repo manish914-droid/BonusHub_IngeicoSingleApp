@@ -4,6 +4,8 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Handler
@@ -1306,5 +1308,55 @@ fun getConnectionType():String{
         return  ConnectionType.WIFI*/
     else{
         ConnectionType.GPRS.code
+    }
+}
+
+fun changeEditTextBackground(editText:TextInputEditText?,editTextBorder:TextInputLayout?){
+    if(editText?.text?.length == 0)
+    {
+        val color: Int = Color.parseColor("#A9A9A9")
+        val color2: Int = Color.parseColor("#A9A9A9")
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_focused),
+            intArrayOf(android.R.attr.state_hovered),
+            intArrayOf(android.R.attr.state_enabled),
+            intArrayOf()
+        )
+
+        val colors = intArrayOf(
+            color,
+            color,
+            color,
+            color2
+        )
+
+        val myColorList = ColorStateList(states, colors)
+        editTextBorder?.setBoxStrokeColorStateList(myColorList)
+        //binding?.saleAmtCrdView?.hintTextColor = myColorList
+        editTextBorder?.defaultHintTextColor = myColorList
+    }else{
+
+        val color: Int = Color.parseColor("#013480")
+        val color2: Int = Color.parseColor("#013480")
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_focused),
+            intArrayOf(android.R.attr.state_hovered),
+            intArrayOf(android.R.attr.state_enabled),
+            intArrayOf()
+        )
+
+        val colors = intArrayOf(
+            color,
+            color,
+            color,
+            color2
+        )
+
+        val myColorList = ColorStateList(states, colors)
+        editTextBorder?.setBoxStrokeColorStateList(myColorList)
+        //binding?.saleAmtCrdView?.hintTextColor = myColorList
+        editTextBorder?.defaultHintTextColor = myColorList
     }
 }
