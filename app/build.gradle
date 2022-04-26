@@ -24,7 +24,7 @@ android {
         versionCode 1
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
         buildConfigField "long", "REVISION_ID", "210107"
-        versionName "02.03.07"
+        versionName "02.04.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
