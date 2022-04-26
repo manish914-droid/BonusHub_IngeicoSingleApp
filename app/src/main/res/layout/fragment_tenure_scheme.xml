@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
         android:background="@color/white"
+        android:fillViewport="true"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,62 +30,60 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/pad_16"
+                android:drawablePadding="@dimen/pad_10"
+                android:fontFamily="@font/muli_regular"
                 android:gravity="center"
                 android:padding="@dimen/pad_4"
                 android:text="@string/select_tenure_txt"
                 android:textColor="@color/txt_color"
                 android:textSize="@dimen/text_size_xregular"
-                android:fontFamily="@font/muli_regular"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
 
-                android:drawablePadding="@dimen/pad_10"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar_txn" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_txn"
+                android:visibility="gone"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/emiSchemeOfferRV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/item_emi_scheme_offer"
+                android:layout_marginStart="@dimen/pad_15"
+                android:layout_marginEnd="@dimen/pad_15"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/emiSchemeTV"
-                android:layout_marginStart="@dimen/pad_15"
-                android:layout_marginEnd="@dimen/pad_15"/>
+                tools:listitem="@layout/item_emi_scheme_offer" />
 
-         <!--   <ImageView
-                android:id="@+id/empty_view_placeholder"
-                android:layout_width="@dimen/standard_placeholder_size"
-                android:layout_height="@dimen/standard_placeholder_size"
-                android:background="@drawable/no_data_found"
-                android:contentDescription="@string/app_name"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
--->
+            <!--   <ImageView
+                   android:id="@+id/empty_view_placeholder"
+                   android:layout_width="@dimen/standard_placeholder_size"
+                   android:layout_height="@dimen/standard_placeholder_size"
+                   android:background="@drawable/no_data_found"
+                   android:contentDescription="@string/app_name"
+                   android:visibility="gone"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toTopOf="parent" />
+   -->
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
     <TextView
         android:id="@+id/emi_scheme_floating_button"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="18dp"
-        android:layout_marginBottom="@dimen/pad_60"
-        android:paddingStart="@dimen/pad_20"
-        android:paddingEnd="@dimen/pad_20"
-        android:paddingTop="@dimen/pad_10"
-        android:paddingBottom="@dimen/pad_10"
+        android:layout_margin="@dimen/pad_20"
+        android:background="@drawable/edge_button_blue"
+        android:drawablePadding="@dimen/pad_15"
+       android:padding="@dimen/pad_15"
         android:text="@string/proceed_txn"
+        android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_xregular"
-        android:background="@drawable/edge_button"
-        android:drawablePadding="@dimen/pad_15"
-        android:drawableLeft="@drawable/ic_proceed_button" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

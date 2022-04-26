@@ -36,7 +36,15 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
         val modelData = emiSchemeDataList?.get(position)
 
         //region==========================Checked Particular Row of RecyclerView Logic:-
-        if (modelData?.isSelected == true) {
+        if(modelData?.isSelected == true){
+            // parent_emi_view_ll
+            holder.binding.parentEmiViewLl.setBackgroundResource(R.drawable.card_edge_blue)
+            holder.binding.schemeCheckIv.visibility = View.VISIBLE
+        }else{
+            holder.binding.parentEmiViewLl.setBackgroundResource(R.drawable.card_edge_transparent_bg_sky_blu)
+            holder.binding.schemeCheckIv.visibility = View.INVISIBLE
+        }
+       /* if (modelData?.isSelected == true) {
             //holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#13E113"))) //
             //holder.binding.schemeCheckIv.visibility = View.VISIBLE//
             holder.binding.cardView.setBackgroundResource(R.drawable.edge_blue)
@@ -98,7 +106,7 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
             setViewColor(holder.binding.tvTotalEmiPay,false)
             setViewColor(holder.binding.tvOfferHeader,false)
             setViewColor(holder.binding.tvOffer,false)
-        }
+        }*/
         //endregion
 
         if (modelData != null) {
