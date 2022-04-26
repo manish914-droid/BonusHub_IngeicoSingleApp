@@ -102,6 +102,7 @@ class TransactionActivity : BaseActivityNew() {
         //setContentView(R.layout.activity_emv)
         setContentView(emvBinding?.root)
         emvBinding?.subHeaderView?.subHeaderText?.text = transactionTypeEDashboardItem.title
+        emvBinding?.subHeaderView?.headerImage?.setImageResource(transactionTypeEDashboardItem.res) //= transactionTypeEDashboardItem.title
         emvBinding?.txnAmtLl?.visibility = View.VISIBLE
 
         globalCardProcessedModel.setTransType(transactionType)
@@ -125,20 +126,20 @@ class TransactionActivity : BaseActivityNew() {
             BhTransactionType.SALE_WITH_CASH.type ->{
                 val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
                 val frtAmt = "%.2f".format(amt)
-                emvBinding?.baseAmtTv?.text = frtAmt
+                emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+frtAmt
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
             }
 
             BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type ->{
                 val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
                 val frtAmt = "%.2f".format(amt)
-                emvBinding?.baseAmtTv?.text = frtAmt
+                emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+frtAmt
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
                 globalCardProcessedModel.setEmiTransactionAmount((saleAmt.toDouble() * 100).toLong())
             }
             else ->{
                 val frtAmt = "%.2f".format(saleAmt.toFloat())
-                emvBinding?.baseAmtTv?.text = frtAmt
+                emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+frtAmt
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
 
             }
@@ -504,7 +505,7 @@ class TransactionActivity : BaseActivityNew() {
                         binding?.baseAmtTv?.text = baseAmountValue*/
                     } else {
                         val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
-                        emvBinding?.baseAmtTv?.text = baseAmountValue
+                        emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+baseAmountValue
                     }
                 }
 
@@ -607,7 +608,7 @@ class TransactionActivity : BaseActivityNew() {
                         binding?.baseAmtTv?.text = baseAmountValue*/
                     } else {
                         val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
-                        emvBinding?.baseAmtTv?.text = baseAmountValue
+                        emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+baseAmountValue
                     }
                 }
 

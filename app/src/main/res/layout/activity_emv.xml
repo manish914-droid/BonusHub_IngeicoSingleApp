@@ -22,29 +22,42 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/toolbar_txn" />
 
+	<androidx.constraintlayout.widget.Guideline
+		android:id="@+id/guidelineLeft"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		app:layout_constraintGuide_begin="20dp" />
+
+	<androidx.constraintlayout.widget.Guideline
+		android:id="@+id/guidelineRight"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		app:layout_constraintGuide_end="20dp" />
+
 	<androidx.cardview.widget.CardView
 		android:id="@+id/trans_amount_cardview"
-		android:layout_margin="@dimen/pad_8"
+		android:layout_marginTop="@dimen/pad_8"
 		android:elevation="@dimen/pad_8"
 		android:visibility="visible"
-		app:cardCornerRadius="@dimen/pad_8"
-		android:layout_width="match_parent"
+		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
-		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
->
+		app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+		app:layout_constraintEnd_toEndOf="@+id/guidelineRight">
 
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/txn_amt_ll"
 			android:layout_width="match_parent"
-			android:visibility="gone"
 			android:layout_height="wrap_content"
-			android:background="@color/themeBackground"
-			android:padding="@dimen/pad_6">
+			android:background="@drawable/edge_blue_bg_skyblue"
+			android:padding="@dimen/pad_6"
+			android:visibility="gone">
 
 
-			<ImageView
+			<!--<ImageView
 				android:id="@+id/imageView"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -52,19 +65,18 @@
 				android:src="@drawable/ic_indian_rupee"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent" />
+				app:layout_constraintTop_toTopOf="parent" />-->
 
 			<TextView
 				android:id="@+id/tv_transaction_amount_heading"
 				android:layout_width="wrap_content"
-				android:layout_height="0dp"
-				android:layout_marginEnd="24dp"
+				android:layout_height="wrap_content"
 				android:gravity="center"
 				android:text="@string/trans_amount"
-				android:textColor="@color/white"
+				android:textColor="@color/txt_color_blue"
 				android:textSize="@dimen/text_size_regular"
 				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintStart_toEndOf="@+id/imageView"
+				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toTopOf="parent" />
 
 			<TextView
@@ -72,13 +84,13 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
-				android:layout_marginEnd="24dp"
 				android:gravity="center"
 				android:text="@string/_500_00"
-				android:textColor="@color/white"
+				android:textColor="@color/txt_color_blue"
 				android:textSize="@dimen/text_size_large"
+				android:textStyle="bold"
 				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintStart_toEndOf="@+id/imageView"
+				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintTop_toBottomOf="@+id/tv_transaction_amount_heading" />
 
 		</androidx.constraintlayout.widget.ConstraintLayout>
@@ -116,20 +128,20 @@ android:textColor="@color/black"
 
 	<androidx.cardview.widget.CardView
 		android:id="@+id/cardView_l"
-
-		android:layout_width="match_parent"
+		android:layout_width="0dp"
 		android:layout_height="wrap_content"
-		android:layout_margin="@dimen/pad_8"
+		android:layout_marginTop="@dimen/pad_8"
 		android:elevation="@dimen/pad_8"
 		android:visibility="gone"
 		app:cardCornerRadius="@dimen/pad_8"
-		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+		app:layout_constraintEnd_toEndOf="@+id/guidelineRight"
 		app:layout_constraintTop_toBottomOf="@+id/trans_amount_cardview">
 
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:background="@color/themeBackground"
+			android:background="@drawable/edge_blue_bg_skyblue"
 			android:orientation="vertical"
 			android:padding="@dimen/pad_8">
 
@@ -138,7 +150,7 @@ android:textColor="@color/black"
 				android:layout_height="wrap_content"
 				android:text="@string/card_number"
 				android:layout_gravity="center"
-				android:textColor="@color/white"
+				android:textColor="@color/txt_color_blue"
 				android:textSize="@dimen/text_size_regular"
 			 />
 
@@ -148,8 +160,7 @@ android:textColor="@color/black"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="@dimen/pad_8"
 				android:gravity="center"
-
-				android:textColor="@color/white"
+				android:textColor="@color/txt_color_blue"
 				android:textSize="@dimen/text_size_xregular"
 				 />
 
@@ -184,7 +195,7 @@ android:textColor="@color/black"
 		android:layout_height="200dp"
 
 		android:layout_marginTop="24dp"
-		android:src="@drawable/ic_card_dip"
+		android:src="@drawable/ic_card_dip_new"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 
@@ -199,7 +210,7 @@ android:textColor="@color/black"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="16dp"
-		android:background="@drawable/card_entry_rounded_cor"
+		android:background="@drawable/edge_blue"
 		android:layout_marginEnd="16dp"
 		android:gravity="center"
 		android:paddingStart="@dimen/pad_20"
@@ -218,15 +229,15 @@ android:textColor="@color/black"
 
 	<Button
 		android:id="@+id/manual_entry_button"
-		android:layout_width="match_parent"
+		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="16dp"
 		android:layout_marginTop="16dp"
 		android:layout_marginEnd="16dp"
 		android:text="@string/manual_entry"
 		android:visibility="gone"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+		app:layout_constraintEnd_toEndOf="@+id/guidelineRight"
 		app:layout_constraintTop_toBottomOf="@+id/cardView_l" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
