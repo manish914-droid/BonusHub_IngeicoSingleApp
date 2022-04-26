@@ -128,7 +128,8 @@
             android:layout_marginRight="@dimen/pad_20"
             android:hint="@string/enter_cash_amount"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sale_amt_crdView">
+            app:layout_constraintTop_toBottomOf="@+id/sale_amt_crdView"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/cashAmount"
@@ -189,7 +190,8 @@
             android:layout_marginRight="@dimen/pad_20"
             android:hint="@string/enter_mobile_number"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView">
+            app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/mobNumbr"

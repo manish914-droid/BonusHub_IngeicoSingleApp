@@ -150,6 +150,7 @@ object IsoPacketCreator{
 
             //adding Field 57
           //  addFieldByHex(57, field57Request ?: "")
+            Log.e("field57RequestData",""+field57RequestData)
             addFieldByHex(57, field57RequestData)
 
             //adding Field 61
