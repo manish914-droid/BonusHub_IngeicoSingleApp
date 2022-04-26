@@ -56,5 +56,54 @@
     </style>
 
 
+    <style name="Theme.App" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnSurface">@color/colorPrimaryDark</item>
+        <item name="colorError">@color/colorPrimaryDark</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.App.Subtitle1</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.App.Caption</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/muli_bold</item>
+        <item name="android:fontFamily">@font/muli_bold</item>
+        <item name="android:gravity">right</item>
+    </style>
+
+    <style name="TextAppearance.App.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/muli_bold</item>
+        <item name="android:fontFamily">@font/muli_bold</item>
+    </style>
+
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+
+    <style name="TextInputEditText" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnSurface">@color/colorPrimaryDark</item>
+        <item name="colorError">@color/colorPrimaryDark</item>
+        <item name="boxCornerRadiusTopStart">@dimen/pad_10</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/pad_10</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/pad_10</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/pad_10</item>
+        <item name="android:textSize">24sp</item>
+        <item name="maxLines">1</item>
+        <item name="android:textAlignment">textEnd</item>
+        <item name="android:textColor">@color/txt_color_new</item>
+        <item name="android:fontFamily">@font/muli_bold</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="TextInputEditTextAmount" parent="TextInputEditText">
+        <item name="android:focusableInTouchMode">false</item>
+        <item name="android:focusable">false</item>
+        <item name="android:cursorVisible">false</item>
+        <item name="android:inputType">none</item>
+        <item name="android:drawablePadding">@dimen/pad_10</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
 
 </resources>
