@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.HDFCApplication
@@ -223,6 +224,8 @@ class NewInputAmountFragment : Fragment() {
         inputInCashAmount = false
         inputInMobilenumber = false
         setOnClickListeners()
+        setOnTextChangeListeners()
+
     }
 
     private fun setTptValue():TerminalParameterTable? {
@@ -284,6 +287,20 @@ class NewInputAmountFragment : Fragment() {
         onSetKeyBoardButtonClick()
     }
 
+    private fun setOnTextChangeListeners()
+    {
+        binding?.saleAmount?.addTextChangedListener {
+            changeEditTextBackground(binding?.saleAmount,binding?.saleAmtCrdView)
+        }
+
+        binding?.cashAmount?.addTextChangedListener {
+            changeEditTextBackground(binding?.cashAmount,binding?.cashAmtCrdView)
+        }
+
+        binding?.mobNumbr?.addTextChangedListener {
+            changeEditTextBackground(binding?.mobNumbr,binding?.mobNoCrdView)
+        }
+    }
     private fun onSetKeyBoardButtonClick() {
         binding?.mainKeyBoard?.key0?.setOnClickListener {
             when {
