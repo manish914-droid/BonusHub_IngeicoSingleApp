@@ -168,85 +168,6 @@ class TransactionActivity : BaseActivityNew() {
                     Toast.makeText(applicationContext,"Mag Card  detected", Toast.LENGTH_LONG).show()
                 }
 
-                val panBlock: String? = cardProcessedDataModal.getPanNumberData()
-
-                // Process Swipe card with or without PIN .
-                fun processSwipeCardWithPINorWithoutPIN(ispin: Boolean, cardProcessedDataModal: CardProcessedDataModal) {
-                    if (ispin) {
-
-                        val param = Bundle()
-                        param.putByteArray(PinpadData.PIN_LIMIT, byteArrayOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12))
-
-                        val listener: OnPinEntryListener = object : OnPinEntryListener.Stub() {
-                            override fun onInput(arg0: Int, arg1: Int) {}
-                            override fun onConfirm(data: ByteArray, arg1: Boolean) {
-                                System.out.println("PinBlock is"+ byte2HexStr(data))
-                                Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
-
-                                respondCVMResult(1.toByte())
-
-                                when (cardProcessedDataModal.getReadCardType()) {
-                                    DetectCardType.EMV_CARD_TYPE -> {
-                                        if (cardProcessedDataModal.getIsOnline() == 1) {
-                                            cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
-                                            //insert with pin
-                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
-                                        } else {
-                                            cardProcessedDataModal.setGeneratePinBlock("")
-                                            //off line pin
-                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
-                                        }
-                                    }
-                                    DetectCardType.CONTACT_LESS_CARD_TYPE -> {
-                                        if (cardProcessedDataModal.getIsOnline() == 1) {
-                                            cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
-                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
-                                        } else {
-                                            cardProcessedDataModal.setGeneratePinBlock("")
-                                            //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
-                                        }
-                                    }
-                                    DetectCardType.MAG_CARD_TYPE -> {
-                                        //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
-                                       // cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
-
-                                        if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
-                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
-                                        else
-                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
-                                        cardProcessedDataModal.setApplicationPanSequenceValue("00")
-                                    }
-
-                                    else -> {
-                                    }
-                                }
-
-
-                                emvProcessNext(cardProcessedDataModal)
-                            }
-
-                            override fun onCancel() {
-                                respondCVMResult(0.toByte())
-                            }
-
-                            override fun onError(error: Int) {
-                                respondCVMResult(2.toByte())
-                            }
-                        }
-                        println("=> onCardHolderVerify | onlinpin")
-                        param.putByteArray(PinpadData.PAN_BLOCK, panBlock?.str2ByteArr())
-                        DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
-
-                    }else{
-                        if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
-                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
-                        else
-                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
-                        cardProcessedDataModal.setApplicationPanSequenceValue("00")
-                        emvProcessNext(cardProcessedDataModal)
-                    }
-                }
-
                 if (cardProcessedDataModal.getFallbackType() != EFallbackCode.Swipe_fallback.fallBackCode) {
 
                     val currDate = getCurrentDateforMag()
@@ -330,17 +251,19 @@ class TransactionActivity : BaseActivityNew() {
                                 if (cardProcessedDataModal.getFallbackType() != EFallbackCode.EMV_fallback.fallBackCode) {
                                     //Checking Fallback
                                     if (scFirstByte == '2' || scFirstByte == '6') {
-                                        onEndProcessCalled(
-                                            EFallbackCode.Swipe_fallback.fallBackCode,
-                                            cardProcessedDataModal
-                                        )
+                                        onEndProcessCalled(EFallbackCode.Swipe_fallback.fallBackCode, cardProcessedDataModal)
                                     } else {
                                         //region================Condition Check and ProcessSwipeCardWithPinOrWithoutPin:-
                                         when (cardProcessedDataModal.getTransType()) {
-                                            TransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(
-                                                isPin,
-                                                cardProcessedDataModal
-                                            )
+                                            TransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
+                                            TransactionType.EMI_SALE.type -> {
+                                                val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                                    putExtra("cardProcessedData", globalCardProcessedModel)
+                                                    putExtra("transactionType", globalCardProcessedModel.getTransType())
+                                                    putExtra("mobileNumber", mobileNumber)
+                                                }
+                                                startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
+                                            }
                                             else -> processSwipeCardWithPINorWithoutPIN(
                                                 isPin, cardProcessedDataModal
                                             )
@@ -351,10 +274,15 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                                 else {
                                     when (cardProcessedDataModal.getTransType()) {
-                                        TransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(
-                                            isPin,
-                                            cardProcessedDataModal
-                                        )
+                                        TransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
+                                        TransactionType.EMI_SALE.type -> {
+                                            val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                                putExtra("cardProcessedData", globalCardProcessedModel)
+                                                putExtra("transactionType", globalCardProcessedModel.getTransType())
+                                                putExtra("mobileNumber", mobileNumber)
+                                            }
+                                            startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
+                                        }
                                         else -> processSwipeCardWithPINorWithoutPIN(
                                             isPin, cardProcessedDataModal
                                         )
@@ -414,6 +342,83 @@ class TransactionActivity : BaseActivityNew() {
             else -> {
 
             }
+        }
+    }
+
+    // Process Swipe card with or without PIN .
+    fun processSwipeCardWithPINorWithoutPIN(ispin: Boolean, cardProcessedDataModal: CardProcessedDataModal) {
+        if (ispin) {
+            val panBlock: String? = cardProcessedDataModal.getPanNumberData()
+            val param = Bundle()
+            param.putByteArray(PinpadData.PIN_LIMIT, byteArrayOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+
+            val listener: OnPinEntryListener = object : OnPinEntryListener.Stub() {
+                override fun onInput(arg0: Int, arg1: Int) {}
+                override fun onConfirm(data: ByteArray, arg1: Boolean) {
+                    System.out.println("PinBlock is"+ byte2HexStr(data))
+                    Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
+
+                    respondCVMResult(1.toByte())
+
+                    when (cardProcessedDataModal.getReadCardType()) {
+                        DetectCardType.EMV_CARD_TYPE -> {
+                            if (cardProcessedDataModal.getIsOnline() == 1) {
+                                cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+                                //insert with pin
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
+                            } else {
+                                cardProcessedDataModal.setGeneratePinBlock("")
+                                //off line pin
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
+                            }
+                        }
+                        DetectCardType.CONTACT_LESS_CARD_TYPE -> {
+                            if (cardProcessedDataModal.getIsOnline() == 1) {
+                                cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
+                            } else {
+                                cardProcessedDataModal.setGeneratePinBlock("")
+                                //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
+                            }
+                        }
+                        DetectCardType.MAG_CARD_TYPE -> {
+                            //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
+                            // cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+
+                            if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
+                            else
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+                            cardProcessedDataModal.setApplicationPanSequenceValue("00")
+                        }
+
+                        else -> {
+                        }
+                    }
+
+
+                    emvProcessNext(cardProcessedDataModal)
+                }
+
+                override fun onCancel() {
+                    respondCVMResult(0.toByte())
+                }
+
+                override fun onError(error: Int) {
+                    respondCVMResult(2.toByte())
+                }
+            }
+            println("=> onCardHolderVerify | onlinpin")
+            param.putByteArray(PinpadData.PAN_BLOCK, panBlock?.str2ByteArr())
+            DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+
+        }else{
+            if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
+            else
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+            cardProcessedDataModal.setApplicationPanSequenceValue("00")
+            emvProcessNext(cardProcessedDataModal)
         }
     }
 
@@ -504,9 +509,9 @@ class TransactionActivity : BaseActivityNew() {
 
                 //region===============Check Transaction Type and Perform Action Accordingly:-
                 if (cardProcessedData.getReadCardType() == DetectCardType.MAG_CARD_TYPE && cardProcessedData.getTransType() != TransactionType.TEST_EMI.type) {
-                    /*val isPin = cardProcessedData.getIsOnline() == 1
+                    val isPin = cardProcessedData.getIsOnline() == 1
                     cardProcessedData.setProcessingCode(transactionProcessingCode)
-                    processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedData)*/
+                    processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedData)
                 } else {
                     if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
                         //VFService.showToast("Connect to BH_HOST1...")
@@ -598,9 +603,9 @@ class TransactionActivity : BaseActivityNew() {
 
                 //region===============Check Transaction Type and Perform Action Accordingly:-
                 if (cardProcessedData.getReadCardType() == DetectCardType.MAG_CARD_TYPE && cardProcessedData.getTransType() != TransactionType.TEST_EMI.type) {
-                    /*val isPin = cardProcessedData.getIsOnline() == 1
+                    val isPin = cardProcessedData.getIsOnline() == 1
                     cardProcessedData.setProcessingCode(transactionProcessingCode)
-                    processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedData)*/
+                    processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedData)
                 } else {
                     if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
                         //VFService.showToast("Connect to BH_HOST1...")
