@@ -791,7 +791,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             brandEMIDataModal.productID = brandEmiProductData?.productID
             brandEMIDataModal.imeiORserailNum = imeiOrSerialNum
 
-            intent.putExtra("brandEMIData", testEmiTxnType)
+            intent.putExtra("brandEMIData", brandEMIDataModal)
 
         }
         if(eDashBoardItem== EDashboardItem.BANK_EMI){
