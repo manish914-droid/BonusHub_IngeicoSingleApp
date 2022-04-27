@@ -11,6 +11,9 @@ import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
+import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
+import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
+import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
@@ -28,8 +31,14 @@ import java.util.*
 import javax.inject.Inject
 
 class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
+                                                     private var bankEmiSchemeData: BankEMITenureDataModal?,
+                                                     private var bankEmiTandCData: BankEMIIssuerTAndCDataModal?,
+                                                     private var brandEMIData: BrandEMIDataModal?,
                                                      private var cardProcessedData: CardProcessedDataModal,
                                                      private var batchdata:BatchTable?) : ITransactionPacketExchangeNew {
+
+    // bankEmiTandCData =  emiTAndCData
+    // bankEmiSchemeData =  emiSelectedData
 
     //Below method is used to create Transaction Packet in all cases:-
     // this method call two times. 1st when create a object. 2nd when call method to get IsoDataWriter object.
@@ -124,8 +133,52 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                     2
                 ) //cardDataTable.getA//"00"
 
-            val indicator =
-                "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"//used for visa// used for ruppay//"0|54|2|00"
+            var indicator = ""
+                //"$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"//used for visa// used for ruppay//"0|54|2|00"
+
+            when (cardProcessedData.getTransType()) {
+                TransactionType.EMI_SALE.type -> {
+                    indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
+                            "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
+                            "${bankEmiTandCData?.issuerID}," +
+                            "${bankEmiTandCData?.emiSchemeID},1,0,${cardProcessedData.getEmiTransactionAmount()}," +
+                            "${bankEmiSchemeData?.discountAmount},${bankEmiSchemeData?.loanAmount},${bankEmiSchemeData?.tenure}," +
+                            "${bankEmiSchemeData?.tenureInterestRate},${bankEmiSchemeData?.emiAmount},${bankEmiSchemeData?.cashBackAmount}," +
+                            "${bankEmiSchemeData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                            ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${bankEmiSchemeData?.processingFee},${bankEmiSchemeData?.processingRate}," +
+                            "${bankEmiSchemeData?.totalProcessingFee},,${bankEmiSchemeData?.instantDiscount}"
+
+                }
+/*0|46|1|00,460133,54,135,25,586,650000,0,635960,3,1300,216596,14040,635748,12,8,,8287305603,,0,0,0,0,,*/
+                TransactionType.BRAND_EMI.type -> {
+                    var imeiOrSerialNo:String?=null
+                    if(brandEMIData?.imeiORserailNum !="" ){
+                        imeiOrSerialNo=brandEMIData?.imeiORserailNum
+                    }
+
+                    indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
+                            "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
+                            "${bankEmiTandCData?.issuerID},${bankEmiTandCData?.emiSchemeID},${brandEMIData?.brandID}," +
+                            "${brandEMIData?.productID},${cardProcessedData.getEmiTransactionAmount()}," +
+                            "${bankEmiSchemeData?.discountAmount},${bankEmiSchemeData?.loanAmount},${bankEmiSchemeData?.tenure}," +
+                            "${bankEmiSchemeData?.tenureInterestRate},${bankEmiSchemeData?.emiAmount},${bankEmiSchemeData?.cashBackAmount}," +
+                            "${bankEmiSchemeData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
+                            "${imeiOrSerialNo ?: ""},,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${bankEmiSchemeData?.processingFee},${bankEmiSchemeData?.processingRate}," +
+                            "${bankEmiSchemeData?.totalProcessingFee},,${bankEmiSchemeData?.instantDiscount}"
+
+                }
+/*                0|43|1|00,438628,54,142,11,2358,1000000,0,1000000,3,1300,340581,0,1041743,,abcdxyz,,,,0,0,200.0,20000,42942319,
+                  0|60|5|00,60832632,52,144,11,2356,800000,18320,781680,3,1400,266663,0,815623,,12qw3e,,,,0,0,200.0,15634,52429840,*/
+
+                else -> {
+                    indicator = if( cardProcessedData.getTransType()==TransactionType.TEST_EMI.type ){
+                        logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
+                        "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
+                    }else
+                        "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"
+                }
+            }
+
             addFieldByHex(58, indicator)
 
             Log.d("SALE Indicator:- ", indicator.toString())
@@ -165,8 +218,15 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                     version  + pcNumbers
             val customerID = issuerParameterTable?.customerIdentifierFiledType?.let { addPad(it, "0", 2) } ?: 0
             //val customerID = HexStringConverter.addPreFixer(issuerParameterTable?.customerIdentifierFiledType, 2)
-            val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
-            //val walletIssuerID = HexStringConverter.addPreFixer(issuerParameterTable?.issuerId, 2)
+            //val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
+
+            val walletIssuerID = if (cardProcessedData.getTransType() == TransactionType.EMI_SALE.type || cardProcessedData.getTransType() == TransactionType.BRAND_EMI.type) {
+                bankEmiTandCData?.issuerID?.let { addPad(it, "0", 2) } ?: 0
+            }
+            else {
+                issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
+            }
+
             addFieldByHex(61, addPad(DeviceHelper.getDeviceSerialNo() ?: "", " ", 15, false)  + AppPreference.getBankCode() + customerID + walletIssuerID + data)
 
             //adding field 62

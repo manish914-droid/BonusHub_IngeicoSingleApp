@@ -93,6 +93,10 @@ class TransactionActivity : BaseActivityNew() {
     private var emiSelectedData: BankEMITenureDataModal? = null // BankEMIDataModal
     private var emiTAndCData: BankEMIIssuerTAndCDataModal? = null
 
+    private val brandEMIData by lazy {
+        intent.getSerializableExtra("brandEMIData") as BrandEMIDataModal?
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
@@ -493,7 +497,7 @@ class TransactionActivity : BaseActivityNew() {
                         binding?.baseAmtTv?.text = baseAmountValue*/
                     } else {
                         val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
-                        emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+baseAmountValue
+                        emvBinding?.baseAmtTv?.text = baseAmountValue
                     }
                 }
 
@@ -587,7 +591,7 @@ class TransactionActivity : BaseActivityNew() {
                         binding?.baseAmtTv?.text = baseAmountValue*/
                     } else {
                         val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
-                        emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+baseAmountValue
+                        emvBinding?.baseAmtTv?.text = baseAmountValue
                     }
                 }
 
@@ -729,7 +733,7 @@ class TransactionActivity : BaseActivityNew() {
 
     // Creating transaction packet and
     private fun emvProcessNext(cardProcessedData: CardProcessedDataModal) {
-        val transactionISO = CreateTransactionPacketNew(appDao,cardProcessedData,BatchTable()).createTransactionPacketNew()
+        val transactionISO = CreateTransactionPacketNew(appDao,emiSelectedData,emiTAndCData,brandEMIData,cardProcessedData,BatchTable()).createTransactionPacketNew()
         cardProcessedData.indicatorF58 = transactionISO.additionalData["indicatorF58"] ?: ""
 
         // logger("Transaction REQUEST PACKET --->>", transactionISO.isoMap, "e")

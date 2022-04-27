@@ -83,6 +83,7 @@ import android.view.Gravity
 
 import android.os.Build
 import com.bonushub.crdb.india.model.local.*
+import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -784,6 +785,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         var txnType= BhTransactionType.NONE.type
         if(eDashBoardItem== EDashboardItem.BRAND_EMI){
             txnType=   BhTransactionType.BRAND_EMI.type
+
+            var brandEMIDataModal = BrandEMIDataModal()
+            brandEMIDataModal.brandID = brandDataMaster?.brandID
+            brandEMIDataModal.productID = brandEmiProductData?.productID
+            brandEMIDataModal.imeiORserailNum = imeiOrSerialNum
+
+            intent.putExtra("brandEMIData", testEmiTxnType)
+
         }
         if(eDashBoardItem== EDashboardItem.BANK_EMI){
             txnType=   BhTransactionType.EMI_SALE.type
