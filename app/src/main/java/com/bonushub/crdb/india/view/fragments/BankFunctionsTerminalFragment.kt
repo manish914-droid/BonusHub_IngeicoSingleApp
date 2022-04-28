@@ -271,6 +271,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
                     CoroutineScope(Dispatchers.IO).launch{
                         Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
+                            iDialog?.hideProgress()
 
                             lifecycleScope.launch(Dispatchers.IO)
                             {
@@ -285,19 +286,27 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                                             Log.e("F56->>", responsef57)
                                             //  if (responsF57List[4] == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
                                             val tpt1 = Field48ResponseTimestamp.getTptData()
-                                            tpt1?.digiPosResponseType = responsF57List[0].toString()
-                                            tpt1?.digiPosStatus = responsF57List[1].toString()
-                                            tpt1?.digiPosStatusMessage =
-                                                responsF57List[2].toString()
-                                            tpt1?.digiPosStatusCode = responsF57List[3].toString()
-                                            tpt1?.digiPosTerminalStatus  = responsF57List[4].toString()
-                                            tpt1?.digiPosBQRStatus = responsF57List[5].toString()
-                                            tpt1?.digiPosUPIStatus =  responsF57List[6].toString()
-                                            tpt1?.digiPosSMSpayStatus = responsF57List[7].toString()
-                                            tpt1?.digiPosStaticQrDownloadRequired =
-                                                responsF57List[8].toString()
-                                            tpt1?.digiPosCardCallBackRequired =
-                                                responsF57List[9].toString()
+
+                                            try{
+                                                if(responsF57List.size > 1){
+                                                    tpt1?.digiPosResponseType = responsF57List[0].toString()
+                                                    tpt1?.digiPosStatus = responsF57List[1].toString()
+                                                    tpt1?.digiPosStatusMessage =
+                                                        responsF57List[2].toString()
+                                                    tpt1?.digiPosStatusCode = responsF57List[3].toString()
+                                                    tpt1?.digiPosTerminalStatus  = responsF57List[4].toString()
+                                                    tpt1?.digiPosBQRStatus = responsF57List[5].toString()
+                                                    tpt1?.digiPosUPIStatus =  responsF57List[6].toString()
+                                                    tpt1?.digiPosSMSpayStatus = responsF57List[7].toString()
+                                                    tpt1?.digiPosStaticQrDownloadRequired =
+                                                        responsF57List[8].toString()
+                                                    tpt1?.digiPosCardCallBackRequired =
+                                                        responsF57List[9].toString()
+                                                }
+                                            }catch (ex:Exception){
+
+                                            }
+
 
                                             if ((tpt1?.digiPosTerminalStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) && (tpt1?.digiPosUPIStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
                                                         || tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
