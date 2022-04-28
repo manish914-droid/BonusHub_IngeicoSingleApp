@@ -60,7 +60,7 @@ class TransactionActivity : BaseActivityNew() {
     private var emvBinding: ActivityEmvBinding? = null
 
     private val transactionProcessingCode by lazy {
-        intent.getStringExtra("proc_code") ?: "92001"
+        intent.getStringExtra("proc_code") ?: "920001"
     } //Just for checking purpose
 
     private var defaultScope = CoroutineScope(Dispatchers.Default)
@@ -749,9 +749,9 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     private fun checkReversal(transactionISOByteArray: IsoDataWriter, cardProcessedDataModal: CardProcessedDataModal) {
-        runOnUiThread {
+        //runOnUiThread {
            // cardView_l.visibility = View.GONE
-        }
+        //}
         // If case Sale data sync to server
         Log.e("1REVERSAL obj ->",""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
         println(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
@@ -782,7 +782,7 @@ class TransactionActivity : BaseActivityNew() {
                             printExtraData,
                             autoSettlementCheck
                         ) { stubbedData ->
-                            /*if (cardProcessedDataModal.getTransType() == TransactionType.EMI_SALE.type ||
+                            if (cardProcessedDataModal.getTransType() == TransactionType.EMI_SALE.type ||
                                 cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI.type ||
                                 cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type ||
                                 cardProcessedDataModal.getTransType() == TransactionType.FLEXI_PAY.type ||
@@ -790,92 +790,101 @@ class TransactionActivity : BaseActivityNew() {
 
                             ) {
 
-                                stubEMI(stubbedData, emiSelectedData, emiTAndCData, brandEMIAccessData,flexiPayemiSelectedData) { data ->
+                                stubEMI(stubbedData, emiSelectedData, emiTAndCData/*, brandEMIAccessData*/) { data ->
                                     Log.d("StubbedEMIData:- ", data.toString())
 
-                                    modal=  saveBrandEMIDataToDB(brandEMIData, data.hostInvoice,data.hostTID)
-                                    saveBrandEMIbyCodeDataInDB(
-                                        brandEMIAccessData,
-                                        data.hostInvoice,data.hostTID
-                                    )
-                                    val modal2=runBlocking(Dispatchers.IO) {
-                                        BrandEMIDataTable.getBrandEMIDataByInvoiceAndTid(data.hostInvoice,data.hostTID)
-                                    }
-                                    if (modal2 != null) {
-                                        modal=modal2
-                                    }
+                                    printAndSaveBatchDataInDB(stubbedData){
 
-                                    printSaveSaleEmiDataInBatch(data) { printCB ->
-                                        if (!printCB) {
-                                            Log.e("EMI FIRST ", "COMMENT ******")
-                                            // Here we are Syncing Txn CallBack to server
-                                            if(tpt?.digiPosCardCallBackRequired=="1") {
-                                                lifecycleScope.launch(Dispatchers.IO) {
-                                                    withContext(Dispatchers.Main) {
-                                                        showProgress(
-                                                            getString(
-                                                                R.string.txn_syn
-                                                            )
-                                                        )
-                                                    }
-
-                                                    val amount = MoneyUtil.fen2yuan(
-                                                        stubbedData.totalAmmount.toDouble()
-                                                            .toLong()
-                                                    )
-                                                    val txnCbReqData = TxnCallBackRequestTable()
-                                                    txnCbReqData.reqtype =
-                                                        EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
-                                                    txnCbReqData.tid = stubbedData.hostTID
-                                                    txnCbReqData.batchnum =
-                                                        stubbedData.hostBatchNumber
-                                                    txnCbReqData.roc = stubbedData.hostRoc
-                                                    txnCbReqData.amount = amount
-
-                                                    txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
-                                                    txnCbReqData.txnTime = stubbedData.time
-                                                    txnCbReqData.txnDate = stubbedData.transactionDate
-                                                    TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
-                                                        txnCbReqData
-                                                    )
-                                                    syncTxnCallBackToHost {
-                                                        Log.e(
-                                                            "TXN CB ",
-                                                            "SYNCED TO SERVER  --> $it"
-                                                        )
-                                                        hideProgress()
-                                                    }
-                                                    Log.e("EMI LAST", "COMMENT ******")
-
-                                                    //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
-                                                    //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
-
-                                                    if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                        withContext(Dispatchers.Main) {
-                                                            syncOfflineSaleAndAskAutoSettlement(
-                                                                autoSettlementCheck.substring(
-                                                                    0,
-                                                                    1
-                                                                )
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            else{
-                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                    GlobalScope.launch(Dispatchers.Main) {
-                                                        syncOfflineSaleAndAskAutoSettlement(
-                                                            autoSettlementCheck.substring(0, 1)
-                                                        )
-                                                    }
-                                                }
-                                            }
+                                        if(it){
+                                            AppPreference.saveLastReceiptDetails(stubbedData)
+                                            Log.e("EMI ", "COMMENT ******")
+                                            goToDashBoard()
                                         }
                                     }
+
+//                                    modal=  saveBrandEMIDataToDB(brandEMIData, data.hostInvoice,data.hostTID)
+//                                    saveBrandEMIbyCodeDataInDB(
+//                                        brandEMIAccessData,
+//                                        data.hostInvoice,data.hostTID
+//                                    )
+//                                    val modal2=runBlocking(Dispatchers.IO) {
+//                                        BrandEMIDataTable.getBrandEMIDataByInvoiceAndTid(data.hostInvoice,data.hostTID)
+//                                    }
+//                                    if (modal2 != null) {
+//                                        modal=modal2
+//                                    }
+//
+//                                    printSaveSaleEmiDataInBatch(data) { printCB ->
+//                                        if (!printCB) {
+//                                            Log.e("EMI FIRST ", "COMMENT ******")
+//                                            // Here we are Syncing Txn CallBack to server
+//                                            if(tpt?.digiPosCardCallBackRequired=="1") {
+//                                                lifecycleScope.launch(Dispatchers.IO) {
+//                                                    withContext(Dispatchers.Main) {
+//                                                        showProgress(
+//                                                            getString(
+//                                                                R.string.txn_syn
+//                                                            )
+//                                                        )
+//                                                    }
+//
+//                                                    val amount = MoneyUtil.fen2yuan(
+//                                                        stubbedData.totalAmmount.toDouble()
+//                                                            .toLong()
+//                                                    )
+//                                                    val txnCbReqData = TxnCallBackRequestTable()
+//                                                    txnCbReqData.reqtype =
+//                                                        EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+//                                                    txnCbReqData.tid = stubbedData.hostTID
+//                                                    txnCbReqData.batchnum =
+//                                                        stubbedData.hostBatchNumber
+//                                                    txnCbReqData.roc = stubbedData.hostRoc
+//                                                    txnCbReqData.amount = amount
+//
+//                                                    txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
+//                                                    txnCbReqData.txnTime = stubbedData.time
+//                                                    txnCbReqData.txnDate = stubbedData.transactionDate
+//                                                    TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
+//                                                        txnCbReqData
+//                                                    )
+//                                                    syncTxnCallBackToHost {
+//                                                        Log.e(
+//                                                            "TXN CB ",
+//                                                            "SYNCED TO SERVER  --> $it"
+//                                                        )
+//                                                        hideProgress()
+//                                                    }
+//                                                    Log.e("EMI LAST", "COMMENT ******")
+//
+//                                                    //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
+//                                                    //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+//
+//                                                    if (!TextUtils.isEmpty(autoSettlementCheck)) {
+//                                                        withContext(Dispatchers.Main) {
+//                                                            syncOfflineSaleAndAskAutoSettlement(
+//                                                                autoSettlementCheck.substring(
+//                                                                    0,
+//                                                                    1
+//                                                                )
+//                                                            )
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                            else{
+//                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
+//                                                    GlobalScope.launch(Dispatchers.Main) {
+//                                                        syncOfflineSaleAndAskAutoSettlement(
+//                                                            autoSettlementCheck.substring(0, 1)
+//                                                        )
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    }
                                 }
                             }
-                            else {*/
+                            else {
                                 printAndSaveBatchDataInDB(stubbedData) { printCB ->
                                     if (printCB) {
                                         AppPreference.saveLastReceiptDetails(stubbedData)
@@ -939,7 +948,7 @@ class TransactionActivity : BaseActivityNew() {
                                         }*/
                                     }
                                 }
-                          //  }
+                            }
 
 
                         }

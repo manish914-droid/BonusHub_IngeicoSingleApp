@@ -8,6 +8,8 @@ import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchFileDataTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
+import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
+import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getCardDataTable
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
@@ -52,8 +54,8 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         batchFileData.transactionType = transactionType
       //  batchFileData.ecrTxnSaleRequestId= ecrDataModal?.txnSaleRequestId.toString() // no need  // kushal
 
-//        batchFileData.emiTransactionAmount =
-//            (cardProcessedDataModal.getEmiTransactionAmount() ?: 0L).toString() // no need // kushal
+        batchFileData.emiTransactionAmount =
+            (cardProcessedDataModal.getEmiTransactionAmount() ?: 0L).toString() // no need // kushal
         batchFileData.nii = Nii.DEFAULT.nii
         batchFileData.applicationPanSequenceNumber =
             cardProcessedDataModal.getApplicationPanSequenceValue() ?: ""
@@ -332,68 +334,67 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
 }
 
 // Here We are stubbing emi data into batch record and save it in BatchFile.
-/*
 fun stubEMI(
-    batchData: BatchFileDataTable,
-    emiCustomerDetails: BankEMIDataModal?,
-    emiIssuerTAndCData: BankEMIIssuerTAndCDataModal?, brandEMIByAccessCodeData: BrandEMIAccessDataModal?, flexiPayemiSelectedData: FlexiPayData?,
-    batchStubCallback: (BatchFileDataTable) -> Unit
+    batchData: TempBatchFileDataTable,
+    emiCustomerDetails: BankEMITenureDataModal?,
+    emiIssuerTAndCData: BankEMIIssuerTAndCDataModal?,/* brandEMIByAccessCodeData: BrandEMIAccessDataModal?,*/
+    batchStubCallback: (TempBatchFileDataTable) -> Unit
 ) {
     GlobalScope.launch(Dispatchers.IO) {
         //For emi find the details from EMI
         if (batchData.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
-
-            // val brandEMIByAccessCodeData = BrandEMIAccessDataModalTable.getBrandEMIByAccessCodeData()
-            if(brandEMIByAccessCodeData!=null) {
-                withContext(Dispatchers.Main) {
-                    batchData.tenure = brandEMIByAccessCodeData.tenure
-                    batchData.issuerId = brandEMIByAccessCodeData.issuerID
-                    batchData.emiSchemeId = brandEMIByAccessCodeData.emiSchemeID
-                    batchData.issuerName = brandEMIByAccessCodeData.issuerName
-                    batchData.bankEmiTAndC = brandEMIByAccessCodeData.schemeTAndC
-                    batchData.tenureTAndC = brandEMIByAccessCodeData.schemeTenureTAndC
-                    batchData.tenureWiseDBDTAndC = brandEMIByAccessCodeData.schemeDBDTAndC
-                    batchData.discountCalculatedValue =
-                        brandEMIByAccessCodeData.discountCalculatedValue
-                    batchData.cashBackCalculatedValue =
-                        brandEMIByAccessCodeData.cashBackCalculatedValue
-                    batchData.transactionAmt = brandEMIByAccessCodeData.transactionAmount
-                    batchData.cashDiscountAmt = brandEMIByAccessCodeData.discountAmount
-                    batchData.loanAmt = brandEMIByAccessCodeData.loanAmount
-                    batchData.roi = brandEMIByAccessCodeData.interestAmount
-                    batchData.monthlyEmi = brandEMIByAccessCodeData.emiAmount
-                    batchData.cashback = brandEMIByAccessCodeData.cashBackAmount
-                    batchData.netPay = brandEMIByAccessCodeData.netPayAmount
-                    batchData.processingFee = brandEMIByAccessCodeData.processingFee
-                    batchData.processingFeeRate=brandEMIByAccessCodeData.processingFeeRate
-                    batchData.totalProcessingFee = brandEMIByAccessCodeData.totalProcessingFee
-                    batchData.totalInterest = brandEMIByAccessCodeData.totalInterest
-                    batchData.emiTransactionAmount = brandEMIByAccessCodeData.transactionAmount
-                    batchData.transactionalAmmount = brandEMIByAccessCodeData.transactionAmount
-                    batchData.baseAmmount = brandEMIByAccessCodeData.transactionAmount
-                    batchData.totalAmmount = brandEMIByAccessCodeData.transactionAmount
-                    batchData.orignalTxnAmt=brandEMIByAccessCodeData.orignalTxnAmt
-
-                    batchData.instantDiscount=brandEMIByAccessCodeData.instaDiscount
-
-                    batchData.tenureLabel=brandEMIByAccessCodeData.tenureLabel
-                    batchData.tid=brandEMIByAccessCodeData.txnTID
-                }
-            }
+//
+//            // val brandEMIByAccessCodeData = BrandEMIAccessDataModalTable.getBrandEMIByAccessCodeData()
+//            if(brandEMIByAccessCodeData!=null) {
+//                withContext(Dispatchers.Main) {
+//                    batchData.tenure = brandEMIByAccessCodeData.tenure
+//                    batchData.issuerId = brandEMIByAccessCodeData.issuerID
+//                    batchData.emiSchemeId = brandEMIByAccessCodeData.emiSchemeID
+//                    batchData.issuerName = brandEMIByAccessCodeData.issuerName
+//                    batchData.bankEmiTAndC = brandEMIByAccessCodeData.schemeTAndC
+//                    batchData.tenureTAndC = brandEMIByAccessCodeData.schemeTenureTAndC
+//                    batchData.tenureWiseDBDTAndC = brandEMIByAccessCodeData.schemeDBDTAndC
+//                    batchData.discountCalculatedValue =
+//                        brandEMIByAccessCodeData.discountCalculatedValue
+//                    batchData.cashBackCalculatedValue =
+//                        brandEMIByAccessCodeData.cashBackCalculatedValue
+//                    batchData.transactionAmt = brandEMIByAccessCodeData.transactionAmount
+//                    batchData.cashDiscountAmt = brandEMIByAccessCodeData.discountAmount
+//                    batchData.loanAmt = brandEMIByAccessCodeData.loanAmount
+//                    batchData.roi = brandEMIByAccessCodeData.interestAmount
+//                    batchData.monthlyEmi = brandEMIByAccessCodeData.emiAmount
+//                    batchData.cashback = brandEMIByAccessCodeData.cashBackAmount
+//                    batchData.netPay = brandEMIByAccessCodeData.netPayAmount
+//                    batchData.processingFee = brandEMIByAccessCodeData.processingFee
+//                    batchData.processingFeeRate=brandEMIByAccessCodeData.processingFeeRate
+//                    batchData.totalProcessingFee = brandEMIByAccessCodeData.totalProcessingFee
+//                    batchData.totalInterest = brandEMIByAccessCodeData.totalInterest
+//                    batchData.emiTransactionAmount = brandEMIByAccessCodeData.transactionAmount
+//                    batchData.transactionalAmmount = brandEMIByAccessCodeData.transactionAmount
+//                    batchData.baseAmmount = brandEMIByAccessCodeData.transactionAmount
+//                    batchData.totalAmmount = brandEMIByAccessCodeData.transactionAmount
+//                    batchData.orignalTxnAmt=brandEMIByAccessCodeData.orignalTxnAmt
+//
+//                    batchData.instantDiscount=brandEMIByAccessCodeData.instaDiscount
+//
+//                    batchData.tenureLabel=brandEMIByAccessCodeData.tenureLabel
+//                    batchData.tid=brandEMIByAccessCodeData.txnTID
+//                }
+//            }
 
         } else if(batchData.transactionType == TransactionType.FLEXI_PAY.type){
-            batchData.tenure = flexiPayemiSelectedData?.tenureMenu.toString()
-            batchData.emiSchemeId = flexiPayemiSelectedData?.schemeCode.toString()
-            batchData.emiTransactionAmount = flexiPayemiSelectedData?.originalTransactionAmount.toString()
-            batchData.tenureTAndC = flexiPayemiSelectedData?.tnCsHeader.toString()
-            batchData.tenureWiseDBDTAndC = flexiPayemiSelectedData?.tnCsFooter.toString()
-            batchData.loanAmt = flexiPayemiSelectedData?.loanAmount.toString()
-            batchData.roi = flexiPayemiSelectedData?.tenureROI.toString()
-            batchData.monthlyEmi = flexiPayemiSelectedData?.interestPerMonth.toString()
-                    batchData.totalAmmount = flexiPayemiSelectedData?.tenureMessage.toString()
-            // batchData.netPay = flexiPayemiSelectedData?.originalTransactionAmount.toString()
-            batchData.totalInterest = flexiPayemiSelectedData?.totalInterest.toString()
-            batchData.transactionAmt=flexiPayemiSelectedData?.baseTransactionAmt.toString()
+//            batchData.tenure = flexiPayemiSelectedData?.tenureMenu.toString()
+//            batchData.emiSchemeId = flexiPayemiSelectedData?.schemeCode.toString()
+//            batchData.emiTransactionAmount = flexiPayemiSelectedData?.originalTransactionAmount.toString()
+//            batchData.tenureTAndC = flexiPayemiSelectedData?.tnCsHeader.toString()
+//            batchData.tenureWiseDBDTAndC = flexiPayemiSelectedData?.tnCsFooter.toString()
+//            batchData.loanAmt = flexiPayemiSelectedData?.loanAmount.toString()
+//            batchData.roi = flexiPayemiSelectedData?.tenureROI.toString()
+//            batchData.monthlyEmi = flexiPayemiSelectedData?.interestPerMonth.toString()
+//                    batchData.totalAmmount = flexiPayemiSelectedData?.tenureMessage.toString()
+//            // batchData.netPay = flexiPayemiSelectedData?.originalTransactionAmount.toString()
+//            batchData.totalInterest = flexiPayemiSelectedData?.totalInterest.toString()
+//            batchData.transactionAmt=flexiPayemiSelectedData?.baseTransactionAmt.toString()
         }
         else
         {
@@ -428,4 +429,4 @@ fun stubEMI(
         AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, lastSuccessReceiptData)
         batchStubCallback(batchData)
     }
-}*/
+}

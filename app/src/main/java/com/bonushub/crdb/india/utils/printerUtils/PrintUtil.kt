@@ -64,7 +64,7 @@ class PrintUtil(context: Context?) {
     private var _issuerName: String? = null
     private var copyType: String? = null
     private var _issuerNameString = "ISSUER"
-    private var isNoEmiOnlyCashBackApplied: Boolean? = null
+    private var isNoEmiOnlyCashBackApplied: Boolean? = false
     private val bankEMIFooterTAndCSeparator = "~!emi~~brd~~!brd~~iss~"
     var nextLineAppendStr = ""
     init {
@@ -273,10 +273,10 @@ class PrintUtil(context: Context?) {
                     BhTransactionType.SALE.type, BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type -> {
                         saleTransaction(batchTable)
                     }
-                    BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
-                        printEMISale(batchTable)
-
-                   }
+//                    BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
+//                        printEMISale(batchTable)
+//
+//                   }
 
                     BhTransactionType.REVERSAL.type -> {
                         val amt = (((receiptDetail.txnAmount)?.toLong())?.div(100)).toString()
@@ -298,17 +298,17 @@ class PrintUtil(context: Context?) {
                 }
                 printSeperator()
                 //region=====================BRAND TAndC===============
-                if (batchTable.transactionType == BhTransactionType.EMI_SALE.type ||batchTable.transactionType == BhTransactionType.TEST_EMI.type||batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
+                /*if (batchTable.transactionType == BhTransactionType.EMI_SALE.type ||batchTable.transactionType == BhTransactionType.TEST_EMI.type||batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
                     if(!isNoEmiOnlyCashBackApplied)
                     printBrandTnC(batchTable)
 
-                }
+                }*/
                 //region=====================BRAND PRODUACT DATA===============
-                if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
+                /*if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
                     printProduactData(batchTable)
                     printSeperator()
                     baseAmounthandling(batchTable)
-                }
+                }*/
 
                 printer?.setAscScale(ASCScale.SC1x2)
                 printer?.setAscSize(ASCSize.DOT16x8)
@@ -582,8 +582,8 @@ class PrintUtil(context: Context?) {
                         )
                     )
                 printer?.addMixStyleText(textBlockList)
-                textBlockList.clear()
-                val isNoEmiOnlyCashBackAppl : Boolean =  bankEMITenureDataModal?.tenure=="1"*/
+                textBlockList.clear()*/
+                val isNoEmiOnlyCashBackAppl : Boolean =  batchTable?.tenure=="1"
 
                 if (isReversal) {
                     sigleLineText("TRANSACTION FAILED", AlignMode.CENTER)
@@ -695,6 +695,10 @@ class PrintUtil(context: Context?) {
                     BhTransactionType.SALE.type, BhTransactionType.CASH_AT_POS.type, BhTransactionType.SALE_WITH_CASH.type -> {
                         saleTransaction(batchTable)
                     }
+                    BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
+                        printEMISale(batchTable)
+
+                    }
                     BhTransactionType.REVERSAL.type -> {
                         val amt = (((batchTable.baseAmmount)?.toLong())?.div(100)).toString()
                         textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
@@ -713,19 +717,14 @@ class PrintUtil(context: Context?) {
 
                     }
 
-                   /* BhTransactionType.EMI_SALE.type , BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
-                        printEMISale(batchTable)
-
-                   }
-                    */
-                }
+                                   }
                 printSeperator()
                 //region=====================BRAND TAndC===============
-                /*if (batchTable.transactionType == BhTransactionType.EMI_SALE.type ||batchTable.transactionType == BhTransactionType.TEST_EMI.type||batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
-                    if(!isNoEmiOnlyCashBackApplied)
+                if (batchTable.transactionType == BhTransactionType.EMI_SALE.type ||batchTable.transactionType == BhTransactionType.TEST_EMI.type||batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
+                    if(!isNoEmiOnlyCashBackApplied!!)
                     printBrandTnC(batchTable)
 
-                }*/
+                }
                 //region=====================BRAND PRODUACT DATA===============
                 /*if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
                     printProduactData(batchTable)
@@ -1339,20 +1338,20 @@ class PrintUtil(context: Context?) {
         textBlockList.clear()
     }
 
-    private fun printEMISale(batchTable: BatchTable) {
+    private fun printEMISale(batchTable: TempBatchFileDataTable) {
         var currencySymbol: String? = "Rs"
         val terminalData = getTptData()
         currencySymbol = terminalData?.currencySymbol
-        val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
-        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
-        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
-        val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
-        val isNoEmiOnlyCashBackApplied : Boolean =  bankEMITenureDataModal?.tenure=="1"
+//        val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
+//        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
+//        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
+        val issuerId = batchTable?.issuerId
+        val isNoEmiOnlyCashBackApplied : Boolean =  batchTable?.tenure=="1"
        if(!isNoEmiOnlyCashBackApplied) {
            textBlockList.add(sigleLineformat("TXN AMOUNT", AlignMode.LEFT))
 
            //   val txnAmount = (((bankEMITenureDataModal?.transactionAmount)?.toLong())?.div(100)).toString()
-           val txnAmount = (((batchTable.emiEnteredAmt).toDouble()).div(100)).toString()
+           var txnAmount = (((batchTable.emiTransactionAmount).toDouble()).div(100)).toString()
 
            logger("txnAmount", "" + txnAmount)
            textBlockList.add(
@@ -1364,19 +1363,19 @@ class PrintUtil(context: Context?) {
            printer?.addMixStyleText(textBlockList)
            textBlockList.clear()
 
-           logger("INSTA DISCOUNT", "  ${bankEMITenureDataModal?.instantDiscount}")
-           if (bankEMITenureDataModal?.instantDiscount?.toIntOrNull() != null) {
-               if (bankEMITenureDataModal.instantDiscount.isNotBlank() && bankEMITenureDataModal.instantDiscount.toInt() > 0) {
+           logger("INSTA DISCOUNT", "  ${batchTable?.instantDiscount}")
+           if (batchTable?.instantDiscount?.toIntOrNull() != null) {
+               if (batchTable.instantDiscount.isNotBlank() && batchTable.instantDiscount.toInt() > 0) {
                    val instantDis =
                        "%.2f".format(
-                           (((bankEMITenureDataModal.instantDiscount).toDouble()).div(
+                           (((batchTable.instantDiscount).toDouble()).div(
                                100
                            )).toString().toDouble()
                        )
 
                    textBlockList.add(sigleLineformat("INSTA DISCOUNT", AlignMode.LEFT))
                    val authAmount =
-                       (((bankEMITenureDataModal.transactionAmount)?.toLong())?.div(100)).toString()
+                       (((batchTable.transactionAmt)?.toLong())?.div(100)).toString()
                    textBlockList.add(
                        sigleLineformat(
                            "$currencySymbol:${instantDis}",
@@ -1399,7 +1398,7 @@ class PrintUtil(context: Context?) {
                )
            } else {
                val authAmount =
-                   (((bankEMITenureDataModal?.transactionAmount)?.toDouble())?.div(100)).toString()
+                   (((batchTable?.transactionAmt)?.toDouble())?.div(100)).toString()
                textBlockList.add(
                    sigleLineformat(
                        "$currencySymbol:${"%.2f".format(authAmount.toDouble())}",
@@ -1420,10 +1419,10 @@ class PrintUtil(context: Context?) {
                    )
                )
            } else {
-               if (bankEMIIssuerTAndCDataModal != null) {
+               if (batchTable != null) {
                    textBlockList.add(
                        sigleLineformat(
-                           bankEMIIssuerTAndCDataModal.issuerName,
+                           batchTable.issuerName,
                            AlignMode.RIGHT
                        )
                    )
@@ -1431,12 +1430,12 @@ class PrintUtil(context: Context?) {
            }
            printer?.addMixStyleText(textBlockList)
            textBlockList.clear()
-           val tenureDuration = "${bankEMITenureDataModal?.tenure} Months"
-           val tenureHeadingDuration = "${bankEMITenureDataModal?.tenure} Months Scheme"
-           var roi = bankEMITenureDataModal?.tenureInterestRate?.toInt()
+           val tenureDuration = "${batchTable?.tenure} Months"
+           val tenureHeadingDuration = "${batchTable?.tenure} Months Scheme"
+           var roi = batchTable?.roi?.toInt()
                ?.let { divideAmountBy100(it).toString() }
            var loanamt =
-               bankEMITenureDataModal?.loanAmount?.toInt()?.let { divideAmountBy100(it).toString() }
+               batchTable?.loanAmt?.toInt()?.let { divideAmountBy100(it).toString() }
            roi = "%.2f".format(roi?.toDouble()) + " %"
            loanamt = "%.2f".format(loanamt?.toDouble())
            textBlockList.add(sigleLineformat("ROI(pa)", AlignMode.LEFT))
@@ -1454,10 +1453,10 @@ class PrintUtil(context: Context?) {
            printer?.addMixStyleText(textBlockList)
            textBlockList.clear()
            //region===============Processing Fee Changes And Showing On ChargeSlip:-
-           if (!TextUtils.isEmpty(bankEMITenureDataModal?.processingFee)) {
-               if ((bankEMITenureDataModal?.processingFee) != "0") {
+           if (!TextUtils.isEmpty(batchTable?.processingFee)) {
+               if ((batchTable?.processingFee) != "0") {
                    val procFee = "%.2f".format(
-                       (((bankEMITenureDataModal?.processingFee)?.toDouble())?.div(100)).toString()
+                       (((batchTable?.processingFee)?.toDouble())?.div(100)).toString()
                            .toDouble()
                    )
                    textBlockList.add(sigleLineformat("PROC-FEE", AlignMode.LEFT))
@@ -1467,14 +1466,14 @@ class PrintUtil(context: Context?) {
                }
            }
 
-           if (!TextUtils.isEmpty(bankEMITenureDataModal?.processingRate)) {
+           if (!TextUtils.isEmpty(batchTable?.processingFeeRate)) {
                val procFeeAmount =
-                   bankEMITenureDataModal?.processingRate?.toFloat()?.div(100)
+                   batchTable?.processingFeeRate?.toFloat()?.div(100)
                val pfeeData: Int? = procFeeAmount?.toInt()
                if ((pfeeData.toString()) != "0") {
                    val procFeeAmount =
                        "%.2f".format(
-                           bankEMITenureDataModal?.processingRate?.toFloat()?.div(100)
+                           batchTable?.processingFeeRate?.toFloat()?.div(100)
                        ) + " %"
 
                    textBlockList.add(sigleLineformat("PROC-FEE", AlignMode.LEFT))
@@ -1489,11 +1488,11 @@ class PrintUtil(context: Context?) {
 
                }
            }
-           if (bankEMITenureDataModal != null) {
-               if (!TextUtils.isEmpty(bankEMITenureDataModal.totalProcessingFee)) {
-                   if (!(bankEMITenureDataModal.totalProcessingFee).equals("0")) {
+           if (batchTable != null) {
+               if (!TextUtils.isEmpty(batchTable.totalProcessingFee)) {
+                   if (!(batchTable.totalProcessingFee).equals("0")) {
                        val totalProcFeeAmount =
-                           "%.2f".format(bankEMITenureDataModal.totalProcessingFee.toFloat() / 100)
+                           "%.2f".format(batchTable.totalProcessingFee.toFloat() / 100)
 
                        textBlockList.add(sigleLineformat("PROC-FEE AMOUNT", AlignMode.LEFT))
                        textBlockList.add(
@@ -1511,8 +1510,8 @@ class PrintUtil(context: Context?) {
            var cashBackPercentHeadingText = ""
            var cashBackAmountHeadingText = ""
            var islongTextHeading = true
-           if (bankEMIIssuerTAndCDataModal != null) {
-               when (bankEMIIssuerTAndCDataModal.issuerID) {
+           if (batchTable != null) {
+               when (batchTable.issuerId) {
                    "51" -> {
                        cashBackPercentHeadingText = "Mfg/Mer Payback"
                        cashBackAmountHeadingText = "Mfg/Mer-"
@@ -1541,7 +1540,7 @@ class PrintUtil(context: Context?) {
                }
 
 
-               when (bankEMIIssuerTAndCDataModal.issuerID) {
+               when (batchTable.issuerId) {
                    "51", "64" -> {
                        nextLineAppendStr = "Payback Amount"
                    }
@@ -1553,12 +1552,12 @@ class PrintUtil(context: Context?) {
            }
 
            //region=============CashBack CalculatedValue====================
-           if (!TextUtils.isEmpty(bankEMITenureDataModal?.cashBackCalculatedValue)) {
+           if (!TextUtils.isEmpty(batchTable?.cashBackCalculatedValue)) {
                if (islongTextHeading) {
                    textBlockList.add(sigleLineformat(cashBackPercentHeadingText, AlignMode.LEFT))
                    textBlockList.add(
                        sigleLineformat(
-                           "$currencySymbol ${bankEMITenureDataModal?.cashBackCalculatedValue}",
+                           "$currencySymbol ${batchTable?.cashBackCalculatedValue}",
                            AlignMode.RIGHT
                        )
                    )
@@ -1568,7 +1567,7 @@ class PrintUtil(context: Context?) {
                    textBlockList.add(sigleLineformat(cashBackPercentHeadingText, AlignMode.LEFT))
                    textBlockList.add(
                        sigleLineformat(
-                           "$currencySymbol ${bankEMITenureDataModal?.cashBackCalculatedValue}",
+                           "$currencySymbol ${batchTable?.cashBackCalculatedValue}",
                            AlignMode.RIGHT
                        )
                    )
@@ -1577,9 +1576,9 @@ class PrintUtil(context: Context?) {
                }
            }
 
-           if (!TextUtils.isEmpty(bankEMITenureDataModal?.cashBackAmount) && bankEMITenureDataModal?.cashBackAmount != "0") {
+           if (!TextUtils.isEmpty(batchTable?.cashBackAmount) && batchTable?.cashBackAmount != "0") {
                val cashBackAmount = "%.2f".format(
-                   bankEMITenureDataModal?.cashBackAmount?.toFloat()
+                   batchTable?.cashBackAmount?.toFloat()
                        ?.div(100)
                )
 
@@ -1599,10 +1598,10 @@ class PrintUtil(context: Context?) {
                    printer?.addMixStyleText(textBlockList)
                    textBlockList.clear()
                } else {
-                   println("test-->${bankEMITenureDataModal?.cashBackAmount}")
-                   if (bankEMITenureDataModal?.cashBackAmount != "0" && !(bankEMITenureDataModal?.cashBackAmount.isNullOrEmpty())) {
+                   println("test-->${batchTable?.cashBackAmount}")
+                   if (batchTable?.cashBackAmount != "0" && !(batchTable?.cashBackAmount.isNullOrEmpty())) {
                        val cashBackAmount = "%.2f".format(
-                           bankEMITenureDataModal?.cashBackAmount?.toFloat()
+                           batchTable?.cashBackAmount?.toFloat()
                                ?.div(100)
                        )
 
@@ -1619,12 +1618,12 @@ class PrintUtil(context: Context?) {
                    }
                }
            }
-           println("bankid ${bankEMIIssuerTAndCDataModal?.issuerID}")
+           println("bankid ${batchTable?.issuerId}")
 
            var discountPercentHeadingText = ""
            var discountAmountHeadingText = ""
            islongTextHeading = true
-           when (bankEMIIssuerTAndCDataModal?.issuerID) {
+           when (batchTable?.issuerId) {
                "51" -> {
                    discountPercentHeadingText = "Mfg/Mer Payback"
                    discountAmountHeadingText = "Mfg/Mer-"
@@ -1653,13 +1652,13 @@ class PrintUtil(context: Context?) {
                    discountAmountHeadingText = "TOTAL DISCOUNT"
                }
            }
-           if (!TextUtils.isEmpty(bankEMITenureDataModal?.discountCalculatedValue)) {
+           if (!TextUtils.isEmpty(batchTable?.discountCalculatedValue)) {
                if (islongTextHeading) {
 
                    textBlockList.add(sigleLineformat(cashBackPercentHeadingText, AlignMode.LEFT))
                    textBlockList.add(
                        sigleLineformat(
-                           "$currencySymbol ${bankEMITenureDataModal?.discountCalculatedValue}",
+                           "$currencySymbol ${batchTable?.discountCalculatedValue}",
                            AlignMode.RIGHT
                        )
                    )
@@ -1670,7 +1669,7 @@ class PrintUtil(context: Context?) {
                    textBlockList.add(sigleLineformat(discountPercentHeadingText, AlignMode.LEFT))
                    textBlockList.add(
                        sigleLineformat(
-                           "$currencySymbol ${bankEMITenureDataModal?.discountCalculatedValue}",
+                           "$currencySymbol ${batchTable?.discountCalculatedValue}",
                            AlignMode.RIGHT
                        )
                    )
@@ -1678,9 +1677,9 @@ class PrintUtil(context: Context?) {
                    textBlockList.clear()
                }
            }
-           if (!(bankEMITenureDataModal?.discountAmount.isNullOrEmpty()) && bankEMITenureDataModal?.discountAmount != "0") {
+           if (!(batchTable?.cashDiscountAmt.isNullOrEmpty()) && batchTable?.cashDiscountAmt != "0") {
                val discAmount =
-                   "%.2f".format(bankEMITenureDataModal?.discountAmount?.toFloat()?.div(100))
+                   "%.2f".format(batchTable?.cashDiscountAmt?.toFloat()?.div(100))
 
                if (islongTextHeading) {
 
@@ -1732,9 +1731,9 @@ class PrintUtil(context: Context?) {
            textBlockList.clear()
 
            textBlockList.add(sigleLineformat("MONTHLY EMI", AlignMode.LEFT))
-           if (!(bankEMITenureDataModal?.emiAmount.isNullOrEmpty()) && bankEMITenureDataModal?.emiAmount != "0") {
+           if (!(batchTable?.monthlyEmi.isNullOrEmpty()) && batchTable?.monthlyEmi != "0") {
                var emiAmount =
-                   "%.2f".format(bankEMITenureDataModal?.emiAmount?.toFloat()?.div(100))
+                   "%.2f".format(batchTable?.monthlyEmi?.toFloat()?.div(100))
                textBlockList.add(
                    sigleLineformat(
                        "$currencySymbol:${emiAmount}",
@@ -1745,9 +1744,9 @@ class PrintUtil(context: Context?) {
                textBlockList.clear()
            }
            textBlockList.add(sigleLineformat("TOTAL INTEREST", AlignMode.LEFT))
-           if (!(bankEMITenureDataModal?.totalInterestPay.isNullOrEmpty()) && bankEMITenureDataModal?.totalInterestPay != "0") {
+           if (!(batchTable?.totalInterest.isNullOrEmpty()) && batchTable?.totalInterest != "0") {
                var totalInterestPay =
-                   "%.2f".format(bankEMITenureDataModal?.totalInterestPay?.toFloat()?.div(100))
+                   "%.2f".format(batchTable?.totalInterest?.toFloat()?.div(100))
                textBlockList.add(
                    sigleLineformat(
                        "$currencySymbol:${totalInterestPay}",
@@ -1770,17 +1769,17 @@ class PrintUtil(context: Context?) {
                "55" -> "TOTAL EFFECTIVE-"
                else -> "TOTAL Amt"
            }
-           if (!TextUtils.isEmpty(bankEMITenureDataModal?.totalInterestPay)) {
+           if (!TextUtils.isEmpty(batchTable?.totalInterest)) {
 
                if (batchTable.transactionType == BhTransactionType.TEST_EMI.type) {
                    val loanAmt =
                        "%.2f".format(
-                           (((bankEMITenureDataModal?.loanAmount)?.toDouble())?.div(100)).toString()
+                           (((batchTable?.loanAmt)?.toDouble())?.div(100)).toString()
                                .toDouble()
                        )
                    val totalInterest =
                        "%.2f".format(
-                           (((bankEMITenureDataModal?.totalInterestPay)?.toDouble())?.div(100)).toString()
+                           (((batchTable?.totalInterest)?.toDouble())?.div(100)).toString()
                                .toDouble()
                        )
                    val totalAmt =
@@ -1854,7 +1853,7 @@ class PrintUtil(context: Context?) {
 
                } else {
                    val f_totalAmt =
-                       "%.2f".format(bankEMITenureDataModal?.netPay?.toFloat()?.div(100))
+                       "%.2f".format(batchTable?.netPay?.toFloat()?.div(100))
                    /*alignLeftRightText(
                 textInLineFormatBundle,
                 totalAmountHeadingText,
@@ -1923,10 +1922,10 @@ class PrintUtil(context: Context?) {
 
        }else{
            textBlockList.add(sigleLineformat("Scheme", AlignMode.LEFT))
-           if (bankEMITenureDataModal != null) {
+           if (batchTable != null) {
                textBlockList.add(
                    sigleLineformat(
-                       bankEMITenureDataModal?.tenureLabel,
+                       batchTable?.tenureLabel,
                        AlignMode.RIGHT
                    )
                )
@@ -1935,10 +1934,10 @@ class PrintUtil(context: Context?) {
            }
 
            textBlockList.add(sigleLineformat("Card Issuer", AlignMode.LEFT))
-           if (bankEMIIssuerTAndCDataModal != null) {
+           if (batchTable != null) {
                textBlockList.add(
                    sigleLineformat(
-                       bankEMIIssuerTAndCDataModal.issuerName,
+                       batchTable.issuerName,
                        AlignMode.RIGHT
                    )
                )
@@ -1949,13 +1948,13 @@ class PrintUtil(context: Context?) {
     }
 
 
-    private fun printBrandTnC(batchTable: BatchTable) {
+    private fun printBrandTnC(batchTable: TempBatchFileDataTable) {
 
-        val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
+        /*val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
         val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
-        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
-        val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
-        var brandId = brandEMIMasterDataModal?.brandID
+        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel*/
+        val issuerId = batchTable?.issuerId
+        var brandId = batchTable?.brandId
 
         val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
         val jsonRespp = Gson().toJson(issuerTAndCData)
@@ -1971,7 +1970,8 @@ class PrintUtil(context: Context?) {
             "#.I have been offered the choice of normal as well as EMI for this purchase and I have chosen EMI.#.I have fully understood and accept the terms of EMI scheme and applicable charges mentioned in this charge-slip.#.EMI conversion subject to Banks discretion and by take minimum * working days.#.GST extra on the interest amount.#.For the first EMI, the interest will be calculated from the loan booking date till the payment due date.#.Convenience fee of Rs --.-- + GST will be applicable on EMI transactions."
 
             logger("getting issuer h tnc=",issuerTAndCData?.headerTAndC.toString(),"e")
-            issuerHeaderTAndC =
+        logger("check kush",""+ (batchTable.transactionType == BhTransactionType.TEST_EMI.type))
+        issuerHeaderTAndC =
                 if (batchTable.transactionType == BhTransactionType.TEST_EMI.type) {
                     testTnc.split(SplitterTypes.POUND.splitter)
                 } else {
@@ -2058,8 +2058,8 @@ class PrintUtil(context: Context?) {
        }
         //endregion
         //region=====================SCHEME TAndC===============
-        val emiCustomerConsent =
-            bankEMIIssuerTAndCDataModal?.schemeTAndC?.split(SplitterTypes.POUND.splitter)
+        //val emiCustomerConsent = bankEMIIssuerTAndCDataModal?.schemeTAndC?.split(SplitterTypes.POUND.splitter)
+        val emiCustomerConsent = batchTable?.bankEmiTAndC?.split(SplitterTypes.POUND.splitter)
         logger("getting emiCustomerConsent tnc=",emiCustomerConsent.toString(),"e")
         if (emiCustomerConsent?.isNotEmpty() == true) {
             for (i in emiCustomerConsent?.indices) {
@@ -2100,10 +2100,10 @@ class PrintUtil(context: Context?) {
         } else {
             printSeperator()
             textBlockList.add(sigleLineformat("Scheme:", AlignMode.LEFT))
-            if (bankEMITenureDataModal != null) {
+            if (batchTable != null) {
                 textBlockList.add(
                     sigleLineformat(
-                        bankEMITenureDataModal.tenureLabel,
+                        batchTable.tenureLabel,
                         AlignMode.RIGHT
                     )
                 )
@@ -2112,10 +2112,10 @@ class PrintUtil(context: Context?) {
             textBlockList.clear()
 
             textBlockList.add(sigleLineformat("Card Issuer:", AlignMode.LEFT))
-            if (bankEMIIssuerTAndCDataModal != null) {
+            if (batchTable != null) {
                 textBlockList.add(
                     sigleLineformat(
-                        bankEMIIssuerTAndCDataModal.issuerName,
+                        batchTable.issuerName,
                         AlignMode.RIGHT
                     )
                 )
@@ -2127,15 +2127,15 @@ class PrintUtil(context: Context?) {
 //endregion
 
         //region=====================Printing Merchant Brand Purchase Details:-
-        if (batchTable.transactionType.equals(EDashboardItem.BRAND_EMI.title)) {
+        /*if (batchTable.transactionType.equals(EDashboardItem.BRAND_EMI.title)) {
         //region====================Printing DBD Wise TAndC Brand EMI==================
             if (!isNoEmiOnlyCashBackApplied!!) {
-                if (copyType?.equals(EPrintCopyType.MERCHANT) == true && (brandEMIMasterDataModal?.mobileNumberBillNumberFlag?.get(
+                if (copyType?.equals(EPrintCopyType.MERCHANT) == true && (batchTable?.mobileNumberBillNumberFlag?.get(
                         3
                     ) == '1')
                 ) {
-                    if (!TextUtils.isEmpty(bankEMITenureDataModal?.tenureWiseDBDTAndC)) {
-                        val tenureWiseTAndC: String? = bankEMITenureDataModal?.tenureWiseDBDTAndC
+                    if (!TextUtils.isEmpty(batchTable?.tenureWiseDBDTAndC)) {
+                        val tenureWiseTAndC: String? = batchTable?.tenureWiseDBDTAndC
                         if (tenureWiseTAndC != null) {
                             logger("Brand Tnc", tenureWiseTAndC, "e")
                             val chunk: List<String> = chunkTnC(tenureWiseTAndC,48)
@@ -2162,7 +2162,7 @@ class PrintUtil(context: Context?) {
 
             }
 
-        }
+        }*/
 
 
         }
@@ -2327,15 +2327,15 @@ class PrintUtil(context: Context?) {
         }
 
     }
-    private fun baseAmounthandling(batchTable: BatchTable){
+    private fun baseAmounthandling(batchTable: TempBatchFileDataTable){
 
-        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
-        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
+//        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
+//        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
         var currencySymbol: String? = "Rs"
         val terminalData = getTptData()
         currencySymbol = terminalData?.currencySymbol
-        if (!TextUtils.isEmpty(bankEMITenureDataModal?.transactionAmount)) {
-            var baseAmount =  "%.2f".format((((bankEMITenureDataModal?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
+        if (!TextUtils.isEmpty(batchTable?.transactionalAmmount)) {
+            var baseAmount =  "%.2f".format((((batchTable?.transactionalAmmount)?.toDouble())?.div(100)).toString().toDouble())
             if (batchTable.transactionType == BhTransactionType.TEST_EMI.type){
                  baseAmount = "1.00"
 
