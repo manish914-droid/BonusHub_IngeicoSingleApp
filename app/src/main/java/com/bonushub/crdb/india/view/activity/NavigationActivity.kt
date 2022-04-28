@@ -791,6 +791,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             brandEMIDataModal.productID = brandEmiProductData?.productID
             brandEMIDataModal.imeiORserailNum = imeiOrSerialNum
 
+            brandEMIDataModal.brandName = brandDataMaster?.brandName
+            brandEMIDataModal.categoryName = brandEmiCat?.categoryName
+            brandEMIDataModal.productCategoryName = brandEmiProductData?.productCategoryName?:""
+            brandEMIDataModal.productName = brandEmiProductData?.productName
+            brandEMIDataModal.mobileNumberBillNumberFlag = brandDataMaster?.mobileNumberBillNumberFlag?:""
+            brandEMIDataModal.producatDesc = brandEmiProductData?.producatDesc
+
             intent.putExtra("brandEMIData", brandEMIDataModal)
 
         }

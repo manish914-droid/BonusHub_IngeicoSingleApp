@@ -726,11 +726,11 @@ class PrintUtil(context: Context?) {
 
                 }
                 //region=====================BRAND PRODUACT DATA===============
-                /*if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
+                if (batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
                     printProduactData(batchTable)
                     printSeperator()
                     baseAmounthandling(batchTable)
-                }*/
+                }
 
                 if(isReversal){
                     sigleLineText("Please contact your card issuer for reversal of debit if any", AlignMode.CENTER)
@@ -2172,22 +2172,22 @@ class PrintUtil(context: Context?) {
 
     }
 
-    private fun printProduactData(batchTable: BatchTable){
+    private fun printProduactData(batchTable: TempBatchFileDataTable){
 
-        val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
-        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiSubCategoryData
-        val brandEMICategoryData: BrandEMISubCategoryTable? = batchTable.emiCategoryData
-        val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
-        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
-        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
+//        val brandEMIMasterDataModal: BrandEMIMasterDataModal? = batchTable.emiBrandData
+//        val brandEMISubCategoryTable: BrandEMISubCategoryTable? = batchTable.emiSubCategoryData
+//        val brandEMICategoryData: BrandEMISubCategoryTable? = batchTable.emiCategoryData
+//        val brandEMIProductDataModal: BrandEMIProductDataModal? = batchTable.emiProductData
+//        val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
+//        val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
 
-        val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
+        val issuerId = batchTable?.issuerId
         sigleLineText("-----**Product Details**-----", AlignMode.CENTER)
-        if (brandEMIMasterDataModal != null) {
+        if (batchTable.brandEMIDataModal != null) {
             textBlockList.add(sigleLineformat("Mer/Mfr Name:", AlignMode.LEFT))
             textBlockList.add(
                 sigleLineformat(
-                    "${brandEMIMasterDataModal?.brandName}",
+                    "${batchTable.brandEMIDataModal?.brandName}",
                     AlignMode.RIGHT
                 )
             )
@@ -2197,7 +2197,7 @@ class PrintUtil(context: Context?) {
             textBlockList.add(sigleLineformat("Prod Cat:", AlignMode.LEFT))
             textBlockList.add(
                 sigleLineformat(
-                    "${brandEMICategoryData?.categoryName}",
+                    "${batchTable.brandEMIDataModal?.categoryName}",
                     AlignMode.RIGHT
                 )
             )
@@ -2205,13 +2205,13 @@ class PrintUtil(context: Context?) {
             textBlockList.clear()
 
 
-            if (brandEMIProductDataModal?.producatDesc == "subCat") {
-                if (!brandEMIProductDataModal?.productCategoryName.isNullOrEmpty()) {
+            if (batchTable.brandEMIDataModal?.producatDesc == "subCat") {
+                if (!batchTable.brandEMIDataModal?.productCategoryName.isNullOrEmpty()) {
 
                     textBlockList.add(sigleLineformat("Prod desc:", AlignMode.LEFT))
                     textBlockList.add(
                         sigleLineformat(
-                            "${brandEMIProductDataModal?.productCategoryName}",
+                            "${batchTable.brandEMIDataModal?.productCategoryName}",
                             AlignMode.RIGHT
                         )
                     )
@@ -2233,18 +2233,18 @@ class PrintUtil(context: Context?) {
             textBlockList.add(sigleLineformat("Prod Name:", AlignMode.LEFT))
             textBlockList.add(
                 sigleLineformat(
-                    "${brandEMIProductDataModal?.productName}",
+                    "${batchTable.brandEMIDataModal?.productName}",
                     AlignMode.RIGHT
                 )
             )
             printer?.addMixStyleText(textBlockList)
             textBlockList.clear()
 
-            if (!TextUtils.isEmpty(batchTable?.imeiOrSerialNum)) {
+            if (!TextUtils.isEmpty(batchTable.brandEMIDataModal?.imeiORserailNum)) {
                 textBlockList.add(sigleLineformat("Prod ${"IEMI"}:", AlignMode.LEFT))
                 textBlockList.add(
                     sigleLineformat(
-                        "${batchTable?.imeiOrSerialNum}",
+                        "${batchTable.brandEMIDataModal?.imeiORserailNum}",
                         AlignMode.RIGHT
                     )
                 )
@@ -2252,9 +2252,9 @@ class PrintUtil(context: Context?) {
                 textBlockList.clear()
 
             }
-            val mobnum=batchTable.mobileNumber?:""
+            val mobnum=batchTable.merchantMobileNumber?:""
             if (!TextUtils.isEmpty(mobnum)) {
-                when (brandEMIMasterDataModal.mobileNumberBillNumberFlag.substring(1, 2)) {
+                when (batchTable.brandEMIDataModal.mobileNumberBillNumberFlag.substring(1, 2)) {
                     "1" -> {
                         // MASK PRINT
                         val maskedMob = panMasking(
@@ -2293,9 +2293,9 @@ class PrintUtil(context: Context?) {
             }
 
             //region====================Printing Tenure TAndC==================
-            if (!TextUtils.isEmpty(bankEMITenureDataModal?.tenureTAndC)) {
+            if (!TextUtils.isEmpty(batchTable?.tenureTAndC)) {
                 printSeperator()
-                val tenureTAndC: String? = bankEMITenureDataModal?.tenureTAndC
+                val tenureTAndC: String? = batchTable?.tenureTAndC
                 val chunk: List<String>? = tenureTAndC?.let { chunkTnC(it,48) }
                 if (tenureTAndC != null) {
                     if (chunk != null) {

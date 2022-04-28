@@ -182,6 +182,8 @@ class BrandEMIDataModal : Serializable {
     var dataTimeStampChangedOrNot: Boolean = false
 
     var imeiORserailNum:String=""
+    var productCategoryName: String = ""
+    var mobileNumberBillNumberFlag: String = ""
 
 
 }

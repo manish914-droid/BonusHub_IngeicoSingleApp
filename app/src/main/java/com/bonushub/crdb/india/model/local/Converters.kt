@@ -2,10 +2,7 @@ package com.bonushub.crdb.india.model.local
 
 import androidx.room.TypeConverter
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
-import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
-import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.india.model.remote.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ingenico.hdfcpayment.model.ReceiptDetail
@@ -132,6 +129,16 @@ class Converters {
     @TypeConverter
     fun toCardProcessedDataModal(cardProcessedDataModal: String?): CardProcessedDataModal? {
         return Gson().fromJson(cardProcessedDataModal, CardProcessedDataModal::class.java)
+    }
+
+    @TypeConverter
+    fun fromBrandEMIDataModal(brandEMIDataModal: BrandEMIDataModal?): String? {
+        return Gson().toJson(brandEMIDataModal, BrandEMIDataModal::class.java)
+    }
+
+    @TypeConverter
+    fun toBrandEMIDataModal(brandEMIDataModal: String?): BrandEMIDataModal? {
+        return Gson().fromJson(brandEMIDataModal, BrandEMIDataModal::class.java)
     }
 
 

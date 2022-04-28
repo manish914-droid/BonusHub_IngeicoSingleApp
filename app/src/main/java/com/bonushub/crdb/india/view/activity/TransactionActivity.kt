@@ -477,7 +477,7 @@ class TransactionActivity : BaseActivityNew() {
 
         when(requestCode){
 
-            BhTransactionType.BRAND_EMI.type ->{
+            /*BhTransactionType.BRAND_EMI.type ->{
                 val cardProcessedData = data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
                 val maskedPan = cardProcessedData.getPanNumberData()?.let {
                     getMaskedPan(getTptData(), it)
@@ -498,8 +498,8 @@ class TransactionActivity : BaseActivityNew() {
                     emvBinding?.manualEntryButton?.visibility = View.GONE
                     emvBinding?.tvInsertCard?.visibility = View.GONE
                     if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
-                       /* val baseAmountValue = getString(R.string.rupees_symbol) + "1.00"
-                        binding?.baseAmtTv?.text = baseAmountValue*/
+                       *//* val baseAmountValue = getString(R.string.rupees_symbol) + "1.00"
+                        binding?.baseAmtTv?.text = baseAmountValue*//*
                     } else {
                         val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
                         emvBinding?.baseAmtTv?.text = baseAmountValue
@@ -516,7 +516,7 @@ class TransactionActivity : BaseActivityNew() {
                     if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
                         //VFService.showToast("Connect to BH_HOST1...")
                         Log.e("WWW", "-----")
-                       /* cardProcessedData.setTransactionAmount(100)
+                       *//* cardProcessedData.setTransactionAmount(100)
 
                         DoEmv(issuerUpdateHandler, this, pinHandler, cardProcessedData, ConstIPBOC.startEMV.intent.VALUE_cardType_smart_card) { cardProcessedDataModal ->
                             cardProcessedDataModal.setProcessingCode(transactionProcessingCode)
@@ -539,7 +539,7 @@ class TransactionActivity : BaseActivityNew() {
                             }
                             //Below Different Type of Transaction check Based ISO Packet Generation happening:-
                             processAccordingToCardType(cardProcessedDataModal)
-                        }*/
+                        }*//*
                     } else {
                         // sir please check emv call
                         DoEmv(testVFEmvHandler, this, cardProcessedData) { cardProcessedDataModal ->
@@ -554,11 +554,11 @@ class TransactionActivity : BaseActivityNew() {
                                // getMaskedPan(TerminalParameterTable.selectFromSchemeTable(), it)
                             }
                             runOnUiThread {
-                              /*  binding?.atCardNoTv?.text = maskedPan
+                              *//*  binding?.atCardNoTv?.text = maskedPan
                                 cardView_l.visibility = View.VISIBLE
                                 //   tv_card_number_heading.visibility = View.VISIBLE
                                 tv_insert_card.visibility = View.INVISIBLE
-                                //  binding?.paymentGif?.visibility = View.INVISIBLE*/
+                                //  binding?.paymentGif?.visibility = View.INVISIBLE*//*
                             }
                             //Below Different Type of Transaction check Based ISO Packet Generation happening:-
                             emvProcessNext(cardProcessedDataModal)
@@ -569,9 +569,9 @@ class TransactionActivity : BaseActivityNew() {
                 }
 
 
-            }
+            }*/
 
-            BhTransactionType.EMI_SALE.type ->{
+            BhTransactionType.EMI_SALE.type, BhTransactionType.BRAND_EMI.type ->{
                 val cardProcessedData = data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
                 val maskedPan = cardProcessedData.getPanNumberData()?.let {
                     getMaskedPan(getTptData(), it)
@@ -790,7 +790,7 @@ class TransactionActivity : BaseActivityNew() {
 
                             ) {
 
-                                stubEMI(stubbedData, emiSelectedData, emiTAndCData/*, brandEMIAccessData*/) { data ->
+                                stubEMI(stubbedData, emiSelectedData, emiTAndCData,brandEMIData/*, brandEMIAccessData*/) { data ->
                                     Log.d("StubbedEMIData:- ", data.toString())
 
                                     printAndSaveBatchDataInDB(stubbedData){

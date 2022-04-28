@@ -10,6 +10,7 @@ import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
+import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getCardDataTable
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
@@ -337,7 +338,8 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
 fun stubEMI(
     batchData: TempBatchFileDataTable,
     emiCustomerDetails: BankEMITenureDataModal?,
-    emiIssuerTAndCData: BankEMIIssuerTAndCDataModal?,/* brandEMIByAccessCodeData: BrandEMIAccessDataModal?,*/
+    emiIssuerTAndCData: BankEMIIssuerTAndCDataModal?,
+    brandEMIDataModal: BrandEMIDataModal?,/* brandEMIByAccessCodeData: BrandEMIAccessDataModal?,*/
     batchStubCallback: (TempBatchFileDataTable) -> Unit
 ) {
     GlobalScope.launch(Dispatchers.IO) {
@@ -422,6 +424,9 @@ fun stubEMI(
             batchData.instantDiscount=emiCustomerDetails?.instantDiscount.toString()
             batchData.tenureLabel=emiCustomerDetails?.tenureLabel.toString()
             batchData.txnTID = emiCustomerDetails?.txnTID.toString()
+
+            batchData.brandEMIDataModal = brandEMIDataModal?:BrandEMIDataModal()
+
         }
 
         val lastSuccessReceiptData = Gson().toJson(batchData)

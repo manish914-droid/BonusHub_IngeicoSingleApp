@@ -7,10 +7,7 @@ import com.bonushub.crdb.india.di.scope.BHDashboardItem
 import com.bonushub.crdb.india.di.scope.BHFieldName
 import com.bonushub.crdb.india.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
-import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
-import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.india.model.remote.*
 import com.bonushub.crdb.india.utils.EAccountType
 import com.bonushub.crdb.india.utils.EDigiPosPaymentStatus
 import com.bonushub.crdb.india.utils.EDashboardItem
@@ -313,6 +310,7 @@ data class TempBatchFileDataTable(
     var hostCardType: String = "",
     var ctlsCaption:String="",
     var orignalTxnAmt:String="",
+    var brandEMIDataModal: BrandEMIDataModal = BrandEMIDataModal(),
 ):Serializable
 
 @Entity
