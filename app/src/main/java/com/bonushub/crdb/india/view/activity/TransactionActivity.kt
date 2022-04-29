@@ -264,6 +264,17 @@ class TransactionActivity : BaseActivityNew() {
                                                 }
                                                 startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
                                             }
+                                            TransactionType.BRAND_EMI.type -> {
+                                                val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                                    putExtra("cardProcessedData", globalCardProcessedModel)
+                                                    putExtra("transactionType", globalCardProcessedModel.getTransType())
+                                                    putExtra("mobileNumber", mobileNumber)
+                                                    putExtra("brandID", brandEMIData?.brandID?:"")
+                                                    putExtra("productID", brandEMIData?.productID?:"")
+                                                    putExtra("imeiOrSerialNum", brandEMIData?.imeiORserailNum?:"")
+                                                }
+                                                startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
+                                            }
                                             else -> processSwipeCardWithPINorWithoutPIN(
                                                 isPin, cardProcessedDataModal
                                             )
@@ -280,6 +291,17 @@ class TransactionActivity : BaseActivityNew() {
                                                 putExtra("cardProcessedData", globalCardProcessedModel)
                                                 putExtra("transactionType", globalCardProcessedModel.getTransType())
                                                 putExtra("mobileNumber", mobileNumber)
+                                            }
+                                            startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
+                                        }
+                                        TransactionType.BRAND_EMI.type -> {
+                                            val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                                putExtra("cardProcessedData", globalCardProcessedModel)
+                                                putExtra("transactionType", globalCardProcessedModel.getTransType())
+                                                putExtra("mobileNumber", mobileNumber)
+                                                putExtra("brandID", brandEMIData?.brandID?:"")
+                                                putExtra("productID", brandEMIData?.productID?:"")
+                                                putExtra("imeiOrSerialNum", brandEMIData?.imeiORserailNum?:"")
                                             }
                                             startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
                                         }
