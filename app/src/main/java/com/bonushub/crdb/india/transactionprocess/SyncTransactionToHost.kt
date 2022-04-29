@@ -149,9 +149,9 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         DetectCardType.EMV_CARD_TYPE -> {
                                             if (TextUtils.isEmpty(AppPreference.getString(GENERIC_REVERSAL_KEY))) {
 
-                                                if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type
+                                                if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type/*&&
                                                     && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&
-                                                        cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI.type /*&&
+                                                        cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI.type
                                                         cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI_BY_ACCESS_CODE.type &&
                                                         cardProcessedDataModal?.getTransType() != TransactionType.SALE.type &&
                                                         cardProcessedDataModal?.getTransType() != TransactionType.PRE_AUTH.type &&
@@ -160,7 +160,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                         cardProcessedDataModal?.getTransType() != TransactionType.TEST_EMI.type*/) {
 
                                                     logger("CompleteSecondGenAc","yes")
-
+                                                    logger("3testVFEmvHandler",""+testVFEmvHandler,"e")
                                                     CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testVFEmvHandler) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
                                                     }.performSecondGenAc(cardProcessedDataModal, responseIsoData)

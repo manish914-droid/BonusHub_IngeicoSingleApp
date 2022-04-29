@@ -41,6 +41,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     private var emv: UEMV? = null
     private lateinit var activity: TransactionActivity
     private lateinit var cardProcessedDataModal: CardProcessedDataModal
+    private lateinit var testCompleteSecondGenAc:CompleteSecondGenAc
     lateinit var vfEmvHandlerCallback: (CardProcessedDataModal) -> Unit
     lateinit var vfFallbackCallback: (CardProcessedDataModal) -> Unit
 
@@ -571,6 +572,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
              if(cardProcessedDataModal.getSuccessResponseCode() == "00"){
                  if(this::testCompleteSecondGenAc.isInitialized){
                      testCompleteSecondGenAc.getEndProcessData(result,transData)
+                 }else{
+                     logger("testCompleteSecondGenAc","uninitialized","e")
                  }
              }
             else{
@@ -855,9 +858,10 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         }
     }
 
-    lateinit var testCompleteSecondGenAc:CompleteSecondGenAc
+
     fun getCompleteSecondGenAc(testCompleteSecondGenAc: CompleteSecondGenAc, cardProcessedDataModal: CardProcessedDataModal?){
         this.testCompleteSecondGenAc = testCompleteSecondGenAc
+      logger("vfemvHan",""+this,"e")
         if (cardProcessedDataModal != null) {
             this.cardProcessedDataModal  = cardProcessedDataModal
         }

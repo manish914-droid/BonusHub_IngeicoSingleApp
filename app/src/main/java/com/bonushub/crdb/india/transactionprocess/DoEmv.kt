@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DoEmv(var testVFEmvHandler: VFEmvHandler,var  activity: Activity, var cardProcessedDataModal: CardProcessedDataModal,
-            var transactionCallback: (CardProcessedDataModal) -> Unit) {
+            var transactionCallback: (CardProcessedDataModal,VFEmvHandler) -> Unit) {
 
 
     //    private var iemv: IEMV? = VFService.vfIEMV
@@ -44,7 +44,7 @@ class DoEmv(var testVFEmvHandler: VFEmvHandler,var  activity: Activity, var card
         return  VFEmvHandler(
             DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP),
             DeviceHelper.getEMV(),activity as TransactionActivity,cardProcessedDataModal){ cardProcessedData ->
-            transactionCallback(cardProcessedData)
+            transactionCallback(cardProcessedData,testVFEmvHandler)
         }
     }
     //endregion

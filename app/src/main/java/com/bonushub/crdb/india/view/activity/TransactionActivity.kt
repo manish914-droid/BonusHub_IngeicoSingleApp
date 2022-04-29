@@ -321,6 +321,7 @@ class TransactionActivity : BaseActivityNew() {
                         flagPSE(0x00.toByte())
                     }
                     testVFEmvHandler = emvHandler()
+                    logger("2testVFEmvHandler",""+testVFEmvHandler,"e")
                     DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
 
                 }
@@ -641,11 +642,13 @@ class TransactionActivity : BaseActivityNew() {
                             flagPSE(0x00.toByte())
                         }
                         testVFEmvHandler = emvHandler()
+                        logger("3testVFEmvHandler",""+testVFEmvHandler,"e")
 
 
                         // sir please check emv call
-                        DoEmv(testVFEmvHandler, this, cardProcessedData) { cardProcessedDataModal ->
+                        DoEmv(testVFEmvHandler,this, cardProcessedData) { cardProcessedDataModal, vfEmvHandler ->
                             Log.d("CardEMIData:- ", cardProcessedDataModal.toString())
+                            testVFEmvHandler = vfEmvHandler
                             cardProcessedDataModal.setProcessingCode(transactionProcessingCode)
                             //    cardProcessedDataModal.setTransactionAmount(emiSelectedTransactionAmount ?: 0L)
                             //     cardProcessedDataModal.setOtherAmount(otherTransAmount)
@@ -762,6 +765,7 @@ class TransactionActivity : BaseActivityNew() {
             println("sale_data_sync")
             val msg: String = getString(R.string.sale_data_sync)
             runOnUiThread { showProgress(msg) }
+            logger("1testVFEmvHandler",""+testVFEmvHandler,"e")
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
                 hideProgress()
 
