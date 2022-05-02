@@ -840,55 +840,59 @@ class PrintUtil(context: Context?) {
                     AlignMode.CENTER
                 )
 
-               /* if(!isNoEmiOnlyCashBackAppl) {
-                    val issuerId = bankEMIIssuerTAndCDataModal?.issuerID
-                    val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
-                    //region=======================Issuer Footer Terms and Condition=================
-                    if (!TextUtils.isEmpty(issuerTAndCData?.footerTAndC)) {
-                        printSeperator()
+                if (batchTable.transactionType == BhTransactionType.EMI_SALE.type ||batchTable.transactionType == BhTransactionType.TEST_EMI.type||batchTable.transactionType == BhTransactionType.BRAND_EMI.type) {
+                    if(!isNoEmiOnlyCashBackAppl) {
+                        val issuerId = batchTable?.issuerId
+                        val issuerTAndCData = issuerId?.let { getIssuerTAndCDataByIssuerId(it) }
+                        //region=======================Issuer Footer Terms and Condition=================
+                        if (!TextUtils.isEmpty(issuerTAndCData?.footerTAndC)) {
+                            printSeperator()
 
-                        val issuerFooterTAndC =
-                            issuerTAndCData?.footerTAndC?.split(SplitterTypes.POUND.splitter)
-                        logger("getting footer tnc1=",issuerTAndCData?.footerTAndC.toString(),"e")
-                        logger("issuerFooterTAndC-->=",issuerFooterTAndC.toString(),"e")
-                        if (issuerFooterTAndC != null) {
-                            if (issuerFooterTAndC.isNotEmpty()) {
-                                for (i in issuerFooterTAndC.indices) {
-                                    if (!TextUtils.isEmpty(issuerFooterTAndC[i])) {
-                                        val limit = 48
-                                        val emiTnc = "#" + issuerFooterTAndC[i]
-                                        val chunks: List<String> = chunkTnC(emiTnc, limit)
-                                        for (st in chunks) {
-                                            logger("TNC", st, "e")
-                                     *//*       textBlockList.add(
-                                                sigleLineformat(
-                                                    st, AlignMode.LEFT
+                            val issuerFooterTAndC =
+                                issuerTAndCData?.footerTAndC?.split(SplitterTypes.POUND.splitter)
+                            logger("getting footer tnc1=",issuerTAndCData?.footerTAndC.toString(),"e")
+                            logger("issuerFooterTAndC-->=",issuerFooterTAndC.toString(),"e")
+                            if (issuerFooterTAndC != null) {
+                                if (issuerFooterTAndC.isNotEmpty()) {
+                                    for (i in issuerFooterTAndC.indices) {
+                                        if (!TextUtils.isEmpty(issuerFooterTAndC[i])) {
+                                            val limit = 48
+                                            val emiTnc = "#" + issuerFooterTAndC[i]
+                                            val chunks: List<String> = chunkTnC(emiTnc, limit)
+                                            for (st in chunks) {
+                                                logger("TNC", st, "e")
+                                                textBlockList.add(
+                                                    sigleLineformat(
+                                                        st, AlignMode.LEFT
+                                                    )
                                                 )
-                                            )*//*
 //                                            printer?.setHzScale(HZScale.SC1x1)
 //                                            printer?.setHzSize(HZSize.DOT24x16)
-                                            printer?.setAscScale(ASCScale.SC1x1)
-                                            printer?.setAscSize(ASCSize.DOT24x8)
-                                            printer?.addText( AlignMode.LEFT, st)
+                                                printer?.setAscScale(ASCScale.SC1x1)
+                                                printer?.setAscSize(ASCSize.DOT24x8)
+                                                printer?.addText( AlignMode.LEFT, st)
+                                            }
+                                            printer?.setAscSize(ASCSize.DOT24x12)
                                         }
-                                        printer?.setAscSize(ASCSize.DOT24x12)
                                     }
-                                }
-                            } else {
-                           *//*     textBlockList.add(
-                                    sigleLineformat(
-                                        "# ${issuerTAndCData.footerTAndC}", AlignMode.LEFT
+                                } else {
+                                    textBlockList.add(
+                                        sigleLineformat(
+                                            "# ${issuerTAndCData.footerTAndC}", AlignMode.LEFT
+                                        )
                                     )
-                                )*//*
 //                                printer?.setHzScale(HZScale.SC1x1)
 //                                printer?.setHzSize(HZSize.DOT24x16)
-                                printer?.setAscScale(ASCScale.SC1x1)
-                                printer?.setAscSize(ASCSize.DOT24x8)
-                                printer?.addText( AlignMode.LEFT, "# ${issuerTAndCData.footerTAndC}")
+                                    printer?.setAscScale(ASCScale.SC1x1)
+                                    printer?.setAscSize(ASCSize.DOT24x8)
+                                    printer?.addText( AlignMode.LEFT, "# ${issuerTAndCData.footerTAndC}")
+                                }
                             }
                         }
                     }
-                }*/ //
+
+                }
+                 //
 
 
             } catch (e: ParseException) {

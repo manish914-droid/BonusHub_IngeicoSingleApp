@@ -489,6 +489,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                 }
                                 //  Success case
                                 1 -> {
+                                    // Txn Approved Dialog kushal
                                     //   println("Index and batchListsize is" + index + " and " + " batch " + (batchList.size - 1))
 //                                    activity?.runOnUiThread {
 //                                        txnSuccessToast(activity as NavigationActivity)
@@ -531,7 +532,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         if (voidData.transactionType == TransactionType.REFUND.type) {
                                             voidData.transactionType = TransactionType.VOID_REFUND.type
                                             voidData.transationName = getTransactionTypeName(TransactionType.VOID_REFUND.type)?:""
-                                        } else if (voidData.transactionType == TransactionType.EMI_SALE.type || voidData.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type || voidData.transactionType == TransactionType.BRAND_EMI.type) {
+                                        } else if ((voidData.transactionType == TransactionType.EMI_SALE.type || voidData.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type || voidData.transactionType == TransactionType.BRAND_EMI.type)&& voidData.tenure != "1") {
                                             voidData.transactionType = TransactionType.VOID_EMI.type
                                             voidData.transationName = getTransactionTypeName(TransactionType.VOID_EMI.type)?:""
                                         } else {
@@ -539,11 +540,14 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                                 voidData.transactionType = TransactionType.VOID.type
                                                 voidData.txnType2=TransactionType.VOID.type
                                                 voidData.transationName = getTransactionTypeName(TransactionType.VOID.type)?:""
+
                                             }else{
                                                 voidData.transactionType = TransactionType.VOID.type
                                                 voidData.transationName = getTransactionTypeName(TransactionType.VOID.type)?:""
                                                 }
                                         }
+
+                                        voidData?.tenure = "0"
 
                                         voidData.referenceNumber =
                                             (respnosedatareader.isoMap[37]?.parseRaw2String()
@@ -554,6 +558,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                                 .toString()
                                         ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
 */
+                                        logger("save",""+ voidData.transationName)
                                         lifecycleScope.launch(Dispatchers.IO) {
                                             batchFileViewModel.deleteTempBatchFileDataTableFromInvoice(voidData.hostInvoice, voidData.hostTID)
                                             batchFileViewModel?.insertTempBatchFileDataTable(voidData)
