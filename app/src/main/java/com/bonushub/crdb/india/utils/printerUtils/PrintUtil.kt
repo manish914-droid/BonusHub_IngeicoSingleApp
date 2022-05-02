@@ -521,11 +521,12 @@ class PrintUtil(context: Context?) {
                 batchTable.hostCardType
             }
 
+            val isNoEmiOnlyCashBackApplied : Boolean =  batchTable?.tenure=="1"
+
 
            // val receiptDetail: ReceiptDetail = batchTable.receiptData ?: ReceiptDetail()
 //            val bankEMITenureDataModal: BankEMITenureDataModal? = batchTable.emiTenureDataModel
 //            val bankEMIIssuerTAndCDataModal: BankEMIIssuerTAndCDataModal? = batchTable.emiIssuerDataModel
-//            val isNoEmiOnlyCashBackApplied : Boolean =  bankEMITenureDataModal?.tenure=="1"
             //setLogoAndHeader()
             //val terminalData = getTptData()
             try {
@@ -588,12 +589,12 @@ class PrintUtil(context: Context?) {
                 if (isReversal) {
                     sigleLineText("TRANSACTION FAILED", AlignMode.CENTER)
                 } else {
-//                    if(isNoEmiOnlyCashBackAppl) {
-//                        sigleLineText("SALE", AlignMode.CENTER)
-//                    }
-//                    else{
+                    if(isNoEmiOnlyCashBackAppl) {
+                        sigleLineText("SALE", AlignMode.CENTER)
+                    }
+                    else{
                         getTransactionTypeName(batchTable.transactionType)?.let { sigleLineText(it, AlignMode.CENTER) }
-                   // }
+                    }
                 }
                 //getTransactionTypeName(batchTable.transactionType)?.let { sigleLineText(it, AlignMode.CENTER) }
 
@@ -644,13 +645,25 @@ class PrintUtil(context: Context?) {
 
 
                 if(!isReversal) {
+                    if(batchTable.merchantMobileNumber.isNotEmpty()){
+                        textBlockList.add(
+                            sigleLineformat(
+                                "MOBILE NO:${batchTable.merchantMobileNumber}",
+                                AlignMode.LEFT
+                            )
+                        )
+
+                        textBlockList.clear()
+                    }
+
+
                     textBlockList.add(
                         sigleLineformat(
                             "AUTH CODE:${batchTable.authCode}",
                             AlignMode.LEFT
                         )
                     )
-                    // textBlockList.add(sigleLineformat("RRN:${batchTable.rrn}", AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat("RRN:${batchTable.referenceNumber}", AlignMode.RIGHT))
                     printer?.addMixStyleText(textBlockList)
 
                     textBlockList.clear()
@@ -1576,9 +1589,9 @@ class PrintUtil(context: Context?) {
                }
            }
 
-           if (!TextUtils.isEmpty(batchTable?.cashBackAmount) && batchTable?.cashBackAmount != "0") {
+           if (!TextUtils.isEmpty(batchTable?.cashback) && batchTable?.cashback != "0") {
                val cashBackAmount = "%.2f".format(
-                   batchTable?.cashBackAmount?.toFloat()
+                   batchTable?.cashback?.toFloat()
                        ?.div(100)
                )
 
@@ -1598,10 +1611,10 @@ class PrintUtil(context: Context?) {
                    printer?.addMixStyleText(textBlockList)
                    textBlockList.clear()
                } else {
-                   println("test-->${batchTable?.cashBackAmount}")
-                   if (batchTable?.cashBackAmount != "0" && !(batchTable?.cashBackAmount.isNullOrEmpty())) {
+                   println("test-->${batchTable?.cashback}")
+                   if (batchTable?.cashback != "0" && !(batchTable?.cashback.isNullOrEmpty())) {
                        val cashBackAmount = "%.2f".format(
-                           batchTable?.cashBackAmount?.toFloat()
+                           batchTable?.cashback?.toFloat()
                                ?.div(100)
                        )
 
