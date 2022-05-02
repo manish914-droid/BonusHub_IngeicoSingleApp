@@ -785,7 +785,7 @@ class TransactionActivity : BaseActivityNew() {
         println("AppPreference.getReversal()"+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
         if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             println("sale_data_sync")
-            val msg: String = getString(R.string.sale_data_sync)
+            val msg: String = getString(R.string.authenticating_transaction_msg)
             runOnUiThread { showProgress(msg) }
             logger("1testVFEmvHandler",""+testVFEmvHandler,"e")
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->

@@ -11,12 +11,14 @@ import android.os.Looper
 import android.text.TextUtils
 
 import android.view.*
+import android.webkit.WebView
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.DialogMsgWithIconBinding
+import com.bonushub.crdb.india.databinding.DialogTxnApprovedBinding
 import com.bonushub.crdb.india.databinding.ItemOkBtnDialogBinding
 import com.bonushub.crdb.india.databinding.NewPrintCustomerCopyBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
@@ -31,7 +33,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     lateinit var progressPercent:ProgressBar
     lateinit var progressPercentTv:TextView
     lateinit var horizontalPLL:LinearLayout
-    lateinit var verticalProgressBar: ProgressBar
+    lateinit var verticalProgressBar: WebView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +58,9 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     private fun setProgressDialog() {
         progressDialog = Dialog(this).apply {
             requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.new_tem_progress_dialog)
+           // setContentView(R.layout.new_tem_progress_dialog) // old
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setContentView(R.layout.new_progress_dialog)
             setCancelable(false)
         }
         progressTitleMsg = progressDialog.findViewById(R.id.msg_et)
@@ -64,6 +68,8 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         progressPercentTv=progressDialog.findViewById(R.id.downloadPercentTv)
         horizontalPLL=progressDialog.findViewById(R.id.horizontalProgressLL)
         verticalProgressBar=progressDialog.findViewById(R.id.verticalProgressbr)
+        verticalProgressBar?.loadUrl("file:///android_asset/loader.html")
+
     }
 
     override fun showProgress(progressMsg: String) {
@@ -213,6 +219,88 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
     }
 
+    /*override fun alertBoxWithAction(
+        title: String, msg: String, showCancelButton: Boolean,
+        positiveButtonText: String, alertCallback: (Boolean) -> Unit,
+        cancelButtonCallback: (Boolean) -> Unit, dialogIcon:Int
+    ) {
+        val dialogBuilder = Dialog(this)
+        //builder.setTitle(title)
+        //  builder.setMessage(msg)
+        val bindingg = NewPrintCustomerCopyBinding.inflate(LayoutInflater.from(this))
+
+        dialogBuilder.setContentView(bindingg.root)
+        if(dialogIcon == 0){
+            if (title == getString(R.string.print_customer_copy)|| title == getString(R.string.sms_upi_pay)|| title == getString(R.string.no_receipt)) {
+                if(title==getString(R.string.sms_upi_pay)){
+                    bindingg.imgPrinter.setImageResource(R.drawable.ic_link_icon)
+                } else if(title==getString(R.string.print_customer_copy)){
+                    bindingg.imgPrinter.setImageResource(R.drawable.ic_printer)
+                } else if(title==getString(R.string.no_receipt)){
+                    bindingg.imgPrinter.setImageResource(R.drawable.ic_info)
+                }
+                bindingg.imgPrinter.visibility = View.VISIBLE
+            } else {
+                // bindingg.imgPrinter.visibility = View.GONE
+            }
+        }else{
+            bindingg.imgPrinter.setImageResource(dialogIcon)
+        }
+
+        if(positiveButtonText==""){
+            bindingg.yesBtn.visibility=View.GONE
+
+        }
+        dialogBuilder.setCancelable(false)
+        val window = dialogBuilder.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        bindingg.yesBtn.text = positiveButtonText
+        bindingg.dialogMsg.text = msg
+
+        bindingg.yesBtn.setOnClickListener {
+            dialogBuilder.dismiss()
+            alertCallback(true)
+        }
+        //Below condition check is to show Cancel Button in Alert Dialog on condition base:-
+        if (showCancelButton) {
+            bindingg.noBtn.setOnClickListener {
+                dialogBuilder.cancel()
+                cancelButtonCallback(true)
+            }
+        } else {
+            //bindingg.imgPrinter.visibility = View.GONE
+            bindingg.noBtn.visibility = View.GONE
+        }
+        //     val alert: androidx.appcompat.app.AlertDialog = dialogBuilder.create()
+        //Below Handler will execute to auto cancel Alert Dialog Pop-Up when positiveButtonText isEmpty:-
+        if (TextUtils.isEmpty(positiveButtonText)) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                dialogBuilder.dismiss()
+                dialogBuilder.cancel()
+                startActivity(Intent(this, NavigationActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }, 2000)
+        }
+
+        try {
+            if (!dialogBuilder.isShowing) {
+                dialogBuilder.show()
+            }
+        } catch (ex: WindowManager.BadTokenException) {
+            ex.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        dialogBuilder.show()
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }*/
+
+
     override fun alertBoxWithAction(
         title: String, msg: String, showCancelButton: Boolean,
         positiveButtonText: String, alertCallback: (Boolean) -> Unit,
@@ -280,6 +368,53 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
                 })
             }, 2000)
         }
+
+        try {
+            if (!dialogBuilder.isShowing) {
+                dialogBuilder.show()
+            }
+        } catch (ex: WindowManager.BadTokenException) {
+            ex.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        dialogBuilder.show()
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
+
+    override fun txnApprovedDialog(
+        amount: String, dateTime: String, alertCallback: (Boolean) -> Unit
+    ) {
+        val dialogBuilder = Dialog(this,android.R.style.ThemeOverlay_Material_ActionBar)
+        //builder.setTitle(title)
+        //  builder.setMessage(msg)
+        val bindingg = DialogTxnApprovedBinding.inflate(LayoutInflater.from(this))
+
+        dialogBuilder.setContentView(bindingg.root)
+
+        bindingg.txtViewAmount.text = amount
+        bindingg.txtViewDateTime.text = dateTime
+
+        dialogBuilder.setCancelable(false)
+        val window = dialogBuilder.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT
+        )
+
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            dialogBuilder.dismiss()
+            dialogBuilder.cancel()
+
+            alertCallback(true)
+                /*startActivity(Intent(this, NavigationActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })*/
+
+                                                    }, 2000)
+
 
         try {
             if (!dialogBuilder.isShowing) {
@@ -488,6 +623,10 @@ interface IDialog {
 
     fun alertBoxMsgWithIconOnly(
         icon: Int, msg: String
+    )
+
+    fun txnApprovedDialog(
+        amount: String = "0.00", dateTime: String = "", alertCallback: (Boolean) -> Unit
     )
 }
 

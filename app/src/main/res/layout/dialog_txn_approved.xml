@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/imgViewBg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pad_20"
+        android:src="@drawable/ic_green_tick_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_tick_green"
+        app:layout_constraintBottom_toBottomOf="@+id/imgViewBg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imgViewBg" />
+
+    <TextView
+        android:id="@+id/txtViewCurrencySymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pad_20"
+        android:fontFamily="@font/muli_semi_bold"
+        android:text="@string/rupees_symbol"
+        android:textColor="@color/txt_color_new"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toStartOf="@+id/txtViewAmount"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgViewBg" />
+
+    <TextView
+        android:id="@+id/txtViewAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="@dimen/pad_20"
+        android:fontFamily="@font/muli_semi_bold"
+        android:text="10,000"
+        android:textColor="@color/txt_color_new"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/txtViewCurrencySymbol"
+        app:layout_constraintTop_toBottomOf="@+id/imgViewBg" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/consLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/pad_20"
+        android:layout_marginTop="@dimen/pad_30"
+        android:layout_marginEnd="@dimen/pad_20"
+        android:background="@drawable/edge_blue_bg_skyblue2"
+        android:padding="@dimen/pad_10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtViewAmount">
+
+        <TextView
+            android:id="@+id/txtViewTxnApprovedTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/muli_regular"
+            android:text="TRANSACTION APPROVED"
+            android:textColor="@color/txt_color_new"
+            android:textSize="@dimen/text_size_xregular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtViewDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/pad_5"
+            android:fontFamily="@font/muli_regular"
+            android:text="16 Jan, 05:10 pm"
+            android:textColor="@color/txt_color_new"
+            android:textSize="@dimen/text_size_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewTxnApprovedTittle" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/txtViewRemoveCardTittle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pad_20"
+        android:fontFamily="@font/muli_semi_bold"
+        android:text="Please remove your card"
+        android:textColor="@color/txt_color_blue"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/consLay" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_remove_card"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtViewRemoveCardTittle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

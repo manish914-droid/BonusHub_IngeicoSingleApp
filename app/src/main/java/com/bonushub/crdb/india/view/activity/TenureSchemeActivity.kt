@@ -26,10 +26,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.content.Intent
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
+import com.bonushub.crdb.india.utils.logger
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.logging.Logger
 import javax.inject.Inject
 import kotlin.math.pow
 
@@ -104,7 +106,7 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         }
 
         if(transactionType== BhTransactionType.BRAND_EMI.type || transactionType== BhTransactionType.EMI_SALE.type) {
-         showProgress()
+         showProgress("Please wait fetching schemes")
             tenureSchemeViewModel = ViewModelProvider(
                 this, TenureSchemeActivityVMFactory(
                     serverRepository,
