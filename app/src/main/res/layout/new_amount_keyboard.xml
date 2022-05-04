@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DBE8F5">
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/dropshadow_blue"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key1"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_margin="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/key2"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="1"
+            android:fontFamily="@font/muli_semi_bold"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key2"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_margin="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/key3"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key1"
+        app:layout_constraintTop_toTopOf="@+id/view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="2"
+            android:fontFamily="@font/muli_semi_bold"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key3"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_margin="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/keyClr"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key2"
+        app:layout_constraintTop_toTopOf="@+id/view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="3"
+            android:fontFamily="@font/muli_semi_bold"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/keyClr"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_margin="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        android:padding="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key3"
+        app:layout_constraintTop_toTopOf="@+id/view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="7dp"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="7dp"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="CAN"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key4"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_margin="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/key5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/key1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:fontFamily="@font/muli_semi_bold"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="4"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key5"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/key6"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key4"
+        app:layout_constraintTop_toTopOf="@id/key4">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:fontFamily="@font/muli_semi_bold"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="5"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key6"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/keyDelete"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key5"
+        app:layout_constraintTop_toTopOf="@id/key4">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:fontFamily="@font/muli_semi_bold"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="6"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/keyDelete"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        android:padding="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key6"
+        app:layout_constraintTop_toTopOf="@+id/key4">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="7dp"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="7dp"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="DEL"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key7"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_margin="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@id/key8"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/key4">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:fontFamily="@font/muli_semi_bold"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="7"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key8"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/key9"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key7"
+        app:layout_constraintTop_toTopOf="@id/key7">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:fontFamily="@font/muli_semi_bold"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="8"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key9"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/keyOK"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key8"
+        app:layout_constraintTop_toTopOf="@id/key7">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:fontFamily="@font/muli_semi_bold"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="9"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/keyOK"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/pad_120"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        android:padding="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key9"
+        app:layout_constraintTop_toTopOf="@+id/key7">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="7dp"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="7dp"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="OK"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key000"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginTop="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/key7"
+        app:layout_constraintTop_toBottomOf="@id/key7">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingBottom="@dimen/pad_12"
+            android:fontFamily="@font/muli_semi_bold"
+            android:text="000"
+            android:textAlignment="center"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="19sp" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key00"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toStartOf="@+id/key0"
+        app:layout_constraintStart_toEndOf="@+id/key000"
+        app:layout_constraintTop_toTopOf="@id/key000">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="00"
+            android:fontFamily="@font/muli_semi_bold"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/key0"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintStart_toStartOf="@id/key9"
+        app:layout_constraintTop_toTopOf="@id/key000">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingStart="@dimen/pad_20"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="@dimen/pad_20"
+            android:paddingBottom="@dimen/pad_12"
+            android:fontFamily="@font/muli_semi_bold"
+            android:text="0"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>
+
+    <!--<androidx.cardview.widget.CardView
+        android:id="@+id/keyOK2"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10"
+        android:background="@color/white"
+        android:elevation="@dimen/pad_5"
+        android:padding="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key0"
+        app:layout_constraintTop_toTopOf="@+id/key000">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="7dp"
+            android:paddingTop="@dimen/pad_12"
+            android:paddingEnd="7dp"
+            android:paddingBottom="@dimen/pad_12"
+            android:text="OK"
+            android:layout_gravity="center"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </androidx.cardview.widget.CardView>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

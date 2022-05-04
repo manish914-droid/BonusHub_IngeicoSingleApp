@@ -70,4 +70,8 @@
     <dimen name="design_btn_padding_bottom">12dp</dimen>
     <dimen name="design_default_inset">12dp</dimen>
 
+    <dimen name="keyboard_txt">20sp</dimen>
+    <dimen name="keyboard_btn_width">55dp</dimen>
+    <dimen name="keyboard_btn_height">55dp</dimen>
+
 </resources>

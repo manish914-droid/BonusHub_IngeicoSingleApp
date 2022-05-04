@@ -270,7 +270,7 @@
 
         <include
             android:id="@+id/main_keyBoard"
-            layout="@layout/new_enter_amount_keyboard"
+            layout="@layout/new_amount_keyboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/pad_5"
