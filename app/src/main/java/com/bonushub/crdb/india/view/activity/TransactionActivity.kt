@@ -810,36 +810,35 @@ class TransactionActivity : BaseActivityNew() {
 
                                       val transactionDate = dateFormaterNew(cardProcessedDataModal.getTimeStamp()?.toLong() ?: 0L)
                                       val transactionTime = timeFormaterNew(cardProcessedDataModal.getTime()?:"")
-                                      txnApprovedDialog(transactionTypeEDashboardItem.res,transactionTypeEDashboardItem.title,txnAmountAfterApproved,"${transactionDate}, ${transactionTime}") {  }
-                                  }
+                                      txnApprovedDialog(transactionTypeEDashboardItem.res,transactionTypeEDashboardItem.title,txnAmountAfterApproved,
+                                          "${transactionDate}, ${transactionTime}") {
 
+                                          StubBatchData(
+                                              de55,
+                                              cardProcessedDataModal.getTransType(),
+                                              cardProcessedDataModal,
+                                              printExtraData,
+                                              autoSettlementCheck
+                                          ) { stubbedData ->
+                                              if (cardProcessedDataModal.getTransType() == TransactionType.EMI_SALE.type ||
+                                                  cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI.type ||
+                                                  cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type ||
+                                                  cardProcessedDataModal.getTransType() == TransactionType.FLEXI_PAY.type ||
+                                                  cardProcessedDataModal.getTransType() == TransactionType.TEST_EMI.type
 
-                        StubBatchData(
-                            de55,
-                            cardProcessedDataModal.getTransType(),
-                            cardProcessedDataModal,
-                            printExtraData,
-                            autoSettlementCheck
-                        ) { stubbedData ->
-                            if (cardProcessedDataModal.getTransType() == TransactionType.EMI_SALE.type ||
-                                cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI.type ||
-                                cardProcessedDataModal.getTransType() == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type ||
-                                cardProcessedDataModal.getTransType() == TransactionType.FLEXI_PAY.type ||
-                                cardProcessedDataModal.getTransType() == TransactionType.TEST_EMI.type
+                                              ) {
 
-                            ) {
+                                                  stubEMI(stubbedData, emiSelectedData, emiTAndCData,brandEMIData/*, brandEMIAccessData*/) { data ->
+                                                      Log.d("StubbedEMIData:- ", data.toString())
 
-                                stubEMI(stubbedData, emiSelectedData, emiTAndCData,brandEMIData/*, brandEMIAccessData*/) { data ->
-                                    Log.d("StubbedEMIData:- ", data.toString())
+                                                      printAndSaveBatchDataInDB(stubbedData){
 
-                                    printAndSaveBatchDataInDB(stubbedData){
-
-                                        if(it){
-                                            AppPreference.saveLastReceiptDetails(stubbedData)
-                                            Log.e("EMI ", "COMMENT ******")
-                                            goToDashBoard()
-                                        }
-                                    }
+                                                          if(it){
+                                                              AppPreference.saveLastReceiptDetails(stubbedData)
+                                                              Log.e("EMI ", "COMMENT ******")
+                                                              goToDashBoard()
+                                                          }
+                                                      }
 
 //                                    modal=  saveBrandEMIDataToDB(brandEMIData, data.hostInvoice,data.hostTID)
 //                                    saveBrandEMIbyCodeDataInDB(
@@ -921,76 +920,81 @@ class TransactionActivity : BaseActivityNew() {
 //                                            }
 //                                        }
 //                                    }
-                                }
-                            }
-                            else {
-                                printAndSaveBatchDataInDB(stubbedData) { printCB ->
-                                    if (printCB) {
-                                        AppPreference.saveLastReceiptDetails(stubbedData)
-                                        Log.e("FIRST ", "COMMENT ******")
-                                        goToDashBoard()
-                                        // Here we are Syncing Txn CallBack to server
+                                                  }
+                                              }
+                                              else {
+                                                  printAndSaveBatchDataInDB(stubbedData) { printCB ->
+                                                      if (printCB) {
+                                                          AppPreference.saveLastReceiptDetails(stubbedData)
+                                                          Log.e("FIRST ", "COMMENT ******")
+                                                          goToDashBoard()
+                                                          // Here we are Syncing Txn CallBack to server
 
-                                        /*if(tpt?.digiPosCardCallBackRequired=="1" || AppPreference.getBoolean(AppPreference.IsECRon)) {
-                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                withContext(Dispatchers.Main) {
-                                                    showProgress(
-                                                        getString(
-                                                            R.string.txn_syn
-                                                        )
-                                                    )
-                                                }
-                                                val amount = MoneyUtil.fen2yuan(
-                                                    stubbedData.totalAmmount.toDouble().toLong()
-                                                )
-                                                val txnCbReqData = TxnCallBackRequestTable()
-                                                txnCbReqData.reqtype = EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
-                                                txnCbReqData.tid = stubbedData.hostTID
-                                                txnCbReqData.batchnum = stubbedData.hostBatchNumber
-                                                txnCbReqData.roc = stubbedData.hostRoc
-                                                txnCbReqData.amount = amount
-                                                txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
-                                                txnCbReqData.txnTime = stubbedData.time
-                                                txnCbReqData.txnDate = stubbedData.transactionDate
-                                                //    20220302 145902
+                                                          /*if(tpt?.digiPosCardCallBackRequired=="1" || AppPreference.getBoolean(AppPreference.IsECRon)) {
+                                                              lifecycleScope.launch(Dispatchers.IO) {
+                                                                  withContext(Dispatchers.Main) {
+                                                                      showProgress(
+                                                                          getString(
+                                                                              R.string.txn_syn
+                                                                          )
+                                                                      )
+                                                                  }
+                                                                  val amount = MoneyUtil.fen2yuan(
+                                                                      stubbedData.totalAmmount.toDouble().toLong()
+                                                                  )
+                                                                  val txnCbReqData = TxnCallBackRequestTable()
+                                                                  txnCbReqData.reqtype = EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+                                                                  txnCbReqData.tid = stubbedData.hostTID
+                                                                  txnCbReqData.batchnum = stubbedData.hostBatchNumber
+                                                                  txnCbReqData.roc = stubbedData.hostRoc
+                                                                  txnCbReqData.amount = amount
+                                                                  txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
+                                                                  txnCbReqData.txnTime = stubbedData.time
+                                                                  txnCbReqData.txnDate = stubbedData.transactionDate
+                                                                  //    20220302 145902
 
-                                                TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(txnCbReqData)
+                                                                  TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(txnCbReqData)
 
-                                                syncTxnCallBackToHost {
-                                                    Log.e(
-                                                        "TXN CB ",
-                                                        "SYNCED TO SERVER  --> $it"
-                                                    )
-                                                    hideProgress()
-                                                }
-                                                Log.e("LAST ", "COMMENT ******")
+                                                                  syncTxnCallBackToHost {
+                                                                      Log.e(
+                                                                          "TXN CB ",
+                                                                          "SYNCED TO SERVER  --> $it"
+                                                                      )
+                                                                      hideProgress()
+                                                                  }
+                                                                  Log.e("LAST ", "COMMENT ******")
 
-                                                //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
-                                                //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+                                                                  //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
+                                                                  //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
 
-                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                    withContext(Dispatchers.Main) {
-                                                        syncOfflineSaleAndAskAutoSettlement(
-                                                            autoSettlementCheck.substring(0, 1)
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }else{
-                                            if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                GlobalScope.launch(Dispatchers.Main) {
-                                                    syncOfflineSaleAndAskAutoSettlement(
-                                                        autoSettlementCheck.substring(0, 1)
-                                                    )
-                                                }
-                                            }
-                                        }*/
-                                    }
-                                }
-                            }
+                                                                  if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                                      withContext(Dispatchers.Main) {
+                                                                          syncOfflineSaleAndAskAutoSettlement(
+                                                                              autoSettlementCheck.substring(0, 1)
+                                                                          )
+                                                                      }
+                                                                  }
+                                                              }
+                                                          }else{
+                                                              if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                                  GlobalScope.launch(Dispatchers.Main) {
+                                                                      syncOfflineSaleAndAskAutoSettlement(
+                                                                          autoSettlementCheck.substring(0, 1)
+                                                                      )
+                                                                  }
+                                                              }
+                                                          }*/
+                                                      }
+                                                  }
+                                              }
 
 
-                        }
+                                          }
+                                      }
+                                  }
+
+
+
 
                     }
                     else if (syncStatus && responseCode != "00") {

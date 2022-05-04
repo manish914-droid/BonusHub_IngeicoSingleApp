@@ -6,12 +6,12 @@
 	android:orientation="vertical">
 
 
-	<include
+	<!--<include
 		android:id="@+id/toolbar_txn"
 		layout="@layout/app_toolbar"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent" />
+		app:layout_constraintTop_toTopOf="parent" />-->
 
 	<include
 		android:id="@+id/sub_header_view"
@@ -20,7 +20,7 @@
 		android:layout_height="wrap_content"
 		android:visibility="visible"
 		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/toolbar_txn" />
+		app:layout_constraintTop_toTopOf="parent"/>
 
 	<androidx.constraintlayout.widget.Guideline
 		android:id="@+id/guidelineLeft"
@@ -200,7 +200,8 @@ android:textColor="@color/black"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 
-		app:layout_constraintTop_toBottomOf="@+id/manual_entry_button">
+		app:layout_constraintTop_toBottomOf="@+id/manual_entry_button"
+		app:layout_constraintBottom_toTopOf="@+id/tv_insert_card">
 
 
 	</ImageView>
