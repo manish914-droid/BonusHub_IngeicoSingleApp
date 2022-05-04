@@ -99,9 +99,17 @@ private val emiIssuerTAndCDataFromIntent by lazy {
 
         var field57=""
         field57 = if(transactionType== BhTransactionType.BRAND_EMI.type) {
+
+            binding?.toolbarTxn?.subHeaderText?.setText("BRAND EMI")
+            binding?.toolbarTxn?.headerImage?.setImageResource(R.drawable.ic_header_brand_emi)
+
             "$bankEMIRequestCode^0^${brandID}^${productID}^${imeiOrSerialNum}" +
                     "^${/*cardBinValue.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }else{
+
+            binding?.toolbarTxn?.subHeaderText?.setText("BANK EMI")
+            binding?.toolbarTxn?.headerImage?.setImageResource(R.drawable.ic_header_emi_sale)
+
             "$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }
 
@@ -172,7 +180,7 @@ lifecycleScope.launch(Dispatchers.IO) {
         }
 
 
-        binding?.toolbarTxn?.mainToolbarStart?.apply {  setBackgroundResource(R.drawable.ic_back_arrow_white)
+        binding?.toolbarTxn?.backImageButton?.apply {  //setBackgroundResource(R.drawable.ic_back_arrow_white)
         setOnClickListener {
             finish()
             startActivity(Intent(this@TenureSchemeActivity, NavigationActivity::class.java).apply {

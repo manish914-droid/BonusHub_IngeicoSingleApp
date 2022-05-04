@@ -97,6 +97,8 @@ class TransactionActivity : BaseActivityNew() {
         intent.getSerializableExtra("brandEMIData") as BrandEMIDataModal?
     }
 
+    var txnAmountAfterApproved = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
@@ -134,12 +136,14 @@ class TransactionActivity : BaseActivityNew() {
             BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type ->{
                 val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
                 val frtAmt = "%.2f".format(amt)
+                txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+frtAmt
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
                 globalCardProcessedModel.setEmiTransactionAmount((saleAmt.toDouble() * 100).toLong())
             }
             else ->{
                 val frtAmt = "%.2f".format(saleAmt.toFloat())
+                txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+frtAmt
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
 
@@ -620,6 +624,7 @@ class TransactionActivity : BaseActivityNew() {
                     } else {
                         val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
                         emvBinding?.baseAmtTv?.text = baseAmountValue
+                        txnAmountAfterApproved = "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
                     }
                 }
 
@@ -797,9 +802,17 @@ class TransactionActivity : BaseActivityNew() {
                     if (syncStatus && responseCode == "00" && !AppPreference.getBoolean(AppPreference.ONLINE_EMV_DECLINED)) {
                         //Below we are saving batch data and print the receipt of transaction:-
 
-                              GlobalScope.launch(Dispatchers.Main) {
+                              /*GlobalScope.launch(Dispatchers.Main) {
                                   Toast.makeText(this@TransactionActivity,"TXn approved",Toast.LENGTH_SHORT).show()
-                              }
+                              }*/
+
+                                  lifecycleScope.launch(Dispatchers.Main){
+
+                                      val transactionDate = dateFormaterNew(cardProcessedDataModal.getTimeStamp()?.toLong() ?: 0L)
+                                      val transactionTime = timeFormaterNew(cardProcessedDataModal.getTime()?:"")
+                                      txnApprovedDialog(transactionTypeEDashboardItem.res,transactionTypeEDashboardItem.title,txnAmountAfterApproved,"${transactionDate}, ${transactionTime}") {  }
+                                  }
+
 
                         StubBatchData(
                             de55,
@@ -982,11 +995,12 @@ class TransactionActivity : BaseActivityNew() {
                     }
                     else if (syncStatus && responseCode != "00") {
                         lifecycleScope.launch(Dispatchers.Main) {
-                            alertBoxWithAction(
+                            alertBoxWithActionNew(
                                 getString(R.string.transaction_delined_msg),
                                 responseIsoData.isoMap[58]?.parseRaw2String().toString(),
-                                false,
+                                R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok),
+                                "",false,false,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         /*if (!TextUtils.isEmpty(autoSettlementCheck)) {
@@ -1017,11 +1031,12 @@ class TransactionActivity : BaseActivityNew() {
                                 hostMsg = getString(R.string.transaction_delined_msg)
                                 Log.e("hostMsgModify",""+hostMsg)
                             }
-                            alertBoxWithAction(
+                            alertBoxWithActionNew(
                                 getString(R.string.transaction_delined_msg),
                                 hostMsg,
-                                false,
+                                R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok),
+                                "",false,false,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         if (!TextUtils.isEmpty(autoSettlementCheck)) {
@@ -1059,11 +1074,12 @@ class TransactionActivity : BaseActivityNew() {
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             //  VFService.showToast(transMsg)
-                            alertBoxWithAction(
+                            alertBoxWithActionNew(
                                 getString(R.string.reversal_upload_fail),
                                 getString(R.string.transaction_delined_msg),
-                                false,
-                                getString(R.string.positive_button_ok),
+                                R.drawable.ic_txn_declined,
+                                getString(R.string.positive_button_ok),"",
+                                false,false,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback)
                                         declinedTransaction()
@@ -1197,7 +1213,7 @@ class TransactionActivity : BaseActivityNew() {
         batchTable: TempBatchFileDataTable,
         cb: suspend (Boolean) -> Unit
     ) {
-        withContext(Dispatchers.Main) {
+       /* withContext(Dispatchers.Main) {
             val printerUtil: PrintUtil? = null
             (this@TransactionActivity as BaseActivityNew).alertBoxWithAction(
                 getString(R.string.print_customer_copy),
@@ -1229,6 +1245,37 @@ class TransactionActivity : BaseActivityNew() {
 //                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
 //                    startActivity(intent)
                 })
+        }*/
+
+        withContext(Dispatchers.Main) {
+            val printerUtil: PrintUtil? = null
+            (this@TransactionActivity as BaseActivityNew).alertBoxWithActionNew("",
+                getString(R.string.print_customer_copy),
+                R.drawable.ic_print_customer_copy, getString(R.string.positive_button_yes), getString(R.string.no),true,false,{ status ->
+                    showProgress(getString(R.string.printing))
+                    PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                        batchTable,
+                        EPrintCopyType.CUSTOMER,
+                        this@TransactionActivity as BaseActivityNew
+                    ) { printCB, printingFail ->
+                        (this@TransactionActivity as BaseActivityNew).hideProgress()
+                        if (printCB) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                cb(printCB)
+                            }
+                            (this@TransactionActivity as BaseActivityNew).hideProgress()
+
+                        }
+
+                    }
+                }, {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        cb(true)
+                    }
+                    (this@TransactionActivity as BaseActivityNew).hideProgress()
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
+                })
         }
     }
 
@@ -1241,8 +1288,8 @@ class TransactionActivity : BaseActivityNew() {
 
     fun handleEMVFallbackFromError(title: String, msg: String, showCancelButton: Boolean, emvFromError: (Boolean) -> Unit) {
         lifecycleScope.launch(Dispatchers.Main) {
-            alertBoxWithAction(title,
-                msg, showCancelButton, getString(R.string.positive_button_ok), { alertCallback ->
+            alertBoxWithActionNew(title,
+                msg,R.drawable.ic_txn_declined, getString(R.string.positive_button_ok),"Cancel",showCancelButton,false , { alertCallback ->
                     if (alertCallback) {
                         emvFromError(true)
                     }

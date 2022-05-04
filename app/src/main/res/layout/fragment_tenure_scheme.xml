@@ -20,9 +20,14 @@
             android:background="@color/white"
             android:descendantFocusability="blocksDescendants">
 
+            <!--<include
+                android:id="@+id/toolbar_txn"
+                layout="@layout/app_toolbar" />-->
+
             <include
                 android:id="@+id/toolbar_txn"
-                layout="@layout/app_toolbar" />
+                layout="@layout/sub_header_layout"
+                android:visibility="visible" />
 
 
             <TextView
@@ -82,8 +87,17 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/text_size_xregular"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/footerApp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <include layout="@layout/footer_app"
+        android:id="@+id/footerApp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="31dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

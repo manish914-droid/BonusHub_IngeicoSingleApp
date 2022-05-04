@@ -17,10 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.databinding.DialogMsgWithIconBinding
-import com.bonushub.crdb.india.databinding.DialogTxnApprovedBinding
-import com.bonushub.crdb.india.databinding.ItemOkBtnDialogBinding
-import com.bonushub.crdb.india.databinding.NewPrintCustomerCopyBinding
+import com.bonushub.crdb.india.databinding.*
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
@@ -219,88 +216,6 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
     }
 
-    /*override fun alertBoxWithAction(
-        title: String, msg: String, showCancelButton: Boolean,
-        positiveButtonText: String, alertCallback: (Boolean) -> Unit,
-        cancelButtonCallback: (Boolean) -> Unit, dialogIcon:Int
-    ) {
-        val dialogBuilder = Dialog(this)
-        //builder.setTitle(title)
-        //  builder.setMessage(msg)
-        val bindingg = NewPrintCustomerCopyBinding.inflate(LayoutInflater.from(this))
-
-        dialogBuilder.setContentView(bindingg.root)
-        if(dialogIcon == 0){
-            if (title == getString(R.string.print_customer_copy)|| title == getString(R.string.sms_upi_pay)|| title == getString(R.string.no_receipt)) {
-                if(title==getString(R.string.sms_upi_pay)){
-                    bindingg.imgPrinter.setImageResource(R.drawable.ic_link_icon)
-                } else if(title==getString(R.string.print_customer_copy)){
-                    bindingg.imgPrinter.setImageResource(R.drawable.ic_printer)
-                } else if(title==getString(R.string.no_receipt)){
-                    bindingg.imgPrinter.setImageResource(R.drawable.ic_info)
-                }
-                bindingg.imgPrinter.visibility = View.VISIBLE
-            } else {
-                // bindingg.imgPrinter.visibility = View.GONE
-            }
-        }else{
-            bindingg.imgPrinter.setImageResource(dialogIcon)
-        }
-
-        if(positiveButtonText==""){
-            bindingg.yesBtn.visibility=View.GONE
-
-        }
-        dialogBuilder.setCancelable(false)
-        val window = dialogBuilder.window
-        window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-
-        bindingg.yesBtn.text = positiveButtonText
-        bindingg.dialogMsg.text = msg
-
-        bindingg.yesBtn.setOnClickListener {
-            dialogBuilder.dismiss()
-            alertCallback(true)
-        }
-        //Below condition check is to show Cancel Button in Alert Dialog on condition base:-
-        if (showCancelButton) {
-            bindingg.noBtn.setOnClickListener {
-                dialogBuilder.cancel()
-                cancelButtonCallback(true)
-            }
-        } else {
-            //bindingg.imgPrinter.visibility = View.GONE
-            bindingg.noBtn.visibility = View.GONE
-        }
-        //     val alert: androidx.appcompat.app.AlertDialog = dialogBuilder.create()
-        //Below Handler will execute to auto cancel Alert Dialog Pop-Up when positiveButtonText isEmpty:-
-        if (TextUtils.isEmpty(positiveButtonText)) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                dialogBuilder.dismiss()
-                dialogBuilder.cancel()
-                startActivity(Intent(this, NavigationActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-            }, 2000)
-        }
-
-        try {
-            if (!dialogBuilder.isShowing) {
-                dialogBuilder.show()
-            }
-        } catch (ex: WindowManager.BadTokenException) {
-            ex.printStackTrace()
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
-        dialogBuilder.show()
-        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    }*/
-
-
     override fun alertBoxWithAction(
         title: String, msg: String, showCancelButton: Boolean,
         positiveButtonText: String, alertCallback: (Boolean) -> Unit,
@@ -383,8 +298,113 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     }
 
 
+    override fun alertBoxWithActionNew(header:String, msg:String, icon: Int, positiveButtonText: String, negativeButtonText:String, isShowNegativeBtn:Boolean,
+                                       isAutoCancel:Boolean, yesButtonCallback: (Boolean) -> Unit, noButtonCallback: (Boolean) -> Unit) {
+        val dialogBuilder = Dialog(this)
+        //builder.setTitle(title)
+        //  builder.setMessage(msg)
+        val bindingg = DialogAlertMsgNewBinding.inflate(LayoutInflater.from(this))
+
+       // dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogBuilder.setContentView(bindingg.root)
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogBuilder.setCancelable(true)
+        val window = dialogBuilder.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+
+        if(header.isNotEmpty()) {
+            bindingg?.txtViewHeading.text = header
+            bindingg?.txtViewHeading.visibility = View.VISIBLE
+        }
+
+        if(icon != 0) {
+            bindingg?.imgViewDialog.setImageResource(icon)
+            bindingg?.imgViewDialog.visibility = View.VISIBLE
+        }
+
+
+        if(msg.isNotEmpty()) {
+            bindingg?.txtViewMsg.text = msg
+            bindingg?.txtViewMsg.visibility = View.VISIBLE
+        }
+
+        if(isShowNegativeBtn) {
+            bindingg?.txtViewNo.text = negativeButtonText
+            bindingg?.txtViewNo.visibility = View.VISIBLE
+        }
+
+        bindingg.txtViewYes.text = positiveButtonText
+
+        bindingg?.txtViewNo?.setOnClickListener {
+            dialogBuilder.dismiss()
+            noButtonCallback(true)
+        }
+
+        bindingg?.txtViewYes?.setOnClickListener {
+            dialogBuilder.dismiss()
+            yesButtonCallback(true)
+        }
+
+        if(isAutoCancel)
+        {
+            Handler(Looper.getMainLooper()).postDelayed({
+                dialogBuilder.dismiss()
+                dialogBuilder.cancel()
+                /*startActivity(Intent(this, NavigationActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })*/
+            }, 2000)
+        }
+
+       /* bindingg.yesBtn.text = positiveButtonText
+        bindingg.dialogMsg.text = msg
+
+        bindingg.yesBtn.setOnClickListener {
+            dialogBuilder.dismiss()
+            alertCallback(true)
+        }
+        //Below condition check is to show Cancel Button in Alert Dialog on condition base:-
+        if (showCancelButton) {
+            bindingg.noBtn.setOnClickListener {
+                dialogBuilder.cancel()
+                cancelButtonCallback(true)
+            }
+        } else {
+            //bindingg.imgPrinter.visibility = View.GONE
+            bindingg.noBtn.visibility = View.GONE
+        }
+        //     val alert: androidx.appcompat.app.AlertDialog = dialogBuilder.create()
+        //Below Handler will execute to auto cancel Alert Dialog Pop-Up when positiveButtonText isEmpty:-
+        if (TextUtils.isEmpty(positiveButtonText)) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                dialogBuilder.dismiss()
+                dialogBuilder.cancel()
+                startActivity(Intent(this, NavigationActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }, 2000)
+        }*/
+
+        try {
+            if (!dialogBuilder.isShowing) {
+                dialogBuilder.show()
+            }
+        } catch (ex: WindowManager.BadTokenException) {
+            ex.printStackTrace()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        dialogBuilder.show()
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
+
     override fun txnApprovedDialog(
-        amount: String, dateTime: String, alertCallback: (Boolean) -> Unit
+        headerImage:Int,headerText:String, amount: String, dateTime: String, alertCallback: (Boolean) -> Unit
     ) {
         val dialogBuilder = Dialog(this,android.R.style.ThemeOverlay_Material_ActionBar)
         //builder.setTitle(title)
@@ -393,6 +413,11 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
         dialogBuilder.setContentView(bindingg.root)
 
+        if(headerImage != 0) {
+            bindingg.subHeaderView?.headerImage.setImageResource(headerImage)
+        }
+
+        bindingg.subHeaderView?.subHeaderText.text = headerText
         bindingg.txtViewAmount.text = amount
         bindingg.txtViewDateTime.text = dateTime
 
@@ -626,8 +651,11 @@ interface IDialog {
     )
 
     fun txnApprovedDialog(
-        amount: String = "0.00", dateTime: String = "", alertCallback: (Boolean) -> Unit
+        headerImage:Int = 0 ,headerText:String = "",amount: String = "0.00", dateTime: String = "", alertCallback: (Boolean) -> Unit
     )
+
+    fun alertBoxWithActionNew(header:String, msg:String, icon: Int, positiveButtonText: String, negativeButtonText:String, isShowNegativeBtn:Boolean,
+                              isAutoCancel:Boolean, yesButtonCallback: (Boolean) -> Unit, noButtonCallback: (Boolean) -> Unit)
 }
 
 

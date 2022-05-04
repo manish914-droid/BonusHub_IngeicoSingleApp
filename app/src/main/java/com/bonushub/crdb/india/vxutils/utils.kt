@@ -44,6 +44,7 @@ import kotlinx.coroutines.*
 import java.io.*
 import java.lang.Runnable
 import java.nio.charset.StandardCharsets
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -1294,8 +1295,29 @@ fun getTidForTestTxn(testEmiItem: String):String{
 fun dateFormater(date: Long): String =
     SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
 
+fun dateFormaterNew(date: Long): String =
+    SimpleDateFormat("d MMM", Locale.getDefault()).format(date)
+
 fun timeFormater(date: Long): String =
     SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(date)
+
+fun timeFormaterNew(time: String): String{
+   // val time = "071108"
+    val timeFormat = SimpleDateFormat("HHmmss", Locale.getDefault())
+    val timeFormat2 = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    var formattedTime = ""
+    try {
+        val t1 = timeFormat.parse(time)
+        formattedTime = timeFormat2.format(t1)
+        Log.e("Time", formattedTime)
+        return formattedTime
+
+    } catch (e: ParseException) {
+        e.printStackTrace()
+        return ""
+    }
+}
+
 
 fun getConnectionType():String{
 

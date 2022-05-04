@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/pad_15"
+        app:cardCornerRadius="@dimen/pad_15">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_5">
+
+            <TextView
+                android:id="@+id/txtViewHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:fontFamily="@font/muli_bold"
+                android:maxLines="2"
+                android:textColor="@color/txt_color_red"
+                android:textSize="@dimen/text_size_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/imgViewDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_txn_declined"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewHeading"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/txtViewMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:fontFamily="@font/muli_semi_bold"
+                android:maxLines="2"
+                android:textColor="@color/txt_color_blue"
+                android:textSize="@dimen/text_size_large"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgViewDialog"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/txtViewNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue_bg_skyblue"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_32"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_32"
+                android:paddingBottom="@dimen/pad_15"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/txtViewYes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewMsg"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/txtViewYes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue3"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_30"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_30"
+                android:paddingBottom="@dimen/pad_15"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/txtViewNo"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewMsg"
+                android:visibility="visible"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+    <!--<androidx.cardview.widget.CardView
+        android:id="@+id/custom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/pad_10"
+        android:layout_marginTop="27dp"
+        android:layout_marginStart="@dimen/pad_15"
+        android:layout_marginEnd="@dimen/pad_15">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:gravity="bottom"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/dialog_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center"
+                    android:padding="@dimen/pad_8"
+                    android:text="BATCH SUCCESSFULLY SETTLE"
+                    android:textColor="@color/themeBackground"
+                    android:textSize="@dimen/text_size_regular"
+                    android:fontFamily="@font/muli_light"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#2349B5"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/pad_16"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+
+                <TextView
+                    android:id="@+id/noBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/pad_15"
+                    android:paddingTop="@dimen/pad_10"
+                    android:paddingBottom="@dimen/pad_10"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/no"
+                    android:background="@drawable/edge_bg_white"
+                    android:fontFamily="@font/muli_regular"
+                    android:textColor="@color/txt_color"
+                    android:textSize="@dimen/text_size_small"/>
+
+
+                <TextView
+                    android:id="@+id/yesBtn"
+                    android:fontFamily="@font/muli_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_15"
+                    android:paddingTop="@dimen/pad_10"
+                    android:paddingBottom="@dimen/pad_10"
+                    android:paddingStart="@dimen/pad_15"
+                    android:paddingEnd="@dimen/pad_15"
+                    android:text="@string/yes"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_small"
+                    android:background="@drawable/edge_white_bg_blue"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/img_printer"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_centerHorizontal="true"
+        android:elevation="5dp"
+        android:src="@drawable/ic_info"
+        android:visibility="visible" />
+-->
+
+</RelativeLayout>
