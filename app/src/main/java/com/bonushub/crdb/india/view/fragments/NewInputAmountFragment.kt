@@ -121,6 +121,9 @@ class NewInputAmountFragment : Fragment() {
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
         testEmiTxnType = (arguments?.getSerializable("TestEmiOption") ?: "") as? String
 
+        (activity as NavigationActivity).manageTopToolBar(false)
+
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }

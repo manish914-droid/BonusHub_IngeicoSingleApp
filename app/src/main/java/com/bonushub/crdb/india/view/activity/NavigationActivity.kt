@@ -150,6 +150,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
+        manageTopToolBar(true)
         setupNavigationDrawerLayout()
          lockStatusBar()
 /*         isFresAppStatus = WifiPrefManager(this).isWifiStatus
@@ -228,6 +229,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         //    }
     }
 
+    fun manageTopToolBar(isShow:Boolean){
+        if(isShow) {
+            navigationBinding?.toobar?.appBarLl?.visibility = View.VISIBLE
+        }else{
+            navigationBinding?.toobar?.appBarLl?.visibility = View.GONE
+        }
+    }
 
 
 

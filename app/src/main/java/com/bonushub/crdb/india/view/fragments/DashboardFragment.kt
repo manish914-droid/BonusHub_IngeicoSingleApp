@@ -49,13 +49,18 @@ import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
 import com.mindorks.example.coroutines.utils.Status
+import com.usdk.apiservice.aidl.printer.AlignMode
 
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 var isAutoSettleCodeInitiated=false
 @AndroidEntryPoint
@@ -102,6 +107,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("Dashboard:- ", "onViewCreated")
+        (activity as NavigationActivity).manageTopToolBar(true)
         isDashboardOpen = true
         Utility().hideSoftKeyboard(requireActivity())
         restartHandaling()
@@ -128,6 +134,13 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         if (isDashboardOpen && !AppPreference.getBoolean(PreferenceKeyConstant.IsAutoSettleDone.keyName))
             checkForAutoSettle()
         //endregion
+
+        /*(activity as NavigationActivity).alertBoxWithActionNew(getString(R.string.transaction_delined_msg),"",
+            R.drawable.ic_txn_declined,"OK","",false,false,{},{})*/
+
+       /* (activity as NavigationActivity).alertBoxWithActionNew("",getString(R.string.print_customer_copy),
+            R.drawable.ic_print_customer_copy,"Yes","No",true,false,{},{})*/
+
     }
 
     override fun onPause() {

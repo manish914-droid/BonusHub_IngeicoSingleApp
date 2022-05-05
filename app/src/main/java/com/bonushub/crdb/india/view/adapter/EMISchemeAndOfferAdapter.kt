@@ -28,23 +28,28 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
     }
 
     override fun getItemCount(): Int {
-        return emiSchemeDataList?.size ?: 0
+        return emiSchemeDataList?.size?.plus(1) ?: 0
     }
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: EMISchemeOfferHolder, position: Int) {
+
+        if (position == emiSchemeDataList?.size) {
+            holder.binding.cardView.visibility = View.INVISIBLE
+        } else {
+            holder.binding.cardView.visibility = View.VISIBLE
         val modelData = emiSchemeDataList?.get(position)
 
         //region==========================Checked Particular Row of RecyclerView Logic:-
-        if(modelData?.isSelected == true){
+        if (modelData?.isSelected == true) {
             // parent_emi_view_ll
             holder.binding.parentEmiViewLl.setBackgroundResource(R.drawable.card_edge_blue)
             holder.binding.schemeCheckIv.visibility = View.VISIBLE
-        }else{
+        } else {
             holder.binding.parentEmiViewLl.setBackgroundResource(R.drawable.card_edge_transparent_bg_sky_blu)
             holder.binding.schemeCheckIv.visibility = View.INVISIBLE
         }
-       /* if (modelData?.isSelected == true) {
+        /* if (modelData?.isSelected == true) {
             //holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#13E113"))) //
             //holder.binding.schemeCheckIv.visibility = View.VISIBLE//
             holder.binding.cardView.setBackgroundResource(R.drawable.edge_blue)
@@ -129,7 +134,7 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
 
                 val tvOffer = holder.binding.tvOffer
 
-               //tvOffer.context.getString(R.string.cashBackOffer)
+                //tvOffer.context.getString(R.string.cashBackOffer)
                 tvOffer.text = modelData.tenureTAndC
                 makeTextViewResizable(tvOffer, 8, "See More", true)
             } else {
@@ -168,8 +173,8 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
                     holder.binding.discountLL.visibility = View.GONE
                 }
                 if (transactionType == BhTransactionType.TEST_EMI.type) {
-                    holder.binding.tvTenure.text = modelData.tenure +" Months"
-                    holder.binding.tenureHeadingTv.text = modelData.tenure +" Months"
+                    holder.binding.tvTenure.text = modelData.tenure + " Months"
+                    holder.binding.tenureHeadingTv.text = modelData.tenure + " Months"
                     holder.binding.toatalemipayLL.visibility = View.GONE
                     holder.binding.tvInterestRate.text =
                         "" + divideAmountBy100(modelData.tenureInterestRate.toInt()).toString() + " %"
@@ -200,13 +205,19 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
             }
         }
 
+    }
         holder.binding.parentEmiViewLl.setOnClickListener {
-            //index = position
-            schemeSelectCB(position)
-            for(i in emiSchemeDataList!!.indices){
-                emiSchemeDataList[i].isSelected = i == position
+            if (position == emiSchemeDataList?.size) {
+                // do nothing
+            }else{
+                //index = position
+                schemeSelectCB(position)
+                for(i in emiSchemeDataList!!.indices){
+                    emiSchemeDataList[i].isSelected = i == position
+                }
+                notifyDataSetChanged()
             }
-            notifyDataSetChanged()
+
         }
 
 

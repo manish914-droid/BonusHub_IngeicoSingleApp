@@ -12,13 +12,16 @@
         android:background="@drawable/dropshadow_blue"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key1"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/key2"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -34,18 +37,21 @@
             android:paddingEnd="@dimen/pad_20"
             android:paddingBottom="@dimen/pad_12"
             android:text="1"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key2"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:rippleColor="@color/ripple_color_effect"
+        app:cardElevation="@dimen/pad_15"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/key3"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -61,18 +67,21 @@
             android:paddingEnd="@dimen/pad_20"
             android:paddingBottom="@dimen/pad_12"
             android:text="2"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key3"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:rippleColor="@color/ripple_color_effect"
+        app:cardElevation="@dimen/pad_15"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/keyClr"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -88,18 +97,21 @@
             android:paddingEnd="@dimen/pad_20"
             android:paddingBottom="@dimen/pad_12"
             android:text="3"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/keyClr"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         android:padding="@dimen/pad_5"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toEndOf="parent"
@@ -118,16 +130,19 @@
             android:text="CAN"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key4"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/key5"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -141,14 +156,14 @@
             android:paddingStart="@dimen/pad_20"
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:paddingBottom="@dimen/pad_12"
             android:text="4"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key5"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
@@ -156,7 +171,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/key6"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -170,14 +188,14 @@
             android:paddingStart="@dimen/pad_20"
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:paddingBottom="@dimen/pad_12"
             android:text="5"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key6"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
@@ -185,7 +203,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/keyDelete"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -199,14 +220,14 @@
             android:paddingStart="@dimen/pad_20"
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:paddingBottom="@dimen/pad_12"
             android:text="6"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/keyDelete"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
@@ -214,7 +235,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         android:padding="@dimen/pad_5"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toEndOf="parent"
@@ -233,16 +257,19 @@
             android:text="DEL"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key7"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
         app:cardCornerRadius="@dimen/pad_8"
+        app:rippleColor="@color/ripple_color_effect"
         app:layout_constraintEnd_toStartOf="@id/key8"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
@@ -255,14 +282,14 @@
             android:paddingStart="@dimen/pad_20"
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:paddingBottom="@dimen/pad_12"
             android:text="7"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key8"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
@@ -270,7 +297,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/key9"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -284,14 +314,14 @@
             android:paddingStart="@dimen/pad_20"
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:paddingBottom="@dimen/pad_12"
             android:text="8"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key9"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
@@ -299,7 +329,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/keyOK"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -313,14 +346,14 @@
             android:paddingStart="@dimen/pad_20"
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:paddingBottom="@dimen/pad_12"
             android:text="9"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/keyOK"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/pad_120"
@@ -328,7 +361,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         android:padding="@dimen/pad_5"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -348,17 +384,20 @@
             android:text="OK"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key000"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_marginTop="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/key7"
@@ -375,9 +414,9 @@
             android:textAlignment="center"
             android:textColor="@color/txt_color_blue"
             android:textSize="19sp" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key00"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
@@ -385,7 +424,10 @@
         android:layout_marginEnd="@dimen/pad_10"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintEnd_toStartOf="@+id/key0"
         app:layout_constraintStart_toEndOf="@+id/key000"
@@ -401,15 +443,18 @@
             android:fontFamily="@font/muli_semi_bold"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/key0"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_marginBottom="@dimen/pad_10"
         android:background="@color/white"
-        android:elevation="@dimen/pad_5"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:rippleColor="@color/ripple_color_effect"
         app:cardCornerRadius="@dimen/pad_8"
         app:layout_constraintStart_toStartOf="@id/key9"
         app:layout_constraintTop_toTopOf="@id/key000">
@@ -422,11 +467,11 @@
             android:paddingTop="@dimen/pad_12"
             android:paddingEnd="@dimen/pad_20"
             android:paddingBottom="@dimen/pad_12"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:text="0"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <!--<androidx.cardview.widget.CardView
         android:id="@+id/keyOK2"

@@ -29,23 +29,35 @@
                 layout="@layout/sub_header_layout"
                 android:visibility="visible" />
 
+            <ImageView
+                android:id="@+id/imgViewIssuerIcon"
+                android:layout_width="@dimen/pad_100"
+                android:layout_height="@dimen/pad_50"
+                android:layout_marginTop="@dimen/pad_5"
+                android:scaleType="fitXY"
+                android:src="@drawable/icici_issuer_icon"
+                app:layout_constraintEnd_toStartOf="@+id/txtViewIssuerName"
+                app:layout_constraintHorizontal_bias="0.93"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_txn" />
 
             <TextView
-                android:id="@+id/emiSchemeTV"
+                android:id="@+id/txtViewIssuerName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/pad_16"
                 android:drawablePadding="@dimen/pad_10"
-                android:fontFamily="@font/muli_regular"
+                android:fontFamily="@font/muli_semi_bold"
                 android:gravity="center"
-                android:padding="@dimen/pad_4"
-                android:text="@string/select_tenure_txt"
-                android:textColor="@color/txt_color"
+                android:hint="ICICI BANK"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                android:textColor="@color/txt_color_blue"
+                android:textColorHint="@color/txt_color_blue"
                 android:textSize="@dimen/text_size_xregular"
                 app:layout_constraintEnd_toEndOf="parent"
-
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar_txn"
+                app:layout_constraintStart_toEndOf="@+id/imgViewIssuerIcon"
+                app:layout_constraintTop_toTopOf="@+id/imgViewIssuerIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/imgViewIssuerIcon"
                 android:visibility="gone"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -57,7 +69,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emiSchemeTV"
+                app:layout_constraintTop_toBottomOf="@+id/imgViewIssuerIcon"
                 tools:listitem="@layout/item_emi_scheme_offer" />
 
             <!--   <ImageView

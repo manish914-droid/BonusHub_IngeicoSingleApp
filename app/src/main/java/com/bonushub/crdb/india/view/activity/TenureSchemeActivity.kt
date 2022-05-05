@@ -94,6 +94,7 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         binding = FragmentTenureSchemeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
+        // txtViewIssuerName imgViewIssuerIcon
         cardProcessedDataModal = intent?.getSerializableExtra("cardProcessedData") as? CardProcessedDataModal?
         transactionType        = intent?.getIntExtra("transactionType",-1) ?: -1
 
