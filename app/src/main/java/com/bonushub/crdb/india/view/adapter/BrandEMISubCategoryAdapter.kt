@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ItemBrandEmiMasterBinding
 import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
 
@@ -31,6 +32,8 @@ class BrandEMISubCategoryAdapter (val onItemClickListener: (BrandEMISubCategoryT
         fun bind(brandData: BrandEMISubCategoryTable) {
             binding.tvBrandMasterName.text = brandData.categoryName
             binding.brandEmiMasterParent.setOnClickListener {
+
+                binding.bankEmiCv.setBackgroundResource(R.drawable.edge_brand_selected)
                 onItemClickListener(brandData)
             }
         }

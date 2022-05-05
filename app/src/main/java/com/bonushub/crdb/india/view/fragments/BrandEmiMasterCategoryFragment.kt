@@ -84,6 +84,9 @@ class BrandEmiMasterCategoryFragment : Fragment() {
             brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
 
         }
+
+        (activity as NavigationActivity).manageTopToolBar(false)
+
         brandMasterBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
 

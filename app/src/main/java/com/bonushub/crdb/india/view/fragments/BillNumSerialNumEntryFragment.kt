@@ -107,12 +107,14 @@ class BillNumSerialNumEntryFragment : Fragment() {
 //0therwise optional
         if ((brandEmiProductData?.isRequired == "1" && brandEmiProductData?.validationTypeName?.isNotBlank() == true)|| (brandEmiProductData?.isRequired == "0" && brandEmiProductData?.validationTypeName?.isNotBlank() == true) ){
             if (brandValidation.isSerialNumReq) {
-                binding?.serialNumEt?.hint = "Enter serial number"
+               // binding?.serialNumEt?.hint = "Enter serial number"
+                binding?.serialNoCrdView?.hint = "Enter serial number"
             }
             else if (brandValidation.isImeiNumReq) {
        //     binding?.serialNumEt?.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(brandEMIDataModal.getMaxLength()?.toInt() ?: 16))
 
-                binding?.serialNumEt?.hint = "Enter IMEI number"
+              //  binding?.serialNumEt?.hint = "Enter IMEI number"
+                binding?.serialNoCrdView?.hint = "Enter IMEI number"
             }
             binding?.serialNoCrdView?.visibility = View.VISIBLE
         } else {
@@ -139,7 +141,7 @@ class BillNumSerialNumEntryFragment : Fragment() {
             }
         }
 
-        binding?.imgViewScanCode?.setOnClickListener {
+        binding?.serialNoCrdView?.setEndIconOnClickListener {
             DeviceHelper.openScanner{ status, msg, barcode ->
 
                 Handler(Looper.getMainLooper()).postDelayed({

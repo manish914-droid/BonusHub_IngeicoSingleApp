@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     android:id="@+id/brand_emi_master_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -32,57 +32,74 @@
 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bank_emi_cv"
-        android:theme="@style/Theme.MaterialComponents.Light"
         android:layout_width="match_parent"
         android:layout_height="@dimen/pad_50"
-        android:background="@drawable/card_edge"
+        android:layout_margin="@dimen/pad_8"
+        android:background="@drawable/edge_brand_unselected"
+        android:theme="@style/Theme.MaterialComponents.Light"
+
+        app:cardCornerRadius="@dimen/pad_12"
         app:cardElevation="@dimen/pad_10"
 
-        app:strokeWidth="1dp"
-        app:cardCornerRadius="@dimen/pad_12"
-
-        android:layout_margin="@dimen/pad_8"
-        app:strokeColor="@color/rippleColor"
         app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
-        >
+        app:strokeColor="@color/rippleColor"
+        app:strokeWidth="1dp">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/imgViewItemIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/txt_color_blue"
+            <RelativeLayout
+                android:id="@+id/relLayImg"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:layout_marginStart="@dimen/pad_20"
+                android:background="@drawable/circle_bg">
+
+                <ImageView
+                    android:id="@+id/imgViewItemIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_tv_solid"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+
+
             <TextView
                 android:id="@+id/tv_brand_master_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:gravity="left"
                 android:layout_marginStart="@dimen/pad_15"
                 android:background="@color/white"
+                android:fontFamily="@font/muli_bold"
+                android:gravity="left"
                 android:text="@string/bankEmi"
                 android:textColor="@color/txt_brand_item"
-                android:fontFamily="@font/muli_semi_bold"
                 android:textColorHint="@color/black"
                 android:textSize="@dimen/text_size_regular"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imgViewItemIcon"
-                app:layout_constraintEnd_toStartOf="@+id/imgViewArrow" />
+                app:layout_constraintEnd_toStartOf="@+id/imgViewArrow"
+                app:layout_constraintStart_toEndOf="@+id/relLayImg"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <ImageView
                 android:id="@+id/imgViewArrow"
                 android:layout_width="@dimen/pad_20"
                 android:layout_height="@dimen/pad_20"
-                android:src="@drawable/ic_right_arrow_new"
-                app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginEnd="@dimen/pad_15"
+                android:src="@drawable/ic_right_arrow_new"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
             </ImageView>
         </androidx.constraintlayout.widget.ConstraintLayout>
