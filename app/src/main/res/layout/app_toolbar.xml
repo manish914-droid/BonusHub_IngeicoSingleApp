@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/appBar_ll"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/appBar_ll"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    android:theme="@style/AppThemeNoActionBar"
-    android:elevation="@dimen/pad_16">
+    android:elevation="@dimen/pad_16"
+    android:theme="@style/AppThemeNoActionBar">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -13,11 +13,11 @@
         android:id="@+id/dashboard_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
+        android:background="@color/white"
         app:layout_scrollFlags="scroll|enterAlways"
         app:popupTheme="@style/VerifoneToolbarStyle">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -28,18 +28,27 @@
 
             <ImageButton
                 android:id="@+id/main_toolbar_start"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/pad_40"
+                android:layout_height="@dimen/pad_40"
                 android:layout_gravity="start|center_vertical"
-                android:background="@drawable/hover_icon"
-                android:contentDescription="@string/app_name" />
+                android:background="@color/white"
+                android:contentDescription="@string/app_name"
+                android:padding="@dimen/pad_5"
+                android:src="@drawable/ic_menu_new"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_margin="@dimen/pad_8"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/main_toolbar_start">
 
                 <ImageView
                     android:id="@+id/toolbar_Bank_logo"
@@ -68,10 +77,23 @@
                     android:paddingEnd="@dimen/pad_4"
                     android:paddingBottom="@dimen/pad_2"
                     android:src="@drawable/bonushub_white"
-                    android:textSize="@dimen/text_size_xregular" />
+                    android:textSize="@dimen/text_size_xregular"
+                    android:tint="@color/txt_color_blue" />
             </LinearLayout>
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/imgViewAmex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/pad_20"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ic_amex_logo_new"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.appcompat.widget.Toolbar>
 

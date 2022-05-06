@@ -69,10 +69,8 @@
                 android:layout_gravity="start"
                 android:fitsSystemWindows="true"
                 android:background="@color/white"
-                app:headerLayout="@layout/main_drawer"
                 app:itemIconTint="@color/txt_color"
-                app:itemTextColor="@color/txt_color"
-                app:menu="@menu/drawer_menu">
+                app:itemTextColor="@color/txt_color">
                 <include
 
                     android:id="@+id/footer"

@@ -61,11 +61,11 @@ class InitFragment : Fragment() {
         fragmentInitBinding.ifProceedBtn.isClickable = false
         fragmentInitBinding.ifEt.addTextChangedListener(textWatcher)
         fragmentInitBinding.ifEt.transformationMethod = null
-        fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_inactive);
+        fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_inactive_init);
         fragmentInitBinding.ifEt.addTextChangedListener(Utility.OnTextChange {
             fragmentInitBinding.ifProceedBtn.isEnabled = it.length == 8
             if (fragmentInitBinding.ifProceedBtn.isEnabled)
-                fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button);
+                fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_active_init);
 
         })
 
@@ -92,7 +92,7 @@ class InitFragment : Fragment() {
                 fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_inactive);
             }
             else if(start>=8){
-                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button);
+                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_active_init);
             }
         }
     }

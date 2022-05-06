@@ -4,27 +4,39 @@
     android:id="@+id/item_parent_rv"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
+    android:background="@color/white"
     android:padding="@dimen/pad_8">
 
-    <ImageView
-        android:id="@+id/item_logo_iv"
-
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardImage"
         android:layout_width="@dimen/dashboard_img_width"
         android:layout_height="@dimen/dashboard_img_height"
-        android:layout_gravity="center"
-        android:padding="@dimen/pad_20"
-        android:src="@drawable/ic_bbg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:cardElevation="@dimen/pad_10"
+        android:layout_margin="@dimen/pad_2"
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/item_logo_iv"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:padding="7dp"
+            android:src="@drawable/ic_bbg" />
+
+    </com.google.android.material.card.MaterialCardView>
+
 
     <TextView
         android:id="@+id/item_title_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-
+        android:layout_marginTop="@dimen/pad_5"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:gravity="center"
@@ -35,7 +47,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/item_logo_iv" />
+        app:layout_constraintTop_toBottomOf="@+id/cardImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -93,7 +93,7 @@ import kotlin.collections.ArrayList
 
 
 @AndroidEntryPoint
-class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,NavigationView.OnNavigationItemSelectedListener,
+class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/*,NavigationView.OnNavigationItemSelectedListener not need*/,
     ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
     private  var  j : Long = 0
     private var tms: UTMS? = null
@@ -169,14 +169,16 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         navigationBinding?.toobar?.mainToolbarStart?.setOnClickListener { toggleDrawer() }
 
         //region====================Adding Right Icon to Navigation Drawer Bank Function Option:-
-        navigationBinding?.navView?.menu?.getItem(0)
-            ?.setActionView(R.layout.bank_function_right_icon)
+        // not need
+        /*navigationBinding?.navView?.menu?.getItem(0)
+            ?.setActionView(R.layout.bank_function_right_icon)*/
         //endregion
 
         //region Getting side drawer header for setting tid mid and merchant name to it
-        navigationBinding?.navView?.setNavigationItemSelectedListener(this)
+        // not need
+        /*navigationBinding?.navView?.setNavigationItemSelectedListener(this)
         headerView = navigationBinding?.navView?.getHeaderView(0)
-        mainDrawerBinding = headerView?.let { MainDrawerBinding.bind(it) }
+        mainDrawerBinding = headerView?.let { MainDrawerBinding.bind(it) }*/
         // endregion
         decideDashBoard()
 
@@ -209,6 +211,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
 
             if (it.value == true) {
                 logger("isAdminPassword", ("" + it.value ?: false) as String)
+                isDashboardOpen = false
                 dialogAdminPassword?.dismiss()
                 closeDrawer()
                 //transactFragment(BankFunctionsFragment())
@@ -227,6 +230,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
         //      if (appUpdateFromSale) {
         //         autoSettleBatchData()
         //    }
+
+        setNavigationItemClickListner()
     }
 
     fun manageTopToolBar(isShow:Boolean){
@@ -238,8 +243,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     }
 
 
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+// not need
+    /*override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         isDashboardOpen = false
         //==============kushal ======= implemented drawer menu
@@ -276,7 +281,50 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             }
         }
         return true
+    }*/
+
+    fun setNavigationItemClickListner() {
+
+        //isDashboardOpen = false
+
+
+        navigationBinding?.footer?.cardBankFunction?.setOnClickListener {
+
+            navigationBinding?.footer?.cardBankFunction?.setBackgroundResource(R.drawable.edge_brand_selected)
+                DialogUtilsNew1.showDialog(this,getString(R.string.admin_password),getString(R.string.hint_enter_admin_password),onClickDialogOkCancel, false)
+        }
+
+
+        navigationBinding?.footer?.cardReports?.setOnClickListener {
+
+            isDashboardOpen = false
+            closeDrawer()
+            transactFragment(ReportsFragment())
+        }
+
+
+        navigationBinding?.footer?.cardSettlement?.setOnClickListener{
+
+            isDashboardOpen = false
+            closeDrawer()
+            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
+                    alertBoxWithAction(
+                        getString(R.string.batch_settle),
+                        getString(R.string.please_settle_batch),
+                        false, getString(R.string.positive_button_ok),
+                        {
+                            //autoSettleBatchData()
+                        },
+                        {})
+                }
+                else {
+                    transactFragment(SettlementFragment())
+                }
+
+            }
+
     }
+
     //region==========================SetUp Drawer Layout================
     private fun setupNavigationDrawerLayout() {
         navigationBinding?.navView?.setupWithNavController(navHostFragment?.navController!!)
@@ -437,8 +485,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
     private fun refreshDrawer() {
 
 
-        headerView?.let { footer?.version_name?.text = "App Version :${BuildConfig.VERSION_NAME}"}
-        headerView?.let { footer?.version_id?.text = "Revision Id :${BuildConfig.REVISION_ID}"}
+        navigationBinding?.let { footer?.version_name?.text = "App Version :${BuildConfig.VERSION_NAME}"}
+        navigationBinding?.let { footer?.version_id?.text = "Revision Id :${BuildConfig.REVISION_ID}"}
 
         lifecycleScope.launch{
             // val tpt = DBModule.appDatabase.appDao?.getAllTerminalParameterTableData()?.get(0) // old
@@ -467,8 +515,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
             mid = getString(R.string.merchant_id) + "  : " + tpt?.merchantId
 
             withContext(Dispatchers.Main){
-                mainDrawerBinding?.mdTidTv?.text = tid
-                mainDrawerBinding?.mdMidTv?.text = mid
+
+                navigationBinding?.footer?.mdTidTv?.text = tid
+                navigationBinding?.footer?.mdMidTv?.text = mid
+//                mainDrawerBinding?.mdTidTv?.text = tid
+//                mainDrawerBinding?.mdMidTv?.text = mid
             }
 
             //region=================Show help Desk Number in Navigation Footer after Init:-
@@ -478,8 +529,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener,
                 val helplineNumber = "HelpLine: ${hdfcTpt.helpDeskNumber.replace("F", "")}"
                 //binding?.mainDrawerView?.helpDeskTV?.text = helplineNumber
                 //binding?.mainDrawerView?.helpDeskTV?.visibility = View.VISIBLE
-                headerView?.let { footer?.help_desk_number?.text = helplineNumber}
-                headerView?.let { footer?.help_desk_number?.visibility = View.VISIBLE}
+                navigationBinding?.let { footer?.help_desk_number?.text = helplineNumber}
+                navigationBinding?.let { footer?.help_desk_number?.visibility = View.VISIBLE}
             }
 
             //endregion
