@@ -158,7 +158,15 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 } else {
 
                    // DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.empty_batch),getString(R.string.last_receipt_not_available), false)
-                    iDiag?.getInfoDialog(getString(R.string.empty_batch),getString(R.string.last_receipt_not_available)){}
+                   // iDiag?.getInfoDialog(getString(R.string.empty_batch),getString(R.string.last_receipt_not_available)){}
+                    iDiag?.alertBoxWithActionNew(
+                        getString(R.string.empty_batch),
+                        getString(R.string.last_receipt_not_available),
+                        R.drawable.ic_info,
+                        getString(R.string.positive_button_ok),
+                        "",false,false,
+                        {},
+                        {})
                 }
 
                 logger("repost", ReportsItem.LAST_RECEIPT._name)
@@ -171,11 +179,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                 val isoW = AppPreference.getReversalNew()
                 if (isoW != null) {
-                    iDiag?.getMsgDialog(
+                    //iDiag?.getMsgDialog(
+                    iDiag?.alertBoxWithActionNew(
                         getString(R.string.confirmation),
                         getString(R.string.last_cancel_report_confirmation),
+                        R.drawable.ic_print_customer_copy,
                         "Yes",
-                        "No",
+                        "No",true,false,
                         {
 
                             lifecycleScope.launch(Dispatchers.Main) {
@@ -199,11 +209,14 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         })
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        iDiag?.alertBoxWithAction(
+                       // iDiag?.alertBoxWithAction(
+                        iDiag?.alertBoxWithActionNew(
                             getString(R.string.no_receipt),
                             getString(R.string.no_cancel_receipt_found),
-                            false,
+                            R.drawable.ic_print_customer_copy,
                             getString(R.string.positive_button_ok),
+                            "",false,
+                            false,
                             {},
                             {})
                     }
@@ -345,7 +358,15 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                        // launch(Dispatchers.Main) {
                                             iDiag?.hideProgress()
                                             //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
-                                            iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
+                                           // iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
+                                        iDiag?.alertBoxWithActionNew(
+                                            getString(R.string.invalid_invoice),
+                                            getString(R.string.invoice_is_invalid),
+                                            R.drawable.ic_info,
+                                            getString(R.string.positive_button_ok),
+                                            "",false,false,
+                                            {},
+                                            {})
                                      //   }
                                     }
 
@@ -383,11 +404,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batchData ->
                         //onlyPreAuthCheck(batchData as MutableList<BatchTable>) // do later
                         if (batchData.isNotEmpty()  /*&& onlyPreAuthFlag == false*/) {
-                            iDiag?.getMsgDialog(
+                            //iDiag?.getMsgDialog(
+                            iDiag?.alertBoxWithActionNew(
                                 getString(R.string.confirmation),
                                 getString(R.string.want_print_detail),
+                                R.drawable.ic_print_customer_copy,
                                 getString(R.string.yes),
-                                getString(R.string.no),
+                                getString(R.string.no),true,false,
                                 {
                                     lifecycleScope.launch {
                                         // val bat = BatchFileDataTable.selectBatchData() // already fetch data in above
@@ -436,11 +459,13 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 })
                         } else {
                             lifecycleScope.launch(Dispatchers.Main) {
-                                iDiag?.alertBoxWithAction(
+                                //iDiag?.alertBoxWithAction(
+                                iDiag?.alertBoxWithActionNew(
                                     getString(R.string.empty_batch),
                                     getString(R.string.detail_report_not_found),
-                                    false,
+                                    R.drawable.ic_print_customer_copy,
                                     getString(R.string.positive_button_ok),
+                                    "",false,false,
                                     {},
                                     {})
                             }
@@ -463,11 +488,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batList ->
                             //onlyPreAuthCheck(batList as MutableList<BatchTable>) // do later
                             if (batList.isNotEmpty() /*&& onlyPreAuthFlag == false*/) {
-                                iDiag?.getMsgDialog(
+                                iDiag?.alertBoxWithActionNew(
                                     getString(R.string.confirmation),
                                     "Do you want to print summary Report",
+                                    R.drawable.ic_print_customer_copy,
                                     "Yes",
-                                    "No",
+                                    "No",true,false,
                                     {
 
                                         GlobalScope.launch {
@@ -504,10 +530,19 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             } else {
                                                 launch(Dispatchers.Main) {
                                                     iDiag?.hideProgress()
-                                                    iDiag?.getInfoDialog(
+                                                    /*iDiag?.getInfoDialog(
                                                         "Error",
                                                         " Summery is not available."
-                                                    ) {}
+                                                    ) {}*/
+
+                                                    iDiag?.alertBoxWithActionNew(
+                                                        "Error",
+                                                        "Summery is not available.",
+                                                        R.drawable.ic_info,
+                                                        getString(R.string.positive_button_ok),
+                                                        "",false,false,
+                                                        {},
+                                                        {})
                                                 }
                                             }
 
@@ -519,11 +554,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     })
                             } else {
                                 GlobalScope.launch(Dispatchers.Main) {
-                                    iDiag?.alertBoxWithAction(
+                                    iDiag?.alertBoxWithActionNew(
                                         getString(R.string.empty_batch),
                                         getString(R.string.summary_report_not_available),
-                                        false,
+                                        R.drawable.ic_print_customer_copy,
                                         getString(R.string.positive_button_ok),
+                                        "",false,false,
                                         {},
                                         {})
                                 }
@@ -543,11 +579,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 val batList = AppPreference.getLastBatch()
 
                 if (batList != null && batList.size > 0) {
-                    iDiag?.getMsgDialog(
+                    iDiag?.alertBoxWithActionNew(
                         getString(R.string.confirmation),
                         getString(R.string.last_summary_confirmation),
+                        R.drawable.ic_print_customer_copy,
                         "Yes",
-                        "No",
+                        "No",true,false,
                         {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.showProgress(
@@ -575,10 +612,19 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 } else {
                                     launch(Dispatchers.Main) {
                                         iDiag?.hideProgress()
-                                        iDiag?.getInfoDialog(
+                                        /*iDiag?.getInfoDialog(
                                             "Error",
                                             "Last summary is not available."
-                                        ) {}
+                                        ) {}*/
+
+                                        iDiag?.alertBoxWithActionNew(
+                                            "Error",
+                                            "Last summary is not available.",
+                                            R.drawable.ic_info,
+                                            getString(R.string.positive_button_ok),
+                                            "",false,false,
+                                            {},
+                                            {})
                                     }
                                 }
 
@@ -589,11 +635,11 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         })
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
-                        iDiag?.alertBoxWithAction(
+                        iDiag?.alertBoxWithActionNew(
                             getString(R.string.no_receipt),
                             getString(R.string.last_summary_not_available),
-                            false,
-                            getString(R.string.positive_button_ok),
+                            R.drawable.ic_print_customer_copy,
+                            getString(R.string.positive_button_ok),"",false,false,
                             {},
                             {})
                     }

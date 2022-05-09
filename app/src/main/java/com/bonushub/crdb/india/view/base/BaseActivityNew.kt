@@ -111,7 +111,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
 
     override fun getInfoDialog(title: String, msg: String, icon: Int,acceptCb: () -> Unit) {
-            val dialog = Dialog(this)
+            /*val dialog = Dialog(this)
             dialog.apply {
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.msg_dialog)
@@ -134,8 +134,16 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
                 }
                 findViewById<View>(R.id.msg_dialog_cancel).visibility = View.GONE
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            }.show()
+            }.show()*/
 
+        alertBoxWithActionNew(
+            title,
+            msg,
+            icon,
+            getString(R.string.positive_button_ok),
+            "",false,false,
+            { acceptCb() },
+            {})
 
 
     }
@@ -221,7 +229,33 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         positiveButtonText: String, alertCallback: (Boolean) -> Unit,
         cancelButtonCallback: (Boolean) -> Unit, dialogIcon:Int
     ) {
-        val dialogBuilder = Dialog(this)
+
+        var icon = if(title==getString(R.string.print_customer_copy)){
+            R.drawable.ic_print_customer_copy
+        }else{
+            R.drawable.ic_info
+        }
+
+        if (TextUtils.isEmpty(positiveButtonText)) {
+            alertBoxWithActionNew(
+                title,
+                msg,
+                icon,
+                positiveButtonText,
+                "No",showCancelButton,false,
+                { alertCallback (it)},
+                { cancelButtonCallback (it)})
+        }else{
+            alertBoxWithActionNew(
+                title,
+                msg,
+                icon,
+                positiveButtonText,
+                "No",showCancelButton,true,
+                { alertCallback (it)},
+                { cancelButtonCallback (it)})
+        }
+       /* val dialogBuilder = Dialog(this)
         //builder.setTitle(title)
         //  builder.setMessage(msg)
         val bindingg = NewPrintCustomerCopyBinding.inflate(LayoutInflater.from(this))
@@ -295,6 +329,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         }
         dialogBuilder.show()
         dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+*/
     }
 
 
@@ -337,7 +372,11 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             bindingg?.txtViewNo.visibility = View.VISIBLE
         }
 
-        bindingg.txtViewYes.text = positiveButtonText
+        if(positiveButtonText.isNotEmpty()) {
+            bindingg?.txtViewYes.text = msg
+            bindingg?.txtViewYes.visibility = View.VISIBLE
+        }
+        //bindingg.txtViewYes.text = positiveButtonText
 
         bindingg?.txtViewNo?.setOnClickListener {
             dialogBuilder.dismiss()
@@ -457,7 +496,17 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     override fun alertBoxMsgWithIconOnly(
         icon: Int, msg: String
     ) {
-        val dialogBuilder = Dialog(this)
+
+        alertBoxWithActionNew(
+            "",
+            msg,
+            icon,
+            "",
+            "",false,true,
+            {},
+            {})
+
+       /* val dialogBuilder = Dialog(this)
         //builder.setTitle(title)
         //  builder.setMessage(msg)
         val bindingg = DialogMsgWithIconBinding.inflate(LayoutInflater.from(this))
@@ -497,7 +546,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         }
 
         dialogBuilder.show()
-        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))*/
     }
 
 

@@ -82,6 +82,7 @@ import javax.inject.Inject
 import android.view.Gravity
 
 import android.os.Build
+import androidx.drawerlayout.widget.DrawerLayout
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import java.lang.IllegalArgumentException
@@ -238,8 +239,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
     fun manageTopToolBar(isShow:Boolean){
         if(isShow) {
             navigationBinding?.toobar?.appBarLl?.visibility = View.VISIBLE
+            navigationBinding?.mainDl?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         }else{
             navigationBinding?.toobar?.appBarLl?.visibility = View.GONE
+            navigationBinding?.mainDl?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
         }
     }
 
