@@ -192,7 +192,7 @@ class QrFragment : Fragment() {
                                                 Log.e("F56->>", responsef57)
 
                                                 lifecycleScope.launch(Dispatchers.Main){
-                                                (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick,"Transaction Approved")
+                                                (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,"Transaction Approved")
                                                     }
                                                 //txnSuccessToast(activity as Context)
                                                 // kushal

@@ -77,6 +77,7 @@ class VoidMainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as NavigationActivity).manageTopToolBar(false)
 
         // set header
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.void_sale)
@@ -571,118 +572,127 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         AppPreference.saveLastReceiptDetails(lastSuccessReceiptData)
 
                                         // kushal
+                                        val transactionDate = dateFormaterNew(voidData.timeStamp ?: 0L)
+                                        val transactionTime = timeFormaterNew(voidData.time)
+                                        (activity as NavigationActivity).txnApprovedDialog(EDashboardItem.VOID_SALE.res,EDashboardItem.VOID_SALE.title,
+                                            voidData.transactionalAmmount,"${transactionDate}, ${transactionTime}") {
 
-                                        (activity as NavigationActivity).showProgress(getString(R.string.printing))
+                                            (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
-                                        PrintUtil(activity).startPrinting(
-                                            voidData,
-                                            EPrintCopyType.MERCHANT,
-                                            requireContext()
-                                        ) { printCB, printingFail ->
+                                            PrintUtil(activity).startPrinting(
+                                                voidData,
+                                                EPrintCopyType.MERCHANT,
+                                                requireContext()
+                                            ) { printCB, printingFail ->
 
-                                            (activity as NavigationActivity).hideProgress()
+                                                (activity as NavigationActivity).hideProgress()
 
-                                            lifecycleScope.launch(Dispatchers.Main){
-                                                if (printCB) {
+                                                lifecycleScope.launch(Dispatchers.Main){
+                                                    if (printCB) {
 
-                                                    DialogUtilsNew1.alertBoxWithAction( requireContext(),
-                                                        getString(R.string.print_customer_copy),
-                                                        "",
-                                                        "yes", "no", R.drawable.ic_printer ,{
+                                                        (activity as NavigationActivity).alertBoxWithActionNew(
+                                                            "",
+                                                            getString(R.string.print_customer_copy),
+                                                            R.drawable.ic_print_customer_copy,
+                                                            "yes", "no",true,false ,{
 
-                                                            (activity as NavigationActivity).showProgress(getString(R.string.printing))
+                                                                (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
-                                                            PrintUtil(activity).startPrinting(
-                                                                voidData,
-                                                                EPrintCopyType.CUSTOMER,
-                                                                requireContext()
-                                                            ) { printCB, printingFail ->
+                                                                PrintUtil(activity).startPrinting(
+                                                                    voidData,
+                                                                    EPrintCopyType.CUSTOMER,
+                                                                    requireContext()
+                                                                ) { printCB, printingFail ->
+                                                                    (activity as NavigationActivity).hideProgress()
+                                                                    // go to dashboard
+                                                                    startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
+                                                                        flags =
+                                                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                    })
+
+
+                                                                }
+                                                            }, {
+
                                                                 (activity as NavigationActivity).hideProgress()
+//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
+//                    startActivity(intent)
                                                                 // go to dashboard
                                                                 startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
                                                                     flags =
                                                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                                                 })
 
-
-                                                            }
-                                                        }, {
-
-                                                            (activity as NavigationActivity).hideProgress()
-//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
-//                    startActivity(intent)
-                                                            // go to dashboard
-                                                            startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
-                                                                flags =
-                                                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                                             })
 
-                                                        })
-
-                                                    // not need now
-                                                    /*val tpt=TerminalParameterTable.selectFromSchemeTable()
-                                                    if(tpt?.digiPosCardCallBackRequired=="1") {
-                                                        lifecycleScope.launch(Dispatchers.IO) {
-                                                            withContext(Dispatchers.Main) {
-                                                                (activity as MainActivity).showProgress(
-                                                                    getString(
-                                                                        R.string.txn_syn
-                                                                    )
-                                                                )
-                                                            }
-                                                            val amount = MoneyUtil.fen2yuan(
-                                                                voidData.totalAmmount.toDouble().toLong()
-                                                            )
-                                                            val txnCbReqData = TxnCallBackRequestTable()
-                                                            txnCbReqData.reqtype =
-                                                                EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
-                                                            txnCbReqData.tid = voidData.hostTID
-                                                            txnCbReqData.batchnum = voidData.hostBatchNumber
-                                                            txnCbReqData.roc = voidData.hostRoc
-                                                            txnCbReqData.amount = amount
-
-                                                            txnCbReqData.ecrSaleReqId=voidData.ecrTxnSaleRequestId
-                                                            txnCbReqData.txnTime = voidData.time
-                                                            txnCbReqData.txnDate = voidData.transactionDate
-                                                            txnCbReqData.txnType= TransactionType.VOID.type
-
-                                                            TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
-                                                                txnCbReqData
-                                                            )
-                                                            syncTxnCallBackToHost {
-                                                                Log.e(
-                                                                    "TXN CB ",
-                                                                    "SYNCED TO SERVER  --> $it"
-                                                                )
-                                                                (activity as MainActivity).hideProgress()
-                                                            }
-                                                            Log.e("VOID LAST", "COMMENT ******")
-
-                                                            //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
-                                                            //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
-
-                                                            if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                        // not need now
+                                                        /*val tpt=TerminalParameterTable.selectFromSchemeTable()
+                                                        if(tpt?.digiPosCardCallBackRequired=="1") {
+                                                            lifecycleScope.launch(Dispatchers.IO) {
                                                                 withContext(Dispatchers.Main) {
+                                                                    (activity as MainActivity).showProgress(
+                                                                        getString(
+                                                                            R.string.txn_syn
+                                                                        )
+                                                                    )
+                                                                }
+                                                                val amount = MoneyUtil.fen2yuan(
+                                                                    voidData.totalAmmount.toDouble().toLong()
+                                                                )
+                                                                val txnCbReqData = TxnCallBackRequestTable()
+                                                                txnCbReqData.reqtype =
+                                                                    EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+                                                                txnCbReqData.tid = voidData.hostTID
+                                                                txnCbReqData.batchnum = voidData.hostBatchNumber
+                                                                txnCbReqData.roc = voidData.hostRoc
+                                                                txnCbReqData.amount = amount
+
+                                                                txnCbReqData.ecrSaleReqId=voidData.ecrTxnSaleRequestId
+                                                                txnCbReqData.txnTime = voidData.time
+                                                                txnCbReqData.txnDate = voidData.transactionDate
+                                                                txnCbReqData.txnType= TransactionType.VOID.type
+
+                                                                TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
+                                                                    txnCbReqData
+                                                                )
+                                                                syncTxnCallBackToHost {
+                                                                    Log.e(
+                                                                        "TXN CB ",
+                                                                        "SYNCED TO SERVER  --> $it"
+                                                                    )
+                                                                    (activity as MainActivity).hideProgress()
+                                                                }
+                                                                Log.e("VOID LAST", "COMMENT ******")
+
+                                                                //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
+                                                                //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
+
+                                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                                    withContext(Dispatchers.Main) {
+                                                                        syncOfflineSaleAndAskAutoSettlement(
+                                                                            autoSettlementCheck.substring(0, 1)
+                                                                        )
+                                                                    }
+                                                                }
+                                                            }
+                                                        }else{
+                                                            if (!TextUtils.isEmpty(autoSettlementCheck)) {
+                                                                GlobalScope.launch(Dispatchers.Main) {
                                                                     syncOfflineSaleAndAskAutoSettlement(
                                                                         autoSettlementCheck.substring(0, 1)
                                                                     )
                                                                 }
                                                             }
-                                                        }
-                                                    }else{
-                                                        if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                            GlobalScope.launch(Dispatchers.Main) {
-                                                                syncOfflineSaleAndAskAutoSettlement(
-                                                                    autoSettlementCheck.substring(0, 1)
-                                                                )
-                                                            }
-                                                        }
 
-                                                    }*/
+                                                        }*/
+                                                    }
                                                 }
+
                                             }
 
                                         }
+
+
                                     }
                                 }
                                 2 -> {

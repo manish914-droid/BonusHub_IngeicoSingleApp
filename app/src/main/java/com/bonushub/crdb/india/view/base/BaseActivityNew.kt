@@ -373,7 +373,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         }
 
         if(positiveButtonText.isNotEmpty()) {
-            bindingg?.txtViewYes.text = msg
+            bindingg?.txtViewYes.text = positiveButtonText
             bindingg?.txtViewYes.visibility = View.VISIBLE
         }
         //bindingg.txtViewYes.text = positiveButtonText

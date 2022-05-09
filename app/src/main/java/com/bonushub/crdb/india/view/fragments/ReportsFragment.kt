@@ -378,7 +378,16 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 ex.printStackTrace()
                                 //launch(Dispatchers.Main) {
                                     iDiag?.hideProgress()
-                                    DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.error),"something Wrong", false)
+                                    //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.error),"something Wrong", false)
+
+                                iDiag?.alertBoxWithActionNew(
+                                    getString(R.string.error),
+                                    "something Wrong",
+                                    R.drawable.ic_info,
+                                    getString(R.string.positive_button_ok),
+                                    "",false,false,
+                                    {},
+                                    {})
 
                               //  }
                             }

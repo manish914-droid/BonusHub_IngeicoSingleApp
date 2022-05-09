@@ -935,7 +935,7 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                 CoroutineScope(Dispatchers.Main).launch {
                                     delay(500)
                                     (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
-                                        R.drawable.ic_tick,
+                                        R.drawable.ic_tick_green,
                                         activity.getString(R.string.successfull_init)
                                     )
                                 }

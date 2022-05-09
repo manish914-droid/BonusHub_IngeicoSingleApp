@@ -215,7 +215,7 @@ class InitFragment : Fragment() {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
-                                                R.drawable.ic_tick,
+                                                R.drawable.ic_tick_green,
                                                 it
                                             )
                                         }
