@@ -214,6 +214,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 isDashboardOpen = false
                 dialogAdminPassword?.dismiss()
                 closeDrawer()
+                navigationBinding?.footer?.cardBankFunction?.setBackgroundResource(R.drawable.edge_brand_unselected)
                 //transactFragment(BankFunctionsFragment())
                 transactFragment(BankFunctionsAdminVasFragment())
 
@@ -297,6 +298,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
         navigationBinding?.footer?.cardReports?.setOnClickListener {
 
+            navigationBinding?.footer?.cardReports?.setBackgroundResource(R.drawable.edge_brand_selected)
             isDashboardOpen = false
             closeDrawer()
             transactFragment(ReportsFragment())
@@ -305,6 +307,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
         navigationBinding?.footer?.cardSettlement?.setOnClickListener{
 
+            navigationBinding?.footer?.cardSettlement?.setBackgroundResource(R.drawable.edge_brand_selected)
             isDashboardOpen = false
             closeDrawer()
             if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
@@ -484,6 +487,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
     //region==========Setting for sidebar details==========
     private fun refreshDrawer() {
 
+        navigationBinding?.footer?.cardBankFunction?.setBackgroundResource(R.drawable.edge_brand_unselected)
+        navigationBinding?.footer?.cardReports?.setBackgroundResource(R.drawable.edge_brand_unselected)
+        navigationBinding?.footer?.cardSettlement?.setBackgroundResource(R.drawable.edge_brand_unselected)
+
+
 
         navigationBinding?.let { footer?.version_name?.text = "App Version :${BuildConfig.VERSION_NAME}"}
         navigationBinding?.let { footer?.version_id?.text = "Revision Id :${BuildConfig.REVISION_ID}"}
@@ -618,6 +626,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         }
 
         override fun onClickCancel() {
+            navigationBinding?.footer?.cardBankFunction?.setBackgroundResource(R.drawable.edge_brand_unselected)
 
         }
 

@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -21,76 +25,92 @@
                 layout="@layout/sub_header_layout"
                 android:visibility="visible" />
 
-            <LinearLayout
-                android:id="@+id/lv_heading_view"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/conLayHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pad_5"
-                android:layout_marginEnd="@dimen/pad_5"
-                android:background="@drawable/edge_bg_gray"
-                android:orientation="horizontal"
+                android:layout_marginStart="@dimen/pad_15"
+                android:layout_marginTop="@dimen/pad_20"
+                android:layout_marginEnd="@dimen/pad_15"
+                app:cardCornerRadius="@dimen/pad_10"
+                app:cardElevation="@dimen/pad_10"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight=".7"
-                    android:fontFamily="@font/muli_semi_bold"
-                    android:gravity="center"
-                    android:padding="@dimen/pad_5"
-                    android:text="@string/invoice"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="@dimen/text_size_small" />
+                <LinearLayout
+                    android:id="@+id/lv_heading_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/pad_5"
+                    android:layout_marginTop="@dimen/pad_8"
+                    android:layout_marginBottom="@dimen/pad_8"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight=".9"
-                    android:fontFamily="@font/muli_semi_bold"
-                    android:gravity="center"
-                    android:padding="@dimen/pad_5"
-                    android:text="@string/amount"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="@dimen/text_size_small" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight=".75"
+                        android:fontFamily="@font/muli_bold"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
+                        android:text="@string/invoice"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_small" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1.5"
-                    android:fontFamily="@font/muli_semi_bold"
-                    android:gravity="center"
-                    android:padding="@dimen/pad_5"
-                    android:text="@string/transaction_type"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="@dimen/text_size_small" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight=".9"
+                        android:fontFamily="@font/muli_bold"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
+                        android:text="@string/amount"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_small" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight=".9"
-                    android:fontFamily="@font/muli_semi_bold"
-                    android:gravity="center"
-                    android:padding="@dimen/pad_5"
-                    android:text="@string/date"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="@dimen/text_size_small" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1.5"
+                        android:fontFamily="@font/muli_bold"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
+                        android:text="@string/transaction_type"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_small" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".9"
+                        android:fontFamily="@font/muli_bold"
+                        android:gravity="center"
+                        android:padding="@dimen/pad_5"
+                        android:text="@string/date"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_small" />
 
 
-            </LinearLayout>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/settlement_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/pad_15"
+                android:layout_marginTop="@dimen/pad_5"
+                android:layout_marginEnd="@dimen/pad_15"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lv_heading_view" />
+                app:layout_constraintTop_toBottomOf="@+id/conLayHeader" />
 
             <!--<ImageView
                     android:id="@+id/empty_view_placeholder"
@@ -110,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/muli_regular"
                 android:text="Batch Empty"
-                android:textColor="@color/txt_color"
+                android:textColor="@color/txt_color_blue"
                 android:textSize="@dimen/text_size_regular"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -122,24 +142,86 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <!--<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/settlement_floating_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="end|bottom"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/pad_15"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="@dimen/pad_60"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
         android:text="@string/settle_batch"
+        android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="@dimen/text_size_xregular"
-        app:backgroundTint="@color/init_button"
+        android:textSize="@dimen/text_size_medium"
+        android:visibility="visible"
+        app:backgroundTint="@color/txt_color"
+        app:cornerRadius="@dimen/pad_5"
         app:elevation="@dimen/pad_0"
-        app:icon="@drawable/ic_settlement"
-        app:iconPadding="@dimen/pad_5"
-        app:iconTint="@color/white"
-        android:visibility="gone"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingStart="@dimen/pad_60"/>-->
 
-</RelativeLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/settlement_floating_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/pad_20"
+        android:layout_marginStart="@dimen/pad_20"
+        android:layout_marginEnd="@dimen/pad_20"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:rippleColor="@android:color/transparent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/conLaySettleBatchBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/txt_color"
+            android:paddingTop="@dimen/pad_10"
+            android:paddingBottom="@dimen/pad_10">
+
+            <ImageView
+                android:id="@+id/imgViewSettlement"
+                android:layout_width="@dimen/pad_30"
+                android:layout_height="@dimen/pad_30"
+                android:src="@drawable/ic_settlement"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/txtViewSettlement"
+                android:tint="@color/white"
+                android:elevation="@dimen/pad_10"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                android:layout_marginEnd="5dp"/>
+
+            <TextView
+                android:id="@+id/txtViewSettlement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_medium"
+                android:fontFamily="@font/muli_regular"
+                android:text="@string/settle_batch"
+                app:layout_constraintStart_toEndOf="@+id/imgViewSettlement"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                android:layout_marginStart="5dp"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

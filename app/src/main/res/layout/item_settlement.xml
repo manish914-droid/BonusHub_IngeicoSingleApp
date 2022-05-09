@@ -21,50 +21,50 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".7"
-            android:fontFamily="@font/muli_extra_light"
+            android:fontFamily="@font/muli_regular"
             android:gravity="center"
             android:hint="@string/_1245678"
-            android:textColor="@color/text_gray"
-            android:textSize="@dimen/text_size_small" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_xsmall" />
 
         <TextView
             android:id="@+id/tv_base_amount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".9"
-            android:fontFamily="@font/muli_extra_light"
+            android:fontFamily="@font/muli_regular"
             android:gravity="center"
             android:hint="@string/_500"
-            android:textColor="@color/text_gray"
-            android:textSize="@dimen/text_size_small" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_xsmall" />
 
         <TextView
             android:id="@+id/tv_transaction_type"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.5"
-            android:fontFamily="@font/muli_extra_light"
+            android:fontFamily="@font/muli_regular"
             android:gravity="center"
             android:hint="@string/_500"
-            android:textColor="@color/text_gray"
-            android:textSize="@dimen/text_size_small" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_xsmall" />
 
         <TextView
             android:id="@+id/tv_transaction_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".9"
-            android:fontFamily="@font/muli_extra_light"
+            android:fontFamily="@font/muli_regular"
             android:gravity="center"
             android:hint="@string/_06_07_2020"
-            android:textColor="@color/text_gray"
-            android:textSize="@dimen/text_size_small" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_xsmall" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#9F9F9F"
+        android:background="#515B6433"
         android:layout_marginTop="5dp"/>
 </LinearLayout>

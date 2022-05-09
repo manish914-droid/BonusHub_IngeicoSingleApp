@@ -61,12 +61,15 @@ class InitFragment : Fragment() {
         fragmentInitBinding.ifProceedBtn.isClickable = false
         fragmentInitBinding.ifEt.addTextChangedListener(textWatcher)
         fragmentInitBinding.ifEt.transformationMethod = null
-        fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_inactive_init);
+       // fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_inactive_init);
+        fragmentInitBinding.conLayInitBtn.alpha = .5f
+
         fragmentInitBinding.ifEt.addTextChangedListener(Utility.OnTextChange {
             fragmentInitBinding.ifProceedBtn.isEnabled = it.length == 8
-            if (fragmentInitBinding.ifProceedBtn.isEnabled)
-                fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_active_init);
-
+            if (fragmentInitBinding.ifProceedBtn.isEnabled) {
+                //fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_active_init);
+                fragmentInitBinding.conLayInitBtn.alpha = 1f
+            }
         })
 
         //region Below Code write App Revision ID to file when first time Init Screen opens
@@ -89,10 +92,13 @@ class InitFragment : Fragment() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
             if (start < 8) {
-                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_inactive);
+                //fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_inactive);
+                fragmentInitBinding.conLayInitBtn.alpha = .5f
             }
             else if(start>=8){
-                fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_active_init);
+               // fragmentInitBinding?.ifProceedBtn?.setBackgroundResource(R.drawable.edge_button_active_init);
+                fragmentInitBinding.conLayInitBtn.alpha = 1f
+
             }
         }
     }

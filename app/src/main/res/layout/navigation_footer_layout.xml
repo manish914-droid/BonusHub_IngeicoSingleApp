@@ -61,7 +61,8 @@
         app:layout_constraintTop_toBottomOf="@+id/imgViewTid"
         app:cardElevation="@dimen/pad_10"
         app:cardCornerRadius="@dimen/pad_5"
-        android:layout_margin="@dimen/pad_20">
+        android:layout_margin="@dimen/pad_20"
+        app:rippleColor="@android:color/transparent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -114,7 +115,8 @@
         android:layout_marginStart="@dimen/pad_20"
         android:layout_marginEnd="@dimen/pad_20"
         android:layout_marginTop="@dimen/pad_10"
-        app:layout_constraintTop_toBottomOf="@+id/cardBankFunction">
+        app:layout_constraintTop_toBottomOf="@+id/cardBankFunction"
+        app:rippleColor="@android:color/transparent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -167,7 +169,8 @@
         app:cardCornerRadius="@dimen/pad_5"
         android:layout_marginStart="@dimen/pad_20"
         android:layout_marginEnd="@dimen/pad_20"
-        android:layout_marginTop="@dimen/pad_10">
+        android:layout_marginTop="@dimen/pad_10"
+        app:rippleColor="@android:color/transparent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

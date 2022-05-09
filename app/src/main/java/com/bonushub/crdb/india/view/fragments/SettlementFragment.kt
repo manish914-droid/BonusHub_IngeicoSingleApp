@@ -79,6 +79,7 @@ class SettlementFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
         // (activity as NavigationActivity).showBottomNavigationBar(isShow = false)
+        (activity as NavigationActivity).manageTopToolBar(false)
         fragmensettlementBinding.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_settlement)
         fragmensettlementBinding.subHeaderView?.subHeaderText?.text = getString(R.string.settlement)
         fragmensettlementBinding.subHeaderView?.backImageButton?.setOnClickListener { /*parentFragmentManager?.popBackStack()*/
@@ -124,7 +125,8 @@ class SettlementFragment : Fragment() {
 
         //endregion
         //region================================RecyclerView On Scroll Extended Floating Button Hide/Show:-
-        fragmensettlementBinding.nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+        // not need
+        /*fragmensettlementBinding.nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
 
             //Scroll Down Condition:-
             if (scrollY > oldScrollY + 20 && fragmensettlementBinding.settlementFloatingButton?.isExtended == true)
@@ -137,13 +139,15 @@ class SettlementFragment : Fragment() {
             //At the Top Condition:-
             if (scrollY == 0)
                 fragmensettlementBinding?.settlementFloatingButton?.extend()
-        })
+        })*/
         //endregion
 
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
 
-            DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info, {
+            if(tempDataList.size > 0 ){
+
+                DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info, {
                     // **** for zero settlement *****
                     if (tempDataList.size == 0) {
 
@@ -354,6 +358,8 @@ class SettlementFragment : Fragment() {
 
 
                 },{})
+
+            }
         }
         //endregion
 
@@ -375,7 +381,7 @@ class SettlementFragment : Fragment() {
         if (tempDataList.size > 0  ) {
             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.VISIBLE
-            fragmensettlementBinding?.lvHeadingView?.visibility = View.VISIBLE
+           // fragmensettlementBinding?.lvHeadingView?.visibility = View.VISIBLE  // now show always
            // kushal check later
             /*if(onlyPreAuthFlag==true){
                 fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE
@@ -385,11 +391,13 @@ class SettlementFragment : Fragment() {
                 itemAnimator = DefaultItemAnimator()
                 adapter = settlementAdapter
             }
+            fragmensettlementBinding?.conLaySettleBatchBtn?.alpha = 1f
         } else {
-            fragmensettlementBinding?.settlementFloatingButton?.visibility = View.GONE  // visible for zero settlement
+            fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.GONE
-            fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE
+            //fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE   // now show always
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
+            fragmensettlementBinding?.conLaySettleBatchBtn?.alpha = .5f
         }
 
 

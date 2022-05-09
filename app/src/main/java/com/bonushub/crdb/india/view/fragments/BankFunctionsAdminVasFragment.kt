@@ -66,6 +66,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as NavigationActivity).manageTopToolBar(false)
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
 
         try {

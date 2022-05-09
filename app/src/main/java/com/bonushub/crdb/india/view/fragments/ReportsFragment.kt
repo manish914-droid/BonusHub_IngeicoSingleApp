@@ -59,6 +59,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
         //iDiag?.onEvents(VxEvent.ChangeTitle(option.name))
        // iDiag?.onEvents(VxEvent.ChangeTitle("Report"))
+        (activity as NavigationActivity).manageTopToolBar(false)
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.reports_header)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_reports)

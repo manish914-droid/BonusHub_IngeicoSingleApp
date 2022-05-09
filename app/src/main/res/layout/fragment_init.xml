@@ -83,7 +83,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-        <Button
+        <!--<Button
             android:id="@+id/if_proceed_btn"
             style="@style/Widget.Neumorph.Button"
             android:layout_width="match_parent"
@@ -95,7 +95,62 @@
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_regular"
             android:background="@drawable/edge_button_inactive_init"
-            android:drawableRight="@drawable/ic_init_next"/>
+            android:drawableRight="@drawable/ic_init_next"/>-->
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/if_proceed_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginBottom="@dimen/pad_20"
+            android:layout_marginStart="@dimen/pad_20"
+            android:layout_marginEnd="@dimen/pad_20"
+            app:cardCornerRadius="@dimen/pad_15"
+            app:rippleColor="@android:color/transparent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/conLayInitBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/txt_color"
+                android:paddingTop="@dimen/pad_10"
+                android:paddingBottom="@dimen/pad_10">
+
+                <ImageView
+                    android:id="@+id/imgViewSettlement"
+                    android:layout_width="@dimen/pad_30"
+                    android:layout_height="@dimen/pad_30"
+                    android:src="@drawable/ic_init_next"
+                    app:layout_constraintStart_toEndOf="@+id/txtViewSettlement"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:tint="@color/white"
+                    android:elevation="@dimen/pad_10"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    android:layout_marginStart="5dp"/>
+
+                <TextView
+                    android:id="@+id/txtViewSettlement"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_medium"
+                    android:fontFamily="@font/muli_regular"
+                    android:text="Proceed Initializing"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/imgViewSettlement"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    android:layout_marginEnd="5dp"/>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
 
 
     </LinearLayout>
