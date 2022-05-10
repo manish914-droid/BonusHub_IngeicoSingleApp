@@ -1002,12 +1002,13 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 if (!action.childList.isNullOrEmpty()) {
                     // dashBoardCatagoryDialog(action.childList!!)
                     if (checkInternetConnection()) {
-                        CoroutineScope(Dispatchers.IO).launch{
+                            // not need
+                        /*CoroutineScope(Dispatchers.IO).launch{
                             val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
                             println("TID LIST --->  $listofTids")
                             val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                             println("RESULT TWO --->  $resultTwo")
-                        }
+                        }*/
                         (transactFragment(
                             PreAuthFragment()
                                 .apply {

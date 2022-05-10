@@ -5,6 +5,7 @@ import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
@@ -104,6 +105,7 @@ class TransactionActivity : BaseActivityNew() {
         emvBinding = ActivityEmvBinding.inflate(layoutInflater)
         //setContentView(R.layout.activity_emv)
         setContentView(emvBinding?.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         emvBinding?.subHeaderView?.subHeaderText?.text = transactionTypeEDashboardItem.title
         emvBinding?.subHeaderView?.headerImage?.setImageResource(transactionTypeEDashboardItem.res) //= transactionTypeEDashboardItem.title
         emvBinding?.txnAmtLl?.visibility = View.VISIBLE
@@ -491,7 +493,7 @@ class TransactionActivity : BaseActivityNew() {
             }
             startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
         }
-        else if(transactionType == BhTransactionType.SALE.type)
+        else if(transactionType == BhTransactionType.SALE.type || transactionType == BhTransactionType.PRE_AUTH.type)
         {
             emvProcessNext(cardProcessedDataModal)
 

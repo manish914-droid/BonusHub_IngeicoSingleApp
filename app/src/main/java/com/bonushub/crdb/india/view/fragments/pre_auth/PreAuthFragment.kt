@@ -42,6 +42,7 @@ class PreAuthFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as NavigationActivity).manageTopToolBar(false)
         binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)
 
