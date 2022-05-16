@@ -355,5 +355,9 @@
     <string name="download_tmk">TMK Download</string>
     <string name="do_you_want_to_download_tmk">Do You Want To Download TMK?</string>
     <string name="sync_transaction">Do you want to clear Sync Transaction</string>
+    <string name="pending_preauthdetails">Could not get connect to host.</string>
+    <string name="please_wait_offline_sale_sync">Please wait uploading offline sale</string>
+    <string name="pending_preauth_alert_msg">Want To Get Pending Pre-Auth Details</string>
+    <string name="complete_txt">Complete</string>
 
 </resources>

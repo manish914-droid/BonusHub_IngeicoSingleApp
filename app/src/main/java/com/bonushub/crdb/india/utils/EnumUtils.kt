@@ -672,3 +672,11 @@ enum class DetectError(val errorCode: Int) {
     TransactionDeclined(1),
     SecondTap_Approved(209)
 }
+
+enum class ApiStatus(val code: String) {
+    Success("00"),
+    Processing("1"),
+    Failed("2"),
+    Nothing("3"),
+
+}

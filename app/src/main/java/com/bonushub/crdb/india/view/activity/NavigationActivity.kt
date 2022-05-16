@@ -85,6 +85,7 @@ import android.os.Build
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
+import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauth
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -1054,7 +1055,22 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
             }
             EDashboardItem.PENDING_PREAUTH ->{
 
-                transactFragment(PreAuthPendingFragment(),true)
+                //transactFragment(PreAuthPendingFragment(),true)
+                if (checkInternetConnection()) {
+                    /*PendingPreauth(this).confirmationAlert(
+                        getString(R.string.confirmation),
+                        getString(R.string.pending_preauth_alert_msg)
+                    )*/
+                    alertBoxWithActionNew(getString(R.string.confirmation),
+                        getString(R.string.pending_preauth_alert_msg),
+                    R.drawable.ic_info,
+                    "Yes","No",true,false,{
+                            transactFragment(PreAuthPendingFragment(),true)
+                        },{})
+
+                } else {
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
             }
             EDashboardItem.MERCHANT_REFERRAL->{
                 /*   transactFragment(BrandEmiMasterCategoryFragment().apply {

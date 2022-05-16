@@ -712,7 +712,7 @@ data class TerminalParameterTable(
     @field:BHDashboardItem(
         EDashboardItem.PREAUTH,
         EDashboardItem.PREAUTH_COMPLETE,
-        EDashboardItem.PREAUTH_VIEW
+        /*EDashboardItem.PREAUTH_VIEW*/
     )
     @field:BHFieldParseIndex(39)
     @field:BHFieldName("Pre Auth")
@@ -757,7 +757,7 @@ data class TerminalParameterTable(
     @field:BHFieldName("roc")
     var stan: String = "",
 
-
+    @field:BHDashboardItem(EDashboardItem.VOID_PREAUTH)
     @field:BHFieldParseIndex(48)
     @field:BHFieldName("Void Preauth")
     var fVoidPreauth: String = "",
@@ -768,6 +768,7 @@ data class TerminalParameterTable(
     var fVoidOfflineSale: String = "",
 
 
+    @field:BHDashboardItem(EDashboardItem.PENDING_PREAUTH)
     @field:BHFieldParseIndex(50)
     @field:BHFieldName("Pending Preauth")
     var fPendingPreauthTrans: String = "",

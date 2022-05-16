@@ -76,13 +76,14 @@ class DashboardRepository {
                 //It returns true if any praauth item is available and return false if no preauth item found
                 val isAnyPreAuthItemAvailable = totalPreAuthItem.retainAll { item ->
                     item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
-                          ||item == EDashboardItem.PREAUTH_VIEW
+                          ||item == EDashboardItem.PREAUTH_VIEW || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
                 }
 
               if (isAnyPreAuthItemAvailable) {
                     itemList.removeAll { item ->
                         item == EDashboardItem.PREAUTH || item == EDashboardItem.PREAUTH_COMPLETE
                                 || item == EDashboardItem.VOID_PREAUTH ||item == EDashboardItem.PREAUTH_VIEW
+                                || item == EDashboardItem.VOID_PREAUTH || item == EDashboardItem.PENDING_PREAUTH
                     }
                     if (totalPreAuthItem.size > 0) {
                         val preAuth = EDashboardItem.PRE_AUTH_CATAGORY

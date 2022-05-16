@@ -34,6 +34,7 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getInitdataList
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectDigiPosDataAccordingToTxnStatus
 import com.bonushub.crdb.india.utils.SplitterTypes
+import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauthData
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.usdk.apiservice.aidl.printer.*
@@ -46,6 +47,7 @@ import java.io.InputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val HDFC_BANK_CODE = "01"
 const val HDFC_BANK_CODE_SINGLE_DIGIT = "1"
@@ -2371,6 +2373,119 @@ class PrintUtil(context: Context?) {
 
         }
     }
+
+    fun printPendingPreAuth(context: Context?,listPendingPreauthData:ArrayList<PendingPreauthData>,printerCallback: (Boolean, Int) -> Unit){
+
+        try{
+
+            try {
+
+                var tpt = Utility().getTptData()
+
+                var item = listPendingPreauthData.get(0)
+                //headerPrinting(batchTable.hostBankID)
+                headerPrinting(item.bankId)
+
+
+
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val timeFormat2 = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                try {
+
+                    var date = dateFormat.format(Date())
+                    var time = timeFormat2.format(Date())
+                    logger("date",date)
+                    logger("time",time)
+
+                    textBlockList.add(sigleLineformat("DATE:${date}", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("TIME:${time}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                }
+
+
+                textBlockList.add(sigleLineformat("MID:${tpt?.merchantId}", AlignMode.LEFT))
+                textBlockList.add(sigleLineformat("TID:${tpt?.terminalId}", AlignMode.RIGHT))
+                printer?.addMixStyleText(textBlockList)
+                textBlockList.clear()
+
+               // getTransactionTypeName(batchTable.transactionType)?.let { sigleLineText(it, AlignMode.CENTER) }
+                sigleLineText("PRE-AUTH TXN", AlignMode.CENTER)
+                printSeperator()
+
+
+                for(item in listPendingPreauthData){
+                    textBlockList.add(
+                        sigleLineformat(
+                            "BATCH NO:${invoiceWithPadding(item.batch.toString())}",
+                            AlignMode.LEFT
+                        )
+                    )
+                    textBlockList.add(sigleLineformat("ROC:${invoiceWithPadding(item.roc.toString())}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+
+                    textBlockList.add(
+                        sigleLineformat(
+                            "PAN:${item.pan}",
+                            AlignMode.LEFT
+                        )
+                    )
+                    Log.e("item.amount",item.amount.toString())
+                    //textBlockList.add(sigleLineformat("AMT:${item.amount}", AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat("AMT:${"%.2f".format(item.amount)}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+
+                    textBlockList.add(
+                        sigleLineformat(
+                            "DATE:${item.date}",
+                            AlignMode.LEFT
+                        )
+                    )
+                    textBlockList.add(sigleLineformat("TIME:${item.time}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    printSeperator()
+                }
+
+                sigleLineText(footerText[1], AlignMode.CENTER)
+                val bhlogo: ByteArray? = context?.let { printLogo(it, "BH.bmp") }
+                printer?.addBmpImage(0, FactorMode.BMP1X1, bhlogo)
+                sigleLineText(
+                    "App Version :${BuildConfig.VERSION_NAME}",
+                    AlignMode.CENTER
+                )
+
+            }catch (ex:Exception){
+                ex.printStackTrace()
+            }
+
+            printer?.setPrnGray(3)
+            printer?.feedLine(5)
+            printer?.startPrint(object : OnPrintListener.Stub() {
+                @Throws(RemoteException::class)
+                override fun onFinish() {
+                    printerCallback(true, 0)  //
+                }
+
+                @Throws(RemoteException::class)
+                override fun onError(error: Int) {
+                    printerCallback(true, 0) //
+                }
+            })
+
+        }catch (ex:Exception){
+            ex.printStackTrace()
+        }
+    }
+
 
     fun printDetailReportupdate(
         batch: MutableList<TempBatchFileDataTable>,

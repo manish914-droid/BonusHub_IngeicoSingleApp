@@ -6,7 +6,8 @@
     android:background="@drawable/edge_blue_bg_white"
     android:elevation="5dp"
     android:padding="@dimen/pad_15"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:id="@+id/linLayItem">
 
     <RelativeLayout
         android:layout_width="@dimen/pad_0"

@@ -90,4 +90,6 @@ class AuthCompletionData :Serializable{
     var authTid: String? = ""
     var authAmt: String? = ""
     var authInvoice: String? = ""
+    var authBatchNo: String? = ""
+    var authRoc: String? = ""
 }
