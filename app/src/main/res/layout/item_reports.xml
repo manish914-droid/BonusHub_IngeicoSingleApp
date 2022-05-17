@@ -1,27 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/edge_gray"
     android:layout_marginBottom="17dp"
     android:id="@+id/relLayParent">
+
+    <ImageView
+        android:id="@+id/imgViewIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_preauth_submenu"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/pad_20"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:fontFamily="@font/muli_bold"
+        android:padding="@dimen/pad_10"
         android:textAllCaps="true"
-        android:textSize="@dimen/text_size_regular"
-        android:fontFamily="@font/muli_semi_bold"
-        android:textColor="@color/black"
-        android:padding="@dimen/pad_10"/>
+        android:textColor="@color/txt_brand_item"
+        android:textSize="@dimen/text_size_xregular"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imgViewArrow"
+        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintStart_toEndOf="@+id/imgViewIcon"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/imgViewArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_margin="10dp"
-        android:src="@drawable/ic_arrow"
-        android:layout_centerVertical="true"/>
-</RelativeLayout>
+        android:src="@drawable/ic_arrow_blue"
+        android:layout_centerVertical="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

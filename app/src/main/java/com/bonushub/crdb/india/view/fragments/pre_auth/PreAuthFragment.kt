@@ -86,6 +86,7 @@ class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>, va
         val model = listItem[position]
 
         holder.viewBinding.textView.text = model.title
+        holder.viewBinding.imgViewIcon.setImageResource(model.res)
 
         holder.viewBinding.relLayParent.setOnClickListener {
             cb(model)

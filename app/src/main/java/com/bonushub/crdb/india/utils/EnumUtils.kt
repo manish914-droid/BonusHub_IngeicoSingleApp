@@ -409,19 +409,19 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     BRAND_EMI("Brand EMI", R.drawable.ic_brandemi_new,4),
     EMI_PRO("Brand EMI By Code", R.drawable.ic_brand_emi_code_new, 5),
     EMI_ENQUIRY("EMI Catalogue", R.drawable.ic_emicatalogue_new, 6),
-    PREAUTH("Pre-Auth", R.drawable.ic_preauth, 7),
+    PREAUTH("Pre-Auth", R.drawable.ic_preauth_submenu, 7),
 
 
 
-   PREAUTH_COMPLETE("Pre-Auth Complete", R.drawable.ic_preauth, 5),
+   PREAUTH_COMPLETE("Pre-Auth Complete", R.drawable.ic_preauth_submenu, 5),
     PREAUTH_VIEW("Pre-Auth View", R.drawable.ic_preauth, 65),
-    PENDING_PREAUTH("Pending Preauth", R.drawable.ic_preauth, 6),
-    OFFLINE_SALE("Offline Sale", R.drawable.ic_sale_new, 7),
-    VOID_OFFLINE_SALE("Void Offline Sale", R.drawable.ic_void_new, 8),
-    SALE_TIP("Tip Adjust", R.drawable.ic_tipadjust, 9),
-    VOID_PREAUTH("Void Preauth", R.drawable.ic_void_new, 10),
+    PENDING_PREAUTH("Pending Preauth", R.drawable.ic_preauth_submenu, 6),
+    OFFLINE_SALE("Offline Sale", R.drawable.ic_offline_sale_new, 7),
+    VOID_OFFLINE_SALE("Void Offline Sale", R.drawable.ic_offline_sale_void_new, 8),
+    SALE_TIP("Tip Adjust", R.drawable.ic_tip_adjust_new, 9),
+    VOID_PREAUTH("Void Preauth", R.drawable.ic_preauth_submenu, 10),
     REFUND("Refund", R.drawable.ic_refund, 11),
-    VOID_REFUND("Void Refund", R.drawable.ic_void_new, 12),
+    VOID_REFUND("Void Refund", R.drawable.ic_void_refund_new, 12),
     VOID_SALE("Void", R.drawable.ic_void_new, 13),
     CROSS_SELL("BNPL", R.drawable.ic_crosssell, 14),
 
@@ -429,7 +429,7 @@ enum class EDashboardItem(val title: String, val res: Int, val rank: Int = 15, v
     CASH_ADVANCE("Cash@pos", R.drawable.ic_cash_at_pos),
 
   ///  PENDING_OFFLINE_SALE("View Offline Sale", R.drawable.ic_pending_preauth),
-    PRE_AUTH_CATAGORY("Pre-Auth", R.drawable.ic_preauth, 9),
+    PRE_AUTH_CATAGORY("Pre-Auth", R.drawable.ic_preauth_new, 9),
     MORE("View More", R.drawable.ic_view_more_new, 999),
     BONUS_PROMO("Bonus Promo", R.drawable.ic_merchant_promo, 15),
 
