@@ -1055,12 +1055,12 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
             }
             EDashboardItem.PENDING_PREAUTH ->{
 
-                //transactFragment(PreAuthPendingFragment(),true)
-                if (checkInternetConnection()) {
-                    /*PendingPreauth(this).confirmationAlert(
+                transactFragment(PreAuthPendingFragment(),true)
+                /*if (checkInternetConnection()) {
+                    *//*PendingPreauth(this).confirmationAlert(
                         getString(R.string.confirmation),
                         getString(R.string.pending_preauth_alert_msg)
-                    )*/
+                    )*//*
                     alertBoxWithActionNew(getString(R.string.confirmation),
                         getString(R.string.pending_preauth_alert_msg),
                     R.drawable.ic_info,
@@ -1070,7 +1070,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
                 } else {
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
-                }
+                }*/
             }
             EDashboardItem.MERCHANT_REFERRAL->{
                 /*   transactFragment(BrandEmiMasterCategoryFragment().apply {

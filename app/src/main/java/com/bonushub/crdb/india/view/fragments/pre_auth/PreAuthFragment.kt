@@ -1,6 +1,7 @@
 package com.bonushub.crdb.india.view.fragments.pre_auth
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,8 @@ import com.bonushub.crdb.india.databinding.FragmentPreAuthBinding
 import com.bonushub.crdb.india.databinding.ItemReportsBinding
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.utils.EDashboardItem
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
+import com.bonushub.crdb.india.utils.ToastUtils
 
 
 class PreAuthFragment : Fragment() {
@@ -44,7 +47,7 @@ class PreAuthFragment : Fragment() {
 
         (activity as NavigationActivity).manageTopToolBar(false)
         binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth_new)
 
         binding?.rvPerAuthCategory?.apply{
             layoutManager = GridLayoutManager(activity, 1)
@@ -62,8 +65,26 @@ class PreAuthFragment : Fragment() {
     }
 
     private fun onOptionClickListner(option: EDashboardItem) {
-        (activity as NavigationActivity).onDashBoardItemClick(option)
+        if(option == EDashboardItem.PENDING_PREAUTH){
+            if (Field48ResponseTimestamp.checkInternetConnection()) {
+
+                (activity as NavigationActivity).alertBoxWithActionNew(getString(R.string.confirmation),
+                    getString(R.string.pending_preauth_alert_msg),
+                    R.drawable.ic_info_orange,
+                    "Yes","No",true,false,{
+                        (activity as NavigationActivity).onDashBoardItemClick(option)
+                    },{
+                        mAdapter.notifyDataSetChanged()
+                    })
+
+            } else {
+                ToastUtils.showToast(activity,getString(R.string.no_internet_available_please_check_your_internet))
+            }
+        }else {
+            (activity as NavigationActivity).onDashBoardItemClick(option)
+        }
     }
+
 }
 
 class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>, var cb: (EDashboardItem) -> Unit) : RecyclerView.Adapter<PreAuthOptionAdapter.PreAuthCategoryViewHolder>() {
@@ -86,9 +107,11 @@ class PreAuthOptionAdapter(private val listItem: MutableList<EDashboardItem>, va
         val model = listItem[position]
 
         holder.viewBinding.textView.text = model.title
-        holder.viewBinding.imgViewIcon.setImageResource(model.res)
+        holder.viewBinding.imgViewIcon.setImageResource(R.drawable.ic_preauth_submenu)
+        holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_gray)
 
         holder.viewBinding.relLayParent.setOnClickListener {
+            holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_brand_selected)
             cb(model)
         }
 

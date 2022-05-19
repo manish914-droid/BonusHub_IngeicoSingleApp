@@ -1148,40 +1148,10 @@ class TransactionActivity : BaseActivityNew() {
         cb: suspend (Boolean) -> Unit
     ) {
         // printerReceiptData will not be saved in Batch if transaction is pre auth
-       // if (transactionType != TransactionTypeValues.PRE_AUTH) {
             //Here we are saving printerReceiptData in BatchFileData Table:-
-        Utility().saveTempBatchFileDataTable(stubbedData)
-       // } //kushal
-
-       /* PrintUtil(this).startPrinting(
-            stubbedData,
-            EPrintCopyType.MERCHANT,
-            this
-        ) { dialogCB, printingFail ->
-            Log.d("Sale Printer Status:- ", printingFail.toString())
-            if (printingFail == 0)
-                runOnUiThread {
-                    alertBoxWithAction(
-                        getString(R.string.printer_error),
-                        getString(R.string.printing_roll_empty_msg),
-                        false,
-                        getString(R.string.positive_button_ok),
-                        {
-                            cb(dialogCB, false)
-                            *//* startActivity(
-                                 Intent(
-                                     this@VFTransactionActivity,
-                                     MainActivity::class.java
-                                 ).apply {
-                                     flags =
-                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                 })*//*
-                        },
-                        {})
-                }
-            else
-                cb(dialogCB, true)
-        }*/
+        if(stubbedData.transactionType != BhTransactionType.PRE_AUTH.type) {
+            Utility().saveTempBatchFileDataTable(stubbedData)
+        }
 
         lifecycleScope.launch(Dispatchers.Main) {
             showProgress(getString(R.string.printing))

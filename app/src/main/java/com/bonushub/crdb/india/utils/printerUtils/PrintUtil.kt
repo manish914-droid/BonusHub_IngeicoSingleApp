@@ -586,6 +586,22 @@ class PrintUtil(context: Context?) {
                     )
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()*/
+
+                if(batchTable.transactionType == BhTransactionType.PRE_AUTH_COMPLETE.type){
+                    printSeperator()
+                    sigleLineText("ENTERED DETAILS", AlignMode.CENTER)
+
+                    textBlockList.add(sigleLineformat("TID:${batchTable.authTID}", AlignMode.LEFT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.add(sigleLineformat("BATCH NO:${batchTable.authBatchNO}", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("ROC:${batchTable.authROC}", AlignMode.RIGHT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
+                    printSeperator()
+                }
                 val isNoEmiOnlyCashBackAppl : Boolean =  batchTable?.tenure=="1"
 
                 if (isReversal) {
@@ -726,6 +742,9 @@ class PrintUtil(context: Context?) {
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
 
+                    }
+                    BhTransactionType.PRE_AUTH_COMPLETE.type ->{
+                        preAuthCompleteTransaction(batchTable)
                     }
                     else -> {
                         voidTransaction(batchTable)
@@ -1347,6 +1366,22 @@ class PrintUtil(context: Context?) {
         currencySymbol = terminalData?.currencySymbol
         textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
         val amt = (((receiptDetail.baseAmmount)?.toDouble())?.div(100)).toString()
+        textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
+
+        textBlockList.add(sigleLineformat("TOTAL AMOUNT:", AlignMode.LEFT))
+        textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
+        printer?.addMixStyleText(textBlockList)
+        textBlockList.clear()
+    }
+
+    private fun preAuthCompleteTransaction(receiptDetail: TempBatchFileDataTable) {
+        var currencySymbol: String? = "Rs"
+        val terminalData = getTptData()
+        currencySymbol = terminalData?.currencySymbol
+        textBlockList.add(sigleLineformat("BASE AMOUNT:", AlignMode.LEFT))
+        val amt = (((receiptDetail.transactionalAmmount)?.toDouble())?.div(100)).toString()
         textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(amt.toDouble())}", AlignMode.RIGHT))
         printer?.addMixStyleText(textBlockList)
         textBlockList.clear()

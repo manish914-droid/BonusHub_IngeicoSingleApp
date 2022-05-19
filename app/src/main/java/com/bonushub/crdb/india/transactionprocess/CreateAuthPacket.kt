@@ -141,7 +141,7 @@ class CreateAuthPacket {
                     HexStringConverter.addPreFixer(issuerParameterTable?.issuerId, 2)
                 addFieldByHex(
                     61, addPad(
-                        AppPreference.getString("serialNumber"), " ", 15, false
+                        DeviceHelper.getDeviceSerialNo() ?: "", " ", 15, false
                     ) + AppPreference.getBankCode() + customerID + walletIssuerID + data
                 )
 

@@ -2,6 +2,7 @@ package com.bonushub.crdb.india.repository
 
 import android.text.TextUtils
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
@@ -26,39 +27,29 @@ import kotlin.collections.ArrayList
 
 class PreAuthRepository @Inject constructor() {
 
-    /*companion object{
 
-        @Synchronized
-        fun getInstance():PreAuthRepository{
-            return PreAuthRepository()
-        }
-    }*/
+    var counter = 0
+
+    init {
+        counter = 0
+    }
 
 
-    val data = MutableLiveData<PendingPreAuthDataResponse>()
-    var dataLocal = PendingPreAuthDataResponse()
+    private val dataLocal = MutableLiveData<PendingPreAuthDataResponse>()
+    val data: LiveData<PendingPreAuthDataResponse>
+        get() = dataLocal
 
 
     private val cardProcessedData: CardProcessedDataModal by lazy { CardProcessedDataModal() }
     val pendingPreauthList = ArrayList<PendingPreauthData>()
-    var counter = 0
 
-    suspend fun getPendingPreAuthTxn():MutableLiveData<PendingPreAuthDataResponse>{
-
-       /* withContext(Dispatchers.Main){
-            dataLocal.apiStatus = ApiStatus.Processing
-            data.postValue(dataLocal)
-        }*/
-
+    suspend fun getPendingPreAuthTxn(){
 
         doPendingPreAuth(counter)
-
-
-        return data
     }
 
-    private suspend fun doPendingPreAuth(counter: Int) {
-        val transactionalAmount = 0L //authCompletionData.authAmt?.replace(".", "")?.toLong() ?: 0L
+    private fun doPendingPreAuth(counter: Int) {
+        val transactionalAmount = 0L
         cardProcessedData.apply {
             setTransactionAmount(transactionalAmount)
             setTransType(TransactionType.PENDING_PREAUTH.type)
@@ -78,8 +69,8 @@ class PreAuthRepository @Inject constructor() {
             ex.printStackTrace()
         }
         logger("Transaction REQUEST PACKET --->>", transactionISO.isoMap, "e")
-        //  runOnUiThread { showProgress(getString(R.string.sale_data_sync)) }
-        withContext(Dispatchers.IO) {
+
+        runBlocking(Dispatchers.IO) {
             checkReversalPerformPendingPreAuthTransaction(
                 transactionISO,
                 cardProcessedData
@@ -94,18 +85,13 @@ class PreAuthRepository @Inject constructor() {
 
         //Sending Transaction Data Packet to Host:-(In case of no reversal)
         if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-//            withContext(Dispatchers.Main) { // done
-//                (context as BaseActivityNew).showProgress("Getting Pending Pre-Auth From Server")
-//            }
 
-    withContext(Dispatchers.Main){
-        dataLocal = PendingPreAuthDataResponse()
-        dataLocal.msg = "Getting Pending Pre-Auth From Server"
-        logger("ApiStatus","Processing","e")
-        dataLocal.apiStatus = ApiStatus.Processing
-        //data.postValue(dataLocal)
-        data.value = dataLocal
-    }
+        val temp = PendingPreAuthDataResponse()
+            temp.msg = "Getting Pending Pre-Auth From Server"
+            logger("ApiStatus","Processing","e")
+            temp.apiStatus = ApiStatus.Processing
+            dataLocal.postValue(temp)
+
 
 
             syncPreAuthTransactionToHost(
@@ -113,12 +99,10 @@ class PreAuthRepository @Inject constructor() {
                 cardProcessedDataModal,
                 false
             ) { syncStatus, responseCode, transactionMsg ->
-//                GlobalScope.launch(Dispatchers.Main) { // done
-//                    (context as BaseActivityNew).hideProgress()
-//                }
+
 
                 if (syncStatus && responseCode == "00") {
-                    //  AppPreference.clearReversal()
+                      AppPreference.clearReversal()
                     val resIso = readIso(transactionMsg, false)
                     logger("RESP DATA..>", transactionMsg)
                     logger("PendingPre RES -->", resIso.isoMap, "e")
@@ -136,8 +120,7 @@ class PreAuthRepository @Inject constructor() {
                         }
                         if (f62Arr[0] == "1") {
                             counter += f62Arr[1].toInt()
-                            //Again Request for pending pre auth transaction with next counter
-                            runBlocking(Dispatchers.IO) {  doPendingPreAuth(counter) }
+                            doPendingPreAuth(counter)
 
                         } else {
 
@@ -145,76 +128,29 @@ class PreAuthRepository @Inject constructor() {
                             //--
 
                             try {
-                                runBlocking (Dispatchers.Main){
                                     pendingPreauthList.sortBy { it.bankId }
                                     logger("ApiStatus","Success","e")
-                                    dataLocal = PendingPreAuthDataResponse()
-                                    dataLocal.apiStatus = ApiStatus.Success
-                                    dataLocal.cardProcessedDataModal = cardProcessedDataModal
-                                    dataLocal.pendingList = pendingPreauthList
-                                    //data.postValue(dataLocal)
-                                    data.value = dataLocal
-                                }
+                                    val temp = PendingPreAuthDataResponse()
+                                    temp.apiStatus = ApiStatus.Success
+                                    temp.cardProcessedDataModal = cardProcessedDataModal
+                                    temp.pendingList = pendingPreauthList
+                                    dataLocal.postValue(temp)
 
                             }catch (ex:Exception){
                                 ex.printStackTrace()
                             }
-
-                            // kushal 1105 done
-                            /*(context as BaseActivityNew).transactFragment(
-                                PreAuthPendingFragment()
-                                    .apply {
-                                        arguments = Bundle().apply {
-                                            putSerializable(
-                                                "PreAuthData",
-                                                pendingPreauthList as java.util.ArrayList<PendingPreauthData>
-                                            )
-                                            putSerializable(
-                                                "CardProcessData",
-                                                cardProcessedDataModal
-                                            )
-                                        }
-                                    })*/
-
-                            //--
-                            /*PrintUtil(context).printPendingPreauth(
-                                cardProcessedDataModal,
-                                context,
-                                pendingPreauthList
-                            ) { printCB ->
-                                if (!printCB) {
-                                    //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
-                                    //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
-                                    if (!TextUtils.isEmpty(autoSettlementCheck))
-                                        syncOfflineSaleAndAskAutoSettlement(
-                                            autoSettlementCheck.substring(
-                                                0,
-                                                1
-                                            ), context as BaseActivity
-                                        )
-                                }
-
-                            }*/
                         }
                     } else {
-                    // kushal 1105
-                    /*GlobalScope.launch(Dispatchers.Main) {
-                            (context as BaseActivityNew).getInfoDialog(
-                                "Info",
-                                "No more Pending Pre-auth available"
-                            ) {}
-                        }*/
+
                         logger("ApiStatus","Success","e")
-                        runBlocking(Dispatchers.Main) {
-                            dataLocal.apiStatus = ApiStatus.Success
-                            // data.postValue(dataLocal)
-                            data.value = dataLocal
-                        }
+                            var temp = PendingPreAuthDataResponse()
+                            temp.apiStatus = ApiStatus.Success
+                            dataLocal.postValue(temp)
 
                     }
 
                 } else if (syncStatus && responseCode != "00") {
-                    //  AppPreference.clearReversal()
+                     AppPreference.clearReversal()
                     val resIso = readIso(transactionMsg, false)
                     logger("RESP DATA..>", transactionMsg)
                     logger("PendingPre RES -->", resIso.isoMap, "e")
@@ -223,98 +159,40 @@ class PreAuthRepository @Inject constructor() {
                     //---
 
                     logger("ApiStatus","Failed","e")
-                    runBlocking(Dispatchers.Main){
-                        dataLocal = PendingPreAuthDataResponse()
-                        dataLocal.msg = resIso.isoMap[58]?.parseRaw2String().toString()
-                        dataLocal.apiStatus = ApiStatus.Failed
-                        //data.postValue(dataLocal)
-                        data.value = dataLocal
-                    }
-
-                    // kushal 1105 done
-                   /* GlobalScope.launch(Dispatchers.Main) {
-                        context.getString(R.string.error_hint).let {
-                            (context as BaseActivityNew).alertBoxWithActionNew(
-                                it,
-                                resIso.isoMap[58]?.parseRaw2String().toString(),
-                                R.drawable.ic_info,
-                                context.getString(R.string.positive_button_ok),
-                                "",false,false,
-                                { alertPositiveCallback ->
-                                    if (alertPositiveCallback) {
-                                        if (!TextUtils.isEmpty(autoSettlementCheck))
-                                            syncOfflineSaleAndAskAutoSettlement(
-                                                autoSettlementCheck.substring(
-                                                    0,
-                                                    1
-                                                ), context as BaseActivityNew
-                                            )
-                                    }
-                                },
-                                {})
-                        }
-                    }*/
+                        var temp = PendingPreAuthDataResponse()
+                    temp.msg = resIso.isoMap[58]?.parseRaw2String().toString()
+                    temp.apiStatus = ApiStatus.Failed
+                        dataLocal.postValue(temp)
                 } else {
-                    //   AppPreference.clearReversal()
+                       AppPreference.clearReversal()
                     logger("ApiStatus","Failed","e")
-                    runBlocking(Dispatchers.Main){
-                        dataLocal = PendingPreAuthDataResponse()
-                        dataLocal.msg = "Connection Failed"
-                        dataLocal.apiStatus = ApiStatus.Failed
-                        // data.postValue(dataLocal)
-                        data.value = dataLocal
-                    }
+                        var temp = PendingPreAuthDataResponse()
+                        temp.msg = "Connection Failed"
+                        temp.apiStatus = ApiStatus.Failed
+                        dataLocal.postValue(temp)
 
-                    // kushal 1105 done
-                /*GlobalScope.launch(Dispatchers.Main) {
-                        (context as BaseActivityNew).hideProgress()
-                        (context as BaseActivityNew).alertBoxWithActionNew(
-                            (context as BaseActivityNew).getString(R.string.connection_failed),
-                            (context as BaseActivityNew).getString(R.string.pending_preauthdetails),
-                            R.drawable.ic_info,
-                            (context as BaseActivityNew).getString(R.string.positive_button_ok),
-                            "",false,false,
-                            { alertPositiveCallback ->
-                                if (alertPositiveCallback)
-                                    declinedTransaction()
-                            },
-                            {})
-
-                        //    VFService.showToast(transactionMsg)
-                    }*/
                 }
             }
         }
         //Sending Reversal Data Packet to Host:-(In Case of reversal)
         else {
             if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-                /*withContext(Dispatchers.Main) {
-                    (context as BaseActivityNew).showProgress((context as NavigationActivity).getString(
-                        R.string.reversal_data_sync))
-                }*/
+
                 logger("ApiStatus","Processing","e")
-                withContext(Dispatchers.Main){
-                    dataLocal = PendingPreAuthDataResponse()
-                    dataLocal.msg = "Uploading reversal"
-                    dataLocal.apiStatus = ApiStatus.Processing
-                    // data.postValue(dataLocal)
-                    data.value = dataLocal
-                }
+                    var temp = PendingPreAuthDataResponse()
+                temp.msg = "Uploading reversal"
+                temp.apiStatus = ApiStatus.Processing
+                     dataLocal.postValue(temp)
 
 
                 SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
-                    //(context as BaseActivityNew).hideProgress()
                     if (isSyncToHost) {
                         AppPreference.clearReversal()
-                        GlobalScope.launch(Dispatchers.IO) {
+                        runBlocking(Dispatchers.IO) {
                             checkReversalPerformPendingPreAuthTransaction(
                                 transactionISOByteArray,
                                 cardProcessedDataModal
                             )
-                        }
-                    } else {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            //  VFService.showToast(transMsg)
                         }
                     }
                 }
@@ -349,6 +227,7 @@ class PreAuthRepository @Inject constructor() {
         //  val reversalPacket = Gson().toJson(transISODataWriter)
         // AppPreference.saveString(AppPreference.GENERIC_REVERSAL_KEY, reversalPacket)
         if (transactionISOByteArray != null) {
+            Log.e("callback","before hit server")
             HitServer.hitServer(transactionISOByteArray, { result, success ->
                 //Save Server Hit Status in Preference:-
                 AppPreference.saveBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString(), true)
@@ -390,6 +269,7 @@ class PreAuthRepository @Inject constructor() {
                         if (successResponseCode == "00") {
                             //   VFService.showToast("Auth-Complete Success")
                                 AppPreference.clearReversal()
+                            Log.e("callback","hit server end")
                             syncAuthTransactionCallback(
                                 true,
                                 successResponseCode.toString(),
@@ -398,6 +278,7 @@ class PreAuthRepository @Inject constructor() {
 
                         } else {
                                AppPreference.clearReversal()
+                            Log.e("callback","hit server end")
                             syncAuthTransactionCallback(
                                 true,
                                 successResponseCode.toString(),
@@ -415,6 +296,7 @@ class PreAuthRepository @Inject constructor() {
                         /* if (!isReversal) {
                          AppPreference.clearReversal()
                      }*/
+                        Log.e("callback","hit server end")
                         syncAuthTransactionCallback(false, successResponseCode.toString(), result)
                         Log.d("Failure Data:- ", result)
                     }
@@ -429,14 +311,19 @@ class PreAuthRepository @Inject constructor() {
 
 
     // complete pre auth
-    val completePreAuthData = MutableLiveData<CompletePreAuthData>()
-    var completePreAuthDataLocal = CompletePreAuthData()
+    //val completePreAuthData = MutableLiveData<CompletePreAuthData>()
+    //var completePreAuthDataLocal = CompletePreAuthData()
     private val cardProcessedDataForComplete: CardProcessedDataModal by lazy { CardProcessedDataModal() }
 
     private var successResponseCode: String? = null
+
+    private val _completePreAuthData = MutableLiveData<PendingPreAuthDataResponse>()
+    val completePreAuthData: LiveData<PendingPreAuthDataResponse>
+        get() = _completePreAuthData
+
     suspend fun confirmCompletePreAuth(
         authCompletionData: AuthCompletionData
-    ):MutableLiveData<CompletePreAuthData> {
+    ){
         var isSuccessComp = false
         val cardProcessedData: CardProcessedDataModal by lazy { CardProcessedDataModal() }
         val transactionalAmount = authCompletionData.authAmt?.replace(".", "")?.toLong() ?: 0L
@@ -463,82 +350,30 @@ class PreAuthRepository @Inject constructor() {
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        //    logger("Transaction REQUEST PACKET --->>", transactionISO.isoMap, "e")
-        //  runOnUiThread { showProgress(getString(R.string.sale_data_sync)) }
-        /*activity?.let {
-            SyncAuthTransToHost(it as BaseActivity).checkReversalPerformAuthTransaction(
-                transactionISO, cardProcessedData
-            ) { isSuccess, msg ->
-
-                if (isSuccess) {
-                    mAdapter.refreshListRemoveAt(position)
-                }
-                // VFService.showToast("$msg----------->  $isSuccess")
-                logger("PREAUTHCOMP", "Is success --->  $isSuccess  Msg --->  $msg")
-                //   parentFragmentManager.popBackStackImmediate()
-            }
-        }*/
 
 
-
-        checkReversalPerformAuthTransaction(
-                transactionISO, cardProcessedData
-            ) { isSuccess, msg ->
-
-                if (isSuccess) {
-                   // mAdapter.refreshListRemoveAt(position) // kushal 1605
-                       runBlocking(Dispatchers.Main){
-                           completePreAuthDataLocal.apiStatus = ApiStatus.Success
-                           completePreAuthData.value = completePreAuthDataLocal
-                       }
-
-                }
-                // VFService.showToast("$msg----------->  $isSuccess")
-                logger("PREAUTHCOMP", "Is success --->  $isSuccess  Msg --->  $msg")
-                //   parentFragmentManager.popBackStackImmediate()
-            }
-
-
-        return completePreAuthData
+        checkReversalPerformAuthTransaction(transactionISO, cardProcessedData)
 
     }
 
     suspend fun checkReversalPerformAuthTransaction(
         transactionISOByteArray: IsoDataWriter,
-        cardProcessedDataModal: CardProcessedDataModal, cb: (Boolean, String) -> Unit
+        cardProcessedDataModal: CardProcessedDataModal
     ) {
         // //Sending Transaction Data Packet to Host:-(In case of no reversal)
         logger("coroutine 4", Thread.currentThread().name, "e")
         if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-           /* withContext(Dispatchers.Main) {
-                activityContext?.getString(R.string.sale_data_sync)?.let {
-                    activityContext?.showProgress(it)
-                }
-            }*/
-                withContext(Dispatchers.Main){
-                    completePreAuthDataLocal.apiStatus = ApiStatus.Processing
-                    completePreAuthDataLocal.msg = "Sending/Receiving From Host"
-                    completePreAuthData.value = completePreAuthDataLocal
-                }
+
+            val temp  = PendingPreAuthDataResponse()
+                    temp.apiStatus = ApiStatus.Processing
+                    temp.msg = "Sending/Receiving From Host"
+                    _completePreAuthData.postValue(temp)
 
 
             logger("coroutine 5", Thread.currentThread().name, "e")
             syncAuthTransactionToHost(transactionISOByteArray, cardProcessedDataModal) { syncStatus, responseCode, transactionMsg ->
-                //withactivityContext(Dispatchers.Main){
-                //activityContext?.hideProgress()
 
-                //}
                 if (syncStatus && responseCode == "00") {
-                    /*GlobalScope.launch(Dispatchers.Main) {
-                        activityContext?.let { txnSuccessToast(it) }
-                    }*/
-
-                        runBlocking(Dispatchers.Main){
-                            completePreAuthDataLocal.apiStatus = ApiStatus.Success
-                            completePreAuthDataLocal.msg = ""
-                            completePreAuthData.value = completePreAuthDataLocal
-                        }
-
 
                     //Below we are saving batch data and print the receipt of transaction:-
                     val responseIsoData: IsoDataReader = readIso(transactionMsg, false)
@@ -552,98 +387,31 @@ class PreAuthRepository @Inject constructor() {
                     responseIsoData.isoMap[4]?.rawData?.toLong()?.let {
                         cardProcessedDataModal.setTransactionAmount(it)
                     }
-                    StubBatchData("", cardProcessedDataModal.getTransType(), cardProcessedDataModal, null, autoSettlementCheck) { stubbedData ->
 
-                        // kushal 1605
-                        /*activityContext?.let {
-                            printAndSaveAuthTransToBatchDataInDB(stubbedData, autoSettlementCheck, it) { isSuccess, msg ->
-                                cb(true, msg)
+                    val temp  = PendingPreAuthDataResponse()
+                    temp.apiStatus = ApiStatus.Success
+                    temp.msg = "Approved"
+                    temp.isoResponse = autoSettlementCheck
+                    temp.cardProcessedDataModal = cardProcessedDataModal
+                    _completePreAuthData.postValue(temp)
 
-                            }
-                        }*/
-
-                    }
                 } else if (syncStatus && responseCode != "00") {
                     AppPreference.clearReversal()
                     val responseIsoData: IsoDataReader = readIso(transactionMsg, false)
                     val autoSettlementCheck =
                         responseIsoData.isoMap[60]?.parseRaw2String().toString()
                     //--------------
-                    runBlocking(Dispatchers.Main){
-                        completePreAuthDataLocal.apiStatus = ApiStatus.Failed
-                        completePreAuthDataLocal.msg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
-                        completePreAuthData.value = completePreAuthDataLocal
-                    }
+                    val temp  = PendingPreAuthDataResponse()
+                    temp.apiStatus = ApiStatus.Failed
+                        temp.msg = responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                        _completePreAuthData.postValue(temp)
 
-
-                    /*GlobalScope.launch(Dispatchers.Main) {
-                        activityContext?.getString(R.string.error_hint)?.let {
-                            activityContext?.alertBoxWithAction(null,
-                                null,
-                                it,
-                                responseIsoData.isoMap[58]?.parseRaw2String().toString(),
-                                false,
-                                activityContext!!.getString(R.string.positive_button_ok),
-                                { alertPositiveCallback ->
-                                    if (alertPositiveCallback) {
-                                        if (!TextUtils.isEmpty(autoSettlementCheck))
-                                            syncOfflineSaleAndAskAutoSettlement(
-                                                autoSettlementCheck.substring(
-                                                    0,
-                                                    1
-                                                ), activityContext!!
-                                            ) { isucc, msg ->
-                                                cb(
-                                                    false,
-                                                    responseIsoData.isoMap[58]?.parseRaw2String()
-                                                        .toString()
-                                                )
-                                            }
-                                        else {
-                                            // activityContext?.startActivity(Intent((activityContext as BaseActivity), MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK })
-                                            cb(
-                                                false,
-                                                responseIsoData.isoMap[58]?.parseRaw2String()
-                                                    .toString()
-                                            )
-
-                                        }
-                                    }
-                                },
-                                {})
-                        }
-                    }*/
                 } else {
-                    //    VFService.showToast(transactionMsg)
-                        runBlocking(Dispatchers.Main){
-                            completePreAuthDataLocal.apiStatus = ApiStatus.Failed
-                            completePreAuthDataLocal.msg = "Declined"
-                            completePreAuthData.value = completePreAuthDataLocal
-                        }
+                    val temp  = PendingPreAuthDataResponse()
+                    temp.apiStatus = ApiStatus.Failed
+                            temp.msg = "Declined"
+                            _completePreAuthData.postValue(temp)
 
-
-                    /*activityContext?.hideProgress()
-                    checkForPrintReversalReceipt(activityContext,"") {
-                        (activityContext as BaseActivity).hideProgress()
-                        GlobalScope.launch(Dispatchers.Main) {
-                            (activityContext as BaseActivity).alertBoxWithAction(
-                                null,
-                                null,
-                                activityContext!!.getString(R.string.declined),
-                                activityContext!!.getString(R.string.transaction_delined_msg),
-                                false,
-                                activityContext!!.getString(R.string.positive_button_ok),
-                                { alertPositiveCallback ->
-                                    if (alertPositiveCallback)
-                                        cb(
-                                            false,
-                                            activityContext!!.getString(R.string.transaction_delined_msg)
-                                        )
-                                    //  declinedTransaction()
-                                },
-                                {})
-                        }
-                    }*/
 
                 }
             }

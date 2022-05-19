@@ -16,21 +16,23 @@
         android:id="@+id/btnPrint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PRINT"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/pad_10"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
         android:paddingStart="@dimen/pad_30"
+        android:paddingTop="@dimen/pad_10"
         android:paddingEnd="@dimen/pad_30"
+        android:paddingBottom="@dimen/pad_10"
+        android:text="PRINT"
         android:textColor="@color/white"
-        android:textSize="@dimen/text_size_small"
-        android:fontFamily="@font/muli_regular"/>
+        android:textSize="@dimen/text_size_small" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPerAuthPending"
+        android:id="@+id/rvPreAuthPending"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/pad_10"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginStart="@dimen/pad_10"
+        android:layout_marginEnd="@dimen/pad_10" />
 
 </LinearLayout>

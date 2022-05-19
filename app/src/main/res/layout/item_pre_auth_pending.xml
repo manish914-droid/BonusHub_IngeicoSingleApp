@@ -1,15 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/pad_15"
-    android:background="@drawable/edge_blue_bg_white"
-    android:elevation="5dp"
-    android:padding="@dimen/pad_15"
-    android:orientation="horizontal"
-    android:id="@+id/linLayItem">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="@dimen/pad_10"
+    app:strokeColor="#BBBBBB"
+    app:cardElevation="@dimen/pad_5"
+    android:id="@+id/linLayItem"
+    android:layout_margin="@dimen/pad_10"
+    app:rippleColor="@color/ripple_color_effect">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/pad_5">
+
+        <TextView
+            android:id="@+id/txtViewBatchNoTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Batch No.:"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_regular"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/txtViewRocTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewRocTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ROC:"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_regular"
+            app:layout_constraintStart_toEndOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/txtViewBatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_bold"
+            app:layout_constraintStart_toStartOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewBatchNoTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewRoc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_bold"
+            app:layout_constraintStart_toStartOf="@+id/txtViewRocTittle"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewRocTittle"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewRocTittle"/>
+
+        <View
+            android:id="@+id/viewLine1"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#4A013480"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewBatch"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="@dimen/pad_10"/>
+
+        <TextView
+            android:id="@+id/txtViewPanTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PAN:"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_regular"
+            android:layout_marginTop="@dimen/pad_5"
+            app:layout_constraintStart_toStartOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintTop_toBottomOf="@+id/viewLine1"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewBatchNoTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewAmountTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount:"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_regular"
+            android:layout_marginTop="@dimen/pad_5"
+            app:layout_constraintStart_toStartOf="@+id/txtViewRocTittle"
+            app:layout_constraintTop_toBottomOf="@+id/viewLine1"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewRocTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewPan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_bold"
+            app:layout_constraintStart_toStartOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewPanTittle"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewBatchNoTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewAmt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_bold"
+            app:layout_constraintStart_toStartOf="@+id/txtViewRocTittle"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewAmountTittle"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewRocTittle"/>
+
+        <View
+            android:id="@+id/viewLine2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#4A013480"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewPan"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="@dimen/pad_10"/>
+
+        <TextView
+            android:id="@+id/txtViewDateTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date:"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_regular"
+            android:layout_marginTop="@dimen/pad_5"
+            app:layout_constraintStart_toStartOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintTop_toBottomOf="@+id/viewLine2"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewBatchNoTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewTimeTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time:"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_regular"
+            android:layout_marginTop="@dimen/pad_5"
+            app:layout_constraintStart_toStartOf="@+id/txtViewRocTittle"
+            app:layout_constraintTop_toBottomOf="@+id/viewLine2"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewRocTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_bold"
+            app:layout_constraintStart_toStartOf="@+id/txtViewBatchNoTittle"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewDateTittle"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewBatchNoTittle"/>
+
+        <TextView
+            android:id="@+id/txtViewTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/text_size_regular"
+            android:fontFamily="@font/muli_bold"
+            app:layout_constraintStart_toStartOf="@+id/txtViewRocTittle"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewDateTittle"
+            app:layout_constraintEnd_toEndOf="@+id/txtViewRocTittle"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <!--  <RelativeLayout
         android:layout_width="@dimen/pad_0"
         android:layout_height="wrap_content"
         android:layout_weight="1.2">
@@ -158,5 +328,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:src="@drawable/ic_right_arrow"
-        android:tint="#013480" />
-</LinearLayout>
+        android:tint="#013480" />-->
+</com.google.android.material.card.MaterialCardView>

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/pad_10"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_back_arrow_black"
+        android:src="@drawable/ic_back_arrow_blue"
         app:layout_constraintBottom_toBottomOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

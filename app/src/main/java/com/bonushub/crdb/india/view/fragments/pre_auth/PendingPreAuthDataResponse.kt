@@ -9,4 +9,5 @@ class PendingPreAuthDataResponse {
     var msg: String? = null
     var pendingList = ArrayList<PendingPreauthData>()
     var cardProcessedDataModal = CardProcessedDataModal()
+    var isoResponse:String?= null
 }

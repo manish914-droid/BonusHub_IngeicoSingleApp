@@ -34,7 +34,7 @@ object HitServer  {
     private var callbackSale: ServerMessageCallbackSale? = null
     var reversalToBeSaved: IsoDataWriter?=null
 
-    @Synchronized
+    //@Synchronized
     suspend fun hitServer(data: ByteArray, callback: ServerMessageCallback, progressMsg: ProgressCallback,isAppUpdate: Boolean = false){
         this@HitServer.callback = callback
         try {
@@ -69,6 +69,7 @@ object HitServer  {
                     Utility().logger(TAG, "len=$len, data = $responseStr")
                     socket.close()
                     //
+                    Log.e("callback","fun end")
                     callback(responseStr, true)
                     this@HitServer.callback = null
                 },isAppUpdate = isAppUpdate)

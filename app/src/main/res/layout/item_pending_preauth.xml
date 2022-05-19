@@ -1,16 +1,276 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pending_pre_auth_crdView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:visibility="visible"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/cash_amt_crdView"
-    app:cardBackgroundColor="@color/themeBackground"
-    app:cardElevation="2dp">
+    >
 
-    <LinearLayout
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/pad_10"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:cardElevation="@dimen/pad_5"
+        app:strokeColor="#BBBBBB"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/pad_5">
+
+            <TextView
+                android:id="@+id/batch_no_tvNoTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_regular"
+                android:text="Batch No.:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toStartOf="@+id/roc_tvTittle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/roc_tvTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_regular"
+                android:text="ROC:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/batch_no_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="232075"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/batch_no_tvNoTittle" />
+
+            <TextView
+                android:id="@+id/roc_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="232075"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/roc_tvTittle"
+                app:layout_constraintStart_toStartOf="@+id/roc_tvTittle"
+                app:layout_constraintTop_toBottomOf="@+id/roc_tvTittle" />
+
+            <View
+                android:id="@+id/viewLine1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_margin="@dimen/pad_10"
+                android:background="#4A013480"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/batch_no_tv" />
+
+            <TextView
+                android:id="@+id/pan_no_tvTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="PAN:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/viewLine1" />
+
+            <TextView
+                android:id="@+id/txtViewAmountTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="Amount:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/roc_tvTittle"
+                app:layout_constraintStart_toStartOf="@+id/roc_tvTittle"
+                app:layout_constraintTop_toBottomOf="@+id/viewLine1" />
+
+            <TextView
+                android:id="@+id/pan_no_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="5413********0078"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/pan_no_tvTittle" />
+
+            <TextView
+                android:id="@+id/amt_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="100.00"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/roc_tvTittle"
+                app:layout_constraintStart_toStartOf="@+id/roc_tvTittle"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewAmountTittle" />
+
+            <View
+                android:id="@+id/viewLine2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_margin="@dimen/pad_10"
+                android:background="#4A013480"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/pan_no_tv" />
+
+            <TextView
+                android:id="@+id/date_tvTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="Date:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/viewLine2" />
+
+            <TextView
+                android:id="@+id/time_tvTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="Time:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/roc_tvTittle"
+                app:layout_constraintStart_toStartOf="@+id/roc_tvTittle"
+                app:layout_constraintTop_toBottomOf="@+id/viewLine2" />
+
+            <TextView
+                android:id="@+id/date_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="22/01/2021"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batch_no_tvNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/date_tvTittle" />
+
+            <TextView
+                android:id="@+id/time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="16:23:33"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/roc_tvTittle"
+                app:layout_constraintStart_toStartOf="@+id/roc_tvTittle"
+                app:layout_constraintTop_toBottomOf="@+id/date_tvTittle" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/amt_crdView"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/pad_10"
+                android:layout_marginTop="@dimen/pad_10"
+                android:layout_marginRight="@dimen/pad_10"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:hint="@string/enter_amount"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/date_tv">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/amount_et"
+                    style="@style/TextInputEditTextAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:drawableStart="@drawable/ic_rupay_circle_new"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:inputType="number"
+                    android:maxLength="12"
+                    android:padding="@dimen/pad_8"
+                    android:imeOptions="actionDone"
+                    android:textIsSelectable="false"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/print_btnn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue_bg_skyblue"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_32"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_32"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="PRINT"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/complete_btnn"
+                app:layout_constraintHorizontal_bias="0.4"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="@+id/amt_crdView" />
+
+            <TextView
+                android:id="@+id/complete_btnn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue3"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_30"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_30"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="COMPLETE"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/amt_crdView"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toEndOf="@+id/print_btnn"
+                app:layout_constraintTop_toBottomOf="@+id/amt_crdView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -33,9 +293,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:textColor="@color/white"
                 android:layout_toEndOf="@+id/batch_no_tv"
-                android:gravity="end" />
+                android:gravity="end"
+                android:textColor="@color/white" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -55,8 +315,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@+id/pan_no_tv"
-                android:textColor="@color/white"
-                android:gravity="end" />
+                android:gravity="end"
+                android:textColor="@color/white" />
 
 
         </RelativeLayout>
@@ -78,8 +338,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@+id/date_tv"
-                android:textColor="@color/white"
-                android:gravity="end" />
+                android:gravity="end"
+                android:textColor="@color/white" />
 
 
         </RelativeLayout>
@@ -125,14 +385,14 @@
 
                 />
         </com.google.android.material.card.MaterialCardView>
-        <!--Buttons-->
+        &lt;!&ndash;Buttons&ndash;&gt;
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/preautn_pending_btns_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/pad_16"
             android:orientation="horizontal"
-         android:visibility="gone">
+            android:visibility="gone">
 
 
             <Button
@@ -164,11 +424,11 @@
                 android:textSize="@dimen/text_size_xsmall"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+    </LinearLayout>-->
+</androidx.constraintlayout.widget.ConstraintLayout>

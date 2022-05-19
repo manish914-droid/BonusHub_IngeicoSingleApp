@@ -14,32 +14,23 @@ import kotlinx.coroutines.launch
 
 class PreAuthViewModel @ViewModelInject constructor(private val preAuthRepository: PreAuthRepository)  : ViewModel() {
 
-    /*var eDashboardItemLiveData:LiveData<ArrayList<EDashboardItem>>? = null
 
-    suspend fun eDashboardItem() : LiveData<ArrayList<EDashboardItem>> {
-        eDashboardItemLiveData = DashboardRepository.getInstance().getEDashboardItem()
-        return eDashboardItemLiveData as LiveData<ArrayList<EDashboardItem>>
-    }*/
+    private val _pendingPreAuthData = MutableLiveData<PendingPreAuthDataResponse>()
+    val pendingPreAuthData: LiveData<PendingPreAuthDataResponse>
+        get() = preAuthRepository.data
 
-    //var pendingPreAuthData:LiveData<PendingPreAuthDataaaa>? = null
-    var pendingPreAuthData:MutableLiveData<PendingPreAuthDataResponse> = MutableLiveData()
-
-    suspend fun getPendingPreAuthData() : LiveData<PendingPreAuthDataResponse> {
-        pendingPreAuthData = preAuthRepository.getPendingPreAuthTxn()
-      //  pendingPreAuthData = PreAuthRepository.getInstance().getPendingPreAuthTxn()
-        return pendingPreAuthData as LiveData<PendingPreAuthDataResponse>
+    suspend fun getPendingPreAuthData(){
+            preAuthRepository.getPendingPreAuthTxn()
     }
 
-    val progressDialog = MutableLiveData<LiveData<Boolean>>()
 
+    private val _completePreAuthData = MutableLiveData<PendingPreAuthDataResponse>()
+    val completePreAuthData: LiveData<PendingPreAuthDataResponse>
+        get() = preAuthRepository.completePreAuthData
 
-    var completePreAuthData:MutableLiveData<CompletePreAuthData> = MutableLiveData()
-    suspend fun getCompletePreAuthData(authData: AuthCompletionData):LiveData<CompletePreAuthData>{
-        viewModelScope.launch(Dispatchers.IO) {
-            completePreAuthData = preAuthRepository.confirmCompletePreAuth(authData)
-        }
+    suspend fun getCompletePreAuthData(authData: AuthCompletionData){
 
-        return completePreAuthData
+        preAuthRepository.confirmCompletePreAuth(authData)
     }
 
 }

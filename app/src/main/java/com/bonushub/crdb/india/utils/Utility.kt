@@ -17,6 +17,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.MainActivity
@@ -29,6 +30,8 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacket
+import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
@@ -2030,4 +2033,91 @@ fun getEncryptedField57DataForVisa(dataLength: Int, dataDescription: String): St
     } else return "TRACK57_LENGTH<8"
 
 
+}
+
+fun doFormatting(text:String):String {
+    if (text?.isNotEmpty() == true) {
+
+        if (text?.toString() == "0.0") {
+            return ""
+        } else {
+            val fl = text.toString().replace(".", "").toLong()
+            val tx = "%.2f".format(fl.toDouble() / 100)
+            return tx
+        }
+    } else {
+        val tx = "%.2f".format(0f)
+        return tx
+    }
+}
+
+suspend fun printChargeSlip(activity : BaseActivityNew,copyType: EPrintCopyType, stubbedData:TempBatchFileDataTable, cb: (Boolean) -> Unit){
+    activity.showProgress(activity.getString(R.string.printing))
+    withContext(Dispatchers.IO) {
+        var printsts = false
+        if (stubbedData != null) {
+            PrintUtil(activity as BaseActivityNew).startPrinting(
+                stubbedData,
+                copyType,
+                activity as BaseActivityNew
+            )
+            { printCB, printingFail ->
+                (activity as BaseActivityNew).hideProgress()
+                if (printCB) {
+                    cb(true)
+
+
+                } else {
+                    ToastUtils.showToast(
+                        activity as BaseActivityNew,
+                        activity.getString(R.string.printer_error)
+                    )
+                    cb(false)
+
+                }
+            }
+        }
+    }
+
+}
+
+suspend fun showMerchantAlertBox(
+    batchTable: TempBatchFileDataTable,
+    activity: BaseActivityNew,
+    cb: (Boolean) -> Unit
+) {
+    withContext(Dispatchers.Main) {
+        val printerUtil: PrintUtil? = null
+        activity.alertBoxWithActionNew("",
+            activity.getString(R.string.print_customer_copy),
+            R.drawable.ic_print_customer_copy, activity.getString(R.string.positive_button_yes), activity.getString(R.string.no),true,false,{ status ->
+                activity.showProgress(activity.getString(R.string.printing))
+
+                runBlocking(Dispatchers.IO){
+                    PrintUtil(activity).startPrinting(
+                        batchTable,
+                        EPrintCopyType.CUSTOMER,
+                        activity
+                    ) { printCB, printingFail ->
+                        activity.hideProgress()
+                        if (printCB) {
+
+                              runBlocking(Dispatchers.Main) {
+                                  cb(printCB)
+                                  activity.hideProgress()
+                            }
+
+
+                        }
+
+                    }
+                }
+
+            }, {
+                runBlocking(Dispatchers.IO) {
+                    cb(true)
+                }
+                activity.hideProgress()
+            })
+    }
 }
