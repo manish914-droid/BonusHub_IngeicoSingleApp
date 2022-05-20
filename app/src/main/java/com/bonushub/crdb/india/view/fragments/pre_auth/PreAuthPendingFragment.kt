@@ -106,6 +106,8 @@ class PreAuthPendingFragment : Fragment() {
                         "", false, false,
                         { alertPositiveCallback ->
                             if (alertPositiveCallback) {
+
+                                gotoDashboard()
                                 // 1105
                                 /*if (!TextUtils.isEmpty(autoSettlementCheck))
                                        syncOfflineSaleAndAskAutoSettlement(
@@ -163,8 +165,14 @@ class PreAuthPendingFragment : Fragment() {
                         val transactionDate = dateFormaterNew(it.cardProcessedDataModal.getTimeStamp()?.toLong() ?: 0L)
                         val transactionTime = timeFormaterNew(it.cardProcessedDataModal.getTime()?:"")
 
-                        var amt = (((stubbedData.transactionalAmmount)?.toDouble())?.div(100)).toString()
-                        amt = "%.2f".format(amt.toDouble())
+                        var amt = ""
+                        try {
+                            amt = (((stubbedData.transactionalAmmount)?.toDouble())?.div(100)).toString()
+                            amt = "%.2f".format(amt.toDouble())
+                        }catch (ex:Exception){
+                            amt = "0.00"
+                        }
+
                         iDialog?.txnApprovedDialog(EDashboardItem.PENDING_PREAUTH.res,EDashboardItem.PENDING_PREAUTH.title,amt,
                             "${transactionDate}, ${transactionTime}") {
 
@@ -220,28 +228,39 @@ class PreAuthPendingFragment : Fragment() {
                     iDialog?.hideProgress()
                     dialogBuilder.hide()
 
-                    if(it.msg.equals("Declined")){
+                    if(it.isReversal){
                         iDialog?.alertBoxWithActionNew(
-                            "Declined",
-                            "Transaction Declined",
+                            getString(R.string.reversal),
+                            getString(R.string.reversal_upload_fail),
                             R.drawable.ic_info_new,
                             getString(R.string.positive_button_ok),
-                            "", false, false,
-                            { alertPositiveCallback ->
-                                gotoDashboard()
-                            },
+                            "",false,false,
+                            {},
                             {})
-                    }else{
-                        iDialog?.alertBoxWithActionNew(
-                            getString(R.string.error_hint),
-                            it.msg ?: "",
-                            R.drawable.ic_info_new,
-                            getString(R.string.positive_button_ok),
-                            "", false, false,
-                            { alertPositiveCallback ->
-                                // gotoDashboard()
-                            },
-                            {})
+                    }else {
+                        if (it.msg.equals("Declined")) {
+                            iDialog?.alertBoxWithActionNew(
+                                "Declined",
+                                "Transaction Declined",
+                                R.drawable.ic_info_new,
+                                getString(R.string.positive_button_ok),
+                                "", false, false,
+                                { alertPositiveCallback ->
+                                    gotoDashboard()
+                                },
+                                {})
+                        } else {
+                            iDialog?.alertBoxWithActionNew(
+                                getString(R.string.error_hint),
+                                it.msg ?: "",
+                                R.drawable.ic_info_new,
+                                getString(R.string.positive_button_ok),
+                                "", false, false,
+                                { alertPositiveCallback ->
+                                    // gotoDashboard()
+                                },
+                                {})
+                        }
                     }
 
                 }

@@ -10,4 +10,5 @@ class PendingPreAuthDataResponse {
     var pendingList = ArrayList<PendingPreauthData>()
     var cardProcessedDataModal = CardProcessedDataModal()
     var isoResponse:String?= null
+    var isReversal:Boolean = false
 }

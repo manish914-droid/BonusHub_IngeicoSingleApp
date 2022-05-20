@@ -775,7 +775,7 @@ class TransactionActivity : BaseActivityNew() {
 
         // logger("Transaction REQUEST PACKET --->>", transactionISO.isoMap, "e")
         //  runOnUiThread { showProgress(getString(R.string.sale_data_sync)) }
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             checkReversal(transactionISO, cardProcessedData)
         }
     }

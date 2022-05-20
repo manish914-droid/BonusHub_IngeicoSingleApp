@@ -234,7 +234,6 @@ class PreAuthRepository @Inject constructor() {
                 try {
                     if (success) {
                         //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
-                        // kushal 1105
                         /*ROCProviderV2.incrementFromResponse(
                         ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
                         AppPreference.getBankCode()
@@ -288,7 +287,6 @@ class PreAuthRepository @Inject constructor() {
                         }
                     } else {
                         //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
-                        // kushal 1105
                         /*ROCProviderV2.incrementFromResponse(
                             ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(),
                             AppPreference.getBankCode()
@@ -418,53 +416,44 @@ class PreAuthRepository @Inject constructor() {
         }
         //Sending Reversal Data Packet to Host:-(In Case of reversal)
         else {
-            /*if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-                withContext(Dispatchers.Main) {
-                    activityContext?.showProgress("Reversal Data Sync...")
-                }
+            if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+
+                val temp  = PendingPreAuthDataResponse()
+                temp.isReversal = true
+                temp.apiStatus = ApiStatus.Processing
+                temp.msg = "Reversal Data Sync..."
+                _completePreAuthData.postValue(temp)
+
                 SyncReversalToHost(
-                    AppPreference.getReversal()
+                    AppPreference.getReversalNew()
                 ) { syncStatus, transactionMsg ->
-                    activityContext?.hideProgress()
+                    //activityContext?.hideProgress()
+                    val temp  = PendingPreAuthDataResponse()
+                    temp.isReversal = true
+                    temp.apiStatus = ApiStatus.Success
+                    _completePreAuthData.postValue(temp)
+
                     if (syncStatus) {
                         AppPreference.clearReversal()
-                        GlobalScope.launch(Dispatchers.IO) {
+                        runBlocking(Dispatchers.IO) {
                             checkReversalPerformAuthTransaction(
                                 transactionISOByteArray,
                                 cardProcessedDataModal
-                            ) { bool, str ->
-                                cb(bool, str)
-                            }
+                            )
                         }
                     } else {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            VFService.showToast(transactionMsg)
-                            cb(false, transactionMsg)
-                            GlobalScope.launch(Dispatchers.Main) {
-                                (activityContext as BaseActivity).alertBoxWithAction(
-                                    null,
-                                    null,
-                                    activityContext!!.getString(R.string.reversal),
-                                    activityContext!!.getString(R.string.reversal_upload_fail),
-                                    false,
-                                    activityContext!!.getString(R.string.positive_button_ok),
-                                    { alertPositiveCallback ->
 
-                                        if (alertPositiveCallback)
-                                            cb(
-                                                false,
-                                                activityContext!!.getString(R.string.transaction_delined_msg)
-                                            )
-                                        // declinedTransaction()
-                                    },
-                                    {})
-                            }
+                        val temp  = PendingPreAuthDataResponse()
+                        temp.isReversal = true
+                        temp.apiStatus = ApiStatus.Failed
+                        temp.msg = "Reversal Upload Fail"
+                        _completePreAuthData.postValue(temp)
 
-
-                        }
                     }
+
                 }
-            }*/
+
+            }
         }
     }
 

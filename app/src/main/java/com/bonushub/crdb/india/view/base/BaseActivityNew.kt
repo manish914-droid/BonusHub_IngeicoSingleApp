@@ -343,7 +343,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
        // dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(bindingg.root)
         dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogBuilder.setCancelable(true)
+        dialogBuilder.setCancelable(false)
         val window = dialogBuilder.window
         window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
