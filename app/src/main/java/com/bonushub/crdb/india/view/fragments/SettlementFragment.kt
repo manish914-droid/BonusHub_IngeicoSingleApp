@@ -432,8 +432,12 @@ internal class SettlementAdapter(private val list: List<TempBatchFileDataTable>)
     override fun onBindViewHolder(holder: SettlementHolder, p1: Int) {
 
         holder.binding.tvInvoiceNumber.text = invoiceWithPadding(list[p1].hostInvoice ?: "")
-        val amount = "%.2f".format(list[p1]?.transactionalAmmount?.toDouble()?.div(100))
-        holder.binding.tvBaseAmount.text = amount
+        try{
+            val amount = "%.2f".format(list[p1]?.transactionalAmmount?.toDouble()?.div(100))
+            holder.binding.tvBaseAmount.text = amount
+        }catch (ex:Exception){
+
+        }
         holder.binding.tvTransactionType.text = getTransactionTypeName(list[p1].transactionType)
         if(getTransactionTypeName(list[p1].transactionType) == "TEST EMI TXN"){
             holder.binding.tvTransactionType.text="SALE "

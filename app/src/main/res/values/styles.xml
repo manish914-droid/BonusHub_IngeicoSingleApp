@@ -95,6 +95,7 @@
         <item name="android:textColor">@color/txt_color_new</item>
         <item name="android:fontFamily">@font/muli_bold</item>
         <item name="android:padding">0dp</item>
+        <item name="android:drawablePadding">@dimen/pad_10</item>
     </style>
 
     <style name="TextInputEditTextAmount" parent="TextInputEditText">
@@ -102,7 +103,6 @@
         <item name="android:focusable">false</item>
         <item name="android:cursorVisible">false</item>
         <item name="android:inputType">none</item>
-        <item name="android:drawablePadding">@dimen/pad_10</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textIsSelectable">false</item>
     </style>

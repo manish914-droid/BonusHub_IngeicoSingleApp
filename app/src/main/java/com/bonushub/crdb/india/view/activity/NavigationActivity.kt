@@ -919,7 +919,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
             }
             EDashboardItem.PREAUTH_COMPLETE->{
                 if (checkInternetConnection()) {
-                    transactFragment(PreAuthCompleteInputDetailFragment(), true)
+                    transactFragment(PreAuthCompleteInputDetailFragment().apply {
+                        arguments = Bundle().apply {
+                            putSerializable("type", action)
+                        }
+                    }, true)
                 }else{
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }

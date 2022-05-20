@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,8 +13,155 @@
             layout="@layout/sub_header_layout"
             android:visibility="visible" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tid_crdView"
+            style="@style/TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="TID"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
 
-        <LinearLayout
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tid_et"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_tid_new"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:inputType="number"
+                android:maxLength="8"
+                android:padding="@dimen/pad_8"
+                android:imeOptions="actionDone"
+                android:textIsSelectable="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/batch_no_crd_view"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="Batch Number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tid_crdView">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/batch_no"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_batch_no_new"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:inputType="number"
+                android:maxLength="8"
+                android:padding="@dimen/pad_8"
+                android:imeOptions="actionDone"
+                android:textIsSelectable="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/roc_crd_view"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="ROC"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/batch_no_crd_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/roc_no"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_batch_no_new"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:inputType="number"
+                android:maxLength="8"
+                android:padding="@dimen/pad_8"
+                android:imeOptions="actionDone"
+                android:textIsSelectable="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/amt_crdView"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/enter_amount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/roc_crd_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/amount_et"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_rupay_circle_new"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:inputType="number"
+                android:maxLength="8"
+                android:padding="@dimen/pad_8"
+                android:imeOptions="actionDone"
+                android:textIsSelectable="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/auth_complete_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_20"
+            android:background="@drawable/edge_blue3"
+            android:fontFamily="@font/muli_regular"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:paddingStart="@dimen/pad_30"
+            android:paddingTop="@dimen/pad_15"
+            android:paddingEnd="@dimen/pad_30"
+            android:paddingBottom="@dimen/pad_15"
+            android:text="Complete PreAuth"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_medium"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/amt_crdView"/>
+
+
+
+        <!--<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -25,7 +170,7 @@
             app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
             android:padding="@dimen/pad_16">
 
-            <!--TID-->
+            &lt;!&ndash;TID&ndash;&gt;
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/tid_crd_view"
                 android:theme="@style/Theme.MaterialComponents.Light"
@@ -63,9 +208,9 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-            <!--Invoice-->
+            &lt;!&ndash;Invoice&ndash;&gt;
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/invoice_crd_view"
+                android:id="@+id/batch_no_crd_view"
                 android:theme="@style/Theme.MaterialComponents.Light"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +223,7 @@
               >
 
                 <EditText
-                    android:id="@+id/invoice_et"
+                    android:id="@+id/batch_no"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
@@ -101,7 +246,7 @@
                     android:background="@drawable/card_edge" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!--Enter Auth Complete Amount-->
+            &lt;!&ndash;Enter Auth Complete Amount&ndash;&gt;
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/enterAmount_view"
                 android:theme="@style/Theme.MaterialComponents.Light"
@@ -151,8 +296,8 @@
 />
 
 
-        </LinearLayout>
+        </LinearLayout>-->
 
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

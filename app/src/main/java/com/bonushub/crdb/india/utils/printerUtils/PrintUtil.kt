@@ -595,8 +595,8 @@ class PrintUtil(context: Context?) {
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
 
-                    textBlockList.add(sigleLineformat("BATCH NO:${batchTable.authBatchNO}", AlignMode.LEFT))
-                    textBlockList.add(sigleLineformat("ROC:${batchTable.authROC}", AlignMode.RIGHT))
+                    textBlockList.add(sigleLineformat("BATCH NO:${paddingInvoiceRoc(batchTable.authBatchNO) }", AlignMode.LEFT))
+                    textBlockList.add(sigleLineformat("ROC:${paddingInvoiceRoc(batchTable.authROC)}", AlignMode.RIGHT))
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
 
