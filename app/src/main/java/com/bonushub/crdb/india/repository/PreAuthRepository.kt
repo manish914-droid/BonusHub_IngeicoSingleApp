@@ -555,5 +555,41 @@ class PreAuthRepository @Inject constructor() {
         }
     }
 
+    // end region
+
+    // void preAuth
+
+    suspend fun voidAuthDataCreation(authCompletionData: AuthCompletionData) {
+        val transactionalAmount = 0L //authCompletionData.authAmt?.replace(".", "")?.toLong() ?: 0L
+        cardProcessedData.apply {
+            setTransactionAmount(transactionalAmount)
+            setTransType(TransactionType.VOID_PREAUTH.type)
+            setProcessingCode(ProcessingCode.VOID_PREAUTH.code)
+            setAuthBatch(authCompletionData.authBatchNo.toString())
+            setAuthRoc(authCompletionData.authRoc.toString())
+            //  setAuthTid(authCompletionData.authTid.toString())
+        }
+        val transactionISO = CreateAuthPacket().createPreAuthCompleteAndVoidPreauthISOPacket(
+            authCompletionData,
+            cardProcessedData
+        )
+        //Here we are Saving Date , Time and TimeStamp in CardProcessedDataModal:-
+        try {
+            val date2: Long = Calendar.getInstance().timeInMillis
+            val timeFormater = SimpleDateFormat("HHmmss", Locale.getDefault())
+            cardProcessedData.setTime(timeFormater.format(date2))
+            val dateFormater = SimpleDateFormat("MMdd", Locale.getDefault())
+            cardProcessedData.setDate(dateFormater.format(date2))
+            cardProcessedData.setTimeStamp(date2.toString())
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        logger("Transaction REQUEST PACKET --->>", transactionISO.isoMap, "e")
+        val voidPreAuthInvoiceNumber = transactionISO.isoMap[62]?.rawData
+        checkReversalPerformAuthTransaction(transactionISO, cardProcessedData)
+
+    }
+    // end region
+
     }
 

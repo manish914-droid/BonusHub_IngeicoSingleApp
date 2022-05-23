@@ -86,6 +86,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauth
+import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthVoidFragment
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -1056,6 +1057,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
               /*  lifecycleScope.launch(Dispatchers.IO) {
                     appDao.deletePendingSyncTransactionTable()
                 }*/
+                //  VoidPreAuthFragment()
+                if (checkInternetConnection()) {
+                    transactFragment(
+                        PreAuthVoidFragment()
+                            .apply {
+                                arguments = Bundle().apply {
+                                    putSerializable("type", EDashboardItem.VOID_PREAUTH)
+                                }
+                            })
+                } else {
+                    ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
+                }
             }
             EDashboardItem.PENDING_PREAUTH ->{
 

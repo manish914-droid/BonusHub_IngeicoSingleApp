@@ -587,13 +587,15 @@ class PrintUtil(context: Context?) {
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()*/
 
-                if(batchTable.transactionType == BhTransactionType.PRE_AUTH_COMPLETE.type){
+                if(batchTable.transactionType == BhTransactionType.PRE_AUTH_COMPLETE.type || batchTable.transactionType == BhTransactionType.VOID_PREAUTH.type){
                     printSeperator()
                     sigleLineText("ENTERED DETAILS", AlignMode.CENTER)
 
+                    if(batchTable.transactionType == BhTransactionType.PRE_AUTH_COMPLETE.type){
                     textBlockList.add(sigleLineformat("TID:${batchTable.authTID}", AlignMode.LEFT))
                     printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
+                    }
 
                     textBlockList.add(sigleLineformat("BATCH NO:${paddingInvoiceRoc(batchTable.authBatchNO) }", AlignMode.LEFT))
                     textBlockList.add(sigleLineformat("ROC:${paddingInvoiceRoc(batchTable.authROC)}", AlignMode.RIGHT))
@@ -632,34 +634,43 @@ class PrintUtil(context: Context?) {
                }*/
 
                 if(!isReversal) {
+                    if(batchTable?.transactionType != BhTransactionType.VOID_PREAUTH.type) {
+                        textBlockList.add(
+                            sigleLineformat(
+                                "CARD TYPE:${hostCardType}",
+                                AlignMode.LEFT
+                            )
+                        )
+                        textBlockList.add(sigleLineformat("EXP:XX/XX", AlignMode.RIGHT))
+
+                        printer?.addMixStyleText(textBlockList)
+
+                        textBlockList.clear()
+                    }
+                }
+
+
+
+                if(batchTable?.transactionType != BhTransactionType.VOID_PREAUTH.type) {
                     textBlockList.add(
                         sigleLineformat(
-                            "CARD TYPE:${hostCardType}",
+                            "CARD NO:${batchTable.cardNumber}",
                             AlignMode.LEFT
                         )
                     )
-                    textBlockList.add(sigleLineformat("EXP:XX/XX", AlignMode.RIGHT))
 
+                    batchTable.operationType?.let { sigleLineformat(it, AlignMode.RIGHT) }?.let {
+                        textBlockList.add(
+                            it
+                        )
+                    }//
                     printer?.addMixStyleText(textBlockList)
 
                     textBlockList.clear()
+
                 }
 
-                textBlockList.add(
-                    sigleLineformat(
-                        "CARD NO:${batchTable.cardNumber}",
-                        AlignMode.LEFT
-                    )
-                )
-                batchTable.operationType?.let { sigleLineformat(it, AlignMode.RIGHT) }?.let {
-                    textBlockList.add(
-                        it
-                    )
-                }//
 
-                printer?.addMixStyleText(textBlockList)
-
-                textBlockList.clear()
 
 
                 if(!isReversal) {
@@ -675,16 +686,33 @@ class PrintUtil(context: Context?) {
                     }
 
 
-                    textBlockList.add(
-                        sigleLineformat(
-                            "AUTH CODE:${batchTable.authCode}",
-                            AlignMode.LEFT
+                    if(batchTable?.transactionType != BhTransactionType.VOID_PREAUTH.type) {
+                        textBlockList.add(
+                            sigleLineformat(
+                                "AUTH CODE:${batchTable.authCode}",
+                                AlignMode.LEFT
+                            )
                         )
-                    )
-                    textBlockList.add(sigleLineformat("RRN:${batchTable.referenceNumber}", AlignMode.RIGHT))
-                    printer?.addMixStyleText(textBlockList)
 
+                        textBlockList.add(sigleLineformat("RRN:${batchTable.referenceNumber}", AlignMode.RIGHT))
+                        printer?.addMixStyleText(textBlockList)
+
+                        textBlockList.clear()
+
+                    }
+
+                }
+
+                if(batchTable.transactionType == BhTransactionType.VOID_PREAUTH.type)
+                {
+                    textBlockList.add(sigleLineformat("CARD NO:${batchTable.cardNumber}", AlignMode.LEFT))
+                    printer?.addMixStyleText(textBlockList)
                     textBlockList.clear()
+
+                    textBlockList.add(sigleLineformat("RRN:${batchTable.referenceNumber}", AlignMode.LEFT))
+                    printer?.addMixStyleText(textBlockList)
+                    textBlockList.clear()
+
                 }
 
                 if (!(batchTable.tvr.isNullOrEmpty()) )
@@ -744,6 +772,9 @@ class PrintUtil(context: Context?) {
 
                     }
                     BhTransactionType.PRE_AUTH_COMPLETE.type ->{
+                        preAuthCompleteTransaction(batchTable)
+                    }
+                    BhTransactionType.VOID_PREAUTH.type ->{
                         preAuthCompleteTransaction(batchTable)
                     }
                     else -> {

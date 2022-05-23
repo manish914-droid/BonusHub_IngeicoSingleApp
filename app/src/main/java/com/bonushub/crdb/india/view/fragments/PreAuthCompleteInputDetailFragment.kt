@@ -85,7 +85,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                 ApiStatus.Success ->{
                     logger("ApiStatus","Success","e")
                     iDialog?.hideProgress()
-                    dialogBuilder.hide()
+                    dialogBuilder.dismiss()
                     // stub batch data
 
                     StubBatchData("", it.cardProcessedDataModal.getTransType(), it.cardProcessedDataModal, null, it.isoResponse?:""){
@@ -160,7 +160,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                 ApiStatus.Failed ->{
                     logger("ApiStatus","Failed","e")
                     iDialog?.hideProgress()
-                    dialogBuilder.hide()
+                    dialogBuilder.dismiss()
 
                     if(it.isReversal){
                         iDialog?.alertBoxWithActionNew(

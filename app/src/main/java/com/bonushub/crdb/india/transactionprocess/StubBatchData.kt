@@ -145,7 +145,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
 
         //Saving card number in mask form because we don't save the pan number in Plain text.
         batchFileData.cardNumber =
-            if (transactionType != TransactionType.PRE_AUTH_COMPLETE.type) {
+            if (transactionType != TransactionType.PRE_AUTH_COMPLETE.type && transactionType != TransactionType.VOID_PREAUTH.type) {
                 getMaskedPan(
                     terminalData,
                     cardProcessedDataModal.getPanNumberData() ?: ""

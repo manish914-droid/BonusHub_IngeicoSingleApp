@@ -33,4 +33,13 @@ class PreAuthViewModel @ViewModelInject constructor(private val preAuthRepositor
         preAuthRepository.confirmCompletePreAuth(authData)
     }
 
+    private val _voidPreAuthData = MutableLiveData<PendingPreAuthDataResponse>()
+    val voidPreAuthData: LiveData<PendingPreAuthDataResponse>
+        get() = preAuthRepository.completePreAuthData
+
+    suspend fun getVoidPreAuthData(authData: AuthCompletionData){
+
+        preAuthRepository.voidAuthDataCreation(authData)
+    }
+
 }

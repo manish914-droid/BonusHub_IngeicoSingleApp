@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".view.fragments.pre_auth.PreAuthVoidFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -14,10 +14,96 @@
         <include
             android:id="@+id/sub_header_view"
             layout="@layout/sub_header_layout"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
 
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/batch_no_crd_view"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="Batch Number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/batch_no"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_batch_no_new"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:inputType="number"
+                android:maxLength="8"
+                android:padding="@dimen/pad_8"
+                android:imeOptions="actionDone"
+                android:textIsSelectable="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/roc_crd_view"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="ROC"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/batch_no_crd_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/roc_no"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_batch_no_new"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:inputType="number"
+                android:maxLength="8"
+                android:padding="@dimen/pad_8"
+                android:imeOptions="actionDone"
+                android:textIsSelectable="false"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/void_preauth_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_20"
+            android:background="@drawable/edge_blue3"
+            android:fontFamily="@font/muli_regular"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:paddingStart="@dimen/pad_30"
+            android:paddingTop="@dimen/pad_15"
+            android:paddingEnd="@dimen/pad_30"
+            android:paddingBottom="@dimen/pad_15"
+            android:text="Void PreAuth"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_medium"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/roc_crd_view"/>
+
+        <!--<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -27,7 +113,7 @@
             app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
 
 
-            <!--BATCH NUMBER-->
+            &lt;!&ndash;BATCH NUMBER&ndash;&gt;
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/batch_number_crd_view"
                 android:layout_width="match_parent"
@@ -59,7 +145,7 @@
                     android:textSize="@dimen/text_size_regular" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!--ROC-->
+            &lt;!&ndash;ROC&ndash;&gt;
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/roc_crd_view"
                 android:layout_width="match_parent"
@@ -108,9 +194,9 @@
                 android:textSize="@dimen/text_size_small" />
 
 
-        </LinearLayout>
+        </LinearLayout>-->
 
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>
