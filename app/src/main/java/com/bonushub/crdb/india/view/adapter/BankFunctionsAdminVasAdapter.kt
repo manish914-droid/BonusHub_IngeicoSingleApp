@@ -3,7 +3,9 @@ package com.bonushub.crdb.india.view.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
+import com.bonushub.crdb.india.databinding.ItemReportsBinding
 import com.bonushub.crdb.india.view.fragments.IBankFunctionsAdminVasItemClick
 import com.bonushub.crdb.india.utils.BankFunctionsAdminVasItem
 
@@ -13,7 +15,8 @@ class BankFunctionsAdminVasAdapter(var iBankFunctionsAdminVasItemClick: IBankFun
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsAdminVasViewHolder {
 
-        val itemBinding = ItemBankFunctionsBinding.inflate(LayoutInflater.from(parent.context),
+      //  val itemBinding = ItemBankFunctionsBinding.inflate(LayoutInflater.from(parent.context),
+        val itemBinding = ItemReportsBinding.inflate(LayoutInflater.from(parent.context),
             parent,
             false)
         return BankFunctionsAdminVasViewHolder(
@@ -28,18 +31,21 @@ class BankFunctionsAdminVasAdapter(var iBankFunctionsAdminVasItemClick: IBankFun
 
         val model = listItem[position]
 
+        holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_gray)
+        holder.viewBinding.imgViewIcon.setImageResource(R.drawable.ic_bankfunction_new)
         holder.viewBinding.textView.text = model._name
 
         holder.viewBinding.relLayParent.setOnClickListener {
 
-            iBankFunctionsAdminVasItemClick?.bankFunctionsAdminVasItemClick(model)
+            holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_brand_selected)
+            iBankFunctionsAdminVasItemClick?.bankFunctionsAdminVasItemClick(model,position)
         }
 
     }
 
 
 
-    inner class BankFunctionsAdminVasViewHolder(val viewBinding: ItemBankFunctionsBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+    inner class BankFunctionsAdminVasViewHolder(val viewBinding: ItemReportsBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 //        val textView: TextView = view.findViewById(R.id.textView)
 //        val relLayParent: RelativeLayout = view.findViewById(R.id.relLayParent)
 

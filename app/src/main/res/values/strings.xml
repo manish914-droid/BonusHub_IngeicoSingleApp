@@ -143,9 +143,9 @@
     <string name="txn_param_header">TXN PARAM</string>
     <string name="app_update_param_header">APP UPDATE PARAM</string>
     <string name="admin_password">ADMIN PASSWORD</string>
-    <string name="hint_enter_admin_password">**** ENTER ADMIN PASSWORD</string>
+    <string name="hint_enter_admin_password"><font size="10">ENTER ADMIN PASSWORD</font></string>
     <string name="super_admin_password">SUPER ADMIN PASSWORD</string>
-    <string name="hint_enter_super_admin_password">**** ENTER SUPER ADMIN PASSWORD</string>
+    <string name="hint_enter_super_admin_password"><font size="10">ENTER SUPER ADMIN PASSWORD</font></string>
     <string name="invalid_password">Invalid Password</string>
     <string name="update">Update</string>
     <string name="please_clear_fbatch_before_init">Please clear FBatch before init</string>

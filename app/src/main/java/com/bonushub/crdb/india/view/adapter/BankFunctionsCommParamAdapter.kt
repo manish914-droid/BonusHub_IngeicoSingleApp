@@ -3,7 +3,9 @@ package com.bonushub.crdb.india.view.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
+import com.bonushub.crdb.india.databinding.ItemReportsBinding
 import com.bonushub.crdb.india.view.fragments.ICommunicationOptionFragmentItemClick
 import com.bonushub.crdb.india.utils.CommunicationParamItem
 
@@ -13,7 +15,7 @@ class BankFunctionsCommParamAdapter(var iCommunicationOptionFragmentItemClick: I
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BankFunctionsCommParamViewHolder {
 
-        val itemBinding = ItemBankFunctionsBinding.inflate(LayoutInflater.from(parent.context),
+        val itemBinding = ItemReportsBinding.inflate(LayoutInflater.from(parent.context),
             parent,
             false)
         return BankFunctionsCommParamViewHolder(
@@ -29,9 +31,10 @@ class BankFunctionsCommParamAdapter(var iCommunicationOptionFragmentItemClick: I
         val model = listItem[position]
 
         holder.viewBinding.textView.text = model._name
-
+        holder.viewBinding.imgViewIcon.setImageResource(R.drawable.ic_bankfunction_new)
         holder.viewBinding.relLayParent.setOnClickListener {
 
+            holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_brand_selected)
             iCommunicationOptionFragmentItemClick?.CommunicationOptionItemClick(model)
         }
 
@@ -39,7 +42,7 @@ class BankFunctionsCommParamAdapter(var iCommunicationOptionFragmentItemClick: I
 
 
 
-    inner class BankFunctionsCommParamViewHolder(val viewBinding: ItemBankFunctionsBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+    inner class BankFunctionsCommParamViewHolder(val viewBinding: ItemReportsBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
 
     }

@@ -75,6 +75,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.terminal_param_header)
 
         iBankFunctionsTerminalItemClick = this
@@ -378,7 +379,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
-                                                R.drawable.ic_tick_green,
+                                                R.drawable.ic_success_with_star,
                                                 it
                                             )
                                         }

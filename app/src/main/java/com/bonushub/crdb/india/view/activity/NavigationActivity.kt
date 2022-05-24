@@ -1464,7 +1464,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                                 AppPreference.saveLastReceiptDetails("")
 
                                 GlobalScope.launch(Dispatchers.Main) {
-                                    alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,getString(R.string.settlement_success))
+                                    alertBoxMsgWithIconOnly(R.drawable.ic_success_with_star,getString(R.string.settlement_success))
 
                                     delay(2000)
                                     if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {
@@ -1539,7 +1539,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
 
                                     GlobalScope.launch(Dispatchers.Main) {
-                                        alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,getString(R.string.settlement_success))
+                                        alertBoxMsgWithIconOnly(R.drawable.ic_success_with_star,getString(R.string.settlement_success))
 
                                         delay(2000)
                                         if (!TextUtils.isEmpty(isAppUpdateAvailableData) && isAppUpdateAvailableData != "00" && isAppUpdateAvailableData != "01") {

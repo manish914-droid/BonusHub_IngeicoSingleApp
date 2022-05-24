@@ -146,6 +146,8 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
     private fun setUiForEdit()
     {
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
+
         when(type){
 
             CommunicationParamItem.TXN_PARAM -> {

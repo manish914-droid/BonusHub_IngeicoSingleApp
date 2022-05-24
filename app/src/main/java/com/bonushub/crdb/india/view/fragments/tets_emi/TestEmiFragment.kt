@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentTestEmiBinding
 import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
+import com.bonushub.crdb.india.databinding.ItemReportsBinding
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.fragments.NewInputAmountFragment
@@ -40,7 +41,7 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.test_emi_header)
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -53,7 +54,7 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
 
         iTestEmiItemClick = this
-        testEmiItem.clear()
+        testEmiItem = mutableListOf()
        // linked tid logic
         /* //val tpt=Field48ResponseTimestamp.getTptData() // old
         val tpt=Field48ResponseTimestamp.getAllTptData()
@@ -181,7 +182,7 @@ class TestEmiAdapter(private var iTestEmiItemClick: ITestEmiItemClick?, private 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TestEmiViewHolder {
 
-        val itemBinding = ItemBankFunctionsBinding.inflate(LayoutInflater.from(parent.context),
+        val itemBinding = ItemReportsBinding.inflate(LayoutInflater.from(parent.context),
             parent,
             false)
         return TestEmiViewHolder(itemBinding)
@@ -192,16 +193,17 @@ class TestEmiAdapter(private var iTestEmiItemClick: ITestEmiItemClick?, private 
     override fun onBindViewHolder(holder: TestEmiViewHolder, position: Int) {
 
         val model = testEmiItem[position]
+        holder.viewBinding.imgViewIcon.setImageResource(R.drawable.ic_bankfunction_new)
         holder.viewBinding.textView.text = model._name
 
 
         holder.viewBinding.relLayParent.setOnClickListener {
-
+            holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_brand_selected)
             iTestEmiItemClick?.testEmiItemClick(model)
 
         }
 
     }
 
-    inner class TestEmiViewHolder(val viewBinding: ItemBankFunctionsBinding) : RecyclerView.ViewHolder(viewBinding.root)
+    inner class TestEmiViewHolder(val viewBinding: ItemReportsBinding) : RecyclerView.ViewHolder(viewBinding.root)
 }

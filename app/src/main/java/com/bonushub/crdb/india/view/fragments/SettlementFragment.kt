@@ -148,7 +148,7 @@ class SettlementFragment : Fragment() {
             if(tempDataList.size > 0 ){
 
                 //DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info, {
-                iDialog?.alertBoxWithActionNew(getString(R.string.do_you_want_to_settle_batch),"",R.drawable.ic_info,getString(R.string.confirm),"Cancel",true,false, {
+                iDialog?.alertBoxWithActionNew(getString(R.string.do_you_want_to_settle_batch),"",R.drawable.ic_info_orange,getString(R.string.confirm),"Cancel",true,false, {
                     // **** for zero settlement *****
                     if (tempDataList.size == 0) {
 

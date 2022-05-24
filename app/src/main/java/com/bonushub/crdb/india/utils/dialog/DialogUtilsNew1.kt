@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.view.fragments.getEditorActionListener
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,16 +36,25 @@ class DialogUtilsNew1 {
         ) {
             val dialog = Dialog(activity!!)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+
+           // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setCancelable(setCancelable)
             dialog.setContentView(R.layout.dialog_admin)
-            val textViewHeader = dialog.findViewById<View>(R.id.textViewHeader) as TextView
-            val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as EditText
+
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT
+            )
+
+           // val textViewHeader = dialog.findViewById<View>(R.id.textViewHeader) as TextView
+            val inputTexLayout = dialog.findViewById<View>(R.id.password_crdView) as TextInputLayout
+            val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
             val txtViewCancel = dialog.findViewById<View>(R.id.txtViewCancel) as TextView
             val txtViewOk = dialog.findViewById<View>(R.id.txtViewOk) as TextView
 
-            textViewHeader.text = header
-            edtTextPassword.hint = hint
+            //textViewHeader.text = header
+            inputTexLayout.hint = hint
 
             if(header?.equals("ADMIN PASSWORD")?:false){
 
@@ -54,7 +65,7 @@ class DialogUtilsNew1 {
                 edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(6))
             }
 
-            edtTextPassword.gravity = Gravity.CENTER_HORIZONTAL
+            //edtTextPassword.gravity = Gravity.CENTER_HORIZONTAL
 
             txtViewOk.setOnClickListener {
 
@@ -79,14 +90,16 @@ class DialogUtilsNew1 {
                 setContentView(R.layout.dialog_admin)
                 setCancelable(false)
                 val window = window
-//                window?.setLayout(
-//                    ViewGroup.LayoutParams.MATCH_PARENT,
-//                    WindowManager.LayoutParams.WRAP_CONTENT
-//                )
+                window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+
+                val inputTexLayout = findViewById<View>(R.id.password_crdView) as TextInputLayout
                 val invoiceET = findViewById<EditText>(R.id.edtTextPassword)
                 val okbtn = findViewById<TextView>(R.id.txtViewOk)
 
-                invoiceET.hint = title
+                inputTexLayout.hint = title
 //                if (_text == TerminalParameterTable.selectFromSchemeTable()?.terminalId.toString()) {
 //                    invoiceET.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(8))
 //                } else {
@@ -119,10 +132,10 @@ class DialogUtilsNew1 {
 //                        if (isNumeric) InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
                     setOnEditorActionListener(getEditorActionListener { okbtn.performClick() })
                     setSelection(text.toString().length)
-                    gravity = Gravity.CENTER_HORIZONTAL
+                    //gravity = Gravity.CENTER_HORIZONTAL
                 }
 
-                findViewById<TextView>(R.id.textViewHeader).text = title
+//                findViewById<TextView>(R.id.textViewHeader).text = title
                 findViewById<TextView>(R.id.txtViewCancel).setOnClickListener {
                     dismiss()
                 }

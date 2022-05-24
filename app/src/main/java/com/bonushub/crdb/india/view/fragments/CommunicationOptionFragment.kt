@@ -46,6 +46,7 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.communication_param_header)
 
         iCommunicationOptionFragmentItemClick = this

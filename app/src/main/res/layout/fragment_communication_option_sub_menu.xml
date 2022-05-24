@@ -27,9 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/sub_header_view"
+        android:layout_marginStart="@dimen/pad_10"
         android:layout_marginTop="@dimen/pad_10"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginEnd="@dimen/pad_10"
+        android:layout_marginBottom="@dimen/pad_10" />
 
 </RelativeLayout>

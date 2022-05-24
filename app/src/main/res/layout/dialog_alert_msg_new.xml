@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/pad_15"
@@ -100,103 +100,6 @@
                 android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-    <!--<androidx.cardview.widget.CardView
-        android:id="@+id/custom_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="@dimen/pad_10"
-        android:layout_marginTop="27dp"
-        android:layout_marginStart="@dimen/pad_15"
-        android:layout_marginEnd="@dimen/pad_15">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-
-
-            <LinearLayout
-                android:id="@+id/linearLayout2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:gravity="bottom"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/dialog_msg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="28dp"
-                    android:gravity="center"
-                    android:padding="@dimen/pad_8"
-                    android:text="BATCH SUCCESSFULLY SETTLE"
-                    android:textColor="@color/themeBackground"
-                    android:textSize="@dimen/text_size_regular"
-                    android:fontFamily="@font/muli_light"/>
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#2349B5"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="@dimen/pad_16"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
-
-
-                <TextView
-                    android:id="@+id/noBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/pad_15"
-                    android:paddingTop="@dimen/pad_10"
-                    android:paddingBottom="@dimen/pad_10"
-                    android:paddingStart="18dp"
-                    android:paddingEnd="18dp"
-                    android:text="@string/no"
-                    android:background="@drawable/edge_bg_white"
-                    android:fontFamily="@font/muli_regular"
-                    android:textColor="@color/txt_color"
-                    android:textSize="@dimen/text_size_small"/>
-
-
-                <TextView
-                    android:id="@+id/yesBtn"
-                    android:fontFamily="@font/muli_regular"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/pad_15"
-                    android:paddingTop="@dimen/pad_10"
-                    android:paddingBottom="@dimen/pad_10"
-                    android:paddingStart="@dimen/pad_15"
-                    android:paddingEnd="@dimen/pad_15"
-                    android:text="@string/yes"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_small"
-                    android:background="@drawable/edge_white_bg_blue"/>
-            </LinearLayout>
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <ImageView
-        android:id="@+id/img_printer"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:layout_centerHorizontal="true"
-        android:elevation="5dp"
-        android:src="@drawable/ic_info"
-        android:visibility="visible" />
--->
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

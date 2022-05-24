@@ -497,16 +497,16 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         icon: Int, msg: String
     ) {
 
-        alertBoxWithActionNew(
+        /*alertBoxWithActionNew(
             "",
             msg,
             icon,
             "",
             "",false,true,
             {},
-            {})
+            {})*/
 
-       /* val dialogBuilder = Dialog(this)
+        val dialogBuilder = Dialog(this)
         //builder.setTitle(title)
         //  builder.setMessage(msg)
         val bindingg = DialogMsgWithIconBinding.inflate(LayoutInflater.from(this))
@@ -546,7 +546,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         }
 
         dialogBuilder.show()
-        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))*/
+        dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
 

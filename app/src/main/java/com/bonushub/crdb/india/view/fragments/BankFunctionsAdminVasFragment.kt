@@ -52,7 +52,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     private var iDialog: IDialog? = null
 
     private val batchFileViewModel: BatchFileViewModel by viewModels()
-
+    lateinit var bankFunctionsAdminVasAdapter:BankFunctionsAdminVasAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,6 +67,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         super.onViewCreated(view, savedInstanceState)
 
         (activity as NavigationActivity).manageTopToolBar(false)
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_drawer_bank_function)
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
 
         try {
@@ -96,21 +97,26 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
         observeMainViewModel()
     }
 
+
     private fun setupRecyclerview(){
         lifecycleScope.launch(Dispatchers.Main) {
+            bankFunctionsAdminVasAdapter = BankFunctionsAdminVasAdapter(iBankFunctionsAdminVasItemClick, adminVasListItem)
             binding?.let {
                 it.recyclerView.layoutManager = GridLayoutManager(activity, 1)
-                it.recyclerView.adapter = BankFunctionsAdminVasAdapter(iBankFunctionsAdminVasItemClick, adminVasListItem)
+                it.recyclerView.adapter = bankFunctionsAdminVasAdapter
             }
 
         }
     }
 
 
-    override fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem) {
+    var itemPosition = 0
+    override fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem, itemPosition:Int) {
+        this.itemPosition = itemPosition
+
         when(bankFunctionsAdminVasItem){
             BankFunctionsAdminVasItem.INIT ->{
-
+// check before init
                 if (checkInternetConnection()) {
 
                     if(!AppPreference.getBoolean(AppPreference.LOGIN_KEY)){
@@ -200,7 +206,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                             }
 
                             override fun onClickCancel() {
-
+                                unselectItem()
                             }
 
                         }, false)
@@ -217,6 +223,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
             BankFunctionsAdminVasItem.APPLICATION_UPDATE ->{
                 (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 // iDialog?.onEvents(VxEvent.AppUpdate)  // please check
+
+                unselectItem()
 
             }
 
@@ -253,28 +261,36 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                         logger("CLEAR_REVERSAL","click","e")
                                         lifecycleScope.launch(Dispatchers.Main) {
                                             if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)))
-                                                iDialog?.alertBoxWithAction(
+                                                iDialog?.alertBoxWithActionNew(
                                                     getString(R.string.reversal),
                                                     getString(R.string.reversal_clear),
-                                                    true,
-                                                    getString(R.string.yes),
+                                                    R.drawable.ic_info_orange,
+                                                    "YES","Cancel",
+                                                    true,false,
                                                     { alertPositiveCallback ->
                                                         if (alertPositiveCallback) {
                                                             AppPreference.clearReversal()
                                                             iDialog?.showToast("Reversal clear successfully")
                                                         }
-
+                                                        unselectItem()
                                                         //    declinedTransaction()
                                                     },
-                                                    {})
+                                                    {
+                                                        unselectItem()
+                                                    })
                                             else
-                                                iDialog?.alertBoxWithAction(
+                                                iDialog?.alertBoxWithActionNew(
                                                     getString(R.string.reversal),
                                                     getString(R.string.no_reversal_found),
-                                                    false,
-                                                    getString(R.string.positive_button_ok),
-                                                    {},
-                                                    {})
+                                                    R.drawable.ic_info_orange,
+                                                    getString(R.string.positive_button_ok),"",
+                                                    false,false,
+                                                    {
+                                                        unselectItem()
+                                                    },
+                                                    {
+                                                        unselectItem()
+                                                    })
 
 
                                         }
@@ -287,11 +303,13 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                             batchList = appDao.getAllTempBatchFileDataTableDataForSettlement()
                                         }
                                         if (batchList.size > 0) {
-                                            iDialog?.alertBoxWithAction(
+                                            iDialog?.alertBoxWithActionNew(
                                                 "Delete",
                                                 "Do you want to delete batch data?",
-                                                true,
-                                                "YES", {
+                                                R.drawable.ic_info_orange,
+                                                "YES","NO",
+                                                true,false, {
+                                                    unselectItem()
                                                     val batchNumber =
                                                         AppPreference.getIntData(PrefConstant.SETTLEMENT_BATCH_INCREMENT.keyName.toString()) + 1
                                                     AppPreference.setIntData(
@@ -327,15 +345,18 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                         }
                                                     }
                                                 }, {
-
+                                                    unselectItem()
                                                 }
                                             )
                                         } else {
-                                            iDialog?.alertBoxWithAction(
+                                            iDialog?.alertBoxWithActionNew(
                                                 "Empty",
                                                 "Batch is empty",
+                                                R.drawable.ic_info_orange,
+                                                "OK","",false,
                                                 false,
-                                                "OK", {
+                                                {
+                                                    unselectItem()
                                                 }, {
                                                     // Added by MKK for automatic FBatch value zero in case of Clear Batch
                                                     AppPreference.saveBoolean(
@@ -343,24 +364,30 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                         false
                                                     )
                                                     //
+                                                    unselectItem()
                                                 }
                                             )
                                         }
                                     }
 
                                     BankFunctionsAdminVasItem.TMK_DOWNLOAD ->{
-                                        iDialog?.alertBoxWithAction(
+                                        iDialog?.alertBoxWithActionNew(
                                             getString(R.string.download_tmk),
                                             getString(R.string.do_you_want_to_download_tmk),
-                                            true,
-                                            getString(R.string.yes),
+                                            R.drawable.ic_info_orange,
+                                            getString(R.string.yes),"Cancel",
+                                            true,false,
                                             {
                                                 (activity as NavigationActivity).window.addFlags(
                                                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                /*iDialog?.onEvents(VxEvent.DownloadTMKForHDFC) */ }, // please check
+                                                /*iDialog?.onEvents(VxEvent.DownloadTMKForHDFC) */
+                                                unselectItem()
+                                            }, // please check
                                             { Log.d("NO:- ", "Clicked")
                                                 (activity as NavigationActivity).getWindow().clearFlags(
                                                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+                                                unselectItem()
                                             })
 
                                     }
@@ -368,20 +395,24 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                     BankFunctionsAdminVasItem.SYNC_TRANSACTION ->{
                                         lifecycleScope.launch(Dispatchers.Main) {
 
-                                            iDialog?.alertBoxWithAction(
+                                            iDialog?.alertBoxWithActionNew(
                                                 getString(R.string.reversal),
                                                 getString(R.string.sync_transaction),
-                                                true,
-                                                getString(R.string.yes),
+                                                R.drawable.ic_info_orange,
+                                                getString(R.string.yes),"Cancel",true,
+                                                false,
                                                 { alertPositiveCallback ->
                                                     if (alertPositiveCallback) {
                                                         //TxnCallBackRequestTable.clear() // please check
                                                         iDialog?.showToast("Sync Transaction clear successfully")
                                                     }
 
+                                                    unselectItem()
                                                     //    declinedTransaction()
                                                 },
-                                                {})
+                                                {
+                                                    unselectItem()
+                                                })
 
 
 
@@ -401,7 +432,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                     }
 
                     override fun onClickCancel() {
-
+                        unselectItem()
                     }
 
                 }, false)
@@ -424,6 +455,11 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
             }*/
 
         }
+    }
+
+    private fun unselectItem()
+    {
+        bankFunctionsAdminVasAdapter.notifyItemChanged(itemPosition)
     }
 
     private fun startFullInitProcess() {
@@ -460,19 +496,19 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
     private fun observeMainViewModel(){
 
-        initViewModel.initData.observe(viewLifecycleOwner, { result ->
+        initViewModel.initData.observe(viewLifecycleOwner) { result ->
 
-            if(!isFromStop) {
+            if (!isFromStop) {
                 when (result.status) {
                     Status.SUCCESS -> {
 
-                        var isStaticQrAvailable=false
+                        var isStaticQrAvailable = false
 
                         CoroutineScope(Dispatchers.IO).launch {
                             Utility().readInitServer(result?.data?.data as ArrayList<ByteArray>) { result, message ->
                                 iDialog?.hideProgress()
 
-                                lifecycleScope.launch(Dispatchers.IO){
+                                lifecycleScope.launch(Dispatchers.IO) {
 
                                     KeyExchanger.getDigiPosStatus(
                                         EnumDigiPosProcess.InitializeDigiPOS.code,
@@ -487,33 +523,40 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                 val tpt1 = Field48ResponseTimestamp.getTptData()
 
                                                 try {
-                                                    if(responsF57List.size > 1){
-                                                        tpt1?.digiPosResponseType = responsF57List[0].toString()
-                                                        tpt1?.digiPosStatus = responsF57List[1].toString()
+                                                    if (responsF57List.size > 1) {
+                                                        tpt1?.digiPosResponseType =
+                                                            responsF57List[0].toString()
+                                                        tpt1?.digiPosStatus =
+                                                            responsF57List[1].toString()
                                                         tpt1?.digiPosStatusMessage =
                                                             responsF57List[2].toString()
-                                                        tpt1?.digiPosStatusCode = responsF57List[3].toString()
-                                                        tpt1?.digiPosTerminalStatus  = responsF57List[4].toString()
-                                                        tpt1?.digiPosBQRStatus = responsF57List[5].toString()
-                                                        tpt1?.digiPosUPIStatus =  responsF57List[6].toString()
-                                                        tpt1?.digiPosSMSpayStatus = responsF57List[7].toString()
+                                                        tpt1?.digiPosStatusCode =
+                                                            responsF57List[3].toString()
+                                                        tpt1?.digiPosTerminalStatus =
+                                                            responsF57List[4].toString()
+                                                        tpt1?.digiPosBQRStatus =
+                                                            responsF57List[5].toString()
+                                                        tpt1?.digiPosUPIStatus =
+                                                            responsF57List[6].toString()
+                                                        tpt1?.digiPosSMSpayStatus =
+                                                            responsF57List[7].toString()
                                                         tpt1?.digiPosStaticQrDownloadRequired =
                                                             responsF57List[8].toString()
                                                         tpt1?.digiPosCardCallBackRequired =
                                                             responsF57List[9].toString()
                                                     }
 
-                                                }catch (ex:Exception){
+                                                } catch (ex: Exception) {
 
                                                 }
 
 
                                                 if ((tpt1?.digiPosTerminalStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) && (tpt1?.digiPosUPIStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
                                                             || tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode
-                                                            || tpt1.digiPosSMSpayStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) ){
+                                                            || tpt1.digiPosSMSpayStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode)
+                                                ) {
                                                     tpt1.isDigiposActive = "1"
-                                                }
-                                                else{
+                                                } else {
                                                     tpt1?.isDigiposActive = "0"
                                                 }
 
@@ -524,7 +567,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                             "Terminal parameter Table updated successfully $tpt1 "
                                                         )
                                                         //val ttp = TerminalParameterTable.selectFromSchemeTable()
-                                                        val ttp = Field48ResponseTimestamp.getTptData()
+                                                        val ttp =
+                                                            Field48ResponseTimestamp.getTptData()
                                                         val tptObj = Gson().toJson(ttp)
                                                         logger(
                                                             LOG_TAG.DIGIPOS.tag,
@@ -534,10 +578,12 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                     if (tpt1.digiPosBQRStatus == EDigiPosTerminalStatusResponseCodes.ActiveString.statusCode) {
                                                         var imgbm: Bitmap? = null
                                                         runBlocking(Dispatchers.IO) {
-                                                            val tpt= Field48ResponseTimestamp.getTptData()
-                                                            imgbm = loadStaticQrFromInternalStorage() // it return null when file not exist
-                                                            if(imgbm==null || tpt?.digiPosStaticQrDownloadRequired =="1") {
-                                                                isStaticQrAvailable=true
+                                                            val tpt =
+                                                                Field48ResponseTimestamp.getTptData()
+                                                            imgbm =
+                                                                loadStaticQrFromInternalStorage() // it return null when file not exist
+                                                            if (imgbm == null || tpt?.digiPosStaticQrDownloadRequired == "1") {
+                                                                isStaticQrAvailable = true
                                                             }
                                                         }
 
@@ -550,7 +596,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                 /* else {
                                                         logger("DIGI_POS", "DIGI_POS_UNAVAILABLE")
                                                     }*/
-                                            }else{
+                                            } else {
                                                 //VFService.showToast(responseMsg)
                                             }
 
@@ -563,28 +609,30 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                         }
                                     }
 
-                                    if(isStaticQrAvailable){
+                                    if (isStaticQrAvailable) {
                                         // getting static qr from server if required
                                         //withContext(Dispatchers.IO){
-                                        getStaticQrFromServerAndSaveToFile(requireActivity()){
+                                        getStaticQrFromServerAndSaveToFile(requireActivity()) {
                                             // FAIL AND SUCCESS HANDELED IN FUNCTION getStaticQrFromServerAndSaveToFile itself
                                         }
                                         //}
 
                                     }
                                     var checkinitstatus = checkInitializationStatus(appDao)
-                                    if(checkinitstatus) {
+                                    if (checkinitstatus) {
                                         CoroutineScope(Dispatchers.Main).launch {
-                                            (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
-                                                (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
-                                                    R.drawable.ic_tick_green,
-                                                    it
-                                                )
-                                            }
+                                            (activity as? NavigationActivity)?.getString(R.string.successfull_init)
+                                                ?.let {
+                                                    (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
+                                                        R.drawable.ic_success_with_star,
+                                                        it
+                                                    )
+                                                }
                                         }
-                                    }
-                                    else{
-                                        (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
+                                    } else {
+                                        (activity as? NavigationActivity)?.transactFragment(
+                                            DashboardFragment()
+                                        )
                                     }
                                 }
 
@@ -607,10 +655,10 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
                     }
                 }
-            }else{
+            } else {
                 isFromStop = false
             }
-        })
+        }
 
 
     }
@@ -651,10 +699,12 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                         )
                         AppPreference.setBankCode(bankEt.text.toString())
                         dismiss()
+                        unselectItem()
                     }
                     findViewById<View>(R.id.env_cancel_btn).setOnClickListener {
 
                         dismiss()
+                        unselectItem()
                     }
 
 
@@ -755,5 +805,5 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
 interface IBankFunctionsAdminVasItemClick{
 
-    fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem)
+    fun bankFunctionsAdminVasItemClick(bankFunctionsAdminVasItem: BankFunctionsAdminVasItem, itemPosition:Int)
 }
