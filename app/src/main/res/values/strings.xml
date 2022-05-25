@@ -7,6 +7,7 @@
     <string name="sending_reciving_data">Sending/Receiving data from host</string>
     <string name="sale_data_sync">Sending/Receiving From Host</string>
     <string name="authenticating_transaction_msg">Authenticating transaction</string>
+    <string name="processing">Processing...</string>
 
     <!--TODO: Settlement-->
     <string name="_1245678">123456789</string>

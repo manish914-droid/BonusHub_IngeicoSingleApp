@@ -31,11 +31,10 @@
 
             <ImageView
                 android:id="@+id/imgViewIssuerIcon"
-                android:layout_width="@dimen/pad_100"
-                android:layout_height="@dimen/pad_50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/pad_5"
                 android:scaleType="fitXY"
-                android:src="@drawable/icici_issuer_icon"
                 app:layout_constraintEnd_toStartOf="@+id/txtViewIssuerName"
                 app:layout_constraintHorizontal_bias="0.93"
                 app:layout_constraintHorizontal_chainStyle="packed"

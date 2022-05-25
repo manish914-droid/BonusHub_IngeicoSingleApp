@@ -147,7 +147,7 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(saleAmt.toFloat())
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol)+frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe/TAP Card"
 
             }
         }
@@ -170,9 +170,7 @@ class TransactionActivity : BaseActivityNew() {
     private fun processAccordingToCardType(cardProcessedDataModal: CardProcessedDataModal) {
         when (cardProcessedDataModal.getReadCardType()) {
             DetectCardType.MAG_CARD_TYPE-> {
-                CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(applicationContext,"Mag Card  detected", Toast.LENGTH_LONG).show()
-                }
+                logger("DetectCard","MAG detected","e")
 
                 if (cardProcessedDataModal.getFallbackType() != EFallbackCode.Swipe_fallback.fallBackCode) {
 
@@ -290,6 +288,8 @@ class TransactionActivity : BaseActivityNew() {
                                     }
                                 }
                                 else {
+                                    hideEmvCardImage()
+
                                     when (cardProcessedDataModal.getTransType()) {
                                         TransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
                                         TransactionType.EMI_SALE.type -> {
@@ -344,7 +344,9 @@ class TransactionActivity : BaseActivityNew() {
 
             DetectCardType.EMV_CARD_TYPE-> {
                 CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(applicationContext,"EMV card contact detected", Toast.LENGTH_LONG).show()
+                   // Toast.makeText(applicationContext,"EMV card contact detected", Toast.LENGTH_LONG).show()
+                    logger("DetectCard","EMV detected","e")
+
                     val emvOption = EmvOption.create().apply {
                         flagPSE(0x00.toByte())
                     }
@@ -358,7 +360,8 @@ class TransactionActivity : BaseActivityNew() {
 
             DetectCardType.CONTACT_LESS_CARD_TYPE -> {
                 CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(applicationContext,"Contactless detected", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(applicationContext,"Contactless detected", Toast.LENGTH_LONG).show
+                    logger("DetectCard","Contactless detected","e")
                     val emvOption = EmvOption.create().apply {
                         flagPSE(0x01.toByte())
                     }
@@ -371,6 +374,17 @@ class TransactionActivity : BaseActivityNew() {
             else -> {
 
             }
+        }
+    }
+
+    private fun hideEmvCardImage() {
+
+        CoroutineScope(Dispatchers.Main).launch {
+            emvBinding?.cardDetectImg?.visibility = View.GONE
+            emvBinding?.tvInsertCard?.visibility = View.GONE
+
+            val msg: String = getString(R.string.processing)
+            runOnUiThread { showProgress(msg) }
         }
     }
 
@@ -468,6 +482,9 @@ class TransactionActivity : BaseActivityNew() {
 
     private fun onEmvprocessnext(cardProcessedDataModal: CardProcessedDataModal) {
         println("processflow called")
+
+        hideEmvCardImage()
+
         if(transactionType == BhTransactionType.BRAND_EMI.type)
         {
             val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
@@ -792,8 +809,12 @@ class TransactionActivity : BaseActivityNew() {
         println("AppPreference.getReversal()"+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
         if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             println("sale_data_sync")
-            val msg: String = getString(R.string.authenticating_transaction_msg)
-            runOnUiThread { showProgress(msg) }
+            if(isShowProgress()){
+                setProgressTitle(getString(R.string.authenticating_transaction_msg))
+            }else {
+                val msg: String = getString(R.string.authenticating_transaction_msg)
+                runOnUiThread { showProgress(msg) }
+            }
             logger("1testVFEmvHandler",""+testVFEmvHandler,"e")
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
                 hideProgress()
@@ -813,7 +834,7 @@ class TransactionActivity : BaseActivityNew() {
                                       val transactionDate = dateFormaterNew(cardProcessedDataModal.getTimeStamp()?.toLong() ?: 0L)
                                       val transactionTime = timeFormaterNew(cardProcessedDataModal.getTime()?:"")
                                       txnApprovedDialog(transactionTypeEDashboardItem.res,transactionTypeEDashboardItem.title,txnAmountAfterApproved,
-                                          "${transactionDate}, ${transactionTime}") {
+                                          "${transactionDate}, ${transactionTime}") { status,dialog ->
 
                                           StubBatchData(
                                               de55,
@@ -838,6 +859,10 @@ class TransactionActivity : BaseActivityNew() {
                                                           if(it){
                                                               AppPreference.saveLastReceiptDetails(stubbedData)
                                                               Log.e("EMI ", "COMMENT ******")
+                                                              lifecycleScope.launch(Dispatchers.Main){
+                                                                  dialog.dismiss()
+                                                              }
+
                                                               goToDashBoard()
                                                           }
                                                       }

@@ -52,6 +52,10 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         }.show()
     }
 
+    override fun isShowProgress(): Boolean {
+        return progressDialog.isShowing
+    }
+
     private fun setProgressDialog() {
         progressDialog = Dialog(this).apply {
             requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -680,6 +684,7 @@ interface IDialog {
 
     fun showToast(msg: String)
     fun showProgress(progressMsg: String = "Please Wait....")
+    fun isShowProgress():Boolean
     fun hideProgress()
     fun getInfoDialog(title: String, msg: String,icon: Int = R.drawable.ic_info , acceptCb: () -> Unit)
     fun getInfoDialogdoubletap(title: String, msg: String, acceptCb: (Boolean, Dialog) -> Unit)

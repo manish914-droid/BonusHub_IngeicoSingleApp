@@ -15,12 +15,7 @@
 
 	<include
 		android:id="@+id/sub_header_view"
-		layout="@layout/sub_header_layout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:visibility="visible"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintTop_toTopOf="parent"/>
+		layout="@layout/sub_header_layout"/>
 
 	<androidx.constraintlayout.widget.Guideline
 		android:id="@+id/guidelineLeft"

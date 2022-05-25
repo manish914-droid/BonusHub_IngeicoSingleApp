@@ -134,6 +134,19 @@ private val emiIssuerTAndCDataFromIntent by lazy {
                         val resp = genericResp.data as TenuresWithIssuerTncs
                         emiSchemeOfferDataList = resp.bankEMISchemesDataList
                         emiIssuerTAndCData = resp.bankEMIIssuerTAndCList
+                        when(emiIssuerTAndCData?.issuerID)
+                        {
+                            "53" ->{
+                                // Amex
+                                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_icici_issuer)
+                            }
+
+                            "" ->{
+
+                            }
+
+                            "" ->{}
+                        }
                         setUpRecyclerView()
 
                     }
