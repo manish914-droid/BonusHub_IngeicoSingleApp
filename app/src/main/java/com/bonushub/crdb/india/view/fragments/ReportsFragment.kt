@@ -42,6 +42,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     private val settlementViewModel : SettlementViewModel by viewModels()
     private val batchReversalViewModel : BatchReversalViewModel by viewModels()
 
+    private lateinit var reportsAdapter:ReportsAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -84,16 +86,17 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
     }
 
     private fun setupRecyclerview() {
+        reportsAdapter = ReportsAdapter(reportsItemList, iReportsFragmentItemClick)
         lifecycleScope.launch(Dispatchers.Main) {
             binding?.let {
                 it.recyclerView.layoutManager = GridLayoutManager(activity, 1)
-                it.recyclerView.adapter = ReportsAdapter(reportsItemList, iReportsFragmentItemClick)
+                it.recyclerView.adapter = reportsAdapter
             }
 
         }
     }
 
-    override fun ReportsOptionItemClick(reportsItem: ReportsItem) {
+    override fun ReportsOptionItemClick(reportsItem: ReportsItem, itemPosition:Int) {
 
         when (reportsItem) {
 
@@ -133,24 +136,14 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                         iDiag?.hideProgress()
                                     }
                                 }
-
-                           /* PrintUtil(activity).startPrinting(lastReceiptData,
-                                    EPrintCopyType.DUPLICATE,
-                                    activity
-                                ) { printCB, printingFail ->
-                                    if (printCB) {
-                                        iDiag?.hideProgress()
-                                        logger("PRINTING", "LAST_RECEIPT")
-                                    } else {
-                                        iDiag?.hideProgress()
-                                    }
-                                }*/
+                            reportsAdapter.notifyItemChanged(itemPosition)
                         }
 
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDiag?.hideProgress()
                                 ToastUtils.showToast(requireContext(),"Report not found")
+                                reportsAdapter.notifyItemChanged(itemPosition)
                             }
                         }
                     }
@@ -162,10 +155,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                     iDiag?.alertBoxWithActionNew(
                         getString(R.string.empty_batch),
                         getString(R.string.last_receipt_not_available),
-                        R.drawable.ic_info,
+                        R.drawable.ic_info_orange,
                         getString(R.string.positive_button_ok),
                         "",false,false,
-                        {},
+                        {
+                        reportsAdapter.notifyItemChanged(itemPosition)
+                        },
                         {})
                 }
 
@@ -201,11 +196,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     ex.printStackTrace()
                                     iDiag?.hideProgress()
                                 }
-
+                                reportsAdapter.notifyItemChanged(itemPosition)
                             }
                         },
                         {
                             //Cancel Handling
+                            reportsAdapter.notifyItemChanged(itemPosition)
                         })
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
@@ -213,77 +209,18 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         iDiag?.alertBoxWithActionNew(
                             getString(R.string.no_receipt),
                             getString(R.string.no_cancel_receipt_found),
-                            R.drawable.ic_print_customer_copy,
+                            R.drawable.ic_info_orange,
                             getString(R.string.positive_button_ok),
                             "",false,
                             false,
-                            {},
+                            {
+                                reportsAdapter.notifyItemChanged(itemPosition)
+                            },
                             {})
                     }
 
 
                 }
-
-                // old
-                /*val lastCancelReceiptData = AppPreference.getLastCancelReceipt()
-
-                val batchData = BatchTable(lastCancelReceiptData)
-
-                val isoW = AppPreference.getReversal()
-
-                if (lastCancelReceiptData != null) {
-                    iDiag?.getMsgDialog(
-                        getString(R.string.confirmation),
-                        getString(R.string.last_cancel_report_confirmation),
-                        "Yes",
-                        "No",
-                        {
-
-                            GlobalScope.launch(Dispatchers.Main) {
-                                iDiag?.showProgress(getString(R.string.printing_last_cancel_receipt))
-                            }
-                            GlobalScope.launch {
-                                try {
-                                    // BB
-//                                    PrintUtil(context).printReversal(context, "") {
-//                                        //  VFService.showToast(it)
-//                                        iDiag?.hideProgress()
-//                                    }
-                                    PrintUtil(activity).startPrinting(batchData,
-                                        EPrintCopyType.DUPLICATE,
-                                        activity,
-                                        true
-                                    ) { printCB, printingFail ->
-                                        if (printCB) {
-                                            iDiag?.hideProgress()
-                                            logger("PRINTING", "LAST_CANCEL_RECEIPT")
-                                        } else {
-                                            iDiag?.hideProgress()
-                                        }
-                                    }
-                                } catch (ex: java.lang.Exception) {
-                                    ex.printStackTrace()
-                                    iDiag?.hideProgress()
-                                }
-
-                            }
-                        },
-                        {
-                            //Cancel Handling
-                        })
-                } else {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        iDiag?.alertBoxWithAction(
-                            getString(R.string.no_receipt),
-                            getString(R.string.no_cancel_receipt_found),
-                            false,
-                            getString(R.string.positive_button_ok),
-                            {},
-                            {})
-                    }
-
-
-                }*/
 
             }
 // End of last cancel receipt
@@ -291,57 +228,15 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
             ReportsItem.ANY_RECEIPT -> {
                 logger("repost", ReportsItem.ANY_RECEIPT._name)
 
-                DialogUtilsNew1.getInputDialog(requireContext(), "Enter Invoice Number", "", true,false,"Invoice Number") { invoice ->
+                DialogUtilsNew1.getInputDialog(requireContext(), "Enter Invoice Number", "", true,false,"Invoice Number", { invoice ->
 
                         iDiag?.showProgress(getString(R.string.printing_receipt))
                         lifecycleScope.launch {
                             try {
 
-                                // old
-                                /*batchFileViewModel?.getBatchTableDataByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
+                                batchFileViewModel?.getTempBatchTableDataListByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner) { bat ->
 
-                                    if(bat?.receiptData != null)
-                                    {
-                                        // please uncomment this code to use with batch data for printing
-                                        *//*PrintUtil(activity).startPrinting(
-                                            bat,
-                                            EPrintCopyType.DUPLICATE,
-                                            activity
-                                        ) { printCB, printingFail ->
-                                            if (printCB) {
-                                                iDiag?.hideProgress()
-                                                logger("PRINTING", "LAST_RECEIPT")
-                                            } else {
-                                                iDiag?.hideProgress()
-                                            }
-                                        }*//*
-
-                                        PrintUtil(activity).startPrinting(
-                                            bat,
-                                            EPrintCopyType.DUPLICATE,
-                                            activity
-                                        ) { printCB, printingFail ->
-                                            if (printCB) {
-                                                iDiag?.hideProgress()
-                                                logger("PRINTING", "LAST_RECEIPT")
-                                            } else {
-                                                iDiag?.hideProgress()
-                                            }
-                                        }
-                                    }else{
-                                       // launch(Dispatchers.Main) {
-                                            iDiag?.hideProgress()
-                                            //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
-                                            iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
-                                     //   }
-                                    }
-
-                                })*/
-
-                                batchFileViewModel?.getTempBatchTableDataListByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner, { bat ->
-
-                                    if(bat != null && bat.size > 0)
-                                    {
+                                    if (bat != null && bat.size > 0) {
                                         PrintUtil(activity).startPrinting(
                                             bat.get(0)!!,
                                             EPrintCopyType.DUPLICATE,
@@ -353,25 +248,31 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             } else {
                                                 iDiag?.hideProgress()
                                             }
+
+
                                         }
-                                    }else{
-                                       // launch(Dispatchers.Main) {
-                                            iDiag?.hideProgress()
-                                            //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
-                                           // iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
+                                        lifecycleScope.launch(Dispatchers.Main){
+                                            reportsAdapter.notifyItemChanged(itemPosition)
+                                        }
+                                    } else {
+                                        // launch(Dispatchers.Main) {
+                                        iDiag?.hideProgress()
+                                        //DialogUtilsNew1.showMsgOkDialog(activity,getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid), false)
+                                        // iDiag?.getInfoDialog(getString(R.string.invalid_invoice),getString(R.string.invoice_is_invalid)){}
                                         iDiag?.alertBoxWithActionNew(
                                             getString(R.string.invalid_invoice),
                                             getString(R.string.invoice_is_invalid),
-                                            R.drawable.ic_info,
+                                            R.drawable.ic_info_orange,
                                             getString(R.string.positive_button_ok),
-                                            "",false,false,
-                                            {},
+                                            "", false, false,
+                                            {
+                                                reportsAdapter.notifyItemChanged(itemPosition)
+                                            },
                                             {})
-                                     //   }
+                                        //   }
                                     }
 
-                                })
-
+                                }
 
 
                             } catch (ex: Exception) {
@@ -383,16 +284,20 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 iDiag?.alertBoxWithActionNew(
                                     getString(R.string.error),
                                     "something Wrong",
-                                    R.drawable.ic_info,
+                                    R.drawable.ic_info_orange,
                                     getString(R.string.positive_button_ok),
                                     "",false,false,
-                                    {},
+                                    {
+                                        reportsAdapter.notifyItemChanged(itemPosition)
+                                    },
                                     {})
 
                               //  }
                             }
                         }
-                    }
+                    },{
+                    reportsAdapter.notifyItemChanged(itemPosition)
+                })
             }
 // End of Any Receipt case
 
@@ -437,11 +342,11 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                     activity
                                                 ) { detailPrintStatus ->
                                                     iDiag?.hideProgress()
+
                                                 }
-                                                //BB
-//                                                PrintUtil(activity).printDetailReportupdate(batchData, activity) {
-//                                                    iDiag?.hideProgress()
-//                                                }
+                                                lifecycleScope.launch(Dispatchers.Main){
+                                                    reportsAdapter.notifyItemChanged(itemPosition)
+                                                }
 
                                             } catch (ex: java.lang.Exception) {
                                                 ex.message ?: getString(R.string.error_in_printing)
@@ -457,6 +362,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             lifecycleScope.launch(Dispatchers.Main) {
                                                 iDiag?.hideProgress()
                                                 iDiag?.showToast("  Batch is empty.  ")
+                                                reportsAdapter.notifyItemChanged(itemPosition)
                                             }
                                         }
 
@@ -465,6 +371,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 },
                                 {
                                     //handle cancel here
+                                    reportsAdapter.notifyItemChanged(itemPosition)
                                 })
                         } else {
                             lifecycleScope.launch(Dispatchers.Main) {
@@ -472,10 +379,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 iDiag?.alertBoxWithActionNew(
                                     getString(R.string.empty_batch),
                                     getString(R.string.detail_report_not_found),
-                                    R.drawable.ic_print_customer_copy,
+                                    R.drawable.ic_info_orange,
                                     getString(R.string.positive_button_ok),
                                     "",false,false,
-                                    {},
+                                    {
+                                        reportsAdapter.notifyItemChanged(itemPosition)
+                                    },
                                     {})
                             }
 
@@ -522,10 +431,11 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                         dataList,
                                                         false
                                                     ) {
-
                                                     }
 
-
+                                                    lifecycleScope.launch(Dispatchers.Main){
+                                                        reportsAdapter.notifyItemChanged(itemPosition)
+                                                    }
                                                 } catch (ex: java.lang.Exception) {
                                                     //  ex.message ?: getString(R.string.error_in_printing)
                                                     ex.printStackTrace()
@@ -547,10 +457,12 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                     iDiag?.alertBoxWithActionNew(
                                                         "Error",
                                                         "Summery is not available.",
-                                                        R.drawable.ic_info,
+                                                        R.drawable.ic_info_orange,
                                                         getString(R.string.positive_button_ok),
                                                         "",false,false,
-                                                        {},
+                                                        {
+                                                            reportsAdapter.notifyItemChanged(itemPosition)
+                                                        },
                                                         {})
                                                 }
                                             }
@@ -559,17 +471,19 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     },
                                     {
                                         //Cancel handle here
-
+                                        reportsAdapter.notifyItemChanged(itemPosition)
                                     })
                             } else {
                                 GlobalScope.launch(Dispatchers.Main) {
                                     iDiag?.alertBoxWithActionNew(
                                         getString(R.string.empty_batch),
                                         getString(R.string.summary_report_not_available),
-                                        R.drawable.ic_print_customer_copy,
+                                        R.drawable.ic_info_orange,
                                         getString(R.string.positive_button_ok),
                                         "",false,false,
-                                        {},
+                                        {
+                                            reportsAdapter.notifyItemChanged(itemPosition)
+                                        },
                                         {})
                                 }
 
@@ -618,21 +532,22 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                             //   iDiag?.showToast(msg)
                                         }
                                     }
+                                    lifecycleScope.launch(Dispatchers.Main){
+                                        reportsAdapter.notifyItemChanged(itemPosition)
+                                    }
                                 } else {
                                     launch(Dispatchers.Main) {
                                         iDiag?.hideProgress()
-                                        /*iDiag?.getInfoDialog(
-                                            "Error",
-                                            "Last summary is not available."
-                                        ) {}*/
 
                                         iDiag?.alertBoxWithActionNew(
                                             "Error",
                                             "Last summary is not available.",
-                                            R.drawable.ic_info,
+                                            R.drawable.ic_info_orange,
                                             getString(R.string.positive_button_ok),
                                             "",false,false,
-                                            {},
+                                            {
+                                                reportsAdapter.notifyItemChanged(itemPosition)
+                                            },
                                             {})
                                     }
                                 }
@@ -641,15 +556,18 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         },
                         {
                             //Cancel Handling
+                            reportsAdapter.notifyItemChanged(itemPosition)
                         })
                 } else {
                     lifecycleScope.launch(Dispatchers.Main) {
                         iDiag?.alertBoxWithActionNew(
                             getString(R.string.no_receipt),
                             getString(R.string.last_summary_not_available),
-                            R.drawable.ic_print_customer_copy,
+                            R.drawable.ic_info_orange,
                             getString(R.string.positive_button_ok),"",false,false,
-                            {},
+                            {
+                                reportsAdapter.notifyItemChanged(itemPosition)
+                            },
                             {})
                     }
                 }
@@ -750,5 +668,5 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
 interface IReportsFragmentItemClick {
 
-    fun ReportsOptionItemClick(reportsItem: ReportsItem)
+    fun ReportsOptionItemClick(reportsItem: ReportsItem, itemPosition:Int)
 }

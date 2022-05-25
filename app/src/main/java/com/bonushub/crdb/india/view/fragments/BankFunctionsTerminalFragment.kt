@@ -205,7 +205,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         lastTid = dataList[position]?.titleValue?:""
         var isTID = titleName.equals("TID", ignoreCase = true)
 
-        DialogUtilsNew1.getInputDialog(context as Context, getString(R.string.update), dataList[position]?.titleValue?:"", false, isTID,dataList[position]?.titleName?:"") {
+        DialogUtilsNew1.getInputDialog(context as Context, getString(R.string.update), dataList[position]?.titleValue?:"", false, isTID,dataList[position]?.titleName?:"",{
             if (titleName.equals("TID", ignoreCase = true)) {
                 when {
                     it == dataList[position]?.titleValue -> {
@@ -233,7 +233,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                     updateTable(position, it, it)
                 }
             }
-        }
+        },{})
     }
 
     suspend fun updateTable(positionValue: Int, lastTidValue: String, updatedTid: String) {

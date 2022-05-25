@@ -264,7 +264,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
             dataList[position]?.titleValue?:"",
             false,
             isTID,
-            dataList[position]?.titleName?:"") {
+            dataList[position]?.titleName?:"", {
             if (titleName.equals("Terminal ID", ignoreCase = true)) {
                 when {
                     it == dataList[position]?.titleValue -> {
@@ -292,7 +292,7 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
                     updateTable()
                 }
             }
-        }
+        },{})
     }
 
     suspend fun updateTable()

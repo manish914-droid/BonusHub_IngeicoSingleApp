@@ -83,7 +83,7 @@ class DialogUtilsNew1 {
             dialog.show()
         }
 
-        fun getInputDialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false,toastMsg:String, callback: (String) -> Unit) {
+        fun getInputDialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false,toastMsg:String, callback: (String) -> Unit, callbackCancel: () -> Unit) {
             Dialog(context).apply {
                 getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -138,6 +138,7 @@ class DialogUtilsNew1 {
 //                findViewById<TextView>(R.id.textViewHeader).text = title
                 findViewById<TextView>(R.id.txtViewCancel).setOnClickListener {
                     dismiss()
+                    callbackCancel()
                 }
                 okbtn.setOnClickListener {
                     if (!invoiceET.text.toString().isNullOrEmpty()) {
