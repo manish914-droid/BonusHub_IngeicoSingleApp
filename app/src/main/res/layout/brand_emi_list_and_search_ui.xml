@@ -159,6 +159,7 @@
             android:id="@+id/brandEmiMasterRV"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_brand_emi_master" />
+            tools:listitem="@layout/item_brand_emi_master"
+            android:layout_marginTop="@dimen/pad_5"/>
     </LinearLayout>
 </RelativeLayout>
