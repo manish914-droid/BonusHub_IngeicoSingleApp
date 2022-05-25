@@ -900,24 +900,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
-                    /*CoroutineScope(Dispatchers.Default).launch {
-                        startActivityForResult(Intent(this@NavigationActivity, TransactionActivity::class.java).apply {
-                            //  putExtra("amt", amt)
-                            //  putExtra("type", transType)
-                        },1000)
-
-                        //inflateInputFragment(PreAuthCompleteInputDetailFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title, EDashboardItem.PREAUTH_COMPLETE)
-                    }*/
                     CoroutineScope(Dispatchers.Main).launch {
                         inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
                     }
-
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
-
-
             }
+
             EDashboardItem.PREAUTH_COMPLETE->{
                 if (checkInternetConnection()) {
                     transactFragment(PreAuthCompleteInputDetailFragment().apply {
@@ -1150,11 +1140,10 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
     }
     // endregion
 //Below Method is to Handle the Input Fragment Inflate with the Sub Heading it belongs to:-
-    fun inflateInputFragment(fragment: Fragment, subHeading: String, action: EDashboardItem, testEmiOption: String = "0") {
-
-        System.out.println("Insert Block option "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
-        System.out.println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()))
-        System.out.println("Init after settlement "+AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString()))
+    private fun inflateInputFragment(fragment: Fragment, subHeading: String, action: EDashboardItem, testEmiOption: String = "0") {
+        println("Insert Block option "+AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()))
+        println("Insert PPk dpk "+AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()))
+        println("Init after settlement "+AppPreference.getBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString()))
 
         if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
             !AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS_INGENICO.keyName.toString()) &&

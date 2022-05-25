@@ -36,22 +36,17 @@ class DashBoardAdapter(private val fragReq: IFragmentRequest?, var lessMoreClick
                 lessMoreClick(mList[position])
             else
                 fragReq?.onDashBoardItemClick(mList[position])
-
         }
-
     }
 
     fun onUpdatedItem(list: List<EDashboardItem>) {
         mList.clear()
         mList.addAll(list)
-
     }
-
 
     inner class DashBoardViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val logoIV: ImageView = view.findViewById(R.id.item_logo_iv)
         val titleTV: TextView = view.findViewById(R.id.item_title_tv)
         //val itemParent: ConstraintLayout = view.findViewById(R.id.item_parent_rv)
-
     }
 }

@@ -19,6 +19,9 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.bonushub.crdb.india.R;
+import com.bonushub.crdb.india.utils.Converter;
+import com.usdk.apiservice.aidl.emv.CandidateAID;
+
 
 import java.util.List;
 
@@ -29,7 +32,7 @@ public final class DialogUtil {
 	
 	private DialogUtil() {}
 
-	public static void showSelectDialog(Context context, String tittle, List<String> dataList, int checkedItem, final OnSelectListener listener) {
+	public static void showSelectDialog(Context context, String tittle, List<CandidateAID> dataList, int checkedItem, final OnSelectListener listener) {
 		selectPosition = checkedItem;
 
 		final Builder b = new Builder(context);
@@ -50,6 +53,7 @@ public final class DialogUtil {
 		});
 
 		final ListView list = (ListView) dlg.findViewById(R.id.listView);
+
 		final ExBaseAdapter adapter = new ExBaseAdapter(context, dataList);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new OnItemClickListener() {
@@ -216,10 +220,10 @@ public final class DialogUtil {
 
 	private static class ExBaseAdapter extends BaseAdapter {
 		private Context context;
-		private List<String> dataList;
+		private List<CandidateAID> dataList;
 		private LayoutInflater inflater;
 
-		public ExBaseAdapter(Context ctx, List<String> data) {
+		public ExBaseAdapter(Context ctx, List<CandidateAID> data) {
 			context = ctx;
 			dataList = data;
 			inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -247,6 +251,9 @@ public final class DialogUtil {
 				holder = new ViewHolder();
 				convertView = inflater.inflate(R.layout.select_dialog_item, null);
 				holder.info = (RadioButton) convertView.findViewById(R.id.info);
+			//	holder.info.setText();
+				holder.info.setText(Converter.byteArr2Str(dataList.get(position).getAppLabel()));
+
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder)convertView.getTag();
@@ -257,12 +264,13 @@ public final class DialogUtil {
 				holder.info.setChecked(false);
 			}
 
-			holder.info.setText(dataList.get(position));
+		//	holder.info.setText(dataList.get(position).getAppLabel());
 			return convertView;
 		}
 	}
 
 	private static class ViewHolder {
 		public RadioButton info;
+
 	}
 }

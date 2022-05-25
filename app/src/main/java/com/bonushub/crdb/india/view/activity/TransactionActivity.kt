@@ -350,7 +350,7 @@ class TransactionActivity : BaseActivityNew() {
                     }
                     testVFEmvHandler = emvHandler()
                     logger("2testVFEmvHandler",""+testVFEmvHandler,"e")
-                    DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
+                    DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(), testVFEmvHandler)
 
                 }
 
@@ -1286,7 +1286,7 @@ class TransactionActivity : BaseActivityNew() {
         CTLS_fallback(333)
     }
 
-    protected open fun respondCVMResult(result: Byte) {
+     fun respondCVMResult(result: Byte) {
         try {
             val chvStatus = TLV.fromData(EMVTag.DEF_TAG_CHV_STATUS, byteArrayOf(result))
             val ret = DeviceHelper.getEMV()!!.respondEvent(chvStatus.toString())

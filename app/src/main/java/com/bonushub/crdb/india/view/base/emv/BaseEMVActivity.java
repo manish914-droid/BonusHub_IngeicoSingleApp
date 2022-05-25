@@ -379,14 +379,14 @@ public abstract class BaseEMVActivity extends BaseDeviceActivity {
 	}
 	
 	protected void selectApp(final List<CandidateAID> candList, final DialogUtil.OnSelectListener listener) {
-		final List<String> aidInfoList = new ArrayList<>();
+	/*	final List<String> aidInfoList = new ArrayList<>();
 		for (CandidateAID candAid : candList) {
 			aidInfoList.add(new String(candAid.getAPN()));
-		}
+		}*/
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				DialogUtil.showSelectDialog(BaseEMVActivity.this, "Please select app", aidInfoList, 0, listener);
+				DialogUtil.showSelectDialog(BaseEMVActivity.this, "Please select app", candList, 0, listener);
 
 			}
 		});

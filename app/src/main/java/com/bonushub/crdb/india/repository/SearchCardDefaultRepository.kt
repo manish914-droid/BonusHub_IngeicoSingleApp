@@ -351,7 +351,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
             aidInfoList.add(String(candAid.apn))
         }
         (context as TransactionActivity).runOnUiThread(Runnable {
-            DialogUtil.showSelectDialog(context, "Please select app", aidInfoList, 0, listener)
+            DialogUtil.showSelectDialog(context, "Please select app", candList, 0, listener)
         })
     }
 

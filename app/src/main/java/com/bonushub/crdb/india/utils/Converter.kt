@@ -181,6 +181,7 @@ fun String.hexStr2ByteArr(): ByteArray {
 /**
  * Converts byte (-128 to 127) into hex String with two chars
  * */
+
 fun ByteArray.byteArr2HexStr(): String {
     val bu = StringBuilder()
     for (d in this) {

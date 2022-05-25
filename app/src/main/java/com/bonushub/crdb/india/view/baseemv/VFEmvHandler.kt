@@ -1,11 +1,13 @@
 package com.bonushub.crdb.india.view.baseemv
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
+import com.bonushub.crdb.india.MainActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
@@ -18,6 +20,7 @@ import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.ingenico.TLVList
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.activity.TransactionActivity
 import com.bonushub.crdb.india.view.activity.TransactionActivity.*
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
@@ -58,29 +61,36 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         this.vfFallbackCallback   = vfEmvHandlerCallback
     }
 
+    //1
     @Throws(RemoteException::class)
     override fun onInitEMV() {
+        Log.e("VFEmvHandler","onInitEMV")
         doInitEMV()
 
     }
 
     @Throws(RemoteException::class)
     override fun onWaitCard(flag: Int) {
-
+Log.e("VFEmvHandler","onWaitCard")
     }
 
     @Throws(RemoteException::class)
     override fun onCardChecked(cardType: Int) {
         // Only happen when use startProcess()
+        Log.e("VFEmvHandler","onCardChecked")
     }
 
+    //2
     @Throws(RemoteException::class)
     override fun onAppSelect(reSelect: Boolean, list: List<CandidateAID>) {
+        Log.e("VFEmvHandler","onAppSelect")
         doAppSelect(reSelect, list)
     }
 
+    //3
     @Throws(RemoteException::class)
     override fun onFinalSelect(finalData: FinalData?) {
+        Log.e("VFEmvHandler","onFinalSelect")
         if (finalData != null) {
             doFinalSelect(finalData)
         }
@@ -88,12 +98,14 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onReadRecord(cardRecord: CardRecord) {
+        Log.e("VFEmvHandler","onReadRecord")
         lastCardRecord = cardRecord
         doReadRecord(cardRecord)
     }
 
     @Throws(RemoteException::class)
     override fun onCardHolderVerify(cvmMethod: CVMMethod?) {
+        Log.e("VFEmvHandler","onCardHolderVerify")
         if (cvmMethod != null) {
             doCardHolderVerify(cvmMethod)
         }
@@ -101,6 +113,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onOnlineProcess(transData: TransData?) {
+        Log.e("VFEmvHandler","onOnlineProcess")
         if (transData != null) {
             doOnlineProcess(transData)
         }
@@ -109,11 +122,13 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onEndProcess(result: Int, transData: TransData?) {
+        Log.e("VFEmvHandler","onEndProcess")
         doEndProcess(result, transData)
     }
 
     @Throws(RemoteException::class)
     override fun onVerifyOfflinePin(flag: Int, random: ByteArray?, caPublicKey: CAPublicKey?, offlinePinVerifyResult: OfflinePinVerifyResult?) {
+        Log.e("VFEmvHandler","onVerifyOfflinePin")
         if (offlinePinVerifyResult != null) {
             doVerifyOfflinePin(flag, random, caPublicKey, offlinePinVerifyResult)
         }
@@ -121,14 +136,19 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onObtainData(ins: Int, data: ByteArray?) {
+        Log.e("VFEmvHandler","onObtainData")
         //	outputText("=> onObtainData: instruction is 0x" + Integer.toHexString(ins) + ", data is " + BytesUtil.bytes2HexString(data));
     }
 
+    //4
     @Throws(RemoteException::class)
     override fun onSendOut(ins: Int, data: ByteArray?) {
+        Log.e("VFEmvHandler","onSendOut")
         doSendOut(ins, data!!)
 
     }
+
+
 
     @Throws(RemoteException::class)
     fun doInitEMV() {
@@ -235,6 +255,10 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                 override fun onCancel() {
                     try {
                         emv!!.stopEMV()
+                        val intent = Intent(activity, NavigationActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        activity.startActivity(intent)
+
                     } catch (e: RemoteException) {
                         e.printStackTrace()
                     }
@@ -250,15 +274,15 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
     }
 
     protected open fun selectApp(candList: List<CandidateAID>, listener: DialogUtil.OnSelectListener?) {
-        val aidInfoList: MutableList<String> = ArrayList()
+       /* val aidInfoList: MutableList<String> = ArrayList()
         for (candAid in candList) {
             aidInfoList.add(String(candAid.apn))
-        }
+        }*/
         activity.runOnUiThread {
             DialogUtil.showSelectDialog(
                 activity,
                 "Please select app",
-                aidInfoList,
+                candList,
                 0,
                 listener
             )
@@ -675,7 +699,6 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         //return desc + String.format("[0x%02X]", flowType)
     }
 
-
     open fun doVerifyOfflinePin(flag: Int, random: ByteArray?, capKey: CAPublicKey?, result: OfflinePinVerifyResult) {
         println("=> onVerifyOfflinePin")
         try {
@@ -819,8 +842,6 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         // cardProcessedDataModal.setEncryptedPan(encrptedPan)
         manageCAPKey()
 
-
-
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
 
@@ -857,7 +878,6 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             )
         }
     }
-
 
     fun getCompleteSecondGenAc(testCompleteSecondGenAc: CompleteSecondGenAc, cardProcessedDataModal: CardProcessedDataModal?){
         this.testCompleteSecondGenAc = testCompleteSecondGenAc

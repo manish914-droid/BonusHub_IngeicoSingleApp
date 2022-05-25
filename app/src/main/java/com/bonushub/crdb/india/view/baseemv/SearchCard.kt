@@ -35,7 +35,7 @@ class SearchCard constructor(){
                 }
 
     fun detectCard(cardOption: CardOption) {
-        var defaultScope = CoroutineScope(Dispatchers.Default)
+        val defaultScope = CoroutineScope(Dispatchers.Default)
         // start search card
         defaultScope.launch {
             println("Searching card...")

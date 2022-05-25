@@ -539,7 +539,7 @@ class NewInputAmountFragment : Fragment() {
             return
         }
         when (eDashBoardItem) {
-          EDashboardItem.SALE -> {
+            EDashboardItem.SALE -> {
                 val saleAmt = saleAmount.toString().trim().toDouble()
                 val saleTipAmt = cashAmt.toString().trim().toDouble()
                 val trnsAmt = saleAmt + saleTipAmt
@@ -771,9 +771,7 @@ class NewInputAmountFragment : Fragment() {
                     )
                 }
             }
-
-            else -> {
-            }
+            else -> {}
         }
 
 
