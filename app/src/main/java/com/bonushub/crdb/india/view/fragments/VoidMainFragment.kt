@@ -576,6 +576,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         val transactionTime = timeFormaterNew(voidData.time)
                                         (activity as NavigationActivity).txnApprovedDialog(EDashboardItem.VOID_SALE.res,EDashboardItem.VOID_SALE.title,
                                             voidData.transactionalAmmount,"${transactionDate}, ${transactionTime}") {
+                                                status , dialog ->
 
                                             (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
@@ -605,6 +606,8 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                                                 ) { printCB, printingFail ->
                                                                     (activity as NavigationActivity).hideProgress()
                                                                     // go to dashboard
+
+                                                                    dialog.dismiss()
                                                                     startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
                                                                         flags =
                                                                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -618,6 +621,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 //                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
 //                    startActivity(intent)
                                                                 // go to dashboard
+                                                                dialog.dismiss()
                                                                 startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
                                                                     flags =
                                                                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK

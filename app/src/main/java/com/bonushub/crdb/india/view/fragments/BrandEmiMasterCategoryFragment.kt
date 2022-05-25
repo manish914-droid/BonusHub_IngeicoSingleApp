@@ -119,11 +119,12 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                     //    ToastUtils.showToast(activity, genericResp.errorMessage)
                     //(activity as MainActivity).show
                     lifecycleScope.launch(Dispatchers.Main) {
-                        (activity as BaseActivityNew).alertBoxWithAction(
-                            getString(R.string.no_receipt),
+                        (activity as BaseActivityNew).alertBoxWithActionNew(
                             genericResp.errorMessage ?: "Oops something went wrong",
-                            false,
-                            getString(R.string.positive_button_ok),
+                            "",
+                            R.drawable.ic_info_orange,
+                            getString(R.string.positive_button_ok),"",false,
+                            true,
                             {
                                 /* finish()
                                  goToDashBoard()*/

@@ -175,6 +175,7 @@ class PreAuthPendingFragment : Fragment() {
 
                         iDialog?.txnApprovedDialog(EDashboardItem.PENDING_PREAUTH.res,EDashboardItem.PENDING_PREAUTH.title,amt,
                             "${transactionDate}, ${transactionTime}") {
+                                status , dialog ->
 
                             lifecycleScope.launch(Dispatchers.IO) {
                                 withContext(Dispatchers.Main){
@@ -195,11 +196,14 @@ class PreAuthPendingFragment : Fragment() {
                                                     {
                                                         withContext(Dispatchers.Main){
                                                             printChargeSlip((activity as BaseActivityNew), EPrintCopyType.CUSTOMER,stubbedData) { it ->
+                                                                dialog.dismiss()
                                                             }
                                                         }
                                                     }
                                                 },
-                                                {})
+                                                {
+                                                    dialog.dismiss()
+                                                })
 
                                         }, 1000)
 

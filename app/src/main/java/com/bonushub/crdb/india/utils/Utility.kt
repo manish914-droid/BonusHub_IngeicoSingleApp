@@ -1781,7 +1781,7 @@ fun getAllBrandEMIMasterDataTimeStamps(): List<BrandEMIMasterTimeStamps>? {
         GlobalScope.launch(Dispatchers.Main) {
             val msg=  "Max txn limit Rs ${("%.2f".format((maxTxnLimit)))}"
 
-            iDialog?.getInfoDialog("Amount Limit", msg) {}
+            iDialog?.getInfoDialog("Amount Limit", msg,R.drawable.ic_info_orange) {}
         }
 
     }
