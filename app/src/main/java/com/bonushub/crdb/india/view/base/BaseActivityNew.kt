@@ -443,7 +443,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
 
     override fun txnApprovedDialog(
-        headerImage:Int,headerText:String, amount: String, dateTime: String, alertCallback: (Boolean) -> Unit
+        headerImage:Int,headerText:String, amount: String, dateTime: String, alertCallback: (Boolean,Dialog) -> Unit
     ) {
         val dialogBuilder = Dialog(this,android.R.style.ThemeOverlay_Material_ActionBar)
         //builder.setTitle(title)
@@ -469,15 +469,15 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            dialogBuilder.dismiss()
-            dialogBuilder.cancel()
+          //  dialogBuilder.dismiss()
+          //  dialogBuilder.cancel()
 
-            alertCallback(true)
+            alertCallback(true,dialogBuilder)
                 /*startActivity(Intent(this, NavigationActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })*/
 
-                                                    }, 2000)
+                                                    }, 1000)
 
 
         try {
@@ -700,7 +700,7 @@ interface IDialog {
     )
 
     fun txnApprovedDialog(
-        headerImage:Int = 0 ,headerText:String = "",amount: String = "0.00", dateTime: String = "", alertCallback: (Boolean) -> Unit
+        headerImage:Int = 0 ,headerText:String = "",amount: String = "0.00", dateTime: String = "", alertCallback: (Boolean, Dialog) -> Unit
     )
 
     fun alertBoxWithActionNew(header:String, msg:String, icon: Int, positiveButtonText: String, negativeButtonText:String, isShowNegativeBtn:Boolean,

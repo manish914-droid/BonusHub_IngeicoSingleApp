@@ -8,7 +8,7 @@
     <include
         android:id="@+id/sub_header_view"
         layout="@layout/sub_header_layout"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/imgViewBg"

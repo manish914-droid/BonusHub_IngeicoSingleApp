@@ -184,7 +184,7 @@ class PreAuthVoidFragment : Fragment() {
                             amt,
                             "${transactionDate}, ${transactionTime}"
                         ) {
-
+                                status , dialog ->
                             lifecycleScope.launch(Dispatchers.IO) {
                                 withContext(Dispatchers.Main) {
                                     printChargeSlip(
@@ -212,12 +212,14 @@ class PreAuthVoidFragment : Fragment() {
                                                                 EPrintCopyType.CUSTOMER,
                                                                 stubbedData
                                                             ) { it ->
+                                                                dialog.dismiss()
                                                                 gotoDashboard()
                                                             }
                                                         }
                                                     }
                                                 },
                                                 {
+                                                    dialog.dismiss()
                                                     gotoDashboard()
                                                 })
 
