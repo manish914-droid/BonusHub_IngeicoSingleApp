@@ -122,9 +122,9 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                         (activity as BaseActivityNew).alertBoxWithActionNew(
                             genericResp.errorMessage ?: "Oops something went wrong",
                             "",
-                            R.drawable.ic_info_orange,
+                            R.drawable.ic_info_new,
                             getString(R.string.positive_button_ok),"",false,
-                            true,
+                            false,
                             {
                                 /* finish()
                                  goToDashBoard()*/

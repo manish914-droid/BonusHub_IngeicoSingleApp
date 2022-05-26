@@ -116,7 +116,11 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         }
 
         if(transactionType== BhTransactionType.BRAND_EMI.type || transactionType== BhTransactionType.EMI_SALE.type) {
-         showProgress("Please wait fetching schemes")
+            if(isShowProgress()){
+                setProgressTitle("Please wait fetching schemes")
+            }else {
+                showProgress("Please wait fetching schemes")
+            }
             tenureSchemeViewModel = ViewModelProvider(
                 this, TenureSchemeActivityVMFactory(
                     serverRepository,

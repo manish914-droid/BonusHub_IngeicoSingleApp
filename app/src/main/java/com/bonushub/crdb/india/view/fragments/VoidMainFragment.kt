@@ -415,7 +415,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
         if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             logger("goto ","Sync Reversal","e")
             if((activity as NavigationActivity).isShowProgress()){
-                (activity as NavigationActivity).setProgressTitle(getString(R.string.reversal_data_sync))
+                activity?.runOnUiThread {  (activity as NavigationActivity).setProgressTitle(getString(R.string.reversal_data_sync)) }
             }else {
                 activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.reversal_data_sync)) }
             }
@@ -732,7 +732,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                 //logger1("Transaction REQUEST PACKET --->>", transactionISO.generateIsoByteRequest(), "e")
 
                 if((context as NavigationActivity).isShowProgress()){
-                    (context as NavigationActivity).setProgressTitle((context).getString(R.string.sale_data_sync))
+                    (context as NavigationActivity).runOnUiThread { (context as NavigationActivity).setProgressTitle((context).getString(R.string.sale_data_sync)) }
                 }else {
                     (context as NavigationActivity).runOnUiThread {
                         (context).showProgress(

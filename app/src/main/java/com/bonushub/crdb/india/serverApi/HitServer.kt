@@ -135,32 +135,11 @@ object HitServer  {
                         callbackSale(responseStr ?: "", true, "")
                         //  this@HitServer.callback = null
 
-                    } catch (ex: SocketTimeoutException) {
-                        println("Read Time out error1" + ex.message)
-                        socket.close()
-                        ex.printStackTrace()
-                        callbackSale(ex.message ?: "Socket Timeout Error", true, ConnectionError.ReadTimeout.errorCode.toString())
-                        //   this@HitServer.callback = null
-                        return@openSocketSale
-                    } catch (ex: ConnectException) {
-                        ex.printStackTrace()
-                        socket.close()
-                        println("Read Time out error2" + ex.message)
-                        callbackSale(ex.message ?: "Connection Error", true, ConnectionError.ReadTimeout.errorCode.toString())
-                        //  this@HitServer.callback = null
-                        return@openSocketSale
-                    } catch (ex: SocketException) {
-                        ex.printStackTrace()
-                        println("Read Time out error3" + ex.message)
-                        socket.close()
-                        callbackSale(ex.message ?: "Connection Error", true, ConnectionError.ReadTimeout.errorCode.toString())
-                        this@HitServer.callback = null
-                        return@openSocketSale
                     } catch (ex: Exception) {
                         ex.printStackTrace()
                         println("Read Time out error4" + ex.message)
                         socket.close()
-                        callbackSale(ex.message ?: "Connection Error", true, ConnectionError.ReadTimeout.errorCode.toString())
+                        callbackSale(HDFCApplication.appContext.getString(R.string.no_RESPONSE), true, ConnectionError.ReadTimeout.errorCode.toString())
                         //  this@HitServer.callback = null
                         return@openSocketSale
 
@@ -341,7 +320,7 @@ object HitServer  {
             } else {
                 hitCounter = 1
                 callbackSale?.invoke(
-                    ex.message ?: "Connection Error",
+                    HDFCApplication.appContext.getString(R.string.connection_failed),
                     false,
                     ConnectionError.ConnectionTimeout.errorCode.toString()
                 )
@@ -363,7 +342,7 @@ object HitServer  {
             } else {
                 hitCounter = 1
                 callbackSale?.invoke(
-                    ex.message ?: "Connection Error",
+                    HDFCApplication.appContext.getString(R.string.connection_failed),
                     false,
                     ConnectionError.ConnectionTimeout.errorCode.toString()
                 )
@@ -384,7 +363,7 @@ object HitServer  {
             } else {
                 hitCounter = 1
                 callbackSale?.invoke(
-                    ex.message ?: "Connection Error",
+                   HDFCApplication.appContext.getString(R.string.connection_failed),
                     false,
                     ConnectionError.ConnectionTimeout.errorCode.toString()
                 )
@@ -442,7 +421,7 @@ object HitServer  {
             } else {
                 hitCounter = 1
                 callback?.invoke(
-                    ex.message ?: "Connection Error",
+                    HDFCApplication.appContext.getString(R.string.connection_failed),
                     false
                 )
             }
@@ -459,7 +438,7 @@ object HitServer  {
             } else {
                 hitCounter = 1
                 callback?.invoke(
-                    ex.message ?: "Connection Error",
+                    HDFCApplication.appContext.getString(R.string.connection_failed),
                     false
                 )
             }

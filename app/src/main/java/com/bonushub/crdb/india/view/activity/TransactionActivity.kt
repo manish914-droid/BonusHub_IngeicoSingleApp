@@ -810,7 +810,7 @@ class TransactionActivity : BaseActivityNew() {
         if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             println("sale_data_sync")
             if(isShowProgress()){
-                setProgressTitle(getString(R.string.authenticating_transaction_msg))
+                runOnUiThread { setProgressTitle(getString(R.string.authenticating_transaction_msg))}
             }else {
                 val msg: String = getString(R.string.authenticating_transaction_msg)
                 runOnUiThread { showProgress(msg) }
@@ -1087,6 +1087,11 @@ class TransactionActivity : BaseActivityNew() {
                     }
 
 
+                }else{
+
+                    runOnUiThread {
+                        alertBoxWithActionNew(transactionMsg?:getString(R.string.transaction_failed_msg),"",R.drawable.ic_info_new,"OK","",false,false,{ declinedTransaction() },{})
+                    }
                 }
 
             }
@@ -1133,12 +1138,12 @@ class TransactionActivity : BaseActivityNew() {
     fun declinedTransaction() {
         try {
             DeviceHelper.getEMV()?.stopSearch()
-            finish()
+        //    finish()
             startActivity(Intent(this, NavigationActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
         } catch (ex: java.lang.Exception) {
-            finish()
+        //    finish()
             startActivity(Intent(this, NavigationActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
