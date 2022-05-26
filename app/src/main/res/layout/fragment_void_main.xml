@@ -12,7 +12,7 @@
         layout="@layout/sub_header_layout"
         android:visibility="visible" />
 
-    <EditText
+    <!--<EditText
         android:id="@+id/edtTextSearchTransaction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,9 +29,58 @@
         android:padding="14dp"
         android:textColor="@color/txt_color"
         android:textColorHint="@color/hint_color"
-        android:textSize="@dimen/text_size_small" />
+        android:textSize="@dimen/text_size_small" />-->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/search_txn_crd_view"
+        style="@style/TextInputEditTextAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/pad_20"
+        android:layout_marginTop="@dimen/pad_20"
+        android:layout_marginRight="@dimen/pad_20"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:hint="@string/enter_invoice"
+        android:layout_below="@+id/sub_header_view">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtTextSearchTransaction"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_mobile_new"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="number"
+            android:maxLength="8"
+            android:padding="@dimen/pad_8"
+            android:imeOptions="actionDone"
+            android:textIsSelectable="false"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
+        android:id="@+id/txtViewSearchTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/pad_20"
+        android:background="@drawable/edge_blue3"
+        android:fontFamily="@font/muli_regular"
+        android:maxLines="1"
+        android:textAlignment="center"
+        android:paddingStart="@dimen/pad_30"
+        android:paddingTop="@dimen/pad_15"
+        android:paddingEnd="@dimen/pad_30"
+        android:paddingBottom="@dimen/pad_15"
+        android:text="Search Transaction"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_medium"
+        android:visibility="visible"
+        android:layout_below="@+id/search_txn_crd_view"/>
+
+   <!-- <TextView
         android:id="@+id/txtViewSearchTransaction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,6 +95,6 @@
         android:paddingBottom="10dp"
         android:text="@string/search_transaction"
         android:textColor="@color/white"
-        android:textSize="@dimen/text_size_small" />
+        android:textSize="@dimen/text_size_small" />-->
 
 </RelativeLayout>

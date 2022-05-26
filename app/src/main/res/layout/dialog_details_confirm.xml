@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/pending_pre_auth_crdView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/pad_20"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:cardElevation="@dimen/pad_5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="#BBBBBB">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/dialogTittle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="VOID SALE"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                android:textAlignment="center"
+                android:paddingTop="@dimen/pad_8"
+                android:paddingBottom="@dimen/pad_8"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="#DBE8F5"/>
+
+            <TextView
+                android:id="@+id/tidTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_regular"
+                android:text="TID"
+                android:textColor="@color/txt_color"
+                android:layout_marginTop="@dimen/pad_5"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toStartOf="@+id/batchNoTittle"
+                app:layout_constraintHorizontal_bias="0.32"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dialogTittle"/>
+
+            <TextView
+                android:id="@+id/batchNoTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_regular"
+                android:text="Batch No.:"
+                android:textColor="@color/txt_color"
+                android:layout_marginTop="@dimen/pad_5"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.79"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dialogTittle"/>
+
+            <TextView
+                android:id="@+id/tid_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/tidTittle"
+                app:layout_constraintStart_toStartOf="@+id/tidTittle"
+                app:layout_constraintTop_toBottomOf="@+id/tidTittle" />
+
+            <TextView
+                android:id="@+id/batch_no_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batchNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batchNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/batchNoTittle" />
+
+            <View
+                android:id="@+id/viewLine1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_margin="@dimen/pad_10"
+                android:background="#4A013480"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tid_tv" />
+
+            <TextView
+                android:id="@+id/total_amount_tvTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="Total Amount:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewLine1" />
+
+            <TextView
+                android:id="@+id/total_amount_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_bold"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/total_amount_tvTittle" />
+
+            <View
+                android:id="@+id/viewLineMiddle"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_margin="@dimen/pad_10"
+                android:background="#4A013480"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/total_amount_tv" />
+
+            <TextView
+                android:id="@+id/roc_tvTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="ROC:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/tidTittle"
+                app:layout_constraintStart_toStartOf="@+id/tidTittle"
+                app:layout_constraintTop_toBottomOf="@+id/viewLineMiddle" />
+
+            <TextView
+                android:id="@+id/txtViewAmountTittle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_5"
+                android:fontFamily="@font/muli_regular"
+                android:text="Amount:"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batchNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batchNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/viewLineMiddle" />
+
+            <TextView
+                android:id="@+id/roc_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/tidTittle"
+                app:layout_constraintStart_toStartOf="@+id/tidTittle"
+                app:layout_constraintTop_toBottomOf="@+id/roc_tvTittle" />
+
+            <TextView
+                android:id="@+id/amt_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintEnd_toEndOf="@+id/batchNoTittle"
+                app:layout_constraintStart_toStartOf="@+id/batchNoTittle"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewAmountTittle" />
+
+            <View
+                android:id="@+id/viewLine2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_margin="@dimen/pad_10"
+                android:background="#4A013480"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/roc_tv" />
+
+
+            <TextView
+                android:id="@+id/cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue_bg_skyblue"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="25dp"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="25dp"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="CANCEL"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                android:layout_margin="@dimen/pad_10"
+                app:layout_constraintTop_toBottomOf="@+id/viewLine2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/confirm_btn"
+                app:layout_constraintHorizontal_bias="0.4"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/confirm_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue3"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="25dp"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="25dp"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="CONFIRM"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/cancel_btn"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="@dimen/pad_10"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toEndOf="@+id/cancel_btn"
+                app:layout_constraintTop_toTopOf="@+id/cancel_btn"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

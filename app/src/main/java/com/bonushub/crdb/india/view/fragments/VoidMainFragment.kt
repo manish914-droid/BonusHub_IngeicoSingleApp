@@ -414,7 +414,11 @@ batchData.field58EmiData=oldBatchData.field58EmiData
         //Sync Reversal
         if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             logger("goto ","Sync Reversal","e")
-            activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.reversal_data_sync)) }
+            if((activity as NavigationActivity).isShowProgress()){
+                (activity as NavigationActivity).setProgressTitle(getString(R.string.reversal_data_sync))
+            }else {
+                activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.reversal_data_sync)) }
+            }
             SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
                 (activity as NavigationActivity).hideProgress()
                 if (isSyncToHost) {
@@ -572,10 +576,11 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         AppPreference.saveLastReceiptDetails(lastSuccessReceiptData)
 
                                         // kushal
+                                        val amt = (((voidData.transactionalAmmount)?.toDouble())?.div(100)).toString()
                                         val transactionDate = dateFormaterNew(voidData.timeStamp ?: 0L)
                                         val transactionTime = timeFormaterNew(voidData.time)
                                         (activity as NavigationActivity).txnApprovedDialog(EDashboardItem.VOID_SALE.res,EDashboardItem.VOID_SALE.title,
-                                            voidData.transactionalAmmount,"${transactionDate}, ${transactionTime}") {
+                                            amt,"${transactionDate}, ${transactionTime}") {
                                                 status , dialog ->
 
                                             (activity as NavigationActivity).showProgress(getString(R.string.printing))
@@ -725,14 +730,21 @@ batchData.field58EmiData=oldBatchData.field58EmiData
             GlobalScope.launch {
                 val transactionISO = CreateVoidPacket(batch).createVoidISOPacket()
                 //logger1("Transaction REQUEST PACKET --->>", transactionISO.generateIsoByteRequest(), "e")
-                (context as NavigationActivity).runOnUiThread {
-                    (context).showProgress(
-                        (context).getString(
-                            R.string.sale_data_sync
-                        )
-                    )
 
+                if((context as NavigationActivity).isShowProgress()){
+                    (context as NavigationActivity).setProgressTitle((context).getString(R.string.sale_data_sync))
+                }else {
+                    (context as NavigationActivity).runOnUiThread {
+                        (context).showProgress(
+                            (context).getString(
+                                R.string.sale_data_sync
+                            )
+                        )
+
+                    }
                 }
+
+
                 GlobalScope.launch(Dispatchers.Main) {
                     sendVoidTransToHost(transactionISO)
                 }
@@ -912,7 +924,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                         0 -> {
 
                             CoroutineScope(Dispatchers.Main).launch {
-                                (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.no_data_found) ?: "") {}
+                                (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", getString(R.string.no_data_found) ?: "",R.drawable.ic_info_orange,"Ok","",false,false,{},{})
                             }
                         }
                         1 -> {
@@ -1022,12 +1034,9 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
     private fun voidTransConfirmationDialog(batchTable: TempBatchFileDataTable) {
         if(batchTable != null) {
-                   // val date = batchTable?.time ?: ""
-                    /*val parts = date.split(" ")
-                    println("Date: " + parts[0])
-                    println("Time: " + (parts[1]) )*/
+
                     val amt ="%.2f".format((((batchTable?.transactionalAmmount ?: "").toDouble()).div(100)).toString().toDouble())
-                    DialogUtilsNew1.showVoidSaleDetailsDialog(
+                    /*DialogUtilsNew1.showVoidSaleDetailsDialog(
                         requireContext(),
                         batchTable.transactionDate,
                         batchTable.time,
@@ -1037,7 +1046,26 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                     ) {
                        // doVoidTransaction(batchTable) // kushal
                         onContinueClicked(batchTable)
-                    }
+                    }*/
+
+            DialogUtilsNew1.showDetailsConfirmDialog(requireContext(), transactionType = BhTransactionType.VOID,
+                tid = batchTable.tid, totalAmount = amt, invoice = batchTable.invoiceNumber, date = batchTable.transactionDate, time = batchTable.time,
+                amount = null, batchNo = null, roc = null,
+                confirmCallback = {
+                                  it.dismiss()
+                    (activity as NavigationActivity).alertBoxWithActionNew("","Do you want to Void Sale this transaction?"
+                        ,R.drawable.ic_info_orange,"OK","Cancel",true,false,{
+
+                            activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.processing)) }
+                            onContinueClicked(batchTable)
+
+                        },{
+                        })
+                },
+                cancelCallback = {
+                    it.dismiss()
+                })
+
                 }else{
                     ToastUtils.showToast(requireContext(),"Data not found.")
                 }

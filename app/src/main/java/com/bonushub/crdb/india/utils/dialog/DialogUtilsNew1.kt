@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.R
+import com.bonushub.crdb.india.utils.BhTransactionType
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.view.fragments.getEditorActionListener
 import com.google.android.material.textfield.TextInputEditText
@@ -456,6 +457,127 @@ class DialogUtilsNew1 {
             }.show()
         }
 
+        fun instaEmiDialog(
+            activity: Activity?,
+            emiCB: (Dialog) ->Unit,
+            saleCB: (Dialog) ->Unit,
+            cancelCB: (Dialog) ->Unit
+        ) {
+            val dialog = Dialog(activity!!)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+
+            // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setCancelable(false)
+            dialog.setContentView(R.layout.dialog_insta_emi)
+
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT
+            )
+
+            val imgViewCross = dialog.findViewById<View>(R.id.imgViewCross) as ImageView
+            val txtViewEmi = dialog.findViewById<View>(R.id.txtViewEmi) as TextView
+            val txtViewSale = dialog.findViewById<View>(R.id.txtViewSale) as TextView
+
+            imgViewCross.setOnClickListener {
+                cancelCB(dialog)
+            }
+
+            txtViewEmi.setOnClickListener {
+                emiCB(dialog)
+            }
+
+            txtViewSale.setOnClickListener {
+                saleCB(dialog)
+            }
+            dialog.show()
+        }
+
+        fun showDetailsConfirmDialog(
+            context: Context,
+            transactionType: BhTransactionType,
+            tid: String?,
+            batchNo: String?,
+            totalAmount: String?,
+            roc: String?,
+            amount: String?,
+            invoice: String?,
+            date: String?,
+            time: String?,
+            confirmCallback: (Dialog) -> Unit,
+            cancelCallback: (Dialog) -> Unit
+        ) {
+            Dialog(context).apply {
+               // getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.dialog_details_confirm)
+                setCancelable(false)
+                val window = window
+                window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                val dialogTittle = findViewById<TextView>(R.id.dialogTittle)
+                val tidTittle = findViewById<TextView>(R.id.tidTittle)
+                val tid_tv = findViewById<TextView>(R.id.tid_tv)
+                val batchNoTittle = findViewById<TextView>(R.id.batchNoTittle)
+                val batch_no_tv = findViewById<TextView>(R.id.batch_no_tv)
+                val total_amount_tvTittle = findViewById<TextView>(R.id.total_amount_tvTittle)
+                val total_amount_tv = findViewById<TextView>(R.id.total_amount_tv)
+                val roc_tvTittle = findViewById<TextView>(R.id.roc_tvTittle)
+                val roc_tv = findViewById<TextView>(R.id.roc_tv)
+                val txtViewAmountTittle = findViewById<TextView>(R.id.txtViewAmountTittle)
+                val amt_tv = findViewById<TextView>(R.id.amt_tv)
+                val cancel_btn = findViewById<TextView>(R.id.cancel_btn)
+                val confirm_btn = findViewById<TextView>(R.id.confirm_btn)
+                val viewLine1 = findViewById<View>(R.id.viewLine1)
+                val viewLineMiddle = findViewById<View>(R.id.viewLineMiddle)
+                val viewLine2 = findViewById<View>(R.id.viewLine2)
+
+
+                when(transactionType){
+
+                    BhTransactionType.VOID ->{
+                        dialogTittle.text = "VOID SALE"
+                        tid_tv.text = tid
+                        batchNoTittle.text = "Invoice No:"
+                        batch_no_tv.text = invoice
+                        total_amount_tv.text = totalAmount
+                        roc_tvTittle.text = "Date:"
+                        roc_tv.text = date
+
+                        val timeFormat = SimpleDateFormat("HHmmss", Locale.getDefault())
+                        val timeFormat2 = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                        var formattedTime = ""
+                        try {
+                            val t1 = timeFormat.parse(time)
+                            formattedTime = timeFormat2.format(t1)
+                            Log.e("Time", formattedTime)
+                        } catch (e: ParseException) {
+                            e.printStackTrace()
+                        }
+
+                        txtViewAmountTittle.text = "Time:"
+                        amt_tv.text = formattedTime
+                    }
+
+                    else ->{
+
+                    }
+                }
+
+
+                cancel_btn.setOnClickListener {
+                    cancelCallback(this)
+                }
+
+                confirm_btn.setOnClickListener {
+                    confirmCallback(this)
+                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+        }
     }
 
 }

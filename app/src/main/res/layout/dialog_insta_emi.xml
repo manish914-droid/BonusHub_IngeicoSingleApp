@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/pad_20"
+        app:cardCornerRadius="@dimen/pad_20"
+        app:cardElevation="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgViewCross"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/pad_5"
+                android:layout_marginTop="@dimen/pad_12"
+                android:padding="@dimen/pad_10"
+                android:src="@drawable/ic_cross_new"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.98"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgViewBg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/ic_insta_emi_bg"
+                android:layout_marginTop="@dimen/pad_12"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/congratulations"
+                android:textColor="@color/txt_color_blue"
+                android:textSize="@dimen/text_size_large"
+                app:layout_constraintStart_toStartOf="@+id/imgViewBg"
+                app:layout_constraintEnd_toEndOf="@+id/imgViewBg"
+                app:layout_constraintTop_toTopOf="@+id/imgViewBg"
+                android:fontFamily="@font/muli_semi_bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imgViewBg"/>
+
+            <TextView
+                android:id="@+id/txtViewHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/emi_sale_hint"
+                android:fontFamily="@font/muli_semi_bold"
+                android:textColor="@color/txt_color_blue"
+                android:textSize="@dimen/text_size_regular"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgViewBg"
+                android:layout_margin="@dimen/pad_20"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/txtViewEmi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue3"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="47dp"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="47dp"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="@string/emi"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewHint"/>
+
+            <TextView
+                android:id="@+id/txtViewSale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_20"
+                android:background="@drawable/edge_blue_bg_skyblue"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_32"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_32"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="@string/sale"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtViewEmi"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
