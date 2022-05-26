@@ -2,18 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-     <RadioButton
-         android:id="@+id/info"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
 
-         android:drawablePadding="10dp"
-         android:paddingLeft="0dp"
-         android:layout_marginTop="10dp"
-         android:layout_marginBottom="6dp"
-         android:clickable="false"
-         android:focusable="false"
-
-         android:focusableInTouchMode="false"
-       />
+    <RadioButton
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/pad_4"
+        android:layout_marginEnd="@dimen/pad_4"
+        android:layout_marginBottom="6dp"
+        android:buttonTint="@color/select_app_radio_btn"
+        android:clickable="false"
+        android:drawablePadding="10dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:paddingLeft="0dp" />
 </LinearLayout>

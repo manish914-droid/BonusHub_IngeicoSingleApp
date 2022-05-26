@@ -50,4 +50,6 @@
     <color name="sky_blue">#E1EDFF</color>
     <color name="ripple_color_effect">#DBE8F5</color>
     <color name="txt_brand_item">#00315F</color>
+
+    <color name="select_app_radio_btn">#62B702</color>
 </resources>

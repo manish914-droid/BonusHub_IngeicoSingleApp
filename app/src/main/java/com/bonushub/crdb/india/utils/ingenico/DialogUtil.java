@@ -3,6 +3,7 @@ package com.bonushub.crdb.india.utils.ingenico;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public final class DialogUtil {
 
 		final Builder b = new Builder(context);
 		final AlertDialog dlg = b.create();
+		dlg.getWindow().setBackgroundDrawableResource(android.R.color.transparent);//?.setBackgroundDrawable();
 		dlg.setCancelable(false);
 		dlg.show();
 		dlg.setContentView(R.layout.select_dialog_view);

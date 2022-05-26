@@ -1,76 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:paddingTop="10dp"
-	android:layout_width="270dp"
-	android:layout_height="wrap_content"
-	android:layout_centerHorizontal="true"
-	android:layout_centerVertical="true"
-	android:background="@drawable/shape_white_normal"
-	android:layout_gravity="center"
-	android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="270dp"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:layout_gravity="center"
+    android:elevation="@dimen/pad_10"
+    android:orientation="vertical">
 
-	<TextView
-		android:id="@+id/tvHeader"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:padding="9dp"
-		android:textSize="14sp"
-		android:textColor="@android:color/black"
-		android:maxLines="1"
-		android:gravity="center_horizontal"
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/pad_15">
 
-		/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-	<View
-		android:id="@+id/viewLine1"
-		android:layout_below="@+id/tvHeader"
-		android:layout_width="fill_parent"
-		android:layout_height="0.1dp"
-		android:background="#00FFFF"
-		/>
+            <TextView
+                android:id="@+id/tvHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#DBE8F5"
+                android:fontFamily="@font/muli_bold"
+                android:maxLines="1"
+                android:paddingTop="@dimen/pad_10"
+                android:paddingBottom="@dimen/pad_10"
+                android:textAlignment="center"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular" />
 
-	<ListView
-		android:id="@+id/listView"
-		android:layout_below="@+id/viewLine1"
-		android:layout_width="match_parent"
-		android:layout_margin="5dp"
-		android:layout_height="110dp"
-		android:dividerHeight="0dp"
-		android:divider="@color/gray"
-		android:choiceMode="singleChoice"
-		android:scrollbarThumbVertical="@color/blue_normal"
-		android:scrollbarSize="2dp"
-		android:cacheColorHint="@android:color/transparent"
-		android:listSelector="@android:color/transparent">
-	</ListView>
 
-	<View
-		android:id="@+id/viewLine"
-		android:layout_below="@+id/listView"
-		android:layout_width="fill_parent"
-		android:layout_height="0.1dp"
-		android:background="#00FFFF"
-		/>
+            <View
+                android:id="@+id/viewLine1"
+                android:layout_width="fill_parent"
+                android:layout_height="0.1dp"
+                android:layout_below="@+id/tvHeader"
+                android:background="#4A013480" />
 
-	<LinearLayout
-		android:id="@+id/layoutBtn"
-		android:layout_below="@+id/viewLine"
-		android:layout_width="match_parent"
-		android:layout_height="45dp"
-		android:orientation="horizontal"
-		android:gravity="center"
-		>
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:layout_below="@+id/viewLine1"
+                android:layout_margin="5dp"
+                android:cacheColorHint="@android:color/transparent"
+                android:choiceMode="singleChoice"
+                android:divider="@color/gray"
+                android:dividerHeight="0dp"
+                android:listSelector="@android:color/transparent"
+                android:scrollbarSize="2dp"
+                android:scrollbarThumbVertical="@color/blue_normal"></ListView>
 
-		<Button android:id="@+id/btnCancel"
-			android:layout_height="wrap_content"
-			android:layout_width="0dp"
-			android:maxLines="1"
-			android:layout_weight="1"
-			android:background="@null"
-			android:textSize="14sp"
-			android:textColor="#0050ef"
-			android:text="@string/cancel"
-			/>
-	</LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutBtn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@+id/viewLine"
+                android:layout_marginStart="@dimen/pad_10"
+                android:layout_marginEnd="@dimen/pad_10"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:maxLines="1"
+                    android:text="@string/cancel"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_regular" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 
 </LinearLayout>
