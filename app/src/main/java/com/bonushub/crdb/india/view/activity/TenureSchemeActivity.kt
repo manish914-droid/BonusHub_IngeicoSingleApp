@@ -24,6 +24,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 import android.content.Intent
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.utils.logger
@@ -134,19 +135,32 @@ private val emiIssuerTAndCDataFromIntent by lazy {
                         val resp = genericResp.data as TenuresWithIssuerTncs
                         emiSchemeOfferDataList = resp.bankEMISchemesDataList
                         emiIssuerTAndCData = resp.bankEMIIssuerTAndCList
+                       // region set issuer icon or name
                         when(emiIssuerTAndCData?.issuerID)
                         {
-                            "53" ->{
-                                // Amex
+
+                            "67" ->{
+                                // Amex -Indusind
+                                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_indusind_issuer)
+                            }
+
+                            "66" ->{
+                                // Amex -sbi
+                                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_sbi_issuer)
+                            }
+
+                            "65" ->{
+                                // Amex -icici
                                 binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_icici_issuer)
                             }
 
-                            "" ->{
-
+                            else ->{
+                                binding?.imgViewIssuerIcon?.visibility = View.GONE
+                                binding?.txtViewIssuerName?.visibility = View.VISIBLE
+                                binding?.txtViewIssuerName?.text = emiIssuerTAndCData?.issuerName?:""
                             }
-
-                            "" ->{}
                         }
+                        // end region
                         setUpRecyclerView()
 
                     }
