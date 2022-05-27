@@ -797,7 +797,7 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
 
-    private fun checkReversal(transactionISOByteArray: IsoDataWriter, cardProcessedDataModal: CardProcessedDataModal) {
+    private suspend fun checkReversal(transactionISOByteArray: IsoDataWriter, cardProcessedDataModal: CardProcessedDataModal) {
         //runOnUiThread {
            // cardView_l.visibility = View.GONE
         //}
@@ -810,13 +810,14 @@ class TransactionActivity : BaseActivityNew() {
         if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
             println("sale_data_sync")
             if(isShowProgress()){
-                runOnUiThread { setProgressTitle(getString(R.string.authenticating_transaction_msg))}
+                withContext(Dispatchers.Main){ setProgressTitle(getString(R.string.authenticating_transaction_msg))}
             }else {
                 val msg: String = getString(R.string.authenticating_transaction_msg)
-                runOnUiThread { showProgress(msg) }
+                withContext(Dispatchers.Main) { showProgress(msg) }
             }
             logger("1testVFEmvHandler",""+testVFEmvHandler,"e")
             SyncTransactionToHost(transactionISOByteArray, cardProcessedDataModal, testVFEmvHandler) { syncStatus, responseCode, transactionMsg, printExtraData, de55, doubletap ->
+                Log.e("hideProgress","2")
                 hideProgress()
 
                 if (syncStatus) {
@@ -1100,12 +1101,22 @@ class TransactionActivity : BaseActivityNew() {
             println("410")
             if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
                 println("412")
-                runOnUiThread { showProgress(getString(R.string.reversal_data_sync)) }
+                if(isShowProgress()){
+                    withContext(Dispatchers.Main) { setProgressTitle(getString(R.string.reversal_data_sync))}
+                }else {
+                    val msg: String = getString(R.string.reversal_data_sync)
+                    withContext(Dispatchers.Main) { showProgress(msg) }
+                }
+                //runOnUiThread { showProgress(getString(R.string.reversal_data_sync)) }
                 SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
-                    hideProgress()
+                    Log.e("hideProgress","1")
+                  //  hideProgress()
                     if (isSyncToHost) {
                         AppPreference.clearReversal()
-                        checkReversal(transactionISOByteArray, cardProcessedDataModal)
+
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            checkReversal(transactionISOByteArray, cardProcessedDataModal)
+                        }
                         println("clearReversal -> check again")
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
@@ -1192,7 +1203,7 @@ class TransactionActivity : BaseActivityNew() {
                     EPrintCopyType.MERCHANT,
                     this@TransactionActivity as BaseActivityNew
                 ) { printCB, printingFail ->
-
+                    Log.e("hideProgress","3")
                     (this@TransactionActivity as BaseActivityNew).hideProgress()
                     if (printCB) {
                         printsts = printCB
@@ -1264,11 +1275,13 @@ class TransactionActivity : BaseActivityNew() {
                         EPrintCopyType.CUSTOMER,
                         this@TransactionActivity as BaseActivityNew
                     ) { printCB, printingFail ->
+                        Log.e("hideProgress","4")
                         (this@TransactionActivity as BaseActivityNew).hideProgress()
                         if (printCB) {
                             lifecycleScope.launch(Dispatchers.IO) {
                                 cb(printCB)
                             }
+                            Log.e("hideProgress","5")
                             (this@TransactionActivity as BaseActivityNew).hideProgress()
 
                         }
@@ -1278,6 +1291,7 @@ class TransactionActivity : BaseActivityNew() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         cb(true)
                     }
+                    Log.e("hideProgress","6")
                     (this@TransactionActivity as BaseActivityNew).hideProgress()
 //                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
 //                    startActivity(intent)
