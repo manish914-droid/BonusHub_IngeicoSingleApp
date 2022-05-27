@@ -562,6 +562,19 @@ class DialogUtilsNew1 {
                         amt_tv.text = formattedTime
                     }
 
+                    BhTransactionType.PRE_AUTH_COMPLETE ->{
+                        dialogTittle.text = "PRE-AUTH COMPLETE"
+                        tid_tv.text = tid
+                        batch_no_tv.text = batchNo
+                        roc_tv.text = roc
+                        amt_tv.text  = amount
+
+                        total_amount_tvTittle.visibility = View.GONE
+                        total_amount_tv.visibility = View.GONE
+                        viewLineMiddle.visibility = View.GONE
+
+                    }
+
                     else ->{
 
                     }

@@ -24,6 +24,7 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.showToast
+import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
@@ -85,7 +86,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                 ApiStatus.Success ->{
                     logger("ApiStatus","Success","e")
                     iDialog?.hideProgress()
-                    dialogBuilder.dismiss()
+                  //  dialogBuilder.dismiss()
                     // stub batch data
 
                     StubBatchData("", it.cardProcessedDataModal.getTransType(), it.cardProcessedDataModal, null, it.isoResponse?:""){
@@ -163,7 +164,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                 ApiStatus.Failed ->{
                     logger("ApiStatus","Failed","e")
                     iDialog?.hideProgress()
-                    dialogBuilder.dismiss()
+                  //  dialogBuilder.dismiss()
 
                     if(it.isReversal){
                         iDialog?.alertBoxWithActionNew(
@@ -241,10 +242,29 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
         }
     }
 
-    lateinit var dialogBuilder : Dialog
+//    lateinit var dialogBuilder : Dialog
     private fun preAuthConfirmDialog(authData: AuthCompletionData) {
 
-        dialogBuilder = Dialog(requireActivity())
+        DialogUtilsNew1.showDetailsConfirmDialog(requireContext(), transactionType = BhTransactionType.PRE_AUTH_COMPLETE,
+            tid = authData.authTid, totalAmount = null, invoice = null, date = null, time = null,
+            amount = authData.authAmt, batchNo = invoiceWithPadding(authData.authBatchNo.toString()), roc = invoiceWithPadding(authData.authRoc.toString()),
+            confirmCallback = {
+                it.dismiss()
+                (activity as NavigationActivity).alertBoxWithActionNew("","Do you want to PreAuth Complete this transaction?"
+                    ,R.drawable.ic_info_orange,"YES"," NO ",true,false,{
+
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            preAuthViewModel.getCompletePreAuthData(authData)
+                        }
+
+                    },{
+                    })
+            },
+            cancelCallback = {
+                it.dismiss()
+            })
+
+        /*dialogBuilder = Dialog(requireActivity())
         val bindingg = ItemCompletePreauthDialogBinding.inflate(LayoutInflater.from(context))
 
         dialogBuilder.setContentView(bindingg.root)
@@ -277,7 +297,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
         }
 
         dialogBuilder.show()
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))*/
 
     }
 

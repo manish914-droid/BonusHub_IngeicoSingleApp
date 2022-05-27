@@ -430,7 +430,7 @@ class PreAuthRepository @Inject constructor() {
                     //activityContext?.hideProgress()
                     val temp  = PendingPreAuthDataResponse()
                     temp.isReversal = true
-                    temp.apiStatus = ApiStatus.Success
+                    temp.apiStatus = ApiStatus.Processing // to sync next txn
                     _completePreAuthData.postValue(temp)
 
                     if (syncStatus) {

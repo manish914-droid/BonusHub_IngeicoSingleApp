@@ -21,8 +21,23 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/pad_5">
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/dialogTittle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="PENDING PRE-AUTH"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                android:textAlignment="center"
+                android:paddingTop="@dimen/pad_8"
+                android:paddingBottom="@dimen/pad_8"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="#DBE8F5"/>
 
             <TextView
                 android:id="@+id/batch_no_tvNoTittle"
@@ -34,7 +49,7 @@
                 android:textSize="@dimen/text_size_regular"
                 app:layout_constraintEnd_toStartOf="@+id/roc_tvTittle"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/dialogTittle" />
 
             <TextView
                 android:id="@+id/roc_tvTittle"
@@ -46,7 +61,7 @@
                 android:textSize="@dimen/text_size_regular"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/batch_no_tvNoTittle"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/dialogTittle" />
 
             <TextView
                 android:id="@+id/batch_no_tv"
