@@ -52,4 +52,7 @@
     <color name="txt_brand_item">#00315F</color>
 
     <color name="select_app_radio_btn">#62B702</color>
+    <color name="keyboard_backgroung_btn">#EEF6FF</color>
+    <color name="keyboard_backgroung_cal">#D80008</color>
+    <color name="keyboard_backgroung_ok">#8DC709</color>
 </resources>

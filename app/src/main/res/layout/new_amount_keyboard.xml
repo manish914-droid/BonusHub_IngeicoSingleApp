@@ -18,26 +18,26 @@
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_margin="@dimen/keyboard_gap"
-        android:background="@color/white"
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="1"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/key2"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view">
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintBottom_toTopOf="@id/key4">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
-            android:paddingBottom="@dimen/pad_12"
             android:text="1"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
@@ -53,20 +53,20 @@
         app:strokeWidth="0.5dp"
         app:rippleColor="@color/ripple_color_effect"
         app:cardElevation="@dimen/pad_15"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintHorizontal_weight="1"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/key3"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key1"
-        app:layout_constraintTop_toBottomOf="@+id/view">
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="@+id/key1">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
-            android:paddingBottom="@dimen/pad_12"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:text="2"
             android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
@@ -81,22 +81,22 @@
         android:background="@color/white"
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
         app:cardElevation="@dimen/pad_15"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/keyClr"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key2"
-        app:layout_constraintTop_toBottomOf="@+id/view">
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="@id/key1">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
-            android:paddingBottom="@dimen/pad_12"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:text="3"
             android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
@@ -112,24 +112,24 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
         android:padding="@dimen/pad_5"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key3"
-        app:layout_constraintTop_toBottomOf="@+id/view">
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="@id/key1">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingStart="7dp"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="7dp"
-            android:paddingBottom="@dimen/pad_12"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_cal"
             android:text="CAN"
-            android:textColor="@color/txt_color_blue"
+            android:fontFamily="@font/muli_bold"
+            android:textColor="@color/white"
             android:textSize="@dimen/keyboard_txt" />
     </com.google.android.material.card.MaterialCardView>
 
@@ -143,22 +143,23 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/key5"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/key1">
+        app:layout_constraintTop_toBottomOf="@+id/key1"
+        app:layout_constraintBottom_toTopOf="@id/key7">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
-            android:paddingBottom="@dimen/pad_12"
             android:text="4"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
@@ -175,22 +176,22 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/key6"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key4"
-        app:layout_constraintTop_toTopOf="@id/key4">
+        app:layout_constraintTop_toTopOf="@id/key4"
+        app:layout_constraintBottom_toBottomOf="@id/key4">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
-            android:paddingBottom="@dimen/pad_12"
             android:text="5"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
@@ -206,59 +207,28 @@
         android:background="@color/white"
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
+        app:layout_constraintHorizontal_weight="1"
         app:cardElevation="@dimen/pad_15"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
-        app:layout_constraintEnd_toStartOf="@+id/keyDelete"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
+        app:layout_constraintEnd_toStartOf="@+id/keyOK"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key5"
-        app:layout_constraintTop_toTopOf="@id/key4">
+        app:layout_constraintTop_toTopOf="@id/key4"
+        app:layout_constraintBottom_toBottomOf="@id/key4">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
-            android:paddingBottom="@dimen/pad_12"
             android:text="6"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/keyDelete"
-        android:layout_width="@dimen/keyboard_btn_width"
-        android:layout_height="@dimen/keyboard_btn_height"
-        android:layout_marginStart="@dimen/keyboard_gap"
-        android:layout_marginEnd="@dimen/keyboard_gap"
-        android:layout_marginBottom="@dimen/keyboard_gap"
-        android:background="@color/white"
-        app:strokeColor="@color/colorAccentO"
-        app:strokeWidth="0.5dp"
-        app:cardElevation="@dimen/pad_15"
-        app:rippleColor="@color/ripple_color_effect"
-        android:padding="@dimen/pad_5"
-        app:cardCornerRadius="@dimen/pad_8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@+id/key6"
-        app:layout_constraintTop_toTopOf="@+id/key4">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingStart="7dp"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="7dp"
-            android:paddingBottom="@dimen/pad_12"
-            android:text="DEL"
-            android:textColor="@color/txt_color_blue"
-            android:textSize="@dimen/keyboard_txt" />
-    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/key7"
@@ -269,22 +239,23 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="1"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:rippleColor="@color/ripple_color_effect"
         app:layout_constraintEnd_toStartOf="@id/key8"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/key4">
+        app:layout_constraintTop_toBottomOf="@+id/key4"
+        app:layout_constraintBottom_toTopOf="@+id/key0">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
-            android:paddingBottom="@dimen/pad_12"
             android:text="7"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
@@ -301,22 +272,22 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/key9"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key7"
-        app:layout_constraintTop_toTopOf="@id/key7">
+        app:layout_constraintTop_toTopOf="@id/key7"
+        app:layout_constraintBottom_toBottomOf="@id/key7">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
-            android:paddingBottom="@dimen/pad_12"
             android:text="8"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
@@ -333,22 +304,22 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintEnd_toStartOf="@+id/keyOK"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key8"
-        app:layout_constraintTop_toTopOf="@id/key7">
+        app:layout_constraintTop_toTopOf="@id/key7"
+        app:layout_constraintBottom_toBottomOf="@id/key7">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_bold"
-            android:paddingBottom="@dimen/pad_12"
             android:text="9"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
@@ -357,7 +328,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/keyOK"
         android:layout_width="@dimen/keyboard_btn_width"
-        android:layout_height="@dimen/pad_120"
+        android:layout_height="@dimen/keyboard_btn_height"
         android:layout_marginStart="@dimen/keyboard_gap"
         android:layout_marginEnd="@dimen/keyboard_gap"
         android:layout_marginBottom="@dimen/keyboard_gap"
@@ -365,25 +336,26 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="3"
         app:rippleColor="@color/ripple_color_effect"
         android:padding="@dimen/pad_5"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/key9"
-        app:layout_constraintTop_toTopOf="@+id/key7">
+        app:layout_constraintTop_toBottomOf="@+id/keyClr">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingStart="7dp"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="7dp"
-            android:paddingBottom="@dimen/pad_12"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_ok"
             android:text="OK"
-            android:textColor="@color/txt_color_blue"
+            android:textColor="@color/white"
+            android:fontFamily="@font/muli_bold"
             android:textSize="@dimen/keyboard_txt" />
     </com.google.android.material.card.MaterialCardView>
 
@@ -398,24 +370,92 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        android:visibility="gone"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/key7"
-        app:layout_constraintTop_toBottomOf="@id/key7">
+        app:layout_constraintTop_toBottomOf="@id/key7"
+        app:layout_constraintEnd_toStartOf="@+id/key00">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingBottom="@dimen/pad_12"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:fontFamily="@font/muli_semi_bold"
             android:text="000"
             android:textAlignment="center"
             android:textColor="@color/txt_color_blue"
             android:textSize="19sp" />
     </com.google.android.material.card.MaterialCardView>
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/key0"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginTop="@dimen/keyboard_gap"
+        android:layout_marginBottom="@dimen/keyboard_gap"
+        android:background="@color/white"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        android:visibility="visible"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintVertical_weight="1"
+        app:rippleColor="@color/ripple_color_effect"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/key7"
+        app:layout_constraintTop_toBottomOf="@id/key7"
+        app:layout_constraintEnd_toStartOf="@+id/key00">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
+            android:text="0"
+            android:fontFamily="@font/muli_bold"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!--<com.google.android.material.card.MaterialCardView
+        android:id="@+id/keyDelete"
+        android:layout_width="@dimen/keyboard_btn_width"
+        android:layout_height="@dimen/keyboard_btn_height"
+        android:layout_marginStart="@dimen/keyboard_gap"
+        android:layout_marginEnd="@dimen/keyboard_gap"
+        android:layout_marginBottom="@dimen/keyboard_gap"
+        android:background="@color/white"
+        app:strokeColor="@color/colorAccentO"
+        app:strokeWidth="0.5dp"
+        app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
+        app:rippleColor="@color/ripple_color_effect"
+        android:padding="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/key6"
+        app:layout_constraintTop_toTopOf="@+id/key4">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
+            android:text="DEL"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />
+    </com.google.android.material.card.MaterialCardView>-->
+
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/key00"
@@ -428,26 +468,28 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
-        app:layout_constraintEnd_toStartOf="@+id/key0"
-        app:layout_constraintStart_toEndOf="@+id/key000"
-        app:layout_constraintTop_toTopOf="@id/key000">
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
+        app:layout_constraintEnd_toStartOf="@+id/keyDelete"
+        app:layout_constraintStart_toEndOf="@+id/key0"
+        app:layout_constraintTop_toTopOf="@id/key0"
+        app:layout_constraintBottom_toBottomOf="@+id/key0">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingBottom="@dimen/pad_12"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
             android:text="00"
-            android:fontFamily="@font/muli_semi_bold"
+            android:fontFamily="@font/muli_bold"
             android:textColor="@color/txt_color_blue"
             android:textSize="@dimen/keyboard_txt" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/key0"
+        android:id="@+id/keyDelete"
         android:layout_width="@dimen/keyboard_btn_width"
         android:layout_height="@dimen/keyboard_btn_height"
         android:layout_marginBottom="@dimen/keyboard_gap"
@@ -455,23 +497,36 @@
         app:strokeColor="@color/colorAccentO"
         app:strokeWidth="0.5dp"
         app:cardElevation="@dimen/pad_15"
+        app:layout_constraintHorizontal_weight="1"
         app:rippleColor="@color/ripple_color_effect"
-        app:cardCornerRadius="@dimen/pad_8"
-        app:layout_constraintStart_toStartOf="@id/key9"
-        app:layout_constraintTop_toTopOf="@id/key000">
+        app:cardCornerRadius="@dimen/keyboard_btn_corner"
+        app:layout_constraintStart_toEndOf="@id/key00"
+        app:layout_constraintTop_toTopOf="@id/key0"
+        app:layout_constraintBottom_toBottomOf="@id/key0"
+        app:layout_constraintEnd_toStartOf="@+id/keyOK">
 
-        <TextView
+       <!-- <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@color/keyboard_backgroung_btn"
+            android:fontFamily="@font/muli_bold"
+            android:text="del"
+            android:textColor="@color/txt_color_blue"
+            android:textSize="@dimen/keyboard_txt" />-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/keyboard_backgroung_btn">
+
+        </RelativeLayout>
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingStart="@dimen/pad_20"
-            android:paddingTop="@dimen/pad_12"
-            android:paddingEnd="@dimen/pad_20"
-            android:paddingBottom="@dimen/pad_12"
-            android:fontFamily="@font/muli_bold"
-            android:text="0"
-            android:textColor="@color/txt_color_blue"
-            android:textSize="@dimen/keyboard_txt" />
+            android:src="@drawable/ic_del"
+            android:layout_gravity="center"/>
+
     </com.google.android.material.card.MaterialCardView>
 
     <!--<androidx.cardview.widget.CardView
