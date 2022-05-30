@@ -204,6 +204,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 super.onDrawerOpened(drawerView)
                 // Do whatever you want here
                 logger("drawer","open")
+                DialogUtilsNew1.hideKeyboardIfOpen(this@NavigationActivity)
                 refreshDrawer()
             }
         }
@@ -1316,7 +1317,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                                 if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         alertBoxMsgWithIconOnly(
-                                            R.drawable.ic_tick_green,
+                                            R.drawable.ic_success_with_star,
                                             this@NavigationActivity.getString(R.string.successfull_init)
                                         )
                                     }

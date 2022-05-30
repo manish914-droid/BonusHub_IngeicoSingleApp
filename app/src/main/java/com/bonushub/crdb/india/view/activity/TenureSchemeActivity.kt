@@ -170,11 +170,11 @@ private val emiIssuerTAndCDataFromIntent by lazy {
                     }
                     is GenericResponse.Error -> {
                         lifecycleScope.launch(Dispatchers.Main) {
-                            alertBoxWithAction(
-                                getString(R.string.no_receipt),
+                            alertBoxWithActionNew(
                                 genericResp.errorMessage ?: "Oops something went wrong",
-                                false,
-                                getString(R.string.positive_button_ok),
+                                "",
+                                R.drawable.ic_info_orange,
+                                getString(R.string.positive_button_ok),"",false,false,
                                 {
                                     finish()
                                     startActivity(

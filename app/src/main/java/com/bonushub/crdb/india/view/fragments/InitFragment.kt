@@ -54,6 +54,9 @@ class InitFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (activity as NavigationActivity).manageTopToolBar(true)
+
         // for screen awake
         (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // it's handling for init button is enable or disable ----> it will be enable when Tid length is equal to 8
@@ -215,7 +218,7 @@ class InitFragment : Fragment() {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
-                                                R.drawable.ic_tick_green,
+                                                R.drawable.ic_success_with_star,
                                                 it
                                             )
                                         }
@@ -241,7 +244,8 @@ class InitFragment : Fragment() {
                 Status.ERROR -> {
                     iDialog?.hideProgress()
                     CoroutineScope(Dispatchers.Main).launch {
-                        (activity as? NavigationActivity)?.getInfoDialog("Error", result.error ?: "") {}
+                        (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", result.error ?: "",
+                            R.drawable.ic_info_orange,"OK","",false,false,{},{})
                     }
                 }
                 Status.LOADING -> {

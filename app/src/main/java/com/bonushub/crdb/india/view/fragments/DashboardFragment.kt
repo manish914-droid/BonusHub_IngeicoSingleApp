@@ -32,6 +32,7 @@ import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.remote.RestartHandlingModel
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 
 
@@ -141,6 +142,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
        /* (activity as NavigationActivity).alertBoxWithActionNew("",getString(R.string.print_customer_copy),
             R.drawable.ic_print_customer_copy,"Yes","No",true,false,{},{})*/
 
+        //DialogUtilsNew1.instaEmiDialog(activity,{ it.dismiss() },{ it.dismiss() },{ it.dismiss() })
     }
 
     override fun onPause() {

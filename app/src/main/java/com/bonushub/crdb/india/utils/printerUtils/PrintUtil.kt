@@ -2729,15 +2729,24 @@ class PrintUtil(context: Context?) {
                                     x.total += b.transactionalAmmount?.toLong()!!
                                 }
                             } else {
+                                if(b.transactionalAmmount != null && !b.transactionalAmmount.equals("null")){
+                                    totalMap[b.transactionType] =
+                                        b.transactionalAmmount?.toLong()
+                                            ?.let { SummeryTotalType(1, it) }!!
+                                }else{
+                                    logger("vd","vd")
+                                }
 
-                                totalMap[b.transactionType] =
-                                    b.transactionalAmmount?.toLong()
-                                        ?.let { SummeryTotalType(1, it) }!!
+
                             }
-                            val transAmount = "%.2f".format(
-                                b.transactionalAmmount?.toDouble()
-                                    ?.div(100)
-                            )
+                            var transAmount = "0.0"
+                            if(b.transactionalAmmount != null && !b.transactionalAmmount.equals("null")){
+                                transAmount = "%.2f".format(
+                                    b.transactionalAmmount?.toDouble()
+                                        ?.div(100)
+                                )
+                            }
+
                             if (b.transationName.equals("TEST EMI TXN")) {
                                 textBlockList.add(
                                     sigleLineformat(

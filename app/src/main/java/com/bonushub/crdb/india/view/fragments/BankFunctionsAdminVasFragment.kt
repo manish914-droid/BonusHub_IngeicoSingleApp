@@ -66,6 +66,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
         (activity as NavigationActivity).manageTopToolBar(false)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_drawer_bank_function)
         binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
@@ -130,7 +131,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                 //observeMainViewModel()
                             }
                         },
-                            {})
+                            { unselectItem() })
 
                     }else{
                         // check batch open or not
@@ -217,6 +218,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                     }
                 }else{
                     ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
+                    unselectItem()
                 }
 
             }
