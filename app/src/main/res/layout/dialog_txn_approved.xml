@@ -15,19 +15,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/pad_20"
-        android:src="@drawable/ic_green_tick_bg"
+        android:src="@mipmap/ic_success_with_star"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sub_header_view" />
 
-    <ImageView
+    <!--<ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_tick_green"
         app:layout_constraintBottom_toBottomOf="@+id/imgViewBg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imgViewBg" />
+        app:layout_constraintTop_toTopOf="@+id/imgViewBg" />-->
 
     <TextView
         android:id="@+id/txtViewCurrencySymbol"
