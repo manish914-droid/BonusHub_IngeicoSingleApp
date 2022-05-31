@@ -7,6 +7,7 @@ import android.os.RemoteException
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.MainActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
@@ -23,18 +24,29 @@ import com.bonushub.crdb.india.utils.ingenico.TLVList
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.activity.TransactionActivity
 import com.bonushub.crdb.india.view.activity.TransactionActivity.*
+import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.vxutils.Utility
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.usdk.apiservice.aidl.data.BytesValue
 
 
 import com.usdk.apiservice.aidl.emv.*
 import com.usdk.apiservice.aidl.pinpad.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.*
 
 
 open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
+
+    //for offline Pin
+    var pinTryRemainingTimes = 0
+    var pinTryCounter = 0
+    var maxPin =0;
+
 //result: Int, transData: TransData?
     lateinit var onEndProcessCallback: (Int,CardProcessedDataModal) -> Unit
 
@@ -71,7 +83,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onWaitCard(flag: Int) {
-Log.e("VFEmvHandler","onWaitCard")
+    Log.e("VFEmvHandler","onWaitCard")
     }
 
     @Throws(RemoteException::class)
@@ -155,9 +167,6 @@ Log.e("VFEmvHandler","onWaitCard")
     fun doInitEMV() {
         println("=> onInitEMV ")
         manageAID()
-      /*  if (emv!!.setEMVProcessOptimization(true)) {
-           // manageCAPKey()
-        }*/
 
         //  init transaction parameters，please refer to transaction parameters
         //  chapter about onInitEMV event in《UEMV develop guide》
@@ -169,6 +178,11 @@ Log.e("VFEmvHandler","onWaitCard")
         // labels DEF_TAG_PSE_FLAG(M) and DEF_TAG_PPSE_6A82_TURNTO_AIDLIST(M) must be set, as follows：
         // emv.setTLV(KernelID.AMEX, EMVTag.DEF_TAG_PSE_FLAG, "03");
         // emv.setTLV(KernelID.AMEX, EMVTag.DEF_TAG_PPSE_6A82_TURNTO_AIDLIST, "01");
+
+        if (emv!!.setEMVProcessOptimization(true)) {
+            manageCAPKey()
+        }
+
     }
     @Throws(RemoteException::class)
     protected fun manageAID() {
@@ -789,17 +803,188 @@ Log.e("VFEmvHandler","onWaitCard")
 
             override fun onCancel() {
                 respondCVMResult(0.toByte())
+                Log.d("Data", "PinPad onCancel")
+                try {
+                    if (null != activity) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            activity.declinedTransaction()
+                        }
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
             }
 
             override fun onError(error: Int) {
                 respondCVMResult(2.toByte())
+                Log.d("Data", "PinPad onError, code:$error")
+                try {
+                    if (null != activity) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            (activity as TransactionActivity).declinedTransaction()
+                        }
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
             }
         }
         when (cvm.cvm) {
-            CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() -> pinPad!!.startOfflinePinEntry(param, listener)
+            CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
+                if(pinTryCounter == 0)
+                    pinTryCounter = emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT)).toInt() ?: 0
+                // val pinTryLimit = BytesUtil.hexString2Bytes(pinTryCounter)
+
+                println("Pin Try limit is "+pinTryCounter)
+                pinTryRemainingTimes = pinTryCounter
+                println("Pin Try Remaining is "+pinTryRemainingTimes)
+
+                if (pinTryRemainingTimes >= 3) {
+                    pinTryRemainingTimes = 3
+                    maxPin = 3
+                } else {
+                    pinTryRemainingTimes = pinTryCounter
+                }
+                if (maxPin == 3) {
+                    println("Going in first")
+                    when (pinTryRemainingTimes) {
+                        3 -> {
+                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                pinTryCounter--
+                                pinTryRemainingTimes--
+                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                            }
+                        }
+                        2 -> {
+
+                            GlobalScope.launch(Dispatchers.Main) {
+                                (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                    "Invalid PIN",
+                                    "Wrong PIN.Please try again",
+                                    R.drawable.ic_txn_declined,
+                                    (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                    "", false, false, { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                                pinTryCounter--
+                                                pinTryRemainingTimes--
+                                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                            }
+
+                                        }
+                                    },
+                                    {})
+                            }
+
+                        }
+                        1 -> {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                    "Invalid PIN",
+                                    "Wrong PIN.This is your last attempt",
+                                    R.drawable.ic_txn_declined,
+                                    (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                    "", false, false, { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                                pinTryCounter--
+                                                pinTryRemainingTimes--
+                                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                            }
+
+                                        }
+                                    },
+                                    {})
+                            }
+
+                        }
+                        else -> {
+                        }
+                    }
+                }
+                else if(pinTryRemainingTimes == 2){
+                    println("Going in second")
+
+                    when (pinTryRemainingTimes) {
+                        2 -> {
+
+                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                pinTryCounter--
+                                pinTryRemainingTimes--
+                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                            }
+                        }
+                        1 -> {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                    "Invalid PIN",
+                                    "This is your last attempt",
+                                    R.drawable.ic_txn_declined,
+                                    (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                    "", false, false, { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                                pinTryCounter--
+                                                pinTryRemainingTimes--
+                                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                            }
+
+                                        }
+                                    },
+                                    {})
+                            }
+
+                        }
+                        else -> {
+                        }
+                    }
+
+                }
+                else {
+                    println("Going in else")
+                    GlobalScope.launch(Dispatchers.Main) {
+                            (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                "Invalid PIN",
+                                "This is your last PIN attempt",
+                                R.drawable.ic_txn_declined,
+                                (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                "", false, false, { alertPositiveCallback ->
+                                    if (alertPositiveCallback) {
+                                        pinPad!!.startOfflinePinEntry(param, listener).also {
+                                            pinTryCounter--
+                                            pinTryRemainingTimes--
+                                            println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                        }
+
+                                    }
+                                },
+                                {})
+                        }
+                }
+
+            }
             CVMFlag.EMV_CVMFLAG_ONLINEPIN.toByte() -> {
                 println("=> onCardHolderVerify | onlinpin")
-                param.putByteArray(PinpadData.PAN_BLOCK, lastCardRecord!!.pan)
+                cardProcessedDataModal.setIsOnline(1)
+
+
+                byte2HexStr(lastCardRecord!!.pan)
+                println("Pan block is "+byte2HexStr(lastCardRecord!!.pan))
+                addPad("374245001751006", "0", 16, true)
+
+                println("CardPanNumber data is "+cardProcessedDataModal.getPanNumberData() ?: "")
+
+                Utility.hexStr2Byte(addPad("374245001751006", "0", 16, true))
+                param.putByteArray(PinpadData.PAN_BLOCK,
+                    Utility.hexStr2Byte(
+                        addPad(
+                            cardProcessedDataModal.getPanNumberData() ?: "",
+                            "0",
+                            16,
+                            true
+                        )
+                    )
+                )
                 pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
             }
             else -> {
@@ -808,6 +993,8 @@ Log.e("VFEmvHandler","onWaitCard")
             }
         }
     }
+
+
 
     protected open fun respondCVMResult(result: Byte) {
         try {
@@ -822,12 +1009,27 @@ Log.e("VFEmvHandler","onWaitCard")
     // 5 calling
     @Throws(RemoteException::class)
     open fun doReadRecord(record: CardRecord?) {
-        println("=> onReadRecord | " + EMVInfoUtil.getRecordDataDesc(record))
-        cardProcessedDataModal.setPanNumberData(EMVInfoUtil.getRecordDataDesc(record))
-        System.out.println("Card pannumber data"+EMVInfoUtil.getRecordDataDesc(record))
+        println("=> onReadRecord | " + BytesUtil.bytes2HexString(record?.pan))
+        var track22: String? = null
+        var track2 = BytesUtil.bytes2HexString(record?.pan)
+
+        var a = track2.indexOf('F')
+        if (a > 0) {
+            track22 = track2.substring(0, a)
+        } else {
+            a = track2.indexOf('=')
+
+            if (a > 0) {
+                track22 = track2.substring(0, a)
+            }
+        }
+
+        cardProcessedDataModal.setPanNumberData(track22 ?: "")
+        System.out.println("Card pannumber data "+cardProcessedDataModal.getPanNumberData())
         //val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
         // cardProcessedDataModal.setEncryptedPan(encrptedPan)
-        manageCAPKey()
+
+
 
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }

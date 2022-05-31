@@ -740,8 +740,8 @@ class TransactionActivity : BaseActivityNew() {
                            cardProcessedDataModal.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
 
                            detectCard(cardProcessedDataModal, CardOption.create().apply {
-                               supportICCard(false)
-                               supportMagCard(true)
+                               supportICCard(true)
+                               supportMagCard(false)
                                supportRFCard(false)
                            })
 
