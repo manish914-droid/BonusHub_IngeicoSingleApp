@@ -96,6 +96,7 @@ Log.e("VFEmvHandler","onWaitCard")
         }
     }
 
+    //5
     @Throws(RemoteException::class)
     override fun onReadRecord(cardRecord: CardRecord) {
         Log.e("VFEmvHandler","onReadRecord")
@@ -149,7 +150,7 @@ Log.e("VFEmvHandler","onWaitCard")
     }
 
 
-
+// 1 calling
     @Throws(RemoteException::class)
     fun doInitEMV() {
         println("=> onInitEMV ")
@@ -248,6 +249,7 @@ Log.e("VFEmvHandler","onWaitCard")
         }
     }
 
+    // 2 calling
     open fun doAppSelect(reSelect: Boolean, candList: List<CandidateAID>) {
         println("=> onAppSelect: cand AID size = " + candList.size)
         if (candList.size > 1) {
@@ -269,6 +271,7 @@ Log.e("VFEmvHandler","onWaitCard")
                 }
             })
         } else {
+            //candList[0].aid.byteArr2Str()
             respondAID(candList[0].aid)
         }
     }
@@ -289,6 +292,7 @@ Log.e("VFEmvHandler","onWaitCard")
         }
     }
 
+    // 3 calling
     @SuppressLint("NewApi")
     @Throws(RemoteException::class)
     open fun doFinalSelect(finalData: FinalData) {
@@ -302,27 +306,29 @@ Log.e("VFEmvHandler","onWaitCard")
 
         var tlvList: String? = null
         when (finalData.kernelID) {
-            KernelID.EMV.toByte() ->
+            // for EMV this call is common for every payment scheme
+            KernelID.EMV.toByte() -> {
 
-                if(aidstr == "A000000025"){
-                // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
-                // For reference only below
-                tlvList = StringBuilder()
-                    .append("9F0206").append(txnAmount) //Txn Amount
-                    .append("9F0306000000000000")       //Other Amount
-                    .append("9A03").append(splitStr[0])   //Txn Date - M
-                    .append("9F2103").append(splitStr[1]) //Txn Time - M
-                    .append("9F410400000001") //Transaction Sequence Counter - 0
-                    .append("9F350122")     //Terminal type
-                    .append("9F3303E0F8C8")     //Terminal capability
-                    .append("9F40056000F0A001")   //additional terminal capability
-                    .append("9F1A020356")  //Terminal country code - M
-                    .append("5F2A020356") //Terminal currency code - M*/
-                    .append("9C0100")       //Transaction type - o
-                    .toString();
+                if (aidstr == "A000000025" || aidstr == "A000000003") {
+                    // Parameter settings, see transaction parameters of EMV Contact Level 2 in《UEMV develop guide》
+                    // For reference only below
+                    tlvList = StringBuilder()
+                        .append("9F0206").append(txnAmount) //Txn Amount
+                        .append("9F0306000000000000")       //Other Amount
+                        .append("9A03").append(splitStr[0])   //Txn Date - M
+                        .append("9F2103").append(splitStr[1]) //Txn Time - M
+                        .append("9F410400000001") //Transaction Sequence Counter - 0
+                        .append("9F350122")     //Terminal type
+                        .append("9F3303E0F8C8")     //Terminal capability
+                        .append("9F40056000F0A001")   //additional terminal capability
+                        .append("9F1A020356")  //Terminal country code - M
+                        .append("5F2A020356") //Terminal currency code - M*/
+                        .append("9C0100")       //Transaction type - o
+                        .toString();
+                }
             }
 
-            KernelID.AMEX.toByte() ->
+            KernelID.AMEX.toByte() -> {
                 tlvList = StringBuilder()
                     .append("9F350122")
                     .append("9F3303E0E8C8")
@@ -347,13 +353,14 @@ Log.e("VFEmvHandler","onWaitCard")
                     .append("DF81300100")            //Try Again Flag
                     .toString()
 
-
-            KernelID.PBOC.toByte() ->                // if suport PBOC Ecash，see transaction parameters of PBOC Ecash in《UEMV develop guide》.
+            }
+            KernelID.PBOC.toByte() -> {              // if suport PBOC Ecash，see transaction parameters of PBOC Ecash in《UEMV develop guide》.
                 // If support qPBOC, see transaction parameters of QuickPass in《UEMV develop guide》.
                 // For reference only below
                 tlvList =
                     "9F02060000000001009F03060000000000009A031710209F21031505129F4104000000019F660427004080"
-            KernelID.VISA.toByte() ->                // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
+            }
+            KernelID.VISA.toByte() -> {               // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
                 tlvList = StringBuilder()
                     .append("9C0100")
                     .append("9F0206000000000100")
@@ -373,7 +380,9 @@ Log.e("VFEmvHandler","onWaitCard")
                     .append("DF040102")
                     .append("DF810602C000")
                     .append("DF9181040100").toString()
-            KernelID.MASTER.toByte() ->                // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
+
+            }
+            KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
                 tlvList = StringBuilder()
                     .append("9F350122")
                     .append("9F3303E0F8C8")
@@ -399,34 +408,11 @@ Log.e("VFEmvHandler","onWaitCard")
                     .append("DF9182060160")
                     .append("DF9182070120")
                     .append("DF9182080120").toString()
-            KernelID.AMEX.toByte() ->
-                tlvList = StringBuilder()
-                .append("9F350122")
-                .append("9F3303E0E8C8")
-                .append("9F40056000F0B001")
-                .append("9F1A020156")
-                .append("5F2A020156")
-                .append("9F09020001")
-                .append("9C0100")
-                .append("9F0206000000000100")
-                .append("9A03171020")
-                .append("9F2103150512")
-                .append("9F410400000001")
-                .append("DF918111050000000000")
-                .append("DF918112050000000000")
-                .append("DF918110050000000000")
-                .append("9F6D01C0")
-                .append("9F6E04D8E00000")
-                .append("DF812406000000010000")
-                .append("DF812606000000010000")
-                .append("DF812306000000010000")
-                .append("DF81300100").toString()
-            KernelID.DISCOVER.toByte() -> {
             }
-            KernelID.JCB.toByte() -> {
-            }
-            else -> {
-            }
+
+            KernelID.DISCOVER.toByte() -> {}
+            KernelID.JCB.toByte() -> {}
+            else -> {}
         }
 
         println(""+emv!!.setTLVList(finalData.kernelID.toInt(),tlvList) +"...onFinalSelect: setTLVList")
@@ -833,6 +819,7 @@ Log.e("VFEmvHandler","onWaitCard")
         }
     }
 
+    // 5 calling
     @Throws(RemoteException::class)
     open fun doReadRecord(record: CardRecord?) {
         println("=> onReadRecord | " + EMVInfoUtil.getRecordDataDesc(record))
@@ -845,6 +832,8 @@ Log.e("VFEmvHandler","onWaitCard")
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
 
+
+    // 4 calling
     open fun doSendOut(ins: Int, data: ByteArray) {
         when (ins) {
             KernelINS.DISPLAY ->            // DisplayMsg: MsgID（1 byte） + Currency（1 byte）+ DataLen（1 byte） + Data（30 bytes）

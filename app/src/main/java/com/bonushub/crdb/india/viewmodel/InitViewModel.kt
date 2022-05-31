@@ -5,7 +5,7 @@ import androidx.lifecycle.*
 import com.bonushub.crdb.india.repository.RoomDBRepository
 import com.bonushub.crdb.india.utils.ResponseHandler
 import com.bonushub.crdb.india.utils.Result
-import com.mindorks.example.coroutines.utils.Status
+import com.bonushub.crdb.india.utils.Status
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch

@@ -14,7 +14,6 @@ import android.os.Looper
 import android.os.RemoteException
 import android.text.TextUtils
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -38,7 +37,6 @@ import com.bonushub.crdb.india.databinding.MainDrawerBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.di.DBModule
-import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.serverApi.HitServer
@@ -60,11 +58,10 @@ import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
 import com.bonushub.pax.utils.*
-import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.response.OperationResult
-import com.mindorks.example.coroutines.utils.Status
+import com.bonushub.crdb.india.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
@@ -85,12 +82,10 @@ import android.os.Build
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
-import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauth
 import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthVoidFragment
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 

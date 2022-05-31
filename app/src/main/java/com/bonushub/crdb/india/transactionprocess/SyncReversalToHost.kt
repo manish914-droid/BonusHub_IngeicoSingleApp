@@ -37,14 +37,14 @@ class SyncReversalToHost(private var transactionISOData: IsoDataWriter?, var syn
 
             System.out.println("HitReversal called2"+field55)
 
-            if(null !=field55 && field55.isNotBlank() && null !=DE55reversal && DE55reversal.isNotBlank()) {
-                field55 = field55 + DE55reversal
-                println("Issuer script data in reversal"+field55)
+            if(field55.isNotBlank() && DE55reversal.isNotBlank()) {
+                field55 += DE55reversal
+                println("Issuer script data in reversal$field55")
                 transactionISOData?.addField(55, field55)
             }
-            else if(null !=field55 && field55.isNotBlank()){
-                println("Issuer script data without reversal"+field55)
-                System.out.println("HitReversal called3")
+            else if(field55.isNotBlank()){
+                println("Issuer script data without reversal$field55")
+                println("HitReversal called3")
                 transactionISOData?.addField(55, field55)
             }
 

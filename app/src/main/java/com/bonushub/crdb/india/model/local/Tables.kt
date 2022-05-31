@@ -560,13 +560,14 @@ data class TerminalParameterTable(
     @field:BHFieldParseIndex(1)
     var actionId: String = "",
 
+    @PrimaryKey
     @field:BHFieldParseIndex(2)
     var tableId: String = "",
 
     @field:BHFieldParseIndex(3)
     var isActive: String = "",
 
-    @PrimaryKey
+
     @field:BHFieldParseIndex(4)
     @field: BHFieldName("TID")
     var terminalId: String = "",

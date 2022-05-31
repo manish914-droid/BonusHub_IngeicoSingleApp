@@ -30,7 +30,7 @@ import com.bonushub.crdb.india.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
-import com.mindorks.example.coroutines.utils.Status
+import com.bonushub.crdb.india.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.*
@@ -689,7 +689,6 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                     requestWindowFeature(Window.FEATURE_NO_TITLE)
                     setContentView(R.layout.dialog_emv)
                     setCancelable(false)
-
 
                     val pcEt = findViewById<EditText>(R.id.emv_pcno_et)
                     val bankEt = findViewById<EditText>(R.id.emv_bankcode_et)

@@ -1493,7 +1493,7 @@ object Field48ResponseTimestamp {
     fun getTptData(): TerminalParameterTable? {
         var tptData: TerminalParameterTable? = null
         runBlocking(Dispatchers.IO) {
-            tptData = appDatabase.appDao?.getTerminalDataByBankCode("2")
+            tptData = appDatabase.appDao?.getTerminalDataByBankCode(AppPreference.getBankCode())
             val jsonResp=Gson().toJson(tptData)
             println(jsonResp)
         }
