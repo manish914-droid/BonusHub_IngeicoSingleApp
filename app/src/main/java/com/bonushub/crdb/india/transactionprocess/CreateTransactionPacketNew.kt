@@ -75,7 +75,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             addField(11, Utility().getROC().toString())
 
             //Date and Time Field 12 & 13
-            addIsoDateTime(this)
+            val dateTime = addIsoDateTime(this)
 
             //println("Pos entry mode is --->" + cardProcessedData.getPosEntryMode().toString())
             //Pos Entry Mode Field 22
@@ -235,13 +235,17 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             //Here we are Saving Date , Time and TimeStamp in CardProcessedDataModal:-
             var year: String = "Year"
             try {
-                val date: Long = Calendar.getInstance().timeInMillis
+                /*val date: Long = Calendar.getInstance().timeInMillis
                 val timeFormater = SimpleDateFormat("HHmmss", Locale.getDefault())
                 cardProcessedData.setTime(timeFormater.format(date))
                 val dateFormater = SimpleDateFormat("MMdd", Locale.getDefault())
                 cardProcessedData.setDate(dateFormater.format(date))
-                cardProcessedData.setTimeStamp(date.toString())
-                year = SimpleDateFormat("yy", Locale.getDefault()).format(date)
+                cardProcessedData.setTimeStamp(date.toString())*/
+
+                cardProcessedData.setTime(dateTime.second)
+                cardProcessedData.setDate(dateTime.first)
+                cardProcessedData.setTimeStamp(dateTime.third.toString())
+                year = SimpleDateFormat("yy", Locale.getDefault()).format(dateTime.third)
 
             } catch (ex: Exception) {
                 ex.printStackTrace()

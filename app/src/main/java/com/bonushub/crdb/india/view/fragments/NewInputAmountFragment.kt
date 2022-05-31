@@ -47,7 +47,6 @@ import com.bonushub.crdb.india.utils.UiAction
 
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_new_input_amount.*
 import kotlinx.coroutines.*
 @AndroidEntryPoint
 class NewInputAmountFragment : Fragment() {
@@ -135,7 +134,7 @@ class NewInputAmountFragment : Fragment() {
             EDashboardItem.SALE_WITH_CASH -> {
                 //  binding?.enterCashAmountTv?.visibility = View.VISIBLE
                 binding?.cashAmtCrdView?.visibility = View.VISIBLE
-                cashAmount?.hint = HDFCApplication.appContext.getString(R.string.cash_amount)
+                binding?.cashAmount?.hint = HDFCApplication.appContext.getString(R.string.cash_amount)
                 //   binding?.enterCashAmountTv?.text = VerifoneApp.appContext.getString(R.string.cash_amount)
 
             }
@@ -153,7 +152,7 @@ class NewInputAmountFragment : Fragment() {
                         logger("isTipEnable()","true")
                         withContext(Dispatchers.Main){
                             binding?.cashAmtCrdView?.visibility = View.VISIBLE
-                            cashAmount?.hint = getString(R.string.enter_tip_amount)
+                            binding?.cashAmount?.hint = getString(R.string.enter_tip_amount)
                         }
                     }else{
                         logger("isTipEnable()","false")
@@ -213,7 +212,7 @@ class NewInputAmountFragment : Fragment() {
             }
 
             else -> {
-                cashAmount?.visibility = View.GONE
+                binding?.cashAmount?.visibility = View.GONE
                 binding?.cashAmtCrdView?.visibility = View.GONE
                 //   binding?.enterCashAmountTv?.visibility = View.GONE
             }
@@ -508,7 +507,7 @@ class NewInputAmountFragment : Fragment() {
     private fun onOKClicked(amt: String) {
 
         Log.e("SALE", "OK CLICKED  ${binding?.saleAmount?.text.toString()}")
-        Log.e("CASh", "OK CLICKED  ${cashAmount?.text}")
+        Log.e("CASh", "OK CLICKED  ${binding?.cashAmount?.text}")
         Log.e("AMT", "OK CLICKED  $amt")
         val maxTxnLimit = 1000000.0///"%.2f".format(getTransactionLimitForHDFCIssuer()).toDouble()
         Log.e("TXN LIMIT", "Txn type = $eDashBoardItem  Txn maxLimit = $maxTxnLimit")
@@ -521,10 +520,10 @@ class NewInputAmountFragment : Fragment() {
             return
         }
 
-        val cashAmtStr = (cashAmount?.text.toString())
+        val cashAmtStr = (binding?.cashAmount?.text.toString())
         var cashAmt = 0.toDouble()
         if (cashAmtStr != "") {
-            cashAmt = (cashAmount?.text.toString()).toDouble()
+            cashAmt = (binding?.cashAmount?.text.toString()).toDouble()
         } else if (eDashBoardItem == EDashboardItem.SALE_WITH_CASH) {
            showToast(getString(R.string.please_enter_cash_amount))
             return
@@ -630,7 +629,8 @@ class NewInputAmountFragment : Fragment() {
                                         ?.let { showToast(it) }
 
                                 TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
-                                    navigateToBankEmiNextProcess(saleAmount.toString().trim(),binding?.mobNumbr?.text.toString().trim())
+                                    var temp = saleAmount.toString().trim()
+                                    navigateToBankEmiNextProcess(temp,binding?.mobNumbr?.text.toString().trim())
 
                                 }
                             }
@@ -870,7 +870,7 @@ class NewInputAmountFragment : Fragment() {
                   brandEmiSubCatData?.let {
                         brandEmiProductData?.let { it1 ->
                             brandDataMaster?.let { it2 ->
-                                (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum,brandDataMaster = it2,
+                                (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=amt,mobileNum = mobileNum,brandDataMaster = it2,
                                     brandEmiSubCatData = it,brandEmiCat=brandEmiCatData,brandEmiProductData = it1, testEmiTxnType = testEmiTxnType?:""
                                 )
                             }
@@ -904,7 +904,7 @@ class NewInputAmountFragment : Fragment() {
 
 
         } else {
-            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=saleAmount.toString(),mobileNum = mobileNum, testEmiTxnType = testEmiTxnType?:""
+            (activity as NavigationActivity).startTransactionActivityForEmi(eDashBoardItem,amt=amt,mobileNum = mobileNum, testEmiTxnType = testEmiTxnType?:""
             )
 
         }
@@ -955,10 +955,10 @@ class NewInputAmountFragment : Fragment() {
                 data = convertValue2BCD(hdfcTpt.option1)
                if(data[2] == '1'){ // checking third position of data for on/off case
                    binding?.cashAmtCrdView?.visibility = View.VISIBLE
-                   cashAmount?.hint =
+                   binding?.cashAmount?.hint =
                        HDFCApplication.appContext.getString(R.string.enter_tip_amount)
                }else{
-                   cashAmount?.visibility = View.GONE
+                   binding?.cashAmount?.visibility = View.GONE
                    binding?.cashAmtCrdView?.visibility = View.GONE
                    //  binding?.enterCashAmountTv?.visibility = View.GONE
                }
@@ -998,7 +998,7 @@ class NewInputAmountFragment : Fragment() {
                 tpt = it
                 if (tpt != null) {
                     val tipAmount = try {
-                        cashAmount?.text.toString().toFloat()
+                        binding?.cashAmount?.text.toString().toFloat()
                     } catch (ex: Exception) {
                         0f
                     }
@@ -1019,7 +1019,7 @@ class NewInputAmountFragment : Fragment() {
                                     EDashboardItem.SALE,
                                     Pair(
                                         totalTransAmount.toString().trim(),
-                                        cashAmount?.text.toString().trim()
+                                        binding?.cashAmount?.text.toString().trim()
                                     ), extraPair
                                 )
                             }
@@ -1046,7 +1046,7 @@ class NewInputAmountFragment : Fragment() {
                                         EDashboardItem.SALE,
                                         Pair(
                                             totalTransAmount.toString().trim(),
-                                            cashAmount?.text.toString().trim()
+                                            binding?.cashAmount?.text.toString().trim()
                                         ), extraPair
                                     )
                                 }
@@ -1079,7 +1079,7 @@ class NewInputAmountFragment : Fragment() {
 
     private fun temproryCheck(totalTransAmount: Double,saleAmt:Double){
         lifecycleScope.launch(Dispatchers.IO) {
-           val tipamt= cashAmount?.text.toString().trim().toFloat()
+           val tipamt= binding?.cashAmount?.text.toString().trim().toFloat()
             if (isTipEnable() && tipamt>=saleAmt) {
                 val msg =
                     "Maximum tip allowed on this terminal is \u20B9 ${
@@ -1100,7 +1100,7 @@ class NewInputAmountFragment : Fragment() {
                     EDashboardItem.SALE,
                     Pair(
                         totalTransAmount.toString().trim(),
-                        cashAmount?.text.toString().trim()
+                        binding?.cashAmount?.text.toString().trim()
                     ), extraPairData
                 )
 

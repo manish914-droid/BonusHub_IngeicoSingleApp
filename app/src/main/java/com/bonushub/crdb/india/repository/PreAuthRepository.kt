@@ -333,18 +333,19 @@ class PreAuthRepository @Inject constructor() {
             setAuthRoc(authCompletionData.authRoc.toString())
             setAuthTid(authCompletionData.authTid.toString())
         }
+        AppPreference.saveString(AppPreference.PCKT_DATE, "")
+        AppPreference.saveString(AppPreference.PCKT_TIME, "")
+        AppPreference.saveString(AppPreference.PCKT_TIMESTAMP, "")
+
         val transactionISO = CreateAuthPacket().createPreAuthCompleteAndVoidPreauthISOPacket(
             authCompletionData,
             cardProcessedData
         )
         //Here we are Saving Date , Time and TimeStamp in CardProcessedDataModal:-
         try {
-            val date2: Long = Calendar.getInstance().timeInMillis
-            val timeFormater = SimpleDateFormat("HHmmss", Locale.getDefault())
-            cardProcessedData.setTime(timeFormater.format(date2))
-            val dateFormater = SimpleDateFormat("MMdd", Locale.getDefault())
-            cardProcessedData.setDate(dateFormater.format(date2))
-            cardProcessedData.setTimeStamp(date2.toString())
+            cardProcessedData.setTime(AppPreference.getString(AppPreference.PCKT_TIME))
+            cardProcessedData.setDate(AppPreference.getString(AppPreference.PCKT_DATE))
+            cardProcessedData.setTimeStamp(AppPreference.getString(AppPreference.PCKT_TIMESTAMP))
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -569,18 +570,21 @@ class PreAuthRepository @Inject constructor() {
             setAuthRoc(authCompletionData.authRoc.toString())
             //  setAuthTid(authCompletionData.authTid.toString())
         }
+
+        AppPreference.saveString(AppPreference.PCKT_DATE, "")
+        AppPreference.saveString(AppPreference.PCKT_TIME, "")
+        AppPreference.saveString(AppPreference.PCKT_TIMESTAMP, "")
+
         val transactionISO = CreateAuthPacket().createPreAuthCompleteAndVoidPreauthISOPacket(
             authCompletionData,
             cardProcessedData
         )
         //Here we are Saving Date , Time and TimeStamp in CardProcessedDataModal:-
         try {
-            val date2: Long = Calendar.getInstance().timeInMillis
-            val timeFormater = SimpleDateFormat("HHmmss", Locale.getDefault())
-            cardProcessedData.setTime(timeFormater.format(date2))
-            val dateFormater = SimpleDateFormat("MMdd", Locale.getDefault())
-            cardProcessedData.setDate(dateFormater.format(date2))
-            cardProcessedData.setTimeStamp(date2.toString())
+            cardProcessedData.setTime(AppPreference.getString(AppPreference.PCKT_TIME))
+            cardProcessedData.setDate(AppPreference.getString(AppPreference.PCKT_DATE))
+            cardProcessedData.setTimeStamp(AppPreference.getString(AppPreference.PCKT_TIMESTAMP))
+
         } catch (ex: Exception) {
             ex.printStackTrace()
         }

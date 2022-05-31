@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.disputetransaction
 
+import android.util.Log
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.local.AppPreference
@@ -33,7 +34,12 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
        // addField(11, ROCProviderV2.getRoc(AppPreference.getBankCode()).toString()) // old
         addField(11, batch.hostRoc)
 
-        addIsoDateTime(this)
+        val dateTime = addIsoDateTime(this)
+        AppPreference.saveString(AppPreference.PCKT_DATE, dateTime.first)
+        AppPreference.saveString(AppPreference.PCKT_TIME, dateTime.second)
+        AppPreference.saveString(AppPreference.PCKT_TIMESTAMP, dateTime.third.toString())
+        Log.e("Time-->",dateTime.first)
+        Log.e("Date-->",dateTime.second)
 
         addField(22, batch.posEntryValue)
         addField(24, Nii.DEFAULT.nii)
@@ -99,8 +105,6 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
             println("Field 56 data is" + "${hostTID}${hostBatchNumber}${hostRoc}${formatedDate}${batch.authCode}${hostInvoice}")
         }
 
-        // old data
-     //   addFieldByHex(56, addPad("${batch.roc}", "0", 6, true) + "${formatedDate}")
 
 
         addField(57, batch.track2Data)

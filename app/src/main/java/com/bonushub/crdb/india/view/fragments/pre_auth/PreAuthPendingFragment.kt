@@ -343,8 +343,7 @@ class PreAuthPendingFragment : Fragment() {
             if (bindingg.amountEt.text.toString().isNotBlank()) {
                 if (bindingg.amountEt.text.toString().toFloat() >= 1) {
 
-                    val tpt = Utility().getTptData()
-                    authData.authTid = tpt?.terminalId
+                    authData.authTid = pendingPreauthData?.TID
                     authData.authAmt = bindingg.amountEt.text.toString()
                     authData.authBatchNo = invoiceWithPadding(pendingPreauthData.batch.toString())
                     authData.authRoc = invoiceWithPadding(pendingPreauthData.roc.toString())

@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.transactionprocess
 
+import android.util.Log
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.HDFCApplication.Companion.appContext
 import com.bonushub.crdb.india.R
@@ -40,7 +41,12 @@ class CreateAuthPacket {
                 addField(11, Utility().getROC().toString())
 
                 //Date and Time Field 12 & 13
-                addIsoDateTime(this)
+                val dateTimeTriple = addIsoDateTime(this)
+                AppPreference.saveString(AppPreference.PCKT_DATE, dateTimeTriple.first)
+                AppPreference.saveString(AppPreference.PCKT_TIME, dateTimeTriple.second)
+                AppPreference.saveString(AppPreference.PCKT_TIMESTAMP, dateTimeTriple.third.toString())
+                Log.e("Time-->",dateTimeTriple.first)
+                Log.e("Date-->",dateTimeTriple.second)
 
                 //NII Field 24
                 addField(24, Nii.DEFAULT.nii)
@@ -54,19 +60,12 @@ class CreateAuthPacket {
                 //Connection Time Stamps Field 48
                 addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
 
-                val dateTime: Long = Calendar.getInstance().timeInMillis
-                val time: String = SimpleDateFormat("HHmmss", Locale.getDefault()).format(dateTime)
-                val date: String = SimpleDateFormat("MMdd", Locale.getDefault()).format(dateTime)
-                val year: String = SimpleDateFormat("yy", Locale.getDefault()).format(dateTime)
-                logger("AUTH YEAR->", year, "e")
-                //adding field 56
 
-                // kushal 1105 done
                 val rocF56 = authCompletionData.authRoc?.let { addPad(it, "0", 6, true) }
                 val batchF56 = authCompletionData.authBatchNo?.let { addPad(it, "0", 6, true) }
                 val tidF56AuthCompletion = authCompletionData.authTid
 
-                val formatedDate = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault()).format(dateTime)
+                val formatedDate = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault()).format(dateTimeTriple.third)
 
 
                 if(tidF56AuthCompletion?.isNotBlank() == true && batchF56?.isNotBlank() == true && rocF56?.isNotBlank() == true) {

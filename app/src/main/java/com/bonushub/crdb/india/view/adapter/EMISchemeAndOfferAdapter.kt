@@ -49,70 +49,6 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
             holder.binding.parentEmiViewLl.setBackgroundResource(R.drawable.card_edge_transparent_bg_sky_blu)
             holder.binding.schemeCheckIv.visibility = View.INVISIBLE
         }
-        /* if (modelData?.isSelected == true) {
-            //holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#13E113"))) //
-            //holder.binding.schemeCheckIv.visibility = View.VISIBLE//
-            holder.binding.cardView.setBackgroundResource(R.drawable.edge_blue)
-            holder.binding.tenureHeadingTv.setBackgroundResource(R.drawable.edge_white_bg_transparent)
-           // holder.binding.tenureHeadingTv.setTextColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))
-            setViewColor(holder.binding.tenureHeadingTv,true)
-            setViewColor(holder.binding.tvTransactionAmountHeader,true)
-            setViewColor(holder.binding.tvTransactionAmount,true)
-            setViewColor(holder.binding.tvTenureHeader,true)
-            setViewColor(holder.binding.tvTenure,true)
-            setViewColor(holder.binding.tvLoanAmountHeader,true)
-            setViewColor(holder.binding.tvLoanAmount,true)
-
-            setViewColor(holder.binding.tvEmiAmountHeader,true)
-            setViewColor(holder.binding.tvEmiAmount,true)
-            setViewColor(holder.binding.tvDiscountAmountHeader,true)
-            setViewColor(holder.binding.tvDiscountAmount,true)
-            setViewColor(holder.binding.tvCashbackAmountHeader,true)
-            setViewColor(holder.binding.tvCashbackAmount,true)
-            setViewColor(holder.binding.tvInterestRateHeader,true)
-            setViewColor(holder.binding.tvInterestRate,true)
-            setViewColor(holder.binding.tvTotalInterestPayHeader,true)
-            setViewColor(holder.binding.tvTotalInterestPay,true)
-            setViewColor(holder.binding.tvRoiHeader,true)
-            setViewColor(holder.binding.tvRoi,true)
-            setViewColor(holder.binding.tvTotalEmiPayHeader,true)
-            setViewColor(holder.binding.tvTotalEmiPay,true)
-            setViewColor(holder.binding.tvOfferHeader,true)
-            setViewColor(holder.binding.tvOffer,true)
-            // schemeSelectCB(position)
-        } else {
-            //holder.binding.cardView.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#FFFFFF")))
-            //holder.binding.schemeCheckIv.visibility = View.GONE//
-            holder.binding.cardView.setBackgroundResource(R.drawable.edge_blue_bg_blue_transparent)
-            holder.binding.tenureHeadingTv.setBackgroundResource(R.drawable.edge_blue_bg_transparent)
-           // holder.binding.tenureHeadingTv.setTextColor(ColorStateList.valueOf(Color.parseColor("#013480")))
-            setViewColor(holder.binding.tenureHeadingTv,false)
-            setViewColor(holder.binding.tenureHeadingTv,false)
-            setViewColor(holder.binding.tvTransactionAmountHeader,false)
-            setViewColor(holder.binding.tvTransactionAmount,false)
-            setViewColor(holder.binding.tvTenureHeader,false)
-            setViewColor(holder.binding.tvTenure,false)
-            setViewColor(holder.binding.tvLoanAmountHeader,false)
-            setViewColor(holder.binding.tvLoanAmount,false)
-
-            setViewColor(holder.binding.tvEmiAmountHeader,false)
-            setViewColor(holder.binding.tvEmiAmount,false)
-            setViewColor(holder.binding.tvDiscountAmountHeader,false)
-            setViewColor(holder.binding.tvDiscountAmount,false)
-            setViewColor(holder.binding.tvCashbackAmountHeader,false)
-            setViewColor(holder.binding.tvCashbackAmount,false)
-            setViewColor(holder.binding.tvInterestRateHeader,false)
-            setViewColor(holder.binding.tvInterestRate,false)
-            setViewColor(holder.binding.tvTotalInterestPayHeader,false)
-            setViewColor(holder.binding.tvTotalInterestPay,false)
-            setViewColor(holder.binding.tvRoiHeader,false)
-            setViewColor(holder.binding.tvRoi,false)
-            setViewColor(holder.binding.tvTotalEmiPayHeader,false)
-            setViewColor(holder.binding.tvTotalEmiPay,false)
-            setViewColor(holder.binding.tvOfferHeader,false)
-            setViewColor(holder.binding.tvOffer,false)
-        }*/
-        //endregion
 
         if (modelData != null) {
             if (modelData.tenure == "1") {
@@ -134,7 +70,6 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
 
                 val tvOffer = holder.binding.tvOffer
 
-                //tvOffer.context.getString(R.string.cashBackOffer)
                 tvOffer.text = modelData.tenureTAndC
                 makeTextViewResizable(tvOffer, 8, "See More", true)
             } else {
@@ -236,57 +171,3 @@ internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private
         }
     }
 }
-
-
-
-/*
-class EMISchemeAndOfferAdapter(val onItemClickListener: (BankEMITenureDataModal) -> Unit) :
-    ListAdapter<BankEMITenureDataModal,  EMISchemeAndOfferAdapter.EMISchemeOfferHolder>(
-        DiffUtilImpl()
-    ) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EMISchemeAndOfferAdapter.EMISchemeOfferHolder {
-        val inflater: ItemEmiSchemeOfferBinding =
-            ItemEmiSchemeOfferBinding.inflate(LayoutInflater.from(p0.context), p0, false)
-        return EMISchemeAndOfferAdapter.EMISchemeOfferHolder(inflater)
-
-    }
-
-    override fun onBindViewHolder(holder: BrandEmiProductAdapter.BrandEmiProductViewHolder, position: Int) {
-        val item = getItem(position)
-        holder.bind(item)
-
-    }
-
-    inner class EMISchemeOfferHolder(private val binding: ItemEmiSchemeOfferBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(productData: BankEMITenureDataModal) {
-            binding.tvBrandMasterName.text = productData.productName
-            binding.brandEmiMasterParent.setOnClickListener {
-
-                onItemClickListener(productData)
-            }
-        }
-    }
-
-    class DiffUtilImpl :
-        androidx.recyclerview.widget.DiffUtil.ItemCallback<BankEMITenureDataModal>() {
-        override fun areItemsTheSame(
-            oldItem: BankEMITenureDataModal,
-            newItem: BankEMITenureDataModal
-        ): Boolean {
-            return oldItem.productID == newItem.productID
-
-        }
-
-        override fun areContentsTheSame(
-            oldItem: BankEMITenureDataModal,
-            newItem: BankEMITenureDataModal
-        ): Boolean {
-            return oldItem == newItem
-        }
-
-    }
-
-}*/

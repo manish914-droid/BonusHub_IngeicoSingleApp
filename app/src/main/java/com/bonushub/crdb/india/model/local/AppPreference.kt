@@ -47,6 +47,9 @@ object AppPreference {
 
     // kushal bank functions
     const val GENERIC_REVERSAL_KEY = "generic_reversal_key"
+    const val PCKT_TIME = "packetTime"
+    const val PCKT_DATE = "packetDate"
+    const val PCKT_TIMESTAMP = "packetimestamp"
 
     const val LAST_SUCCESS_RECEIPT_KEY = "Last_Success_Receipt"
     const val LAST_BATCH = "last_batch"

@@ -1,19 +1,23 @@
 package com.bonushub.crdb.india.view.activity
 
 import android.content.Intent
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.*
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ActivityEmvBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.model.local.*
+import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.BatchTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.model.remote.*
 import com.bonushub.crdb.india.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.india.transactionprocess.*
@@ -21,20 +25,16 @@ import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
-import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.SearchCard
-import com.bonushub.crdb.india.viewmodel.*
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
 import com.bonushub.crdb.india.vxutils.TransactionType
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.bonushub.crdb.india.vxutils.Utility.getCardHolderName
 import com.google.gson.Gson
-import com.ingenico.hdfcpayment.request.*
-import com.usdk.apiservice.aidl.emv.CVMFlag
 import com.usdk.apiservice.aidl.emv.EMVTag
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
@@ -42,9 +42,7 @@ import com.usdk.apiservice.aidl.pinpad.OnPinEntryListener
 import com.usdk.apiservice.aidl.pinpad.PinpadData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import java.util.*
 import javax.inject.Inject
-import kotlin.jvm.Throws
 
 @AndroidEntryPoint
 class TransactionActivity : BaseActivityNew() {

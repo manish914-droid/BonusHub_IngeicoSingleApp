@@ -100,315 +100,13 @@ class VoidMainFragment : Fragment() {
                     if (binding?.edtTextSearchTransaction?.text.isNullOrBlank()) {
                         ToastUtils.showToast(requireContext(),"Enter Invoice")
                     } else {
-                        //voidRefundBT?.isEnabled = true
-                       // showConfirmation(binding?.edtTextSearchTransaction?.text.toString())
                         searchTransaction()
                     }
                 }
             }
 
-            //doVoidTransaction()
-            //searchTransaction()
-
-            // (activity as NavigationActivity).transactFragment(VoidDetailFragment())
         }
     }
-
-    // old
-   /* private fun doVoidTransaction(oldBatchData:BatchTable){
-        var ecrID: String
-        try {
-            DeviceHelper.doVoidTransaction(
-                VoidRequest(
-                    tid = oldBatchData.receiptData?.tid,
-                    invoice =  binding?.edtTextSearchTransaction?.text.toString(),
-                    transactionUuid = UUID.randomUUID().toString().also {
-                        ecrID = it
-
-                    }
-                ),
-                listener = object : OnPaymentListener.Stub() {
-                    override fun onCompleted(result: PaymentResult?) {
-                        val txnResponse = result?.value as? TransactionResponse
-                        val receiptDetail = txnResponse?.receiptDetail
-
-                        Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                        when (txnResponse?.responseCode) {
-                            ResponseCode.SUCCESS.value -> {
-                                val jsonResp= Gson().toJson(receiptDetail)
-                                println(jsonResp)
-                                val tpt = runBlocking(Dispatchers.IO) {
-                                   getTptData()
-                                }
-                                if (receiptDetail != null) {
-                                    lifecycleScope.launch(Dispatchers.IO) {
-                                        val batchData =BatchTable(receiptDetail)
-                                        batchData.invoice = receiptDetail.invoice.toString()
-                                        batchData.transactionType = BhTransactionType.VOID.type
-                                        //To assign bonushub batchnumber,bonushub invoice,bonuhub stan
-
-                                     // todo old data update in VOID txn
-                                        batchData.bonushubbatchnumber = oldBatchData.bonushubbatchnumber
-                                            ?: ""
-                                        batchData.bonushubInvoice     = oldBatchData.bonushubInvoice
-                                            ?: ""
-                                        batchData.bonushubStan        = tpt?.stan.toString()
-                                        batchData.oldStanForVoid=oldBatchData.bonushubStan ?: ""
-                                        batchData.oldDateTimeInVoid= oldBatchData.receiptData?.dateTime.toString()
-                                    batchData.field57EncryptedData=oldBatchData.field57EncryptedData
-batchData.field58EmiData=oldBatchData.field58EmiData
-                                        DBModule.appDatabase.appDao.insertBatchData(batchData)
-                                        AppPreference.saveLastReceiptDetails(batchData)
-
-                                        //To increment base Stan
-                                        Utility().incrementUpdateRoc()
-
-                                        printingSaleData(batchData) {
-                                            withContext(Dispatchers.Main) {
-                                                (activity as BaseActivityNew).showProgress(
-                                                    getString(
-                                                        R.string.transaction_syncing_msg
-                                                    )
-                                                )
-                                            }
-                                            createCardProcessingModelData(receiptDetail)
-                                            val transactionISO =
-                                                CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
-                                            // sync pending transaction
-                                               Utility().syncPendingTransaction(transactionViewModel){}
-
-                                            when (val genericResp =
-                                                transactionViewModel.serverCall(transactionISO)) {
-                                                is GenericResponse.Success -> {
-                                                    withContext(Dispatchers.Main) {
-                                                        logger(
-                                                            "success:- ",
-                                                            "in success $genericResp",
-                                                            "e"
-                                                        )
-                                                        (activity as BaseActivityNew).hideProgress()
-                                                        startActivity(Intent(activity, NavigationActivity::class.java).apply {
-                                                            flags =
-                                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                        })
-                                                    }
-                                                }
-                                                is GenericResponse.Error -> {
-                                                    logger("error:- ", "in error ${genericResp.errorMessage}", "e")
-                                                    logger(
-                                                        "error:- ",
-                                                        "save transaction sync later",
-                                                        "e"
-                                                    )
-
-                                                    val pendingSyncTransactionTable =
-                                                        PendingSyncTransactionTable(
-                                                            invoice = receiptDetail.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel
-                                                        )
-
-                                                    pendingSyncTransactionViewModel.insertPendingSyncTransactionData(
-                                                        pendingSyncTransactionTable
-                                                    )
-                                                    withContext(Dispatchers.Main) {
-                                                        (activity as BaseActivityNew).hideProgress()
-                                                        errorOnSyncing(
-                                                            genericResp.errorMessage
-                                                                ?: "Sync Error...."
-                                                        )
-                                                    }
-                                                }
-                                                is GenericResponse.Loading -> {
-                                                    logger(
-                                                        "Loading:- ",
-                                                        "in Loading $genericResp",
-                                                        "e"
-                                                    )
-                                                    withContext(Dispatchers.Main) {
-                                                        (activity as BaseActivityNew).hideProgress()
-                                                    }
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-
-
-                            }
-                            ResponseCode.FAILED.value,
-                            ResponseCode.ABORTED.value -> {
-
-                                startActivity(Intent(activity, NavigationActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                })
-                            }
-                            else -> {
-                                startActivity(Intent(activity, NavigationActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                })
-                            }
-                        }
-                    }
-                }
-            )
-        }
-        catch (exc: Exception){
-            exc.printStackTrace()
-        }
-    }*/
-
-    // kushal this is call aidl method to executed txn
-    /*private fun doVoidTransaction(oldBatchData:TempBatchFileDataTable){
-        var ecrID: String
-        try {
-            DeviceHelper.doVoidTransaction(
-                VoidRequest(
-                    tid = oldBatchData.tid,
-                    invoice =  binding?.edtTextSearchTransaction?.text.toString(),
-                    transactionUuid = UUID.randomUUID().toString().also {
-                        ecrID = it
-
-                    }
-                ),
-                listener = object : OnPaymentListener.Stub() {
-                    override fun onCompleted(result: PaymentResult?) {
-                        val txnResponse = result?.value as? TransactionResponse
-                        val receiptDetail = txnResponse?.receiptDetail
-
-                        Log.d(TAG, "Response Code: ${txnResponse?.responseCode}")
-                        when (txnResponse?.responseCode) {
-                            ResponseCode.SUCCESS.value -> {
-                                val jsonResp= Gson().toJson(receiptDetail)
-                                println(jsonResp)
-                                val tpt = runBlocking(Dispatchers.IO) {
-                                   getTptData()
-                                }
-                                if (receiptDetail != null) {
-                                    lifecycleScope.launch(Dispatchers.IO) {
-                                        val batchData =BatchTable(receiptDetail)
-                                        batchData.invoice = receiptDetail.invoice.toString()
-                                        batchData.transactionType = BhTransactionType.VOID.type
-                                        //To assign bonushub batchnumber,bonushub invoice,bonuhub stan
-
-                                     // todo old data update in VOID txn
-                                        batchData.bonushubbatchnumber = oldBatchData.bonushubbatchnumber
-                                            ?: ""
-                                        batchData.bonushubInvoice     = oldBatchData.bonushubInvoice
-                                            ?: ""
-                                        batchData.bonushubStan        = tpt?.stan.toString()
-                                        batchData.oldStanForVoid=oldBatchData.bonushubStan ?: ""
-                                        batchData.oldDateTimeInVoid= oldBatchData.receiptData?.dateTime.toString()
-                                    batchData.field57EncryptedData=oldBatchData.field57EncryptedData
-batchData.field58EmiData=oldBatchData.field58EmiData
-                                        DBModule.appDatabase.appDao.insertBatchData(batchData)
-                                        AppPreference.saveLastReceiptDetails(batchData)
-
-                                        //To increment base Stan
-                                        Utility().incrementUpdateRoc()
-
-                                        printingSaleData(batchData) {
-                                            withContext(Dispatchers.Main) {
-                                                (activity as BaseActivityNew).showProgress(
-                                                    getString(
-                                                        R.string.transaction_syncing_msg
-                                                    )
-                                                )
-                                            }
-                                            createCardProcessingModelData(receiptDetail)
-                                            val transactionISO =
-                                                CreateTransactionPacket(appDao,globalCardProcessedModel,batchData).createTransactionPacket()
-                                            // sync pending transaction
-                                               Utility().syncPendingTransaction(transactionViewModel){}
-
-                                            when (val genericResp =
-                                                transactionViewModel.serverCall(transactionISO)) {
-                                                is GenericResponse.Success -> {
-                                                    withContext(Dispatchers.Main) {
-                                                        logger(
-                                                            "success:- ",
-                                                            "in success $genericResp",
-                                                            "e"
-                                                        )
-                                                        (activity as BaseActivityNew).hideProgress()
-                                                        startActivity(Intent(activity, NavigationActivity::class.java).apply {
-                                                            flags =
-                                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                        })
-                                                    }
-                                                }
-                                                is GenericResponse.Error -> {
-                                                    logger("error:- ", "in error ${genericResp.errorMessage}", "e")
-                                                    logger(
-                                                        "error:- ",
-                                                        "save transaction sync later",
-                                                        "e"
-                                                    )
-
-                                                    val pendingSyncTransactionTable =
-                                                        PendingSyncTransactionTable(
-                                                            invoice = receiptDetail.invoice.toString(),
-                                                            batchTable = batchData,
-                                                            responseCode = genericResp.toString(),
-                                                            cardProcessedDataModal = globalCardProcessedModel
-                                                        )
-
-                                                    pendingSyncTransactionViewModel.insertPendingSyncTransactionData(
-                                                        pendingSyncTransactionTable
-                                                    )
-                                                    withContext(Dispatchers.Main) {
-                                                        (activity as BaseActivityNew).hideProgress()
-                                                        errorOnSyncing(
-                                                            genericResp.errorMessage
-                                                                ?: "Sync Error...."
-                                                        )
-                                                    }
-                                                }
-                                                is GenericResponse.Loading -> {
-                                                    logger(
-                                                        "Loading:- ",
-                                                        "in Loading $genericResp",
-                                                        "e"
-                                                    )
-                                                    withContext(Dispatchers.Main) {
-                                                        (activity as BaseActivityNew).hideProgress()
-                                                    }
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-
-
-                            }
-                            ResponseCode.FAILED.value,
-                            ResponseCode.ABORTED.value -> {
-
-                                startActivity(Intent(activity, NavigationActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                })
-                            }
-                            else -> {
-                                startActivity(Intent(activity, NavigationActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                })
-                            }
-                        }
-                    }
-                }
-            )
-        }
-        catch (exc: Exception){
-            exc.printStackTrace()
-        }
-    }*/
 
     private fun onContinueClicked(voidData: TempBatchFileDataTable) {
         //Sync Reversal
@@ -454,11 +152,6 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                             .toString(),
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    /*ROCProviderV2.incrementFromResponse(
-                                        ROCProviderV2.getRoc(
-                                            AppPreference.getBankCode()
-                                        ).toString(), AppPreference.getBankCode()
-                                    )*/
 
                                     /*GlobalScope.launch(Dispatchers.Main) {
                                         val autoSettlementCheck =
@@ -494,31 +187,23 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                 }
                                 //  Success case
                                 1 -> {
-                                    // Txn Approved Dialog kushal
-                                    //   println("Index and batchListsize is" + index + " and " + " batch " + (batchList.size - 1))
-//                                    activity?.runOnUiThread {
-//                                        txnSuccessToast(activity as NavigationActivity)
-//                                    }
 
                                     if (respnosedatareader != null) {
-                                        // respnosedatareader.isoMap[62]?.parseRaw2String()?.let {
-                                        /*  deleteBatchTableDataInDBWithInvoiceNumber(
-                                                                        it
-                                                                    )*/
+
                                         val autoSettlementCheck =
                                             respnosedatareader.isoMap.get(60)?.parseRaw2String()
                                                 .toString()
 
                                         val f60DataList = autoSettlementCheck.split('|')
-                                        //   Auto settle flag | Bank id| Issuer id | MID | TID | Batch No | Stan | Invoice | Card Type
-                                        //0|1|51|000000041501002|41501369|000150|260|000260|RUPAY|
-                                        val date: Long = Calendar.getInstance().timeInMillis
-                                        val timeFormater =
-                                            SimpleDateFormat("HHmmss", Locale.getDefault())
-                                        voidData.time = (timeFormater.format(date))
-                                        val dateFormater =
-                                            SimpleDateFormat("MMdd", Locale.getDefault())
-                                        voidData.date = (dateFormater.format(date))
+
+                                        voidData.time =
+                                            AppPreference.getString(AppPreference.PCKT_TIME)
+                                        voidData.date =
+                                            AppPreference.getString(AppPreference.PCKT_DATE)
+                                        val timestamp =
+                                            AppPreference.getString(AppPreference.PCKT_TIMESTAMP)
+                                        voidData.timeStamp = timestamp.toLong()
+
                                         try {
                                             voidData.hostBankID = f60DataList[1]
                                             voidData.hostIssuerID = f60DataList[2]
@@ -528,10 +213,9 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                             voidData.hostRoc = f60DataList[6]
                                             voidData.hostInvoice = f60DataList[7]
                                             voidData.hostCardType = f60DataList[8]
-                                            // batchFileData
+
                                         } catch (ex: Exception) {
                                             ex.printStackTrace()
-                                            //batchFileData
                                         }
 
                                         if (voidData.transactionType == TransactionType.REFUND.type) {
@@ -557,25 +241,18 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                         voidData.referenceNumber =
                                             (respnosedatareader.isoMap[37]?.parseRaw2String()
                                                 ?: "").replace(" ", "")
-                                        // kushal
-                                        /*voidData.roc =
-                                            ROCProviderV2.getRoc(AppPreference.getBankCode())
-                                                .toString()
-                                        ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
-*/
+
                                         logger("save",""+ voidData.transationName)
                                         lifecycleScope.launch(Dispatchers.IO) {
                                             batchFileViewModel.deleteTempBatchFileDataTableFromInvoice(voidData.hostInvoice, voidData.hostTID)
                                             batchFileViewModel?.insertTempBatchFileDataTable(voidData)
                                         }
-                                        //BatchFileDataTable.deleteBatchRecord(voidData.hostInvoice,voidData.hostTID)
-                                        //BatchFileDataTable.performOperation(voidData)
+
 
                                         // Saving for Last Success Receipt
                                         val lastSuccessReceiptData = Gson().toJson(voidData)
                                         AppPreference.saveLastReceiptDetails(lastSuccessReceiptData)
 
-                                        // kushal
                                         val amt = (((voidData.transactionalAmmount)?.toDouble())?.div(100)).toString()
                                         val transactionDate = dateFormaterNew(voidData.timeStamp ?: 0L)
                                         val transactionTime = timeFormaterNew(voidData.time)
@@ -623,8 +300,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                                             }, {
 
                                                                 (activity as NavigationActivity).hideProgress()
-//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
-//                    startActivity(intent)
+
                                                                 // go to dashboard
                                                                 dialog.dismiss()
                                                                 startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
@@ -634,66 +310,6 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
                                                             })
 
-                                                        // not need now
-                                                        /*val tpt=TerminalParameterTable.selectFromSchemeTable()
-                                                        if(tpt?.digiPosCardCallBackRequired=="1") {
-                                                            lifecycleScope.launch(Dispatchers.IO) {
-                                                                withContext(Dispatchers.Main) {
-                                                                    (activity as MainActivity).showProgress(
-                                                                        getString(
-                                                                            R.string.txn_syn
-                                                                        )
-                                                                    )
-                                                                }
-                                                                val amount = MoneyUtil.fen2yuan(
-                                                                    voidData.totalAmmount.toDouble().toLong()
-                                                                )
-                                                                val txnCbReqData = TxnCallBackRequestTable()
-                                                                txnCbReqData.reqtype =
-                                                                    EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
-                                                                txnCbReqData.tid = voidData.hostTID
-                                                                txnCbReqData.batchnum = voidData.hostBatchNumber
-                                                                txnCbReqData.roc = voidData.hostRoc
-                                                                txnCbReqData.amount = amount
-
-                                                                txnCbReqData.ecrSaleReqId=voidData.ecrTxnSaleRequestId
-                                                                txnCbReqData.txnTime = voidData.time
-                                                                txnCbReqData.txnDate = voidData.transactionDate
-                                                                txnCbReqData.txnType= TransactionType.VOID.type
-
-                                                                TxnCallBackRequestTable.insertOrUpdateTxnCallBackData(
-                                                                    txnCbReqData
-                                                                )
-                                                                syncTxnCallBackToHost {
-                                                                    Log.e(
-                                                                        "TXN CB ",
-                                                                        "SYNCED TO SERVER  --> $it"
-                                                                    )
-                                                                    (activity as MainActivity).hideProgress()
-                                                                }
-                                                                Log.e("VOID LAST", "COMMENT ******")
-
-                                                                //Here we are Syncing Offline Sale if we have any in Batch Table and also Check Sale Response has Auto Settlement enabled or not:-
-                                                                //If Auto Settlement Enabled Show Pop Up and User has choice whether he/she wants to settle or not:-
-
-                                                                if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                                    withContext(Dispatchers.Main) {
-                                                                        syncOfflineSaleAndAskAutoSettlement(
-                                                                            autoSettlementCheck.substring(0, 1)
-                                                                        )
-                                                                    }
-                                                                }
-                                                            }
-                                                        }else{
-                                                            if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                                                GlobalScope.launch(Dispatchers.Main) {
-                                                                    syncOfflineSaleAndAskAutoSettlement(
-                                                                        autoSettlementCheck.substring(0, 1)
-                                                                    )
-                                                                }
-                                                            }
-
-                                                        }*/
                                                     }
                                                 }
 
@@ -705,9 +321,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                                     }
                                 }
                                 2 -> {
-                                    // kushal
-                                    //checkForPrintReversalReceipt(activity, "") {
-                                    //}
+
                                 }
                             }
                         }
@@ -728,6 +342,11 @@ batchData.field58EmiData=oldBatchData.field58EmiData
         val TAG = VoidHelper::class.java.simpleName
         fun start() {
             GlobalScope.launch {
+
+                AppPreference.saveString(AppPreference.PCKT_DATE, "")
+                AppPreference.saveString(AppPreference.PCKT_TIME, "")
+                AppPreference.saveString(AppPreference.PCKT_TIMESTAMP, "")
+
                 val transactionISO = CreateVoidPacket(batch).createVoidISOPacket()
                 //logger1("Transaction REQUEST PACKET --->>", transactionISO.generateIsoByteRequest(), "e")
 
@@ -874,20 +493,14 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                             }
                             (activity as BaseActivityNew).hideProgress()
 
-//                            val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
-//                            startActivity(intent)
                         }
 
                     }
                 }, {
                     lifecycleScope.launch(Dispatchers.IO) {
-
-
                         cb(true)
                     }
                     (activity as BaseActivityNew).hideProgress()
-//                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
-//                    startActivity(intent)
                 })
         }
     }
@@ -943,7 +556,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
                         }
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
-                                voidTransInvoicesDialog(bat as ArrayList<TempBatchFileDataTable>) // kushal
+                                voidTransInvoicesDialog(bat as ArrayList<TempBatchFileDataTable>)
                             }
                         }
                     }
@@ -952,101 +565,15 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
             }
 
-            /*batchFileViewModel.getBatchTableDataListByInvoice(invoiceWithPadding(invoice)).observe(viewLifecycleOwner) { allbat ->
-
-                logger("batchTable", allbat.size.toString(), "e")
-                var voidData: BatchTable? = null
-                val bat: ArrayList<BatchTable> = arrayListOf()
-                if (allbat != null) {
-                    for (i in allbat) {
-                        if (i?.transactionType == BhTransactionType.SALE.type ||
-                            i?.transactionType == BhTransactionType.EMI_SALE.type ||
-                            i?.transactionType == BhTransactionType.REFUND.type ||
-                            i?.transactionType == BhTransactionType.SALE_WITH_CASH.type ||
-                            i?.transactionType == BhTransactionType.CASH_AT_POS.type ||
-                            i?.transactionType == BhTransactionType.TIP_SALE.type ||
-                            i?.transactionType == BhTransactionType.TEST_EMI.type ||
-                            i?.transactionType == BhTransactionType.BRAND_EMI.type ||
-                            i?.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type||
-                            i?.transactionType == BhTransactionType.PRE_AUTH.type
-                        )
-                            bat.add(i)
-                    }
-
-                    val tpt = getTptData()
-                    when (bat.size) {
-                        0 -> {
-
-                            CoroutineScope(Dispatchers.Main).launch {
-                                (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.no_data_found) ?: "") {}
-                            }
-                        }
-                        1 -> {
-                            voidData = bat.first()
-                            if (voidData?.transactionType == BhTransactionType.REFUND.type && tpt?.voidRefund != "1") {
-                                ToastUtils.showToast(
-                                    requireContext(),
-                                    getString(R.string.void_refund_not_allowed)
-                                )
-                            } else {
-
-                                lifecycleScope.launch(Dispatchers.Main) {
-                                    voidTransConfirmationDialog(voidData)
-                                }
-                            }
-                        }
-                        else -> {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                voidTransInvoicesDialog(bat as ArrayList<BatchTable>)
-                            }
-                        }
-                    }
-
-                }
-
-            }*/
         }
 
     }
 
-    // old
-    /*private fun voidTransConfirmationDialog(batchTable: BatchTable) {
-        if(batchTable.receiptData != null) {
-                    val date = batchTable.receiptData?.dateTime ?: ""
-                    val parts = date.split(" ")
-                    println("Date: " + parts[0])
-                    println("Time: " + (parts[1]) )
-                    val amt ="%.2f".format((((batchTable.receiptData?.txnAmount ?: "").toDouble()).div(100)).toString().toDouble())
-                    DialogUtilsNew1.showVoidSaleDetailsDialog(
-                        requireContext(),
-                        parts[0],
-                        parts[1],
-                        batchTable.receiptData?.tid ?: "",
-                        batchTable.receiptData?.invoice ?: "",
-                        amt
-                    ) {
-                        doVoidTransaction(batchTable)
-                    }
-                }else{
-                    ToastUtils.showToast(requireContext(),"Data not found.")
-                }
-    }*/
 
     private fun voidTransConfirmationDialog(batchTable: TempBatchFileDataTable) {
         if(batchTable != null) {
 
                     val amt ="%.2f".format((((batchTable?.transactionalAmmount ?: "").toDouble()).div(100)).toString().toDouble())
-                    /*DialogUtilsNew1.showVoidSaleDetailsDialog(
-                        requireContext(),
-                        batchTable.transactionDate,
-                        batchTable.time,
-                        batchTable.tid ?: "",
-                        batchTable.invoiceNumber ?: "",
-                        amt
-                    ) {
-                       // doVoidTransaction(batchTable) // kushal
-                        onContinueClicked(batchTable)
-                    }*/
 
             DialogUtilsNew1.showDetailsConfirmDialog(requireContext(), transactionType = BhTransactionType.VOID,
                 tid = batchTable.tid, totalAmount = amt, invoice = batchTable.invoiceNumber, date = batchTable.transactionDate, time = batchTable.time,
@@ -1205,31 +732,6 @@ batchData.field58EmiData=oldBatchData.field58EmiData
 
     }
 
-    // old
-    /*private fun voidTransInvoicesDialog(voidData: ArrayList<BatchTable>) {
-        val dialog = Dialog(requireActivity())
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.recyclerview_layout)
-
-        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-        val window = dialog.window
-        window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-
-        val rv = dialog.findViewById<RecyclerView>(R.id.recycler_view)
-        val adptr = VoidTxnAdapter(voidData) {
-            dialog.hide()
-            //voidTransConfirmationDialog(it) // kushal
-        }
-        rv.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = adptr
-        }
-        dialog.show()
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    }*/
 
     private fun voidTransInvoicesDialog(voidData: ArrayList<TempBatchFileDataTable>) {
         val dialog = Dialog(requireActivity())
@@ -1246,7 +748,7 @@ batchData.field58EmiData=oldBatchData.field58EmiData
         val rv = dialog.findViewById<RecyclerView>(R.id.recycler_view)
         val adptr = VoidTxnAdapter(voidData) {
             dialog.hide()
-            voidTransConfirmationDialog(it) // kushal
+            voidTransConfirmationDialog(it)
         }
         rv.apply {
             layoutManager = LinearLayoutManager(activity)
@@ -1290,39 +792,3 @@ class VoidTxnAdapter(
 
     }
 }
-
-// old
-/*
-class VoidTxnAdapter(
-    var batchData: ArrayList<BatchTable>,
-    var cb: (BatchTable) -> Unit
-) :
-    RecyclerView.Adapter<VoidTxnAdapter.VoidTxnViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VoidTxnViewHolder {
-        return VoidTxnViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_void_invoices_data, parent, false)
-        )
-    }
-
-    override fun onBindViewHolder(holder: VoidTxnViewHolder, position: Int) {
-        val voidData = batchData[position]
-        holder.tidView.text = "TID : " + voidData?.receiptData?.tid
-        holder.invoiceView.text = "INVOICE : " + voidData.bonushubInvoice
-        holder.voidView.setOnClickListener {
-            //  VFService.showToast("CLICKED  $position")
-            cb(voidData)
-        }
-    }
-
-    override fun getItemCount(): Int = batchData.size
-
-
-    class VoidTxnViewHolder(var v: View) : RecyclerView.ViewHolder(v) {
-        var tidView = v.findViewById<TextView>(R.id.txn_tid_tv)
-        var invoiceView = v.findViewById<TextView>(R.id.txn_invoice_tv)
-        var voidView = v.findViewById<CardView>(R.id.voidTxnLL)
-
-    }
-}*/

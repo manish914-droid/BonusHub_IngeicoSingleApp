@@ -472,7 +472,7 @@ fun readIso(data: String, isRequest: Boolean = true): IsoDataReader = IsoDataRea
 /**
  * It adds date and time field in ISODataWriter object.
  * */
-fun addIsoDateTime(iWriter: IsoDataWriter) {
+fun addIsoDateTime(iWriter: IsoDataWriter):Triple<String,String, Long> {
     val dateTime: Long = Calendar.getInstance().timeInMillis
     val time: String = SimpleDateFormat("HHmmss", Locale.getDefault()).format(dateTime)
     val date: String = SimpleDateFormat("MMdd", Locale.getDefault()).format(dateTime)
@@ -482,6 +482,7 @@ fun addIsoDateTime(iWriter: IsoDataWriter) {
         addField(13, date)
     }
 
+    return Triple(date,time, dateTime)
 }
 
 
