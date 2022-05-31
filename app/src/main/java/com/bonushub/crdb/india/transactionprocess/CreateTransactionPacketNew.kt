@@ -267,5 +267,9 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             additionalData["cardType"]= cardProcessedData.getReadCardType()?.cardTypeName.toString()
 
         }
+        else{
+
+            Log.e("TPT","Tpt is null")
+        }
     }
 }

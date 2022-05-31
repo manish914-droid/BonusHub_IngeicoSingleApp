@@ -19,7 +19,7 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.MainViewModel
-import com.mindorks.example.coroutines.utils.Status
+import com.bonushub.crdb.india.utils.Status
 
 
 import dagger.hilt.android.AndroidEntryPoint

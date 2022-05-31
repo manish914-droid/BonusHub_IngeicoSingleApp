@@ -1,6 +1,5 @@
 package com.bonushub.crdb.india.utils
 
-import com.mindorks.example.coroutines.utils.Status
 
 /**
  * Generic class for holding success response, error response and loading status

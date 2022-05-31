@@ -1,4 +1,4 @@
-package com.mindorks.example.coroutines.utils
+package com.bonushub.crdb.india.utils
 
 enum class Status {
     SUCCESS,

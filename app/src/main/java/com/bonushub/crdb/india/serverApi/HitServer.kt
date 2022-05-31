@@ -34,7 +34,7 @@ object HitServer  {
     private var callbackSale: ServerMessageCallbackSale? = null
     var reversalToBeSaved: IsoDataWriter?=null
 
-    //@Synchronized
+    @Synchronized
     suspend fun hitServer(data: ByteArray, callback: ServerMessageCallback, progressMsg: ProgressCallback,isAppUpdate: Boolean = false){
         this@HitServer.callback = callback
         try {
@@ -404,37 +404,18 @@ object HitServer  {
                 socket.connect(sAddress, connTimeOut)//
                 socket.soTimeout = resTimeOut
                 cb(socket)
-                hitCounter = 1
+               // hitCounter = 1
 
             } else callback?.invoke("No Comm Data Found", false)
 
-        }    catch (ex: SocketTimeoutException) {
-            println("SocketTimeoutException -> " + ex.message)
-            //    callback?.invoke(VerifoneApp.appContext.getString(R.string.socket_timeout), false)
-            println("SocketTimeoutException -> " + ex.message)
-            if (hitCounter == 1) {
-                hitCounter = 2
-                openSocket({ hitCounter = 1
-                    cb(it)
-
-                }, isAppUpdate)
-            } else {
-                hitCounter = 1
-                callback?.invoke(
-                    HDFCApplication.appContext.getString(R.string.connection_failed),
-                    false
-                )
-            }
-
-        } catch (ex: Exception) {
+        }   catch (ex: Exception) {
             ex.printStackTrace()
             println("SOCKET CONNECT Parent EXCEPTION")
             if (hitCounter == 1) {
                 hitCounter = 2
                 openSocket({ hitCounter = 1
                     cb(it)
-
-                }, isAppUpdate)
+                           }, isAppUpdate)
             } else {
                 hitCounter = 1
                 callback?.invoke(
@@ -447,8 +428,6 @@ object HitServer  {
             Log.d("Finally Call:- ", "Final Block Runs Here.....")
         }
     }
-
-
 
     suspend fun openSocket(): Socket? {
         try {

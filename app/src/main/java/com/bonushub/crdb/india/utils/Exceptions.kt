@@ -1,8 +1,6 @@
 
 package com.bonushub.crdb.india.utils
 
-import com.mindorks.example.coroutines.utils.Status
-
 
 class RespMessageStatusData(var message: String="Unknown Error", var isSuccess: Boolean=false, var anyData:Any?=null)
 

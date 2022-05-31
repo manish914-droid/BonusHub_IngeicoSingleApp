@@ -26,13 +26,10 @@ import com.bonushub.crdb.india.appupdate.SyncAppUpdateConfirmation
 import com.bonushub.crdb.india.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.di.DBModule
-import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.remote.RestartHandlingModel
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
-import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 
 
@@ -49,17 +46,12 @@ import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
-import com.mindorks.example.coroutines.utils.Status
-import com.usdk.apiservice.aidl.printer.AlignMode
 
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 

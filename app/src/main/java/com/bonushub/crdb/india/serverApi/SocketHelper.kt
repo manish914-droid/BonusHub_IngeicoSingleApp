@@ -117,6 +117,7 @@ object SocketHelper {
                 }
                 socket.connect(sAddress, connTimeOut)//
                 socket.soTimeout = resTimeOut
+
                 hitCounter = 1
                 return RespMessageStatusData(isSuccess = true, anyData = socket)
             } else {

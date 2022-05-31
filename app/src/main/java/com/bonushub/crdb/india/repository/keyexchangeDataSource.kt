@@ -14,13 +14,11 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.vxutils.Utility.*
 
 import com.bonushub.pax.utils.*
-import com.mindorks.example.coroutines.utils.Status
+import com.bonushub.crdb.india.utils.Status
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.data.IntValue
 import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
-import kotlinx.coroutines.*
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -176,11 +174,13 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
             var strinitSuccess: Boolean? = null
 
             val isoW = createKeyExchangeIso(tid)
+            logger("startExchange1_req",(isoW as IsoDataWriter).isoMap,"e")
             val bData = isoW.generateIsoByteRequest()
             val (strResult,strSucess,_) = socketConnection(bData)
 
             if (null !=strResult && strSucess == true) {
                 val iso = readIso(strResult)
+                logger("startExchange1_resp",(iso).isoMap,"e")
                 Utility().logger(KeyExchanger.TAG, iso.isoMap)
                 val resp = iso.isoMap[39]
                 val f11 = iso.isoMap[11]
@@ -241,7 +241,6 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                                 }
                             } else {
                                 AppPreference.saveBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString(), true)
-
                               //  AppPreference.saveLogin(false)
                                 return Result.error(ResponseHandler(Status.ERROR,"Error in key insertion",false,false),"Error in key insertion")
                             }
