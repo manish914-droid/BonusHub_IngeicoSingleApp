@@ -92,7 +92,8 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         syncTransactionCallback(false, "", result, null,null,null)
                                     }
                                 }
-                            } else {
+                            }
+                            else {
 
                                 try {
                                     val responseIsoData: IsoDataReader = readIso(result, false)

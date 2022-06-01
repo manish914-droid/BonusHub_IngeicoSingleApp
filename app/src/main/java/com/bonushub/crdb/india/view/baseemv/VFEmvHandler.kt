@@ -481,7 +481,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
             }
         }
 
-        cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_NO_PIN.posEntry.toString())
+     //   cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_NO_PIN.posEntry.toString())
 
         val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
 
@@ -750,6 +750,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         }
     }
 
+    // CVM rule
     @Throws(RemoteException::class)
     open fun doCardHolderVerify(cvm: CVMMethod) {
         System.out.println("=> onCardHolderVerify | " + EMVInfoUtil.getCVMDataDesc(cvm))
@@ -765,7 +766,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                 when (cardProcessedDataModal.getReadCardType()) {
                     DetectCardType.EMV_CARD_TYPE -> {
                         if (cardProcessedDataModal.getIsOnline() == 1) {
-                            cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                             //insert with pin
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                         } else {
@@ -776,7 +777,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                     }
                     DetectCardType.CONTACT_LESS_CARD_TYPE -> {
                         if (cardProcessedDataModal.getIsOnline() == 1) {
-                            cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
                         } else {
                             cardProcessedDataModal.setGeneratePinBlock("")
@@ -785,7 +786,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                     }
                     DetectCardType.MAG_CARD_TYPE -> {
                         //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
-                        cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+                        cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
 
                         if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
@@ -1000,7 +1001,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
         try {
             val chvStatus = TLV.fromData(EMVTag.DEF_TAG_CHV_STATUS, byteArrayOf(result))
             val ret = emv!!.respondEvent(chvStatus.toString())
-            println("...onCardHolderVerify: respondEvent" + ret)
+            println("...onCardHolderVerify: respondEvent$ret")
         } catch (e: Exception) {
             //handleException(e);
         }
@@ -1021,6 +1022,8 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
 
             if (a > 0) {
                 track22 = track2.substring(0, a)
+            }else{
+                track22=track2
             }
         }
 
@@ -1044,6 +1047,7 @@ open class VFEmvHandler constructor(): EMVEventHandler.Stub() {
                     val account = BytesUtil.subBytes(data, 1 + 1 + 1, len.toInt())
                     val accTLVList = TLVList.fromBinary(account)
                     val track2 = BytesUtil.bytes2HexString(accTLVList.getTLV("57").bytesValue)
+                    println("Field 57 data is1"+track2)
                     var field57 =   "35|"+track2.replace("D", "=")?.replace("F", "")
                     println("Field 57 data is"+field57)
                     val encrptedPan = getEncryptedPanorTrackData(field57,true)
