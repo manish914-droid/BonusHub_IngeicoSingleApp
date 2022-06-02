@@ -122,7 +122,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
                     if(!AppPreference.getBoolean(AppPreference.LOGIN_KEY)){
                         //showEnterTIDPopUp
-                        DialogUtilsNew1.getInputDialog(requireContext(),"ENTER TID","",true,true,"TID", {
+                        /*DialogUtilsNew1.getInputTID_Dialog(requireContext(),"ENTER TID","",true,true,"TID", {
 
                             if(it.length < 8){
                             ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
@@ -131,7 +131,9 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                 //observeMainViewModel()
                             }
                         },
-                            { unselectItem() })
+                            { unselectItem() })*/
+
+                        (activity as NavigationActivity).transactFragment(InitFragment(), isBackStackAdded = false)
 
                     }else{
                         // check batch open or not
@@ -484,7 +486,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                // get tid by user
                 logger("get tid","by user")
 
-                DialogUtilsNew1.getInputDialog(requireContext(),"ENTER TID","",true,true,"TID", {
+                DialogUtilsNew1.getInputTID_Dialog(requireContext(),"ENTER TID","",true,true,"TID", {
 
                     if(it.length < 8){
                         ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
@@ -646,10 +648,11 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                     Status.ERROR -> {
                         iDialog?.hideProgress()
                         CoroutineScope(Dispatchers.Main).launch {
-                            (activity as? NavigationActivity)?.getInfoDialog(
+                            (activity as? NavigationActivity)?.alertBoxWithActionNew(
                                 "Error",
                                 result.error ?: ""
-                            ) {}
+                            ,R.drawable.ic_info_orange,getString(R.string.ok),"",false,false,{ unselectItem() },{}
+                            )
                         }
                         // ToastUtils.showToast(activity,"Error called  ${result.error}")
                     }

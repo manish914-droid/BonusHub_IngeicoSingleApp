@@ -14,49 +14,15 @@
         android:layout_marginTop="@dimen/dashboard_img_height"
         android:orientation="vertical">
 
-        <!--<androidx.cardview.widget.CardView
-            android:id="@+id/tid_crd_view"
-            style="@style/CardView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/pad_10"
-
-            >
-
-            <EditText
-                android:id="@+id/if_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/card_edge"
-                android:cursorVisible="false"
-                android:drawableStart="@drawable/ic_tid"
-                android:drawablePadding="@dimen/pad_20"
-                android:ems="10"
-                android:hint="@string/enter_tid_colon"
-                android:imeOptions="actionDone"
-                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-                android:inputType="text"
-                android:maxLength="8"
-                android:paddingStart="@dimen/pad_16"
-                android:paddingTop="@dimen/pad_10"
-                android:paddingEnd="@dimen/pad_16"
-                android:paddingBottom="@dimen/pad_10"
-
-                android:textColor="@color/black"
-                android:textColorHint="@color/hint_color"
-                />
-
-        </androidx.cardview.widget.CardView>-->
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/billno_crd_view"
             style="@style/TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/pad_20"
             android:layout_marginTop="@dimen/pad_20"
             android:layout_marginRight="@dimen/pad_20"
-            android:hint="Terminal Id"
+            android:hint="@string/terminal_id"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
@@ -82,20 +48,39 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <!--<Button
-            android:id="@+id/if_proceed_btn"
-            style="@style/Widget.Neumorph.Button"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputEditText"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:minHeight="@dimen/pad_50"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/pad_20"
-            android:text="Proceed Initializing"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_regular"
-            android:background="@drawable/edge_button_inactive_init"
-            android:drawableRight="@drawable/ic_init_next"/>-->
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/re_enter_confirm"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
+            app:boxCornerRadiusTopStart="@dimen/pad_12"
+            app:boxCornerRadiusTopEnd="@dimen/pad_12"
+            app:boxCornerRadiusBottomStart="@dimen/pad_12"
+            app:boxCornerRadiusBottomEnd="@dimen/pad_12">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/if_et_confirm"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_tid_new"
+                android:drawablePadding="@dimen/pad_5"
+                android:ems="10"
+                android:textSize="20sp"
+                android:maxLength="8"
+                android:textAlignment="textStart"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:padding="@dimen/pad_10" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/if_proceed_btn"

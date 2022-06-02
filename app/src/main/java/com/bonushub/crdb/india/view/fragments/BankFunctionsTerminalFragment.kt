@@ -205,6 +205,38 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
         lastTid = dataList[position]?.titleValue?:""
         var isTID = titleName.equals("TID", ignoreCase = true)
 
+        if(isTID){
+            DialogUtilsNew1.getInputTID_Dialog(context as Context, getString(R.string.update), dataList[position]?.titleValue?:"", false, isTID,dataList[position]?.titleName?:"",{
+                if (titleName.equals("TID", ignoreCase = true)) {
+                    when {
+                        it == dataList[position]?.titleValue -> {
+                            ToastUtils.showToast(requireContext(),"TID Unchanged")
+                        }
+                        it.length < 8 -> {
+                            ToastUtils.showToast(requireContext(), "Please enter a valid 8 digit TID")
+                        }
+                        else -> {
+                            lifecycleScope.launch {
+                                dataList[position]?.titleValue = it
+                                dataList[position]?.isUpdated = true
+                                mAdapter.notifyItemChanged(position)
+                                updateTable(position,lastTid ?: "",it)
+                            }
+
+                        }
+                    }
+
+                } else {
+                    dataList[position]?.titleValue = it
+                    dataList[position]?.isUpdated = true
+                    mAdapter.notifyItemChanged(position)
+                    lifecycleScope.launch {
+                        updateTable(position, it, it)
+                    }
+                }
+            },{})
+
+        }else{
         DialogUtilsNew1.getInputDialog(context as Context, getString(R.string.update), dataList[position]?.titleValue?:"", false, isTID,dataList[position]?.titleName?:"",{
             if (titleName.equals("TID", ignoreCase = true)) {
                 when {
@@ -234,6 +266,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                 }
             }
         },{})
+        }
     }
 
     suspend fun updateTable(positionValue: Int, lastTidValue: String, updatedTid: String) {
@@ -405,7 +438,8 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                     }
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        (activity as? NavigationActivity)?.getInfoDialog("Error", result.error ?: "") {}
+                        (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", result.error ?: "",R.drawable.ic_info_orange,
+                            getString(R.string.ok),"",false,false,{},{})
                     }
 
                  //   ToastUtils.showToast(activity,"Error called  ${result.error}")

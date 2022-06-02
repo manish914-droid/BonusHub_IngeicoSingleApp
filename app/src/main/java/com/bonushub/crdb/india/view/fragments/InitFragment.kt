@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
@@ -62,23 +64,123 @@ class InitFragment : Fragment() {
         // it's handling for init button is enable or disable ----> it will be enable when Tid length is equal to 8
         fragmentInitBinding.ifProceedBtn.isEnabled = false
         fragmentInitBinding.ifProceedBtn.isClickable = false
+
+        fragmentInitBinding?.ifEt?.setText("")
+        fragmentInitBinding?.ifEtConfirm?.setText("")
+
         fragmentInitBinding.ifEt.addTextChangedListener(textWatcher)
         fragmentInitBinding.ifEt.transformationMethod = null
        // fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_inactive_init);
         fragmentInitBinding.conLayInitBtn.alpha = .5f
 
-        fragmentInitBinding.ifEt.addTextChangedListener(Utility.OnTextChange {
-            fragmentInitBinding.ifProceedBtn.isEnabled = it.length == 8
-            if (fragmentInitBinding.ifProceedBtn.isEnabled) {
-                //fragmentInitBinding.ifProceedBtn.setBackgroundResource(R.drawable.edge_button_active_init);
-                fragmentInitBinding.conLayInitBtn.alpha = 1f
-            }
-        })
 
         //region Below Code write App Revision ID to file when first time Init Screen opens
         //in App after that this file will override after settlement:-
         context?.let { writeAppRevisionIDInFile(it) }
         //endregion
+
+        fragmentInitBinding?.ifEt?.addTextChangedListener(Utility.OnTextChange {
+
+            fragmentInitBinding?.ifEtConfirm?.setText("")
+            checkInitProcessEnable()
+
+        })
+
+        fragmentInitBinding?.ifEt?.setOnFocusChangeListener { view, b ->
+            if(fragmentInitBinding?.ifEt?.hasFocus() == true){
+                Log.e("tid","focus")
+                //  binding?.ifEt?.setInputType(InputType.TYPE_CLASS_TEXT)
+
+                fragmentInitBinding?.ifEt?.setSelection(fragmentInitBinding?.ifEt?.text.toString().length)
+
+                if(fragmentInitBinding?.ifEtConfirm?.text.toString().isNotEmpty() && fragmentInitBinding?.ifEt?.text.toString().equals(fragmentInitBinding?.ifEtConfirm?.text.toString())){
+                    fragmentInitBinding?.ifEtConfirm?.setError(null)
+                }else{
+                    //  binding?.ifEt?.setError(null)
+                    if(fragmentInitBinding?.ifEtConfirm?.text.toString().isNotEmpty()) {
+                        fragmentInitBinding?.ifEtConfirm?.setError("TID Mismatch")
+                       // (activity as NavigationActivity).showToast("TID Mismatch")
+                    }else{
+                        fragmentInitBinding?.ifEtConfirm?.setError(null)
+                    }
+                }
+
+            }else{
+                Log.e("tid","not focus")
+                fragmentInitBinding?.ifEt?.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+
+                if(fragmentInitBinding?.ifEt?.text.toString().length == 8){
+                   // binding?.ifEt?.setError(null) //
+
+                }else{
+                    fragmentInitBinding?.ifEt?.setError("Tid should be 8 char.")
+                }
+
+            }
+
+            checkInitProcessEnable()
+
+        }
+
+        fragmentInitBinding?.ifEtConfirm?.addTextChangedListener(object:TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+                val ll = p0.toString().length
+                if(ll > 0) {
+                    if (fragmentInitBinding?.ifEt?.text.toString().length >= ll && fragmentInitBinding?.ifEt?.text.toString().substring(0,ll).equals(p0.toString())) {
+                        fragmentInitBinding?.ifEtConfirm?.setError(null)
+
+                    } else {
+                        fragmentInitBinding?.ifEtConfirm?.setError("TID Mismatch")
+                    }
+                }else{
+                    fragmentInitBinding?.ifEtConfirm?.setError(null)
+                }
+
+                checkInitProcessEnable()
+
+            }
+
+        })
+
+        val alphanumericFilter =
+            InputFilter { source, start, end, dest, dstart, dend ->
+                for (i in start until end) {
+                    if (!Character.isLetterOrDigit(source[i])) {
+                        return@InputFilter ""
+                    }
+                }
+                null
+            }
+        val lengthFilter = InputFilter.LengthFilter(8)
+
+        val filterError =
+            InputFilter { source, start, end, dest, dstart, dend ->
+
+                val ll = fragmentInitBinding?.ifEtConfirm?.text.toString().length
+                if(ll > 0) {
+                    if (fragmentInitBinding?.ifEt?.text.toString().length >= ll && fragmentInitBinding?.ifEt?.text.toString().substring(0,ll).equals(fragmentInitBinding?.ifEtConfirm?.text.toString())) {
+                        fragmentInitBinding?.ifEtConfirm?.setError(null)
+
+                    } else {
+                        fragmentInitBinding?.ifEtConfirm?.setError("TID Mismatch")
+                    }
+                }else{
+                    fragmentInitBinding?.ifEtConfirm?.setError(null)
+                }
+
+                null
+            }
+
+        fragmentInitBinding?.ifEt?.filters = arrayOf(alphanumericFilter,lengthFilter)
+        fragmentInitBinding?.ifEtConfirm?.filters = arrayOf(alphanumericFilter,lengthFilter, filterError)
 
         fragmentInitBinding.ifProceedBtn.setOnClickListener {
        iDialog?.showProgress(getString(R.string.please_wait_host))
@@ -86,6 +188,13 @@ class InitFragment : Fragment() {
         }
         observeMainViewModel()
     }
+
+    override fun onResume() {
+        super.onResume()
+        fragmentInitBinding?.ifEt?.setText("")
+        fragmentInitBinding?.ifEtConfirm?.setText("")
+    }
+
 // it's for watching length of tid and change the color of proceed button according to that
     private val textWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -257,6 +366,17 @@ class InitFragment : Fragment() {
         })
 
 
+    }
+
+    private fun checkInitProcessEnable():Boolean
+    {
+        fragmentInitBinding?.ifProceedBtn?.isEnabled =  fragmentInitBinding?.ifEt?.text.toString().length == 8 && fragmentInitBinding?.ifEt?.text.toString().equals(fragmentInitBinding?.ifEtConfirm?.text.toString())
+        if(fragmentInitBinding?.ifProceedBtn?.isEnabled == true){
+            fragmentInitBinding.conLayInitBtn.alpha = 1f
+        }else{
+            fragmentInitBinding.conLayInitBtn.alpha = .5f
+        }
+        return fragmentInitBinding?.ifProceedBtn?.isEnabled!!
     }
 
 

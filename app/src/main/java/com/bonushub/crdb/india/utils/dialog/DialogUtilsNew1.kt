@@ -5,8 +5,10 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
 import android.text.method.DigitsKeyListener
 import android.util.Log
 import android.view.*
@@ -18,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.utils.BhTransactionType
 import com.bonushub.crdb.india.utils.ToastUtils
+import com.bonushub.crdb.india.utils.Utility
 import com.bonushub.crdb.india.view.fragments.getEditorActionListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -151,6 +154,153 @@ class DialogUtilsNew1 {
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }.show()
+        }
+
+        fun getInputTID_Dialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false,toastMsg:String, callback: (String) -> Unit, callbackCancel: () -> Unit) {
+            Dialog(context).apply {
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                requestWindowFeature(Window.FEATURE_NO_TITLE)
+                setContentView(R.layout.dialog_tid)
+                setCancelable(false)
+                val window = window
+                window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+
+                findViewById<TextView>(R.id.dialogTittle).text = title
+                val edtTextTid = findViewById<EditText>(R.id.edtTextTid)
+                val edtTextReEnterTid = findViewById<EditText>(R.id.edtTextReEnterTid)
+                val okbtn = findViewById<TextView>(R.id.txtViewOk)
+
+                edtTextTid?.addTextChangedListener(Utility.OnTextChange {
+
+                    edtTextReEnterTid.setText("")
+                    checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)
+
+                })
+
+                edtTextTid.setOnFocusChangeListener { view, b ->
+                    if(edtTextTid.hasFocus() == true){
+                        Log.e("tid","focus")
+                        //  binding?.ifEt?.setInputType(InputType.TYPE_CLASS_TEXT)
+
+                        edtTextTid.setSelection(edtTextTid.text.toString().length)
+
+                        if(edtTextReEnterTid.text.toString().isNotEmpty() && edtTextTid.text.toString().equals(edtTextReEnterTid.text.toString())){
+                            edtTextReEnterTid.setError(null)
+                        }else{
+                            //  binding?.ifEt?.setError(null)
+                            if(edtTextReEnterTid.text.toString().isNotEmpty()) {
+                                edtTextReEnterTid.setError("TID Mismatch")
+                                // (activity as NavigationActivity).showToast("TID Mismatch")
+                            }else{
+                                edtTextReEnterTid.setError(null)
+                            }
+                        }
+
+                    }else{
+                        Log.e("tid","not focus")
+                        edtTextTid.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+
+                        if(edtTextTid.text.toString().length == 8){
+                            // binding?.ifEt?.setError(null) //
+
+                        }else{
+                            edtTextTid.setError("Tid should be 8 char.")
+                        }
+
+                    }
+
+                    checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)
+
+                }
+
+                edtTextReEnterTid.addTextChangedListener(object: TextWatcher {
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun afterTextChanged(p0: Editable?) {
+
+                        val ll = p0.toString().length
+                        if(ll > 0) {
+                            if (edtTextTid.text.toString().length >= ll && edtTextTid.text.toString().substring(0,ll).equals(p0.toString())) {
+                                edtTextReEnterTid.setError(null)
+
+                            } else {
+                                edtTextReEnterTid.setError("TID Mismatch")
+                            }
+                        }else{
+                            edtTextReEnterTid.setError(null)
+                        }
+
+                       checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)
+
+                    }
+
+                })
+
+                val alphanumericFilter =
+                    InputFilter { source, start, end, dest, dstart, dend ->
+                        for (i in start until end) {
+                            if (!Character.isLetterOrDigit(source[i])) {
+                                return@InputFilter ""
+                            }
+                        }
+                        null
+                    }
+                val lengthFilter = InputFilter.LengthFilter(8)
+
+                val filterError =
+                    InputFilter { source, start, end, dest, dstart, dend ->
+
+                        val ll = edtTextReEnterTid.text.toString().length
+                        if(ll > 0) {
+                            if (edtTextTid.text.toString().length >= ll && edtTextTid.text.toString().substring(0,ll).equals(edtTextReEnterTid.text.toString())) {
+                                edtTextReEnterTid.setError(null)
+
+                            } else {
+                                edtTextReEnterTid.setError("TID Mismatch")
+                            }
+                        }else{
+                            edtTextReEnterTid.setError(null)
+                        }
+
+                        null
+                    }
+
+                edtTextTid.filters = arrayOf(alphanumericFilter,lengthFilter)
+                edtTextReEnterTid.filters = arrayOf(alphanumericFilter,lengthFilter, filterError)
+
+                //-------
+                findViewById<TextView>(R.id.txtViewCancel).setOnClickListener {
+                    dismiss()
+                    callbackCancel()
+                }
+                okbtn.setOnClickListener {
+
+                    if (checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)) {
+                        dismiss()
+                        callback(edtTextTid.text.toString())
+                    }
+                }
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }.show()
+        }
+
+        private fun checkInitProcessEnable(tidText:String, tidConfirmText:String,okBtn:TextView):Boolean
+        {
+            val isEnabled =  tidText.length == 8 && tidText.equals(tidConfirmText)
+            if(isEnabled){
+                okBtn.alpha = 1f
+            }else{
+                okBtn.alpha = .5f
+            }
+            return isEnabled
         }
 
         fun showMsgOkDialog(

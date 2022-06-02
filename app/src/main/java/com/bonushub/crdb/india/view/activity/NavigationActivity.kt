@@ -371,7 +371,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 }
             }
             navHostFragment?.navController?.popBackStack()
-            navHostFragment?.navController?.navigate(R.id.initFragment)
+           // navHostFragment?.navController?.navigate(R.id.initFragment)
+            navHostFragment?.navController?.navigate(R.id.initConfirmFragment)
         }
     }
 
@@ -384,15 +385,9 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
             transactFragment(DashboardFragment())
 
         } else {
-            /*      GlobalScope.launch(Dispatchers.IO) {
-                      Utility().readLocalInitFile { status, msg ->
-                          Log.d("Init File Read Status ", status.toString())
-                          Log.d("Message ", msg)
-                          //    refreshDrawer()
-                      }
-                  }*/
-
-            transactFragment(InitFragment())
+           // transactFragment(InitFragment())
+            manageTopToolBar(true)
+            transactFragment(InitConfirmFragment())
 
         }
     }
@@ -558,7 +553,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         /*logger("current Fragment3",""+supportFragmentManager.fragments.size)
         logger("current Fragment4",""+supportFragmentManager.fragments.toString())
         logger("current Fragment5",""+supportFragmentManager.fragments.get(0)::class.java.simpleName)*/
-        if (supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("NavHostFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("DashboardFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("InitFragment",true)) {
+        //if (supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("NavHostFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("DashboardFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("InitFragment",true)) {
+        if (supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("NavHostFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("DashboardFragment",true) || supportFragmentManager.fragments.get(0)::class.java.simpleName.equals("InitConfirmFragment",true)) {
             Log.d("Dashboard:- ", "Inflated")
             if (isExpanded)
                 showLessOnBackPress?.showLessDashOptions()

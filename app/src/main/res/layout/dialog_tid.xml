@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="@dimen/pad_12"
+        android:layout_margin="@dimen/pad_10">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/dialogTittle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/muli_bold"
+                android:text="UPDATE"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_regular"
+                android:textAlignment="center"
+                android:paddingTop="@dimen/pad_8"
+                android:paddingBottom="@dimen/pad_8"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="#DBE8F5"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tid_crdView"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="@dimen/pad_20"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="start"
+                android:hint="Enter TID"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dialogTittle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtTextTid"
+                    style="@style/TextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:drawableStart="@drawable/ic_key_new"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLength="12"
+                    android:padding="@dimen/pad_8"
+                    android:textIsSelectable="false"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/re_enter_tid_crdView"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="@dimen/pad_20"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="start"
+                android:hint="Re-Enter TID"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tid_crdView">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtTextReEnterTid"
+                    style="@style/TextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:drawableStart="@drawable/ic_key_new"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLength="12"
+                    android:padding="@dimen/pad_8"
+                    android:textIsSelectable="false"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/txtViewCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue_bg_skyblue"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_32"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_32"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="Cancel"
+                android:textColor="@color/txt_color"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/txtViewOk"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="@+id/re_enter_tid_crdView"
+                app:layout_constraintTop_toBottomOf="@+id/re_enter_tid_crdView" />
+
+            <TextView
+                android:id="@+id/txtViewOk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pad_15"
+                android:layout_marginBottom="@dimen/pad_15"
+                android:background="@drawable/edge_blue3"
+                android:fontFamily="@font/muli_regular"
+                android:maxLines="1"
+                android:paddingStart="@dimen/pad_30"
+                android:paddingTop="@dimen/pad_15"
+                android:paddingEnd="@dimen/pad_30"
+                android:paddingBottom="@dimen/pad_15"
+                android:text="OK"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_medium"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/re_enter_tid_crdView"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toEndOf="@+id/txtViewCancel" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

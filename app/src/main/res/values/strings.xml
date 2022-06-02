@@ -35,7 +35,9 @@
 
     <!--TODO: navigation drawer strings-->
     <string name="merchant_name">ME Name  : </string>
-    <string name="terminal_id">TID</string>
+    <string name="terminal_id">Terminal Id</string>
+    <string name="re_enter_confirm">Re-Enter TID</string>
+    <string name="tid">TID</string>
     <string name="merchant_id">MID</string>
     <string name="bank_functions">Bank Functions</string>
     <string name="settings">Settings</string>
@@ -301,6 +303,7 @@
     <string name="sms_payment_link_sent">"SMS payment link has been sent \n \n Would you like to check payment status now."</string>
     <string name="transaction_delined_msg">Transaction Declined</string>
     <string name="transaction_failed_msg">Transaction Failed</string>
+    <string name="network">Network Error!!!</string>
     <string name="network_error">Please enable your data connection</string>
     <string name="txn_status_still_pending">Txn Status Still Pending Check Later</string>
 

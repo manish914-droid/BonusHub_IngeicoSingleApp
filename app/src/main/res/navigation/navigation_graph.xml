@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/initFragment">
+    app:startDestination="@id/initConfirmFragment">
 
     <fragment
         android:id="@+id/initFragment"
@@ -38,5 +38,10 @@
         android:name="com.bonushub.crdb.india.view.fragments.BillNumSerialNumEntryFragment"
         android:label="fragment_bank_functions"
         tools:layout="@layout/fragment_bank_functions" />
+    <fragment
+        android:id="@+id/initConfirmFragment"
+        android:name="com.bonushub.crdb.india.view.fragments.InitConfirmFragment"
+        android:label="fragment_init_confirm"
+        tools:layout="@layout/fragment_init_confirm" />
 
 </navigation>
