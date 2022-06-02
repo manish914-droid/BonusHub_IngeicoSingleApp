@@ -77,6 +77,8 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         if (!progressDialog.isShowing && !(this as Activity).isFinishing) {
             progressTitleMsg.text = progressMsg
             progressDialog.show()
+        }else{
+            progressTitleMsg.text = progressMsg
         }
     }
 
