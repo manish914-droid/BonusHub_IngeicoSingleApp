@@ -11,7 +11,7 @@ import java.nio.channels.ServerSocketChannel
 /**
  * Author Lucky (SocketHelper for Server communication)
  */
-var hitCounter = 1
+//var hitCounter = 1
 
 object SocketHelper {
     val TAG: String = SocketHelper::class.java.simpleName
@@ -92,7 +92,7 @@ object SocketHelper {
     }
 
 
-    private suspend fun getSocket(socketForAppUpdate: Boolean = false): RespMessageStatusData {
+    private suspend fun getSocket(socketForAppUpdate: Boolean = false, hitCounter:Int = 1): RespMessageStatusData {
         Log.d("Getting Socket:- ", "Socket Started Here.....")
         try {
             tct = Utility().getTctData()// always get tct it may get refresh meanwhile
@@ -118,7 +118,7 @@ object SocketHelper {
                 socket.connect(sAddress, connTimeOut)//
                 socket.soTimeout = resTimeOut
 
-                hitCounter = 1
+               // hitCounter = 1
                 return RespMessageStatusData(isSuccess = true, anyData = socket)
             } else {
                 return RespMessageStatusData("No Comm Data Found", isSuccess = false)
@@ -128,11 +128,11 @@ object SocketHelper {
             ex.printStackTrace()
             println("SOCKET CONNECT Parent EXCEPTION")
             return if (hitCounter == 1) {
-                hitCounter = 2
-                getSocket(socketForAppUpdate)
+               // hitCounter = 2
+                getSocket(socketForAppUpdate,2)
 
             } else {
-                hitCounter = 1
+               // hitCounter = 1
 
               //  RespMessageStatusData(ex.message ?: "Connection Error", isSuccess = false)
             RespMessageStatusData("Connection Error \n Unable to connect host" ?: "Connection Error", isSuccess = false)

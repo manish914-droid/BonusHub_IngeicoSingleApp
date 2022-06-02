@@ -86,7 +86,7 @@ object HitServer  {
         }
     }
 
-  //  @Synchronized
+    @Synchronized
     suspend fun hitServersale(data: ByteArray, callbackSale: ServerMessageCallbackSale, progressMsg: ProgressCallback) {
         this@HitServer.callbackSale = callbackSale
         try {
@@ -98,7 +98,7 @@ object HitServer  {
                 // Log.d("OpenSocket:- ", "Socket Start")
 
                 var responseStr: String? = null
-                openSocketSale { socket ->
+                openSocketSale({ socket ->
                     try {
                         // irh?.saveReversal()
                         logger(TAG, "address = ${socket.inetAddress}, port = ${socket.port}", "e")
@@ -145,7 +145,7 @@ object HitServer  {
 
                     }
 
-                }
+                })
 
             } else {
                 callbackSale(
@@ -275,7 +275,7 @@ object HitServer  {
         }
     }
 
-    private suspend fun openSocketSale(cb: OnSocketComplete) {
+    private suspend fun openSocketSale(cb: OnSocketComplete, hitCounter:Int = 1) {
         Log.d("Socket Start:- ", "Sale Socket Started Here.....")
         try {
 
@@ -311,14 +311,16 @@ object HitServer  {
 
         } catch (ex: SocketTimeoutException) {
             println("SocketTimeoutException -> " + ex.message)
+            ex.printStackTrace()
+
             if (hitCounter == 1) {
-                hitCounter = 2
-                openSocketSale {
-                    hitCounter = 1
+              //  hitCounter = 2
+                openSocketSale( {
+                  //  hitCounter = 1
                     cb(it)
-                }
+                },2)
             } else {
-                hitCounter = 1
+              //  hitCounter = 1
                 callbackSale?.invoke(
                     HDFCApplication.appContext.getString(R.string.connection_failed),
                     false,
@@ -334,13 +336,13 @@ object HitServer  {
                    ConnectionError.ConnectionRefusedorOtherError.errorCode.toString()
                )*/
             if (hitCounter == 1) {
-                hitCounter = 2
-                openSocketSale {
-                    hitCounter = 1
+               // hitCounter = 2
+                openSocketSale( {
+                  //  hitCounter = 1
                     cb(it)
-                }
+                },2)
             } else {
-                hitCounter = 1
+              //  hitCounter = 1
                 callbackSale?.invoke(
                     HDFCApplication.appContext.getString(R.string.connection_failed),
                     false,
@@ -355,13 +357,13 @@ object HitServer  {
                    ConnectionError.ConnectionRefusedorOtherError.errorCode.toString()
                )*/
             if (hitCounter == 1) {
-                hitCounter = 2
-                openSocketSale {
-                    hitCounter = 1
+               // hitCounter = 2
+                openSocketSale ({
+                  //  hitCounter = 1
                     cb(it)
-                }
+                },2)
             } else {
-                hitCounter = 1
+               // hitCounter = 1
                 callbackSale?.invoke(
                    HDFCApplication.appContext.getString(R.string.connection_failed),
                     false,
@@ -373,7 +375,7 @@ object HitServer  {
         }
     }
 
-    suspend fun openSocket(cb: OnSocketComplete,isAppUpdate: Boolean = false) {
+    suspend fun openSocket(cb: OnSocketComplete,isAppUpdate: Boolean = false, hitCounter:Int = 1) {
         Log.d("Socket Start:- " , "Socket Started Here.....")
 
         try {
@@ -412,12 +414,12 @@ object HitServer  {
             ex.printStackTrace()
             println("SOCKET CONNECT Parent EXCEPTION")
             if (hitCounter == 1) {
-                hitCounter = 2
-                openSocket({ hitCounter = 1
+                //hitCounter = 2
+                openSocket({ //hitCounter = 1
                     cb(it)
-                           }, isAppUpdate)
+                           }, isAppUpdate,2)
             } else {
-                hitCounter = 1
+             //   hitCounter = 1
                 callback?.invoke(
                     HDFCApplication.appContext.getString(R.string.connection_failed),
                     false

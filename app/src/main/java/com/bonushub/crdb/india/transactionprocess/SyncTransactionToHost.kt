@@ -79,8 +79,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         ConnectionError.ReadTimeout.errorCode
                                         when (cardProcessedDataModal?.getReadCardType()) {
                                             DetectCardType.MAG_CARD_TYPE, DetectCardType.CONTACT_LESS_CARD_TYPE,
-                                            DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE -> {
-                                            }
+                                            DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE ,
                                             DetectCardType.EMV_CARD_TYPE -> {
                                                 val reversalPacket = Gson().toJson(transactionISOData)
                                                 AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
