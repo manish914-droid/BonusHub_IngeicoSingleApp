@@ -1088,9 +1088,49 @@ class TransactionActivity : BaseActivityNew() {
 
                 }else{
 
-                    runOnUiThread {
-                        alertBoxWithActionNew(transactionMsg?:getString(R.string.transaction_failed_msg),"",R.drawable.ic_info_new,"OK","",false,false,{ declinedTransaction() },{})
+                    runOnUiThread { hideProgress() }
+                    //below condition is for print reversal receipt if reversal is generated
+                    // and also check is need to printed or not(backend enable disable)
+                    checkForPrintReversalReceipt(this, "") {
+                        logger("ReversalReceipt", it, "e")
                     }
+
+                    if (ConnectionError.NetworkError.errorCode.toString() == responseCode) {
+                        runOnUiThread {
+                            alertBoxWithActionNew(
+                                getString(R.string.network),
+                                getString(R.string.network_error),
+                                R.drawable.ic_info_orange,
+                                getString(R.string.positive_button_ok),
+                                "",false,false,
+                                { alertPositiveCallback ->
+                                    if (alertPositiveCallback)
+                                        declinedTransaction()
+                                },
+                                {})
+                        }
+                    }else if (ConnectionError.ConnectionTimeout.errorCode.toString() == responseCode) {
+                        runOnUiThread{
+                            alertBoxWithActionNew(
+                                getString(R.string.error_hint),
+                                getString(R.string.connection_error),
+                                R.drawable.ic_info_orange,
+                                getString(R.string.positive_button_ok),
+                                "",false,
+                                false,
+                                { alertPositiveCallback ->
+                                    if (alertPositiveCallback)
+                                        declinedTransaction()
+                                },
+                                {})
+                        }
+                    } else {
+                        runOnUiThread {
+                            alertBoxWithActionNew(transactionMsg?:getString(R.string.transaction_failed_msg),"",R.drawable.ic_info_new,"OK","",false,false,{ declinedTransaction() },{})
+                        }
+                    }
+
+
                 }
 
             }
@@ -1146,6 +1186,7 @@ class TransactionActivity : BaseActivityNew() {
     //Below method is used to handle Transaction Declined case:-
     fun declinedTransaction() {
         try {
+            hideProgress()
             DeviceHelper.getEMV()?.stopSearch()
         //    finish()
             startActivity(Intent(this, NavigationActivity::class.java).apply {
@@ -1153,6 +1194,7 @@ class TransactionActivity : BaseActivityNew() {
             })
         } catch (ex: java.lang.Exception) {
         //    finish()
+            hideProgress()
             startActivity(Intent(this, NavigationActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
