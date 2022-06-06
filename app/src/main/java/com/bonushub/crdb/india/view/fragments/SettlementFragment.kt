@@ -442,7 +442,7 @@ internal class SettlementAdapter(private val list: List<TempBatchFileDataTable>)
         if(getTransactionTypeName(list[p1].transactionType) == "TEST EMI TXN"){
             holder.binding.tvTransactionType.text="SALE "
         }
-        holder.binding.tvTransactionDate.text = list[p1].date
+        holder.binding.tvTransactionDate.text = list[p1].transactionDate
     }
 
     inner class SettlementHolder(val binding: ItemSettlementBinding) :

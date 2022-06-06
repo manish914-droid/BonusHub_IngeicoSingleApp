@@ -951,7 +951,7 @@ class PrintUtil(context: Context?) {
                 e.printStackTrace()
             }
             printer?.setPrnGray(3)
-            printer?.feedLine(5)
+            printer?.feedLine(4)
             printer?.startPrint(object : OnPrintListener.Stub() {
                 @Throws(RemoteException::class)
                 override fun onFinish() {
