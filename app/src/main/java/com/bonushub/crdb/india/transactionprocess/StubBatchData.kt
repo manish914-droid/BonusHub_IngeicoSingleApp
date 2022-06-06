@@ -164,10 +164,10 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
             cardProcessedDataModal.getReadCardType()?.cardTypeName.toString()
         //batchFileData.expiry = isoPackageWriter.expiryDate (Need to Discuss by Ajay)
         if (AppPreference.getBankCode() == "02" || AppPreference.getBankCode() == "2")
-            batchFileData.cardHolderName = cardProcessedDataModal.getCardHolderName() ?: "Amex"
+            batchFileData.cardHolderName = cardProcessedDataModal.getCardHolderName() ?: ""
         else
             batchFileData.cardHolderName = cardProcessedDataModal.getCardHolderName()
-                ?: HDFCApplication.appContext.getString(R.string.hdfc)
+                ?: ""
         //batchFileData.indicator = isoPackageWriter.indicator (Need to Discuss by Ajay)
         batchFileData.field55Data = cardProcessedDataModal.getFiled55() ?: ""
 

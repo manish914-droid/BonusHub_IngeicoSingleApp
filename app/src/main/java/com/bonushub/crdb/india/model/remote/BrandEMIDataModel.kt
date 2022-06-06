@@ -109,6 +109,7 @@ data class BankEMITenureDataModal(
 
 data class TenuresWithIssuerTncs(  var bankEMIIssuerTAndCList: BankEMIIssuerTAndCDataModal
         , var bankEMISchemesDataList: MutableList<BankEMITenureDataModal>
+        , var tripleForInstaEmi:Triple<Boolean, String, Boolean> = Triple(false,"",false)
 )
 
 

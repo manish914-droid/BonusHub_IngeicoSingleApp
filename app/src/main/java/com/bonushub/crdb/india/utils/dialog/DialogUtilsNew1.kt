@@ -609,7 +609,7 @@ class DialogUtilsNew1 {
 
         fun instaEmiDialog(
             activity: Activity?,
-            emiCB: (Dialog) ->Unit,
+            emiCB: (Dialog, Activity) ->Unit,
             saleCB: (Dialog) ->Unit,
             cancelCB: (Dialog) ->Unit
         ) {
@@ -635,7 +635,7 @@ class DialogUtilsNew1 {
             }
 
             txtViewEmi.setOnClickListener {
-                emiCB(dialog)
+                emiCB(dialog, activity!!)
             }
 
             txtViewSale.setOnClickListener {

@@ -224,7 +224,20 @@ class ServerRepository @Inject constructor(val appDB: AppDatabase, val remoteSer
                 val isoDataReader=genericResp.data
                 val tenureTnc = isoDataReader?.isoMap?.get(57)?.parseRaw2String().toString()
                 Log.e("Tenure",tenureTnc)
-                stubbingEMITenureDataToList(tenureTnc,field56Pan,field57)
+
+                val hostMsg = isoDataReader?.isoMap?.get(58)?.parseRaw2String().toString()
+                val successResponseCode = isoDataReader?.isoMap?.get(39)?.parseRaw2String().toString()
+                val isBool = successResponseCode == "00"
+//                if (isBool) {
+//                    //parseAndStubbingBankEMIDataToList(bankEMIHostResponseData, hostMsg)
+//                } else {
+//                    callback(
+//                        Pair(bankEMISchemesDataList, bankEMIIssuerTAndCList),
+//                        Triple(isBool, hostMsg, false)
+//                    )
+//                }
+
+                stubbingEMITenureDataToList(tenureTnc,field56Pan,field57, Triple(isBool, hostMsg, false))
             }
             is GenericResponse.Error->{
                 emiTenureMLData.postValue(GenericResponse.Error(genericResp.errorMessage.toString()))
@@ -668,7 +681,7 @@ if(!fromBankEmi)
 
     //region=================Parse and Stubbing BankEMI Data To List:-
     private suspend fun stubbingEMITenureDataToList(
-        bankEMITenureResponseData: String,field56Pan:String="0",field57:String) {
+        bankEMITenureResponseData: String,field56Pan:String="0",field57:String, triple:Triple<Boolean, String, Boolean>) {
             if (!TextUtils.isEmpty(bankEMITenureResponseData)) {
                 val parsingDataWithCurlyBrace =
                     Utility().parseDataListWithSplitter("}", bankEMITenureResponseData)
@@ -803,6 +816,7 @@ if(!fromBankEmi)
 
                             }
 
+                        tenuresWithIssuerTncs.tripleForInstaEmi = Triple(triple.first,triple.second,true)
                         emiTenureMLData.postValue(GenericResponse.Success(tenuresWithIssuerTncs))
 
                     }

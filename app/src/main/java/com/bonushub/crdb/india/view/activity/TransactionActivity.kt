@@ -4,11 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ActivityEmvBinding
@@ -19,18 +21,22 @@ import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.model.remote.*
+import com.bonushub.crdb.india.repository.GenericResponse
+import com.bonushub.crdb.india.repository.ServerRepository
 import com.bonushub.crdb.india.serverApi.bankEMIRequestCode
 import com.bonushub.crdb.india.transactionprocess.*
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.SearchCard
 import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
+import com.bonushub.crdb.india.viewmodel.TenureSchemeViewModel
 import com.bonushub.crdb.india.vxutils.TransactionType
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.bonushub.crdb.india.vxutils.Utility.getCardHolderName
@@ -55,6 +61,11 @@ class TransactionActivity : BaseActivityNew() {
 
     @Inject
     lateinit var appDao: AppDao
+
+    private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
+
+    @Inject
+    lateinit var serverRepository: ServerRepository
 
     private var emvBinding: ActivityEmvBinding? = null
 
@@ -112,18 +123,8 @@ class TransactionActivity : BaseActivityNew() {
         globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
         globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
 
-        // now below converted to when
-       /* if (transactionType == BhTransactionType.SALE_WITH_CASH.type) {
-            val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
-            val frtAmt = "%.2f".format(amt)
-            emvBinding?.baseAmtTv?.text = frtAmt
-            emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
-        } else {
-            val frtAmt = "%.2f".format(saleAmt.toFloat())
-            emvBinding?.baseAmtTv?.text = frtAmt
-            emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+        tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
 
-        }*/
         when(transactionType){
 
             BhTransactionType.SALE_WITH_CASH.type ->{
@@ -162,6 +163,94 @@ class TransactionActivity : BaseActivityNew() {
         emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             declinedTransaction()
         }
+
+        tenureSchemeViewModel.emiTenureLiveData.observe(
+            this@TransactionActivity
+        ) {
+
+            when (val genericResp = it) {
+                is GenericResponse.Success -> {
+                    println(Gson().toJson(genericResp.data))
+                    val resp = genericResp.data as TenuresWithIssuerTncs
+                    logger("instaEmi","yes","e")
+                    hideProgress()
+                    val hostResponseCodeAndMessageAndHasEMI = resp.tripleForInstaEmi
+
+                    if (hostResponseCodeAndMessageAndHasEMI.first) {
+                        // Checking Insta Emi
+                        if (hostResponseCodeAndMessageAndHasEMI.third) {
+
+                            DialogUtilsNew1.instaEmiDialog(this@TransactionActivity,
+                                { dialog , activity ->
+                                    // emi
+                                    globalCardProcessedModel.setTransType(TransactionType.EMI_SALE.type)
+                                    globalCardProcessedModel.setEmiType(1)  //1 for insta emi
+                                    emvBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_header_emi_sale)
+                                    emvBinding?.subHeaderView?.subHeaderText?.text = TransactionType.EMI_SALE.txnTitle
+
+                                    dialog.dismiss()
+
+                                    val intent = Intent(activity, TenureSchemeActivity::class.java)
+                                    intent.putParcelableArrayListExtra("emiSchemeOfferDataList", resp.bankEMISchemesDataList as ArrayList<out Parcelable>)
+                                    intent.putExtra("emiIssuerTAndCDataList", resp.bankEMIIssuerTAndCList)
+                                    intent.putExtra("cardProcessedData", globalCardProcessedModel)
+                                    intent.putExtra("transactionType", BhTransactionType.SALE.type) // for insta emi
+
+                                    activity.startActivityForResult(intent , EIntentRequest.BankEMISchemeOffer.code)
+
+
+                                },
+                                {
+                                    // sale
+                                    globalCardProcessedModel.setTransType(TransactionType.SALE.type) //0306
+                                    emvProcessNext(globalCardProcessedModel)
+
+                                it.dismiss()
+                                },
+                                {
+                                    // cancel
+                                    it.dismiss()
+                                    declinedTransaction()
+                                })
+
+
+                        }else{
+                            //0306
+                            logger("instaEmi","no","e")
+                            emvProcessNext(globalCardProcessedModel)
+                        }
+
+                    } else {
+                        logger("instaEmi","no","e") // 0306
+                        emvProcessNext(globalCardProcessedModel)
+                    }
+
+
+                }
+                is GenericResponse.Error -> {
+
+                    hideProgress()
+
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        alertBoxWithActionNew(
+                            genericResp.errorMessage ?: "Oops something went wrong",
+                            "",
+                            R.drawable.ic_info_orange,
+                            getString(R.string.positive_button_ok),"",false,false,
+                            {
+
+                                declinedTransaction()
+                            },
+                            {})
+                    }
+                    println(genericResp.errorMessage.toString())
+                }
+                is GenericResponse.Loading -> {
+// currently not in use ....
+                }
+            }
+        }
+
     }
 
 
@@ -508,9 +597,53 @@ class TransactionActivity : BaseActivityNew() {
             }
             startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
         }
-        else if(transactionType == BhTransactionType.SALE.type || transactionType == BhTransactionType.PRE_AUTH.type)
+        else if(transactionType == BhTransactionType.PRE_AUTH.type)
         {
             emvProcessNext(cardProcessedDataModal)
+
+        }else if(transactionType == BhTransactionType.SALE.type)
+        {
+            // check insta emi
+            var hasInstaEmi = false
+            val tpt = getTptData()
+            var limitAmt = 0f
+            if (tpt?.surChargeValue?.isNotEmpty()!!) {
+                limitAmt = try {
+                   // tpt.surChargeValue.toFloat() / 100
+                    tpt.surChargeValue.toFloat()
+                } catch (ex: Exception) {
+                    0f
+                }
+            }
+            if (tpt.surcharge.isNotEmpty()) {
+                hasInstaEmi = try {
+                    tpt.surcharge == "1"
+                } catch (ex: Exception) {
+                    false
+                }
+            }
+            if(tpt.bankEmi!="1"){
+                hasInstaEmi=false
+            }
+
+            // Condition executes, If insta EMI is Available on card
+            var transactionalAmt = (saleAmt.toDouble() * 100).toLong()
+            if (limitAmt <= transactionalAmt && hasInstaEmi) {
+
+                //region=========This Field is use only in case of BankEMI Field58 Transaction Amount:-
+                cardProcessedDataModal.setEmiTransactionAmount(transactionalAmt)
+
+                val field57="$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
+
+                lifecycleScope.launch(Dispatchers.IO){
+                    globalCardProcessedModel = cardProcessedDataModal
+                    tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
+                }
+
+            } else {
+                //Condition executes when  No EMI Available instantly(Directly Normal Sale)
+                emvProcessNext(cardProcessedDataModal)
+            }
 
         }
     }
@@ -521,101 +654,7 @@ class TransactionActivity : BaseActivityNew() {
 
         when(requestCode){
 
-            /*BhTransactionType.BRAND_EMI.type ->{
-                val cardProcessedData = data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
-                val maskedPan = cardProcessedData.getPanNumberData()?.let {
-                    getMaskedPan(getTptData(), it)
-                }
-               // emiSelectedData = data.getParcelableExtra("emiSchemeDataList")
-                emiSelectedData = data.getParcelableExtra("EMITenureDataModal")
-                emiTAndCData = data.getParcelableExtra("emiIssuerTAndCDataList")
-                Log.d("SelectedEMI Data:- ", emiSelectedData.toString())
-                Log.d("emiTAndCData Data:- ", emiTAndCData.toString())
-
-                runOnUiThread {
-                    emvBinding?.atCardNoTv?.text = maskedPan
-                    emvBinding?.cardViewL?.visibility = View.VISIBLE
-                    // tv_card_number_heading.visibility = View.VISIBLE
-                    Log.e("CHANGED ", "NEW LAUNCH")
-                    //    binding?.paymentGif?.loadUrl("file:///android_asset/cardprocess.html")
-                    //todo Processing dialog in case of EMI
-                    emvBinding?.manualEntryButton?.visibility = View.GONE
-                    emvBinding?.tvInsertCard?.visibility = View.GONE
-                    if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
-                       *//* val baseAmountValue = getString(R.string.rupees_symbol) + "1.00"
-                        binding?.baseAmtTv?.text = baseAmountValue*//*
-                    } else {
-                        val baseAmountValue = getString(R.string.rupees_symbol) + "%.2f".format((((emiSelectedData?.transactionAmount)?.toDouble())?.div(100)).toString().toDouble())
-                        emvBinding?.baseAmtTv?.text = baseAmountValue
-                    }
-                }
-
-
-                //region===============Check Transaction Type and Perform Action Accordingly:-
-                if (cardProcessedData.getReadCardType() == DetectCardType.MAG_CARD_TYPE && cardProcessedData.getTransType() != TransactionType.TEST_EMI.type) {
-                    val isPin = cardProcessedData.getIsOnline() == 1
-                    cardProcessedData.setProcessingCode(transactionProcessingCode)
-                    processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedData)
-                } else {
-                    if (cardProcessedData.getTransType() == TransactionType.TEST_EMI.type) {
-                        //VFService.showToast("Connect to BH_HOST1...")
-                        Log.e("WWW", "-----")
-                       *//* cardProcessedData.setTransactionAmount(100)
-
-                        DoEmv(issuerUpdateHandler, this, pinHandler, cardProcessedData, ConstIPBOC.startEMV.intent.VALUE_cardType_smart_card) { cardProcessedDataModal ->
-                            cardProcessedDataModal.setProcessingCode(transactionProcessingCode)
-                            cardProcessedDataModal.setTransactionAmount(100)
-                            cardProcessedDataModal.setOtherAmount(otherTransAmount)
-                            cardProcessedDataModal.setMobileBillExtraData(
-                                Pair(mobileNumber, billNumber))
-                            //    localCardProcessedData.setTransType(transactionType)
-                            globalCardProcessedModel = cardProcessedDataModal
-                            Log.d("CardProcessedData:- ", Gson().toJson(cardProcessedDataModal))
-                            val maskedPan = cardProcessedDataModal.getPanNumberData()?.let {
-                                getMaskedPan(TerminalParameterTable.selectFromSchemeTable(), it)
-                            }
-                            runOnUiThread {
-                                binding?.atCardNoTv?.text = maskedPan
-                                cardView_l.visibility = View.VISIBLE
-                                //    tv_card_number_heading.visibility = View.VISIBLE
-                                tv_insert_card.visibility = View.INVISIBLE
-                                //  binding?.paymentGif?.visibility = View.INVISIBLE
-                            }
-                            //Below Different Type of Transaction check Based ISO Packet Generation happening:-
-                            processAccordingToCardType(cardProcessedDataModal)
-                        }*//*
-                    } else {
-                        // sir please check emv call
-                        DoEmv(testVFEmvHandler, this, cardProcessedData) { cardProcessedDataModal ->
-                            Log.d("CardEMIData:- ", cardProcessedDataModal.toString())
-                            cardProcessedDataModal.setProcessingCode(transactionProcessingCode)
-                        //    cardProcessedDataModal.setTransactionAmount(emiSelectedTransactionAmount ?: 0L)
-                       //     cardProcessedDataModal.setOtherAmount(otherTransAmount)
-                            cardProcessedDataModal.setMobileBillExtraData(Pair(mobileNumber, billNumber))
-                            globalCardProcessedModel = cardProcessedDataModal
-                            Log.d("CardProcessedData:- ", Gson().toJson(cardProcessedDataModal))
-                            val maskedPan = cardProcessedDataModal.getPanNumberData()?.let {
-                               // getMaskedPan(TerminalParameterTable.selectFromSchemeTable(), it)
-                            }
-                            runOnUiThread {
-                              *//*  binding?.atCardNoTv?.text = maskedPan
-                                cardView_l.visibility = View.VISIBLE
-                                //   tv_card_number_heading.visibility = View.VISIBLE
-                                tv_insert_card.visibility = View.INVISIBLE
-                                //  binding?.paymentGif?.visibility = View.INVISIBLE*//*
-                            }
-                            //Below Different Type of Transaction check Based ISO Packet Generation happening:-
-                            emvProcessNext(cardProcessedDataModal)
-
-                           // processAccordingToCardType(cardProcessedDataModal)
-                        }
-                    }
-                }
-
-
-            }*/
-
-            BhTransactionType.EMI_SALE.type, BhTransactionType.BRAND_EMI.type ->{
+            BhTransactionType.EMI_SALE.type, BhTransactionType.BRAND_EMI.type, EIntentRequest.BankEMISchemeOffer.code ->{
                 val cardProcessedData = data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
                 val maskedPan = cardProcessedData.getPanNumberData()?.let {
                     getMaskedPan(getTptData(), it)

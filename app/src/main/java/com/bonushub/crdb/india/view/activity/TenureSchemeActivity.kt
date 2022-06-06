@@ -18,7 +18,6 @@ import com.bonushub.crdb.india.serverApi.RemoteService
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.view.adapter.EMISchemeAndOfferAdapter
 import com.bonushub.crdb.india.viewmodel.TenureSchemeViewModel
-import com.bonushub.crdb.india.viewmodel.viewModelFactory.TenureSchemeActivityVMFactory
 import com.bonushub.crdb.india.utils.BhTransactionType
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -121,13 +120,19 @@ private val emiIssuerTAndCDataFromIntent by lazy {
             }else {
                 showProgress("Please wait fetching schemes")
             }
-            tenureSchemeViewModel = ViewModelProvider(
+            /*tenureSchemeViewModel = ViewModelProvider(
                 this, TenureSchemeActivityVMFactory(
                     serverRepository,
                     cardProcessedDataModal?.getPanNumberData() ?: "",
                     field57
                 )
-            ).get(TenureSchemeViewModel::class.java)
+            ).get(TenureSchemeViewModel::class.java)*/
+
+            tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
+            lifecycleScope.launch(Dispatchers.IO){
+                tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
+            }
+
             //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
             tenureSchemeViewModel.emiTenureLiveData.observe(
                 this
@@ -140,30 +145,7 @@ private val emiIssuerTAndCDataFromIntent by lazy {
                         emiSchemeOfferDataList = resp.bankEMISchemesDataList
                         emiIssuerTAndCData = resp.bankEMIIssuerTAndCList
                        // region set issuer icon or name
-                        when(emiIssuerTAndCData?.issuerID)
-                        {
-
-                            "67" ->{
-                                // Amex -Indusind
-                                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_indusind_issuer)
-                            }
-
-                            "66" ->{
-                                // Amex -sbi
-                                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_sbi_issuer)
-                            }
-
-                            "65" ->{
-                                // Amex -icici
-                                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_icici_issuer)
-                            }
-
-                            else ->{
-                                binding?.imgViewIssuerIcon?.visibility = View.GONE
-                                binding?.txtViewIssuerName?.visibility = View.VISIBLE
-                                binding?.txtViewIssuerName?.text = emiIssuerTAndCData?.issuerName?:""
-                            }
-                        }
+                        setIssuerIcon(emiIssuerTAndCData?.issuerID?:"")
                         // end region
                         setUpRecyclerView()
 
@@ -200,6 +182,7 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         }else if (transactionType== BhTransactionType.SALE.type ){
             emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent
             emiIssuerTAndCData= emiIssuerTAndCDataFromIntent!!
+            setIssuerIcon(emiIssuerTAndCData?.issuerID?:"")
             setUpRecyclerView()
         }else if(transactionType== BhTransactionType.TEST_EMI.type){
 lifecycleScope.launch(Dispatchers.IO) {
@@ -254,6 +237,34 @@ lifecycleScope.launch(Dispatchers.IO) {
                 ToastUtils.showToast(this,getString(R.string.please_select_scheme))
         }
         //endregion
+    }
+
+    private fun setIssuerIcon(issuerID:String) {
+
+        when(issuerID)
+        {
+
+            "67" ->{
+                // Amex -Indusind
+                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_indusind_issuer)
+            }
+
+            "66" ->{
+                // Amex -sbi
+                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_sbi_issuer)
+            }
+
+            "65" ->{
+                // Amex -icici
+                binding?.imgViewIssuerIcon?.setImageResource(R.mipmap.ic_icici_issuer)
+            }
+
+            else ->{
+                binding?.imgViewIssuerIcon?.visibility = View.GONE
+                binding?.txtViewIssuerName?.visibility = View.VISIBLE
+                binding?.txtViewIssuerName?.text = emiIssuerTAndCData?.issuerName?:""
+            }
+        }
     }
 
     override fun onBackPressed() {
