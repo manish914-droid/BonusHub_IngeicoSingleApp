@@ -22,6 +22,7 @@ import com.bonushub.crdb.india.databinding.ItemCompletePreauthDialogBinding
 import com.bonushub.crdb.india.databinding.ItemVoidPreauthDialogBinding
 import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
@@ -96,52 +97,6 @@ class PreAuthVoidFragment : Fragment() {
                 }
             }
 
-        }
-
-    }
-
-    lateinit var dialogBuilder : Dialog
-    private fun confirmationDialog(authData: AuthCompletionData) {
-
-        dialogBuilder = Dialog(requireActivity())
-        val bindingg = ItemVoidPreauthDialogBinding.inflate(LayoutInflater.from(context))
-
-        dialogBuilder.setContentView(bindingg.root)
-
-        dialogBuilder.setCancelable(true)
-        val window = dialogBuilder.window
-        window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-
-
-        val batchNo =  invoiceWithPadding(authData.authBatchNo.toString())
-        bindingg.batchNoTv.text = batchNo
-        val roc = invoiceWithPadding(authData.authRoc.toString())
-        bindingg.rocTv.text = roc
-        val tid = authData.authTid
-        bindingg.tidTv.text = tid
-
-        bindingg.cancelBtn.setOnClickListener {
-            dialogBuilder.dismiss()
-        }
-
-        bindingg.confirmBtn.setOnClickListener {
-            Log.e("preAuth","comp")
-
-            voidPreAuth(authData)
-        }
-
-        dialogBuilder.show()
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-    }
-
-    private fun voidPreAuth(authData: AuthCompletionData) {
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            preAuthViewModel.getVoidPreAuthData(authData)
         }
 
         preAuthViewModel.voidPreAuthData.observe(viewLifecycleOwner) {
@@ -261,16 +216,25 @@ class PreAuthVoidFragment : Fragment() {
                             {})
                     } else {
                         if (it.msg.equals("Declined")) {
-                            iDialog?.alertBoxWithActionNew(
-                                "Declined",
-                                "Transaction Declined",
-                                R.drawable.ic_info_new,
-                                getString(R.string.positive_button_ok),
-                                "", false, false,
-                                { alertPositiveCallback ->
-                                    //gotoDashboard()
-                                },
-                                {})
+
+                            iDialog?.showProgress(getString(R.string.printing))
+                            checkForPrintReversalReceipt(context,"") {
+                                iDialog?.hideProgress()
+                                lifecycleScope.launch(Dispatchers.Main){
+                                    iDialog?.alertBoxWithActionNew(
+                                        "Declined",
+                                        "Transaction Declined",
+                                        R.drawable.ic_info_new,
+                                        getString(R.string.positive_button_ok),
+                                        "", false, false,
+                                        { alertPositiveCallback ->
+                                            //gotoDashboard()
+                                        },
+                                        {})
+                                }
+
+                            }
+
                         } else {
                             iDialog?.alertBoxWithActionNew(
                                 getString(R.string.error_hint),
@@ -291,6 +255,51 @@ class PreAuthVoidFragment : Fragment() {
 
                 }
             }
+        }
+    }
+
+    lateinit var dialogBuilder : Dialog
+    private fun confirmationDialog(authData: AuthCompletionData) {
+
+        dialogBuilder = Dialog(requireActivity())
+        val bindingg = ItemVoidPreauthDialogBinding.inflate(LayoutInflater.from(context))
+
+        dialogBuilder.setContentView(bindingg.root)
+
+        dialogBuilder.setCancelable(true)
+        val window = dialogBuilder.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+
+        val batchNo =  invoiceWithPadding(authData.authBatchNo.toString())
+        bindingg.batchNoTv.text = batchNo
+        val roc = invoiceWithPadding(authData.authRoc.toString())
+        bindingg.rocTv.text = roc
+        val tid = authData.authTid
+        bindingg.tidTv.text = tid
+
+        bindingg.cancelBtn.setOnClickListener {
+            dialogBuilder.dismiss()
+        }
+
+        bindingg.confirmBtn.setOnClickListener {
+            Log.e("preAuth","comp")
+
+            voidPreAuth(authData)
+        }
+
+        dialogBuilder.show()
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+    }
+
+    private fun voidPreAuth(authData: AuthCompletionData) {
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            preAuthViewModel.getVoidPreAuthData(authData)
         }
     }
 

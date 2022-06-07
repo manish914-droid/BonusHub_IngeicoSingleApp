@@ -25,6 +25,7 @@ import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.showToast
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
@@ -177,16 +178,24 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                             {})
                     }else {
                         if (it.msg.equals("Declined")) {
-                            iDialog?.alertBoxWithActionNew(
-                                "Declined",
-                                "Transaction Declined",
-                                R.drawable.ic_info_new,
-                                getString(R.string.positive_button_ok),
-                                "", false, false,
-                                { alertPositiveCallback ->
-                                    //gotoDashboard()
-                                },
-                                {})
+                            iDialog?.showProgress(getString(R.string.printing))
+                            checkForPrintReversalReceipt(context,"") {
+                                iDialog?.hideProgress()
+                                lifecycleScope.launch(Dispatchers.Main){
+                                    iDialog?.alertBoxWithActionNew(
+                                        "Declined",
+                                        "Transaction Declined",
+                                        R.drawable.ic_info_new,
+                                        getString(R.string.positive_button_ok),
+                                        "", false, false,
+                                        { alertPositiveCallback ->
+                                            //gotoDashboard()
+                                        },
+                                        {})
+                                }
+
+                            }
+
                         } else {
                             iDialog?.alertBoxWithActionNew(
                                 getString(R.string.error_hint),
