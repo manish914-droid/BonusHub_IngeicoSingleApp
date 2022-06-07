@@ -1196,7 +1196,7 @@ class TransactionActivity : BaseActivityNew() {
                         }
                         println("clearReversal -> check again")
                     } else {
-                        GlobalScope.launch(Dispatchers.Main) {
+                        lifecycleScope.launch(Dispatchers.Main) {
                             //  VFService.showToast(transMsg)
                             alertBoxWithActionNew(
                                 getString(R.string.reversal_upload_fail),

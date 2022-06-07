@@ -113,7 +113,7 @@ object HitServer  {
                         progressMsg(HDFCApplication.appContext.getString(R.string.sending_reciving_data))
                         val dis = DataInputStream(socket.getInputStream())
 
-                           throw SocketTimeoutException("Reversal generated") // please check
+                       //    throw SocketTimeoutException("Reversal generated") // please check
 
                         val len = dis.readShort().toInt()
                         val response = ByteArray(len)

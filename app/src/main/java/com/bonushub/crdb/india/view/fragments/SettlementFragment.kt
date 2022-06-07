@@ -2,12 +2,12 @@ package com.bonushub.crdb.india.view.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,18 +21,16 @@ import com.bonushub.crdb.india.databinding.FragmentSettlementBinding
 import com.bonushub.crdb.india.databinding.ItemSettlementBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
+import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
-import com.bonushub.crdb.india.model.local.BatchTableReversal
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
+import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
-import com.bonushub.crdb.india.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
 import com.bonushub.crdb.india.view.base.BaseActivityNew
-import com.bonushub.crdb.india.viewmodel.TransactionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -46,20 +44,12 @@ class SettlementFragment : Fragment() {
     @Inject
     lateinit var appDao: AppDao
     private val settlementViewModel : SettlementViewModel by viewModels()
-    //private val dataList: MutableList<BatchTable> by lazy { mutableListOf<BatchTable>() }/ old
     private val tempDataList: MutableList<TempBatchFileDataTable> by lazy { mutableListOf<TempBatchFileDataTable>() }
-    private val dataListReversal: MutableList<BatchTableReversal> by lazy { mutableListOf<BatchTableReversal>() }
-   // private val settlementAdapter by lazy { SettlementAdapter(dataList) } // old
     private val settlementAdapter by lazy { SettlementAdapter(tempDataList) }
     private var settlementByteArray: ByteArray? = null
     private var navController: NavController? = null
     private var iDialog: IDialog? = null
     private var onlyPreAuthFlag: Boolean? = true
-    private val batchReversalViewModel : BatchReversalViewModel by viewModels()
-
-    private var ioSope = CoroutineScope(Dispatchers.IO)
-
-    private val transactionViewModel: TransactionViewModel by viewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -91,56 +81,15 @@ class SettlementFragment : Fragment() {
             }
         }
 
-
-        //region===============Get Batch Data from HDFCViewModal:- kushal
-       /* settlementViewModel.getBatchData()?.observe(requireActivity()) { batchData ->
-            Log.d("TPT Data:- ", batchData.toString())
-            dataList.clear()
-            dataList.addAll(batchData as MutableList<BatchTable>)
-            onlyPreAuthCheck(dataList)
-            setUpRecyclerView()
-
-        }*/
-
         //region===============Get Batch Data from HDFCViewModal:-
         settlementViewModel.getTempBatchFileData()?.observe(requireActivity()) { tempBatchData ->
             Log.d("TPT Data:- ", tempBatchData.toString())
             tempDataList.clear()
             tempDataList.addAll(tempBatchData as MutableList<TempBatchFileDataTable>)
-           // onlyPreAuthCheck(tempDataList) // do later
             setUpRecyclerView()
 
         }
 
-
-
-        lifecycleScope.launch {
-            batchReversalViewModel?.getBatchTableReversalData()?.observe(viewLifecycleOwner) { batchReversalList ->
-                dataListReversal.clear()
-                dataListReversal.addAll(batchReversalList as MutableList<BatchTableReversal>)
-            }
-        }
-
-
-
-        //endregion
-        //region================================RecyclerView On Scroll Extended Floating Button Hide/Show:-
-        // not need
-        /*fragmensettlementBinding.nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
-
-            //Scroll Down Condition:-
-            if (scrollY > oldScrollY + 20 && fragmensettlementBinding.settlementFloatingButton?.isExtended == true)
-                fragmensettlementBinding?.settlementFloatingButton?.shrink()
-
-            //Scroll Up Condition:-
-            if (scrollY < oldScrollY - 20 && fragmensettlementBinding?.settlementFloatingButton?.isExtended != true)
-                fragmensettlementBinding?.settlementFloatingButton?.extend()
-
-            //At the Top Condition:-
-            if (scrollY == 0)
-                fragmensettlementBinding?.settlementFloatingButton?.extend()
-        })*/
-        //endregion
 
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
@@ -173,81 +122,57 @@ class SettlementFragment : Fragment() {
                     }else{
 
                         lifecycleScope.launch(Dispatchers.IO){
-                            withContext(Dispatchers.Main){
-
-                                (activity as BaseActivityNew).showProgress("Transaction syncing...")
-                            }
 //                            (activity as NavigationActivity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-                            PrintUtil(activity).printDetailReportupdate(tempDataList, activity){ detailPrintStatus ->
+                            val reversalObj = AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)
+                            println(reversalObj)
+                            if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+                                    // do txn
+                                withContext(Dispatchers.Main){
 
-                                    if (detailPrintStatus) {
-                                        GlobalScope.launch(
-                                            Dispatchers.IO
-                                        ) {
-                                            val data =
-                                                CreateSettlementPacket(appDao).createSettlementISOPacket()
-                                            settlementByteArray =
-                                                data.generateIsoByteRequest()
-                                            try {
-                                                (activity as NavigationActivity).settleBatch(
-                                                    settlementByteArray
-                                                ) {
-                                                    if (!it)
-                                                        enableDisableSettlementButton(
-                                                            true
-                                                        )
-                                                }
-                                            } catch (ex: Exception) {
-                                                (activity as NavigationActivity).hideProgress()
-                                                enableDisableSettlementButton(
-                                                    true
-                                                )
-                                                ex.printStackTrace()
+                                    (activity as BaseActivityNew).showProgress("Transaction syncing...")
+                                }
+
+                                printAndDoSettlement()
+                            }
+                            else {
+                                if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+
+                                    withContext(Dispatchers.Main) {  (activity as BaseActivityNew).showProgress(getString(R.string.reversal_data_sync))}
+
+                                    SyncReversalToHost(AppPreference.getReversalNew()) { isSyncToHost, transMsg ->
+                                        Log.e("hideProgress","1")
+                                        //  hideProgress()
+                                        if (isSyncToHost) {
+                                            AppPreference.clearReversal()
+
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                printAndDoSettlement()
+                                            }
+                                            println("clearReversal -> check again")
+                                        } else {
+                                            lifecycleScope.launch(Dispatchers.Main) {
+                                                //  VFService.showToast(transMsg)
+                                                (activity as BaseActivityNew).alertBoxWithActionNew(
+                                                    getString(R.string.reversal_upload_fail),
+                                                    getString(R.string.transaction_delined_msg),
+                                                    R.drawable.ic_txn_declined,
+                                                    getString(R.string.positive_button_ok),"",
+                                                    false,false,
+                                                    {},
+                                                    {})
+
+
                                             }
                                         }
-                                    } else {
-                                        (activity as NavigationActivity).hideProgress()
-                                        GlobalScope.launch(Dispatchers.Main) {
-                                            (activity as NavigationActivity).alertBoxWithAction(
-                                                getString(R.string.printer_error),
-                                                getString(R.string.please_check_printing_roll),
-                                                true,
-                                                getString(R.string.yes),
-                                                {
-                                                    /*val data =
-                                                        CreateSettlementPacket(
-                                                            ProcessingCode.SETTLEMENT.code,
-                                                            batchList
-                                                        ).createSettlementISOPacket()
-                                                    settlementByteArray =
-                                                        data.generateIsoByteRequest()
-                                                    try {
-                                                        (activity as MainActivity).hideProgress()
-                                                        GlobalScope.launch(
-                                                            Dispatchers.IO
-                                                        ) {
-                                                            (activity as MainActivity).settleBatch(
-                                                                settlementByteArray
-                                                            ) {
-                                                                if (!it)
-                                                                    enableDisableSettlementButton(
-                                                                        true
-                                                                    )
-                                                            }
-                                                        }
-                                                    } catch (ex: Exception) {
-                                                        (activity as MainActivity).hideProgress()
-                                                        enableDisableSettlementButton(
-                                                            true
-                                                        )
-                                                        ex.printStackTrace()
-                                                    }*/
-                                                },
-                                                {})
-                                        }
                                     }
+                                }else{
+                                    println("442")
+                                }
                             }
+
+
+
 
 
                             /*Utility().syncPendingTransaction(transactionViewModel){
@@ -366,6 +291,80 @@ class SettlementFragment : Fragment() {
 
 
     }
+
+    private suspend fun printAndDoSettlement() {
+
+        PrintUtil(activity).printDetailReportupdate(tempDataList, activity){ detailPrintStatus ->
+
+            if (detailPrintStatus) {
+                lifecycleScope.launch(
+                    Dispatchers.IO
+                ) {
+                    val data =
+                        CreateSettlementPacket(appDao).createSettlementISOPacket()
+                    settlementByteArray =
+                        data.generateIsoByteRequest()
+                    try {
+                        (activity as NavigationActivity).settleBatch(
+                            settlementByteArray
+                        ) {
+                            if (!it)
+                                enableDisableSettlementButton(
+                                    true
+                                )
+                        }
+                    } catch (ex: Exception) {
+                        (activity as NavigationActivity).hideProgress()
+                        enableDisableSettlementButton(
+                            true
+                        )
+                        ex.printStackTrace()
+                    }
+                }
+            } else {
+                (activity as NavigationActivity).hideProgress()
+                lifecycleScope.launch(Dispatchers.Main) {
+                    (activity as NavigationActivity).alertBoxWithAction(
+                        getString(R.string.printer_error),
+                        getString(R.string.please_check_printing_roll),
+                        true,
+                        getString(R.string.yes),
+                        {
+                            /*val data =
+                                CreateSettlementPacket(
+                                    ProcessingCode.SETTLEMENT.code,
+                                    batchList
+                                ).createSettlementISOPacket()
+                            settlementByteArray =
+                                data.generateIsoByteRequest()
+                            try {
+                                (activity as MainActivity).hideProgress()
+                                GlobalScope.launch(
+                                    Dispatchers.IO
+                                ) {
+                                    (activity as MainActivity).settleBatch(
+                                        settlementByteArray
+                                    ) {
+                                        if (!it)
+                                            enableDisableSettlementButton(
+                                                true
+                                            )
+                                    }
+                                }
+                            } catch (ex: Exception) {
+                                (activity as MainActivity).hideProgress()
+                                enableDisableSettlementButton(
+                                    true
+                                )
+                                ex.printStackTrace()
+                            }*/
+                        },
+                        {})
+                }
+            }
+        }
+    }
+
     private fun onlyPreAuthCheck(dataList: MutableList<BatchTable>) {
         for (i in 0 until dataList.size) {
             if(dataList[i].transactionType != BhTransactionType.PRE_AUTH.type){
