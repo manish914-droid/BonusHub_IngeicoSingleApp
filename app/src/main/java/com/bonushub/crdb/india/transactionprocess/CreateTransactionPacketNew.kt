@@ -145,7 +145,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                             "${bankEmiSchemeData?.discountAmount},${bankEmiSchemeData?.loanAmount},${bankEmiSchemeData?.tenure}," +
                             "${bankEmiSchemeData?.tenureInterestRate},${bankEmiSchemeData?.emiAmount},${bankEmiSchemeData?.cashBackAmount}," +
                             "${bankEmiSchemeData?.netPay},${cardProcessedData.getMobileBillExtraData()?.second ?: ""}," +
-                            ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,0,${bankEmiSchemeData?.processingFee},${bankEmiSchemeData?.processingRate}," +
+                            ",,${cardProcessedData.getMobileBillExtraData()?.first ?: ""},,${cardProcessedData.getEmiType()},${bankEmiSchemeData?.processingFee},${bankEmiSchemeData?.processingRate}," +
                             "${bankEmiSchemeData?.totalProcessingFee},,${bankEmiSchemeData?.instantDiscount}"
 
                 }
