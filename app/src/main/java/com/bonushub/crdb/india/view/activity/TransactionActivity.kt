@@ -527,7 +527,9 @@ class TransactionActivity : BaseActivityNew() {
                     }
 
 
-                    emvProcessNext(cardProcessedDataModal)
+                    if(!checkInstaEmi(cardProcessedDataModal)) {
+                        emvProcessNext(cardProcessedDataModal)
+                    }
                 }
 
                 override fun onCancel() {
@@ -604,48 +606,57 @@ class TransactionActivity : BaseActivityNew() {
         }else if(transactionType == BhTransactionType.SALE.type)
         {
             // check insta emi
-            var hasInstaEmi = false
-            val tpt = getTptData()
-            var limitAmt = 0f
-            if (tpt?.surChargeValue?.isNotEmpty()!!) {
-                limitAmt = try {
-                   // tpt.surChargeValue.toFloat() / 100
-                    tpt.surChargeValue.toFloat()
-                } catch (ex: Exception) {
-                    0f
-                }
-            }
-            if (tpt.surcharge.isNotEmpty()) {
-                hasInstaEmi = try {
-                    tpt.surcharge == "1"
-                } catch (ex: Exception) {
-                    false
-                }
-            }
-            if(tpt.bankEmi!="1"){
-                hasInstaEmi=false
-            }
-
-            // Condition executes, If insta EMI is Available on card
-            var transactionalAmt = (saleAmt.toDouble() * 100).toLong()
-            if (limitAmt <= transactionalAmt && hasInstaEmi) {
-
-                //region=========This Field is use only in case of BankEMI Field58 Transaction Amount:-
-                cardProcessedDataModal.setEmiTransactionAmount(transactionalAmt)
-
-                val field57="$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
-
-                lifecycleScope.launch(Dispatchers.IO){
-                    globalCardProcessedModel = cardProcessedDataModal
-                    tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
-                }
-
-            } else {
+             if(!checkInstaEmi(cardProcessedDataModal)) {
                 //Condition executes when  No EMI Available instantly(Directly Normal Sale)
                 emvProcessNext(cardProcessedDataModal)
             }
 
         }
+    }
+
+    private fun checkInstaEmi(cardProcessedDataModal:CardProcessedDataModal):Boolean
+    {
+        var hasInstaEmi = false
+        val tpt = getTptData()
+        var limitAmt = 0f
+        if (tpt?.surChargeValue?.isNotEmpty()!!) {
+            limitAmt = try {
+                // tpt.surChargeValue.toFloat() / 100
+                tpt.surChargeValue.toFloat()
+            } catch (ex: Exception) {
+                0f
+            }
+        }
+        if (tpt.surcharge.isNotEmpty()) {
+            hasInstaEmi = try {
+                tpt.surcharge == "1"
+            } catch (ex: Exception) {
+                false
+            }
+        }
+        if(tpt.bankEmi!="1"){
+            hasInstaEmi=false
+        }
+
+        // Condition executes, If insta EMI is Available on card
+        var transactionalAmt = (saleAmt.toDouble() * 100).toLong()
+        if (limitAmt <= transactionalAmt && hasInstaEmi) {
+
+            //region=========This Field is use only in case of BankEMI Field58 Transaction Amount:-
+            cardProcessedDataModal.setEmiTransactionAmount(transactionalAmt)
+
+            val field57="$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
+
+            lifecycleScope.launch(Dispatchers.IO){
+                globalCardProcessedModel = cardProcessedDataModal
+                tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
+            }
+            return true
+
+        }else{
+            return false
+        }
+
     }
 
 
