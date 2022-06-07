@@ -2479,7 +2479,7 @@ class PrintUtil(context: Context?) {
 
 
                 textBlockList.add(sigleLineformat("MID:${tpt?.merchantId}", AlignMode.LEFT))
-                textBlockList.add(sigleLineformat("TID:${tpt?.terminalId}", AlignMode.RIGHT))
+                textBlockList.add(sigleLineformat("TID:${item?.TID}", AlignMode.RIGHT))
                 printer?.addMixStyleText(textBlockList)
                 textBlockList.clear()
 
