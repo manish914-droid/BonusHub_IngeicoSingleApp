@@ -1032,13 +1032,18 @@ class PrintUtil(context: Context?) {
                     val mid = isoW.isoMap[42]?.parseRaw2String() ?: ""
                     val batchdata = isoW.isoMap[60]?.parseRaw2String() ?: ""
                     val batch = batchdata.split("|")[0]
-                    val bankID = batchdata.split("|")[1]
                     val cardType = isoW.additionalData["cardType"] ?: ""
 
-                    if (hostBankID?.isNotBlank() == true) {
-                        hostBankID
-                    } else {
-                        hostBankID =  bankID
+                    try{
+                        val bankID = batchdata.split("|").getOrNull(1)
+
+                        if (hostBankID?.isNotBlank() == true) {
+                            hostBankID
+                        } else {
+                            hostBankID =  bankID
+                        }
+                    }catch (ex:Exception){
+                        ex.printStackTrace()
                     }
 
                     if (hostMID?.isNotBlank() == true) {
@@ -1200,7 +1205,7 @@ class PrintUtil(context: Context?) {
             }
 
             printer?.setPrnGray(3)
-            printer?.feedLine(5)
+            printer?.feedLine(3)
             printer?.startPrint(object : OnPrintListener.Stub() {
                 @Throws(RemoteException::class)
                 override fun onFinish() {
@@ -4819,15 +4824,15 @@ fun checkForPrintReversalReceipt(
     callback: (String) -> Unit
 ) {
     if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-//        val tpt = TerminalParameterTable.selectFromSchemeTable()
-//        tpt?.cancledTransactionReceiptPrint?.let { logger("CancelPrinting", it, "e") }
-        //if (tpt?.cancledTransactionReceiptPrint == "01") {
+        val tpt = getTptData()
+        tpt?.canceledTransactionReceiptPrint?.let { logger("CancelPrinting", it, "e") }
+        if (tpt?.canceledTransactionReceiptPrint == "01") {
             PrintUtil(context).printReversal(context, field60Data) {
                 callback(it)
             }
-//        } else {
-//            callback("")
-//        }
+        } else {
+            callback("")
+        }
     } else {
         callback("")
     }

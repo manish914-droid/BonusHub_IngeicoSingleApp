@@ -36,6 +36,7 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.viewmodel.BatchFileViewModel
@@ -136,13 +137,13 @@ class VoidMainFragment : Fragment() {
         } else {
             //Sync Main Transaction(VOID transaction)
             if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-                GlobalScope.launch {
-                    delay(1000)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    //delay(1000) //
                     //**** Creating void packet and send to server ****
                     VoidHelper(
                         activity as NavigationActivity, voidData
                     ) { code, respnosedatareader, msg ->
-                        GlobalScope.launch(Dispatchers.Main) {
+                        lifecycleScope.launch(Dispatchers.IO) {
                             //voidRefundBT?.isEnabled = true
                             when (code) {
                                 0 -> {
@@ -243,7 +244,7 @@ class VoidMainFragment : Fragment() {
                                                 ?: "").replace(" ", "")
 
                                         logger("save",""+ voidData.transationName)
-                                        lifecycleScope.launch(Dispatchers.IO) {
+                                        withContext(Dispatchers.IO) {
                                             batchFileViewModel.deleteTempBatchFileDataTableFromInvoice(voidData.hostInvoice, voidData.hostTID)
                                             batchFileViewModel?.insertTempBatchFileDataTable(voidData)
                                         }
@@ -256,72 +257,77 @@ class VoidMainFragment : Fragment() {
                                         val amt = (((voidData.transactionalAmmount)?.toDouble())?.div(100)).toString()
                                         val transactionDate = dateFormaterNew(voidData.timeStamp ?: 0L)
                                         val transactionTime = timeFormaterNew(voidData.time)
-                                        (activity as NavigationActivity).txnApprovedDialog(EDashboardItem.VOID_SALE.res,EDashboardItem.VOID_SALE.title,
-                                            amt,"${transactionDate}, ${transactionTime}") {
-                                                status , dialog ->
 
-                                            (activity as NavigationActivity).showProgress(getString(R.string.printing))
+                                        withContext(Dispatchers.Main){
+                                            (activity as NavigationActivity).txnApprovedDialog(EDashboardItem.VOID_SALE.res,EDashboardItem.VOID_SALE.title,
+                                                amt,"${transactionDate}, ${transactionTime}") {
+                                                    status , dialog ->
 
-                                            PrintUtil(activity).startPrinting(
-                                                voidData,
-                                                EPrintCopyType.MERCHANT,
-                                                requireContext()
-                                            ) { printCB, printingFail ->
+                                                (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
-                                                (activity as NavigationActivity).hideProgress()
+                                                PrintUtil(activity).startPrinting(
+                                                    voidData,
+                                                    EPrintCopyType.MERCHANT,
+                                                    requireContext()
+                                                ) { printCB, printingFail ->
 
-                                                lifecycleScope.launch(Dispatchers.Main){
-                                                    if (printCB) {
+                                                    (activity as NavigationActivity).hideProgress()
 
-                                                        (activity as NavigationActivity).alertBoxWithActionNew(
-                                                            "",
-                                                            getString(R.string.print_customer_copy),
-                                                            R.drawable.ic_print_customer_copy,
-                                                            "yes", "no",true,false ,{
+                                                    lifecycleScope.launch(Dispatchers.Main){
+                                                        if (printCB) {
 
-                                                                (activity as NavigationActivity).showProgress(getString(R.string.printing))
+                                                            (activity as NavigationActivity).alertBoxWithActionNew(
+                                                                "",
+                                                                getString(R.string.print_customer_copy),
+                                                                R.drawable.ic_print_customer_copy,
+                                                                "yes", "no",true,false ,{
 
-                                                                PrintUtil(activity).startPrinting(
-                                                                    voidData,
-                                                                    EPrintCopyType.CUSTOMER,
-                                                                    requireContext()
-                                                                ) { printCB, printingFail ->
+                                                                    (activity as NavigationActivity).showProgress(getString(R.string.printing))
+
+                                                                    PrintUtil(activity).startPrinting(
+                                                                        voidData,
+                                                                        EPrintCopyType.CUSTOMER,
+                                                                        requireContext()
+                                                                    ) { printCB, printingFail ->
+                                                                        (activity as NavigationActivity).hideProgress()
+                                                                        // go to dashboard
+
+                                                                        dialog.dismiss()
+                                                                        startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
+                                                                            flags =
+                                                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                        })
+
+
+                                                                    }
+                                                                }, {
+
                                                                     (activity as NavigationActivity).hideProgress()
-                                                                    // go to dashboard
 
+                                                                    // go to dashboard
                                                                     dialog.dismiss()
                                                                     startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
                                                                         flags =
                                                                             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                                                     })
 
-
-                                                                }
-                                                            }, {
-
-                                                                (activity as NavigationActivity).hideProgress()
-
-                                                                // go to dashboard
-                                                                dialog.dismiss()
-                                                                startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
-                                                                    flags =
-                                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                                                 })
 
-                                                            })
-
+                                                        }
                                                     }
+
                                                 }
 
                                             }
-
                                         }
+
 
 
                                     }
                                 }
                                 2 -> {
-
+                                    checkForPrintReversalReceipt(activity, "") {
+                                    }
                                 }
                             }
                         }
@@ -340,8 +346,8 @@ class VoidMainFragment : Fragment() {
         companion object
 
         val TAG = VoidHelper::class.java.simpleName
-        fun start() {
-            GlobalScope.launch {
+        suspend fun start() {
+            withContext(Dispatchers.IO) {
 
                 AppPreference.saveString(AppPreference.PCKT_DATE, "")
                 AppPreference.saveString(AppPreference.PCKT_TIME, "")
@@ -364,13 +370,13 @@ class VoidMainFragment : Fragment() {
                 }
 
 
-                GlobalScope.launch(Dispatchers.Main) {
+               // withContext(Dispatchers.Main) {
                     sendVoidTransToHost(transactionISO)
-                }
+              //  }
             }
         }
 
-        private fun sendVoidTransToHost(transactionISOByteArray: IsoDataWriter) {
+        private suspend fun sendVoidTransToHost(transactionISOByteArray: IsoDataWriter) {
 
             if (TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
                 //  (context as MainActivity).showProgress((context).getString(R.string.please_wait_offline_sale_sync))
@@ -397,7 +403,7 @@ class VoidMainFragment : Fragment() {
                                 callback(1, null, "")
                             }
                         } else if (syncStatus && responseCode != "00") {
-                            GlobalScope.launch(Dispatchers.Main) {
+                            runBlocking(Dispatchers.IO) {
                                 //      VFService.showToast("$responseCode ------> $transactionMsg")
                                 try {
                                     val responseIsoData: IsoDataReader =
@@ -422,8 +428,11 @@ class VoidMainFragment : Fragment() {
                     } else {
                         (context).runOnUiThread {
                             (context).hideProgress()
-                            ToastUtils.showToast(HDFCApplication.appContext,"No Internet Available , Please check your Internet and try again")
-                            callback(2, null, "")
+                            (context).alertBoxWithActionNew("",transactionMsg?:"Something went wrong.",R.drawable.ic_info_orange,
+                            "OK","",false,false,{ callback(2, null, "") },{})
+
+//                            ToastUtils.showToast(HDFCApplication.appContext,"No Internet Available , Please check your Internet and try again")
+//                            callback(2, null, "")
                         }
                         //  val responseIsoData: IsoDataReader = readIso(transactionMsg, false)
                         //   callback(0, IsoDataReader(), "")

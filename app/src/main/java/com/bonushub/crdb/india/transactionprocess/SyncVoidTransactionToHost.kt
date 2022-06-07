@@ -3,6 +3,7 @@ package com.bonushub.crdb.india.transactionprocess
 import android.util.Log
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.AppPreference.clearReversal
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.vxutils.Mti
@@ -99,7 +100,7 @@ class SyncVoidTransactionToHost(
                             cardProcessedDataModal?.setTC(tcDataFromField55(responseIsoData))
 
                         if (successResponseCode == "00") {
-                            //  clearReversal()
+                              clearReversal()
                             syncTransactionCallback(
                                 true,
                                 successResponseCode.toString(),
@@ -108,7 +109,7 @@ class SyncVoidTransactionToHost(
                             )
 
                         } else {
-                            //    clearReversal()
+                                clearReversal()
                             syncTransactionCallback(
                                 true,
                                 successResponseCode.toString(),
