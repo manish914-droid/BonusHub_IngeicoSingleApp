@@ -378,7 +378,12 @@ class TransactionActivity : BaseActivityNew() {
                                     hideEmvCardImage()
 
                                     when (cardProcessedDataModal.getTransType()) {
-                                        TransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
+                                        TransactionType.SALE.type -> {
+
+                                            if(!checkInstaEmi(cardProcessedDataModal)){
+                                                processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
+                                            }
+                                        }
                                         TransactionType.EMI_SALE.type -> {
                                             val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
                                                 putExtra("cardProcessedData", globalCardProcessedModel)
@@ -527,9 +532,9 @@ class TransactionActivity : BaseActivityNew() {
                     }
 
 
-                    if(!checkInstaEmi(cardProcessedDataModal)) {
+                   // if(!checkInstaEmi(cardProcessedDataModal)) {
                         emvProcessNext(cardProcessedDataModal)
-                    }
+                    //}
                 }
 
                 override fun onCancel() {
@@ -651,6 +656,7 @@ class TransactionActivity : BaseActivityNew() {
                 globalCardProcessedModel = cardProcessedDataModal
                 tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
             }
+
             return true
 
         }else{

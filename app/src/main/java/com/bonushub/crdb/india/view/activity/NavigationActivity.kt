@@ -150,7 +150,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         DeviceHelper.setServiceListener(this)
         manageTopToolBar(true)
         setupNavigationDrawerLayout()
-         lockStatusBar()
+         //lockStatusBar()
 /*         isFresAppStatus = WifiPrefManager(this).isWifiStatus
          if (!isFresAppStatus) {
              isFresApp = WifiPrefManager(this).appStatus

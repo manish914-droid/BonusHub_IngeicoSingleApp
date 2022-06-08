@@ -138,10 +138,11 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                     }else{
                         // check batch open or not
 
+                        unselectItem()
                         lifecycleScope.launch(Dispatchers.Main) {
 
                             batchFileViewModel.getBatchTableData()
-                                .observe(viewLifecycleOwner, { batchData ->
+                                .observe(viewLifecycleOwner) { batchData ->
 
                                     when {
                                         AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
@@ -164,7 +165,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                             startFullInitProcess()
                                         }
                                     }
-                                })
+                                }
 
                         }
                     }
