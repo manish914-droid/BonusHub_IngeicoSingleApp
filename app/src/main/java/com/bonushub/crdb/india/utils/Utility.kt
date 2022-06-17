@@ -1766,8 +1766,8 @@ fun getAllIssuerData(): MutableList<IssuerParameterTable?>? {
 }
 //endregion
 //region======================Get issuer Data:-
-fun getAllBrandEMIMasterDataTimeStamps(): List<BrandEMIMasterTimeStamps>? {
-    var issuerData: List<BrandEMIMasterTimeStamps>? = null
+fun getAllBrandEMIMasterDataTimeStamps(): List<BrandEMITimeStamps>? {
+    var issuerData: List<BrandEMITimeStamps>? = null
     runBlocking(Dispatchers.IO) {
         issuerData = DBModule.appDatabase.appDao.getBrandEMIDateTimeStamps()
         val jsonResp=Gson().toJson(issuerData)

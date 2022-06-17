@@ -1,6 +1,5 @@
 package com.bonushub.crdb.india.transactionprocess
 
-import android.os.Bundle
 import android.os.DeadObjectException
 import android.os.RemoteException
 import android.text.TextUtils
@@ -11,8 +10,7 @@ import com.bonushub.crdb.india.model.local.AppPreference.GENERIC_REVERSAL_KEY
 import com.bonushub.crdb.india.model.local.AppPreference.clearReversal
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.view.activity.TransactionActivity
-import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
+import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.TransactionType
 import com.google.gson.Gson
@@ -24,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                             var cardProcessedDataModal: CardProcessedDataModal? = null,
-                            var testVFEmvHandler:VFEmvHandler,
+                            var testEmvHandler:EmvHandler,
                             var syncTransactionCallback: (Boolean, String, String?, Triple<String, String, String>?,String?,String?) -> Unit) {
 
     val iemv: UEMV? = DeviceHelper.getEMV()
@@ -160,8 +158,8 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                         cardProcessedDataModal?.getTransType() != TransactionType.TEST_EMI.type*/) {
 
                                                     logger("CompleteSecondGenAc","yes")
-                                                    logger("3testVFEmvHandler",""+testVFEmvHandler,"e")
-                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testVFEmvHandler) { printExtraData, de55 ->
+                                                    logger("3testVFEmvHandler",""+testEmvHandler,"e")
+                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testEmvHandler) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
                                                     }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
 

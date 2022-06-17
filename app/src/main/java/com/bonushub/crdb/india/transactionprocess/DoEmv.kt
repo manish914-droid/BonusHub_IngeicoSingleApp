@@ -1,22 +1,16 @@
 package com.bonushub.crdb.india.transactionprocess
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.os.*
-import android.util.Log
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.type.EmvOption
 import com.bonushub.crdb.india.utils.DeviceHelper
 import com.bonushub.crdb.india.view.activity.TransactionActivity
-import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
+import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-class DoEmv(var testVFEmvHandler: VFEmvHandler,var  activity: Activity, var cardProcessedDataModal: CardProcessedDataModal,
-            var transactionCallback: (CardProcessedDataModal,VFEmvHandler) -> Unit) {
+class DoEmv(var testEmvHandler: EmvHandler, var  activity: Activity, var cardProcessedDataModal: CardProcessedDataModal,
+            var transactionCallback: (CardProcessedDataModal, EmvHandler) -> Unit) {
 
 
     //    private var iemv: IEMV? = VFService.vfIEMV
@@ -32,19 +26,19 @@ class DoEmv(var testVFEmvHandler: VFEmvHandler,var  activity: Activity, var card
         val emvOption = EmvOption.create().apply {
             flagPSE(0x00.toByte())
         }
-        testVFEmvHandler = emvHandler()
-        DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testVFEmvHandler)
+        testEmvHandler = emvHandler()
+        DeviceHelper.getEMV()?.startEMV(emvOption?.toBundle(), testEmvHandler)
     }
     //endregion
 
     //region========================================Below Method is a Handler for EMV CardType:-
-    private fun emvHandler(): VFEmvHandler {
+    private fun emvHandler(): EmvHandler {
         println("DoEmv VfEmvHandler is calling")
         println("IEmv value is" + DeviceHelper.getEMV().toString())
-        return  VFEmvHandler(
+        return  EmvHandler(
             DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP),
             DeviceHelper.getEMV(),activity as TransactionActivity,cardProcessedDataModal){ cardProcessedData ->
-            transactionCallback(cardProcessedData,testVFEmvHandler)
+            transactionCallback(cardProcessedData,testEmvHandler)
         }
     }
     //endregion

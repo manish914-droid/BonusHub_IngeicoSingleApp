@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.db
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bonushub.crdb.india.model.local.*
@@ -181,17 +182,25 @@ interface AppDao{
 
     //region=================================BrandEMIMasterCategory Table Manipulation:-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBrandEMIMasterCategoryData(brandEMIMasterCategoryTable: BrandEMIMasterCategoryTable): Long?
+    suspend fun insertBrandEMIMasterCategoryData(brandEMIMasterCategoryTable: BrandEMITimeStamps): Long?
 
-    @Query("SELECT * FROM BrandEMIMasterCategoryTable")
-    suspend fun getAllBrandEMIMasterCategoryData(): MutableList<BrandEMIMasterCategoryTable?>?
+    @Query("SELECT * FROM BrandEMITimeStamps")
+    suspend fun getAllBrandEMIMasterCategoryData(): MutableList<BrandEMITimeStamps?>?
 
-    @Query("UPDATE BrandEMIMasterCategoryTable SET brandCategoryUpdatedTimeStamp = :updatedTimeStamp WHERE brandTimeStamp = :brandTimeStamp")
+   /* @Query("UPDATE BrandEMITimeStamps SET brandCategoryUpdatedTimeStamp = :updatedTimeStamp WHERE brandTimeStamp = :brandTimeStamp")
     fun updateCategoryTimeStamp(updatedTimeStamp: String, brandTimeStamp: String)
-
-    @Query("DELETE FROM BrandEMIMasterCategoryTable")
+*/
+    @Query("DELETE FROM BrandEMITimeStamps")
     suspend fun deleteBrandEMIMasterCategoryData(): Int?
     //endregion
+
+    // region =========== Saving Brand TimeStamps method========
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBrandEMITimeStamps(timestamps: BrandEMITimeStamps): Long?
+    // endregion
+
+    @Update
+    suspend fun updateBrandEMITimeStamps(timestamps: BrandEMITimeStamps):Int
 
     // region=================================BrandEMIMasterSubCategory Table Manipulation:-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -317,16 +326,15 @@ interface AppDao{
     fun updateBatchDataTableRecord(batch: BatchFileDataTable): Int
 
     // region =========== Saving Brand TimeStamps method========
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBrandEMIMasterTimeStamps(timestamps: BrandEMIMasterTimeStamps): Long?
+
     // endregion
 
-    @Query("DELETE FROM BrandEMIMasterTimeStamps")
-    suspend fun deleteBrandEMIMasterTimeStamps(): Int?
+    @Query("DELETE FROM BrandEMITimeStamps")
+    suspend fun deleteBrandEMITimeStamps(): Int?
 
     // region =========== Saving Brand TimeStamps method========
-    @Query("SELECT * FROM BrandEMIMasterTimeStamps")
-    suspend fun getBrandEMIDateTimeStamps():List<BrandEMIMasterTimeStamps>?
+    @Query("SELECT * FROM BrandEMITimeStamps")
+    suspend fun getBrandEMIDateTimeStamps():List<BrandEMITimeStamps>?
     // endregion
     // region =========== Saving Brand Subcat data method========
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -336,7 +344,7 @@ interface AppDao{
     @Query("SELECT * FROM BrandEMISubCategoryTable")
     suspend fun getBrandEMISubCategoryData():List<BrandEMISubCategoryTable>?
     // endregion
-    suspend fun getBrandTimeStampFromDB(): BrandEMIMasterTimeStamps?{
+    suspend fun getBrandTimeStampFromDB(): BrandEMITimeStamps?{
    val list= getBrandEMIDateTimeStamps()
     return if(list.isNullOrEmpty()){
         null
@@ -353,6 +361,55 @@ interface AppDao{
     fun selectFromIssuerParameterTable(issuerId: String): IssuerParameterTable?
 
 
+    suspend fun insertBrandTncTimeStamp(brandTncTimeStamp:String){
+        var emiTimeStamps=getBrandTimeStampFromDB()
+        if (emiTimeStamps != null) {
+            emiTimeStamps.brandTAndCTimeStamp =brandTncTimeStamp
+            val rowNo= updateBrandEMITimeStamps(emiTimeStamps)
+            println("updateBrandEMITimeStamps--->  "+rowNo.toString())
+        }else{
+            emiTimeStamps = BrandEMITimeStamps()
+            emiTimeStamps.brandTAndCTimeStamp=brandTncTimeStamp
+            val rowNo=  insertBrandEMITimeStamps(emiTimeStamps)
+            println("insertBrandEMITimeStamps--->  "+rowNo.toString())
+            Log.e("BrandTncTimeStamp", "Brand Time stamp table is null")
+        }
+
+    }
+
+    suspend fun insertIssuerTncTimeStamp(issuerTncTimeStamp:String){
+        var emiTimeStamps=getBrandTimeStampFromDB()
+
+        if (emiTimeStamps != null) {
+            emiTimeStamps?.issuerTAndCTimeStamp=issuerTncTimeStamp
+            val rowNo=  updateBrandEMITimeStamps(emiTimeStamps)
+            println("updateBrandEMITimeStamps--->  "+rowNo.toString())
+        }else{
+            emiTimeStamps= BrandEMITimeStamps()
+            emiTimeStamps.issuerTAndCTimeStamp =issuerTncTimeStamp
+            val rowNo=     insertBrandEMITimeStamps(emiTimeStamps)
+            println(" insertBrandEMITimeStamps--->  "+rowNo.toString())
+            Log.e("BrandTncTimeStamp", "Brand Time stamp table is null")
+        }
+
+    }
+
+    suspend fun insertCategoryTimeStamp(categoryTimeStamp:String){
+        var emiTimeStamps=getBrandTimeStampFromDB()
+
+        if (emiTimeStamps != null) {
+            emiTimeStamps?.brandCategoryUpdatedTimeStamp=categoryTimeStamp
+            val rowno=   updateBrandEMITimeStamps(emiTimeStamps)
+            println("BrandEMITimeStamps--->  "+rowno.toString())
+        }else{
+            emiTimeStamps= BrandEMITimeStamps()
+            emiTimeStamps.brandCategoryUpdatedTimeStamp =categoryTimeStamp
+            val rowNo=   insertBrandEMITimeStamps(emiTimeStamps)
+            println("insertBrandEMITimeStamps--->  "+rowNo.toString())
+            Log.e("BrandTncTimeStamp", "Brand Time stamp table is null")
+        }
+
+    }
 
     //region==============================BrandEMI Helper Methods:-
     /*fun insertBrandEMIMasterCategoryDataInDB(model: BrandEMIMasterCategoryTable): Long? {

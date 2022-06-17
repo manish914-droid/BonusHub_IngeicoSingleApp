@@ -44,7 +44,7 @@ class TenureSchemeActivity : BaseActivityNew() {
 //    private val serverRepository: ServerRepository = ServerRepository(dbObj, remoteService)
 
     @Inject
-    lateinit var serverRepository: ServerRepository
+   lateinit var serverRepository: ServerRepository
 
     private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
     var binding: FragmentTenureSchemeBinding? = null

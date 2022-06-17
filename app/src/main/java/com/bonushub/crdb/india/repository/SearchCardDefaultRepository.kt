@@ -60,7 +60,7 @@ class SearchCardDefaultRepository @Inject constructor(@USDKScope private var alg
     }
 
     // Detecting the card type ie(emv,cls,mag...)
-    open fun detectCard(cardProcessedDataModal: CardProcessedDataModal,cardOption: CardOption){
+    private fun detectCard(cardProcessedDataModal: CardProcessedDataModal, cardOption: CardOption){
 
         try {
             emv?.searchCard(cardOption.toBundle(), DemoConfig.TIMEOUT, object : SearchCardListener.Stub() {

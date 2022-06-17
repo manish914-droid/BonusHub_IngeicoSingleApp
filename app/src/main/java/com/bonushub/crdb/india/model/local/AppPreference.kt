@@ -44,7 +44,7 @@ object AppPreference {
     const val F48IdentifierAndSuccesssTxn="f48id_txnDate"
     const val ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE = "enquiry_amount_for_emi_catalogue"
 
-
+    const val EmiTimestampPrimaryKey = 1
     // kushal bank functions
     const val GENERIC_REVERSAL_KEY = "generic_reversal_key"
     const val PCKT_TIME = "packetTime"

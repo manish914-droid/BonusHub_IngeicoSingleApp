@@ -11,7 +11,7 @@ import com.bonushub.crdb.india.model.local.AppPreference.ONLINE_EMV_DECLINED
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
-import com.bonushub.crdb.india.view.baseemv.VFEmvHandler
+import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.google.gson.Gson
 import com.usdk.apiservice.aidl.emv.*
@@ -33,18 +33,18 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
     val iemv: UEMV? = DeviceHelper.getEMV()
 
-    lateinit var testVFEmvHandler:VFEmvHandler
+    lateinit var testEmvHandler:EmvHandler
     var field56data: String? = null
 
     constructor(cardProcessedDataModal: CardProcessedDataModal?,
                 data: IsoDataReader, isoData: IsoDataWriter? = null,
-                testVFEmvHandler:VFEmvHandler,
+                testEmvHandler:EmvHandler,
                 printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this(printExtraDataSB) {
                     this.cardProcessedDataModal = cardProcessedDataModal
                     this.data = data
                     this.isoData = isoData
                     //this.printExtraDataSB = printExtraDataSB
-                    this.testVFEmvHandler = testVFEmvHandler
+                    this.testEmvHandler = testEmvHandler
 
                 }
 
@@ -204,7 +204,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                 )
 
 
-                testVFEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+                testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
                 iemv?.respondEvent(onlineResult.toString())
 
                 // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)

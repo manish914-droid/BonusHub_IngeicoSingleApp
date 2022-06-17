@@ -7,6 +7,7 @@ import com.bonushub.crdb.india.di.scope.BHDashboardItem
 import com.bonushub.crdb.india.di.scope.BHFieldName
 import com.bonushub.crdb.india.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.model.local.AppPreference.EmiTimestampPrimaryKey
 import com.bonushub.crdb.india.model.remote.*
 import com.bonushub.crdb.india.utils.EAccountType
 import com.bonushub.crdb.india.utils.EDigiPosPaymentStatus
@@ -1148,8 +1149,10 @@ data class WifiCommunicationTable(
 
 //region===========================================BrandEMIMasterCategory Table:-
 @Entity
-data class BrandEMIMasterCategoryTable(
+data class BrandEMITimeStamps(
     @PrimaryKey
+    val branEmiTimestampPrimaryKey :Int=EmiTimestampPrimaryKey,
+
     var brandTimeStamp: String = "",
     var brandCategoryUpdatedTimeStamp: String? = null,
     var issuerTAndCTimeStamp: String? = null,
@@ -1188,14 +1191,14 @@ data class BrandTAndCTable(
 //region
 
 // region===============Brand EMI Master Category TimeStamps Table:-
-@Entity
+/*@Entity
 data class BrandEMIMasterTimeStamps(
     @PrimaryKey
     var brandTimeStamp: String = "",
     var brandCategoryUpdatedTimeStamp: String = "",
     var issuerTAndCTimeStamp: String = "",
     var brandTAndCTimeStamp: String = ""
-)
+)*/
 //endregion
 
 // region===============Brand EMI Sub-Category Data Table:-

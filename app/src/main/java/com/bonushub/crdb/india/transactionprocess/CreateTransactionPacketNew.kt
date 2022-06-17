@@ -81,6 +81,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             //Pos Entry Mode Field 22
             //    if(null !=cardProcessedData.getPosEntryMode().toString() && cardProcessedData.getPosEntryMode().toString().isNotEmpty())
             addField(22, cardProcessedData.getPosEntryMode().toString())
+           // addField(22,"0553")
 
             //Pan Sequence Number Field 23
             addFieldByHex(

@@ -11,7 +11,7 @@ import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import javax.inject.Inject
 
- val bankEMIRequestCode = "4"
+ const val bankEMIRequestCode = "4"
 
 class RemoteService @Inject constructor(){
 //:LiveData<GenericResponse<IsoDataReader>>
