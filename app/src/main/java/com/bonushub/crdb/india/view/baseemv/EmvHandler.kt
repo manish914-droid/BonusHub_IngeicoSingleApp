@@ -12,6 +12,7 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.transactionprocess.CompleteSecondGenAc
+import com.bonushub.crdb.india.type.DemoConfigs
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
@@ -26,6 +27,7 @@ import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
 import com.usdk.apiservice.aidl.data.BytesValue
 import com.usdk.apiservice.aidl.emv.*
 import com.usdk.apiservice.aidl.pinpad.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -34,6 +36,7 @@ import java.util.*
 
 open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
+    private var defaultScope = CoroutineScope(Dispatchers.Default)
     //for offline Pin
     var pinTryRemainingTimes = 0
     var pinTryCounter = 0
@@ -76,16 +79,52 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     @Throws(RemoteException::class)
     override fun onWaitCard(flag: Int) {
     Log.e("VFEmvHandler","onWaitCard  --->   $flag")
-       // WaitCardFlag.EXECUTE_CDCVM
-    //   onFinalSelect()
-    val option=    CardOption.create().apply {
-            supportICCard(false)
-            supportMagCard(false)
-            supportRFCard(true)
+
+        defaultScope.launch {
+            println("Searching card...")
+            try {
+
+                val cardOption = CardOption.create().apply {
+                    supportICCard(true)
+                    supportMagCard(true)
+                    supportRFCard(true)
+                }
+                DeviceHelper.getEMV()?.searchCard(
+                    cardOption.toBundle(),
+                    DemoConfigs.TIMEOUT,
+                    object : SearchCardListener.Stub() {
+                        override fun onCardPass(cardType: Int) {
+                            println("=> onCardPass | cardType = $cardType")
+                            cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+                            // transactionCallback(cardProcessedDataModal)
+                            emv?.respondCard()
+                        }
+
+                        override fun onCardInsert() {
+                            println("=> onCardInsert")
+                            cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
+                            //  transactionCallback(cardProcessedDataModal)
+
+                        }
+
+                        override fun onCardSwiped(track: Bundle) {
+
+                        }
+
+                        override fun onTimeout() {
+                            println("=> onTimeout")
+                        }
+
+                        override fun onError(code: Int, message: String) {
+                            println("Code: $code")
+                            println("message: $message")
+                            println(String.format("=> onError | %s[0x%02X]", message, code))
+                        }
+                    })
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
-
-            SearchCard(cardProcessedDataModal,option,vfEmvHandlerCallback)
-
 
 
     }
@@ -832,6 +871,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 println("Field 55 is $field55")
 
                 cardProcessedDataModal.setField55(field55)
+                vfEmvHandlerCallback(cardProcessedDataModal)
+
             }
             else -> "Unkown Type"
         }
