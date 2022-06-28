@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ItemEmiSchemeOfferBinding
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
-import com.bonushub.crdb.india.utils.divideAmountBy100
+
+import com.bonushub.crdb.india.vxutils.divideAmountBy100
 import com.bonushub.crdb.india.utils.makeTextViewResizable
-import com.bonushub.crdb.india.utils.BhTransactionType
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+
 
 
 internal class EMISchemeAndOfferAdapter(private val transactionType: Int,private val emiSchemeDataList: MutableList<BankEMITenureDataModal>?, private var schemeSelectCB: (Int) -> Unit) : RecyclerView.Adapter<EMISchemeAndOfferAdapter.EMISchemeOfferHolder>()

@@ -29,6 +29,9 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.view.fragments.AuthCompletionData
 import com.bonushub.crdb.india.viewmodel.PreAuthViewModel
+import com.bonushub.crdb.india.vxutils.dateFormaterNew
+import com.bonushub.crdb.india.vxutils.invoiceWithPadding
+import com.bonushub.crdb.india.vxutils.timeFormaterNew
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

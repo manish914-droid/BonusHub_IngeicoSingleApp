@@ -10,32 +10,26 @@ import android.os.RemoteException
 import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.india.BuildConfig
-import com.bonushub.crdb.india.R
+
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.local.AppPreference.AMEX_BANK_CODE
 import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
-import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
-import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
-import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getBrandTAndCData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getBrandTAndCDataByBrandId
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerTAndCDataByIssuerId
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.panMasking
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.transactionType2Name
-import com.bonushub.crdb.india.view.base.BaseActivityNew
-
-import com.bonushub.crdb.india.utils.EPrintCopyType
-import com.bonushub.crdb.india.utils.BhTransactionType
-import com.bonushub.crdb.india.utils.EDashboardItem
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getInitdataList
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectDigiPosDataAccordingToTxnStatus
-import com.bonushub.crdb.india.utils.SplitterTypes
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.transactionType2Name
+import com.bonushub.crdb.india.utils.Utility
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauthData
+import com.bonushub.crdb.india.vxutils.*
 import com.google.gson.Gson
+
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.usdk.apiservice.aidl.printer.*
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +41,6 @@ import java.io.InputStream
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 const val HDFC_BANK_CODE = "01"
 const val HDFC_BANK_CODE_SINGLE_DIGIT = "1"
@@ -2217,7 +2210,7 @@ class PrintUtil(context: Context?) {
 //endregion
 
         //region=====================Printing Merchant Brand Purchase Details:-
-        /*if (batchTable.transactionType.equals(EDashboardItem.BRAND_EMI.title)) {
+        /*if (batchTable.BhTransactionType.equals(EDashboardItem.BRAND_EMI.title)) {
         //region====================Printing DBD Wise TAndC Brand EMI==================
             if (!isNoEmiOnlyCashBackApplied!!) {
                 if (copyType?.equals(EPrintCopyType.MERCHANT) == true && (batchTable?.mobileNumberBillNumberFlag?.get(
@@ -2701,7 +2694,7 @@ class PrintUtil(context: Context?) {
                     var pre_authLastItem:Boolean=false
 
                     for (b in batch) {
-                        //  || b.transactionType == TransactionType.VOID_PREAUTH.type
+                        //  || b.transactionType == BhTransactionType.VOID_PREAUTH.type
                         if (updatedindex <= frequencylist.size - 1)
                             frequency = frequencylist[updatedindex].toInt() + lastfrequecny
                         count++
@@ -3180,7 +3173,7 @@ class PrintUtil(context: Context?) {
                     iteration = tidlist.distinct().size - 1
 
                     for (b in batch) {
-                        //  || b.transactionType == TransactionType.VOID_PREAUTH.type
+                        //  || b.transactionType == BhTransactionType.VOID_PREAUTH.type
                         if (b.transactionType == BhTransactionType.PRE_AUTH.type) continue  // Do not add pre auth transactions
 
                         if (b.transactionType == BhTransactionType.EMI_SALE.type || b.transactionType == BhTransactionType.BRAND_EMI.type || b.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
@@ -3626,7 +3619,7 @@ class PrintUtil(context: Context?) {
                 val frequencylist = mutableListOf<String>()
 
                 for (it in batch) {  // Do not count preauth transaction
-// || it.transactionType == TransactionType.VOID_PREAUTH.type
+// || it.transactionType == BhTransactionType.VOID_PREAUTH.type
                     if (it.transactionType == BhTransactionType.PRE_AUTH.type) continue
 
                     if (it.transactionType == BhTransactionType.EMI_SALE.type ||
@@ -4113,7 +4106,7 @@ class PrintUtil(context: Context?) {
                 val frequencylist = mutableListOf<String>()
 
                 for (it in batch) {  // Do not count preauth transaction
-// || it.transactionType == TransactionType.VOID_PREAUTH.type
+// || it.transactionType == BhTransactionType.VOID_PREAUTH.type
 
                     mapTidToBankId[it.hostTID] = it.hostBankID
 

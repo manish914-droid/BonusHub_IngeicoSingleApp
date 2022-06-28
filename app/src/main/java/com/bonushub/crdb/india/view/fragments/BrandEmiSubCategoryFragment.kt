@@ -16,18 +16,17 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.BrandEmiListAndSearchUiBinding
 import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
+import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.logger
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BrandEMISubCategoryAdapter
 import com.bonushub.crdb.india.view.base.IDialog
-import com.bonushub.crdb.india.utils.EDashboardItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.ArrayList
 
 var catagory:BrandEMISubCategoryTable?=null
 // var FRAGMENT_COUNTER=0

@@ -20,7 +20,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentVoidMainBinding
 import com.bonushub.crdb.india.db.AppDao
@@ -34,6 +33,7 @@ import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.transactionprocess.SyncVoidTransactionToHost
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
+import com.bonushub.crdb.india.utils.ProcessingCode
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
@@ -42,13 +42,11 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.india.viewmodel.PendingSyncTransactionViewModel
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
-import com.bonushub.crdb.india.vxutils.TransactionType
+import com.bonushub.crdb.india.vxutils.*
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -147,35 +145,10 @@ class VoidMainFragment : Fragment() {
                             //voidRefundBT?.isEnabled = true
                             when (code) {
                                 0 -> {
-                                    if (msg.isNotEmpty()) Toast.makeText(
-                                        activity as Context,
-                                        respnosedatareader?.isoMap?.get(58)?.parseRaw2String()
-                                            .toString(),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
-                                    /*GlobalScope.launch(Dispatchers.Main) {
-                                        val autoSettlementCheck =
-                                            respnosedatareader?.isoMap?.get(60)?.parseRaw2String()
-                                                .toString()
-                                        if (!TextUtils.isEmpty(autoSettlementCheck))
-                                            syncOfflineSaleAndAskAutoSettlement(
-                                                autoSettlementCheck.substring(
-                                                    0,
-                                                    1
-                                                )
-                                            )
-                                        else {
-                                            startActivity(
-                                                Intent(
-                                                    (activity as BaseActivity),
-                                                    NavigationActivity::class.java
-                                                ).apply {
-                                                    flags =
-                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                })
-                                        }
-                                    }*/
+                                    withContext(Dispatchers.Main){
+                                        (activity as? NavigationActivity)?.alertBoxWithActionNew("Error",  respnosedatareader?.isoMap?.get(58)?.parseRaw2String()
+                                            .toString() ?: "",R.drawable.ic_info_orange,"Ok","",false,false,{},{})
+                                    }
 
                                     startActivity(
                                         Intent(
@@ -219,21 +192,25 @@ class VoidMainFragment : Fragment() {
                                             ex.printStackTrace()
                                         }
 
-                                        if (voidData.transactionType == TransactionType.REFUND.type) {
-                                            voidData.transactionType = TransactionType.VOID_REFUND.type
-                                            voidData.transationName = getTransactionTypeName(TransactionType.VOID_REFUND.type)?:""
-                                        } else if ((voidData.transactionType == TransactionType.EMI_SALE.type || voidData.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type || voidData.transactionType == TransactionType.BRAND_EMI.type)&& voidData.tenure != "1") {
-                                            voidData.transactionType = TransactionType.VOID_EMI.type
-                                            voidData.transationName = getTransactionTypeName(TransactionType.VOID_EMI.type)?:""
+                                        if (voidData.transactionType == BhTransactionType.REFUND.type) {
+                                            voidData.transactionType = BhTransactionType.VOID_REFUND.type
+                                            voidData.transationName = getTransactionTypeName(BhTransactionType.VOID_REFUND.type)
+                                                ?:""
+                                        } else if ((voidData.transactionType == BhTransactionType.EMI_SALE.type || voidData.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type || voidData.transactionType == BhTransactionType.BRAND_EMI.type)&& voidData.tenure != "1") {
+                                            voidData.transactionType = BhTransactionType.VOID_EMI.type
+                                            voidData.transationName = getTransactionTypeName(BhTransactionType.VOID_EMI.type)
+                                                ?:""
                                         } else {
-                                            if(voidData.tenure=="1"&& voidData.transactionType==TransactionType.SALE.type){
-                                                voidData.transactionType = TransactionType.VOID.type
-                                                voidData.txnType2=TransactionType.VOID.type
-                                                voidData.transationName = getTransactionTypeName(TransactionType.VOID.type)?:""
+                                            if(voidData.tenure=="1"&& voidData.transactionType==BhTransactionType.SALE.type){
+                                                voidData.transactionType = BhTransactionType.VOID.type
+                                                voidData.txnType2=BhTransactionType.VOID.type
+                                                voidData.transationName = getTransactionTypeName(BhTransactionType.VOID.type)
+                                                    ?:""
 
                                             }else{
-                                                voidData.transactionType = TransactionType.VOID.type
-                                                voidData.transationName = getTransactionTypeName(TransactionType.VOID.type)?:""
+                                                voidData.transactionType = BhTransactionType.VOID.type
+                                                voidData.transationName = getTransactionTypeName(BhTransactionType.VOID.type)
+                                                    ?:""
                                                 }
                                         }
 
@@ -580,31 +557,27 @@ class VoidMainFragment : Fragment() {
 
 
     private fun voidTransConfirmationDialog(batchTable: TempBatchFileDataTable) {
-        if(batchTable != null) {
 
-                    val amt ="%.2f".format((((batchTable?.transactionalAmmount ?: "").toDouble()).div(100)).toString().toDouble())
+        val amt ="%.2f".format((((batchTable?.transactionalAmmount ?: "").toDouble()).div(100)).toString().toDouble())
 
-            DialogUtilsNew1.showDetailsConfirmDialog(requireContext(), transactionType = BhTransactionType.VOID,
-                tid = batchTable.tid, totalAmount = amt, invoice = batchTable.invoiceNumber, date = batchTable.transactionDate, time = batchTable.time,
-                amount = null, batchNo = null, roc = null,
-                confirmCallback = {
-                                  it.dismiss()
-                    (activity as NavigationActivity).alertBoxWithActionNew("","Do you want to Void Sale this transaction?"
-                        ,R.drawable.ic_info_orange,"OK","Cancel",true,false,{
+        DialogUtilsNew1.showDetailsConfirmDialog(requireContext(), transactionType = BhTransactionType.VOID,
+            tid = batchTable.tid, totalAmount = amt, invoice = batchTable.invoiceNumber, date = batchTable.transactionDate, time = batchTable.time,
+            amount = null, batchNo = null, roc = null,
+            confirmCallback = {
+                              it.dismiss()
+                (activity as NavigationActivity).alertBoxWithActionNew("","Do you want to Void Sale this transaction?"
+                    ,R.drawable.ic_info_orange,"OK","Cancel",true,false,{
 
-                            activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.processing)) }
-                            onContinueClicked(batchTable)
+                        activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.processing)) }
+                        onContinueClicked(batchTable)
 
-                        },{
-                        })
-                },
-                cancelCallback = {
-                    it.dismiss()
-                })
+                    },{
+                    })
+            },
+            cancelCallback = {
+                it.dismiss()
+            })
 
-                }else{
-                    ToastUtils.showToast(requireContext(),"Data not found.")
-                }
     }
 
     fun createCardProcessingModelData(receiptDetail: ReceiptDetail) {

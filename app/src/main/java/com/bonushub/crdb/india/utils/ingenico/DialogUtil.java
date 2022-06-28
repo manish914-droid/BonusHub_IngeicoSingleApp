@@ -3,7 +3,6 @@ package com.bonushub.crdb.india.utils.ingenico;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -22,7 +21,6 @@ import android.widget.TextView;
 import com.bonushub.crdb.india.R;
 import com.bonushub.crdb.india.utils.Converter;
 import com.usdk.apiservice.aidl.emv.CandidateAID;
-
 
 import java.util.List;
 

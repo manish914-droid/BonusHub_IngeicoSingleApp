@@ -4,10 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.india.databinding.ItemReportsBinding
-import com.bonushub.crdb.india.view.fragments.ICommunicationOptionFragmentItemClick
 import com.bonushub.crdb.india.utils.CommunicationParamItem
+import com.bonushub.crdb.india.view.fragments.ICommunicationOptionFragmentItemClick
 
 class BankFunctionsCommParamAdapter(var iCommunicationOptionFragmentItemClick: ICommunicationOptionFragmentItemClick?, private val listItem: MutableList<CommunicationParamItem>) : RecyclerView.Adapter<BankFunctionsCommParamAdapter.BankFunctionsCommParamViewHolder>() {
 

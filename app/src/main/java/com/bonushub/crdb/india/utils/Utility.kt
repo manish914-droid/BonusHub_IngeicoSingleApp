@@ -17,7 +17,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.MainActivity
@@ -26,7 +25,6 @@ import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.di.DBModule.appDatabase
 import com.bonushub.crdb.india.di.scope.BHFieldParseIndex
-import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacket
@@ -34,17 +32,16 @@ import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
-import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.bonushub.crdb.india.vxutils.getConnectionType
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
-import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 /**
@@ -1043,12 +1040,12 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 //endregion
 
     //region=========================Below method to check HDFC TPT Fields Check:-
-    fun checkHDFCTPTFieldsBitOnOff(bhTransactionType: BhTransactionType): Boolean {
+    fun checkHDFCTPTFieldsBitOnOff(transactionType: BhTransactionType): Boolean {
         val hdfcTPTData = runBlocking(Dispatchers.IO) { getHDFCTptData() }
         Log.d("HDFC TPT:- ", hdfcTPTData.toString())
         var data: String? = null
         if (hdfcTPTData != null) {
-            when (bhTransactionType) {
+            when (transactionType) {
                 BhTransactionType.VOID -> {
                     data = convertValue2BCD(hdfcTPTData.localTerminalOption)
                     return data[1] == '1' // checking second position of data for on/off case
@@ -1091,13 +1088,13 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 //region=========================Below method to check HDFC CDT Fields Check:-
     fun checkForTransactionAllowedOrNot(
         panNumber: String,
-        bhTransactionType: BhTransactionType
+        transactionType: BhTransactionType
     ): Boolean {
         val hdfcCDTData = appDatabase?.appDao?.getCardDataByHDFCCDTPanNumber(panNumber)
         Log.d("HDFC TPT:- ", hdfcCDTData.toString())
         var data: String? = null
         return if (hdfcCDTData != null) {
-            when (bhTransactionType) {
+            when (transactionType) {
                 BhTransactionType.TIP_ADJUSTMENT -> {
                     data = convertValue2BCD(hdfcCDTData.option1)
                     data[7] == '1' // checking eight position of data for on/off case

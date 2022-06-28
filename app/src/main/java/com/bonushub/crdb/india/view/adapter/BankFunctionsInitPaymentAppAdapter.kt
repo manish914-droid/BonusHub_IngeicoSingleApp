@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ItemBankFunctionsInitPaymentBinding
 import com.bonushub.crdb.india.view.fragments.TidsListModel
-import java.util.*
 
 class BankFunctionsInitPaymentAppAdapter(var tidsList:ArrayList<TidsListModel>) : RecyclerView.Adapter<BankFunctionsInitPaymentAppAdapter.BankFunctionsInitPaymentViewHolder>() {
 

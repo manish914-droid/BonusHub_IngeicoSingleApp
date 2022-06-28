@@ -20,9 +20,9 @@ import com.bonushub.crdb.india.view.adapter.BankFunctionsInitPaymentAppAdapter
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
+import com.bonushub.crdb.india.vxutils.checkBaseTid
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
-import com.bonushub.crdb.india.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

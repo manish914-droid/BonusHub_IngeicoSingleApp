@@ -3,21 +3,20 @@ package com.bonushub.crdb.india.view.fragments
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentEmiCompareBinding
 import com.bonushub.crdb.india.databinding.ItemEmiCompareViewBinding
+import com.bonushub.crdb.india.utils.UiAction
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.EMICompareDiffUtil
-import com.bonushub.crdb.india.utils.UiAction
 import com.google.gson.Gson
 import java.util.*
 

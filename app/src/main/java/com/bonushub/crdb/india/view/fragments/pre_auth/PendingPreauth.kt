@@ -11,7 +11,6 @@ import android.util.Log
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.TextView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.CardProcessedDataModal
@@ -22,9 +21,9 @@ import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.ProcessingCode
-import com.bonushub.crdb.india.vxutils.TransactionType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,7 +44,7 @@ class PendingPreauth(var context: Context) {
         val transactionalAmount = 0L //authCompletionData.authAmt?.replace(".", "")?.toLong() ?: 0L
         cardProcessedData.apply {
             setTransactionAmount(transactionalAmount)
-            setTransType(TransactionType.PENDING_PREAUTH.type)
+            setTransType(BhTransactionType.PENDING_PREAUTH.type)
             setProcessingCode(ProcessingCode.PENDING_PREAUTH.code)
         }
         val transactionISO =

@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.view.fragments
 
+
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -14,14 +15,11 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.local.TerminalCommunicationTable
+import com.bonushub.crdb.india.utils.Status
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.MainViewModel
-import com.bonushub.crdb.india.utils.Status
-
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_info.*
 

@@ -8,10 +8,11 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
+import com.bonushub.crdb.india.utils.Utility
 import com.bonushub.crdb.india.view.fragments.AuthCompletionData
+import com.bonushub.crdb.india.vxutils.*
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.Nii
-import com.bonushub.crdb.india.vxutils.TransactionType
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -76,7 +77,7 @@ class CreateAuthPacket {
 
 
                 when (cardProcessedData.getTransType()) {
-                    TransactionType.PRE_AUTH_COMPLETE.type -> {
+                    BhTransactionType.PRE_AUTH_COMPLETE.type -> {
                         //new data of field56       //tid              //batchno   //roc //datetime       //authcode //invoice
                         val f56AuthCompletion = "${tidF56AuthCompletion}${batchF56}${rocF56}${formatedDate}${""}${""}"
 
@@ -89,7 +90,7 @@ class CreateAuthPacket {
                         additionalData["F56reversal"] = f56AuthCompletion
                     }
 
-                    TransactionType.VOID_PREAUTH.type -> {
+                    BhTransactionType.VOID_PREAUTH.type -> {
 
                         println("Field 56 void data is" + "${tidF56AuthCompletion}${batchF56}${rocF56}${formatedDate}${"000000"}${""}")
 
@@ -118,7 +119,7 @@ class CreateAuthPacket {
                 )
                 val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
                 val pcNumber = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
-                val data = getConnectionType()+addPad(
+                val data = getConnectionType() +addPad(
                     AppPreference.getString("deviceModel"),
                     " ",
                     6,
@@ -199,7 +200,7 @@ class CreateAuthPacket {
                 val issuerParameterTable = getIssuerData(AppPreference.WALLET_ISSUER_ID)
                 val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
                 val pcNumber = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
-                val data = getConnectionType()+addPad(
+                val data = getConnectionType() +addPad(
                     AppPreference.getString("deviceModel"),
                     " ",
                     6,

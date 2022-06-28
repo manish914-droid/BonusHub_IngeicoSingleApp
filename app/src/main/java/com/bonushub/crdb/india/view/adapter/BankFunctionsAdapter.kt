@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
-import com.bonushub.crdb.india.view.fragments.IBankFunctionItemClick
 import com.bonushub.crdb.india.utils.BankFunctionsItem
+import com.bonushub.crdb.india.view.fragments.IBankFunctionItemClick
 
 class BankFunctionsAdapter(private var iBankFunctionItemClick: IBankFunctionItemClick?, private val bankFunctionsItem: MutableList<BankFunctionsItem>) : RecyclerView.Adapter<BankFunctionsAdapter.BankFunctionsViewHolder>() {
 

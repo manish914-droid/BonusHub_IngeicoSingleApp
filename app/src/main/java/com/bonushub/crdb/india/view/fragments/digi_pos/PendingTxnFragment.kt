@@ -20,7 +20,6 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectDigiPosDataA
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
-import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers

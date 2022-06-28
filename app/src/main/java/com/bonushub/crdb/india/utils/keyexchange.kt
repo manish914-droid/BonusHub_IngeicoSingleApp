@@ -3,23 +3,29 @@ package com.bonushub.pax.utils
 
 import android.content.Context
 import android.util.Log
-import com.bonushub.crdb.india.di.DBModule.appDatabase
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.db.AppDao
-import com.bonushub.crdb.india.di.DBModule
-import com.bonushub.crdb.india.model.local.TerminalParameterTable
+import com.bonushub.crdb.india.di.DBModule.appDatabase
 import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.serverApi.ServerCommunicator
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.DemoConfig.*
+import com.bonushub.crdb.india.vxutils.deviceModel
+import com.bonushub.crdb.india.vxutils.getAppVersionNameAndRevisionID
+import com.bonushub.crdb.india.vxutils.getBaseTID
+import com.bonushub.crdb.india.vxutils.getConnectionType
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.KeyType
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -87,7 +93,7 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
             processingCode: String, isSaveTransAsPending: Boolean = false,
             cb: (Boolean, String, String, String) -> Unit
         ) {
-            val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(DBModule.appDatabase.appDao) }
+            val baseTid = runBlocking(Dispatchers.IO) { getBaseTID(appDatabase.appDao) }
             val idw = IsoDataWriter().apply {
                 val terminalData = Field48ResponseTimestamp.getTptData()
                 if (terminalData != null) {

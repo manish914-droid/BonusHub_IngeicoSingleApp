@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentReportsBinding
 import com.bonushub.crdb.india.model.local.AppPreference
-import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
@@ -23,6 +22,8 @@ import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.india.viewmodel.BatchReversalViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.bonushub.crdb.india.vxutils.invoiceWithPadding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -234,7 +235,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                         lifecycleScope.launch {
                             try {
 
-                                batchFileViewModel?.getTempBatchTableDataListByInvoice(invoiceWithPadding(invoice))?.observe(viewLifecycleOwner) { bat ->
+                                batchFileViewModel?.getTempBatchTableDataListByInvoice(
+                                    invoiceWithPadding(invoice)
+                                )?.observe(viewLifecycleOwner) { bat ->
 
                                     if (bat != null && bat.size > 0) {
                                         PrintUtil(activity).startPrinting(

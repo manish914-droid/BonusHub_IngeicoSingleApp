@@ -1,4 +1,5 @@
 package com.bonushub.crdb.india.serverApi
+
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import com.bonushub.crdb.india.HDFCApplication
@@ -8,15 +9,12 @@ import com.bonushub.crdb.india.model.local.TerminalCommunicationTable
 import com.bonushub.crdb.india.repository.keyexchangeDataSource
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
-import com.bonushub.pax.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getF48TimeStamp
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
-
 import java.io.DataInputStream
 import java.io.FileOutputStream
 import java.net.ConnectException
 import java.net.Socket
-import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.nio.channels.ServerSocketChannel
 

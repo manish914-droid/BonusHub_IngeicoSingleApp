@@ -4,9 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bonushub.crdb.india.repository.ServerRepository
 import com.bonushub.crdb.india.viewmodel.BrandEmiByCodeViewModel
-import com.bonushub.crdb.india.viewmodel.BrandEmiMasterCategoryViewModel
-import com.bonushub.crdb.india.viewmodel.BrandEmiProductViewModel
-import com.bonushub.crdb.india.viewmodel.TenureSchemeViewModel
 
 /*class BrandEmiViewModelFactory
     (private val serverRepository: ServerRepository,private val brandId:String="",private val subCatId : String=""):ViewModelProvider.Factory {

@@ -1,9 +1,6 @@
 package com.bonushub.crdb.india.view.fragments
 
-import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,15 +8,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentPreAuthCompleteDetailBinding
-import com.bonushub.crdb.india.databinding.ItemCompletePreauthDialogBinding
-import com.bonushub.crdb.india.databinding.ItemPendingPreauthBinding
-import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.utils.*
@@ -29,16 +22,16 @@ import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
-import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauthData
 import com.bonushub.crdb.india.viewmodel.PreAuthViewModel
-import com.google.android.material.textfield.TextInputEditText
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.bonushub.crdb.india.vxutils.dateFormaterNew
+import com.bonushub.crdb.india.vxutils.invoiceWithPadding
+import com.bonushub.crdb.india.vxutils.timeFormaterNew
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.Serializable
-import java.util.*
 
 @AndroidEntryPoint
 class PreAuthCompleteInputDetailFragment : Fragment() {

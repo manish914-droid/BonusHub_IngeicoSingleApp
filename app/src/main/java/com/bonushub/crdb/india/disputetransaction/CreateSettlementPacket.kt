@@ -7,11 +7,13 @@ import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptDataByTid
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.transactionType2Name
-import com.bonushub.crdb.india.vxutils.TransactionType
+import com.bonushub.crdb.india.utils.Mti
+import com.bonushub.crdb.india.utils.Nii
+import com.bonushub.crdb.india.utils.ProcessingCode
+import com.bonushub.crdb.india.utils.Utility
+import com.bonushub.crdb.india.vxutils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import java.util.HashMap
 import javax.inject.Inject
 
 
@@ -56,7 +58,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
             addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
             /*for (i in 0 until batchListData.size) {
                 when (batchListData[i]?.transactionType) {
-                    BhTransactionType.SALE.type -> {
+                    TransactionType.SALE.type -> {
                         batchNumber = batchListData[i]?.receiptData?.batchNumber
                     }
 
@@ -134,7 +136,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                         println("key value in _map "+ k)
                         println("Value value in _map "+ m)
                         when (k) {
-                            BhTransactionType.SALE.type -> {
+                            TransactionType.SALE.type -> {
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
                                 bonushubsalebatchNumber = m.bonushubbatchNumber
@@ -142,7 +144,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleAmount += m.total
                             }
 
-                            BhTransactionType.EMI_SALE.type -> {
+                            TransactionType.EMI_SALE.type -> {
 
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
@@ -152,22 +154,14 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
                             }
 
-                            BhTransactionType.BRAND_EMI.type -> {
+                            TransactionType.BRAND_EMI.type -> {
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
                                 bonushubsalebatchNumber = m.bonushubbatchNumber
                                 saleCount += m.count
                                 saleAmount += m.total
                             }
-                            BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
-                                saletid = key
-                                ingenicosalebatchNumber = m.ingenicobatchNumber
-                                bonushubsalebatchNumber = m.bonushubbatchNumber
-                                saleCount += m.count
-                                saleAmount += m.total
-                            }
-
-                            BhTransactionType.SALE_WITH_CASH.type -> {
+                            TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
                                 bonushubsalebatchNumber = m.bonushubbatchNumber
@@ -175,7 +169,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleAmount += m.total
                             }
 
-                            BhTransactionType.CASH_AT_POS.type -> {
+                            TransactionType.SALE_WITH_CASH.type -> {
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
                                 bonushubsalebatchNumber = m.bonushubbatchNumber
@@ -183,14 +177,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleAmount += m.total
                             }
 
-                            BhTransactionType.PRE_AUTH_COMPLETE.type -> {
-                                saletid = key
-                                ingenicosalebatchNumber = m.ingenicobatchNumber
-                                bonushubsalebatchNumber = m.bonushubbatchNumber
-                                saleCount += m.count
-                                saleAmount += m.total
-                            }
-                            BhTransactionType.TIP_SALE.type -> {
+                            TransactionType.CASH_AT_POS.type -> {
                                 saletid = key
                                 ingenicosalebatchNumber = m.ingenicobatchNumber
                                 bonushubsalebatchNumber = m.bonushubbatchNumber
@@ -198,7 +185,22 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleAmount += m.total
                             }
 
-                            BhTransactionType.REFUND.type -> {
+                            TransactionType.PRE_AUTH_COMPLETE.type -> {
+                                saletid = key
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+                            TransactionType.TIP_SALE.type -> {
+                                saletid = key
+                                ingenicosalebatchNumber = m.ingenicobatchNumber
+                                bonushubsalebatchNumber = m.bonushubbatchNumber
+                                saleCount += m.count
+                                saleAmount += m.total
+                            }
+
+                            TransactionType.REFUND.type -> {
                                 refundCount += m.count
                                 refundAmount += m.total
                             }
@@ -278,7 +280,7 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
 
                 for (i in 0 until batchListData.size) {
                     when (batchListData[i]?.transactionType) {
-                        TransactionType.SALE.type -> {
+                        BhTransactionType.SALE.type -> {
                             if(batchListData[i]?.tenure=="1"){
                                 saleCount = saleCount.plus(1)
                                 saleAmount = saleAmount.plus(batchListData[i]?.emiTransactionAmount?.toLong()?:0L)
@@ -287,39 +289,39 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                                 saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
                             }
                         }
-                        TransactionType.EMI_SALE.type -> {
+                        BhTransactionType.EMI_SALE.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.emiTransactionAmount?.toLong()?:0L)
                         }
-                        TransactionType.BRAND_EMI.type -> {
+                        BhTransactionType.BRAND_EMI.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.emiTransactionAmount?.toLong()?:0L)
                         }
-                        TransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
+                        BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
                         }
-                        TransactionType.SALE_WITH_CASH.type -> {
+                        BhTransactionType.SALE_WITH_CASH.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
                         }
-                        TransactionType.CASH_AT_POS.type -> {
+                        BhTransactionType.CASH_AT_POS.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
                         }
-                        TransactionType.PRE_AUTH_COMPLETE.type -> {
+                        BhTransactionType.PRE_AUTH_COMPLETE.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)
                         }
-                        TransactionType.TIP_SALE.type -> {
+                        BhTransactionType.TIP_SALE.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(batchListData[i]?.totalAmmount?.toLong()?:0L)
                         }
-                        TransactionType.TEST_EMI.type -> {
+                        BhTransactionType.TEST_EMI.type -> {
                             saleCount = saleCount.plus(1)
                             saleAmount = saleAmount.plus(100.toLong())
                         }
-                        TransactionType.REFUND.type -> {
+                        BhTransactionType.REFUND.type -> {
                             refundCount = refundCount.plus(1)
                             refundAmount =
                                 refundAmount.plus(batchListData[i]?.transactionalAmmount?.toLong()?:0L)

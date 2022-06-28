@@ -48,29 +48,30 @@ enum class ESaleType(val posEntryValue: Int) {
 
 }
 
-fun getEmvTransactionType(transactionType: TransactionType): Int = when (transactionType) {
-    TransactionType.SALE, TransactionType.EMI_SALE -> 0x00
+fun getEmvTransactionType(bhTransactionType: BhTransactionType): Int = when (bhTransactionType) {
+    BhTransactionType.SALE, BhTransactionType.EMI_SALE -> 0x00
     else -> 0x00
 }
 
-fun getTransactionType(uiAction: UiAction): TransactionType {
+fun getTransactionType(uiAction: UiAction): BhTransactionType {
     return when (uiAction) {
-        UiAction.START_SALE -> TransactionType.SALE
-        UiAction.INIT -> TransactionType.INIT
-        UiAction.KEY_EXCHANGE -> TransactionType.KEY_EXCHANGE
-        UiAction.PRE_AUTH -> TransactionType.PRE_AUTH
-        UiAction.REFUND -> TransactionType.REFUND
-        UiAction.BANK_EMI -> TransactionType.EMI_SALE
-        else -> TransactionType.NONE
+        UiAction.START_SALE -> BhTransactionType.SALE
+        UiAction.INIT -> BhTransactionType.INIT
+        UiAction.KEY_EXCHANGE -> BhTransactionType.KEY_EXCHANGE
+        UiAction.PRE_AUTH -> BhTransactionType.PRE_AUTH
+        UiAction.REFUND -> BhTransactionType.REFUND
+        UiAction.BANK_EMI -> BhTransactionType.EMI_SALE
+        else -> BhTransactionType.NONE
     }
 }
 
-enum class TransactionType(
+enum class BhTransactionType(
     val type: Int,
     val processingCode: ProcessingCode = ProcessingCode.NONE,
     val txnTitle: String = "Not Defined",
     val settlementSequence: Int = 0
-) {
+)
+{
     //   sale, emi sale ,sale with cash, cash only,auth comp,and tip transaction type will be included.
 
     NONE(0),
@@ -85,7 +86,7 @@ enum class TransactionType(
     REFUND(9, ProcessingCode.REFUND, "REFUND"),
     VOID_REFUND(10, ProcessingCode.VOID_REFUND, "VOID OF REFUND"),
     SALE_WITH_CASH(11, ProcessingCode.SALE_WITH_CASH, "SALE-CASH", 3),
-    CASH(12),
+  //  CASH(12),
     BATCH_UPLOAD(13),
     PRE_AUTH(14, ProcessingCode.PRE_AUTH, "PRE-AUTH"),
 

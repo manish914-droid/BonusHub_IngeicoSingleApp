@@ -3,22 +3,23 @@ package com.bonushub.crdb.india.view.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
-
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.repository.ServerRepository
 import com.bonushub.crdb.india.serverApi.RemoteService
-import com.bonushub.crdb.india.utils.BhTransactionType
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.showToast
 import com.bonushub.crdb.india.utils.ProcessingCode
+
 import com.bonushub.crdb.india.view.activity.TransactionActivity
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.ingenico.hdfcpayment.type.TransactionType
 
 
 class BrandEmiByCodeFragment : Fragment() {

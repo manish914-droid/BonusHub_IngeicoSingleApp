@@ -13,7 +13,10 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentTxnListBinding
@@ -23,13 +26,13 @@ import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.parseDataListWithSplitter
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.vxutils.getAppVersionNameAndRevisionID
+import com.bonushub.crdb.india.vxutils.getConnectionType
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
-import com.bonushub.crdb.india.utils.logger
-import com.bonushub.crdb.india.utils.EDashboardItem
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.parseDataListWithSplitter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
@@ -513,7 +516,7 @@ class TxnListFragment : Fragment() {
                         addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
                     val pcNumber2 =
                         addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
-                    val f61 = getConnectionType()+ addPad(
+                    val f61 = getConnectionType() + addPad(
                         AppPreference.getString("deviceModel"),
                         " ",
                         6,

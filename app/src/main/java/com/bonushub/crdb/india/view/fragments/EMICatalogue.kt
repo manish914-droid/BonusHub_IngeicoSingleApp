@@ -1,27 +1,26 @@
 package com.bonushub.crdb.india.view.fragments
 
+
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.HDFCApplication
-
-
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentEmiCatalogueBinding
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
+import com.bonushub.crdb.india.utils.EDashboardItem
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.india.view.activity.IFragmentRequest
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.EmiCatalogueViewModel
-import com.bonushub.crdb.india.utils.EDashboardItem
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

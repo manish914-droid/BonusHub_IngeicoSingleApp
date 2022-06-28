@@ -11,19 +11,23 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.text.method.DigitsKeyListener
 import android.util.Log
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.utils.BhTransactionType
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.utils.Utility
 import com.bonushub.crdb.india.view.fragments.getEditorActionListener
+import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.ingenico.hdfcpayment.type.TransactionType
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,10 +43,10 @@ class DialogUtilsNew1 {
             setCancelable: Boolean = true
         ) {
             val dialog = Dialog(activity!!)
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
-           // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialog.setCancelable(setCancelable)
             dialog.setContentView(R.layout.dialog_admin)
 
@@ -51,21 +55,21 @@ class DialogUtilsNew1 {
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
 
-           // val textViewHeader = dialog.findViewById<View>(R.id.textViewHeader) as TextView
+            // val textViewHeader = dialog.findViewById<View>(R.id.textViewHeader) as TextView
             val inputTexLayout = dialog.findViewById<View>(R.id.password_crdView) as TextInputLayout
-            val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
+            val edtTextPassword =
+                dialog.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
             val txtViewCancel = dialog.findViewById<View>(R.id.txtViewCancel) as TextView
             val txtViewOk = dialog.findViewById<View>(R.id.txtViewOk) as TextView
 
             //textViewHeader.text = header
             inputTexLayout.hint = hint
 
-            if(header?.equals("ADMIN PASSWORD")?:false){
+            if (header?.equals("ADMIN PASSWORD") == true) {
 
                 edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
 
-            }else if(header?.equals("SUPER ADMIN PASSWORD")?:false)
-            {
+            } else if (header?.equals("SUPER ADMIN PASSWORD") == true) {
                 edtTextPassword.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(6))
             }
 
@@ -87,9 +91,18 @@ class DialogUtilsNew1 {
             dialog.show()
         }
 
-        fun getInputDialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false,toastMsg:String, callback: (String) -> Unit, callbackCancel: () -> Unit) {
+        fun getInputDialog(
+            context: Context,
+            title: String,
+            _text: String,
+            isNumeric: Boolean = false,
+            isTID: Boolean = false,
+            toastMsg: String,
+            callback: (String) -> Unit,
+            callbackCancel: () -> Unit
+        ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_admin)
                 setCancelable(false)
@@ -117,16 +130,16 @@ class DialogUtilsNew1 {
                     invoiceET.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(25))
                 }
 
-                if (isNumeric||isTID) {
-                    if(isTID){
+                if (isNumeric || isTID) {
+                    if (isTID) {
                         //invoiceET.setKeyListener(DigitsKeyListener.getInstance("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
                         invoiceET.inputType = InputType.TYPE_CLASS_TEXT
-                    }else{
+                    } else {
                         invoiceET.inputType = InputType.TYPE_CLASS_NUMBER
-                        invoiceET.setKeyListener(DigitsKeyListener.getInstance("0123456789."))
+                        invoiceET.keyListener = DigitsKeyListener.getInstance("0123456789.")
                     }
 
-                }else{
+                } else {
                     invoiceET.inputType = InputType.TYPE_CLASS_TEXT
                 }
 
@@ -156,9 +169,18 @@ class DialogUtilsNew1 {
             }.show()
         }
 
-        fun getInputTID_Dialog(context: Context, title: String, _text: String, isNumeric: Boolean = false, isTID: Boolean = false,toastMsg:String, callback: (String) -> Unit, callbackCancel: () -> Unit) {
+        fun getInputTID_Dialog(
+            context: Context,
+            title: String,
+            _text: String,
+            isNumeric: Boolean = false,
+            isTID: Boolean = false,
+            toastMsg: String,
+            callback: (String) -> Unit,
+            callbackCancel: () -> Unit
+        ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_tid)
                 setCancelable(false)
@@ -176,47 +198,58 @@ class DialogUtilsNew1 {
                 edtTextTid?.addTextChangedListener(Utility.OnTextChange {
 
                     edtTextReEnterTid.setText("")
-                    checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)
+                    checkInitProcessEnable(
+                        edtTextTid.text.toString(),
+                        edtTextReEnterTid.text.toString(),
+                        okbtn
+                    )
 
                 })
 
                 edtTextTid.setOnFocusChangeListener { view, b ->
-                    if(edtTextTid.hasFocus() == true){
-                        Log.e("tid","focus")
+                    if (edtTextTid.hasFocus() == true) {
+                        Log.e("tid", "focus")
                         //  binding?.ifEt?.setInputType(InputType.TYPE_CLASS_TEXT)
 
                         edtTextTid.setSelection(edtTextTid.text.toString().length)
 
-                        if(edtTextReEnterTid.text.toString().isNotEmpty() && edtTextTid.text.toString().equals(edtTextReEnterTid.text.toString())){
-                            edtTextReEnterTid.setError(null)
-                        }else{
+                        if (edtTextReEnterTid.text.toString()
+                                .isNotEmpty() && edtTextTid.text.toString()
+                                .equals(edtTextReEnterTid.text.toString())
+                        ) {
+                            edtTextReEnterTid.error = null
+                        } else {
                             //  binding?.ifEt?.setError(null)
-                            if(edtTextReEnterTid.text.toString().isNotEmpty()) {
-                                edtTextReEnterTid.setError("TID Mismatch")
+                            if (edtTextReEnterTid.text.toString().isNotEmpty()) {
+                                edtTextReEnterTid.error = "TID Mismatch"
                                 // (activity as NavigationActivity).showToast("TID Mismatch")
-                            }else{
-                                edtTextReEnterTid.setError(null)
+                            } else {
+                                edtTextReEnterTid.error = null
                             }
                         }
 
-                    }else{
-                        Log.e("tid","not focus")
-                        edtTextTid.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                    } else {
+                        Log.e("tid", "not focus")
+                        edtTextTid.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
-                        if(edtTextTid.text.toString().length == 8){
+                        if (edtTextTid.text.toString().length == 8) {
                             // binding?.ifEt?.setError(null) //
 
-                        }else{
-                            edtTextTid.setError("Tid should be 8 char.")
+                        } else {
+                            edtTextTid.error = "Tid should be 8 char."
                         }
 
                     }
 
-                    checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)
+                    checkInitProcessEnable(
+                        edtTextTid.text.toString(),
+                        edtTextReEnterTid.text.toString(),
+                        okbtn
+                    )
 
                 }
 
-                edtTextReEnterTid.addTextChangedListener(object: TextWatcher {
+                edtTextReEnterTid.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
                     }
@@ -227,18 +260,24 @@ class DialogUtilsNew1 {
                     override fun afterTextChanged(p0: Editable?) {
 
                         val ll = p0.toString().length
-                        if(ll > 0) {
-                            if (edtTextTid.text.toString().length >= ll && edtTextTid.text.toString().substring(0,ll).equals(p0.toString())) {
-                                edtTextReEnterTid.setError(null)
+                        if (ll > 0) {
+                            if (edtTextTid.text.toString().length >= ll && edtTextTid.text.toString()
+                                    .substring(0, ll).equals(p0.toString())
+                            ) {
+                                edtTextReEnterTid.error = null
 
                             } else {
-                                edtTextReEnterTid.setError("TID Mismatch")
+                                edtTextReEnterTid.error = "TID Mismatch"
                             }
-                        }else{
-                            edtTextReEnterTid.setError(null)
+                        } else {
+                            edtTextReEnterTid.error = null
                         }
 
-                       checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)
+                        checkInitProcessEnable(
+                            edtTextTid.text.toString(),
+                            edtTextReEnterTid.text.toString(),
+                            okbtn
+                        )
 
                     }
 
@@ -259,22 +298,24 @@ class DialogUtilsNew1 {
                     InputFilter { source, start, end, dest, dstart, dend ->
 
                         val ll = edtTextReEnterTid.text.toString().length
-                        if(ll > 0) {
-                            if (edtTextTid.text.toString().length >= ll && edtTextTid.text.toString().substring(0,ll).equals(edtTextReEnterTid.text.toString())) {
-                                edtTextReEnterTid.setError(null)
+                        if (ll > 0) {
+                            if (edtTextTid.text.toString().length >= ll && edtTextTid.text.toString()
+                                    .substring(0, ll).equals(edtTextReEnterTid.text.toString())
+                            ) {
+                                edtTextReEnterTid.error = null
 
                             } else {
-                                edtTextReEnterTid.setError("TID Mismatch")
+                                edtTextReEnterTid.error = "TID Mismatch"
                             }
-                        }else{
-                            edtTextReEnterTid.setError(null)
+                        } else {
+                            edtTextReEnterTid.error = null
                         }
 
                         null
                     }
 
-                edtTextTid.filters = arrayOf(alphanumericFilter,lengthFilter)
-                edtTextReEnterTid.filters = arrayOf(alphanumericFilter,lengthFilter, filterError)
+                edtTextTid.filters = arrayOf(alphanumericFilter, lengthFilter)
+                edtTextReEnterTid.filters = arrayOf(alphanumericFilter, lengthFilter, filterError)
 
                 //-------
                 findViewById<TextView>(R.id.txtViewCancel).setOnClickListener {
@@ -283,7 +324,12 @@ class DialogUtilsNew1 {
                 }
                 okbtn.setOnClickListener {
 
-                    if (checkInitProcessEnable(edtTextTid.text.toString(),edtTextReEnterTid.text.toString(),okbtn)) {
+                    if (checkInitProcessEnable(
+                            edtTextTid.text.toString(),
+                            edtTextReEnterTid.text.toString(),
+                            okbtn
+                        )
+                    ) {
                         dismiss()
                         callback(edtTextTid.text.toString())
                     }
@@ -292,12 +338,15 @@ class DialogUtilsNew1 {
             }.show()
         }
 
-        private fun checkInitProcessEnable(tidText:String, tidConfirmText:String,okBtn:TextView):Boolean
-        {
-            val isEnabled =  tidText.length == 8 && tidText.equals(tidConfirmText)
-            if(isEnabled){
+        private fun checkInitProcessEnable(
+            tidText: String,
+            tidConfirmText: String,
+            okBtn: TextView
+        ): Boolean {
+            val isEnabled = tidText.length == 8 && tidText.equals(tidConfirmText)
+            if (isEnabled) {
                 okBtn.alpha = 1f
-            }else{
+            } else {
                 okBtn.alpha = .5f
             }
             return isEnabled
@@ -316,7 +365,7 @@ class DialogUtilsNew1 {
                     WindowManager.LayoutParams.MATCH_PARENT,
                     WindowManager.LayoutParams.WRAP_CONTENT
                 )
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setCancelable(setCancelable)
 
@@ -346,7 +395,7 @@ class DialogUtilsNew1 {
             callback: () -> Unit
         ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_void_details)
                 setCancelable(false)
@@ -407,7 +456,7 @@ class DialogUtilsNew1 {
             callback: () -> Unit
         ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_brand_emi_by_code_details)
                 setCancelable(false)
@@ -447,15 +496,20 @@ class DialogUtilsNew1 {
         }
 
 
-        fun alertBoxWithAction(context: Context,
-                               heading: String, msg: String,
-            positiveButtonText: String, negativeButtonText: String, imgHeaader:Int, callback: () -> Unit,
+        fun alertBoxWithAction(
+            context: Context,
+            heading: String,
+            msg: String,
+            positiveButtonText: String,
+            negativeButtonText: String,
+            imgHeaader: Int,
+            callback: () -> Unit,
             cancelButtonCallback: () -> Unit
         ) {
             // BaseActivity. getInfoDialog()
 
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_alert_message_with_icon)
                 setCancelable(false)
@@ -475,16 +529,16 @@ class DialogUtilsNew1 {
                 noBtn.text = negativeButtonText
                 yesBtn.text = positiveButtonText
 
-                if(imgHeaader == 0){
+                if (imgHeaader == 0) {
                     img_header.visibility = View.GONE
-                }else{
+                } else {
                     img_header.visibility = View.VISIBLE
                     img_header.setImageResource(imgHeaader)
                 }
 
-                if(msg.isEmpty()){
+                if (msg.isEmpty()) {
                     dialog_msg.visibility = View.GONE
-                }else{
+                } else {
                     dialog_msg.visibility = View.VISIBLE
                 }
                 noBtn.setOnClickListener {
@@ -505,7 +559,8 @@ class DialogUtilsNew1 {
         fun hideKeyboardIfOpen(activity: Activity) {
             val view = activity.currentFocus
             if (view != null) {
-                val imm = activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
         }
@@ -522,7 +577,7 @@ class DialogUtilsNew1 {
             callbackPrint: () -> Unit
         ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_pending_txn_details)
                 setCancelable(false)
@@ -571,7 +626,7 @@ class DialogUtilsNew1 {
             callbackPrint: () -> Unit
         ) {
             Dialog(context).apply {
-                getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.fragment_upi_collect)
                 setCancelable(false)
@@ -609,12 +664,12 @@ class DialogUtilsNew1 {
 
         fun instaEmiDialog(
             activity: Activity?,
-            emiCB: (Dialog, Activity) ->Unit,
-            saleCB: (Dialog) ->Unit,
-            cancelCB: (Dialog) ->Unit
+            emiCB: (Dialog, Activity) -> Unit,
+            saleCB: (Dialog) -> Unit,
+            cancelCB: (Dialog) -> Unit
         ) {
             val dialog = Dialog(activity!!)
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
             // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -635,7 +690,7 @@ class DialogUtilsNew1 {
             }
 
             txtViewEmi.setOnClickListener {
-                emiCB(dialog, activity!!)
+                emiCB(dialog, activity)
             }
 
             txtViewSale.setOnClickListener {
@@ -659,7 +714,7 @@ class DialogUtilsNew1 {
             cancelCallback: (Dialog) -> Unit
         ) {
             Dialog(context).apply {
-               // getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                // getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
                 requestWindowFeature(Window.FEATURE_NO_TITLE)
                 setContentView(R.layout.dialog_details_confirm)
                 setCancelable(false)
@@ -686,9 +741,9 @@ class DialogUtilsNew1 {
                 val viewLine2 = findViewById<View>(R.id.viewLine2)
 
 
-                when(transactionType){
+                when (transactionType) {
 
-                    BhTransactionType.VOID ->{
+                    BhTransactionType.VOID -> {
                         dialogTittle.text = "VOID SALE"
                         tid_tv.text = tid
                         batchNoTittle.text = "Invoice No:"
@@ -712,12 +767,12 @@ class DialogUtilsNew1 {
                         amt_tv.text = formattedTime
                     }
 
-                    BhTransactionType.PRE_AUTH_COMPLETE ->{
+                    BhTransactionType.PRE_AUTH_COMPLETE -> {
                         dialogTittle.text = "PRE-AUTH COMPLETE"
                         tid_tv.text = tid
                         batch_no_tv.text = batchNo
                         roc_tv.text = roc
-                        amt_tv.text  = amount
+                        amt_tv.text = amount
 
                         total_amount_tvTittle.visibility = View.GONE
                         total_amount_tv.visibility = View.GONE
@@ -725,7 +780,7 @@ class DialogUtilsNew1 {
 
                     }
 
-                    else ->{
+                    else -> {
 
                     }
                 }

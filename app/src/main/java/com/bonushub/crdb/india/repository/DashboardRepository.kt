@@ -7,8 +7,8 @@ import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.di.scope.BHDashboardItem
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
-import com.bonushub.crdb.india.view.fragments.DashboardFragment
 import com.bonushub.crdb.india.utils.EDashboardItem
+import com.bonushub.crdb.india.view.fragments.DashboardFragment
 import com.google.gson.Gson
 
 class DashboardRepository {

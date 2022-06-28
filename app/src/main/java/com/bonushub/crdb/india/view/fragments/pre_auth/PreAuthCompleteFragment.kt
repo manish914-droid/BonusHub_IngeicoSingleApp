@@ -1,10 +1,10 @@
 package com.bonushub.crdb.india.view.fragments.pre_auth
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentPreAuthCompleteBinding
 import com.bonushub.crdb.india.view.activity.NavigationActivity

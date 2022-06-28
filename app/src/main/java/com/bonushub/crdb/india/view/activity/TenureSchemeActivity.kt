@@ -1,37 +1,33 @@
 package com.bonushub.crdb.india.view.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentTenureSchemeBinding
-import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.india.model.remote.TenuresWithIssuerTncs
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.repository.ServerRepository
-import com.bonushub.crdb.india.serverApi.RemoteService
 import com.bonushub.crdb.india.utils.ToastUtils
-import com.bonushub.crdb.india.view.adapter.EMISchemeAndOfferAdapter
-import com.bonushub.crdb.india.viewmodel.TenureSchemeViewModel
-import com.bonushub.crdb.india.utils.BhTransactionType
-import com.google.gson.Gson
-import dagger.hilt.android.AndroidEntryPoint
 
-import android.content.Intent
-import android.view.View
-import androidx.lifecycle.lifecycleScope
-import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
-import com.bonushub.crdb.india.utils.logger
+import com.bonushub.crdb.india.view.adapter.EMISchemeAndOfferAdapter
 import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.viewmodel.TenureSchemeViewModel
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.google.gson.Gson
+
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.logging.Logger
 import javax.inject.Inject
 import kotlin.math.pow
 
@@ -114,84 +110,89 @@ private val emiIssuerTAndCDataFromIntent by lazy {
             "$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${cardProcessedDataModal?.getTransactionAmount()}"
         }
 
-        if(transactionType== BhTransactionType.BRAND_EMI.type || transactionType== BhTransactionType.EMI_SALE.type) {
-            if(isShowProgress()){
-                setProgressTitle("Please wait fetching schemes")
-            }else {
-                showProgress("Please wait fetching schemes")
-            }
-            /*tenureSchemeViewModel = ViewModelProvider(
-                this, TenureSchemeActivityVMFactory(
-                    serverRepository,
-                    cardProcessedDataModal?.getPanNumberData() ?: "",
-                    field57
-                )
-            ).get(TenureSchemeViewModel::class.java)*/
 
-            tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
-            lifecycleScope.launch(Dispatchers.IO){
-                tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
-            }
+        when (transactionType) {
+            BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type -> {
+                if(isShowProgress()){
+                    setProgressTitle("Please wait fetching schemes")
+                }else {
+                    showProgress("Please wait fetching schemes")
+                }
+                /*tenureSchemeViewModel = ViewModelProvider(
+                    this, TenureSchemeActivityVMFactory(
+                        serverRepository,
+                        cardProcessedDataModal?.getPanNumberData() ?: "",
+                        field57
+                    )
+                ).get(TenureSchemeViewModel::class.java)*/
 
-            //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
-            tenureSchemeViewModel.emiTenureLiveData.observe(
-                this
-            ) {
-                hideProgress()
-                when (val genericResp = it) {
-                    is GenericResponse.Success -> {
-                        println(Gson().toJson(genericResp.data))
-                        val resp = genericResp.data as TenuresWithIssuerTncs
-                        emiSchemeOfferDataList = resp.bankEMISchemesDataList
-                        emiIssuerTAndCData = resp.bankEMIIssuerTAndCList
-                       // region set issuer icon or name
-                        setIssuerIcon(emiIssuerTAndCData?.issuerID?:"")
-                        // end region
-                        setUpRecyclerView()
+                tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
+                lifecycleScope.launch(Dispatchers.IO){
+                    tenureSchemeViewModel.getEMITenureData(cardProcessedDataModal?.getPanNumberData() ?: "",field57)
+                }
 
-                    }
-                    is GenericResponse.Error -> {
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            alertBoxWithActionNew(
-                                genericResp.errorMessage ?: "Oops something went wrong",
-                                "",
-                                R.drawable.ic_info_orange,
-                                getString(R.string.positive_button_ok),"",false,false,
-                                {
-                                    finish()
-                                    startActivity(
-                                        Intent(
-                                            this@TenureSchemeActivity,
-                                            NavigationActivity::class.java
-                                        ).apply {
-                                            flags =
-                                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                        })
-                                },
-                                {})
+                //  tenureSchemeViewModel = ViewModelProvider(this, BrandEmiViewModelFactory(serverRepository)).get(TenureSchemeViewModel::class.java)
+                tenureSchemeViewModel.emiTenureLiveData.observe(
+                    this
+                ) {
+                    hideProgress()
+                    when (val genericResp = it) {
+                        is GenericResponse.Success -> {
+                            println(Gson().toJson(genericResp.data))
+                            val resp = genericResp.data as TenuresWithIssuerTncs
+                            emiSchemeOfferDataList = resp.bankEMISchemesDataList
+                            emiIssuerTAndCData = resp.bankEMIIssuerTAndCList
+                            // region set issuer icon or name
+                            setIssuerIcon(emiIssuerTAndCData?.issuerID?:"")
+                            // end region
+                            setUpRecyclerView()
+
                         }
-                        //  ToastUtils.showToast(this, genericResp.errorMessage)
-                        println(genericResp.errorMessage.toString())
-                    }
-                    is GenericResponse.Loading -> {
-// currently not in use ....
+                        is GenericResponse.Error -> {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                alertBoxWithActionNew(
+                                    genericResp.errorMessage ?: "Oops something went wrong",
+                                    "",
+                                    R.drawable.ic_info_orange,
+                                    getString(R.string.positive_button_ok),"",false,false,
+                                    {
+                                        finish()
+                                        startActivity(
+                                            Intent(
+                                                this@TenureSchemeActivity,
+                                                NavigationActivity::class.java
+                                            ).apply {
+                                                flags =
+                                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                            })
+                                    },
+                                    {})
+                            }
+                            //  ToastUtils.showToast(this, genericResp.errorMessage)
+                            println(genericResp.errorMessage.toString())
+                        }
+                        is GenericResponse.Loading -> {
+    // currently not in use ....
+                        }
                     }
                 }
+
             }
+            BhTransactionType.SALE.type -> {
+                emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent
+                emiIssuerTAndCData= emiIssuerTAndCDataFromIntent!!
+                setIssuerIcon(emiIssuerTAndCData?.issuerID?:"")
+                setUpRecyclerView()
+            }
+            BhTransactionType.TEST_EMI.type -> {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    emiSchemeOfferDataList = calculateEmi()
+                    withContext(Dispatchers.Main) {
+                        setUpRecyclerView()
+                    }
+                }
 
-        }else if (transactionType== BhTransactionType.SALE.type ){
-            emiSchemeOfferDataList=emiSchemeOfferDataListFromIntent
-            emiIssuerTAndCData= emiIssuerTAndCDataFromIntent!!
-            setIssuerIcon(emiIssuerTAndCData?.issuerID?:"")
-            setUpRecyclerView()
-        }else if(transactionType== BhTransactionType.TEST_EMI.type){
-lifecycleScope.launch(Dispatchers.IO) {
-    emiSchemeOfferDataList = calculateEmi()
-    withContext(Dispatchers.Main) {
-        setUpRecyclerView()
-    }
-}
-
+            }
         }
 
 

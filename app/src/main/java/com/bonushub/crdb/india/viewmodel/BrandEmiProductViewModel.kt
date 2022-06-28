@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.repository.ServerRepository
-import javax.inject.Inject
 
 
 class BrandEmiProductViewModel @ViewModelInject constructor(private val serverRepository: ServerRepository) : ViewModel() {

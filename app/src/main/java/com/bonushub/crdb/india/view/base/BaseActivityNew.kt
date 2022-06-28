@@ -9,19 +9,24 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-
 import android.view.*
 import android.webkit.WebView
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.databinding.*
+import com.bonushub.crdb.india.databinding.DialogAlertMsgNewBinding
+import com.bonushub.crdb.india.databinding.DialogMsgWithIconBinding
+import com.bonushub.crdb.india.databinding.DialogTxnApprovedBinding
+import com.bonushub.crdb.india.databinding.ItemOkBtnDialogBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
+import com.bonushub.crdb.india.utils.EPrintCopyType
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
-import com.bonushub.crdb.india.utils.EPrintCopyType
 
 abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 

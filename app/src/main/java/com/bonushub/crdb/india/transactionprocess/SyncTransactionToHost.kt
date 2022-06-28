@@ -11,8 +11,8 @@ import com.bonushub.crdb.india.model.local.AppPreference.clearReversal
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.baseemv.EmvHandler
+import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.Mti
-import com.bonushub.crdb.india.vxutils.TransactionType
 import com.google.gson.Gson
 import com.usdk.apiservice.aidl.emv.UEMV
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
     //Below method is used to sync Transaction Packet Data to host:-
     private suspend fun sendTransactionPacketToHost(transactionISOData: IsoDataWriter?) {
         when (cardProcessedDataModal?.getTransType()) {
-            TransactionType.PRE_AUTH.type -> {
+            BhTransactionType.PRE_AUTH.type -> {
                 transactionISOData?.mti = Mti.PRE_AUTH_MTI.mti
             }
             else -> {
@@ -147,7 +147,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         DetectCardType.EMV_CARD_TYPE -> {
                                             if (TextUtils.isEmpty(AppPreference.getString(GENERIC_REVERSAL_KEY))) {
 
-                                                if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type/*&&
+                                                if (cardProcessedDataModal?.getTransType() != BhTransactionType.REFUND.type/*&&
                                                     && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&
                                                         cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI.type
                                                         cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI_BY_ACCESS_CODE.type &&
@@ -193,7 +193,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                         }
                                         DetectCardType.EMV_CARD_TYPE -> {
                                             clearReversal()
-                                            if (cardProcessedDataModal?.getTransType() != TransactionType.REFUND.type
+                                            if (cardProcessedDataModal?.getTransType() != BhTransactionType.REFUND.type
                                              /*   && cardProcessedDataModal?.getTransType() != TransactionType.EMI_SALE.type &&
                                                     cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI.type &&
                                                     cardProcessedDataModal?.getTransType() != TransactionType.BRAND_EMI_BY_ACCESS_CODE.type &&

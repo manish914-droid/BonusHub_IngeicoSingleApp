@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentCommunicationOptionBinding
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
+import com.bonushub.crdb.india.utils.CommunicationParamItem
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BankFunctionsCommParamAdapter
 import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
-import com.bonushub.crdb.india.utils.CommunicationParamItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

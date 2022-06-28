@@ -2,6 +2,7 @@
 
 package com.bonushub.crdb.india.transactionprocess
 
+
 import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.india.BuildConfig
@@ -18,14 +19,11 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
-import com.bonushub.crdb.india.vxutils.TransactionType
-import com.bonushub.pax.utils.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import java.lang.Exception
-import java.text.DateFormat
-
-
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.bonushub.crdb.india.vxutils.deviceModel
+import com.bonushub.crdb.india.vxutils.getAppVersionNameAndRevisionID
+import com.bonushub.crdb.india.vxutils.getConnectionType
+import com.bonushub.pax.utils.ITransactionPacketExchangeNew
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -58,7 +56,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                     Mti.REVERSAL.mti
                 } else {
                     when (cardProcessedData.getTransType()) {
-                       TransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
+                       BhTransactionType.PRE_AUTH.type -> Mti.PRE_AUTH_MTI.mti
                         else -> Mti.DEFAULT_MTI.mti
                     }
                 }
@@ -68,7 +66,18 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
            // addField(3, "920001")
 
             //Transaction Amount Field
+when(cardProcessedData.getTransType()){
+    BhTransactionType.SALE_WITH_CASH.type->{
+        val saleAmount=cardProcessedData.getTransactionAmount()
+        val otherAmount=cardProcessedData.getOtherAmount()?:0L
+        val txnAmount= saleAmount?.plus(otherAmount)
+        addField(4, addPad(txnAmount.toString(), "0", 12, true))
+
+    }
+    else->{
             addField(4, addPad(cardProcessedData.getTransactionAmount().toString(), "0", 12, true))
+    }
+}
 
 
             //STAN(ROC) Field 11
@@ -105,12 +114,33 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             if (!(TextUtils.isEmpty(cardProcessedData.getGeneratePinBlock())))
                 addField(52, cardProcessedData.getGeneratePinBlock().toString())
 
+
+            // todo adding field 54 here in case of sale with cash and cash@Pos
+            when(cardProcessedData.getTransType()){
+                BhTransactionType.SALE_WITH_CASH.type->{
+                    addFieldByHex(
+                        54,
+                        addPad(cardProcessedData.getOtherAmount().toString(), "0", 12, true)
+                    )
+
+                }
+                BhTransactionType.CASH_AT_POS.type->{
+                    addFieldByHex(
+                        54,
+                        addPad(cardProcessedData.getTransactionAmount().toString(), "0", 12, true)
+                    )
+                }
+
+            }
+
             //Field 55
             when (cardProcessedData.getReadCardType()) {
                 DetectCardType.EMV_CARD_TYPE, DetectCardType.CONTACT_LESS_CARD_TYPE -> addField(
                     55, cardProcessedData.getFiled55().toString()
                 )
+
                 else -> {
+
                 }
             }
 
@@ -138,7 +168,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                 //"$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection"//used for visa// used for ruppay//"0|54|2|00"
 
             when (cardProcessedData.getTransType()) {
-                TransactionType.EMI_SALE.type -> {
+                BhTransactionType.EMI_SALE.type -> {
                     indicator = "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection," +
                             "${cardProcessedData.getPanNumberData()?.substring(0, 8)}," +
                             "${bankEmiTandCData?.issuerID}," +
@@ -151,7 +181,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
 
                 }
 /*0|46|1|00,460133,54,135,25,586,650000,0,635960,3,1300,216596,14040,635748,12,8,,8287305603,,0,0,0,0,,*/
-                TransactionType.BRAND_EMI.type -> {
+                BhTransactionType.BRAND_EMI.type -> {
                     var imeiOrSerialNo:String?=null
                     if(brandEMIData?.imeiORserailNum !="" ){
                         imeiOrSerialNo=brandEMIData?.imeiORserailNum
@@ -172,7 +202,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
                   0|60|5|00,60832632,52,144,11,2356,800000,18320,781680,3,1400,266663,0,815623,,12qw3e,,,,0,0,200.0,15634,52429840,*/
 
                 else -> {
-                    indicator = if( cardProcessedData.getTransType()==TransactionType.TEST_EMI.type ){
+                    indicator = if( cardProcessedData.getTransType()==BhTransactionType.TEST_EMI.type ){
                         logger("TEST OPTION",cardProcessedData.testEmiOption,"e")
                         "$cardIndFirst|$firstTwoDigitFoCard|$cdtIndex|$accSellection|${cardProcessedData.testEmiOption}"
                     }else
@@ -221,7 +251,7 @@ class CreateTransactionPacketNew @Inject constructor(private var appDao: AppDao,
             //val customerID = HexStringConverter.addPreFixer(issuerParameterTable?.customerIdentifierFiledType, 2)
             //val walletIssuerID = issuerParameterTable?.issuerId?.let { addPad(it, "0", 2) } ?: 0
 
-            val walletIssuerID = if (cardProcessedData.getTransType() == TransactionType.EMI_SALE.type || cardProcessedData.getTransType() == TransactionType.BRAND_EMI.type) {
+            val walletIssuerID = if (cardProcessedData.getTransType() == BhTransactionType.EMI_SALE.type || cardProcessedData.getTransType() == BhTransactionType.BRAND_EMI.type) {
                 bankEmiTandCData?.issuerID?.let { addPad(it, "0", 2) } ?: 0
             }
             else {

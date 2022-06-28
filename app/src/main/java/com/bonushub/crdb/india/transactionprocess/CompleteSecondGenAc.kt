@@ -16,8 +16,6 @@ import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.google.gson.Gson
 import com.usdk.apiservice.aidl.emv.*
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, String, String>?, String?) -> Unit) {
 

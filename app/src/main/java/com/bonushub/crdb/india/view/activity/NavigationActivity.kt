@@ -8,12 +8,10 @@ import android.content.pm.PackageInfo
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.net.wifi.WifiManager
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.RemoteException
+import android.os.*
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -21,6 +19,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -31,12 +30,13 @@ import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.appupdate.AppUpdateDownloadManager
 import com.bonushub.crdb.india.appupdate.OnDownloadCompleteListener
-
 import com.bonushub.crdb.india.databinding.ActivityNavigationBinding
 import com.bonushub.crdb.india.databinding.MainDrawerBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.di.DBModule
+import com.bonushub.crdb.india.model.local.*
+import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.serverApi.HitServer
@@ -46,6 +46,8 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.performOperation
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
+import com.bonushub.crdb.india.utils.ProcessingCode
+import com.bonushub.crdb.india.utils.Utility
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
@@ -54,14 +56,15 @@ import com.bonushub.crdb.india.view.fragments.*
 import com.bonushub.crdb.india.view.fragments.digi_pos.DigiPosMenuFragment
 import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthFragment
 import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthPendingFragment
+import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthVoidFragment
 import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
+import com.bonushub.crdb.india.vxutils.*
 import com.bonushub.pax.utils.*
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.response.OperationResult
-import com.bonushub.crdb.india.utils.Status
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 import com.usdk.apiservice.aidl.pinpad.UPinpad
@@ -75,19 +78,10 @@ import kotlinx.android.synthetic.main.navigation_footer_layout.view.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.lang.Runnable
-import javax.inject.Inject
-import android.view.Gravity
-
-import android.os.Build
-import androidx.drawerlayout.widget.DrawerLayout
-import com.bonushub.crdb.india.model.local.*
-import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
-import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthVoidFragment
-import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.*
-import kotlin.collections.ArrayList
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -715,7 +709,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     //  val amt = data as String
                     val amt = (data as Pair<*, *>).first.toString()
                     val cashBackAmount = data.second.toString()
-                    startActivityForResult(
+                    startActivity(
                         Intent(
                             this,
                             TransactionActivity::class.java
@@ -726,7 +720,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                             putExtra("type", BhTransactionType.SALE_WITH_CASH.type)
                             putExtra("proc_code", ProcessingCode.SALE_WITH_CASH.code)
                             putExtra("edashboardItem",  EDashboardItem.SALE_WITH_CASH)
-                        }, EIntentRequest.TRANSACTION.code
+                        }
                     )
                 } else {
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))

@@ -2,8 +2,6 @@ package com.bonushub.crdb.india.utils
 
 import android.util.Log
 import com.bonushub.crdb.india.BuildConfig
-import java.lang.Exception
-import java.util.HashMap
 
 
 class LogUtils private constructor() {

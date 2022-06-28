@@ -1,23 +1,22 @@
 package com.bonushub.crdb.india.view.fragments
 
-import  android.content.Context
+
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.HDFCApplication
-
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentNewInputAmountBinding
-
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
@@ -32,22 +31,20 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.convertValue2BCD
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.isTipEnable
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.maxAmountLimitDialog
-
 import com.bonushub.crdb.india.view.activity.IFragmentRequest
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.NewInputAmountViewModel
-import com.bonushub.crdb.india.utils.EDashboardItem
-
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
-import com.bonushub.crdb.india.utils.BhTransactionType
-import com.bonushub.crdb.india.utils.UiAction
-
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.bonushub.crdb.india.vxutils.changeEditTextBackground
+import com.bonushub.crdb.india.vxutils.showMobileBillDialog
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+
 @AndroidEntryPoint
 class NewInputAmountFragment : Fragment() {
 
@@ -241,11 +238,11 @@ class NewInputAmountFragment : Fragment() {
         Log.d("tpt===>:- ", Gson().toJson(tpt))
         return tpt
     }
-    private fun observeNewInpuAmountViewModelForHdfcTpt(bhTransactionType: BhTransactionType)  {
+    private fun observeNewInpuAmountViewModelForHdfcTpt(BhTransactionType: BhTransactionType)  {
       lifecycleScope.launch(Dispatchers.Main) {
             newInputAmountViewModel.fetchHdfcTptData()?.observe(viewLifecycleOwner,{
                 hdfctpt = it
-            checkHDFCTPTFieldsBitOnOff(bhTransactionType,it)
+            checkHDFCTPTFieldsBitOnOff(BhTransactionType,it)
                 Log.d("Hdfctpt===>:- ", Gson().toJson(it))
                 Log.d("Hdfctpt===>:- ", Gson().toJson(status))
             })
@@ -913,7 +910,7 @@ class NewInputAmountFragment : Fragment() {
 
     private fun isMobileNumberEntryOnsale(cb: (Boolean, Boolean) -> Unit) {
         lifecycleScope.launch(Dispatchers.Main) {
-            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner, {
+            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner) {
                 tpt = it
                 Log.d("tptllll===>:- ", Gson().toJson(it))
                 when (eDashBoardItem) {
@@ -929,7 +926,7 @@ class NewInputAmountFragment : Fragment() {
                         cb(false, false)
                     }
                 }
-            })
+            }
         }
 
     }

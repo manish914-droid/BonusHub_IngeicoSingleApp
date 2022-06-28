@@ -5,14 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-
 import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.view.activity.IFragmentRequest
-
 import com.bonushub.crdb.india.utils.EDashboardItem
-import java.util.ArrayList
+import com.bonushub.crdb.india.view.activity.IFragmentRequest
 
 class DashBoardAdapter(private val fragReq: IFragmentRequest?, var lessMoreClick: (item: EDashboardItem) -> Unit
 ) : RecyclerView.Adapter<DashBoardAdapter.DashBoardViewHolder>() {

@@ -1,14 +1,15 @@
 package com.bonushub.crdb.india.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.disputetransaction.CreateSettlementPacket
 import com.bonushub.crdb.india.model.local.IngenicoSettlementResponse
-import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.repository.SettlementRepository
 import com.bonushub.crdb.india.utils.Result
-import com.bonushub.crdb.india.utils.getBaseTID
+import com.bonushub.crdb.india.vxutils.getBaseTID
 import com.bonushub.crdb.india.utils.logger
 import com.ingenico.hdfcpayment.request.SettlementRequest
 import kotlinx.coroutines.Dispatchers

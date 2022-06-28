@@ -32,11 +32,12 @@ enum class EAccountType(val code: String) {
 //endregion
 
 //region==================Transaction Type================
-enum class BhTransactionType(
+/*enum class TransactionType(
     val type: Int,
     val processingCode: ProcessingCode = ProcessingCode.NONE,
     val txnTitle: String = "Not Defined"
-) {
+)
+{
     NONE(0),
     KEY_EXCHANGE(1, ProcessingCode.KEY_EXCHANGE),
     INIT(2, ProcessingCode.INIT),
@@ -77,7 +78,7 @@ enum class BhTransactionType(
     BRAND_EMI_BY_ACCESS_CODE(35, ProcessingCode.BRAND_EMI, "EMI SALE"),
     VOID_EMI(37, ProcessingCode.VOID, "VOID EMI"),
 
-}
+}*/
 //endregion
 
 //region=========================Processing Code=================
@@ -205,13 +206,16 @@ enum class DetectCardType(val cardType: Int, val cardTypeName: String = "") {
     EMV_Fallback_TYPE(-1, "Chip Fallabck"),
     NONE(-1,"None"),
     REMOVE(-2,"Remove"),
+    TIMEOUT(-3, "Card Read Time out"),
+    ERROR(-4, "Card Read Error"),
     CARD_ERROR_TYPE(0),
     MAG_CARD_TYPE(1, "Mag"),
     EMV_CARD_TYPE(2, "Chip"),
     CONTACT_LESS_CARD_TYPE(3, "CTLS"),
     CONTACT_LESS_CARD_WITH_MAG_TYPE(4, "CTLSMAG"),
     CONTACT_LESS_CARD_WITH_EMV_TYPE(6, "CTLSEMV"),
-    MANUAL_ENTRY_TYPE(5, "MAN")
+    MANUAL_ENTRY_TYPE(5, "MAN"),
+
 }
 
 //Below Enum Class is used to check which Pos Entry Type:-

@@ -5,10 +5,11 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.utils.ConnectionType
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
-import com.bonushub.crdb.india.utils.Nii
-import com.bonushub.crdb.india.utils.ProcessingCode
+import com.bonushub.crdb.india.vxutils.deviceModel
+import com.bonushub.crdb.india.vxutils.getAppVersionNameAndRevisionID
+import com.bonushub.crdb.india.vxutils.getBaseTID
+import com.bonushub.crdb.india.vxutils.getConnectionType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject

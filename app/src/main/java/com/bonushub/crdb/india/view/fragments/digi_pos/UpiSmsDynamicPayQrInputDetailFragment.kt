@@ -16,12 +16,9 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.india.view.base.BaseActivityNew
-import com.bonushub.crdb.india.utils.EDashboardItem
-import com.bonushub.crdb.india.utils.IsoDataReader
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
-import com.bonushub.crdb.india.utils.readIso
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

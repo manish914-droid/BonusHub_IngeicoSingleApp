@@ -10,13 +10,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentTestEmiBinding
-import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.india.databinding.ItemReportsBinding
-import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
-import com.bonushub.crdb.india.view.activity.NavigationActivity
-import com.bonushub.crdb.india.view.fragments.NewInputAmountFragment
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.TestEmiItem
+import com.bonushub.crdb.india.view.activity.NavigationActivity
+import com.bonushub.crdb.india.view.fragments.NewInputAmountFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

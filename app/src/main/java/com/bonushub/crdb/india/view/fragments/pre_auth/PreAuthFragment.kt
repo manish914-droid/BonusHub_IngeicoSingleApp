@@ -1,7 +1,6 @@
 package com.bonushub.crdb.india.view.fragments.pre_auth
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentPreAuthBinding
 import com.bonushub.crdb.india.databinding.ItemReportsBinding
-import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.india.utils.ToastUtils
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 
 
 class PreAuthFragment : Fragment() {

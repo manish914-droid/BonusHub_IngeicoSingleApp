@@ -11,16 +11,17 @@ import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.vxutils.Utility.*
-
-import com.bonushub.pax.utils.*
-import com.bonushub.crdb.india.utils.Status
+import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
+import com.bonushub.crdb.india.vxutils.deviceModel
+import com.bonushub.crdb.india.vxutils.getAppVersionNameAndRevisionID
+import com.bonushub.crdb.india.vxutils.getConnectionType
+import com.bonushub.crdb.india.vxutils.getErrorDetail
+import com.bonushub.pax.utils.KeyExchanger
 import com.usdk.apiservice.aidl.BaseError
 import com.usdk.apiservice.aidl.data.IntValue
 import com.usdk.apiservice.aidl.pinpad.*
 import com.usdk.apiservice.limited.pinpad.PinpadLimited
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 interface IKeyExchangeInit{
     suspend fun createInitIso(nextCounter: String, isFirstCall: Boolean,tid: String): IWriter

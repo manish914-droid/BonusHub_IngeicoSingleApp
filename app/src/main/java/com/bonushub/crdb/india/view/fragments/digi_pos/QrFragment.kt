@@ -14,9 +14,8 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.BitmapUtils.convertCompressedByteArrayToBitmap
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
-import com.bonushub.crdb.india.view.base.BaseActivityNew
-import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

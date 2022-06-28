@@ -4,14 +4,13 @@ import android.util.Log
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.local.AppPreference
-import com.bonushub.crdb.india.model.local.IssuerParameterTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
+import com.bonushub.crdb.india.vxutils.*
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.Nii
 import com.bonushub.crdb.india.vxutils.ProcessingCode
-import com.bonushub.crdb.india.vxutils.TransactionType
 import com.bonushub.pax.utils.IVoidExchange
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,7 +21,7 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
         // packing data
         mti = Mti.DEFAULT_MTI.mti
 
-        if (batch.transactionType == TransactionType.REFUND.type) {
+        if (batch.transactionType == BhTransactionType.REFUND.type) {
             addField(3, ProcessingCode.VOID_REFUND.code)
         } else {
             addField(3, ProcessingCode.VOID.code)
@@ -53,7 +52,7 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
         addFieldByHex(42, batch.mid)
         addFieldByHex(48, Field48ResponseTimestamp.getF48Data())
 
-        if (batch.transactionType == TransactionType.TIP_SALE.type)
+        if (batch.transactionType == BhTransactionType.TIP_SALE.type)
             addFieldByHex(54, addPad(batch.tipAmmount, "0", 12))
 
         var aidstr = ""
@@ -124,7 +123,7 @@ class CreateVoidPacket(val batch: TempBatchFileDataTable) : IVoidExchange {
         val issuerParameterTable = getIssuerData(AppPreference.WALLET_ISSUER_ID)
         val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
         val pcNumbers = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)+addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
-        val data = getConnectionType()+addPad(
+        val data = getConnectionType() +addPad(
             AppPreference.getString("deviceModel"),
             " ",
             6,

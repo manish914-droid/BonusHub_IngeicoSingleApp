@@ -8,25 +8,31 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
-import android.view.*
-import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ProgressBar
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.databinding.FragmentInitBinding
-import com.bonushub.crdb.india.viewmodel.InitViewModel
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.bonushub.crdb.india.R
+import com.bonushub.crdb.india.databinding.FragmentInitBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.utils.*
-
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
+import com.bonushub.crdb.india.viewmodel.InitViewModel
+import com.bonushub.crdb.india.vxutils.checkInitializationStatus
+import com.bonushub.crdb.india.vxutils.writeAppRevisionIDInFile
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
-import com.bonushub.crdb.india.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint

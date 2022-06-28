@@ -8,22 +8,20 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.transactionprocess.CreateAuthPacket
-import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.fragments.AuthCompletionData
-import com.bonushub.crdb.india.view.fragments.pre_auth.CompletePreAuthData
 import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreAuthDataResponse
 import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauthData
+import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.ProcessingCode
-import com.bonushub.crdb.india.vxutils.TransactionType
 import com.google.gson.Gson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class PreAuthRepository @Inject constructor() {
 
@@ -52,7 +50,7 @@ class PreAuthRepository @Inject constructor() {
         val transactionalAmount = 0L
         cardProcessedData.apply {
             setTransactionAmount(transactionalAmount)
-            setTransType(TransactionType.PENDING_PREAUTH.type)
+            setTransType(BhTransactionType.PENDING_PREAUTH.type)
             setProcessingCode(ProcessingCode.PENDING_PREAUTH.code)
         }
         val transactionISO =
@@ -327,7 +325,7 @@ class PreAuthRepository @Inject constructor() {
         val transactionalAmount = authCompletionData.authAmt?.replace(".", "")?.toLong() ?: 0L
         cardProcessedData.apply {
             setTransactionAmount(transactionalAmount)
-            setTransType(TransactionType.PRE_AUTH_COMPLETE.type)
+            setTransType(BhTransactionType.PRE_AUTH_COMPLETE.type)
             setProcessingCode(ProcessingCode.PRE_SALE_COMPLETE.code)
             setAuthBatch(authCompletionData.authBatchNo.toString())
             setAuthRoc(authCompletionData.authRoc.toString())
@@ -564,7 +562,7 @@ class PreAuthRepository @Inject constructor() {
         val transactionalAmount = 0L //authCompletionData.authAmt?.replace(".", "")?.toLong() ?: 0L
         cardProcessedData.apply {
             setTransactionAmount(transactionalAmount)
-            setTransType(TransactionType.VOID_PREAUTH.type)
+            setTransType(BhTransactionType.VOID_PREAUTH.type)
             setProcessingCode(ProcessingCode.VOID_PREAUTH.code)
             setAuthBatch(authCompletionData.authBatchNo.toString())
             setAuthRoc(authCompletionData.authRoc.toString())

@@ -4,10 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
-import com.bonushub.crdb.india.databinding.ItemBankFunctionsBinding
 import com.bonushub.crdb.india.databinding.ItemReportsBinding
-import com.bonushub.crdb.india.view.fragments.IBankFunctionsAdminVasItemClick
 import com.bonushub.crdb.india.utils.BankFunctionsAdminVasItem
+import com.bonushub.crdb.india.view.fragments.IBankFunctionsAdminVasItemClick
 
 class BankFunctionsAdminVasAdapter(var iBankFunctionsAdminVasItemClick: IBankFunctionsAdminVasItemClick?, private val listItem: MutableList<BankFunctionsAdminVasItem>) : RecyclerView.Adapter<BankFunctionsAdminVasAdapter.BankFunctionsAdminVasViewHolder>() {
 

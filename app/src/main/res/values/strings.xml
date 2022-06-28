@@ -364,5 +364,6 @@
     <string name="pending_preauth_alert_msg">Want To Get Pending Pre-Auth Details</string>
     <string name="complete_txt">Complete</string>
     <string name="no_RESPONSE">No Response</string>
+    <string name="please_select_app">Please select app</string>
 
 </resources>

@@ -7,6 +7,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.usdk.apiservice.aidl.BaseError;
 
 

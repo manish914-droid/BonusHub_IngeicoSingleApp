@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.view.baseemv
 
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -7,37 +8,27 @@ import android.os.RemoteException
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
-import com.bonushub.crdb.india.MainActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.repository.SearchCardDefaultRepository
 import com.bonushub.crdb.india.transactionprocess.CompleteSecondGenAc
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.utils.DetectCardType
-import com.bonushub.crdb.india.utils.EFallbackCode
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.ingenico.TLVList
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.activity.TransactionActivity
-import com.bonushub.crdb.india.view.activity.TransactionActivity.*
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.vxutils.Utility
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
+import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
 import com.usdk.apiservice.aidl.data.BytesValue
-
-
 import com.usdk.apiservice.aidl.emv.*
 import com.usdk.apiservice.aidl.pinpad.*
-import com.usdk.apiservice.aidl.systemstatistics.FactorNo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.lang.StringBuilder
 import java.util.*
 
 
@@ -84,7 +75,19 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
     @Throws(RemoteException::class)
     override fun onWaitCard(flag: Int) {
-    Log.e("VFEmvHandler","onWaitCard")
+    Log.e("VFEmvHandler","onWaitCard  --->   $flag")
+       // WaitCardFlag.EXECUTE_CDCVM
+    //   onFinalSelect()
+    val option=    CardOption.create().apply {
+            supportICCard(false)
+            supportMagCard(false)
+            supportRFCard(true)
+        }
+
+            SearchCard(cardProcessedDataModal,option,vfEmvHandlerCallback)
+
+
+
     }
 
     @Throws(RemoteException::class)
@@ -105,7 +108,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     override fun onFinalSelect(finalData: FinalData?) {
         Log.e("VFEmvHandler","onFinalSelect")
         if (finalData != null) {
-            doFinalSelect(finalData)
+          createAndSetCDOL1ForFirstGenAC(finalData,cardProcessedDataModal,emv)
+         //   doFinalSelect(finalData)
         }
     }
 
@@ -116,7 +120,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         lastCardRecord = cardRecord
         doReadRecord(cardRecord)
     }
-
+// 6
     @Throws(RemoteException::class)
     override fun onCardHolderVerify(cvmMethod: CVMMethod?) {
         Log.e("VFEmvHandler","onCardHolderVerify")
@@ -167,26 +171,14 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     @Throws(RemoteException::class)
     fun doInitEMV() {
         println("=> onInitEMV ")
-        manageAID()
-        //  init transaction parameters，please refer to transaction parameters
-        //  chapter about onInitEMV event in《UEMV develop guide》
-        //  For example, if VISA is supported in the current transaction,
-        //  the label: DEF_TAG_PSE_FLAG(M) must be set, as follows:
-        emv!!.setTLV(KernelID.AMEX, EMVTag.DEF_TAG_PSE_FLAG, "03")
-
-        // For example, if AMEX is supported in the current transaction，
-        // labels DEF_TAG_PSE_FLAG(M) and DEF_TAG_PPSE_6A82_TURNTO_AIDLIST(M) must be set, as follows：
-        // emv.setTLV(KernelID.AMEX, EMVTag.DEF_TAG_PSE_FLAG, "03");
-        // emv.setTLV(KernelID.AMEX, EMVTag.DEF_TAG_PPSE_6A82_TURNTO_AIDLIST, "01");
-
-        if (emv!!.setEMVProcessOptimization(true)) {
-            manageCAPKey()
-        }
-
+        settingAids(emv)
+        settingCAPkeys(emv)
     }
+
     @Throws(RemoteException::class)
     protected fun manageAID() {
         println("****** manage AID ******")
+        emv!!.manageAID(ActionFlag.CLEAR, null,false)
         val aids = arrayOf(
             "A000000025",
             "A000000333010106",
@@ -410,16 +402,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 }
             })
         } else {
-            //candList[0].aid.byteArr2Str()
+
             respondAID(candList[0].aid)
         }
     }
 
-    protected open fun selectApp(candList: List<CandidateAID>, listener: DialogUtil.OnSelectListener?) {
-        /* val aidInfoList: MutableList<String> = ArrayList()
-         for (candAid in candList) {
-             aidInfoList.add(String(candAid.apn))
-         }*/
+    private fun selectApp(candList: List<CandidateAID>, listener: DialogUtil.OnSelectListener?) {
         activity.runOnUiThread {
             DialogUtil.showSelectDialog(
                 activity,
@@ -439,7 +427,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
         val datetime: String = DeviceHelper.getCurentDateTime()
         val splitStr = datetime.split("\\s+".toRegex()).toTypedArray()
-        var txnAmount = addPad(cardProcessedDataModal.getTransactionAmount().toString(), "0", 12, true)
+        val txnAmount = addPad(cardProcessedDataModal.getTransactionAmount().toString(), "0", 12, true)
 
         var aidstr = BytesUtil.bytes2HexString(finalData.aid).subSequence(0, 10).toString()
 
@@ -757,7 +745,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
 
             System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
-        } else {
+        }
+        else {
             System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
 
             if (transData != null) {
@@ -892,7 +881,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
     protected open fun respondAID(aid: ByteArray?) {
         try {
-            System.out.println("Select aid: " + BytesUtil.bytes2HexString(aid))
+            println("Select aid: " + BytesUtil.bytes2HexString(aid))
             val tmAid = TLV.fromData(EMVTag.EMV_TAG_TM_AID, aid)
             println(""+ emv!!.respondEvent(tmAid.toString())+ "...onAppSelect: respondEvent")
         } catch (e: Exception) {
@@ -956,14 +945,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
 
             override fun onCancel() {
-                respondCVMResult(0.toByte())
+              //  respondCVMResult(0.toByte())
                 Log.d("Data", "PinPad onCancel")
                 try {
-                    if (null != activity) {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            activity.declinedTransaction()
-                        }
-                    }
+                  //  GlobalScope.launch(Dispatchers.Main) {
+                        activity.declinedTransaction()
+                //    }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 }
@@ -973,10 +960,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 respondCVMResult(2.toByte())
                 Log.d("Data", "PinPad onError, code:$error")
                 try {
-                    if (null != activity) {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            (activity as TransactionActivity).declinedTransaction()
-                        }
+                    GlobalScope.launch(Dispatchers.Main) {
+                        (activity as TransactionActivity).declinedTransaction()
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
@@ -1165,7 +1150,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     open fun doReadRecord(record: CardRecord?) {
         println("=> onReadRecord | " + BytesUtil.bytes2HexString(record?.pan))
         var track22: String? = null
-        var track2 = BytesUtil.bytes2HexString(record?.pan)
+        val track2 = BytesUtil.bytes2HexString(record?.pan)
 
         var a = track2.indexOf('F')
         if (a > 0) {
@@ -1173,16 +1158,16 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         } else {
             a = track2.indexOf('=')
 
-            if (a > 0) {
-                track22 = track2.substring(0, a)
+            track22 = if (a > 0) {
+                track2.substring(0, a)
             }else{
-                track22=track2
+                track2
             }
         }
 
         cardProcessedDataModal.setPanNumberData(track22 ?: "")
         System.out.println("Card pannumber data "+cardProcessedDataModal.getPanNumberData())
-        //val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
+       // val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
         // cardProcessedDataModal.setEncryptedPan(encrptedPan)
 
 
@@ -1206,6 +1191,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     val encrptedPan = getEncryptedPanorTrackData(field57,true)
                     cardProcessedDataModal.setEncryptedPan(encrptedPan)
                     println("=> onSendOut | track2 = $field57")
+
+
                 }
             KernelINS.DBLOG -> {
                 var i = data.size - 1

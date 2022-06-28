@@ -9,9 +9,9 @@ import androidx.annotation.CallSuper;
 import com.bonushub.crdb.india.R;
 import com.bonushub.crdb.india.entity.CardOption;
 import com.bonushub.crdb.india.entity.EMVOption;
+import com.bonushub.crdb.india.utils.DeviceHelper;
 import com.bonushub.crdb.india.utils.ingenico.BytesUtil;
 import com.bonushub.crdb.india.utils.ingenico.DemoConfig;
-import com.bonushub.crdb.india.utils.DeviceHelper;
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil;
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil;
 import com.bonushub.crdb.india.utils.ingenico.TLV;
@@ -44,7 +44,6 @@ import com.usdk.apiservice.aidl.pinpad.PinVerifyResult;
 import com.usdk.apiservice.aidl.pinpad.PinpadData;
 import com.usdk.apiservice.aidl.pinpad.UPinpad;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.ItemReportsBinding
-import com.bonushub.crdb.india.view.fragments.IReportsFragmentItemClick
 import com.bonushub.crdb.india.utils.ReportsItem
+import com.bonushub.crdb.india.view.fragments.IReportsFragmentItemClick
 
 class ReportsAdapter(private val listItem: MutableList<ReportsItem>, var iReportsFragmentItemClick: IReportsFragmentItemClick?) : RecyclerView.Adapter<ReportsAdapter.ReportsViewHolder>() {
 

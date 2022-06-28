@@ -5,7 +5,6 @@ import android.os.RemoteException
 import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.entity.EMVOption
 import com.bonushub.crdb.india.utils.DeviceHelper
-import com.bonushub.crdb.india.utils.ingenico.BytesUtil
 import com.usdk.apiservice.aidl.emv.*
 
 abstract class BaseActivity : AppCompatActivity() {

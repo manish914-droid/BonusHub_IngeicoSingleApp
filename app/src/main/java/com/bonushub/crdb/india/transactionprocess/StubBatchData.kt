@@ -5,9 +5,7 @@ import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
-import com.bonushub.crdb.india.model.local.BatchFileDataTable
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
-import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
@@ -15,14 +13,15 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getCardDataTable
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
+import com.bonushub.crdb.india.utils.ProcessingCode
+import com.bonushub.crdb.india.utils.Utility
+import com.bonushub.crdb.india.vxutils.*
 import com.bonushub.crdb.india.vxutils.Mti
 import com.bonushub.crdb.india.vxutils.Nii
-import com.bonushub.crdb.india.vxutils.TransactionType
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -145,7 +144,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
 
         //Saving card number in mask form because we don't save the pan number in Plain text.
         batchFileData.cardNumber =
-            if (transactionType != TransactionType.PRE_AUTH_COMPLETE.type && transactionType != TransactionType.VOID_PREAUTH.type) {
+            if (transactionType != BhTransactionType.PRE_AUTH_COMPLETE.type && transactionType != BhTransactionType.VOID_PREAUTH.type) {
                 getMaskedPan(
                     terminalData,
                     cardProcessedDataModal.getPanNumberData() ?: ""
@@ -180,7 +179,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         var totalAmount = 0L
         var saleWithTipAmount = 0L
         when (cardProcessedDataModal.getTransType()) {
-            TransactionType.SALE_WITH_CASH.type -> {
+            BhTransactionType.SALE_WITH_CASH.type -> {
                 baseAmount = cardProcessedDataModal.getSaleAmount() ?: 0L
                 cashAmount = cardProcessedDataModal.getOtherAmount() ?: 0L
                 totalAmount = cardProcessedDataModal.getTransactionAmount() ?: 0L
@@ -300,7 +299,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         batchFileData.merchantBillNumber =
             cardProcessedDataModal.getMobileBillExtraData()?.second ?: ""
 
-        if (batchFileData.transactionType != TransactionType.PRE_AUTH.type) {
+        if (batchFileData.transactionType != BhTransactionType.PRE_AUTH.type) {
             val lastSuccessReceiptData = Gson().toJson(batchFileData)
             AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, lastSuccessReceiptData)
         }
@@ -318,7 +317,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
             batchFileData.hostRoc = f60DataList[6]
             batchFileData.hostInvoice = f60DataList[7]//"000123"//
             batchFileData.hostCardType = f60DataList[8]
-            if (batchFileData.transactionType != TransactionType.PRE_AUTH.type) {
+            if (batchFileData.transactionType != BhTransactionType.PRE_AUTH.type) {
                 val lastSuccessReceiptData = Gson().toJson(batchFileData)
                 AppPreference.saveString(AppPreference.LAST_SUCCESS_RECEIPT_KEY, lastSuccessReceiptData)
             }
@@ -344,7 +343,7 @@ fun stubEMI(
 ) {
     GlobalScope.launch(Dispatchers.IO) {
         //For emi find the details from EMI
-        if (batchData.transactionType == TransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+        if (batchData.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
 //
 //            // val brandEMIByAccessCodeData = BrandEMIAccessDataModalTable.getBrandEMIByAccessCodeData()
 //            if(brandEMIByAccessCodeData!=null) {
@@ -384,7 +383,7 @@ fun stubEMI(
 //                }
 //            }
 
-        } else if(batchData.transactionType == TransactionType.FLEXI_PAY.type){
+        } else if(batchData.transactionType == BhTransactionType.FLEXI_PAY.type){
 //            batchData.tenure = flexiPayemiSelectedData?.tenureMenu.toString()
 //            batchData.emiSchemeId = flexiPayemiSelectedData?.schemeCode.toString()
 //            batchData.emiTransactionAmount = flexiPayemiSelectedData?.originalTransactionAmount.toString()

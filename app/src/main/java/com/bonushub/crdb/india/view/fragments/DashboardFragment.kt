@@ -8,21 +8,18 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.appupdate.SendAppUpdateConfirmationPacket
 import com.bonushub.crdb.india.appupdate.SyncAppUpdateConfirmation
-
 import com.bonushub.crdb.india.databinding.FragmentDashboardBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.di.DBModule
@@ -30,9 +27,8 @@ import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.BatchTable
 import com.bonushub.crdb.india.model.remote.RestartHandlingModel
 import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.Utility
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
-
-
 import com.bonushub.crdb.india.view.activity.IFragmentRequest
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.DashBoardAdapter
@@ -40,20 +36,17 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.viewmodel.DashboardViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
 import com.bonushub.crdb.india.viewmodel.TransactionViewModel
+import com.bonushub.crdb.india.vxutils.*
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import com.ingenico.hdfcpayment.model.TransactionDetail
 import com.ingenico.hdfcpayment.response.OperationResult
 import com.ingenico.hdfcpayment.response.TransactionDataResponse
 import com.ingenico.hdfcpayment.type.RequestStatus
-
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.coroutines.*
-import java.lang.Runnable
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 var isAutoSettleCodeInitiated=false
 @AndroidEntryPoint
@@ -508,7 +501,7 @@ logger("PFR","Failed","e")
 
                 batchData.invoice = receiptDetail.invoice.toString()
                 println("invoice code = ${receiptDetail.invoice.toString()}")
-                // batchData.transactionType = BhTransactionType.SALE.type
+                // batchData.transactionType = TransactionType.SALE.type
                 DBModule.appDatabase.appDao.insertBatchData(batchData)
 
                 if(batchData.receiptData?.txnOtherAmount == null)

@@ -2,7 +2,6 @@ package com.bonushub.crdb.india.model
 
 
 import com.bonushub.crdb.india.utils.DetectCardType
-import com.bonushub.crdb.india.view.activity.TransactionActivity.*
 import java.io.Serializable
 
 //Below Modal class is for holding Card Returning Data Fields:-

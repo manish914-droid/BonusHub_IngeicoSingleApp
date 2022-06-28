@@ -1,4 +1,4 @@
-package com.bonushub.crdb.india.utils
+package com.bonushub.crdb.india.vxutils
 
 import android.app.Activity
 import android.app.Dialog
@@ -23,11 +23,12 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
+import com.bonushub.crdb.india.utils.*
+import com.bonushub.crdb.india.utils.ConnectionType
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptDataByLinkTidType
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.fragments.DashboardFragment
-import com.bonushub.crdb.india.vxutils.BHTextView
 import com.bonushub.crdb.india.vxutils.Utility.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -47,7 +48,6 @@ import java.nio.charset.StandardCharsets
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -125,7 +125,8 @@ private fun calculateDes(dataDescription: String): String {
         val key: ByteArray = BytesUtil.hexString2Bytes(AppPreference.getString("dpk"))
         val strtohex = dataDescription.str2ByteArr().byteArr2HexStr()
        var desMode = DESMode(DESMode.DM_ENC, DESMode.DM_OM_TECB)
-       var  encResult = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(DemoConfig.KEYID_DES, desMode, null, BytesUtil.hexString2Bytes(strtohex))
+       var  encResult = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
+           ?.calculateDes(DemoConfig.KEYID_DES, desMode, null, BytesUtil.hexString2Bytes(strtohex))
        if (encResult == null) {
           println("Calculate encrypt fail"+encResult)
 
@@ -133,7 +134,8 @@ private fun calculateDes(dataDescription: String): String {
        println("TECB encrypt result = " + byte2HexStr(encResult))
 
        desMode = DESMode(DESMode.DM_DEC, DESMode.DM_OM_TECB)
-       val decResult: ByteArray? = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)?.calculateDes(DemoConfig.KEYID_DES, desMode, null, encResult)
+       val decResult: ByteArray? = DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
+           ?.calculateDes(DemoConfig.KEYID_DES, desMode, null, encResult)
        if (decResult == null) {
            println("")
            println("Calculate decrypt fail"+encResult)
@@ -266,7 +268,10 @@ fun showMobileBillDialog(
                                 )
                             )
                         } else {
-                             ToastUtils.showToast(context,context.getString(R.string.enter_valid_bill_number))
+                            ToastUtils.showToast(
+                                context,
+                                context.getString(R.string.enter_valid_bill_number)
+                            )
                         }
                     } else if (brandEMIDataModal?.validationTypeName
                             ?.substring(2, 3) == "1" && brandEMIDataModal.validationTypeName
@@ -282,19 +287,26 @@ fun showMobileBillDialog(
                                 )
                             )
                         } else {
-                             ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                            ToastUtils.showToast(
+                                context,
+                                context.getString(R.string.enter_valid_mobile_number)
+                            )
                         }
                     } else {
                         when {
                             TextUtils.isEmpty(mobileNumberET?.text.toString()) || mobileNumberET?.text.toString().length !in 10..13 ->
-                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                                ToastUtils.showToast(
+                                    context,
+                                    context.getString(R.string.enter_valid_mobile_number)
+                                )
                             TextUtils.isEmpty(billNumberET?.text.toString()) && (brandEMIDataModal?.validationTypeName
                                 ?.substring(
                                     0,
                                     1
                                 ) == "1" && brandEMIDataModal.validationTypeName
                                 ?.substring(2, 3)
-                                ?.toInt() ?: 0 > "1".toInt()) ->  ToastUtils.showToast(context,
+                                ?.toInt() ?: 0 > "1".toInt()) -> ToastUtils.showToast(
+                                context,
                                 context.getString(
                                     R.string.enter_valid_bill_number
                                 )
@@ -327,7 +339,10 @@ fun showMobileBillDialog(
                                 dialog.dismiss()
                                 dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
                             } else
-                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                                ToastUtils.showToast(
+                                    context,
+                                    context.getString(R.string.enter_valid_mobile_number)
+                                )
                             TextUtils.isEmpty(mobileNumberET?.text.toString()) -> {
                                 dialog.dismiss()
                                 dialogCB(Triple("", "", third = true))
@@ -351,13 +366,19 @@ fun showMobileBillDialog(
                                     )
                                 )
                             } else
-                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                                ToastUtils.showToast(
+                                    context,
+                                    context.getString(R.string.enter_valid_mobile_number)
+                                )
 
                             !TextUtils.isEmpty(mobileNumberET?.text.toString()) -> if (mobileNumberET?.text.toString().length in 10..13) {
                                 dialog.dismiss()
                                 dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
                             } else
-                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                                ToastUtils.showToast(
+                                    context,
+                                    context.getString(R.string.enter_valid_mobile_number)
+                                )
 
                             !TextUtils.isEmpty(billNumberET?.text.toString()) -> {
                                 dialog.dismiss()
@@ -381,7 +402,10 @@ fun showMobileBillDialog(
                                 dialog.dismiss()
                                 dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
                             } else
-                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                                ToastUtils.showToast(
+                                    context,
+                                    context.getString(R.string.enter_valid_mobile_number)
+                                )
                             TextUtils.isEmpty(mobileNumberET?.text.toString()) -> {
                                 dialog.dismiss()
                                 dialogCB(Triple("", "", third = true))
@@ -408,7 +432,10 @@ fun showMobileBillDialog(
                                 dialog.dismiss()
                                 dialogCB(Triple(mobileNumberET?.text.toString(), "", third = true))
                             } else
-                                 ToastUtils.showToast(context,context.getString(R.string.enter_valid_mobile_number))
+                                ToastUtils.showToast(
+                                    context,
+                                    context.getString(R.string.enter_valid_mobile_number)
+                                )
                         }
 
                     } else {
@@ -576,7 +603,7 @@ suspend fun checkTidUpdate(appDao: AppDao): Boolean {
                     ingenicoInitialization.tidStatusList   = strstatus
                     ingenicoInitialization.initdataList    = IngenicoInitialization?.initdataList
 
-                    val returnvalue =updateIngenicoInitialization(appDao, ingenicoInitialization)
+                    val returnvalue = updateIngenicoInitialization(appDao, ingenicoInitialization)
                     println("Diff value is"+returnvalue)
                     val result = appDao.getIngenicoInitialization()
                     println("Tid value is"+result?.forEach { it->
@@ -665,16 +692,29 @@ suspend fun doCommsTransaction(appDao: AppDao){
                         when (status) {
                             RequestStatus.SUCCESS -> {
                                 println("Success")
-                                AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "1")
+                                AppPreference.saveString(
+                                    PreferenceKeyConstant.Wifi_Communication.keyName,
+                                    "1"
+                                )
 
-                                println("Wifi comm ->"+AppPreference.getString(PreferenceKeyConstant.Wifi_Communication.keyName))
+                                println(
+                                    "Wifi comm ->" + AppPreference.getString(
+                                        PreferenceKeyConstant.Wifi_Communication.keyName
+                                    )
+                                )
                             }
                             RequestStatus.FAILED -> {
-                                AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                                AppPreference.saveString(
+                                    PreferenceKeyConstant.Wifi_Communication.keyName,
+                                    "0"
+                                )
                                 println("Failed")
                             }
                             else -> {
-                                AppPreference.saveString(PreferenceKeyConstant.Wifi_Communication.keyName, "0")
+                                AppPreference.saveString(
+                                    PreferenceKeyConstant.Wifi_Communication.keyName,
+                                    "0"
+                                )
                                 println("Error")
                             }
                         }
@@ -891,7 +931,9 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                    Response_Code = ${response?.responseCode}
                                    TIDStatusList = [${response?.tidStatusList?.joinToString()}]
                                    TIDs = [${response?.tidList?.joinToString()}]
-                                   INITDATAList = [${response?.initDataList?.firstOrNull().toString()}]
+                                   INITDATAList = [${
+                                response?.initDataList?.firstOrNull().toString()
+                            }]
                                 """.trimIndent()
 
                         when (response?.status) {
@@ -901,7 +943,7 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                 var initDataListList = InitDataListList()
                                 var tidarrayList = ArrayList<String>()
                                 var tidstatusList = ArrayList<String>()
-                                CoroutineScope(Dispatchers.IO).launch{
+                                CoroutineScope(Dispatchers.IO).launch {
                                     model.id = 0
                                     model.responseCode = response?.responseCode
                                     model.apiresponseCode = response?.status.name
@@ -917,20 +959,23 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                     model.tidStatusList = tidstatusList
                                     var list = response?.initDataList
 
-                                    list.forEach { it->
+                                    list.forEach { it ->
                                         initDataListList.adminPassword = it.adminPassword
                                         initDataListList.helpDeskNumber = it.helpDeskNumber
                                         initDataListList.merAddHeader1 = it.merAddHeader1
                                         initDataListList.merAddHeader2 = it.merAddHeader2
-                                        initDataListList.merchantName  = it.merchantName
-                                        initDataListList.isRefundPasswordEnable = it.isRefundPasswordEnable
-                                        initDataListList.isReportPasswordEnable = it.isReportPasswordEnable
-                                        initDataListList.isVoidPasswordEnable = it.isVoidPasswordEnable
+                                        initDataListList.merchantName = it.merchantName
+                                        initDataListList.isRefundPasswordEnable =
+                                            it.isRefundPasswordEnable
+                                        initDataListList.isReportPasswordEnable =
+                                            it.isReportPasswordEnable
+                                        initDataListList.isVoidPasswordEnable =
+                                            it.isVoidPasswordEnable
                                         initDataListList.isTipEnable = it.isTipEnable
 
                                         model.initdataList = listOf(initDataListList)
                                     }
-                                    saveInitializtionData(appDao,model)
+                                    saveInitializtionData(appDao, model)
                                 }
                                 CoroutineScope(Dispatchers.Main).launch {
                                     delay(500)
@@ -947,7 +992,7 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                 var initDataListList = InitDataListList()
                                 var tidarrayList = ArrayList<String>()
                                 var tidstatusList = ArrayList<String>()
-                                CoroutineScope(Dispatchers.IO).launch{
+                                CoroutineScope(Dispatchers.IO).launch {
                                     model.id = 0
                                     model.responseCode = response?.responseCode
                                     model.apiresponseCode = response?.status.name
@@ -961,20 +1006,23 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                     model.tidStatusList = tidstatusList
                                     var list = response?.initDataList
 
-                                    list.forEach { it->
+                                    list.forEach { it ->
                                         initDataListList.adminPassword = it.adminPassword
                                         initDataListList.helpDeskNumber = it.helpDeskNumber
                                         initDataListList.merAddHeader1 = it.merAddHeader1
                                         initDataListList.merAddHeader2 = it.merAddHeader2
-                                        initDataListList.merchantName  = it.merchantName
-                                        initDataListList.isRefundPasswordEnable = it.isRefundPasswordEnable
-                                        initDataListList.isReportPasswordEnable = it.isReportPasswordEnable
-                                        initDataListList.isVoidPasswordEnable = it.isVoidPasswordEnable
+                                        initDataListList.merchantName = it.merchantName
+                                        initDataListList.isRefundPasswordEnable =
+                                            it.isRefundPasswordEnable
+                                        initDataListList.isReportPasswordEnable =
+                                            it.isReportPasswordEnable
+                                        initDataListList.isVoidPasswordEnable =
+                                            it.isVoidPasswordEnable
                                         initDataListList.isTipEnable = it.isTipEnable
 
                                         model.initdataList = listOf(initDataListList)
                                     }
-                                    saveInitializtionData(appDao,model)
+                                    saveInitializtionData(appDao, model)
                                 }
                             }
                             else -> {
@@ -983,7 +1031,7 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                 var initDataListList = InitDataListList()
                                 var tidarrayList = ArrayList<String>()
                                 var tidstatusList = ArrayList<String>()
-                                CoroutineScope(Dispatchers.IO).launch{
+                                CoroutineScope(Dispatchers.IO).launch {
                                     model.id = 0
                                     model.responseCode = response?.responseCode
                                     model.apiresponseCode = response?.status?.name
@@ -997,20 +1045,23 @@ suspend fun checkInitializationStatus(appDao: AppDao) : Boolean{
                                     model.tidStatusList = tidstatusList
                                     var list = response?.initDataList
 
-                                    list?.forEach { it->
+                                    list?.forEach { it ->
                                         initDataListList.adminPassword = it.adminPassword
                                         initDataListList.helpDeskNumber = it.helpDeskNumber
                                         initDataListList.merAddHeader1 = it.merAddHeader1
                                         initDataListList.merAddHeader2 = it.merAddHeader2
-                                        initDataListList.merchantName  = it.merchantName
-                                        initDataListList.isRefundPasswordEnable = it.isRefundPasswordEnable
-                                        initDataListList.isReportPasswordEnable = it.isReportPasswordEnable
-                                        initDataListList.isVoidPasswordEnable = it.isVoidPasswordEnable
+                                        initDataListList.merchantName = it.merchantName
+                                        initDataListList.isRefundPasswordEnable =
+                                            it.isRefundPasswordEnable
+                                        initDataListList.isReportPasswordEnable =
+                                            it.isReportPasswordEnable
+                                        initDataListList.isVoidPasswordEnable =
+                                            it.isVoidPasswordEnable
                                         initDataListList.isTipEnable = it.isTipEnable
 
                                         model.initdataList = listOf(initDataListList)
                                     }
-                                    saveInitializtionData(appDao,model)
+                                    saveInitializtionData(appDao, model)
                                 }
                             }
                         }

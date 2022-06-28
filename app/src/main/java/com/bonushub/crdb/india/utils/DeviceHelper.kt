@@ -6,8 +6,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.bonushub.crdb.india.HDFCApplication.Companion.appContext
+import com.bonushub.crdb.india.vxutils.getErrorDetail
 import com.ingenico.hdfcpayment.IPaymentService
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.listener.OnPaymentListener
@@ -27,8 +27,6 @@ import com.usdk.apiservice.aidl.scanner.UScanner
 import com.usdk.apiservice.aidl.tms.UTMS
 import com.usdk.apiservice.limited.DeviceServiceLimited
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 object DeviceHelper   {
@@ -292,15 +290,8 @@ object DeviceHelper   {
     @JvmStatic
     //@RequiresApi(Build.VERSION_CODES.O)
     fun getCurentDateTime() : String{
-       // val current = LocalDateTime.now()
-
         val currentTime = SimpleDateFormat("yyMMdd HHmmss", Locale.getDefault()).format(Date())
-
-        //val formatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss")
-       // val formatted = current.format(formatter)
-
         println("Current Date and Time is: $currentTime")
-
         return currentTime
     }
 
@@ -322,6 +313,7 @@ object DeviceHelper   {
     fun getEMV(): UEMV? {
         val iBinder = object : IBinderCreator() {
             override fun create(): IBinder {
+                Log.e("EMV INSTANCE", vfDeviceService!!.emv.toString())
                 return vfDeviceService!!.emv
             }
 
@@ -414,7 +406,7 @@ object DeviceHelper   {
                 override fun onError(p0: Int) {
                     logger("start scan"," -> on Error","e")
                     getErrorDetail(p0)
-                    cb(false,getErrorDetail(p0),"")
+                    cb(false, getErrorDetail(p0),"")
 
                 }
 

@@ -15,6 +15,7 @@ import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.fragments.TableEditHelper
 import com.bonushub.crdb.india.view.fragments.TidsListModel
+import com.bonushub.crdb.india.vxutils.checkBaseTid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext

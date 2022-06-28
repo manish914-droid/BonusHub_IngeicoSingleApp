@@ -2,7 +2,9 @@ package com.bonushub.crdb.india.model.local
 
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.bonushub.crdb.india.di.scope.BHDashboardItem
 import com.bonushub.crdb.india.di.scope.BHFieldName
 import com.bonushub.crdb.india.di.scope.BHFieldParseIndex
@@ -10,8 +12,8 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference.EmiTimestampPrimaryKey
 import com.bonushub.crdb.india.model.remote.*
 import com.bonushub.crdb.india.utils.EAccountType
-import com.bonushub.crdb.india.utils.EDigiPosPaymentStatus
 import com.bonushub.crdb.india.utils.EDashboardItem
+import com.bonushub.crdb.india.utils.EDigiPosPaymentStatus
 import com.ingenico.hdfcpayment.model.ReceiptDetail
 import java.io.Serializable
 

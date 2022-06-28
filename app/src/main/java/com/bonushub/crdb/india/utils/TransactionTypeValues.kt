@@ -1,5 +1,7 @@
 package com.bonushub.crdb.india.utils
 
+import com.bonushub.crdb.india.vxutils.BhTransactionType
+
 
 class TransactionTypeValues {
     class TotalTrans {
@@ -8,7 +10,7 @@ class TransactionTypeValues {
         var amount: String = ""
     }
 
-    enum class TransactionType {
+   /* enum class TransactionType {
         KEY_EXCHANGE,
         INIT,
         LOGON,
@@ -35,7 +37,7 @@ class TransactionTypeValues {
         BATCH_SETTELEMENT,
         PRE_AUTH_COMPLETE
     }
-
+*/
     enum class SALETYPE {
         EMV_POS_ENTRY_PIN,
         EMV_POS_ENTRY_NO_PIN,
@@ -251,57 +253,57 @@ class TransactionTypeValues {
         const val PRE_AUTH_COMPLETE = 26
         //var transactionType: TransactionType? = TransactionType.SALE
 
-        fun getTransactionType(transactionType: TransactionType?): Int {
+        fun getTransactionType(bhTransactionType: BhTransactionType?): Int {
 
-            return when (transactionType) {
+            return when (bhTransactionType) {
 
-                TransactionType.KEY_EXCHANGE -> KEY_EXCHANGE
+                BhTransactionType.KEY_EXCHANGE -> KEY_EXCHANGE
 
-                TransactionType.INIT -> INIT
+                BhTransactionType.INIT -> INIT
 
-                TransactionType.LOGON -> LOGON
+                BhTransactionType.LOGON -> LOGON
 
-                TransactionType.SALE -> SALE
+                BhTransactionType.SALE -> SALE
 
-                TransactionType.VOID -> VOID
+                BhTransactionType.VOID -> VOID
 
-                TransactionType.SETTLEMENT -> SETTLEMENT
+                BhTransactionType.SETTLEMENT -> SETTLEMENT
 
-                TransactionType.APP_UPDATE -> APP_UPDATE
+                BhTransactionType.APP_UPDATE -> APP_UPDATE
 
-                TransactionType.BALANCE_ENQUIRY -> BALANCE_ENQUIRY
+                BhTransactionType.BALANCE_ENQUIRY -> BALANCE_ENQUIRY
 
-                TransactionType.REFUND -> REFUND
+                BhTransactionType.REFUND -> REFUND
 
-                TransactionType.VOID_REFUND -> VOID_REFUND
+                BhTransactionType.VOID_REFUND -> VOID_REFUND
 
-                TransactionType.SALE_WITH_CASH -> SALE_WITH_CASH
+                BhTransactionType.SALE_WITH_CASH -> SALE_WITH_CASH
 
-                TransactionType.CASH -> CASH
+           //     BhTransactionType.CASH -> CASH
 
-                TransactionType.BATCH_UPLOAD -> BATCH_UPLOAD
+                BhTransactionType.BATCH_UPLOAD -> BATCH_UPLOAD
 
-                TransactionType.PRE_AUTH -> PRE_AUTH
+                BhTransactionType.PRE_AUTH -> PRE_AUTH
 
-                TransactionType.SALE_WITH_TIP -> SALE_WITH_TIP
+                BhTransactionType.SALE_WITH_TIP -> SALE_WITH_TIP
 
-                TransactionType.ADJUSTMENT -> ADJUSTMENT
+                BhTransactionType.ADJUSTMENT -> ADJUSTMENT
 
-                TransactionType.REVERSAL -> REVERSAL
+                BhTransactionType.REVERSAL -> REVERSAL
 
-                TransactionType.EMI_SALE -> EMI_SALE
+                BhTransactionType.EMI_SALE -> EMI_SALE
 
-                TransactionType.EMI -> EMI
+                BhTransactionType.EMI -> EMI
 
-                TransactionType.SALE_COMPLETION -> SALE_COMPLETION
+                BhTransactionType.SALE_COMPLETION -> SALE_COMPLETION
 
-                TransactionType.TIP_ADJUSTMENT -> TIP_ADJUSTMENT
+                BhTransactionType.TIP_ADJUSTMENT -> TIP_ADJUSTMENT
 
-                TransactionType.CASH_AT_POS -> CASH_AT_POS
+                BhTransactionType.CASH_AT_POS -> CASH_AT_POS
 
-                TransactionType.BATCH_SETTELEMENT -> BATCH_SETTELEMENT
+                BhTransactionType.BATCH_SETTLEMENT -> BATCH_SETTELEMENT
 
-                TransactionType.PRE_AUTH_COMPLETE -> PRE_AUTH_COMPLETE
+                BhTransactionType.PRE_AUTH_COMPLETE -> PRE_AUTH_COMPLETE
 
                 else -> 0
             }

@@ -1,20 +1,15 @@
 package com.bonushub.crdb.india.utils
 
 import android.graphics.Color
-import android.widget.TextView
-
-import android.text.SpannableStringBuilder
-
-import android.text.Spanned
-
 import android.text.Html
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextPaint
-
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
-
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.TextView
 
 
 fun makeTextViewResizable(tv: TextView, maxLine: Int, expandText: String, viewMore: Boolean) {
