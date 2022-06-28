@@ -365,5 +365,6 @@
     <string name="complete_txt">Complete</string>
     <string name="no_RESPONSE">No Response</string>
     <string name="please_select_app">Please select app</string>
+    <string name="emv_declined">EMV Declined</string>
 
 </resources>

@@ -66,6 +66,7 @@ class PrintUtil(context: Context?) {
         this.context = context
         try {
             printer = DeviceHelper.getPrinter()
+
             if (printer?.status == 0) {
                 logger("PrintInit->", "Called Printing", "e")
                 logger("PrintUtil->", "Printer Status --->  ${printer?.status}", "e")

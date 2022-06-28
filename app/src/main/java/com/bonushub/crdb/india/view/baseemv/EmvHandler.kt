@@ -79,11 +79,10 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     @Throws(RemoteException::class)
     override fun onWaitCard(flag: Int) {
     Log.e("VFEmvHandler","onWaitCard  --->   $flag")
-
+       // WaitCardFlag.EXECUTE_CDCVM
         defaultScope.launch {
             println("Searching card...")
             try {
-
                 val cardOption = CardOption.create().apply {
                     supportICCard(true)
                     supportMagCard(true)
@@ -796,7 +795,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         println("\n")
     }
 
-    fun getFlowTypeDesc(flowType: Byte, result: Int, transData: TransData) {
+    private fun getFlowTypeDesc(flowType: Byte, result: Int, transData: TransData) {
         val desc: String
         when (flowType) {
             FlowType.EMV_FLOWTYPE_EMV.toByte() -> {
@@ -805,8 +804,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 }
 
             }
-            FlowType.EMV_FLOWTYPE_ECASH.toByte() -> "ECASH"
-            FlowType.EMV_FLOWTYPE_QPBOC.toByte() -> "QPBOC"
+            FlowType.EMV_FLOWTYPE_ECASH.toByte() -> println("ECASH")
+            FlowType.EMV_FLOWTYPE_QPBOC.toByte() ->println( "QPBOC")
             FlowType.EMV_FLOWTYPE_QVSDC.toByte() -> {
 
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
@@ -829,12 +828,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
 
 
-            FlowType.EMV_FLOWTYPE_PBOC_CTLESS.toByte() -> "PBOC_CTLESS"
-            FlowType.EMV_FLOWTYPE_M_CHIP.toByte() -> "M_CHIP"
-            FlowType.EMV_FLOWTYPE_M_STRIPE.toByte() -> "M_STRIPE"
-            FlowType.EMV_FLOWTYPE_MSD.toByte() -> "MSD"
-            FlowType.EMV_FLOWTYPE_MSD_LEGACY.toByte() -> "MSD_LEGACY"
-            FlowType.EMV_FLOWTYPE_WAVE2.toByte() -> "WAVE2"
+            FlowType.EMV_FLOWTYPE_PBOC_CTLESS.toByte() -> println("PBOC_CTLESS")
+
+            FlowType.EMV_FLOWTYPE_M_STRIPE.toByte() -> println("M_STRIPE")
+            FlowType.EMV_FLOWTYPE_MSD.toByte() ->println( "MSD")
+            FlowType.EMV_FLOWTYPE_MSD_LEGACY.toByte() -> println("MSD_LEGACY")
+            FlowType.EMV_FLOWTYPE_WAVE2.toByte() -> println("WAVE2")
             FlowType.EMV_FLOWTYPE_A_XP2_MS.toByte() -> {
 
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_MSD_POS_ENTRY_CODE.posEntry.toString())
@@ -844,9 +843,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
 
                 val tagDF46 = emv!!.getTLV(Integer.toHexString(0xDF46))
-                var tagDf46Str = hexString2String(tagDF46)
-                var track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
-                var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
+                val tagDf46Str = hexString2String(tagDF46)
+                val track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
+                val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
                 println("Field 57 data is"+field57)
                 val encrptedPan = getEncryptedPanorTrackData(field57,true)
                 cardProcessedDataModal.setEncryptedPan(encrptedPan)
@@ -862,7 +861,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
 
                 val track2data = emv!!.getTLV(Integer.toHexString(0x57))
-                var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
+                val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
                 println("Field 57 data is"+field57)
                 val encrptedPan = getEncryptedPanorTrackData(field57,true)
                 cardProcessedDataModal.setEncryptedPan(encrptedPan)
@@ -874,7 +873,24 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 vfEmvHandlerCallback(cardProcessedDataModal)
 
             }
-            else -> "Unkown Type"
+            FlowType.EMV_FLOWTYPE_M_CHIP.toByte()->{
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
+                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+                val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
+                cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+                val track2data = emv!!.getTLV(Integer.toHexString(0x57))
+                val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
+                println("Field 57 data is"+field57)
+                val encrptedPan = getEncryptedPanorTrackData(field57,true)
+                cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+                val field55: String = getFields55()
+                println("Field 55 is $field55")
+
+                cardProcessedDataModal.setField55(field55)
+                vfEmvHandlerCallback(cardProcessedDataModal)
+            }
+            else -> println("Unkown Flow Type")
         }
         //return desc + String.format("[0x%02X]", flowType)
     }
@@ -901,7 +917,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             result.setSW(sw1.toInt(), sw2.toInt())
             result.result = apduRet.toInt()
         } catch (e: Exception) {
-            // handleException(e);
+            e.printStackTrace()
         }
     }
 

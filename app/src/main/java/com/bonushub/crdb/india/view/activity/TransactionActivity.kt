@@ -1113,9 +1113,22 @@ return false
             }
 
             else -> {
-                Log.e("onEndProcessCalled", "Error in onEndProcessCalled Result --> $result")
+                lifecycleScope.launch(Dispatchers.Main) {
+                    alertBoxWithActionNew(
+                        getString(R.string.transaction_delined_msg),
+                        "onEndProcessCalled $result",
+                        R.drawable.ic_txn_declined,
+                        getString(R.string.positive_button_ok),
+                        "", false, false,
+                        { alertPositiveCallback ->
+                            if (alertPositiveCallback) {
+                                goToDashBoard()
+                            }
+                        },
+                        {})
+                    Log.e("onEndProcessCalled", "Error in onEndProcessCalled Result --> $result")
+                }
             }
-
 
         }
 
@@ -1183,9 +1196,8 @@ return false
                     val autoSettlementCheck =
                         responseIsoData.isoMap[60]?.parseRaw2String().toString()
                     if (syncStatus && responseCode == "00" && !AppPreference.getBoolean(
-                            AppPreference.ONLINE_EMV_DECLINED
-                        )
-                    ) {
+                            AppPreference.ONLINE_EMV_DECLINED))
+                        {
                         //Below we are saving batch data and print the receipt of transaction:-
 
                         /*GlobalScope.launch(Dispatchers.Main) {
@@ -1395,11 +1407,18 @@ return false
                         }
 
 
-                    } else if (syncStatus && responseCode != "00") {
+                    }
+                    else  {
                         lifecycleScope.launch(Dispatchers.Main) {
+                            var msg =""
+                            msg = if(AppPreference.getBoolean(AppPreference.ONLINE_EMV_DECLINED)){
+                                getString(R.string.emv_declined)
+                            }else{
+                                responseIsoData.isoMap[58]?.parseRaw2String().toString()
+                            }
                             alertBoxWithActionNew(
                                 getString(R.string.transaction_delined_msg),
-                                responseIsoData.isoMap[58]?.parseRaw2String().toString(),
+                                msg,
                                 R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok),
                                 "", false, false,
@@ -1410,56 +1429,21 @@ return false
                                                 autoSettlementCheck.substring(0, 1)
                                             )
                                         } else {*/
-                                        startActivity(
-                                            Intent(
-                                                this@TransactionActivity,
-                                                NavigationActivity::class.java
-                                            ).apply {
-                                                flags =
-                                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                            })
-                                        //   }
-                                    }
-                                },
-                                {})
-                        }
-                    } else if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
-
-                        GlobalScope.launch(Dispatchers.Main) {
-                            var hostMsg = responseIsoData.isoMap[58]?.parseRaw2String()
-                            Log.e("hostMsg", "" + hostMsg)
-                            if (hostMsg.isNullOrEmpty()) {
-                                hostMsg = getString(R.string.transaction_delined_msg)
-                                Log.e("hostMsgModify", "" + hostMsg)
-                            }
-                            alertBoxWithActionNew(
-                                getString(R.string.transaction_delined_msg),
-                                hostMsg,
-                                R.drawable.ic_txn_declined,
-                                getString(R.string.positive_button_ok),
-                                "", false, false,
-                                { alertPositiveCallback ->
-                                    if (alertPositiveCallback) {
-                                        if (!TextUtils.isEmpty(autoSettlementCheck)) {
-                                            checkForPrintReversalReceipt(
-                                                this@TransactionActivity,
-                                                autoSettlementCheck
-                                            ) {
-                                                goToDashBoard()
-                                            }
-                                            // syncOfflineSaleAndAskAutoSettlement(autoSettlementCheck.substring(0, 1))
-                                        } else {
-
+                                        checkForPrintReversalReceipt(
+                                            this@TransactionActivity,
+                                            autoSettlementCheck
+                                        ) {
+                                            goToDashBoard()
                                         }
                                     }
                                 },
                                 {})
                         }
-                        //Condition for having a reversal(EMV CASE)
                     }
 
 
-                } else {
+                }
+                else {
 
                     runOnUiThread { hideProgress() }
                     //below condition is for print reversal receipt if reversal is generated

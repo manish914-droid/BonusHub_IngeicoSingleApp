@@ -79,7 +79,7 @@ fun settingAids(emv: UEMV?) {
              "9F0605A0000003339F220102DF05083230323431323331DF060101DF070101DF028190A3767ABD1B6AA69D7F3FBF28C092DE9ED1E658BA5F0909AF7A1CCD907373B7210FDEB16287BA8E78E1529F443976FD27F991EC67D95E5F4E96B127CAB2396A94D6E45CDA44CA4C4867570D6B07542F8D4BF9FF97975DB9891515E66F525D2B3CBEB6D662BFB6C3F338E93B02142BFC44173A3764C56AADD202075B26DC2F9F7D7AE74BD7D00FD05EE430032663D27A57DF040103DF031403BB335A8549A03B87AB089D006F60852E4B8060",
              "9F0605A0000003339F220103DF05083230323731323331DF060101DF070101DF0281B0B0627DEE87864F9C18C13B9A1F025448BF13C58380C91F4CEBA9F9BCB214FF8414E9B59D6ABA10F941C7331768F47B2127907D857FA39AAF8CE02045DD01619D689EE731C551159BE7EB2D51A372FF56B556E5CB2FDE36E23073A44CA215D6C26CA68847B388E39520E0026E62294B557D6470440CA0AEFC9438C923AEC9B2098D6D3A1AF5E8B1DE36F4B53040109D89B77CAFAF70C26C601ABDF59EEC0FDC8A99089140CD2E817E335175B03B7AA33DDF040103DF031487F0CD7C0E86F38F89A66F8C47071A8B88586F26"*/
 
-             //Amex Test Cap keys
+             //region ===========================================Amex Test Cap keys
              "9F0605A000000025" +
                      "9F2201C8" +
                      "DF0503201231DF060101DF070101DF028190BF0CFCED708FB6B048E3014336EA24AA007D7967B8AA4E613D26D015C4FE7805D9DB131CED0D2A8ED504C3B5CCD48C33199E5A5BF644DA043B54DBF60276F05B1750FAB39098C7511D04BABC649482DDCF7CC42C8C435BAB8DD0EB1A620C31111D1AAAF9AF6571EEBD4CF5A08496D57E7ABDBB5180E0A42DA869AB95FB620EFF2641C3702AF3BE0B0C138EAEF202E21DDF040103DF031433BD7A059FAB094939B90A8F35845C9DC779BD50", //c8
@@ -89,8 +89,9 @@ fun settingAids(emv: UEMV?) {
              "9F0605A000000025" +
                      "9F2201CA" +
                      "DF0503201231DF060101DF070101DF0281F8C23ECBD7119F479C2EE546C123A585D697A7D10B55C2D28BEF0D299C01DC65420A03FE5227ECDECB8025FBC86EEBC1935298C1753AB849936749719591758C315FA150400789BB14FADD6EAE2AD617DA38163199D1BAD5D3F8F6A7A20AEF420ADFE2404D30B219359C6A4952565CCCA6F11EC5BE564B49B0EA5BF5B3DC8C5C6401208D0029C3957A8C5922CBDE39D3A564C6DEBB6BD2AEF91FC27BB3D3892BEB9646DCE2E1EF8581EFFA712158AAEC541C0BBB4B3E279D7DA54E45A0ACC3570E712C9F7CDF985CFAFD382AE13A3B214A9E8E1E71AB1EA707895112ABC3A97D0FCB0AE2EE5C85492B6CFD54885CDD6337E895CC70FB3255E3DF040103DF03146BDA32B1AA171444C7E8F88075A74FBFE845765F", //CA,
+// endregion
 
-             //region =========================================================================== Visa Test cap keys Starts==================================================================================================================================================================================================================================
+             //region ========================================== Visa Test cap keys Starts==================================================================================================================================================================================================================================
              //Visa Test cap Keys 92
              "9F0605A000000003" +
                      "9F220192" +
@@ -118,7 +119,8 @@ fun settingAids(emv: UEMV?) {
                      "DF0314EE1511CEC71020A9B90443B37B1D5F6E703030F6" +
                      "BF010131",
              //endregion =========================================================================== Visa Test cap keys ends==================================================================================================================================================================================================================================
-//region =========================================================================== Visa Live cap keys start==================================================================================================================================================================================================================================
+
+             //region =============================== Visa Live cap keys start==================================================================================================================================================================================================================================
              //Visa Live cap Keys 08
              "9F0605A000000003" + //AID
                      "9F220108" + //Index
@@ -137,7 +139,7 @@ fun settingAids(emv: UEMV?) {
 
 //endregion =========================================================================== Visa Live cap keys ends==================================================================================================================================================================================================================================
 
-// region ===================Visa CLS cap keys=============
+          /*   // region ===================Visa CLS cap keys=============
              "9F3303E0F8C8" +
                      "97099F02065F2A029A0390" +
                      "9F40056F00F0F001" + //additional terminal capability
@@ -257,10 +259,10 @@ fun settingAids(emv: UEMV?) {
                      "DF1906000000000000" +
                      "DF13055C40000000",
 
-             // endregion =============
+             // endregion =============*/
 
 /*
-//region =========================================================================== Master Testcap keys starts==================================================================================================================================================================================================================================
+//region ======================= Master Testcap keys starts=======================================================
                 // MasterCard
                 // MasterCard
                 "9F0605A000000004" +
@@ -324,6 +326,69 @@ fun settingAids(emv: UEMV?) {
                      "DF0314" + "F910A1504D5FFB793D94F3B500765E1ABCAD72D9", //exponent
 //endregion =========================================================================== Master Live cap keys ends==================================================================================================================================================================================================================================
 
+             // region =========================================================================== Rupay Cap keys Starts==================================================================================================================================================================================================================================
+             //Rupay Live cap keys 01
+             "9F0605A000000524" + //Aids
+                     "9F220101" + //Key Id
+                     "DF050420241231" + //expiry Date
+                     "DF02" + "8180" + "ED2CBDC0E377CFE24640B819AAA606EF9B177F50A4C55917A53266CFB90DCA7C39D0C429207BFC29786945F912D59AA67508C62FA5B19E187D9FAEFB718084E14E7ADDBCC69211D4418CDE26FD10FCE8BFFFC46877768FED780615E74AA162EC823CF548FFEE5B263A9FE56FF42DE215A7112F9A1878DF81178AD1D69F0D47F5" + //Module
+                     "DF040103" + //exponent
+                     "DF03" + "14" + "6E57B86C9C10A3EB7AA4BB4342F902D58444D69B" + //checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Rupay Live cap keys 02
+             "9F0605A000000524" + //Aids
+                     "9F220102" + //Key Id
+                     "DF050420241231" + //expiry Date
+                     "DF02" + "8180" + "B628CAB46EC37E24B0EFE78FD651BADC2545958B4D088FE8DA8CF7F04CF1916EF894386376608814C2F6F1662D964D0F7CA34C29E2FFEBF4AB4AB8E35BACCCF6D653EBB06AA1FCA3A877A6644B54894B9E1FAFBA7206F40BB4AF2EE7F9964F8259CE8A82DB00460B5820FA4CDF0D213E3710F5CA40838D57FC956B134760A0B1" + //Module
+                     "DF040103" + //exponent
+                     "DF03" + "14" + "52A1FE6E066F82CD484F1E7FEA10B7E5F02CEC8B" + //checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Rupay Live cap keys 03
+             "9F0605A000000524" + //Aids
+                     "9F220103" + //Key Id
+                     "DF050420241231" + //expiry Date
+                     "DF02" + "8190" + "E703A908FFAE3730F82E550869A294C1FF1DA25F2B53D2C8BB18F770DAD505135D03D5EC8EE3926550051C3D4857F6FEDB882C2889E0B25F389F78741F2931A92D45D3A47E62810D3253653AB0AB3570C35DFD08D3167B6DB42ED28F765186F4287CDAF9D9BAD20BCE2C4ECFECDD218E50F1FCC718878882F3934A6FEB502CFCAD615A2B2E279A0868DDA9489DFA9CD9" + //Module
+                     "DF040103" + //exponent
+                     "DF03" + "14" + "4B93D1E1F57CFA16970501F17D3E06411043F1D5" + //checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Rupay Live cap keys 04
+             "9F0605A000000524" + //Aids
+                     "9F220104" + //Key Id
+                     "DF050420241231" + //expiry Date
+                     "DF02" + "81B0" + "AC0019624FC0A72270C6885CC0B3C9140C351FCFE6F8145881A27750393453D3265F69E7658132D8D253EDF8991E2BA32B782D39ADE1FF1FC8F211F5DF51A0007C761AD9882587BD6A36AECD3ABBF944307AC97A2D905FAB489C3E1CCD76DE9EB93ECFAB2BB84F34E770119E356DC6372D8685DA8EB92FCAC7B53C0167100E4CDFB9830D1C45E787E44C9F6A42EC131A6A4CD66BBE4F93CA91FDF157C7B22FC7221A6348F0EDA6151302A80EF77D6CA5" + //Module
+                     "DF040103" + //exponent
+                     "DF03" + "14" + "6F843CE765B9144CE1A6BFEA46BC37B65081CE7F" + //checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Rupay Live cap keys 05
+             "9F0605A000000524" + //Aids
+                     "9F220105" + //Key Id
+                     "DF050420241231" + //expiry Date
+                     "DF02" + "81F8" + "C04E80180369898AAEF6EE7741EDED25239D765301614B5B41A008CA3009358D626D828BC5F1B1E04A2DC1367101266905D262003BE747FD231C9B0011F2F2B21BA8E4C0F4CA5E93ED9DBB2E92ABC450576A4EB59AD00DCA59C8BF3230E4B19D43452871C6215D837663310DF43CAEA1B9B08C1F500AF1B550F62E18D70EEE9E9475321BCD1799AB193E0BC849DACE892A0E6A1F42FE0786DB30345AE1A0E7E4C4B71640E03BFD2832C491A7D83F3B4EF4D388CDDBB748C2FD1D9D4A9BF52FC856CBA088D4B274846002C23CDA722C5CFF3B1F8218A1843B0426474BDC92F2F5E31FBF321CC17480AD069DF55381F2E601D5CBA7B871253F" + //Module
+                     "DF040103" + //exponent
+                     "DF03" + "14" + "7081DF2A0C36360F24C122C574F0AD2E57893DD2" + //checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Rupay Live cap keys 06
+             "9F0605A000000524" + //Aids
+                     "9F220106" + //Key Id
+                     "DF050420241231" + //expiry Date
+                     "DF02" + "81F8" + "9D8A75B36BCBDF250B87615A46F6EA35DE35226EEAB7B473D7DC0A28B5DF075C83B2775F23337E6CEE36CCFE3A6568C9C822D6DE81299565A829348E03D479B631BB18A2429A8590C597F446A3CEA3BE2E822106F43DFBB981EC0F1121919CB35F85DBA3355C5E7FF35F2B221FD65EDBEA41F23A7A109FBBC4A774A756D89B593B199E1E9DA9A99217D4BF31F67CDA8C4E1B81FA2A377C83B5D1CD6AF1F1880448CFF48D3A4ADBBC7FBD730061508A6EA8FDFC5BD66A2E94E33B83F81E0E56CF1C9473E4426EE435F9E80136760D8F4AD946805B03A67C55361582F5AD8F40404392FA4CB4F5C2BAF6E26857A1D60941E3D055ACD9AC0BEF" + //Module
+                     "DF040103" + //exponent
+                     "DF03" + "14" + "E98F4134E1949A9A054E4679AC9A7EC83969E209" + //checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+//endregion =========================================================================== Rupay Live Cap keys ends==================================================================================================================================================================================================================================
+
+
 
          )
          for (item: String in ca) {
@@ -352,7 +417,7 @@ fun settingAids(emv: UEMV?) {
              } else {
                  capKey.hashFlag = 0x00.toByte()
              }
-             val ret = emv!!.manageCAPubKey(ActionFlag.ADD, capKey)
+             val ret = emv.manageCAPubKey(ActionFlag.ADD, capKey)
              println(
                  "=> add CAPKey rid = : " + BytesUtil.bytes2HexString(rid)
                      .toString() + ", index = " + index + "return type " + ret
@@ -505,6 +570,34 @@ Log.e("TLV LIST --> ",tlvList)
 
         }
         KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
+            tlvList = StringBuilder()
+                .append("9F350122")
+                .append("9F3303E0F8C8")
+                .append("9F40056000F0A001")
+                .append("9A03171020")
+                .append("9F2103150512")
+                .append("9F0206000000000100")
+                .append("9F1A020156")
+                .append("5F2A020156")
+                .append("9C0100")
+                .append("DF918111050000000000")
+                .append("DF91811205FFFFFFFFFF")
+                .append("DF91811005FFFFFFFFFF")
+                .append("DF9182010102")
+                .append("DF9182020100")
+                .append("DF9181150100")
+                .append("DF9182040100")
+                .append("DF812406000000010000")
+                .append("DF812506000000010000")
+                .append("DF812606000000010000")
+                .append("DF812306000000010000")
+                .append("DF9182050160")
+                .append("DF9182060160")
+                .append("DF9182070120")
+                .append("DF9182080120").toString()
+        }
+
+        KernelID.RUPAY.toByte() -> {
             tlvList = StringBuilder()
                 .append("9F350122")
                 .append("9F3303E0F8C8")
