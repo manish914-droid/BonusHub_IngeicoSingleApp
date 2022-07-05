@@ -788,12 +788,41 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
 
             if (transData != null) {
-                getFlowTypeDesc(transData.flowType,result, transData)
+               getFlowTypeDesc(transData.flowType,result, transData)
             }
 
         }
         println("\n")
     }
+
+    open fun getACTypeDesc(acType: Byte): String? {
+        val desc: String
+        desc = when (acType) {
+            ACType.EMV_ACTION_AAC.toByte() -> "AAC"
+            ACType.EMV_ACTION_ARQC.toByte() -> "ARQC"
+            ACType.EMV_ACTION_TC.toByte() -> "TC"
+            else -> "Unkown type"
+        }
+        return desc + String.format("[0x%02X]", acType)
+    }
+
+    open fun getCVMDesc(cvm: Byte): String? {
+        val desc: String
+        desc = when (cvm) {
+            CVMFlag.EMV_CVMFLAG_NOCVM.toByte() -> "No CVM verification required"
+            CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() -> "Offline PIN"
+            CVMFlag.EMV_CVMFLAG_ONLINEPIN.toByte() -> "Online PIN"
+            CVMFlag.EMV_CVMFLAG_SIGNATURE.toByte() -> "Signature"
+            CVMFlag.EMV_CVMFLAG_OLPIN_SIGN.toByte() -> "Online PIN plus signature"
+            CVMFlag.EMV_CVMFLAG_CDV.toByte() -> "Consumer Device Verification(qVSDC/qPBOC)"
+            CVMFlag.EMV_CVMFLAG_CCV.toByte() -> "Confirmation Code Verified(PayPass)"
+            CVMFlag.EMV_CVMFLAG_CERTIFICATE.toByte() -> "Certificate verification"
+            CVMFlag.EMV_CVMFLAG_ECASHPIN.toByte() -> "Electronic cash recharge PIN"
+            else -> "Unknown type"
+        }
+        return desc + String.format("[0x%02X]", cvm)
+    }
+
 
     private fun getFlowTypeDesc(flowType: Byte, result: Int, transData: TransData) {
         val desc: String
@@ -854,23 +883,127 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
             }
             FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte() -> {
-                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
-                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
 
-                val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
-                cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+                 when (transData.cvm) {
 
-                val track2data = emv!!.getTLV(Integer.toHexString(0x57))
-                val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
-                println("Field 57 data is"+field57)
-                val encrptedPan = getEncryptedPanorTrackData(field57,true)
-                cardProcessedDataModal.setEncryptedPan(encrptedPan)
+                    CVMFlag.EMV_CVMFLAG_ONLINEPIN.toByte() -> {
 
-                val field55: String = getFields55()
-                println("Field 55 is $field55")
+                        val param = Bundle()
+                        //optional Pin Block format by default its 0
+                        param.putByte(PinpadData.PIN_BLOCK_FORMAT,0)
+                        param.putByteArray(PinpadData.PIN_LIMIT, byteArrayOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12))
 
-                cardProcessedDataModal.setField55(field55)
-                vfEmvHandlerCallback(cardProcessedDataModal)
+                        val listener: OnPinEntryListener = object : OnPinEntryListener.Stub() {
+                            override fun onInput(arg0: Int, arg1: Int) {}
+                            override fun onConfirm(data: ByteArray, arg1: Boolean) {
+                                System.out.println("PinBlock is"+byte2HexStr(data))
+                                Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
+                                respondCVMResult(1.toByte())
+
+                                when (cardProcessedDataModal.getReadCardType()) {
+                                    DetectCardType.EMV_CARD_TYPE -> {
+                                        if (cardProcessedDataModal.getIsOnline() == 1) {
+                                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                                            //insert with pin
+                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
+                                        } else {
+                                            cardProcessedDataModal.setGeneratePinBlock("")
+                                            //off line pin
+                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
+                                        }
+                                    }
+                                    DetectCardType.CONTACT_LESS_CARD_TYPE -> {
+                                        if (cardProcessedDataModal.getIsOnline() == 1) {
+                                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
+
+                                            val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
+                                            cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
+
+                                            val track2data = emv!!.getTLV(Integer.toHexString(0x57))
+                                            val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
+                                            println("Field 57 data is"+field57)
+                                            val encrptedPan = getEncryptedPanorTrackData(field57,true)
+                                            cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+                                            val field55: String = getFields55()
+                                            println("Field 55 is $field55")
+
+                                            cardProcessedDataModal.setField55(field55)
+                                            vfEmvHandlerCallback(cardProcessedDataModal)
+
+                                        } else {
+                                            cardProcessedDataModal.setGeneratePinBlock("")
+                                            //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
+                                        }
+                                    }
+                                    DetectCardType.MAG_CARD_TYPE -> {
+                                        //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
+                                        cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+
+                                        if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)
+                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
+                                        else
+                                            cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+                                        cardProcessedDataModal.setApplicationPanSequenceValue("00")
+                                    }
+
+                                    else -> {
+                                    }
+                                }
+
+
+                            }
+
+                            override fun onCancel() {
+                                //  respondCVMResult(0.toByte())
+                                Log.d("Data", "PinPad onCancel")
+                                try {
+                                    //  GlobalScope.launch(Dispatchers.Main) {
+                                    activity.declinedTransaction()
+                                    //    }
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                }
+                            }
+
+                            override fun onError(error: Int) {
+                                respondCVMResult(2.toByte())
+                                Log.d("Data", "PinPad onError, code:$error")
+                                try {
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        (activity as TransactionActivity).declinedTransaction()
+                                    }
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                }
+                            }
+                        }
+
+                            println("=> onCardHolderVerify | onlinpin")
+                            cardProcessedDataModal.setIsOnline(1)
+
+
+                            byte2HexStr(lastCardRecord!!.pan)
+                            println("Pan block is "+byte2HexStr(lastCardRecord!!.pan))
+                            addPad("374245001751006", "0", 16, true)
+
+                            println("CardPanNumber data is "+cardProcessedDataModal.getPanNumberData() ?: "")
+
+                            Utility.hexStr2Byte(addPad("374245001751006", "0", 16, true))
+                            param.putByteArray(PinpadData.PAN_BLOCK, Utility.hexStr2Byte(addPad(cardProcessedDataModal.getPanNumberData() ?: "", "0", 16, true)))
+                            pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+
+
+                    }
+
+                    else -> "Unknown type"
+                }
+
+            //    cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
+             //   cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+
+
 
             }
             FlowType.EMV_FLOWTYPE_M_CHIP.toByte()->{
