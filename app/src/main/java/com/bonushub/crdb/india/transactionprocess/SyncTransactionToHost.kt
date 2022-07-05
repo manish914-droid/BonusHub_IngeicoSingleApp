@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                             var cardProcessedDataModal: CardProcessedDataModal? = null,
-                            var testEmvHandler:EmvHandler,
+                            var testEmvHandler:EmvHandler?,
                             var syncTransactionCallback: (Boolean, String, String?, Triple<String, String, String>?,String?,String?) -> Unit) {
 
     val iemv: UEMV? = DeviceHelper.getEMV()
@@ -159,9 +159,13 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
 
                                                     logger("CompleteSecondGenAc","yes")
                                                     logger("3testVFEmvHandler",""+testEmvHandler,"e")
-                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, testEmvHandler) { printExtraData, de55 ->
-                                                        syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
-                                                    }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
+                                                    testEmvHandler?.let {
+                                                        CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData,
+                                                            it
+                                                        ) { printExtraData, de55 ->
+                                                            syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
+                                                        }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
+                                                    }
 
                                                 } else {
                                                        clearReversal()

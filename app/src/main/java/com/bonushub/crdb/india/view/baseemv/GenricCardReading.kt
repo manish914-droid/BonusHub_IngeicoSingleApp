@@ -38,9 +38,10 @@ class GenericCardReadHandler constructor(val emv:UEMV?, val activity: BaseActivi
     }
 
     override fun onReadRecord(cardRecord: CardRecord?) {
-      emv?.stopSearch()
-        emv?.stopProcess()
-        emv?.stopEMV()
+    //  emv?.stopSearch()
+      //  emv?.stopProcess()
+      //  emv?.stopEMV()
+      //  emv?.halt()
         cardBinCb(  cardRecord?.pan?.byteArr2HexStr().toString())
 
 

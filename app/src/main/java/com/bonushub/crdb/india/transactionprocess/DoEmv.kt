@@ -9,8 +9,8 @@ import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.usdk.apiservice.aidl.pinpad.DeviceName
 import com.usdk.apiservice.aidl.pinpad.KAPId
 
-class DoEmv(var testEmvHandler: EmvHandler, var  activity: Activity, var cardProcessedDataModal: CardProcessedDataModal,
-            var transactionCallback: (CardProcessedDataModal, EmvHandler) -> Unit) {
+class DoEmv(var testEmvHandler: EmvHandler?, var  activity: Activity, var cardProcessedDataModal: CardProcessedDataModal,
+            var transactionCallback: (CardProcessedDataModal, EmvHandler?) -> Unit) {
 
 
     //    private var iemv: IEMV? = VFService.vfIEMV

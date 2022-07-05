@@ -388,8 +388,6 @@ fun settingAids(emv: UEMV?) {
                      "DF070101",// ARITH_IND
 //endregion =========================================================================== Rupay Live Cap keys ends==================================================================================================================================================================================================================================
 
-
-
          )
          for (item: String in ca) {
              val tlvList: TLVList = TLVList.fromBinary(item)
@@ -535,7 +533,9 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF918110050000000000")  // Terminal action code(default)
                 .append("9F6D01C0")              // Contactless Reader Capabilities
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
+
                 .append("DF812406000000010000") //Terminal Contactless Transaction Limit
+
                 .append("DF812606000000010000") // Terminal CVM Required Limit
                 .append("DF812306000000010000")  //Terminal Contactless Floor Limit
                 .append("DF81300100")            //Try Again Flag
@@ -557,7 +557,9 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("9F350122")
                 .append("9F1A020156")
                 .append("5F2A020156")
+
                 .append("9F1B0400003A98")
+
                 .append("9F660436004000")
                 .append("DF06027C00")
                 .append("DF812406000000100000")
@@ -565,6 +567,10 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF812606000000100000")
                 .append("DF918165050100000000")
                 .append("DF040102")
+                    //cvmvalue-->"000000001000"  "DF2106${cvmVal}"
+                    //ctclsvalue-->009999999999  "DF2006${ctlsVal}"
+                .append("DF2006").append("009999999999")
+                .append("DF2106").append("000000001000")
                 .append("DF810602C000")
                 .append("DF9181040100").toString()
 
@@ -576,10 +582,10 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("9F40056000F0A001")
                 .append("9A03171020")
                 .append("9F2103150512")
-                .append("9F0206000000000100")
+
                 .append("9F1A020156")
                 .append("5F2A020156")
-                .append("9C0100")
+
                 .append("DF918111050000000000")
                 .append("DF91811205FFFFFFFFFF")
                 .append("DF91811005FFFFFFFFFF")
@@ -587,27 +593,30 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9182020100")
                 .append("DF9181150100")
                 .append("DF9182040100")
-                .append("DF812406000000010000")
+
+                .append("DF812406000000030000") //Terminal Contactless Transaction Limit --> working
+
                 .append("DF812506000000010000")
-                .append("DF812606000000010000")
-                .append("DF812306000000010000")
+                .append("DF812606000000010000")// Terminal CVM Required Limit
+                .append("DF812306000000010000")// //Terminal Contactless Floor Limit
                 .append("DF9182050160")
                 .append("DF9182060160")
+
                 .append("DF9182070120")
                 .append("DF9182080120").toString()
         }
 
-        KernelID.RUPAY.toByte() -> {
-            tlvList = StringBuilder()
+        KernelID.RUPAY.toByte() , KernelID.DISCOVER.toByte()-> {
+     /*       tlvList = StringBuilder()
                 .append("9F350122")
                 .append("9F3303E0F8C8")
                 .append("9F40056000F0A001")
                 .append("9A03171020")
                 .append("9F2103150512")
-                .append("9F0206000000000100")
+
                 .append("9F1A020156")
                 .append("5F2A020156")
-                .append("9C0100")
+
                 .append("DF918111050000000000")
                 .append("DF91811205FFFFFFFFFF")
                 .append("DF91811005FFFFFFFFFF")
@@ -622,9 +631,35 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9182050160")
                 .append("DF9182060160")
                 .append("DF9182070120")
-                .append("DF9182080120").toString()
+                .append("DF9182080120").toString()*/
+            tlvList=    "9F3303E0F8C8" + // terminal capability
+                    "97099F02065F2A029A0390" +
+                    "9F40056F00F0F001" + //additional terminal capability
+                    "9f0607A0000005241010" +
+                    "DF0306009999999999" +
+                  // "DF2006${ctlsVal}" +
+                  "DF2006000000009999" +
+                    "DF010100" +
+                    "DF14039F3704" +
+                    "9F6604F6004000" + //TTQ
+                    "5F2A020356" +
+                    "DF170101" +
+                    "9F09020002" +
+                    "DF180101" +
+                    "DF1205D84004F800" +
+                    "9F1B0400000000" +
+                    "9F1A020356" +
+                   // "DF2106${cvmVal}" +   //CVm Limit
+                  "DF2106000000050000" +   //CVm Limit
+                    "DF160101" +
+                    "DF150400000000" +
+                    "DF1105D84004A800" +
+                    "DF0406000000000000" +
+                    "DF1906000000000000" +
+                    "DF13050010000000"
+
         }
-        KernelID.DISCOVER.toByte() -> {}
+       // KernelID.DISCOVER.toByte() -> {}
         KernelID.JCB.toByte() -> {}
         else -> {}
     }

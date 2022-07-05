@@ -46,6 +46,7 @@ import com.bonushub.crdb.india.vxutils.dateFormaterNew
 import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
 import com.bonushub.crdb.india.vxutils.timeFormaterNew
 import com.google.gson.Gson
+import com.usdk.apiservice.aidl.emv.EMVError.*
 import com.usdk.apiservice.aidl.emv.EMVTag
 import com.usdk.apiservice.aidl.emv.SearchCardListener
 import com.usdk.apiservice.aidl.pinpad.DeviceName
@@ -94,7 +95,7 @@ class TransactionActivity : BaseActivityNew() {
     private val cashBackAmt by lazy { intent.getStringExtra("cashBackAmt") ?: "0" }
 
     private var cardDetectionCb: (CardProcessedDataModal) -> Unit = ::onCardDetectionAction
-    //private var cardDetectionCb: (CardProcessedDataModal) -> Unit = ::onCardDetectionAction
+
 
     private fun onCardDetectionAction(cardProcessedDataModal: CardProcessedDataModal) {
         println("Detected card type ------> ${cardProcessedDataModal.getReadCardType()}")
@@ -102,7 +103,7 @@ class TransactionActivity : BaseActivityNew() {
     }
 
 
-    private lateinit var emvProcessHandler: EmvHandler
+    private  var emvProcessHandler: EmvHandler?=null
 
     private val brandDataMaster by lazy { intent.getSerializableExtra("brandDataMaster") as BrandEMIMasterDataModal }
     private val brandEmiProductData by lazy { intent.getSerializableExtra("brandEmiProductData") as BrandEMIProductDataModal }
@@ -151,6 +152,7 @@ class TransactionActivity : BaseActivityNew() {
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
                 globalCardProcessedModel.setEmiTransactionAmount((saleAmt.toDouble() * 100).toLong())
             }
+
             else -> {
                 val frtAmt = "%.2f".format(saleAmt.toFloat())
                 txnAmountAfterApproved = frtAmt
@@ -160,12 +162,12 @@ class TransactionActivity : BaseActivityNew() {
             }
         }
 
-
         val cardOption = CardOption.create().apply {
             supportICCard(true)
             supportMagCard(true)
             supportRFCard(true)
         }
+
         detectCard(globalCardProcessedModel, cardOption)
 
         emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
@@ -175,7 +177,6 @@ class TransactionActivity : BaseActivityNew() {
         tenureSchemeViewModel.emiTenureLiveData.observe(
             this@TransactionActivity
         ) {
-
             when (val genericResp = it) {
                 is GenericResponse.Success -> {
                     println(Gson().toJson(genericResp.data))
@@ -211,7 +212,14 @@ class TransactionActivity : BaseActivityNew() {
                             // sale
                             dialog.dismiss()
                             globalCardProcessedModel.setTransType(BhTransactionType.SALE.type) //0306
-                            startEmvAfterCardGenricCardRead()
+
+                            if(globalCardProcessedModel.getReadCardType()==DetectCardType.MAG_CARD_TYPE){
+                            val isPin= globalCardProcessedModel.getIsOnline()==1
+processSwipeCardWithPINorWithoutPIN(isPin,globalCardProcessedModel)
+                            }
+                            if(globalCardProcessedModel.getReadCardType()==DetectCardType.EMV_CARD_TYPE) {
+                                startEmvAfterCardGenricCardRead()
+                            }
 
                         },
                         { dialog ->
@@ -228,18 +236,6 @@ class TransactionActivity : BaseActivityNew() {
                     emvProcessHandler = emvHandler()
                     logger("2testVFEmvHandler", "" + emvProcessHandler, "e")
                     DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(), emvProcessHandler)
-                    /*  lifecycleScope.launch(Dispatchers.Main) {
-                          alertBoxWithActionNew(
-                              genericResp.errorMessage ?: "Oops something went wrong",
-                              "",
-                              R.drawable.ic_info_orange,
-                              getString(R.string.positive_button_ok),"",false,false,
-                              {
-
-                                  declinedTransaction()
-                              },
-                              {})
-                      }*/
                     println(genericResp.errorMessage.toString())
                 }
                 is GenericResponse.Loading -> {
@@ -257,7 +253,6 @@ class TransactionActivity : BaseActivityNew() {
                 logger("DetectCard", "MAG detected", "e")
 
                 if (cardProcessedDataModal.getFallbackType() != EFallbackCode.Swipe_fallback.fallBackCode) {
-
                     val currDate = getCurrentDateforMag()
                     if (/*currDate.compareTo(cardProcessedDataModal.getExPiryDate()!!) <= 0*/true) {
                         println("Correct Date")
@@ -265,12 +260,7 @@ class TransactionActivity : BaseActivityNew() {
                         //  val bytes: ByteArray = ROCProviderV2.hexStr2Byte(track2)
                         // Log.d(TAG, "Track2:" + track2 + " (" + ROCProviderV2.byte2HexStr(bytes) + ")")
 
-                        getCardHolderName(
-                            cardProcessedDataModal,
-                            cardProcessedDataModal.getTrack1Data(),
-                            '^',
-                            '^'
-                        )
+                        getCardHolderName(cardProcessedDataModal, cardProcessedDataModal.getTrack1Data(), '^', '^')
                         //Stubbing Card Processed Data:-
                         cardProcessedDataModal.setReadCardType(DetectCardType.MAG_CARD_TYPE)
 
@@ -321,7 +311,6 @@ class TransactionActivity : BaseActivityNew() {
                                     scLastbyte = sc.last()
 
                                 }
-
                                 //Checking the card has a PIN or WITHOUTPIN
                                 // Here the changes are , Now we have to ask pin for all swipe txns ...
                                 val isPin = true
@@ -413,13 +402,29 @@ class TransactionActivity : BaseActivityNew() {
 
                                     when (cardProcessedDataModal.getTransType()) {
                                         BhTransactionType.SALE.type -> {
+                                            lifecycleScope.launch(Dispatchers.IO) {
+                                                if (checkInstaEmi()) {
+                                                    val field57Data = "$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${globalCardProcessedModel.getTransactionAmount()}"
+                                                    runBlocking {
+                                                        withContext(Dispatchers.Main) {
+                                                            showProgress()
+                                                        }
+                                                        withContext(Dispatchers.IO) {
+                                                            tenureSchemeViewModel.getEMITenureData(
+                                                                globalCardProcessedModel.getPanNumberData()
+                                                                    ?: "",
+                                                                field57Data
+                                                            )
+                                                        }
+                                                    }
+                                                } else {
+                                                    processSwipeCardWithPINorWithoutPIN(
+                                                        isPin,
+                                                        cardProcessedDataModal
+                                                    )
+                                                }
+                                            }
 
-                                            ///   if(!checkInstaEmi(cardProcessedDataModal)){
-                                            processSwipeCardWithPINorWithoutPIN(
-                                                isPin,
-                                                cardProcessedDataModal
-                                            )
-                                            ///   }
                                         }
                                         BhTransactionType.EMI_SALE.type -> {
                                             val intent = Intent(
@@ -442,34 +447,20 @@ class TransactionActivity : BaseActivityNew() {
                                             )
                                         }
                                         BhTransactionType.BRAND_EMI.type -> {
-                                            val intent = Intent(
-                                                this@TransactionActivity,
-                                                TenureSchemeActivity::class.java
-                                            ).apply {
-                                                putExtra(
-                                                    "cardProcessedData",
-                                                    globalCardProcessedModel
-                                                )
-                                                putExtra(
-                                                    "transactionType",
-                                                    globalCardProcessedModel.getTransType()
-                                                )
+                                            val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
+                                                putExtra("cardProcessedData", globalCardProcessedModel)
+                                                putExtra("transactionType", globalCardProcessedModel.getTransType())
                                                 putExtra("mobileNumber", mobileNumber)
                                                 putExtra("brandID", brandEMIData?.brandID ?: "")
                                                 putExtra("productID", brandEMIData?.productID ?: "")
-                                                putExtra(
-                                                    "imeiOrSerialNum",
-                                                    brandEMIData?.imeiORserailNum ?: ""
-                                                )
+                                                putExtra("imeiOrSerialNum", brandEMIData?.imeiORserailNum ?: "")
                                             }
                                             startActivityForResult(
                                                 intent,
                                                 BhTransactionType.EMI_SALE.type
                                             )
                                         }
-                                        else -> processSwipeCardWithPINorWithoutPIN(
-                                            isPin, cardProcessedDataModal
-                                        )
+                                        else -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
                                         //endregion
                                     }
                                 }
@@ -495,11 +486,8 @@ class TransactionActivity : BaseActivityNew() {
                                     ex.printStackTrace()
                                 }
                         }
-
                     }
                 }
-
-
             }
 
             DetectCardType.EMV_CARD_TYPE -> {
@@ -520,12 +508,15 @@ class TransactionActivity : BaseActivityNew() {
 
                                         val field57 = "$bankEMIRequestCode^0^1^0^^${/*cardProcessedDataModal?.getPanNumberData()?.substring(0, 8)*/""}^${globalCardProcessedModel.getTransactionAmount()}"
                                         runBlocking {
+                                            withContext(Dispatchers.Main){
+                                                    showProgress()
+                                            }
                                             withContext(Dispatchers.IO) {
                                                 tenureSchemeViewModel.getEMITenureData(globalCardProcessedModel.getPanNumberData() ?: "", field57)
                                             }
                                         }
-                                    }.also {
-                                        it.onEndProcessCallback = ::onEndProcessCalled
+                                    }.apply {
+                                        onEndProcessCallback = ::onEndProcessCalled
                                     }
                                 )
                             } else {
@@ -539,7 +530,7 @@ class TransactionActivity : BaseActivityNew() {
                         BhTransactionType.CASH_AT_POS.type->{
                             startFullEmvProcess()
                         }
-                        BhTransactionType.EMI_SALE.type -> {
+                        BhTransactionType.EMI_SALE.type,BhTransactionType.BRAND_EMI.type -> {
                             val emvOption = EmvOption.create().apply { flagPSE(0x00.toByte()) }
                             DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(),
                                 GenericCardReadHandler(
@@ -549,32 +540,33 @@ class TransactionActivity : BaseActivityNew() {
                                 ) {
                                     globalCardProcessedModel.setPanNumberData(it)
 
-                                    val intent = Intent(
-                                        this@TransactionActivity,
-                                        TenureSchemeActivity::class.java
-                                    ).apply {
+                                    val intent = Intent(this@TransactionActivity, TenureSchemeActivity::class.java).apply {
                                         putExtra("cardProcessedData", globalCardProcessedModel)
-                                        putExtra(
-                                            "transactionType",
-                                            globalCardProcessedModel.getTransType()
-                                        )
+                                        putExtra("transactionType", globalCardProcessedModel.getTransType())
                                         putExtra("mobileNumber", mobileNumber)
+                                        putExtra("brandID", brandEMIData?.brandID ?: "")
+                                        putExtra("productID", brandEMIData?.productID ?: "")
+                                        putExtra("imeiOrSerialNum", brandEMIData?.imeiORserailNum ?: "")
                                     }
-                                    startActivityForResult(intent, BhTransactionType.EMI_SALE.type)
+                                    startActivityForResult(intent, globalCardProcessedModel.getTransType())
+                                }.apply {
+                                    onEndProcessCallback = ::onEndProcessCalled
                                 }
                             )
                         }
-                        BhTransactionType.BRAND_EMI.type -> {}
+                       BhTransactionType.BRAND_EMI.type -> {
+
+                           startActivityForResult(
+                               intent,
+                               BhTransactionType.EMI_SALE.type
+                           )
+
+                       }
                         else -> {
                             startFullEmvProcess()
                         }
-
-
                     }
-
-
                 }
-
             }
 
             DetectCardType.CONTACT_LESS_CARD_TYPE -> {
@@ -904,7 +896,7 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     private suspend fun checkInstaEmi(): Boolean {
-return false
+//return false
         var hasInstaEmi = false
         val tpt = getTptData()
         var limitAmt = 0f
@@ -1074,7 +1066,7 @@ return false
     private fun onEndProcessCalled(result: Int, cardProcessedDataModal: CardProcessedDataModal) {
         println("Fallback called")
         when (result) {
-            //Swipe fallabck case when chip and swipe card used
+            //Swipe fallback case when chip and swipe card used
             EFallbackCode.Swipe_fallback.fallBackCode -> {
                 globalCardProcessedModel.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
                 //_insertCardStatus.postValue(cardProcessedDataModal)
@@ -1093,7 +1085,7 @@ return false
                 }
             }
 
-            CardErrorCode.EMV_FALLBACK_ERROR_CODE.errorCode -> {
+            EFallbackCode.EMV_fallback.fallBackCode -> {
                 //EMV Fallback case when we insert card from other side then chip side:-
                 globalCardProcessedModel.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
                 globalCardProcessedModel.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
@@ -1113,23 +1105,48 @@ return false
             }
 
             else -> {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    alertBoxWithActionNew(
-                        getString(R.string.transaction_delined_msg),
-                        "onEndProcessCalled $result",
-                        R.drawable.ic_txn_declined,
-                        getString(R.string.positive_button_ok),
-                        "", false, false,
-                        { alertPositiveCallback ->
-                            if (alertPositiveCallback) {
-                                goToDashBoard()
-                            }
-                        },
-                        {})
-                    Log.e("onEndProcessCalled", "Error in onEndProcessCalled Result --> $result")
+              val errorMsg=  when (result) {
+                    ERROR_POWERUP_FAIL -> "ERROR_POWERUP_FAIL"
+                    ERROR_ACTIVATE_FAIL -> "ERROR_ACTIVATE_FAIL"
+                    ERROR_WAITCARD_TIMEOUT -> "ERROR_WAITCARD_TIMEOUT"
+                    ERROR_NOT_START_PROCESS -> "ERROR_NOT_START_PROCESS"
+                    ERROR_PARAMERR -> "ERROR_PARAMERR"
+                    ERROR_MULTIERR -> "ERROR_MULTIERR"
+                    ERROR_CARD_NOT_SUPPORT -> "ERROR_CARD_NOT_SUPPORT"
+                    ERROR_EMV_RESULT_BUSY -> "ERROR_EMV_RESULT_BUSY"
+                    ERROR_EMV_RESULT_NOAPP -> "ERROR_EMV_RESULT_NOAPP"
+                    ERROR_EMV_RESULT_NOPUBKEY -> "ERROR_EMV_RESULT_NOPUBKEY"
+                    ERROR_EMV_RESULT_EXPIRY -> "ERROR_EMV_RESULT_EXPIRY"
+                    ERROR_EMV_RESULT_FLASHCARD -> "ERROR_EMV_RESULT_FLASHCARD"
+                    ERROR_EMV_RESULT_STOP -> "ERROR_EMV_RESULT_STOP"
+                    ERROR_EMV_RESULT_REPOWERICC -> "ERROR_EMV_RESULT_REPOWERICC"
+                    ERROR_EMV_RESULT_REFUSESERVICE -> "ERROR_EMV_RESULT_REFUSESERVICE"
+                    ERROR_EMV_RESULT_CARDLOCK -> "ERROR_EMV_RESULT_CARDLOCK"
+                    ERROR_EMV_RESULT_APPLOCK -> "ERROR_EMV_RESULT_APPLOCK"
+                    ERROR_EMV_RESULT_EXCEED_CTLMT -> "ERROR_EMV_RESULT_EXCEED_CTLMT"
+                    ERROR_EMV_RESULT_APDU_ERROR -> "ERROR_EMV_RESULT_APDU_ERROR"
+                    ERROR_EMV_RESULT_APDU_STATUS_ERROR -> "ERROR_EMV_RESULT_APDU_STATUS_ERROR"
+                  ERROR_EMV_RESULT_KERNEL_ABSENT->"ERROR_EMV_RESULT_KERNEL_ABSENT"
+                    ERROR_EMV_RESULT_ALL_FLASH_CARD -> "ERROR_EMV_RESULT_ALL_FLASH_CARD"
+                    EMV_RESULT_AMOUNT_EMPTY -> "EMV_RESULT_AMOUNT_EMPTY"
+                    else -> "unknow error"
                 }
+                lifecycleScope.launch(Dispatchers.Main) {
+                   alertBoxWithActionNew(
+                       getString(R.string.transaction_delined_msg),
+                       "onEndProcessCalled $result --> $errorMsg",
+                       R.drawable.ic_txn_declined,
+                       getString(R.string.positive_button_ok),
+                       "", false, false,
+                       { alertPositiveCallback ->
+                           if (alertPositiveCallback) {
+                               goToDashBoard()
+                           }
+                       },
+                       {})
+                   Log.e("onEndProcessCalled", "Error in onEndProcessCalled Result --> $result")
+               }
             }
-
         }
 
     }
@@ -1182,7 +1199,8 @@ return false
                 val msg: String = getString(R.string.authenticating_transaction_msg)
                 withContext(Dispatchers.Main) { showProgress(msg) }
             }
-            logger("1testVFEmvHandler", "" + emvProcessHandler, "e")
+
+            logger("1testVFEmvHandler", ("" + emvProcessHandler), "e")
             SyncTransactionToHost(
                 transactionISOByteArray,
                 cardProcessedDataModal,
@@ -1747,7 +1765,7 @@ return false
 
     enum class EFallbackCode(var fallBackCode: Int) {
         Swipe_fallback(111),
-        EMV_fallback(8),
+        EMV_fallback(40961),
         NO_fallback(0),
         EMV_fallbackNew(12),
         CTLS_fallback(333)
