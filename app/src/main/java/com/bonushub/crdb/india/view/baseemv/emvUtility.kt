@@ -516,6 +516,7 @@ Log.e("TLV LIST --> ",tlvList)
         }
         KernelID.AMEX.toByte() -> {
             tlvList = StringBuilder()
+                .append("9F6604A6004000") ///terminal transaction attribute 86004000  // "9F660426000080 //TTQ
                 .append("9F350122")
                 .append("9F3303E0E8C8")
                 .append("9F40056000F0B001")
@@ -575,15 +576,18 @@ Log.e("TLV LIST --> ",tlvList)
 
         }
         KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
+
+
             tlvList = StringBuilder()
                 .append("9F350122")
                 .append("9F3303E0F8C8")
                 .append("9F40056000F0A001")
                 .append("9A03171020")
                 .append("9F2103150512")
-
+                //    .append("9F0206").append(txnAmount)
                 .append("9F1A020156")
                 .append("5F2A020156")
+
 
                 .append("DF918111050000000000")
                 .append("DF91811205FFFFFFFFFF")
@@ -593,16 +597,29 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9181150100")
                 .append("DF9182040100")
 
-                .append("DF812406000000030000") //Terminal Contactless Transaction Limit --> working
 
+
+                //  .append("DF812406000000030000") //Terminal Contactless Transaction Limit --> working
                 .append("DF812506000000010000")
-                .append("DF812606000000010000")// Terminal CVM Required Limit
-                .append("DF812306000000010000")// //Terminal Contactless Floor Limit
+                //    .append("DF812606000000010000")// Terminal CVM Required Limit
+                .append("DF812306000000000100")// //Terminal Contactless Floor Limit
+
                 .append("DF9182050160")
                 .append("DF9182060160")
-
                 .append("DF9182070120")
                 .append("DF9182080120").toString()
+
+
+            val limitCvm="000000010000"
+            val ctlsTransLimit="000000030000"
+
+            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT,ctlsTransLimit)//DF8124
+           //  emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
+
+            //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.R_TAG_TM_CVM_LIMIT,limitCvm)// DF48
+            //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.DEF_TAG_J_CVM_LIMIT,limitCvm)//DF918403
+            //  M_TAG_TM_FLOOR_LIMIT
+           // emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,limitCvm)//DF8125
         }
 
         KernelID.RUPAY.toByte() , KernelID.DISCOVER.toByte()-> {

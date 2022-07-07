@@ -129,8 +129,8 @@ class TransactionActivity : BaseActivityNew() {
         emvBinding?.txnAmtLl?.visibility = View.VISIBLE
 
         globalCardProcessedModel.setTransType(transactionType)
-        globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
-        globalCardProcessedModel.setOtherAmount((cashBackAmt.toDouble() * 100).toLong())
+        globalCardProcessedModel.setTransactionAmount((saleAmt.toFloat() * 100).toLong())
+        globalCardProcessedModel.setOtherAmount((cashBackAmt.toFloat() * 100).toLong())
         globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
 
         tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
@@ -215,7 +215,7 @@ class TransactionActivity : BaseActivityNew() {
 
                             if(globalCardProcessedModel.getReadCardType()==DetectCardType.MAG_CARD_TYPE){
                             val isPin= globalCardProcessedModel.getIsOnline()==1
-processSwipeCardWithPINorWithoutPIN(isPin,globalCardProcessedModel)
+                             processSwipeCardWithPINorWithoutPIN(isPin,globalCardProcessedModel)
                             }
                             if(globalCardProcessedModel.getReadCardType()==DetectCardType.EMV_CARD_TYPE) {
                                 startEmvAfterCardGenricCardRead()
@@ -581,6 +581,7 @@ processSwipeCardWithPINorWithoutPIN(isPin,globalCardProcessedModel)
                     DeviceHelper.getEMV()?.halt()
                     emvProcessHandler = emvHandler()
                     DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(), emvProcessHandler)
+                    DeviceHelper.getEMV()?.switchDebug(2) //emvLogLevel -> 2
                 }
             }
 
@@ -625,6 +626,7 @@ processSwipeCardWithPINorWithoutPIN(isPin,globalCardProcessedModel)
         emvProcessHandler = emvHandler()
         logger("2testVFEmvHandler", "" + emvProcessHandler, "e")
         DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(), emvProcessHandler)
+        DeviceHelper.getEMV()?.switchDebug(2) //emvLogLevel -> 2
     }
 
 
