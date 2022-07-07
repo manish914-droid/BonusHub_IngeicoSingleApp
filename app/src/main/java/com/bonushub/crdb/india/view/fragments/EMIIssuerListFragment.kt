@@ -45,7 +45,7 @@ import java.io.Serializable
 import java.util.*
 
 
-class EMIIssuerList : Fragment() {
+class EMIIssuerListFragment : Fragment() {
 
     /** need to use Hilt for instance initializing here..*/
     private val remoteService: RemoteService = RemoteService()
@@ -106,10 +106,6 @@ class EMIIssuerList : Fragment() {
     private var selectedTenure: String? = null
     // private var brandEMISelectedData: BrandEMIDataTable? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -124,6 +120,10 @@ class EMIIssuerList : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mobileNumberOnOff = !TextUtils.isEmpty(mobileNumber)
         enquiryAmount=((enquiryAmtStr.toFloat()) * 100).toLong()
+
+        // below selection is by default as firstly we have to show the COMPARE BANK option
+        binding?.compareByBankCV?.setBackgroundResource(R.drawable.edge_brand_selected)
+        binding?.compareByTenureCV?.setBackgroundResource(R.drawable.edge_brand_unselected)
 
        //emiCatalogueImageList = arguments?.getSerializable("imagesData") as MutableMap<String, Uri>
         setUpRecyclerViews()
@@ -166,7 +166,7 @@ class EMIIssuerList : Fragment() {
             emiissuerListViewModel.getIssuerListData(field57RequestData)
         }
         emiissuerListViewModel.emiIssuerListLivedata.observe(viewLifecycleOwner) {
-            (activity as IDialog).hideProgress()
+        //    (activity as IDialog).hideProgress()
             when (val genericResp = it) {
                 is GenericResponse.Success -> {
                     println(Gson().toJson(genericResp.data))
@@ -191,14 +191,14 @@ class EMIIssuerList : Fragment() {
                 }
             }
         }
-        emiissuerListViewModel.emiIssuerTenureListLiveData.observe(viewLifecycleOwner, {
+        emiissuerListViewModel.emiIssuerTenureListLiveData.observe(viewLifecycleOwner) {
             when (val genericResp = it) {
                 is GenericResponse.Success -> {
                     println(Gson().toJson(genericResp.data))
 
                     Log.d("genericResp.data:- ", genericResp.data.toString())
-                    allIssuerTenureList= genericResp.data as MutableList<TenureBankModal>
-                    Log.d("allIssuerTenureList:- ",allIssuerTenureList.toString())
+                    allIssuerTenureList = genericResp.data as MutableList<TenureBankModal>
+                    Log.d("allIssuerTenureList:- ", allIssuerTenureList.toString())
                     if (allIssuerBankList.isNotEmpty() && allIssuerTenureList.isNotEmpty()) {
                         lifecycleScope.launch(Dispatchers.IO) {
                             AppPreference.setLongData(
@@ -219,6 +219,7 @@ class EMIIssuerList : Fragment() {
 
                                 //region===============Below Code will Execute EveryTime Merchant Came to This Screen:-
                                 compareByBankSelectEventMethod()
+                                (activity as IDialog).hideProgress()
                                 setUpRecyclerViews()
                                 //endregion
                             }
@@ -226,13 +227,13 @@ class EMIIssuerList : Fragment() {
                     }
                 }
                 is GenericResponse.Error -> {
-
+                    iDialog?.hideProgress()
                 }
                 is GenericResponse.Loading -> {
 
                 }
             }
-        })
+        }
         binding?.headingText?.text = getString(R.string.calculate_and_compare_emi_offers)
 
         //region=================Select All CheckBox OnClick Event:-
@@ -259,13 +260,16 @@ class EMIIssuerList : Fragment() {
 
         //region==============OnClick event of Compare By Tenure CardView:-
         binding?.compareByTenure?.setOnClickListener {
-
+            binding?.compareByTenureCV?.setBackgroundResource(R.drawable.edge_brand_selected)
+            binding?.compareByBankCV?.setBackgroundResource(R.drawable.edge_brand_unselected)
             compareByTenureSelectEventMethod()
         }
         //endregion
 
         // region==============OnClick event of Compare By Bank CardView:-
         binding?.compareByBank?.setOnClickListener {
+            binding?.compareByBankCV?.setBackgroundResource(R.drawable.edge_brand_selected)
+            binding?.compareByTenureCV?.setBackgroundResource(R.drawable.edge_brand_unselected)
             compareByBankSelectEventMethod()
         }
         //endregion
@@ -294,6 +298,7 @@ class EMIIssuerList : Fragment() {
             itemAnimator = DefaultItemAnimator()
             adapter = issuerListAdapter
         }
+      //  (activity as IDialog).hideProgress()
         //endregion
     }
     //endregion
@@ -491,15 +496,14 @@ class IssuerListAdapter(
         //If Condition to check whether we have got EMI catalogue Data from File which we save after Settlement Success, Image Data from Host:-
         if (emiCatalogueImagesMap?.isNotEmpty() == true && emiCatalogueImagesMap?.containsKey(modal.issuerID) == true) {
             val imageUri: Uri? = emiCatalogueImagesMap?.get(modal.issuerID)
-            val bitmap =
-                MediaStore.Images.Media.getBitmap(HDFCApplication.appContext.contentResolver, imageUri)
+            val bitmap = MediaStore.Images.Media.getBitmap(HDFCApplication.appContext.contentResolver, imageUri)
             if (bitmap != null) {
                 holder.viewBinding.issuerBankLogo.setImageBitmap(bitmap)
             }
         }
         //Else Condition to Read Images From Drawable and Show:-
         else {
-            val resource: Int? = when (modal.issuerBankName?.toLowerCase(Locale.ROOT)?.trim()) {
+            val resource: Int? = when (modal.issuerBankName?.lowercase(Locale.ROOT)?.trim()) {
                 "hdfc bank cc" -> R.drawable.hdfc_issuer_icon
                 "hdfc bank dc" -> R.drawable.hdfc_dc_issuer_icon
                 "sbi card" -> R.drawable.sbi_issuer_icon
@@ -511,6 +515,7 @@ class IssuerListAdapter(
                 "scb" -> R.drawable.scb_issuer_icon
                 "axis" -> R.drawable.axis_issuer_icon
                 "indusind" -> R.drawable.indusind_issuer_icon
+                "amex" ->  R.drawable.amex_issuer_icon // to change when backend issue fixed
                 else -> null
             }
             if (resource != null) {

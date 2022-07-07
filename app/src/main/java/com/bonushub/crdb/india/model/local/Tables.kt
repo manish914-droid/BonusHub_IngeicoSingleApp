@@ -627,7 +627,7 @@ data class TerminalParameterTable(
 
     @field:BHFieldParseIndex(18)
     @field:BHFieldName("Tip Processing")
-
+@field:BHDashboardItem(EDashboardItem.SALE_TIP)
     var tipProcessing: String = "",
 
     @field:BHFieldParseIndex(19)

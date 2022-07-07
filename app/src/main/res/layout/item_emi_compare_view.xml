@@ -30,7 +30,7 @@
                 <FrameLayout
                     android:id="@+id/frame_banks"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/pad_60"
+                    android:layout_height="@dimen/pad_50"
                     android:layout_margin="@dimen/pad_2"
                     android:background="@drawable/edge_gray_bg_white"
                     android:orientation="horizontal">
@@ -38,7 +38,7 @@
                     <TextView
                         android:id="@+id/topHeaderBT"
 
-                        android:layout_width="120dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:clickable="false"
@@ -52,8 +52,8 @@
 
                     <ImageView
                         android:id="@+id/issuerDeleteIV"
-                        android:layout_width="@dimen/pad_16"
-                        android:layout_height="@dimen/pad_16"
+                        android:layout_width="@dimen/pad_20"
+                        android:layout_height="@dimen/pad_20"
                         android:layout_gravity="end"
                         android:layout_margin="5dp"
                         android:clickable="false"

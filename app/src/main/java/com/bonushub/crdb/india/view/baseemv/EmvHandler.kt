@@ -112,6 +112,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
                         override fun onTimeout() {
                             println("=> onTimeout")
+                            cardProcessedDataModal.setReadCardType(DetectCardType.TIMEOUT)
+                           // onEndProcess()
                         }
 
                         override fun onError(code: Int, message: String) {
@@ -786,7 +788,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         }
         else {
             System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
-
+            System.out.println(transData?.cvm?.let { EMVInfoUtil.getCVMDesc(it) })
             if (transData != null) {
                getFlowTypeDesc(transData.flowType,result, transData)
             }
@@ -826,6 +828,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
     private fun getFlowTypeDesc(flowType: Byte, result: Int, transData: TransData) {
         val desc: String
+       Log.e("getFlow",transData.cvm.toString())
         when (flowType) {
             FlowType.EMV_FLOWTYPE_EMV.toByte() -> {
                 if(this::testCompleteSecondGenAc.isInitialized){
@@ -1398,8 +1401,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
        // val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
         // cardProcessedDataModal.setEncryptedPan(encrptedPan)
 
-
-
+record?.pan?.byteArr2HexStr()
+       // settingCAPkeys(emv)
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
 

@@ -195,16 +195,17 @@ class EMICompareAdapter(
         holder.viewBinding.cashbackAmount.text = "%.2f".format((((modal.cashBackAmount).toDouble()).div(100)).toString().toDouble())
         holder.viewBinding.netCost.text =  "%.2f".format((((modal.netPay).toDouble()).div(100)).toString().toDouble())
         holder.viewBinding.additionalOffer.text = ""
-        holder.viewBinding.issuerDeleteIV.setOnClickListener { cb(position) }
+      holder.viewBinding.issuerDeleteIV.setOnClickListener { cb(holder.adapterPosition) }
     }
 
     override fun getItemCount(): Int = compareDataList.size
 
     inner class EMICompareViewHolder(var viewBinding: ItemEmiCompareViewBinding) :
+
         RecyclerView.ViewHolder(viewBinding.root) {
-        init {
-          //  viewBinding.issuerDeleteIV.setOnClickListener { cb(absoluteAdapterPosition) }
-        }
+          /*  init {
+                viewBinding.issuerDeleteIV.setOnClickListener { cb(abd) }
+            }*/
     }
 
     //region==========================Below Method is used to refresh Adapter New Data after Delete Cell:-

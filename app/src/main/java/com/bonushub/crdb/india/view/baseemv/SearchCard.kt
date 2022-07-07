@@ -63,7 +63,7 @@ class SearchCard (val cardProcessedDataModal: CardProcessedDataModal,val cardOpt
 
                     override fun onTimeout() {
                         println("=> onTimeout")
-                        DetectCardType.TIMEOUT
+                     //   DetectCardType.TIMEOUT
                         cardProcessedDataModal.setReadCardType(DetectCardType.TIMEOUT)
                         searchCardCb(cardProcessedDataModal)
                     }

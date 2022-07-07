@@ -16,6 +16,7 @@ import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.usdk.apiservice.aidl.emv.*
+import com.usdk.apiservice.aidl.emv.EMVTag.*
 
 /**
  * Author Lucky Rajput
@@ -60,6 +61,7 @@ fun settingAids(emv: UEMV?) {
  * settingCAPkeys(emv: UEMV?) used for setting the CAP keys
  * for ODA
  */
+
  fun settingCAPkeys(emv: UEMV?) {
      if(emv?.setEMVProcessOptimization(true) == true) {
          emv.manageCAPubKey(ActionFlag.CLEAR, null)
@@ -478,6 +480,10 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
     println("=> onFinalSelect | " + EMVInfoUtil.getFinalSelectDesc(finalData))
     val datetime: String = DeviceHelper.getCurentDateTime()
     val splitStr = datetime.split("\\s+".toRegex()).toTypedArray()
+   val txnDate=splitStr[0]
+    val txnTime=splitStr[1]
+
+
     val txnAmount = addPad(cardProcessedDataModal.getTransactionAmount().toString(), "0", 12, true)
    val otherAmount= addPad(cardProcessedDataModal.getOtherAmount().toString(), "0", 12, true)
 
@@ -523,11 +529,11 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("9F1A020356")
                 .append("5F2A020356")
                 .append("9F09020001")
-                .append("9C0100")
-                .append("9F0206").append(txnAmount) //Txn Amount
-                .append("9F0306000000000000")
-                .append("9A03").append(splitStr[0])   //Txn Date - M
-                .append("9F2103").append(splitStr[1]) //Txn Time - M
+              //  .append("9C0100")
+             //   .append("9F0206").append(txnAmount) //Txn Amount
+            //    .append("9F0306000000000000")
+             //   .append("9A03").append(splitStr[0])   //Txn Date - M
+             //   .append("9F2103").append(splitStr[1]) //Txn Time - M
                 .append("9F410400000001")
                 .append("DF918111050000000000") // Terminal action code(decline)
                 .append("DF918112050000000000") // Terminal action code(online)
@@ -562,21 +568,31 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F660436004000")
                 .append("DF06027C00")
-                .append("DF812406000000100000")
+
+           //     .append("DF812406000000020000") //Terminal Contactless Transaction Limit
+            //    .append("DF812606000000010000") // Terminal CVM Required Limit
+
+              //  .append("DF812406000000100000")
                 .append("DF812306000000100000")
-                .append("DF812606000000100000")
+              //  .append("DF812606000000100000")
                 .append("DF918165050100000000")
                 .append("DF040102")
                     //cvmvalue-->"000000001000"  "DF2106${cvmVal}"
                     //ctclsvalue-->009999999999  "DF2006${ctlsVal}"
-                .append("DF2006").append("009999999999")
-                .append("DF2106").append("000000001000")
+              //  .append("DF2006").append("009999999999")
+             //   .append("DF2106").append("000000001000")
                 .append("DF810602C000")
                 .append("DF9181040100").toString()
 
+
+            val cvmTransLimit="000000030000"
+            val limitCvm="000000010000"
+
+            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.V_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
+            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.V_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
+
         }
         KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
-
 
             tlvList = StringBuilder()
                 .append("9F350122")
@@ -602,7 +618,7 @@ Log.e("TLV LIST --> ",tlvList)
                 //  .append("DF812406000000030000") //Terminal Contactless Transaction Limit --> working
                 .append("DF812506000000010000")
                 //    .append("DF812606000000010000")// Terminal CVM Required Limit
-                .append("DF812306000000000100")// //Terminal Contactless Floor Limit
+                .append("DF812306000000000000")// //Terminal Contactless Floor Limit
 
                 .append("DF9182050160")
                 .append("DF9182060160")
@@ -611,44 +627,53 @@ Log.e("TLV LIST --> ",tlvList)
 
 
             val limitCvm="000000010000"
-            val ctlsTransLimit="000000030000"
+            val cvmTransLimit="000000030000"
 
-            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT,ctlsTransLimit)//DF8124
-           //  emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
+            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
+              emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
 
             //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.R_TAG_TM_CVM_LIMIT,limitCvm)// DF48
             //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.DEF_TAG_J_CVM_LIMIT,limitCvm)//DF918403
             //  M_TAG_TM_FLOOR_LIMIT
-           // emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,limitCvm)//DF8125
+        //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,limitCvm)//DF8125
         }
 
         KernelID.RUPAY.toByte() , KernelID.DISCOVER.toByte()-> {
-     /*       tlvList = StringBuilder()
+            tlvList = StringBuilder()
+               // .append("9F0206000000000100")
+                .append("9F3303E06840")
+                .append("DF4C06000000015000")
+                .append("DF812406000000015000")
+                .append("DF8142011E")
                 .append("9F350122")
-                .append("9F3303E0F8C8")
-                .append("9F40056000F0A001")
-                .append("9A03171020")
-                .append("9F2103150512")
-
+                .append("9F4005F040F0B001")
                 .append("9F1A020156")
                 .append("5F2A020156")
+                .append("9F09020002")
+                .append("9C0100")
+                .append("9A03171020")
+                .append("9F2103150512")
+                .append("9F410400001234")
+                .append("9F1B0400002710")
+                .append("DF918111050410000000")
+                .append("DF918112059060009000")
+                .append("DF918110059040008000")
+                .append("DF814002002C")
+                .append("DF16020015")
+                .append("DF3A050040000000")
+                .append("DF4D06000000010000")
+            //    .append("DF812406000000020000")//Trans Limit
+                .append("DF812606000000010000")//Terminal CVM Required Limit
 
-                .append("DF918111050000000000")
-                .append("DF91811205FFFFFFFFFF")
-                .append("DF91811005FFFFFFFFFF")
-                .append("DF9182010102")
-                .append("DF9182020100")
-                .append("DF9181150100")
-                .append("DF9182040100")
-                .append("DF812406000000010000")
-                .append("DF812506000000010000")
-                .append("DF812606000000010000")
-                .append("DF812306000000010000")
-                .append("DF9182050160")
-                .append("DF9182060160")
-                .append("DF9182070120")
-                .append("DF9182080120").toString()*/
-            tlvList=    "9F3303E0F8C8" + // terminal capability
+                .append("DF812306000000008000")
+                .append("DF9181050100")
+                .append("DF9181020100").toString()
+
+
+
+         /*
+         ========= VERIFONE ====
+         tlvList=    "9F3303E0F8C8" + // terminal capability
                     "97099F02065F2A029A0390" +
                     "9F40056F00F0F001" + //additional terminal capability
                     "9f0607A0000005241010" +
@@ -672,7 +697,7 @@ Log.e("TLV LIST --> ",tlvList)
                     "DF1105D84004A800" +
                     "DF0406000000000000" +
                     "DF1906000000000000" +
-                    "DF13050010000000"
+                    "DF13050010000000"*/
 
         }
        // KernelID.DISCOVER.toByte() -> {}
@@ -680,50 +705,41 @@ Log.e("TLV LIST --> ",tlvList)
         else -> {}
     }
 
-
-
     val tag9CData: String // Txn Type
     val tag9f02Data:String //Txn Amount
     val tag9f03Data:String //Other Amount
-    /*  .append("9F0206").append(txnAmount)
-        .append("9F0306").append(otherAmount) */
+
 
     when(cardProcessedDataModal.getTransType()){
 
         BhTransactionType.SALE_WITH_CASH.type->{
             tag9CData= "09"
-
             tag9f02Data=addPad((txnAmount.toLong()+otherAmount.toLong()).toString(), "0", 12, true)
             tag9f03Data=otherAmount
-
         }
         BhTransactionType.CASH_AT_POS.type->{
             tag9CData= "01"
-            // other amount =0
-            // txn amount= txnamnt
             tag9f02Data=txnAmount
             tag9f03Data=otherAmount
         }
         BhTransactionType.REFUND.type->{
             tag9CData= "20"
-            // other amt=0
             tag9f02Data=txnAmount
             tag9f03Data=otherAmount
         }
         else->{
             tag9CData= "00"
-            // other amnt=0
-            // txn amt = txnamnt
             tag9f02Data=txnAmount
             tag9f03Data=otherAmount
         }
     }
 
-    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.EMV_TAG_TM_AUTHAMNTN,tag9f02Data)
-    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.EMV_TAG_TM_OTHERAMNTN,tag9f03Data)
-    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.EMV_TAG_TM_TRANSTYPE,tag9CData)
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_AUTHAMNTN,tag9f02Data)
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_OTHERAMNTN,tag9f03Data)
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTYPE,tag9CData)
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSDATE,txnDate)
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTIME,txnTime)
 
     println(""+emv?.setTLVList(finalData.kernelID.toInt(),tlvList) +"...onFinalSelect: setTLVList")
-
     println("...onFinalSelect: respondEvent" + emv?.respondEvent(null))
 }

@@ -800,8 +800,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
             }
 
-            EDashboardItem.EMI_ENQUIRY -> {
-            }
+
             EDashboardItem.BRAND_EMI_CATALOGUE, EDashboardItem.BANK_EMI_CATALOGUE -> {
                 val amt = (data as Pair<*, *>).first.toString()
                 val brandId=(data as Pair<*, *>).second.toString()
@@ -809,7 +808,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     runBlocking(Dispatchers.IO) {
                         /// readEMICatalogueAndBannerImages()
                     }
-                transactFragment(EMIIssuerList().apply {
+                transactFragment(EMIIssuerListFragment().apply {
                     arguments = Bundle().apply {
                         putSerializable("type", action)
                         putString("proc_code", ProcessingCode.PRE_AUTH.code)
