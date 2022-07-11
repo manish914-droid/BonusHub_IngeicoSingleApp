@@ -15,6 +15,7 @@ import com.ingenico.hdfcpayment.request.*
 import com.usdk.apiservice.aidl.DeviceServiceData
 import com.usdk.apiservice.aidl.UDeviceService
 import com.usdk.apiservice.aidl.algorithm.UAlgorithm
+import com.usdk.apiservice.aidl.beeper.UBeeper
 import com.usdk.apiservice.aidl.device.DeviceInfo
 import com.usdk.apiservice.aidl.device.UDeviceManager
 import com.usdk.apiservice.aidl.emv.UEMV
@@ -58,6 +59,8 @@ object DeviceHelper   {
 
     @JvmStatic
     var vfDeviceManager: UDeviceManager? = null
+
+
 
     @JvmStatic
     var vfUEMV: UEMV? = null
@@ -321,6 +324,21 @@ object DeviceHelper   {
         return UEMV.Stub.asInterface(iBinder)
     }
 
+     @JvmStatic
+    @Throws(IllegalStateException::class)
+    fun getBeeper(): UEMV? {
+        val iBinder = object : IBinderCreator() {
+            override fun create(): IBinder {
+                Log.e("EMV INSTANCE", vfDeviceService!!.emv.toString())
+                return vfDeviceService!!.emv
+            }
+
+        }.start()
+        return UEMV.Stub.asInterface(iBinder)
+    }
+
+
+
     @JvmStatic
     @Throws(IllegalStateException::class)
     fun getAlgorithm(): UAlgorithm? {
@@ -367,6 +385,8 @@ object DeviceHelper   {
         // System.out.println("Serial no is"+getDeviceManager()!!.deviceInfo?.serialNo)
         return getDeviceManager()?.deviceInfo?.imei
     }
+
+
 
     @Throws(java.lang.IllegalStateException::class)
     fun getPrinter(): UPrinter? {

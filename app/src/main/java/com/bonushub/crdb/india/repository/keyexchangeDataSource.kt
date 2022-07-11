@@ -225,20 +225,19 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
                             //    ROCProviderV2.resetRoc(AppPreference.HDFC_BANK_CODE)
                             //    ROCProviderV2.resetRoc(AppPreference.AMEX_BANK_CODE)
 
-                            var insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
+                            val insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
                             if (insertkeys) {
                                 AppPreference.saveLogin(true)
-                                if (keWithInit) {
+                                return if (keWithInit) {
                                     val (strResult,strSucess,initList) = startInit(tid)
                                     if(strSucess == true){
-                                        return Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,initList))
-                                    }
-                                    else{
+                                        Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,initList))
+                                    } else{
                                         AppPreference.saveBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString(), true)
-                                        return Result.error(ResponseHandler(Status.ERROR,strResult ?: "",false,false),strResult ?: "")
+                                        Result.error(ResponseHandler(Status.ERROR,strResult ?: "",false,false),strResult ?: "")
                                     }
                                 } else {
-                                    return  Result.success(ResponseHandler(Status.SUCCESS,"Key Exchange Successful",false,false))
+                                    Result.success(ResponseHandler(Status.SUCCESS,"Key Exchange Successful",false,false))
                                 }
                             } else {
                                 AppPreference.saveBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString(), true)
@@ -283,6 +282,8 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
         }
         try {
             pinpadLimited = PinpadLimited(HDFCApplication.appContext, KAPId(DemoConfig.REGION_ID, DemoConfig.KAP_NUM), 0, DemoConfig.PINPAD_DEVICE_NAME)
+
+
         } catch (e: RemoteException) {
             e.printStackTrace()
         }

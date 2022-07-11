@@ -229,10 +229,10 @@ class NewInputAmountFragment : Fragment() {
 
     private fun setTptValue():TerminalParameterTable? {
         lifecycleScope.launch(Dispatchers.Main) {
-            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner,{
+            newInputAmountViewModel.fetchtptData()?.observe(viewLifecycleOwner) {
                 tpt = it
                 Log.d("tptllll===>:- ", Gson().toJson(it))
-            })
+            }
 
         }
         Log.d("tpt===>:- ", Gson().toJson(tpt))
@@ -240,14 +240,14 @@ class NewInputAmountFragment : Fragment() {
     }
     private fun observeNewInpuAmountViewModelForHdfcTpt(BhTransactionType: BhTransactionType)  {
       lifecycleScope.launch(Dispatchers.Main) {
-            newInputAmountViewModel.fetchHdfcTptData()?.observe(viewLifecycleOwner,{
+            newInputAmountViewModel.fetchHdfcTptData()?.observe(viewLifecycleOwner) {
                 hdfctpt = it
-            checkHDFCTPTFieldsBitOnOff(BhTransactionType,it)
+                checkHDFCTPTFieldsBitOnOff(BhTransactionType, it)
                 Log.d("Hdfctpt===>:- ", Gson().toJson(it))
                 Log.d("Hdfctpt===>:- ", Gson().toJson(status))
-            })
+            }
 
-        }
+      }
         Log.d("Hdfctpt===>:- ", Gson().toJson(status))
 
     }
@@ -642,6 +642,7 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             }
+
             EDashboardItem.BRAND_EMI -> {
                 when {
                     // mobile entry  optional handling

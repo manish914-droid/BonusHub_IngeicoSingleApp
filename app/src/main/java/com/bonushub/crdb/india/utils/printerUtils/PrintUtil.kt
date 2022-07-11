@@ -1514,18 +1514,16 @@ class PrintUtil(context: Context?) {
            }
            printer?.addMixStyleText(textBlockList)
            textBlockList.clear()
-           val tenureDuration = "${batchTable?.tenure} Months"
-           val tenureHeadingDuration = "${batchTable?.tenure} Months Scheme"
-           var roi = batchTable?.roi?.toInt()
-               ?.let { divideAmountBy100(it).toString() }
-           var loanamt =
-               batchTable?.loanAmt?.toInt()?.let { divideAmountBy100(it).toString() }
-           roi = "%.2f".format(roi?.toDouble()) + " %"
-           loanamt = "%.2f".format(loanamt?.toDouble())
+           val tenureDuration = "${batchTable.tenure} Months"
+           val tenureHeadingDuration = "${batchTable.tenure} Months Scheme"
+           var roi = batchTable.roi.toInt().let { divideAmountBy100(it).toString() }
+           var loanamt = batchTable.loanAmt.toInt().let { divideAmountBy100(it).toString() }
+           roi = "%.2f".format(roi.toDouble()) + " %"
+           loanamt = "%.2f".format(loanamt.toDouble())
            textBlockList.add(sigleLineformat("ROI(pa)", AlignMode.LEFT))
            textBlockList.add(
                sigleLineformat(
-                   "$roi",
+                   roi,
                    AlignMode.RIGHT
                )
            )
@@ -1537,10 +1535,10 @@ class PrintUtil(context: Context?) {
            printer?.addMixStyleText(textBlockList)
            textBlockList.clear()
            //region===============Processing Fee Changes And Showing On ChargeSlip:-
-           if (!TextUtils.isEmpty(batchTable?.processingFee)) {
-               if ((batchTable?.processingFee) != "0") {
+           if (!TextUtils.isEmpty(batchTable.processingFee)) {
+               if ((batchTable.processingFee) != "0") {
                    val procFee = "%.2f".format(
-                       (((batchTable?.processingFee)?.toDouble())?.div(100)).toString()
+                       (((batchTable.processingFee)?.toDouble())?.div(100)).toString()
                            .toDouble()
                    )
                    textBlockList.add(sigleLineformat("PROC-FEE", AlignMode.LEFT))

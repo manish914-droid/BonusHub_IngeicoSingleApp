@@ -53,52 +53,6 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
         iTestEmiItemClick = this
         testEmiItem = mutableListOf()
-       // linked tid logic
-        /* //val tpt=Field48ResponseTimestamp.getTptData() // old
-        val tpt=Field48ResponseTimestamp.getAllTptData()
-       // val linkedTid:ArrayList<String> =tpt?.LinkTidType as ArrayList<String> // old
-        val linkedTid = ArrayList<String>()
-
-        for(item in tpt)
-        {
-            if(!item?.LinkTidType.equals("-1")) {
-                linkedTid.add(item?.LinkTidType ?: "")
-            }
-        }
-
-        for (tid in linkedTid){
-            when(tid){
-             "0"->{
-                 // for Amex
-
-             }
-                "1"->{
-                    // DC type
-                    testEmiItem.add(TestEmiItem.BASE_TID)
-                }
-                "2"->{
-                    // off us Tid
-                    testEmiItem.add(TestEmiItem.OFFUS_TID)
-                }
-                "3"->{
-                    // 3 months onus
-                    testEmiItem.add(TestEmiItem._3_M_TID)
-                }
-                "6"->{
-                    // 6 months onus
-                    testEmiItem.add(TestEmiItem._6_M_TID)
-                }
-                "9"->{
-                    // 9 months onus
-                    testEmiItem.add(TestEmiItem._9_M_TID)
-                }
-                "12"->{
-                    // 12 months onus
-                    testEmiItem.add(TestEmiItem._12_M_TID)
-                }
-
-            }
-        }*/
 
         testEmiItem.addAll(TestEmiItem.values())
         val sortedList = testEmiItem.sortedWith(compareBy { it.id.toInt() })
@@ -107,8 +61,6 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
         setupRecyclerview()
 
     }
-
-
 
     private fun setupRecyclerview(){
         lifecycleScope.launch(Dispatchers.Main) {
@@ -122,41 +74,6 @@ class TestEmiFragment : Fragment(), ITestEmiItemClick {
 
     override fun testEmiItemClick(testEmiItem: TestEmiItem) {
 
-/*
-var testEmiOption="0"
-
-        when(testEmiItem){
-            TestEmiItem.BASE_TID ->{
-                testEmiOption=TestEmiItem.BASE_TID.id
-                logger("BASE_TID","click")
-            }
-
-            TestEmiItem.OFFUS_TID ->{
-                testEmiOption=TestEmiItem.OFFUS_TID.id
-                logger("OFFUS_TID","click")
-            }
-
-            TestEmiItem._3_M_TID ->{
-                testEmiOption=TestEmiItem._3_M_TID.id
-                logger("_3_M_TID","click")
-            }
-
-            TestEmiItem._6_M_TID ->{
-                testEmiOption=TestEmiItem._6_M_TID.id
-                logger("_6_M_TID","click")
-            }
-
-            TestEmiItem._9_M_TID ->{
-                testEmiOption=TestEmiItem._9_M_TID.id
-                logger("_9_M_TID","click")
-            }
-
-            TestEmiItem._12_M_TID ->{
-                testEmiOption=TestEmiItem._12_M_TID.id
-                logger("_12_M_TID","click")
-            }
-        }*/
-
         (activity as NavigationActivity).transactFragment(NewInputAmountFragment().apply {
             arguments = Bundle().apply {
                 putSerializable("type", EDashboardItem.TEST_EMI)
@@ -167,6 +84,7 @@ var testEmiOption="0"
 
 
     }
+
 }
 
 interface ITestEmiItemClick{

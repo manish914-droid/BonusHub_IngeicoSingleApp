@@ -830,7 +830,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
     fun startTransactionActivityForEmi(eDashBoardItem: EDashboardItem, amt:String, mobileNum:String="", billNum:String="", imeiOrSerialNum:String="", brandEmiSubCatData: BrandEMISubCategoryTable?=null, brandEmiCat: BrandEMISubCategoryTable?=null,
                                        brandEmiProductData: BrandEMIProductDataModal?=null,
-                                       brandDataMaster: BrandEMIMasterDataModal?=null, testEmiTxnType: String=""){
+                                       brandDataMaster: BrandEMIMasterDataModal?=null, testEmiTxnType: String="0"){
         val intent = Intent (this, TransactionActivity::class.java)
         intent.putExtra("mobileNumber", mobileNum)
         intent.putExtra("billNumber", billNum)
@@ -841,6 +841,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         intent.putExtra("brandEmiProductData", brandEmiProductData)
         intent.putExtra("brandDataMaster", brandDataMaster)
         intent.putExtra("edashboardItem", eDashBoardItem)
+        intent.putExtra("TestEmiOption", testEmiTxnType)
         var txnType= BhTransactionType.NONE.type
         if(eDashBoardItem== EDashboardItem.BRAND_EMI){
             txnType=   BhTransactionType.BRAND_EMI.type
@@ -879,13 +880,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
     }
 
     override  fun onDashBoardItemClick(action: EDashboardItem) {
-
         isDashboardOpen = false
-
         when (action) {
-            EDashboardItem.SALE, EDashboardItem.BANK_EMI, EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE, EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
+            EDashboardItem.SALE, EDashboardItem.BANK_EMI,
+            EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE,
+            EDashboardItem.PREAUTH, EDashboardItem.REFUND -> {
                 if (checkInternetConnection()) {
                     CoroutineScope(Dispatchers.Main).launch {
+                    //    DeviceHelper.iBeeper?.startBeep(2000)
                         inflateInputFragment(NewInputAmountFragment(), SubHeaderTitle.SALE_SUBHEADER_VALUE.title,action)
                     }
                 } else {
@@ -910,6 +912,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
 
             }
+
             EDashboardItem.EMI_ENQUIRY -> {
                 if (Field48ResponseTimestamp.checkInternetConnection()) {
                     CoroutineScope(Dispatchers.IO).launch{
@@ -929,6 +932,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                 }
             }
+
             EDashboardItem.BRAND_EMI->{
                 if (checkInternetConnection()) {
                    /* CoroutineScope(Dispatchers.IO).launch{
@@ -951,6 +955,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                 }
             }
+
             EDashboardItem.VOID_SALE->{
                 /*CoroutineScope(Dispatchers.IO).launch{
                     val listofTids = withContext(Dispatchers.IO) { checkBaseTid(appDao) }
@@ -978,6 +983,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                          )*/
 
             }
+
             EDashboardItem.PRE_AUTH_CATAGORY -> {
 
                 if (!action.childList.isNullOrEmpty()) {
@@ -1028,6 +1034,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     }
                 })
             }
+
             EDashboardItem.VOID_PREAUTH->{
               /*  lifecycleScope.launch(Dispatchers.IO) {
                     appDao.deletePendingSyncTransactionTable()
@@ -1045,6 +1052,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                 }
             }
+
             EDashboardItem.PENDING_PREAUTH ->{
 
                 transactFragment(PreAuthPendingFragment(),true)
@@ -1064,6 +1072,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                 }*/
             }
+
             EDashboardItem.MERCHANT_REFERRAL->{
                 /*   transactFragment(BrandEmiMasterCategoryFragment().apply {
                        arguments = Bundle().apply {
@@ -1076,6 +1085,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                    })*/
 
             }
+
             EDashboardItem.DIGI_POS -> {
                 /* if (!AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString()) &&
              !AppPreference.getBoolean(PrefConstant.INSERT_PPK_DPK.keyName.toString()) &&
@@ -1116,10 +1126,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
             }
-            else->{
 
-
-            }
+            else->{}
 
         }
     }
