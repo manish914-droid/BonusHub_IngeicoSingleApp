@@ -543,7 +543,7 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
 
                 .append("DF812406000000010000") //Terminal Contactless Transaction Limit
-                .append("DF812606000000000000") // Terminal CVM Required Limit
+                .append("DF812606000000000500") // Terminal CVM Required Limit
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
                 .append("DF81300100")            //Try Again Flag
                 .toString()

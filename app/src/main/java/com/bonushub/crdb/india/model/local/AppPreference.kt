@@ -25,7 +25,7 @@ object AppPreference {
     private val TAG = AppPreference::class.java.simpleName
     const val PC_NUMBER_KEY = "pc_number_key"
     const val PC_NUMBER_KEY_2 = "pc_number_key_2"
-    const val AMEX_BANK_CODE = "07"
+    const val AMEX_BANK_CODE = "02"
     const val ROC_V2 = "roc_tan_v2"
     const val WALLET_ISSUER_ID = "50"
     private val preferenceName = "HDFCPreference"
@@ -35,7 +35,7 @@ object AppPreference {
     const val REVERSAL_DATA = "reversal_data"
     const val BANK_CODE_KEY = "bank_code_key"
 
-    const val BANKCODE = "01" //For testing
+    const val BANKCODE = "02" //For testing
     const val F48_STAMP = "f48timestamp"
     const val ACC_SEL_KEY = "acc_sel_key"
  /*   const val PC_NUMBER_KEY = "pc_number_key"

@@ -1473,8 +1473,18 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
        // val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
         // cardProcessedDataModal.setEncryptedPan(encrptedPan)
 
-record?.pan?.byteArr2HexStr()
+
+        val tvDynamicLimit = emv!!.getTLV(Integer.toHexString(0x9F70))  // card Type TAG
+        if (null != tvDynamicLimit && !(tvDynamicLimit.isEmpty())) {
+            println("Dynamic Limit  Type ---> " + tvDynamicLimit)
+           //cardProcessedDataModal.setcardLabel(hexString2String(tvDynamicLimit))
+        }
+
+       record?.pan?.byteArr2HexStr()
        // settingCAPkeys(emv)
+
+
+
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
 
