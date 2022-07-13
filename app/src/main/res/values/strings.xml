@@ -366,5 +366,6 @@
     <string name="no_RESPONSE">No Response</string>
     <string name="please_select_app">Please select app</string>
     <string name="emv_declined">EMV Declined</string>
+    <string name="see_Phone">See Phone</string>
 
 </resources>

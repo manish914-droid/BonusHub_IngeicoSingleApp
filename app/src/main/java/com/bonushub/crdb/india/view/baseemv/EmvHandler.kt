@@ -80,50 +80,117 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     override fun onWaitCard(flag: Int) {
     Log.e("VFEmvHandler","onWaitCard  --->   $flag")
        // WaitCardFlag.EXECUTE_CDCVM
-        defaultScope.launch {
-            println("Searching card...")
-            try {
-                val cardOption = CardOption.create().apply {
-                    supportICCard(true)
-                    supportMagCard(true)
-                    supportRFCard(true)
+
+        when (flag) {
+            WaitCardFlag.NORMAL -> {
+                defaultScope.launch {
+                    println("Searching card...")
+                    try {
+                        val cardOption = CardOption.create().apply {
+                            supportICCard(true)
+                            supportMagCard(true)
+                            supportRFCard(true)
+                        }
+                        DeviceHelper.getEMV()?.searchCard(
+                            cardOption.toBundle(),
+                            DemoConfigs.TIMEOUT,
+                            object : SearchCardListener.Stub() {
+                                override fun onCardPass(cardType: Int) {
+                                    println("=> onCardPass | cardType = $cardType")
+                                    cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+                                    // transactionCallback(cardProcessedDataModal)
+                                    emv?.respondCard()
+                                }
+
+                                override fun onCardInsert() {
+                                    println("=> onCardInsert")
+                                    cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
+                                    //  transactionCallback(cardProcessedDataModal)
+
+                                }
+
+                                override fun onCardSwiped(track: Bundle) {
+
+                                }
+
+                                override fun onTimeout() {
+                                    println("=> onTimeout")
+                                    cardProcessedDataModal.setReadCardType(DetectCardType.TIMEOUT)
+                                    // onEndProcess()
+                                }
+
+                                override fun onError(code: Int, message: String) {
+                                    println("Code: $code")
+                                    println("message: $message")
+                                    println(String.format("=> onError | %s[0x%02X]", message, code))
+                                }
+                            })
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-                DeviceHelper.getEMV()?.searchCard(
-                    cardOption.toBundle(),
-                    DemoConfigs.TIMEOUT,
-                    object : SearchCardListener.Stub() {
-                        override fun onCardPass(cardType: Int) {
-                            println("=> onCardPass | cardType = $cardType")
-                            cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
-                            // transactionCallback(cardProcessedDataModal)
-                            emv?.respondCard()
-                        }
+            }
 
-                        override fun onCardInsert() {
-                            println("=> onCardInsert")
-                            cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
-                            //  transactionCallback(cardProcessedDataModal)
+            WaitCardFlag.EXECUTE_CDCVM -> {
+                defaultScope.launch(Dispatchers.Main) {
+                    (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                        activity?.getString(R.string.see_Phone),
+                        "Execute CDCVM",
+                        R.drawable.ic_txn_declined,
+                        activity?.getString(R.string.positive_button_ok),
+                        "", false, false,
+                        { alertPositiveCallback ->
+                            if (alertPositiveCallback) {
+                                try {
+                                    val cardOption = CardOption.create().apply {
+                                        supportICCard(true)
+                                        supportMagCard(true)
+                                        supportRFCard(true)
+                                    }
+                                    DeviceHelper.getEMV()?.searchCard(
+                                        cardOption.toBundle(),
+                                        DemoConfigs.TIMEOUT,
+                                        object : SearchCardListener.Stub() {
+                                            override fun onCardPass(cardType: Int) {
+                                                println("=> onCardPass | cardType = $cardType")
+                                                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+                                                // transactionCallback(cardProcessedDataModal)
+                                                emv?.respondCard()
+                                            }
 
-                        }
+                                            override fun onCardInsert() {
+                                                println("=> onCardInsert")
+                                                cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
+                                                //  transactionCallback(cardProcessedDataModal)
 
-                        override fun onCardSwiped(track: Bundle) {
+                                            }
 
-                        }
+                                            override fun onCardSwiped(track: Bundle) {
 
-                        override fun onTimeout() {
-                            println("=> onTimeout")
-                            cardProcessedDataModal.setReadCardType(DetectCardType.TIMEOUT)
-                           // onEndProcess()
-                        }
+                                            }
 
-                        override fun onError(code: Int, message: String) {
-                            println("Code: $code")
-                            println("message: $message")
-                            println(String.format("=> onError | %s[0x%02X]", message, code))
-                        }
-                    })
-            } catch (e: Exception) {
-                e.printStackTrace()
+                                            override fun onTimeout() {
+                                                println("=> onTimeout")
+                                                cardProcessedDataModal.setReadCardType(DetectCardType.TIMEOUT)
+                                                // onEndProcess()
+                                            }
+
+                                            override fun onError(code: Int, message: String) {
+                                                println("Code: $code")
+                                                println("message: $message")
+                                                println(String.format("=> onError | %s[0x%02X]", message, code))
+                                            }
+                                        })
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        },
+                        {})
+
+                }
+
+
             }
         }
 
@@ -1053,6 +1120,11 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
                 cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
 
+             /*   val tagDF46 = emv!!.getTLV(Integer.toHexString(0xDF46))
+                val tagDf46Str = hexString2String(tagDF46)
+                val track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
+                println("Field D46 data is"+track2data)*/
+
                 val track2data = emv!!.getTLV(Integer.toHexString(0x57))
                 val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
                 println("Field 57 data is"+field57)
@@ -1062,8 +1134,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 val field55: String = getFields55()
                 println("Field 55 is $field55")
 
-                cardProcessedDataModal.setField55(field55)
-                vfEmvHandlerCallback(cardProcessedDataModal)
+               cardProcessedDataModal.setField55(field55)
+               vfEmvHandlerCallback(cardProcessedDataModal)
             }
         }
         //return desc + String.format("[0x%02X]", flowType)

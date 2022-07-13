@@ -522,7 +522,8 @@ Log.e("TLV LIST --> ",tlvList)
         }
         KernelID.AMEX.toByte() -> {
             tlvList = StringBuilder()
-                .append("9F6604A6004000") ///terminal transaction attribute 86004000  // "9F660426000080 //TTQ
+             //   .append("9F6604A6004000") ///terminal transaction attribute 86004000  // "9F660426000080 //TTQ
+               // .append("DF812304A6004000")
                 .append("9F350122")
                 .append("9F3303E0E8C8")
                 .append("9F40056000F0B001")
