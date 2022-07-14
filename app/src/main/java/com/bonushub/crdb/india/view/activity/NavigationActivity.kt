@@ -62,6 +62,7 @@ import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
 import com.bonushub.crdb.india.vxutils.*
 import com.bonushub.pax.utils.*
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.response.OperationResult
@@ -212,11 +213,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 transactFragment(BankFunctionsAdminVasFragment())
 
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@NavigationActivity,
                     R.string.invalid_password,
                     Toast.LENGTH_LONG
-                ).show()
+                ).show()*/
+
+                val edtTextPassword = dialogAdminPassword?.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
+                edtTextPassword.setError(getString(R.string.invalid_password))
             }
         }
 

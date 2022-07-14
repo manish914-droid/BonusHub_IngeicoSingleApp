@@ -31,6 +31,7 @@ import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.crdb.india.vxutils.checkBaseTid
 import com.bonushub.crdb.india.vxutils.checkInitializationStatus
 import com.bonushub.pax.utils.KeyExchanger
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -200,10 +201,14 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
 
                                     } else {
-                                        ToastUtils.showToast(
+                                        /*ToastUtils.showToast(
                                             requireContext(),
                                             R.string.invalid_password
-                                        )
+                                        )*/
+
+
+                                        val edtTextPassword = dialog?.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
+                                        edtTextPassword.setError(getString(R.string.invalid_password))
                                     }
                                 }
 
@@ -427,10 +432,13 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                     else -> {}
                                 }
                             } else {
-                                ToastUtils.showToast(
+                                /*ToastUtils.showToast(
                                     requireContext(),
                                     R.string.invalid_password
-                                )
+                                )*/
+
+                                val edtTextPassword = dialog?.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
+                                edtTextPassword.setError(getString(R.string.invalid_password))
                             }
                         }
 

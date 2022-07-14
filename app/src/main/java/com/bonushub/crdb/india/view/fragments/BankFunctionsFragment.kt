@@ -20,6 +20,7 @@ import com.bonushub.crdb.india.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BankFunctionsAdapter
 import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
+import com.google.android.material.textfield.TextInputEditText
 import com.ingenico.hdfcpayment.listener.OnOperationListener
 import com.ingenico.hdfcpayment.response.OperationResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -112,18 +113,20 @@ class BankFunctionsFragment : Fragment(), IBankFunctionItemClick {
 
             dialogSuperAdminPassword = dialog
 
-            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner, {
+            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner) {
 
-                    if (it) {
-                        dialogSuperAdminPassword?.dismiss()
-                        (activity as NavigationActivity).transactFragment(
-                            BankFunctionsAdminVasFragment(),
-                            true
-                        )
-                    } else {
-                        ToastUtils.showToast(requireContext(), R.string.invalid_password)
-                    }
-                })
+                if (it) {
+                    dialogSuperAdminPassword?.dismiss()
+                    (activity as NavigationActivity).transactFragment(
+                        BankFunctionsAdminVasFragment(),
+                        true
+                    )
+                } else {
+                    //ToastUtils.showToast(requireContext(), R.string.invalid_password)
+                    val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
+                    edtTextPassword.setError(getString(R.string.invalid_password))
+                }
+            }
 
         }
 

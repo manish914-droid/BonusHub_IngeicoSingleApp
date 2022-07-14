@@ -29,6 +29,7 @@ import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.india.viewmodel.BatchFileViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.pax.utils.KeyExchanger
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -211,37 +212,51 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
         override fun onClickOk(dialog: Dialog, password:String) {
 
             dialogSuperAdminPassword = dialog
-            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner,{ success ->
+            bankFunctionsViewModel.isSuperAdminPassword(password)?.observe(viewLifecycleOwner) { success ->
 
-                if(success)
-                {
+                if (success) {
                     dialogSuperAdminPassword?.dismiss()
 
 
-                    lifecycleScope.launch(Dispatchers.Main){
+                    lifecycleScope.launch(Dispatchers.Main) {
 
-                        batchFileViewModel.getBatchTableData().observe(viewLifecycleOwner,{ batchData ->
+                        batchFileViewModel.getBatchTableData()
+                            .observe(viewLifecycleOwner, { batchData ->
 
-                            when {
-                                AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
-                                    ToastUtils.showToast(requireContext(),getString(R.string.please_clear_fbatch_before_init))
+                                when {
+                                    AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
+                                        ToastUtils.showToast(
+                                            requireContext(),
+                                            getString(R.string.please_clear_fbatch_before_init)
+                                        )
 
-                                !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
-                                    ToastUtils.showToast(requireContext(), getString(R.string.reversal_found_please_clear_or_settle_first_before_init))
+                                    !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
+                                        ToastUtils.showToast(
+                                            requireContext(),
+                                            getString(R.string.reversal_found_please_clear_or_settle_first_before_init)
+                                        )
 
-                                batchData.size > 0 -> ToastUtils.showToast(requireContext(),getString(R.string.please_settle_batch_first_before_init))
-                                else -> {
-                                    updateTPTOptionsValue(dataPosition, dataList[dataPosition]?.titleName?:"")
+                                    batchData.size > 0 -> ToastUtils.showToast(
+                                        requireContext(),
+                                        getString(R.string.please_settle_batch_first_before_init)
+                                    )
+                                    else -> {
+                                        updateTPTOptionsValue(
+                                            dataPosition,
+                                            dataList[dataPosition]?.titleName ?: ""
+                                        )
+                                    }
                                 }
-                            }
-                        })
+                            })
 
                     }
-                }else{
-                    ToastUtils.showToast(requireContext(),R.string.invalid_password)
+                } else {
+                    //ToastUtils.showToast(requireContext(), R.string.invalid_password)
+                    val edtTextPassword = dialog.findViewById<View>(R.id.edtTextPassword) as TextInputEditText
+                    edtTextPassword.setError(getString(R.string.invalid_password))
 
                 }
-            })
+            }
 
 
         }
