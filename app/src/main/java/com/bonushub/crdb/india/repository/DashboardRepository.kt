@@ -53,7 +53,7 @@ class DashboardRepository {
                                 itemList.add(ann.item)
                                 if (ann.childItem != EDashboardItem.NONE) {
                                     itemList.add(ann.childItem)
-                                    itemList.add(ann.childItem2)
+                                    //itemList.add(ann.childItem2)
                                 }
                             }
                         }
