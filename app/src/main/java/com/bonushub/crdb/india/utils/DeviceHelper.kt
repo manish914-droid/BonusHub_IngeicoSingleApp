@@ -26,6 +26,7 @@ import com.usdk.apiservice.aidl.scanner.OnScanListener
 import com.usdk.apiservice.aidl.scanner.ScannerData
 import com.usdk.apiservice.aidl.scanner.UScanner
 import com.usdk.apiservice.aidl.tms.UTMS
+import com.usdk.apiservice.aidl.vectorprinter.UVectorPrinter
 import com.usdk.apiservice.limited.DeviceServiceLimited
 import java.text.SimpleDateFormat
 import java.util.*
@@ -397,6 +398,17 @@ object DeviceHelper   {
             }
         }.start()
         return UPrinter.Stub.asInterface(iBinder)
+    }
+
+    @Throws(java.lang.IllegalStateException::class)
+    fun getVectorPrinter(): UVectorPrinter? {
+        val iBinder = object : IBinderCreator() {
+            @Throws(RemoteException::class)
+            override fun create(): IBinder {
+                return vfDeviceService?.vectorPrinter!!
+            }
+        }.start()
+        return UVectorPrinter.Stub.asInterface(iBinder)
     }
 
     @JvmStatic

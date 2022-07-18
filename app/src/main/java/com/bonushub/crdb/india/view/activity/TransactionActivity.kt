@@ -33,6 +33,7 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.EmvHandler
@@ -1625,8 +1626,35 @@ class TransactionActivity : BaseActivityNew() {
         lifecycleScope.launch(Dispatchers.Main) {
             showProgress(getString(R.string.printing))
             var printsts = false
-            if (stubbedData != null) {
+            /*if (stubbedData != null) {
                 PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                    stubbedData,
+                    EPrintCopyType.MERCHANT,
+                    this@TransactionActivity as BaseActivityNew
+                ) { printCB, printingFail ->
+                    Log.e("hideProgress", "3")
+                    (this@TransactionActivity as BaseActivityNew).hideProgress()
+                    if (printCB) {
+                        printsts = printCB
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            showMerchantAlertBox(stubbedData, cb)
+                        }
+
+                    } else {
+                        ToastUtils.showToast(
+                            this@TransactionActivity as BaseActivityNew,
+                            getString(R.string.printer_error)
+                        )
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            cb(false)
+                        }
+
+                    }
+                }
+            }*/
+
+            if (stubbedData != null) {
+                PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
                     stubbedData,
                     EPrintCopyType.MERCHANT,
                     this@TransactionActivity as BaseActivityNew
