@@ -68,6 +68,8 @@ class PrintUtil(context: Context?) {
             printer = DeviceHelper.getPrinter()
 
             if (printer?.status == 0) {
+                printer?.setPrintFormat(PrintFormat.FORMAT_ZEROSPECSET, PrintFormat.VALUE_ZEROSPECSET_SPECIALZERO)
+
                 logger("PrintInit->", "Called Printing", "e")
                 logger("PrintUtil->", "Printer Status --->  ${printer?.status}", "e")
                 val terminalData = getTptData()

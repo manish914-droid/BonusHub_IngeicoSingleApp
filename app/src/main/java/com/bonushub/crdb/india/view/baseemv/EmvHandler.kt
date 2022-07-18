@@ -39,7 +39,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     private var defaultScope = CoroutineScope(Dispatchers.Default)
     //for offline Pin
     var pinTryRemainingTimes = 0
-    var pinTryCounter = 0
+    var pinTryCounter = -1
     var maxPin =0;
 
 //result: Int, transData: TransData?
@@ -659,7 +659,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
         println("EMV Balance is" + emv!!.balance)
         println("TLV data is" + emv!!.getTLV("9F02"))
-        val tagList = arrayOf(
+    /*    val tagList = arrayOf(
             0x5F2A,
             0x5F34,
             0x82,
@@ -700,7 +700,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 Log.e("EmvHelper", "getEmvData:" + Integer.toHexString(tag) + ", fails")
             }
         }
-
+*/
        cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_NO_PIN.posEntry.toString())
         when (cardProcessedDataModal.getReadCardType()) {
             DetectCardType.EMV_CARD_TYPE -> {
@@ -725,7 +725,6 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
         }
 
-
         //   cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_NO_PIN.posEntry.toString())
 
         val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
@@ -735,7 +734,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         // val onlineResult: String = doOnlineProcess()
         // val ret = emv!!.respondEvent(onlineResult)
         // println("...onOnlineProcess: respondEvent" + ret)
-        tagOfF55.toString()
+      //  tagOfF55.toString()
 
         val field55: String = getFields55()
         println("Field 55 is $field55")
@@ -763,7 +762,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F26,
             0x9F27,
             0x9F33,
-            0x9F34,
+           0x9F34,
             0x9F35,
             0x9F36,
             0x9F37,
@@ -779,14 +778,26 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 if (l.length < 2) {
                     l = "0$l"
                 }
-                if (f == 0x9F10 /*&& CardAid.AMEX.aid == cardProcessedDataModal.getAID()*/) {
+
+                if (false){//f == 0x9F10 /*&& CardAid.AMEX.aid == cardProcessedDataModal.getAID()*/) {
+                   /* val c = l + BytesUtil.bytes2HexString(v)
+                    var le = Integer.toHexString(c.length / 2)
+                    if (le.length < 2) {
+                        le = "0$le"
+                    }
+
+                    sb.append(le)
+                    sb.append(c)*/
+
                     val c = l + BytesUtil.bytes2HexString(v)
                     var le = Integer.toHexString(c.length / 2)
                     if (le.length < 2) {
                         le = "0$le"
                     }
+
                     sb.append(le)
                     sb.append(c)
+
                 } else {
                     sb.append(l)
                     sb.append(BytesUtil.bytes2HexString(v))
@@ -837,7 +848,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
     open fun doEndProcess(result: Int, transData: TransData?) {
         if (result != EMVError.SUCCESS) {
-
+            println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
             if(cardProcessedDataModal.getSuccessResponseCode() == "00"){
                 if(this::testCompleteSecondGenAc.isInitialized){
                     testCompleteSecondGenAc.getEndProcessData(result,transData)
@@ -847,21 +858,41 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
             else{
                 onEndProcessCallback(result,cardProcessedDataModal)
-
             }
 
-
-            System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
         }
         else {
-            System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
-            System.out.println(transData?.cvm?.let { EMVInfoUtil.getCVMDesc(it) })
+            println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
+            println(transData?.cvm?.let { EMVInfoUtil.getCVMDesc(it) })
             if (transData != null) {
-               getFlowTypeDesc(transData.flowType,result, transData)
-            }
+                when(transData.acType.toInt()){
+                    // Transaction declined offline
+                    ACType.EMV_ACTION_AAC->{
+                        println("ACType.EMV_ACTION_AAC")
+                        emv?.stopProcess()
+                        activity.txnDeclinedDialog()
+                    }
+                    // Transaction go online form authorization
+                    ACType.EMV_ACTION_ARQC->{
+                        println("ACType.EMV_ACTION_ARQC")
+                        doFlowTypeAction(transData.flowType,result, transData)
+                    }
+                    // Transaction approved by the terminal itself
+                    ACType.EMV_ACTION_TC->{
+                        println("ACType.EMV_ACTION_TC")
+                        if(this::testCompleteSecondGenAc.isInitialized){
+                            doFlowTypeAction(transData.flowType,result, transData)
+                        }else{
+                            emv?.stopProcess()
+                            activity.txnDeclinedDialog()
+                            println("testCompleteSecondGenAc is null , EMV declined --> Terminal declined the txn")
+                        }
 
+
+                    }
+                }
+            }
         }
-        println("\n")
     }
 
     open fun getACTypeDesc(acType: Byte): String? {
@@ -893,19 +924,21 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     }
 
 
-    private fun getFlowTypeDesc(flowType: Byte, result: Int, transData: TransData) {
+    private fun doFlowTypeAction(flowType: Byte, result: Int, transData: TransData) {
         val desc: String
-       Log.e("getFlow",transData.cvm.toString())
+       Log.e("getFlow",transData.flowType.toString())
         when (flowType) {
             FlowType.EMV_FLOWTYPE_EMV.toByte() -> {
                 if(this::testCompleteSecondGenAc.isInitialized){
                     testCompleteSecondGenAc.getEndProcessData(result,transData)
+                }else{
+                    println("doFlowTypeAction  ... testCompleteSecondGenAc is null , EMV declined --> Terminal declined ")
                 }
 
             }
             FlowType.EMV_FLOWTYPE_ECASH.toByte() -> println("ECASH")
             FlowType.EMV_FLOWTYPE_QPBOC.toByte() ->println( "QPBOC")
-            FlowType.EMV_FLOWTYPE_QVSDC.toByte() -> {
+           /* FlowType.EMV_FLOWTYPE_QVSDC.toByte() -> {
 
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
                 cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
@@ -924,11 +957,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 cardProcessedDataModal.setField55(field55)
 
                 vfEmvHandlerCallback(cardProcessedDataModal)
-            }
-
-
+            }*/
             FlowType.EMV_FLOWTYPE_PBOC_CTLESS.toByte() -> println("PBOC_CTLESS")
-
             FlowType.EMV_FLOWTYPE_M_STRIPE.toByte() -> println("M_STRIPE")
             FlowType.EMV_FLOWTYPE_MSD.toByte() ->println( "MSD")
             FlowType.EMV_FLOWTYPE_MSD_LEGACY.toByte() -> println("MSD_LEGACY")
@@ -952,9 +982,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 vfEmvHandlerCallback(cardProcessedDataModal)
 
             }
-            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte() -> {
+            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte(),FlowType.EMV_FLOWTYPE_QVSDC.toByte()  -> {
 
-                 when (transData.cvm) {
+                when (transData.cvm) {
                     CVMFlag.EMV_CVMFLAG_NOCVM.toByte() -> {
                         cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
                         cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
@@ -1069,19 +1099,19 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             }
                         }
 
-                            println("=> onCardHolderVerify | onlinpin")
-                            cardProcessedDataModal.setIsOnline(1)
+                        println("=> onCardHolderVerify | onlinpin")
+                        cardProcessedDataModal.setIsOnline(1)
 
 
-                            byte2HexStr(lastCardRecord!!.pan)
-                            println("Pan block is "+byte2HexStr(lastCardRecord!!.pan))
-                            addPad("374245001751006", "0", 16, true)
+                       // byte2HexStr(lastCardRecord!!.pan)
+                    //    println("Pan block is "+byte2HexStr(lastCardRecord!!.pan))
+                     //   addPad("374245001751006", "0", 16, true)
 
-                            println("CardPanNumber data is "+cardProcessedDataModal.getPanNumberData() ?: "")
+                        println("CardPanNumber data is "+cardProcessedDataModal.getPanNumberData() ?: "")
 
-                            Utility.hexStr2Byte(addPad("374245001751006", "0", 16, true))
-                            param.putByteArray(PinpadData.PAN_BLOCK, Utility.hexStr2Byte(addPad(cardProcessedDataModal.getPanNumberData() ?: "", "0", 16, true)))
-                            pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+                        Utility.hexStr2Byte(addPad("374245001751006", "0", 16, true))
+                        param.putByteArray(PinpadData.PAN_BLOCK, Utility.hexStr2Byte(addPad(cardProcessedDataModal.getPanNumberData() ?: "", "0", 16, true)))
+                        pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
 
 
                     }
@@ -1089,8 +1119,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     else -> "Unknown type"
                 }
 
-            //    cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
-             //   cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+                //    cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
+                //   cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
 
 
 
@@ -1114,16 +1144,16 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
             else -> {
                 println("Unkown Flow Type")
-              //  cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                //  cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
 
                 val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
                 cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
 
-             /*   val tagDF46 = emv!!.getTLV(Integer.toHexString(0xDF46))
-                val tagDf46Str = hexString2String(tagDF46)
-                val track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
-                println("Field D46 data is"+track2data)*/
+                /*   val tagDF46 = emv!!.getTLV(Integer.toHexString(0xDF46))
+                   val tagDf46Str = hexString2String(tagDF46)
+                   val track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
+                   println("Field D46 data is"+track2data)*/
 
                 val track2data = emv!!.getTLV(Integer.toHexString(0x57))
                 val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
@@ -1134,11 +1164,10 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 val field55: String = getFields55()
                 println("Field 55 is $field55")
 
-               cardProcessedDataModal.setField55(field55)
-               vfEmvHandlerCallback(cardProcessedDataModal)
+                cardProcessedDataModal.setField55(field55)
+                vfEmvHandlerCallback(cardProcessedDataModal)
             }
         }
-        //return desc + String.format("[0x%02X]", flowType)
     }
 
     open fun doVerifyOfflinePin(flag: Int, random: ByteArray?, capKey: CAPublicKey?, result: OfflinePinVerifyResult) {
@@ -1272,11 +1301,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
         }
         when (cvm.cvm) {
-            CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
-                if(pinTryCounter == 0)
-                    pinTryCounter = emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT)).toInt() ?: 0
-                // val pinTryLimit = BytesUtil.hexString2Bytes(pinTryCounter)
+           /* CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
 
+               // hexString2String(emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT))  )
+                if(pinTryCounter == 0)
+                    pinTryCounter = cvm.pinTimes.toInt()//emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT)).toInt() ?: 0
+                // val pinTryLimit = BytesUtil.hexString2Bytes(pinTryCounter)
                 println("Pin Try limit is "+pinTryCounter)
                 pinTryRemainingTimes = pinTryCounter
                 println("Pin Try Remaining is "+pinTryRemainingTimes)
@@ -1298,7 +1328,6 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             }
                         }
                         2 -> {
-
                             GlobalScope.launch(Dispatchers.Main) {
                                 (activity as? BaseActivityNew)?.alertBoxWithActionNew(
                                     "Invalid PIN",
@@ -1404,7 +1433,149 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     }
                 }
 
+            }*/
+
+            CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
+
+                // hexString2String(emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT))  )
+                if(pinTryCounter == -1)
+                    pinTryCounter = cvm.pinTimes.toInt()//emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT)).toInt() ?: 0
+                // val pinTryLimit = BytesUtil.hexString2Bytes(pinTryCounter)
+
+              if(pinTryCounter>3){
+                  pinTryCounter=3
+              }
+                println("Pin Try limit is "+pinTryCounter)
+                pinTryRemainingTimes = pinTryCounter
+                println("Pin Try Remaining is "+pinTryRemainingTimes)
+
+                if (pinTryRemainingTimes >= 3) {
+                    pinTryRemainingTimes = 3
+                    maxPin = 3
+                } else {
+                    pinTryRemainingTimes = pinTryCounter
+                }
+                if (maxPin == 3) {
+                    println("Going in first")
+                    when (pinTryRemainingTimes) {
+                        3 -> {
+                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                pinTryCounter--
+                                pinTryRemainingTimes--
+                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                            }
+                        }
+                        2 -> {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                    "Invalid PIN",
+                                    "Wrong PIN.Please try again",
+                                    R.drawable.ic_txn_declined,
+                                    (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                    "", false, false, { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                                pinTryCounter--
+                                                pinTryRemainingTimes--
+                                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                            }
+
+                                        }
+                                    },
+                                    {})
+                            }
+
+                        }
+                        1 -> {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                    "Invalid PIN",
+                                    "Wrong PIN.This is your last attempt",
+                                    R.drawable.ic_txn_declined,
+                                    (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                    "", false, false, { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                                pinTryCounter--
+                                                pinTryRemainingTimes--
+                                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                            }
+
+                                        }
+                                    },
+                                    {})
+                            }
+
+                        }
+                        else -> {
+                            activity.txnDeclinedDialog("Wrong Pin Declined")
+                            println("Going in first --> ELSE")
+                        }
+                    }
+                }
+                else if(pinTryRemainingTimes == 2){
+                    println("Going in second")
+                    when (pinTryRemainingTimes) {
+                        2 -> {
+                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                pinTryCounter--
+                                pinTryRemainingTimes--
+                                println("Pin Try Remaining is1 $pinTryRemainingTimes")
+                            }
+                        }
+                        1 -> {
+                            GlobalScope.launch(Dispatchers.Main) {
+                                (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                                    "Invalid PIN",
+                                    "This is your last attempt",
+                                    R.drawable.ic_txn_declined,
+                                    (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                                    "", false, false, { alertPositiveCallback ->
+                                        if (alertPositiveCallback) {
+                                            pinPad!!.startOfflinePinEntry(param, listener).also {
+                                                pinTryCounter--
+                                                pinTryRemainingTimes--
+                                                println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                            }
+
+                                        }
+                                    },
+                                    {})
+                            }
+
+                        }
+                        else -> {
+                            activity.txnDeclinedDialog("Wrong Pin Declined")
+                            println("Going in second------> Else")
+                        }
+                    }
+
+                }
+                else {
+                    println("Going in else")
+                    GlobalScope.launch(Dispatchers.Main) {
+                        (activity as? BaseActivityNew)?.alertBoxWithActionNew(
+                            "Invalid PIN",
+                            "This is your last PIN attempt",
+                            R.drawable.ic_txn_declined,
+                            (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
+                            "", false, false, { alertPositiveCallback ->
+                                if (alertPositiveCallback) {
+                                    pinPad!!.startOfflinePinEntry(param, listener).also {
+                                        pinTryCounter--
+                                        pinTryRemainingTimes--
+                                        println("Pin Try Remaining is1 " + pinTryRemainingTimes)
+                                    }
+
+                                }
+                            },
+                            {})
+                    }
+                }
+
             }
+
+
             CVMFlag.EMV_CVMFLAG_ONLINEPIN.toByte() -> {
                 println("=> onCardHolderVerify | onlinpin")
                 cardProcessedDataModal.setIsOnline(1)

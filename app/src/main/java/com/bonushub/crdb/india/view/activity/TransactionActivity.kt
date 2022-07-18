@@ -31,6 +31,7 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
+import com.bonushub.crdb.india.utils.ingenico.DialogUtil.showProgress
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
@@ -340,13 +341,11 @@ class TransactionActivity : BaseActivityNew() {
                                             EFallbackCode.Swipe_fallback.fallBackCode,
                                             cardProcessedDataModal
                                         )
-                                    } else {
+                                    }
+                                    else {
                                         //region================Condition Check and ProcessSwipeCardWithPinOrWithoutPin:-
                                         when (cardProcessedDataModal.getTransType()) {
-                                            BhTransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(
-                                                isPin,
-                                                cardProcessedDataModal
-                                            )
+                                            BhTransactionType.SALE.type -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
                                             BhTransactionType.EMI_SALE.type -> {
                                                 val intent = Intent(
                                                     this@TransactionActivity,
@@ -396,14 +395,13 @@ class TransactionActivity : BaseActivityNew() {
                                                     BhTransactionType.EMI_SALE.type
                                                 )
                                             }
-                                            else -> processSwipeCardWithPINorWithoutPIN(
-                                                isPin, cardProcessedDataModal
-                                            )
+                                            else -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
                                             //endregion
                                         }
 
                                     }
-                                } else {
+                                }
+                                else {
                                     hideEmvCardImage()
 
                                     when (cardProcessedDataModal.getTransType()) {
@@ -476,13 +474,30 @@ class TransactionActivity : BaseActivityNew() {
                                             }
                                             startActivityForResult(
                                                 intent,
-                                                BhTransactionType.EMI_SALE.type
+                                                BhTransactionType.BRAND_EMI.type
                                             )
                                         }
-                                        else -> processSwipeCardWithPINorWithoutPIN(
-                                            isPin,
-                                            cardProcessedDataModal
-                                        )
+                                        BhTransactionType.TEST_EMI.type -> {
+                                            val intent = Intent(
+                                                this@TransactionActivity,
+                                                TenureSchemeActivity::class.java
+                                            ).apply {
+                                                putExtra(
+                                                    "cardProcessedData",
+                                                    globalCardProcessedModel
+                                                )
+                                                putExtra(
+                                                    "transactionType",
+                                                    globalCardProcessedModel.getTransType()
+                                                )
+                                                putExtra("mobileNumber", mobileNumber)
+                                            }
+                                            startActivityForResult(
+                                                intent,
+                                                BhTransactionType.TEST_EMI.type
+                                            )
+                                        }
+                                        else -> processSwipeCardWithPINorWithoutPIN(isPin, cardProcessedDataModal)
                                         //endregion
                                     }
                                 }
@@ -593,14 +608,7 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                             )
                         }
-                        /* BhTransactionType.BRAND_EMI.type -> {
 
-                             startActivityForResult(
-                                 intent,
-                                 BhTransactionType.EMI_SALE.type
-                             )
-
-                         }*/
                         else -> {
                             startFullEmvProcess()
                         }
@@ -935,7 +943,7 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     private suspend fun checkInstaEmi(): Boolean {
-//return false
+return false
         var hasInstaEmi = false
         val tpt = getTptData()
         var limitAmt = 0f
@@ -975,7 +983,7 @@ class TransactionActivity : BaseActivityNew() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            BhTransactionType.EMI_SALE.type, BhTransactionType.TEST_EMI.type, EIntentRequest.BankEMISchemeOffer.code -> {
+            BhTransactionType.EMI_SALE.type, BhTransactionType.TEST_EMI.type, BhTransactionType.BRAND_EMI.type -> {
                 val cardProcessedData =
                     data?.getSerializableExtra("cardProcessedDataModal") as CardProcessedDataModal
                 val maskedPan =
@@ -1137,6 +1145,7 @@ class TransactionActivity : BaseActivityNew() {
                     ERROR_EMV_RESULT_KERNEL_ABSENT -> "ERROR_EMV_RESULT_KERNEL_ABSENT"
                     ERROR_EMV_RESULT_ALL_FLASH_CARD -> "ERROR_EMV_RESULT_ALL_FLASH_CARD"
                     EMV_RESULT_AMOUNT_EMPTY -> "EMV_RESULT_AMOUNT_EMPTY"
+                    ERROR_EMV_RESULT_CARD_DATA_ERROR->"ERROR_EMV_RESULT_CARD_DATA_ERROR"
                     else -> "unknow error"
                 }
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -1431,9 +1440,8 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                             }
                         }
-
-
-                    } else {
+                    }
+                    else {
                         lifecycleScope.launch(Dispatchers.Main) {
                             var msg = ""
                             msg = if (AppPreference.getBoolean(AppPreference.ONLINE_EMV_DECLINED)) {
@@ -1476,47 +1484,51 @@ class TransactionActivity : BaseActivityNew() {
                         logger("ReversalReceipt", it, "e")
                     }
 
-                    if (ConnectionError.NetworkError.errorCode.toString() == responseCode) {
-                        runOnUiThread {
-                            alertBoxWithActionNew(
-                                getString(R.string.network),
-                                getString(R.string.network_error),
-                                R.drawable.ic_info_orange,
-                                getString(R.string.positive_button_ok),
-                                "", false, false,
-                                { alertPositiveCallback ->
-                                    if (alertPositiveCallback)
-                                        declinedTransaction()
-                                },
-                                {})
+                    when (responseCode) {
+                        ConnectionError.NetworkError.errorCode.toString() -> {
+                            runOnUiThread {
+                                alertBoxWithActionNew(
+                                    getString(R.string.network),
+                                    getString(R.string.network_error),
+                                    R.drawable.ic_info_orange,
+                                    getString(R.string.positive_button_ok),
+                                    "", false, false,
+                                    { alertPositiveCallback ->
+                                        if (alertPositiveCallback)
+                                            declinedTransaction()
+                                    },
+                                    {})
+                            }
                         }
-                    } else if (ConnectionError.ConnectionTimeout.errorCode.toString() == responseCode) {
-                        runOnUiThread {
-                            alertBoxWithActionNew(
-                                getString(R.string.error_hint),
-                                getString(R.string.connection_error),
-                                R.drawable.ic_info_orange,
-                                getString(R.string.positive_button_ok),
-                                "", false,
-                                false,
-                                { alertPositiveCallback ->
-                                    if (alertPositiveCallback)
-                                        declinedTransaction()
-                                },
-                                {})
+                        ConnectionError.ConnectionTimeout.errorCode.toString() -> {
+                            runOnUiThread {
+                                alertBoxWithActionNew(
+                                    getString(R.string.error_hint),
+                                    getString(R.string.connection_error),
+                                    R.drawable.ic_info_orange,
+                                    getString(R.string.positive_button_ok),
+                                    "", false,
+                                    false,
+                                    { alertPositiveCallback ->
+                                        if (alertPositiveCallback)
+                                            declinedTransaction()
+                                    },
+                                    {})
+                            }
                         }
-                    } else {
-                        runOnUiThread {
-                            alertBoxWithActionNew(
-                                transactionMsg ?: getString(R.string.transaction_failed_msg),
-                                "",
-                                R.drawable.ic_info_new,
-                                "OK",
-                                "",
-                                false,
-                                false,
-                                { declinedTransaction() },
-                                {})
+                        else -> {
+                            runOnUiThread {
+                                alertBoxWithActionNew(
+                                    transactionMsg ?: getString(R.string.transaction_failed_msg),
+                                    "",
+                                    R.drawable.ic_info_new,
+                                    "OK",
+                                    "",
+                                    false,
+                                    false,
+                                    { declinedTransaction() },
+                                    {})
+                            }
                         }
                     }
 
@@ -1590,6 +1602,22 @@ class TransactionActivity : BaseActivityNew() {
         }
     }
 
+    fun txnDeclinedDialog(msg:String = getString(R.string.emv_declined)){
+        lifecycleScope.launch(Dispatchers.Main) {
+            alertBoxWithActionNew(
+                getString(R.string.transaction_delined_msg),
+                msg,
+                R.drawable.ic_txn_declined,
+                getString(R.string.positive_button_ok),
+                "", isShowNegativeBtn = false, isAutoCancel = false,
+                yesButtonCallback = {
+                    goToDashBoard()
+                },
+                noButtonCallback = {})
+        }
+
+
+    }
 
     override fun onBackPressed() {
         exitApp()

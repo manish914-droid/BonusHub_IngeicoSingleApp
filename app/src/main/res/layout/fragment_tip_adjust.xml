@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scc"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/sub_header_view"
+            layout="@layout/sub_header_layout"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--Invoice no-->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/invoice_crd_view"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_invoice"
+            android:layout_marginTop="@dimen/pad_10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tip_on_invoice_et"
+                style="@style/TextInputEditTextAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_invoice_img"
+                android:maxLength="12"
+                android:padding="@dimen/pad_8"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <!--Enter tip Amount-->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cash_amt_crdView"
+            style="@style/TextInputEditTextAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_8"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_amount"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/invoice_crd_view"
+            android:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tip_amount_et"
+                style="@style/TextInputEditTextAmount"
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_tip_amount"
+                android:maxLength="15"
+                android:padding="@dimen/pad_8"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <include
+            android:id="@+id/main_keyBoard"
+            layout="@layout/new_amount_keyboard"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="@dimen/pad_5"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

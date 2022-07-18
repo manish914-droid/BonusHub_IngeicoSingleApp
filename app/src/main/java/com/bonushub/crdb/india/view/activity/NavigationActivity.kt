@@ -63,6 +63,7 @@ import com.bonushub.crdb.india.view.fragments.digi_pos.DigiPosMenuFragment
 import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthFragment
 import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthPendingFragment
 import com.bonushub.crdb.india.view.fragments.pre_auth.PreAuthVoidFragment
+import com.bonushub.crdb.india.view.fragments.tipAdjust.TipAdjustFragment
 import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
@@ -911,6 +912,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 } else {
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
+            }
+
+            EDashboardItem.SALE_TIP->{
+                if (checkInternetConnection()) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        //    DeviceHelper.iBeeper?.startBeep(2000)
+                        inflateInputFragment(TipAdjustFragment(), SubHeaderTitle.TIP_SALE.title,action)
+                    }
+                } else {
+                    ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
+                }
+
             }
 
             EDashboardItem.PREAUTH_COMPLETE->{

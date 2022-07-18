@@ -500,13 +500,17 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
                 .append("9F1A020356")
                 .append("5F2A020356")
                 .append("9F09020001")
-
                 .append("9A03").append(splitStr[0])   //Txn Date - M
                 .append("9F2103").append(splitStr[1]) //Txn Time - M
+
                 .append("9F410400000001")  //Transaction Sequence Counter - 0
-                .append("DF918111050000000000") // Terminal action code(decline)
-                .append("DF918112050000000000") // Terminal action code(online)
-                .append("DF918110050000000000")  // Terminal action code(default)
+                .append("DF918111050010000000") // Terminal action code(decline)
+                    //D84000F800
+                .append("DF91811205D84000F800") // Terminal action code(online)
+
+                    //D84000A812
+                .append("DF91811005D84000A812")  // Terminal action code(default)
+
                 .append("9F6D01C0")              // Contactless Reader Capabilities
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
                 .append("DF812406000000010000") //Terminal Contactless Transaction Limit
@@ -515,6 +519,8 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
                 .append("DF81300100")            //Try Again Flag
                 .toString()
 
+            //0010000000
+         //   emv?.setTLV(finalData.kernelID.toInt(),EMVTag.DEF_TAG_TAC_DECLINE,cvmTransLimit)//DF8124
 
   //    tlvList=tlvList+"9C01"+tag9CData +"9F0206"+tag9f02Data+"9F0306"+tag9f03Data
 Log.e("TLV LIST --> ",tlvList)
@@ -539,9 +545,9 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF918111050000000000") // Terminal action code(decline)
                 .append("DF918112050000000000") // Terminal action code(online)
                 .append("DF918110050000000000")  // Terminal action code(default)
+
                 .append("9F6D01C0")              // Contactless Reader Capabilities
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
-
                 .append("DF812406000000010000") //Terminal Contactless Transaction Limit
                 .append("DF812606000000000500") // Terminal CVM Required Limit
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
@@ -558,30 +564,42 @@ Log.e("TLV LIST --> ",tlvList)
         KernelID.VISA.toByte() -> {               // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
             tlvList = StringBuilder()
 
-                .append("9A03171020")
-                .append("9F2103150512")
+
                 .append("9F410400000001")
+
                 .append("9F350122")
-                .append("9F1A020156")
-                .append("5F2A020156")
+                .append("9F3303E0F0C8")
+                .append("9F40056000F0B001")
+                .append("9F1A020356")
+                .append("5F2A020356")
+                .append("9F09020001")
+
+                .append("9F410400000001")  //Transaction Sequence Counter - 0
 
                 .append("9F1B0400003A98")
 
                 .append("9F660436004000")
                 .append("DF06027C00")
 
-           //     .append("DF812406000000020000") //Terminal Contactless Transaction Limit
-            //    .append("DF812606000000010000") // Terminal CVM Required Limit
+                .append("DF918111050010000000") // Terminal action code(decline)
+                //D84000F800
+                .append("DF91811205D84000F800") // Terminal action code(online)
+                //D84000A812
+                .append("DF91811005D84000A812")  // Terminal action code(default)
 
-              //  .append("DF812406000000100000")
-                .append("DF812306000000100000")
+                .append("9F6D01C0")              // Contactless Reader Capabilities
+                .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
+                .append("DF812406000000010000") //Terminal Contactless Transaction Limit
+                .append("DF812606000000000100") // Terminal CVM Required Limit
+                .append("DF812306000000000000")  //Terminal Contactless Floor Limit
+                .append("DF81300100")            //Try Again Flag
+                //.append("")
+
+
+             //   .append("DF812306000000100000")
               //  .append("DF812606000000100000")
                 .append("DF918165050100000000")
                 .append("DF040102")
-                    //cvmvalue-->"000000001000"  "DF2106${cvmVal}"
-                    //ctclsvalue-->009999999999  "DF2006${ctlsVal}"
-              //  .append("DF2006").append("009999999999")
-             //   .append("DF2106").append("000000001000")
                 .append("DF810602C000")
                 .append("DF9181040100").toString()
 
