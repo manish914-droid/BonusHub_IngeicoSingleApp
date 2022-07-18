@@ -54,7 +54,6 @@
             android:layout_marginLeft="@dimen/pad_20"
             android:layout_marginTop="@dimen/pad_8"
             android:layout_marginRight="@dimen/pad_20"
-            android:hint="@string/enter_cash_amount"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sale_amt_crdView"
             android:visibility="gone">
