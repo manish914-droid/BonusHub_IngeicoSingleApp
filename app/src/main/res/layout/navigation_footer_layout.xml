@@ -105,7 +105,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardReports"
+        android:id="@+id/cardSetting"
         android:layout_width="match_parent"
         android:layout_height="@dimen/pad_50"
         app:layout_constraintStart_toStartOf="parent"
@@ -116,6 +116,60 @@
         android:layout_marginEnd="@dimen/pad_20"
         android:layout_marginTop="@dimen/pad_10"
         app:layout_constraintTop_toBottomOf="@+id/cardBankFunction"
+        app:rippleColor="@android:color/transparent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imgViewSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_setting"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_margin="@dimen/pad_10"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/txt_color"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="@dimen/pad_10"
+                android:fontFamily="@font/muli_semi_bold"
+                app:layout_constraintStart_toEndOf="@id/imgViewSetting"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/ic_arrow_blue"
+                android:layout_marginEnd="@dimen/pad_10"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardReports"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardElevation="@dimen/pad_10"
+        app:cardCornerRadius="@dimen/pad_5"
+        android:layout_marginStart="@dimen/pad_20"
+        android:layout_marginEnd="@dimen/pad_20"
+        android:layout_marginTop="@dimen/pad_10"
+        app:layout_constraintTop_toBottomOf="@+id/cardSetting"
         app:rippleColor="@android:color/transparent">
 
         <androidx.constraintlayout.widget.ConstraintLayout

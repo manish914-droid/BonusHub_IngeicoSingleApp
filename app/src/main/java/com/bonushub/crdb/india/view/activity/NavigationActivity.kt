@@ -27,6 +27,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bonushub.crdb.india.BuildConfig
+import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.appupdate.AppUpdateDownloadManager
 import com.bonushub.crdb.india.appupdate.OnDownloadCompleteListener
@@ -35,7 +36,10 @@ import com.bonushub.crdb.india.databinding.MainDrawerBinding
 import com.bonushub.crdb.india.db.AppDao
 import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.di.DBModule
-import com.bonushub.crdb.india.model.local.*
+import com.bonushub.crdb.india.model.local.AppPreference
+import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
+import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
@@ -51,6 +55,8 @@ import com.bonushub.crdb.india.utils.Utility
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrinterFonts.initialize
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.fragments.*
 import com.bonushub.crdb.india.view.fragments.digi_pos.DigiPosMenuFragment
@@ -61,7 +67,7 @@ import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
 import com.bonushub.crdb.india.viewmodel.InitViewModel
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
 import com.bonushub.crdb.india.vxutils.*
-import com.bonushub.pax.utils.*
+import com.bonushub.pax.utils.KeyExchanger
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.ingenico.hdfcpayment.listener.OnOperationListener
@@ -81,7 +87,6 @@ import java.io.File
 import java.lang.Runnable
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
-import java.util.*
 import javax.inject.Inject
 
 
@@ -296,6 +301,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         }
 
 
+        navigationBinding?.footer?.cardSetting?.setOnClickListener {
+
+            navigationBinding?.footer?.cardSetting?.setBackgroundResource(R.drawable.edge_brand_selected)
+            isDashboardOpen = false
+            closeDrawer()
+            transactFragment(SettingsFragment())
+        }
+
         navigationBinding?.footer?.cardReports?.setOnClickListener {
 
             navigationBinding?.footer?.cardReports?.setBackgroundResource(R.drawable.edge_brand_selected)
@@ -483,6 +496,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
     private fun refreshDrawer() {
 
         navigationBinding?.footer?.cardBankFunction?.setBackgroundResource(R.drawable.edge_brand_unselected)
+        navigationBinding?.footer?.cardSetting?.setBackgroundResource(R.drawable.edge_brand_unselected)
         navigationBinding?.footer?.cardReports?.setBackgroundResource(R.drawable.edge_brand_unselected)
         navigationBinding?.footer?.cardSettlement?.setBackgroundResource(R.drawable.edge_brand_unselected)
 

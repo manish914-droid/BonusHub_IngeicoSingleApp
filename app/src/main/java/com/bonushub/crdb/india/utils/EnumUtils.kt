@@ -602,6 +602,11 @@ enum class ReportsItem(val _name: String){
     /*PRINT_REVERSAL_REPORT("Print Reversal Report")*/
 }
 
+// region settings option
+enum class SettingsItem(val _name: String){
+    WIFI_SETTINGS("Wifi Settings")
+}
+
 enum class EPrintCopyType(val pName: String) {
     MERCHANT("**MERCHANT COPY**"), CUSTOMER("**CUSTOMER COPY**"), DUPLICATE("**DUPLICATE COPY**");
 }

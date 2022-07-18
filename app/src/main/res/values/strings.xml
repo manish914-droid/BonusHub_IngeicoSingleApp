@@ -368,4 +368,7 @@
     <string name="emv_declined">EMV Declined</string>
     <string name="see_Phone">See Phone</string>
 
+    <!--wifi setting-->
+    <string name="wifi_settings">Wifi Settings</string>
+
 </resources>
