@@ -162,7 +162,8 @@ class DialogUtilsNew1 {
                         dismiss()
                         callback(invoiceET.text.toString())
                     } else {
-                        ToastUtils.showToast(context, "Please enter $toastMsg.")
+                        //ToastUtils.showToast(context, "Please enter $toastMsg.")
+                        invoiceET.error = "Please enter $toastMsg."
                     }
                 }
                 window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
