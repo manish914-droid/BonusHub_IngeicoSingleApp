@@ -94,10 +94,11 @@ class VoidMainFragment : Fragment() {
         binding?.txtViewSearchTransaction?.setOnClickListener {
             logger("txtViewSearchTransaction","click")
             when {
-                TextUtils.isEmpty(binding?.edtTextSearchTransaction?.text.toString().trim()) -> ToastUtils.showToast( requireContext(), getString(R.string.invoice_number_should_not_be_empty))
+                TextUtils.isEmpty(binding?.edtTextSearchTransaction?.text.toString().trim()) -> binding?.edtTextSearchTransaction?.error =
+                    getString(R.string.invoice_number_should_not_be_empty)
                 else -> {
                     if (binding?.edtTextSearchTransaction?.text.isNullOrBlank()) {
-                        ToastUtils.showToast(requireContext(),"Enter Invoice")
+                        binding?.edtTextSearchTransaction?.error = "Enter Invoice"
                     } else {
                         searchTransaction()
                     }
@@ -146,8 +147,9 @@ class VoidMainFragment : Fragment() {
                             when (code) {
                                 0 -> {
                                     withContext(Dispatchers.Main){
-                                        (activity as? NavigationActivity)?.alertBoxWithActionNew("Error",  respnosedatareader?.isoMap?.get(58)?.parseRaw2String()
-                                            .toString() ?: "",R.drawable.ic_info_orange,"Ok","",false,false,{},{})
+                                        (activity as? NavigationActivity)?.alertBoxWithActionNew("Error",
+                                            respnosedatareader?.isoMap?.get(58)?.parseRaw2String()
+                                                .toString(),R.drawable.ic_info_orange,"Ok","",false,false,{},{})
                                     }
 
                                     startActivity(
@@ -214,7 +216,7 @@ class VoidMainFragment : Fragment() {
                                                 }
                                         }
 
-                                        voidData?.tenure = "0"
+                                        voidData.tenure = "0"
 
                                         voidData.referenceNumber =
                                             (respnosedatareader.isoMap[37]?.parseRaw2String()
@@ -223,7 +225,7 @@ class VoidMainFragment : Fragment() {
                                         logger("save",""+ voidData.transationName)
                                         withContext(Dispatchers.IO) {
                                             batchFileViewModel.deleteTempBatchFileDataTableFromInvoice(voidData.hostInvoice, voidData.hostTID)
-                                            batchFileViewModel?.insertTempBatchFileDataTable(voidData)
+                                            batchFileViewModel.insertTempBatchFileDataTable(voidData)
                                         }
 
 
@@ -231,8 +233,8 @@ class VoidMainFragment : Fragment() {
                                         val lastSuccessReceiptData = Gson().toJson(voidData)
                                         AppPreference.saveLastReceiptDetails(lastSuccessReceiptData)
 
-                                        val amt = (((voidData.transactionalAmmount)?.toDouble())?.div(100)).toString()
-                                        val transactionDate = dateFormaterNew(voidData.timeStamp ?: 0L)
+                                        val amt = (((voidData.transactionalAmmount).toDouble()).div(100)).toString()
+                                        val transactionDate = dateFormaterNew(voidData.timeStamp)
                                         val transactionTime = timeFormaterNew(voidData.time)
 
                                         withContext(Dispatchers.Main){
@@ -334,9 +336,9 @@ class VoidMainFragment : Fragment() {
                 //logger1("Transaction REQUEST PACKET --->>", transactionISO.generateIsoByteRequest(), "e")
 
                 if((context as NavigationActivity).isShowProgress()){
-                    (context as NavigationActivity).runOnUiThread { (context as NavigationActivity).setProgressTitle((context).getString(R.string.sale_data_sync)) }
+                    context.runOnUiThread { context.setProgressTitle((context).getString(R.string.sale_data_sync)) }
                 }else {
-                    (context as NavigationActivity).runOnUiThread {
+                    context.runOnUiThread {
                         (context).showProgress(
                             (context).getString(
                                 R.string.sale_data_sync
@@ -523,12 +525,13 @@ class VoidMainFragment : Fragment() {
                         0 -> {
 
                             CoroutineScope(Dispatchers.Main).launch {
-                                (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", getString(R.string.no_data_found) ?: "",R.drawable.ic_info_orange,"Ok","",false,false,{},{})
+                                (activity as? NavigationActivity)?.alertBoxWithActionNew("Error",
+                                    getString(R.string.no_data_found),R.drawable.ic_info_orange,"Ok","",false,false,{},{})
                             }
                         }
                         1 -> {
                             voidData = bat.first()
-                            if (voidData?.transactionType == BhTransactionType.REFUND.type && tpt?.voidRefund != "1") {
+                            if (voidData.transactionType == BhTransactionType.REFUND.type && tpt?.voidRefund != "1") {
                                 ToastUtils.showToast(
                                     requireContext(),
                                     getString(R.string.void_refund_not_allowed)
@@ -542,7 +545,7 @@ class VoidMainFragment : Fragment() {
                         }
                         else -> {
                             lifecycleScope.launch(Dispatchers.Main) {
-                                voidTransInvoicesDialog(bat as ArrayList<TempBatchFileDataTable>)
+                                voidTransInvoicesDialog(bat)
                             }
                         }
                     }
@@ -558,7 +561,7 @@ class VoidMainFragment : Fragment() {
 
     private fun voidTransConfirmationDialog(batchTable: TempBatchFileDataTable) {
 
-        val amt ="%.2f".format((((batchTable?.transactionalAmmount ?: "").toDouble()).div(100)).toString().toDouble())
+        val amt ="%.2f".format(((batchTable.transactionalAmmount.toDouble()).div(100)).toString().toDouble())
 
         DialogUtilsNew1.showDetailsConfirmDialog(requireContext(), transactionType = BhTransactionType.VOID,
             tid = batchTable.tid, totalAmount = amt, invoice = batchTable.invoiceNumber, date = batchTable.transactionDate, time = batchTable.time,
@@ -756,7 +759,7 @@ class VoidTxnAdapter(
 
     override fun onBindViewHolder(holder: VoidTxnViewHolder, position: Int) {
         val voidData = batchData[position]
-        holder.tidView.text = "TID : " + voidData?.tid
+        holder.tidView.text = "TID : " + voidData.tid
         holder.invoiceView.text = "INVOICE : " + voidData.hostInvoice
         holder.voidView.setOnClickListener {
             //  VFService.showToast("CLICKED  $position")

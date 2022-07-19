@@ -219,16 +219,16 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
             authData.authRoc = binding?.rocNo?.text.toString()
 
             if (authData.authTid.isNullOrBlank() || authData.authTid!!.length < 8) {
-                showToast("Invalid TID")
+                binding?.tidEt?.error = "Invalid TID"
                 return@setOnClickListener
             } else if (authData.authBatchNo.isNullOrBlank()) {
-                showToast("Invalid Batch No")
+                binding?.batchNo?.error = "Invalid Batch No"
                 return@setOnClickListener
             }else if (authData.authRoc.isNullOrBlank()) {
-                showToast("Invalid ROC")
+                binding?.rocNo?.error = "Invalid ROC"
                 return@setOnClickListener
             }  else if (authData.authAmt.isNullOrBlank() || authData.authAmt!!.toDouble() < 1) {
-                showToast("Invalid Amount")
+                binding?.amountEt?.error = "Invalid Amount"
                 return@setOnClickListener
             } else {
                 Log.e("preAuth","dialog")

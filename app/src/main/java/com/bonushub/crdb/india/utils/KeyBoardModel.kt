@@ -94,7 +94,10 @@ class KeyboardModel {
     }
 
     private suspend fun setEt(et: EditText, value: String) =
-        withContext(Dispatchers.Main) { et.setText(value) }
+        withContext(Dispatchers.Main) {
+            et.setError(null)
+            et.setText(value)
+        }
 
     private suspend fun setTv(tv: TextView, value: String) =
         withContext(Dispatchers.Main) { tv.text = value }

@@ -38,6 +38,7 @@ import com.bonushub.crdb.india.viewmodel.NewInputAmountViewModel
 import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.changeEditTextBackground
 import com.bonushub.crdb.india.vxutils.showMobileBillDialog
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -513,7 +514,8 @@ class NewInputAmountFragment : Fragment() {
             (binding?.saleAmount?.text.toString()).toDouble()
         } catch (ex: Exception) {
             ex.printStackTrace()
-            showToast( "Please enter amount")
+            //showToast( "Please enter amount")
+            setErrorInField("Please enter amount", binding?.saleAmount!!)
             return
         }
 
@@ -522,7 +524,8 @@ class NewInputAmountFragment : Fragment() {
         if (cashAmtStr != "") {
             cashAmt = (binding?.cashAmount?.text.toString()).toDouble()
         } else if (eDashBoardItem == EDashboardItem.SALE_WITH_CASH) {
-           showToast(getString(R.string.please_enter_cash_amount))
+           //showToast(getString(R.string.please_enter_cash_amount))
+            setErrorInField(getString(R.string.please_enter_cash_amount), binding?.cashAmount!!)
             return
         }
         val saleAmountStr = binding?.saleAmount?.text.toString()
@@ -531,7 +534,9 @@ class NewInputAmountFragment : Fragment() {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
         if (saleAmount < 1) {
-           showToast(getString(R.string.sale_amount_should_greater_then_1))
+           //showToast(getString(R.string.sale_amount_should_greater_then_1))
+            setErrorInField(getString(R.string.sale_amount_should_greater_then_1), binding?.saleAmount!!)
+
             return
         }
         when (eDashBoardItem) {
@@ -552,7 +557,7 @@ class NewInputAmountFragment : Fragment() {
                            // temproryCheck(trnsAmt,saleAmount)
                         } else
                             context?.getString(R.string.enter_valid_mobile_number)
-                                ?.let { showToast( it) }
+                                ?.let { setErrorInField( it, binding?.mobNumbr!!) }
 
                         TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                             val extraPairData = Triple("", "", third = true)
@@ -582,7 +587,7 @@ class NewInputAmountFragment : Fragment() {
                                     )
                                 } else
                                     context?.getString(R.string.enter_valid_mobile_number)
-                                        ?.let { showToast( it) }
+                                        ?.let { setErrorInField( it, binding?.mobNumbr!!) }
 
                                 TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                                     iFrReq?.onFragmentRequest(
@@ -623,7 +628,7 @@ class NewInputAmountFragment : Fragment() {
                                     navigateToBankEmiNextProcess(saleAmount.toString().trim(),binding?.mobNumbr?.text.toString().trim())
                                 } else
                                     context?.getString(R.string.enter_valid_mobile_number)
-                                        ?.let { showToast(it) }
+                                        ?.let { setErrorInField(it, binding?.mobNumbr!!) }
 
                                 TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                                     var temp = saleAmount.toString().trim()
@@ -652,7 +657,7 @@ class NewInputAmountFragment : Fragment() {
                                 navigateToBrandEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
                             } else
                                 context?.getString(R.string.enter_valid_mobile_number)
-                                    ?.let {showToast(it) }
+                                    ?.let {setErrorInField(it, binding?.mobNumbr!!) }
 
                             TextUtils.isEmpty(binding?.mobNumbr?.text.toString()) -> {
                                 navigateToBrandEmiNextProcess(saleAmountStr,binding?.mobNumbr?.text.toString())
@@ -666,7 +671,7 @@ class NewInputAmountFragment : Fragment() {
 
                         } else {
                             context?.getString(R.string.enter_valid_mobile_number)
-                                ?.let { showToast(it) }
+                                ?.let { setErrorInField(it, binding?.mobNumbr!!) }
                         }
                     }
                     else -> {
@@ -748,7 +753,7 @@ class NewInputAmountFragment : Fragment() {
                 when {
                     TextUtils.isEmpty(
                         saleAmount.toString().trim()
-                    ) -> showToast( "Enter Sale Amount")
+                    ) -> setErrorInField( "Enter Sale Amount", binding?.saleAmount!!)
                     //  TextUtils.isEmpty(binding?.mobNumbr?.text?.toString()?.trim()) -> VFService.showToast("Enter Mobile Number")
                     else -> iFrReq?.onFragmentRequest(
                         EDashboardItem.BRAND_EMI_CATALOGUE,
@@ -761,7 +766,7 @@ class NewInputAmountFragment : Fragment() {
                 when {
                     TextUtils.isEmpty(
                         saleAmount.toString().trim()
-                    ) -> showToast( "Enter Sale Amount")
+                    ) -> setErrorInField( "Enter Sale Amount", binding?.saleAmount!!)
                     //  TextUtils.isEmpty(binding?.mobNumbr?.text?.toString()?.trim()) -> VFService.showToast("Enter Mobile Number")
                     else -> iFrReq?.onFragmentRequest(
                         EDashboardItem.BANK_EMI_CATALOGUE,
@@ -1113,4 +1118,15 @@ class NewInputAmountFragment : Fragment() {
         }
     }
 
+    private fun setErrorInField(str:String,edt:TextInputEditText){
+        lifecycleScope.launch(Dispatchers.Main) {
+            edt.setError(str)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Utility().hideSoftKeyboard(activity!!)
+    }
 }

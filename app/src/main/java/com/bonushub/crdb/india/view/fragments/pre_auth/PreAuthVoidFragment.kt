@@ -81,15 +81,21 @@ class PreAuthVoidFragment : Fragment() {
 
             when {
                 authData.authTid.isNullOrBlank() -> {
-                    ToastUtils.showToast(activity,"Enter TID")
+                    binding?.tidEt?.error = "Enter TID"
                     return@setOnClickListener
                 }
+
+                authData.authTid!!.length != 8 -> {
+                    binding?.tidEt?.error = "Invalid TID"
+                    return@setOnClickListener
+                }
+
                 authData.authBatchNo.isNullOrBlank() -> {
-                    ToastUtils.showToast(activity,"Enter batch Number")
+                    binding?.batchNo?.error = "Enter batch Number"
                     return@setOnClickListener
                 }
                 authData.authRoc.isNullOrBlank() -> {
-                    ToastUtils.showToast(activity,"Enter ROC")
+                    binding?.rocNo?.error = "Enter ROC"
                     return@setOnClickListener
                 }
                 else -> {

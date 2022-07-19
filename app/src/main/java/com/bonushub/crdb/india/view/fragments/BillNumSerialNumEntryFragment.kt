@@ -150,7 +150,8 @@ class BillNumSerialNumEntryFragment : Fragment() {
                         binding?.serialNumEt?.setText(barcode)
                         binding?.serialNumEt?.setSelection(binding?.serialNumEt?.length()?:0)
                     }else{
-                        ToastUtils.showToast(requireContext(),msg)
+                       // ToastUtils.showToast(requireContext(),msg)
+                        binding?.serialNumEt?.setError(msg)
                     }
 
                 }, 1000)
@@ -169,7 +170,8 @@ class BillNumSerialNumEntryFragment : Fragment() {
             if (brandValidation.isBillNumMandatory) {
                 if (TextUtils.isEmpty(binding?.billNumEt?.text.toString().trim())) {
                     context?.getString(R.string.enter_valid_bill_number)?.let { it1 ->
-                        ToastUtils.showToast(activity,it1)
+                        //ToastUtils.showToast(activity,it1)
+                        binding?.billNumEt?.setError(it1)
                     }
 
                     return
@@ -180,31 +182,41 @@ class BillNumSerialNumEntryFragment : Fragment() {
             if (brandEmiProductData?.isRequired == "1") {
                 if (TextUtils.isEmpty(binding?.serialNumEt?.text.toString().trim())) {
  context?.getString(R.string.enterValid_serial_iemei_no)?.let { it1 ->
-     ToastUtils.showToast(activity,it1)
+    // ToastUtils.showToast(activity,it1)
+     binding?.serialNumEt?.setError(it1)
                     }
 
                         if(brandEmiProductData?.validationTypeName == "IMEI" ||
                             brandEmiProductData?.validationTypeName == "imei") {
 
-                            ToastUtils.showToast(activity,
+                            /*ToastUtils.showToast(activity,
                                 getString(
                                     R.string.enterValid_iemei_no
                                 )
-                            )
+                            )*/
+                            binding?.serialNumEt?.setError(getString(
+                                R.string.enterValid_iemei_no
+                            ))
                         }else if (brandEmiProductData?.validationTypeName == "SerialNo"){
-                            ToastUtils.showToast(activity,
+                            /*ToastUtils.showToast(activity,
                                 getString(
                                     R.string.enterValid_serial
                                 )
-                            )
+                            )*/
+                            binding?.serialNumEt?.setError(getString(
+                                R.string.enterValid_serial
+                            ))
 
                         }
                     else{
-                            ToastUtils.showToast(activity,
+                            /*ToastUtils.showToast(activity,
                                 getString(
                                     R.string.enterValid_serial_iemei_no
                                 )
-                            )
+                            )*/
+                            binding?.serialNumEt?.setError(getString(
+                                R.string.enterValid_serial_iemei_no
+                            ))
                         }
                     return
                 }
