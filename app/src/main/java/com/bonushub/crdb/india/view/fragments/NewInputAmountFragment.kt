@@ -2,6 +2,8 @@ package com.bonushub.crdb.india.view.fragments
 
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -39,6 +41,7 @@ import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.changeEditTextBackground
 import com.bonushub.crdb.india.vxutils.showMobileBillDialog
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -263,6 +266,8 @@ class NewInputAmountFragment : Fragment() {
             inputInSaleAmount = true
             inputInCashAmount = false
             inputInMobilenumber = false
+
+            setFocusColor(binding?.saleAmtCrdView)
         }
 
         binding?.cashAmount?.setOnClickListener {
@@ -273,6 +278,8 @@ class NewInputAmountFragment : Fragment() {
             inputInSaleAmount = false
             inputInCashAmount = true
             inputInMobilenumber = false
+
+            setFocusColor(binding?.cashAmtCrdView)
         }
 
         binding?.mobNumbr?.setOnClickListener {
@@ -283,8 +290,96 @@ class NewInputAmountFragment : Fragment() {
             inputInCashAmount = false
             inputInMobilenumber = true
 
+            setFocusColor(binding?.mobNoCrdView)
         }
         onSetKeyBoardButtonClick()
+    }
+
+    fun setFocusColor(editTextBorder: TextInputLayout?){
+
+        val color: Int = Color.parseColor("#013480")
+        val color2: Int = Color.parseColor("#013480")
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_focused),
+            intArrayOf(android.R.attr.state_hovered),
+            intArrayOf(android.R.attr.state_enabled),
+            intArrayOf()
+        )
+
+        val colors = intArrayOf(
+            color,
+            color,
+            color,
+            color2
+        )
+
+        val myColorList = ColorStateList(states, colors)
+
+        val colorUnFous: Int = Color.parseColor("#A9A9A9")
+        val color2UnFous: Int = Color.parseColor("#A9A9A9")
+
+        val statesUnFous = arrayOf(
+            intArrayOf(android.R.attr.state_focused),
+            intArrayOf(android.R.attr.state_hovered),
+            intArrayOf(android.R.attr.state_enabled),
+            intArrayOf()
+        )
+
+        val colorsUnFous = intArrayOf(
+            colorUnFous,
+            colorUnFous,
+            colorUnFous,
+            color2UnFous
+        )
+
+        val myColorListUnFous = ColorStateList(statesUnFous, colorsUnFous)
+
+        /*editTextBorder?.setBoxStrokeColorStateList(myColorList)
+        //binding?.saleAmtCrdView?.hintTextColor = myColorList
+        editTextBorder?.defaultHintTextColor = myColorList*/
+
+        when(editTextBorder)
+        {
+            binding?.saleAmtCrdView ->{
+
+                binding?.saleAmtCrdView?.setBoxStrokeColorStateList(myColorList)
+                binding?.saleAmtCrdView?.defaultHintTextColor = myColorList
+
+                binding?.mobNoCrdView?.setBoxStrokeColorStateList(myColorListUnFous)
+                binding?.mobNoCrdView?.defaultHintTextColor = myColorListUnFous
+
+                binding?.cashAmtCrdView?.setBoxStrokeColorStateList(myColorListUnFous)
+                binding?.cashAmtCrdView?.defaultHintTextColor = myColorListUnFous
+
+
+            }
+
+            binding?.mobNoCrdView ->{
+
+                binding?.saleAmtCrdView?.setBoxStrokeColorStateList(myColorListUnFous)
+                binding?.saleAmtCrdView?.defaultHintTextColor = myColorListUnFous
+
+                binding?.mobNoCrdView?.setBoxStrokeColorStateList(myColorList)
+                binding?.mobNoCrdView?.defaultHintTextColor = myColorList
+
+                binding?.cashAmtCrdView?.setBoxStrokeColorStateList(myColorListUnFous)
+                binding?.cashAmtCrdView?.defaultHintTextColor = myColorListUnFous
+            }
+
+            binding?.cashAmtCrdView ->{
+
+                binding?.saleAmtCrdView?.setBoxStrokeColorStateList(myColorListUnFous)
+                binding?.saleAmtCrdView?.defaultHintTextColor = myColorListUnFous
+
+                binding?.mobNoCrdView?.setBoxStrokeColorStateList(myColorListUnFous)
+                binding?.mobNoCrdView?.defaultHintTextColor = myColorListUnFous
+
+                binding?.cashAmtCrdView?.setBoxStrokeColorStateList(myColorList)
+                binding?.cashAmtCrdView?.defaultHintTextColor = myColorList
+            }
+        }
+
     }
 
     private fun setOnTextChangeListeners()
