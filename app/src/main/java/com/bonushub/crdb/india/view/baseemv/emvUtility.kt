@@ -569,6 +569,7 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F350122")
                 .append("9F3303E0F0C8")
+             //   .append("9F3303E0E8C8")
                 .append("9F40056000F0B001")
                 .append("9F1A020356")
                 .append("5F2A020356")
@@ -578,7 +579,7 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F1B0400003A98")
 
-                .append("9F660436004000")
+                .append("9F660436004000") // TTQ
                 .append("DF06027C00")
 
                 .append("DF918111050010000000") // Terminal action code(decline)
@@ -589,8 +590,7 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F6D01C0")              // Contactless Reader Capabilities
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
-                .append("DF812406000000010000") //Terminal Contactless Transaction Limit
-                .append("DF812606000000000100") // Terminal CVM Required Limit
+
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
                 .append("DF81300100")            //Try Again Flag
                 //.append("")
@@ -604,11 +604,12 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9181040100").toString()
 
 
-            val cvmTransLimit="000000030000"
-            val limitCvm="000000010000"
+            val cvmTransLimit="000000200000"
+            val limitCvm="000000050000"
 
             emv?.setTLV(finalData.kernelID.toInt(),EMVTag.V_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
             emv?.setTLV(finalData.kernelID.toInt(),EMVTag.V_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
+          //  emv?.setTLV(finalData.kernelID.toInt(),EMVTag.EMV_TAG_TM_CVMRESULT,"3F0000")//9F34
 
         }
         KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.

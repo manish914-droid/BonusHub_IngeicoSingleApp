@@ -762,18 +762,22 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F26,
             0x9F27,
             0x9F33,
-           0x9F34,
+          0x9F34,
             0x9F35,
             0x9F36,
             0x9F37,
             0x9F10
         )
         val sb = StringBuilder()
-        for (f in tagList) {
-            val v1 = emv!!.getTLV(Integer.toHexString(f).toUpperCase(Locale.ROOT))
+        for (tag in tagList) {
+       //   println(  "9F34 --->  "+    emv!!.getTLV(Integer.toHexString(f).toUpperCase(Locale.ROOT)))
+if(emv!!.getTLV(Integer.toHexString(tag).toUpperCase(Locale.ROOT)).isEmpty())
+continue
+
+            val v1 = emv!!.getTLV(Integer.toHexString(tag).toUpperCase(Locale.ROOT))
             val v = BytesUtil.hexString2Bytes(v1)
             if (v != null) {
-                sb.append(Integer.toHexString(f))
+                sb.append(Integer.toHexString(tag))
                 var l = Integer.toHexString(v.size)
                 if (l.length < 2) {
                     l = "0$l"
@@ -802,12 +806,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     sb.append(l)
                     sb.append(BytesUtil.bytes2HexString(v))
                 }
-            } else if (f == 0x9F03) {
-                sb.append(Integer.toHexString(f))
+            } else if (tag == 0x9F03) {
+                sb.append(Integer.toHexString(tag))
                 sb.append("06")
                 sb.append("000000000000")
-            } else if (f == 0x5f34 /*&& CardAid.Rupay.aid.equals(cardProcessedDataModal.getAID())*/) {
-                sb.append(Integer.toHexString(f))
+            } else if (tag == 0x5f34 /*&& CardAid.Rupay.aid.equals(cardProcessedDataModal.getAID())*/) {
+                sb.append(Integer.toHexString(tag))
                 sb.append("01")
                 sb.append("00")
             }
@@ -1228,7 +1232,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         val param = Bundle()
         //optional Pin Block format by default its 0
         param.putByte(PinpadData.PIN_BLOCK_FORMAT,0)
-        param.putByteArray(PinpadData.PIN_LIMIT, byteArrayOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+        param.putByteArray(PinpadData.PIN_LIMIT, byteArrayOf( 4, 5, 6, 7, 8, 9, 10, 11, 12))
 
         val listener: OnPinEntryListener = object : OnPinEntryListener.Stub() {
             override fun onInput(arg0: Int, arg1: Int) {}
@@ -1436,7 +1440,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }*/
 
             CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
-
+println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
                 // hexString2String(emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT))  )
                 if(pinTryCounter == -1)
                     pinTryCounter = cvm.pinTimes.toInt()//emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT)).toInt() ?: 0
