@@ -14,6 +14,7 @@ import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.Mti
 import com.google.gson.Gson
+import com.usdk.apiservice.aidl.emv.EMVTag
 import com.usdk.apiservice.aidl.emv.UEMV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -167,7 +168,8 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                         }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
                                                     }
 
-                                                } else {
+                                                }
+                                                else {
                                                        clearReversal()
                                                        logger("CompleteSecondGenAc","no")
                                                     syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
@@ -185,9 +187,10 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                     }
                                     //remove emi case
 
-                                } else {
+                                }
+                                else {
                                     //here 2nd Gen Ac in case of Failure
-                                    //here reversal will also be there
+                                    //here reversal will also be clear there
                                     when (cardProcessedDataModal?.getReadCardType()) {
                                         DetectCardType.MAG_CARD_TYPE, DetectCardType.CONTACT_LESS_CARD_TYPE,
                                         DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE,
@@ -205,7 +208,24 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                     cardProcessedDataModal?.getTransType() != TransactionType.SALE.type*/) {
                                                 logger("blank if block","true","e")
 
-                                                syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
+                                               /* testEmvHandler?.let {
+                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData,
+                                                        it
+                                                    ) { printExtraData, de55 ->
+                                                        syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
+                                                    }.performSecondGenOnFail(cardProcessedDataModal)
+                                                }*/
+
+                                                testEmvHandler?.let {
+                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData,
+                                                        it
+                                                    ) { printExtraData, de55 ->
+                                                        syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
+                                                    }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
+                                                }
+
+
+                                             //   syncTransactionCallback(true, successResponseCode.toString(), result, null, null, null)
 
 
                                             } else {

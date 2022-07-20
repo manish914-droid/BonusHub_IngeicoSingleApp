@@ -182,33 +182,30 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
         try {
 
-            if (field55 != null ) {
-                println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+            println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
 
-                var field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
+            val field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
 
-                val onlineResult = StringBuffer()
-                onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
+            val onlineResult = StringBuffer()
+            onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
 
-                val hostRespCode = "3030"
-                onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
+          //  val hostRespCode = "3030"
+          val hostRespCode = "3035"
+            onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
 
-                val onlineApproved = true
-                onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
+            val onlineApproved = true
+            onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
 
-                val hostTlvData = field55
-                onlineResult.append(
-                    TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
-                )
-
-
-                testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
-                iemv?.respondEvent(onlineResult.toString())
-
-                // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
-            }
+            val hostTlvData = field55
+            onlineResult.append(
+                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
+            )
 
 
+            testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+            iemv?.respondEvent(onlineResult.toString())
+
+            // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
 
 
         } catch (ex: java.lang.Exception) {
@@ -218,7 +215,15 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
     }
 
+fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
+    val onlineResult = StringBuffer()
+    val hostRespCode = "3035"
+    onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
 
+    testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+    iemv?.respondEvent(onlineResult.toString())
+
+}
     fun getEndProcessData(result: Int, transData: TransData?) {
 
         logger("end txn","call","e")
