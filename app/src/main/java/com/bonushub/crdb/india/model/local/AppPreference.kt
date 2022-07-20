@@ -57,6 +57,8 @@ object AppPreference {
     const val LAST_CANCEL_RECEIPT_KEY = "Last_Cancel_Receipt"
     const val ONLINE_EMV_DECLINED = "online_emv_Declined"
 
+    const val LAST_BATCH_TimeStamp = "last_batch_time_stemp"
+
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
         val startTs = System.currentTimeMillis()

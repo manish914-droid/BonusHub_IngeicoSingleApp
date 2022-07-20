@@ -1759,7 +1759,7 @@ return false
                 false,
                 { status ->
                     showProgress(getString(R.string.printing))
-                    PrintUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                    PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
                         batchTable,
                         EPrintCopyType.CUSTOMER,
                         this@TransactionActivity as BaseActivityNew

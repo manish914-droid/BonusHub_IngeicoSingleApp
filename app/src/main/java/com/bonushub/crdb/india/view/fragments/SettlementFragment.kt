@@ -26,6 +26,7 @@ import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.transactionprocess.SyncReversalToHost
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
@@ -296,7 +297,7 @@ class SettlementFragment : Fragment() {
 
     private suspend fun printAndDoSettlement() {
 
-        PrintUtil(activity).printDetailReportupdate(tempDataList, activity){ detailPrintStatus ->
+        PrintVectorUtil(activity).printDetailReportupdate(tempDataList, activity){ detailPrintStatus ->
 
             if (detailPrintStatus) {
                 lifecycleScope.launch(

@@ -1453,7 +1453,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                         }
 
                         //Here printing will be there
-                        PrintUtil(this).printSettlementReportupdate(this, batchList, true) {
+                        PrintVectorUtil(this).printSettlementReportupdate(this, batchList, true) {
                             if (it) {
 
                                 //region Saving Batch Data For Last Summary Report and Update Required Values in DB:-

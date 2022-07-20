@@ -16,6 +16,7 @@ import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.ReportsAdapter
 import com.bonushub.crdb.india.view.base.IDialog
@@ -126,7 +127,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             logger("print","util")
 
                             // please uncomment this code to use with batch data for printing
-                            PrintUtil(activity).startPrinting(batchData,
+                            /*PrintUtil(activity).startPrinting(batchData,
                                     EPrintCopyType.DUPLICATE,
                                     activity
                                 ) { printCB, printingFail ->
@@ -136,7 +137,20 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     } else {
                                         iDiag?.hideProgress()
                                     }
+                                }*/
+
+                            PrintVectorUtil(requireContext()).startPrinting(batchData,
+                                EPrintCopyType.DUPLICATE,
+                                activity
+                            ){
+                                    printCB, printingFail ->
+                                if (printCB) {
+                                    iDiag?.hideProgress()
+                                    logger("PRINTING", "LAST_RECEIPT")
+                                } else {
+                                    iDiag?.hideProgress()
                                 }
+                            }
                             reportsAdapter.notifyItemChanged(itemPosition)
                         }
 
@@ -189,7 +203,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             }
                             lifecycleScope.launch {
                                 try {
-                                    PrintUtil(context).printReversal(context, "") {
+                                    PrintVectorUtil(context).printReversal(context, "") {
                                         //  VFService.showToast(it)
                                         iDiag?.hideProgress()
                                     }
@@ -240,7 +254,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                 )?.observe(viewLifecycleOwner) { bat ->
 
                                     if (bat != null && bat.size > 0) {
-                                        PrintUtil(activity).startPrinting(
+                                        PrintVectorUtil(activity).startPrinting(
                                             bat.get(0)!!,
                                             EPrintCopyType.DUPLICATE,
                                             activity
@@ -340,7 +354,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 dataList.clear()
                                                 dataList.addAll(batchData as MutableList<TempBatchFileDataTable>)
                                                 // kushal enble later
-                                                PrintUtil(activity).printDetailReportupdate(
+                                                PrintVectorUtil(activity).printDetailReportupdate(
                                                     dataList,
                                                     activity
                                                 ) { detailPrintStatus ->
@@ -429,7 +443,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                                 dataList.addAll(batList as MutableList<TempBatchFileDataTable>)
                                                 try {
 
-                                                    PrintUtil(activity).printSettlementReportupdate(
+                                                    PrintVectorUtil(activity).printSettlementReportupdate(
                                                         activity,
                                                         dataList,
                                                         false
@@ -524,7 +538,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                                     try {
                                         //BB
                                         logger("print","util")
-                                        PrintUtil(activity).printSettlementReportupdate(activity, batList as MutableList<TempBatchFileDataTable>, false,true) {
+                                        PrintVectorUtil(activity).printSettlementReportupdate(activity, batList as MutableList<TempBatchFileDataTable>, false,true) {
 
                                         }
                                     } catch (ex: java.lang.Exception) {
