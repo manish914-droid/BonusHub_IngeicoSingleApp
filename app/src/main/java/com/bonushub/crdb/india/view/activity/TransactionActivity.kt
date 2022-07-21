@@ -808,7 +808,9 @@ class TransactionActivity : BaseActivityNew() {
                                 //insert with pin
                                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                             } else {
-                                cardProcessedDataModal.setGeneratePinBlock("")
+                                cardProcessedDataModal.setGeneratePinBlock( BytesUtil.bytes2HexString(
+                                    data
+                                ))
                                 //off line pin
                                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
                             }
@@ -822,7 +824,9 @@ class TransactionActivity : BaseActivityNew() {
                                 )
                                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
                             } else {
-                                cardProcessedDataModal.setGeneratePinBlock("")
+                                cardProcessedDataModal.setGeneratePinBlock( BytesUtil.bytes2HexString(
+                                    data
+                                ))
                                 //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                             }
                         }

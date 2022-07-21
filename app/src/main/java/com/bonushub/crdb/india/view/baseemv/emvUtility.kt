@@ -499,7 +499,7 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
             tlvList = StringBuilder()
                 .append("9F350122")
               //  .append("9F3303E0E8C8")
-                .append("9F3303E0F0C8")
+                .append("9F3303E0F0C8") // Terminal Capability // value is changed for support Enciphered
                 .append("9F40056000F0B001")
                 .append("9F1A020356")
                 .append("5F2A020356")
@@ -764,10 +764,10 @@ Log.e("TLV LIST --> ",tlvList)
     println("...onFinalSelect: respondEvent" + emv?.respondEvent(null))
 }
 
-fun utitiyfunction(cardProcessedDataModal: CardProcessedDataModal, emv: UEMV) {
+fun utilityFunctionForCardDataSetting(cardProcessedDataModal: CardProcessedDataModal, emv: UEMV) {
 
     try {
-        val tlvcardTypeLabel = emv?.getTLV(Integer.toHexString(0x50))  // card Type TAG //50
+        val tlvcardTypeLabel = emv.getTLV(Integer.toHexString(0x50))  // card Type TAG //50
         val cardTypeLabel = if (tlvcardTypeLabel?.isNotEmpty() == true) {
             tlvcardTypeLabel
         }

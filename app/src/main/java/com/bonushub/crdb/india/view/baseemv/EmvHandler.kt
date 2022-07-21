@@ -874,7 +874,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         else {
             println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
             println(transData?.cvm?.let { EMVInfoUtil.getCVMDesc(it) })
-            utitiyfunction(cardProcessedDataModal, emv!!)
+            utilityFunctionForCardDataSetting(cardProcessedDataModal, emv!!)
             if (transData != null) {
                 when(transData.acType.toInt()){
                     // Transaction declined offline
@@ -1005,6 +1005,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                         val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
                         cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
 
+
                         val track2data = emv!!.getTLV(Integer.toHexString(0x57))
                         val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
                         println("Field 57 data is"+field57)
@@ -1039,7 +1040,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                             //insert with pin
                                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                                         } else {
-                                            cardProcessedDataModal.setGeneratePinBlock("")
+                                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                                             //off line pin
                                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
                                         }
@@ -1065,7 +1066,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                             vfEmvHandlerCallback(cardProcessedDataModal)
 
                                         } else {
-                                            cardProcessedDataModal.setGeneratePinBlock("")
+                                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                                             //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                                         }
                                     }
@@ -1120,10 +1121,17 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     //    println("Pan block is "+byte2HexStr(lastCardRecord!!.pan))
                      //   addPad("374245001751006", "0", 16, true)
 
-                        println("CardPanNumber data is "+cardProcessedDataModal.getPanNumberData() ?: "")
+                        println(("CardPanNumber data is " + cardProcessedDataModal.getPanNumberData()) ?: "")
 
-                        Utility.hexStr2Byte(addPad("374245001751006", "0", 16, true))
+                        // Getting Pan number for Cls online Pin here
+
+                       val trackList=emv!!.getTLV(Integer.toHexString(0x57)).split('D', ignoreCase = true)
+                        val panNum=trackList[0]
+                        cardProcessedDataModal.setPanNumberData(panNum ?: "")
+
+                      //  Utility.hexStr2Byte(addPad("374245001751006", "0", 16, true))
                         param.putByteArray(PinpadData.PAN_BLOCK, Utility.hexStr2Byte(addPad(cardProcessedDataModal.getPanNumberData() ?: "", "0", 16, true)))
+
                         pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
 
 
@@ -1255,7 +1263,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             //insert with pin
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                         } else {
-                            cardProcessedDataModal.setGeneratePinBlock("")
+                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                             //off line pin
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
                         }
@@ -1265,7 +1273,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
                         } else {
-                            cardProcessedDataModal.setGeneratePinBlock("")
+                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                             //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                         }
                     }
@@ -1594,7 +1602,7 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
 
                 byte2HexStr(lastCardRecord!!.pan)
                 println("Pan block is "+byte2HexStr(lastCardRecord!!.pan))
-                addPad("374245001751006", "0", 16, true)
+              //  addPad("374245001751006", "0", 16, true)
 
                 println("CardPanNumber data is "+cardProcessedDataModal.getPanNumberData() ?: "")
 
@@ -1667,7 +1675,7 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
 
        record?.pan?.byteArr2HexStr()
        // settingCAPkeys(emv)
-        utitiyfunction(cardProcessedDataModal, emv!!)
+        utilityFunctionForCardDataSetting(cardProcessedDataModal, emv!!)
 
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
@@ -1677,7 +1685,7 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
     open fun doSendOut(ins: Int, data: ByteArray) {
         when (ins) {
             KernelINS.DISPLAY ->            // DisplayMsg: MsgID（1 byte） + Currency（1 byte）+ DataLen（1 byte） + Data（30 bytes）
-                if (data[0] == MessageID.ICC_ACCOUNT.toByte()) {
+                if (data[0] == MessageID.ICC_ACCOUNT.toByte() ) {
                     val len: Byte = data[2]
                     val account = BytesUtil.subBytes(data, 1 + 1 + 1, len.toInt())
                     val accTLVList = TLVList.fromBinary(account)
