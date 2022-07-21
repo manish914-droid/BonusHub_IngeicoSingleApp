@@ -663,7 +663,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
         println("EMV Balance is" + emv!!.balance)
         println("TLV data is" + emv!!.getTLV("9F02"))
-    /*    val tagList = arrayOf(
+        val tagList = arrayOf(
             0x5F2A,
             0x5F34,
             0x82,
@@ -686,6 +686,14 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F37,
             0x9F10,
             0x8F01
+       /*     0x8E,
+            0x9F2E,
+            0x9F2D,
+            0x9F2F,
+            0x90,
+            0x82,
+            0x9F32,*/
+
         )
         val out = BytesValue()
         val tagOfF55 = SparseArray<String>()
@@ -704,7 +712,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 Log.e("EmvHelper", "getEmvData:" + Integer.toHexString(tag) + ", fails")
             }
         }
-*/
+
        cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_NO_PIN.posEntry.toString())
         when (cardProcessedDataModal.getReadCardType()) {
             DetectCardType.EMV_CARD_TYPE -> {
@@ -766,17 +774,22 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F26,
             0x9F27,
             0x9F33,
-          0x9F34,
+            0x9F34,
             0x9F35,
             0x9F36,
             0x9F37,
-            0x9F10
+            0x9F10,
+         /*   0x8E,
+            0x9F2E,
+            0x9F2D,
+            0x9F2F*/
+
         )
         val sb = StringBuilder()
         for (tag in tagList) {
        //   println(  "9F34 --->  "+    emv!!.getTLV(Integer.toHexString(f).toUpperCase(Locale.ROOT)))
-if(emv!!.getTLV(Integer.toHexString(tag).toUpperCase(Locale.ROOT)).isEmpty())
-continue
+        if(emv!!.getTLV(Integer.toHexString(tag).toUpperCase(Locale.ROOT)).isEmpty())
+          continue
 
             val v1 = emv!!.getTLV(Integer.toHexString(tag).toUpperCase(Locale.ROOT))
             val v = BytesUtil.hexString2Bytes(v1)
@@ -787,16 +800,7 @@ continue
                     l = "0$l"
                 }
 
-                if (false){//f == 0x9F10 /*&& CardAid.AMEX.aid == cardProcessedDataModal.getAID()*/) {
-                   /* val c = l + BytesUtil.bytes2HexString(v)
-                    var le = Integer.toHexString(c.length / 2)
-                    if (le.length < 2) {
-                        le = "0$le"
-                    }
-
-                    sb.append(le)
-                    sb.append(c)*/
-
+                if (tag == 0x9F10 && CardAid.AMEX.aid == cardProcessedDataModal.getAID()) {
                     val c = l + BytesUtil.bytes2HexString(v)
                     var le = Integer.toHexString(c.length / 2)
                     if (le.length < 2) {
