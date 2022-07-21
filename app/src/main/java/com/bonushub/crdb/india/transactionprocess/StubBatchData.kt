@@ -137,7 +137,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         }
 
 
-        batchFileData.isPinverified = true
+        //batchFileData.isPinverified = true
 
         batchFileData.nocvm = cardProcessedDataModal.getNoCVM() ?: false
         batchFileData.ctlsCaption= terminalData?.ctlsCaption?:""
