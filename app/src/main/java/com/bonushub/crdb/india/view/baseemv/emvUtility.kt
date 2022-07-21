@@ -564,10 +564,7 @@ Log.e("TLV LIST --> ",tlvList)
         }
         KernelID.VISA.toByte() -> {               // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
             tlvList = StringBuilder()
-
-
                 .append("9F410400000001")
-
                 .append("9F350122")
                 .append("9F3303E0F0C8")
              //   .append("9F3303E0E8C8")
@@ -580,7 +577,8 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F1B0400003A98")
 
-                .append("9F660436004000") // TTQ
+               // .append("9F660436004000") // TTQ
+                .append("9F6604F6004000") // TTQ
                 .append("DF06027C00")
 
                 .append("DF918111050010000000") // Terminal action code(decline)
@@ -593,9 +591,7 @@ Log.e("TLV LIST --> ",tlvList)
             //    .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
 
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
-                .append("DF81300100")            //Try Again Flag
-                //.append("")
-
+               // .append("DF81300100")            //Try Again Flag
 
              //   .append("DF812306000000100000")
               //  .append("DF812606000000100000")

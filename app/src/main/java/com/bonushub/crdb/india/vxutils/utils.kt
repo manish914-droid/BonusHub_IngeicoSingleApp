@@ -1437,9 +1437,9 @@ fun changeEditTextBackground(editText:TextInputEditText?,editTextBorder:TextInpu
 }
 
 
-fun stringToHex(ascii:String) :String?{
+fun stringToHex(ascii:String) :String{
     // Initialize final String
-    var hex: String? = ""
+    var hex: String = ""
 
     // Make a loop to iterate through
     // every character of ascii string

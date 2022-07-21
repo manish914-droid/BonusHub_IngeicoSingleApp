@@ -663,7 +663,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
         println("EMV Balance is" + emv!!.balance)
         println("TLV data is" + emv!!.getTLV("9F02"))
-        val tagList = arrayOf(
+    /*    val tagList = arrayOf(
             0x5F2A,
             0x5F34,
             0x82,
@@ -712,7 +712,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 Log.e("EmvHelper", "getEmvData:" + Integer.toHexString(tag) + ", fails")
             }
         }
-
+*/
        cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_NO_PIN.posEntry.toString())
         when (cardProcessedDataModal.getReadCardType()) {
             DetectCardType.EMV_CARD_TYPE -> {
@@ -800,7 +800,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     l = "0$l"
                 }
 
-                if (tag == 0x9F10 && CardAid.AMEX.aid == cardProcessedDataModal.getAID()) {
+                if (tag == 0x9F10 && CardAid.AMEX.aid == cardProcessedDataModal.getAID()){//f == 0x9F10 /*&& CardAid.AMEX.aid == cardProcessedDataModal.getAID()*/) {
                     val c = l + BytesUtil.bytes2HexString(v)
                     var le = Integer.toHexString(c.length / 2)
                     if (le.length < 2) {
