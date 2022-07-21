@@ -999,6 +999,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
                 when (transData.cvm) {
                     CVMFlag.EMV_CVMFLAG_NOCVM.toByte() -> {
+
+                        //cardProcessedDataModal.setIsOnline(0)
+
                         cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
                         cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
 
@@ -1137,6 +1140,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
                     }
                     CVMFlag.EMV_CVMFLAG_SIGNATURE.toByte() -> {
+
+                        //cardProcessedDataModal.setIsOnline(0)
+
                         cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
                         cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
 
