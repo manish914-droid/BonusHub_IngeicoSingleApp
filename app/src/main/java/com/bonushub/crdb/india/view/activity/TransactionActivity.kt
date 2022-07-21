@@ -340,6 +340,11 @@ class TransactionActivity : BaseActivityNew() {
                                 if (cardProcessedDataModal.getFallbackType() != EFallbackCode.EMV_fallback.fallBackCode) {
                                     //Checking Fallback
                                     if (scFirstByte == '2' || scFirstByte == '6') {
+
+                                        // reset flag of pin verify when swipe fallback
+                                        cardProcessedDataModal.setIsOnline(0)
+                                        cardProcessedDataModal.setPinEntryFlag("0")
+
                                         onEndProcessCalled(
                                             EFallbackCode.Swipe_fallback.fallBackCode,
                                             cardProcessedDataModal
