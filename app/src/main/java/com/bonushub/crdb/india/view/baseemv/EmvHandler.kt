@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
-import android.util.SparseArray
 import android.widget.Toast
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
@@ -24,7 +23,6 @@ import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.vxutils.Utility
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
-import com.usdk.apiservice.aidl.data.BytesValue
 import com.usdk.apiservice.aidl.emv.*
 import com.usdk.apiservice.aidl.pinpad.*
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +35,7 @@ import java.util.*
 open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
     companion object {
-        private val TAG = EmvHandler::class.java.simpleName
+        val TAG = EmvHandler::class.java.simpleName
     }
 
     private var defaultScope = CoroutineScope(Dispatchers.Default)
@@ -876,6 +874,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         else {
             println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
             println(transData?.cvm?.let { EMVInfoUtil.getCVMDesc(it) })
+            utitiyfunction(cardProcessedDataModal, emv!!)
             if (transData != null) {
                 when(transData.acType.toInt()){
                     // Transaction declined offline
@@ -1668,83 +1667,7 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
 
        record?.pan?.byteArr2HexStr()
        // settingCAPkeys(emv)
-
-
-        try {
-            val tlvcardTypeLabel = emv?.getTLV(Integer.toHexString(0x50))  // card Type TAG //50
-            val cardTypeLabel = if (tlvcardTypeLabel?.isNotEmpty() == true) {
-                tlvcardTypeLabel
-            }
-            else {
-                ""
-            }
-            Log.d(TAG,"Card Type ->${hexString2String(cardTypeLabel)}")
-            cardProcessedDataModal.setcardLabel(hexString2String(cardTypeLabel))
-
-        } catch (ex: Exception) {
-            Log.e(TAG, ex.message ?: "")
-        }
-
-        try {
-            val tlvcardHolderName = emv?.getTLV(Integer.toHexString(0x5F20))   // CardHolder Name TAG //5F20
-            val cardHolderName = if (tlvcardHolderName?.isNotEmpty() == true) {
-                tlvcardHolderName
-            }
-            else {""}
-            Log.d(TAG,"Card Holder Name ---> ${hexString2String(cardHolderName)}")
-
-            cardProcessedDataModal.setCardHolderName(hexString2String(cardHolderName))
-
-        } catch (ex: Exception) {
-            Log.e(TAG, ex.message ?: "")
-        }
-
-        try {
-            val tlvAppLabel = emv?.getTLV(Integer.toHexString(0x9F12))   // application label  TAG // 9F12
-            val appLabel = if (tlvAppLabel?.isNotEmpty() == true) {
-                val removespace = hexString2String(tlvAppLabel)
-                val finalstr = removespace.trimEnd()
-               finalstr
-            }
-            else {
-                ""
-            }
-            Log.d(TAG,"Application label ->${appLabel}")
-            cardProcessedDataModal.setApplicationLabel(appLabel)
-        } catch (ex: Exception) {
-            Log.e(TAG, ex.message ?: "")
-        }
-
-        try {
-            val tlvissuerCounTryCode = emv?.getTLV(Integer.toHexString(0x5F2A))    //issuer country code 5F2A
-            val issuerCountryCode = if (tlvissuerCounTryCode?.isNotEmpty() == true) {
-                tlvissuerCounTryCode
-            }
-            else {
-                ""
-            }
-            Log.d(TAG,"Card issuer country code ---> $issuerCountryCode")
-            cardProcessedDataModal.setCardIssuerCountryCode(issuerCountryCode)
-        } catch (ex: Exception) {
-            Log.e(TAG, ex.message ?: "")
-        }
-
-        try {
-            val tlvAid = emv?.getTLV(Integer.toHexString(0x84))     // AID  TAG //84
-            val aidStr = if (tlvAid?.isNotEmpty() == true) {
-                val aidstr = tlvAid.take(10)
-                aidstr
-            }
-            else {
-                ""
-            }
-            Log.d(TAG,"Aid  code ---> $aidStr")
-            cardProcessedDataModal.setAID(aidStr)
-
-        } catch (ex: Exception) {
-            Log.e(TAG, ex.message ?: "")
-        }
-
+        utitiyfunction(cardProcessedDataModal, emv!!)
 
         println("...onReadRecord: respondEvent" + emv!!.respondEvent(null))
     }
