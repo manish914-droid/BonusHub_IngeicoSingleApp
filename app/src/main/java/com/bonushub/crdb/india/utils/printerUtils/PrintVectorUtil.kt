@@ -657,7 +657,8 @@ class PrintVectorUtil(context: Context?) {
                         }
 
 
-                        batchTable.cardHolderName?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL) }
+                        Log.e("HolderName",""+batchTable.cardHolderName)
+                        batchTable.cardHolderName?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL) }
                     }
 
                     try {
@@ -2286,7 +2287,9 @@ class PrintVectorUtil(context: Context?) {
                         headerPrinting(AppPreference.AMEX_BANK_CODE)
                         isFirstTimeForAmxLogo = false
                     }else{
-                        headerPrinting(DEFAULT_BANK_CODE)
+                        //headerPrinting(DEFAULT_BANK_CODE)
+                        //headerPrinting(AppPreference.getBankCode())
+                        headerPrinting(tpt?.tidBankCode)
                     }
 
 
@@ -2730,7 +2733,9 @@ class PrintVectorUtil(context: Context?) {
                 // setLogoAndHeader()
 
 
-                headerPrinting(DEFAULT_BANK_CODE)
+                //headerPrinting(DEFAULT_BANK_CODE)
+                //headerPrinting(AppPreference.getBankCode())
+                headerPrinting(tpt?.tidBankCode)
 
                 val td = System.currentTimeMillis()
                 val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
@@ -2848,7 +2853,9 @@ class PrintVectorUtil(context: Context?) {
                     isFirstTimeForAmxLogo = false
                     firstTimePrintedTid = isAmexPresent!!.hostTID.toString()
                 }else{
-                    headerPrinting(DEFAULT_BANK_CODE)
+                    //headerPrinting(DEFAULT_BANK_CODE)
+                   // headerPrinting(AppPreference.getBankCode())
+                    headerPrinting(tpt?.tidBankCode)
                 }
 
 
@@ -3314,7 +3321,9 @@ class PrintVectorUtil(context: Context?) {
                     isFirstTimeForAmxLogo = false
                 }else
                 {
-                    headerPrinting(DEFAULT_BANK_CODE)
+                    //headerPrinting(DEFAULT_BANK_CODE)
+                    //headerPrinting(AppPreference.getBankCode())
+                    headerPrinting(tpt?.tidBankCode)
                 }
 
                 if (isLastSummary) {
@@ -3493,7 +3502,9 @@ class PrintVectorUtil(context: Context?) {
                     isFirstTimeForAmxLogo = false
                 }else
                 {
-                    headerPrinting(DEFAULT_BANK_CODE)
+                    //headerPrinting(DEFAULT_BANK_CODE)
+                    //headerPrinting(AppPreference.getBankCode())
+                    headerPrinting(tpt?.tidBankCode)
                 }
 
                 if (isLastSummary) {
@@ -3930,7 +3941,9 @@ class PrintVectorUtil(context: Context?) {
                         headerPrinting(AMEX_BANK_CODE)
                         isFirstTimeForAmxLogo = false
                     }else{
-                        headerPrinting(DEFAULT_BANK_CODE)
+                        //headerPrinting(DEFAULT_BANK_CODE)
+                        //headerPrinting(AppPreference.getBankCode())
+                        headerPrinting(tpt?.tidBankCode)
                     }
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()
