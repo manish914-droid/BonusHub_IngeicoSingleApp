@@ -17,6 +17,7 @@ import com.bonushub.crdb.india.model.remote.TenuresWithIssuerTncs
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.repository.ServerRepository
 import com.bonushub.crdb.india.utils.ToastUtils
+import com.bonushub.crdb.india.utils.refreshToolbarLogos
 
 import com.bonushub.crdb.india.view.adapter.EMISchemeAndOfferAdapter
 import com.bonushub.crdb.india.view.base.BaseActivityNew
@@ -89,6 +90,8 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         super.onCreate(savedInstanceState)
         binding = FragmentTenureSchemeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+
+        refreshToolbarLogos(this)
 
         // txtViewIssuerName imgViewIssuerIcon
         cardProcessedDataModal = intent?.getSerializableExtra("cardProcessedData") as? CardProcessedDataModal?

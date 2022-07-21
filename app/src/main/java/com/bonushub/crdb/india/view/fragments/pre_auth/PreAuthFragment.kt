@@ -13,6 +13,7 @@ import com.bonushub.crdb.india.databinding.ItemReportsBinding
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.india.utils.ToastUtils
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 
 
@@ -45,8 +46,9 @@ class PreAuthFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as NavigationActivity).manageTopToolBar(false)
-        binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth_new)
+        /*binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth_new)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_preauth_new, "PRE-AUTH")
 
         binding?.rvPerAuthCategory?.apply{
             layoutManager = GridLayoutManager(activity, 1)

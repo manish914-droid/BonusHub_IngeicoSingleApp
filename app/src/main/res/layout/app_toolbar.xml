@@ -42,9 +42,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:gravity="right"
                 android:orientation="horizontal"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -62,7 +62,7 @@
                     android:paddingTop="@dimen/pad_2"
                     android:paddingEnd="@dimen/pad_4"
                     android:paddingBottom="@dimen/pad_2"
-
+                    android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_hdfcsvg"
                     android:visibility="visible" />
 
@@ -78,7 +78,9 @@
                     android:paddingBottom="@dimen/pad_2"
                     android:src="@drawable/bonushub_white"
                     android:textSize="@dimen/text_size_xregular"
-                    android:tint="@color/txt_color_blue" />
+                    android:tint="@color/txt_color_blue"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="visible"/>
             </LinearLayout>
 
             <ImageView
@@ -88,7 +90,7 @@
                 android:layout_marginEnd="@dimen/pad_20"
                 android:scaleType="fitXY"
                 android:src="@mipmap/ic_amex_logo_new"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

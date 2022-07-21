@@ -17,15 +17,15 @@
         app:layout_constraintTop_toTopOf="parent"
         android:padding="@dimen/pad_10"/>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout3"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/pad_5"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/guideline"
         app:layout_constraintStart_toEndOf="@+id/back_image_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -34,24 +34,43 @@
             android:layout_height="@dimen/pad_40"
             android:padding="@dimen/pad_8"
             android:scaleType="fitXY"
-
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
             android:id="@+id/sub_header_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="5dp"
             android:fontFamily="@font/muli_bold"
-            android:gravity="center"
-            android:text="@string/dashboard"
             android:textAllCaps="true"
             android:textColor="@color/txt_color"
             android:textSize="@dimen/text_size_regular"
-            android:textStyle="normal" />
+            android:textStyle="normal"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:textAlignment="textStart"
+            app:layout_constraintStart_toEndOf="@+id/header_Image"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/toolbar_Bank_logo"/>
+
+        <ImageView
+            android:id="@+id/toolbar_Bank_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/pad_20"
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_amex_logo_new"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/header_home"
@@ -66,17 +85,6 @@
 
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imgViewAmex"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/pad_20"
-        android:scaleType="fitXY"
-        android:src="@mipmap/ic_amex_logo_new"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:layout_width="match_parent"

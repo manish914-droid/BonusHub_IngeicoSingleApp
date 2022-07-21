@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentReportsBinding
 import com.bonushub.crdb.india.utils.SettingsItem
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.SettingsAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,8 +44,9 @@ class SettingsFragment : Fragment(), ISettingsFragmentItemClick {
 
         (activity as NavigationActivity).manageTopToolBar(false)
 
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.settings)
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_setting)
+        /*binding?.subHeaderView?.subHeaderText?.text = getString(R.string.settings)
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_setting)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_setting, getString(R.string.settings))
 
         iSettingsFragmentItemClick = this
 

@@ -65,8 +65,9 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
        // iDiag?.onEvents(VxEvent.ChangeTitle("Report"))
         (activity as NavigationActivity).manageTopToolBar(false)
 
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.reports_header)
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_reports)
+        /*binding?.subHeaderView?.subHeaderText?.text = getString(R.string.reports_header)
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_reports)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_reports, getString(R.string.reports_header))
 
         iReportsFragmentItemClick = this
 

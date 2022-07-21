@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentPreAuthPendingDetailsBinding
 import com.bonushub.crdb.india.utils.logger
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 
 
 class PreAuthPendingDetailsFragment : Fragment() {
@@ -26,8 +27,10 @@ class PreAuthPendingDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)
+       /* binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_preauth, "PRE-AUTH")
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }

@@ -21,10 +21,7 @@ import com.bonushub.crdb.india.model.local.BrandEMISubCategoryTable
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.model.remote.BrandEmiBillSerialMobileValidationModel
-import com.bonushub.crdb.india.utils.DeviceHelper
-import com.bonushub.crdb.india.utils.EDashboardItem
-import com.bonushub.crdb.india.utils.ToastUtils
-import com.bonushub.crdb.india.utils.logger
+import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -85,8 +82,10 @@ class BillNumSerialNumEntryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
+//        binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
+//        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
+        refreshSubToolbarLogos(this,eDashBoardItem)
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }

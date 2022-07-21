@@ -19,6 +19,7 @@ import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.logger
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BrandEMISubCategoryAdapter
 import com.bonushub.crdb.india.view.base.IDialog
@@ -66,15 +67,19 @@ class BrandEmiSubCategoryFragment : Fragment() {
 
 
         if (eDashBoardItem  == EDashboardItem.BRAND_EMI_CATALOGUE) {
-            brandSubCatBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
-            brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+            /*brandSubCatBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+            brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)*/
+            refreshSubToolbarLogos(this,null,R.drawable.ic_emicatalogue, getString(R.string.brandEmiCatalogue))
+
             brandSubCatBinding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
             brandSubCatBinding?.subHeaderView?.headerHome?.setOnClickListener {   (activity as NavigationActivity).transactFragment(
                 DashboardFragment()
             ) }
         }else {
-            brandSubCatBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
-            brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+           /* brandSubCatBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+            brandSubCatBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)*/
+            refreshSubToolbarLogos(this,null,R.drawable.ic_brandemi, "Brand Emi")
+
         }
         brandSubCatBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()

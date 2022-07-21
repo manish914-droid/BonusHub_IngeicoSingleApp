@@ -13,6 +13,7 @@ import com.bonushub.crdb.india.databinding.FragmentCommunicationOptionBinding
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.utils.CommunicationParamItem
 import com.bonushub.crdb.india.utils.ToastUtils
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BankFunctionsCommParamAdapter
 import com.bonushub.crdb.india.viewmodel.BankFunctionsViewModel
@@ -46,8 +47,9 @@ class CommunicationOptionFragment : Fragment(), ICommunicationOptionFragmentItem
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.communication_param_header)
+        /*binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
+        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.communication_param_header)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_bankfunction_new, getString(R.string.communication_param_header))
 
         iCommunicationOptionFragmentItemClick = this
 

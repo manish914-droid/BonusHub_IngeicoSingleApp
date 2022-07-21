@@ -149,6 +149,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
+        refreshToolbarLogos(this)
         manageTopToolBar(true)
         setupNavigationDrawerLayout()
          //lockStatusBar()

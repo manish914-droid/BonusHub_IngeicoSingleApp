@@ -79,8 +79,11 @@ class VoidMainFragment : Fragment() {
         (activity as NavigationActivity).manageTopToolBar(false)
 
         // set header
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.void_sale)
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_void)
+        /*binding?.subHeaderView?.subHeaderText?.text = getString(R.string.void_sale)
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_void)*/
+
+        refreshSubToolbarLogos(this,null,R.drawable.ic_void, getString(R.string.void_sale))
+
         globalCardProcessedModel.setTransType(BhTransactionType.VOID.type)
 
         lifecycleScope.launch(Dispatchers.IO) {

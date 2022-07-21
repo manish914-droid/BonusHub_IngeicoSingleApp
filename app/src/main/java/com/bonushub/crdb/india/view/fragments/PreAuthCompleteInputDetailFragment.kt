@@ -63,9 +63,11 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
 //        binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH COMPLETE"
 //        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)
 
-        binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
-        binding?.subHeaderView?.headerImage?.setImageResource(eDashBoardItem.res)
-       
+       /* binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
+        binding?.subHeaderView?.headerImage?.setImageResource(eDashBoardItem.res)*/
+
+        refreshSubToolbarLogos(this,eDashBoardItem)
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }

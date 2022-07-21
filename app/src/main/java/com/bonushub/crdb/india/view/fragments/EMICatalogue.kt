@@ -17,6 +17,7 @@ import com.bonushub.crdb.india.db.AppDatabase
 import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.IFragmentRequest
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
@@ -57,10 +58,12 @@ class EMICatalogue : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.emi_catalogue)
+        /*binding?.subHeaderView?.subHeaderText?.text = getString(R.string.emi_catalogue)
         (action as? EDashboardItem)?.res?.let {
             binding?.subHeaderView?.headerImage?.setImageResource(it)
-        }
+        }*/
+        refreshSubToolbarLogos(this,null,(action as? EDashboardItem)?.res?:0, getString(R.string.emi_catalogue))
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager.popBackStackImmediate() }
         binding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
         binding?.subHeaderView?.headerHome?.setOnClickListener { parentFragmentManager.popBackStackImmediate() }

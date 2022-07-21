@@ -128,6 +128,9 @@ class TransactionActivity : BaseActivityNew() {
         //setContentView(R.layout.activity_emv)
         setContentView(emvBinding?.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        refreshToolbarLogos(this)
+
         emvBinding?.subHeaderView?.subHeaderText?.text = transactionTypeEDashboardItem.title
         emvBinding?.subHeaderView?.headerImage?.setImageResource(transactionTypeEDashboardItem.res) //= transactionTypeEDashboardItem.title
         emvBinding?.txnAmtLl?.visibility = View.VISIBLE

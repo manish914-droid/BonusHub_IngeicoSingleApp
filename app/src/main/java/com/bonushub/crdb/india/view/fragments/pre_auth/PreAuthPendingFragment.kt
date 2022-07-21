@@ -66,8 +66,10 @@ class PreAuthPendingFragment : Fragment() {
 
         iDialog = (activity as NavigationActivity)
 
-        binding?.subHeaderView?.subHeaderText?.text = "PENDING PREAUTH"
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth_submenu)
+        /*binding?.subHeaderView?.subHeaderText?.text = "PENDING PREAUTH"
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth_submenu)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_preauth_submenu, "PENDING PREAUTH")
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }

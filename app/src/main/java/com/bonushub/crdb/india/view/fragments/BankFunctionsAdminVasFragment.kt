@@ -69,8 +69,9 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
         DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
         (activity as NavigationActivity).manageTopToolBar(false)
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_drawer_bank_function)
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
+//        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_drawer_bank_function)
+//        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bank_functions_header)
+        refreshSubToolbarLogos(this,null,R.drawable.ic_drawer_bank_function, getString(R.string.bank_functions_header))
 
         try {
             iDialog = (activity as NavigationActivity)

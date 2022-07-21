@@ -22,6 +22,7 @@ import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.logger
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BrandEMIMasterCategoryAdapter
 import com.bonushub.crdb.india.view.base.BaseActivityNew
@@ -73,15 +74,19 @@ class BrandEmiMasterCategoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         if (eDashBoardItem == EDashboardItem.BRAND_EMI_CATALOGUE) {
-            brandMasterBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
-            brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+//            brandMasterBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+//            brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+
+            refreshSubToolbarLogos(this,null,R.drawable.ic_emicatalogue, getString(R.string.brandEmiCatalogue))
+
             brandMasterBinding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
             brandMasterBinding?.subHeaderView?.headerHome?.setOnClickListener {   (activity as NavigationActivity).transactFragment(
                 DashboardFragment()
             ) }
         }else {
-            brandMasterBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
-            brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+//            brandMasterBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+//            brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+            refreshSubToolbarLogos(this,null,R.drawable.ic_brandemi, "Brand Emi")
 
         }
 

@@ -146,13 +146,14 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
     private fun setUiForEdit()
     {
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
+       // binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
 
         when(type){
 
             CommunicationParamItem.TXN_PARAM -> {
 
-                binding?.subHeaderView?.subHeaderText?.text = getString(R.string.txn_param_header)
+                refreshSubToolbarLogos(this,null,R.drawable.ic_bankfunction_new, getString(R.string.txn_param_header))
+               // binding?.subHeaderView?.subHeaderText?.text = getString(R.string.txn_param_header)
 
                 lifecycleScope.launch(Dispatchers.Main) {
                     bankFunctionsViewModel.getTerminalCommunicationTableByRecordType(type.value.toString())?.observe(viewLifecycleOwner,{
@@ -168,7 +169,8 @@ class CommunicationOptionSubMenuFragment : Fragment(), IBankFunctionsTableEditIt
 
             CommunicationParamItem.APP_UPDATE_PARAM -> {
 
-                binding?.subHeaderView?.subHeaderText?.text = getString(R.string.app_update_param_header)
+               // binding?.subHeaderView?.subHeaderText?.text = getString(R.string.app_update_param_header)
+                refreshSubToolbarLogos(this,null,R.drawable.ic_bankfunction_new, getString(R.string.app_update_param_header))
 
                 lifecycleScope.launch(Dispatchers.Main) {
                     bankFunctionsViewModel.getTerminalCommunicationTableByRecordType(type.value.toString())?.observe(viewLifecycleOwner,{

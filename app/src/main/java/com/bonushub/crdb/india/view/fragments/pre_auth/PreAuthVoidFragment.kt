@@ -60,8 +60,9 @@ class PreAuthVoidFragment : Fragment() {
 
         eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
 
-        binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
-        binding?.subHeaderView?.headerImage?.setImageResource(eDashBoardItem.res)
+        /*binding?.subHeaderView?.subHeaderText?.text = eDashBoardItem.title
+        binding?.subHeaderView?.headerImage?.setImageResource(eDashBoardItem.res)*/
+        refreshSubToolbarLogos(this,eDashBoardItem)
 
         binding?.amtCrdView?.visibility = View.GONE
         binding?.authCompleteBtn?.text = "Void PreAuth"

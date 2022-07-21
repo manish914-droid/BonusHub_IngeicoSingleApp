@@ -77,8 +77,10 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.terminal_param_header)
+//        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bankfunction_new)
+//        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.terminal_param_header)
+
+        refreshSubToolbarLogos(this,null,R.drawable.ic_bankfunction_new, getString(R.string.terminal_param_header))
 
         iBankFunctionsTerminalItemClick = this
 

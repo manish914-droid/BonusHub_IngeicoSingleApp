@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentPreAuthCompleteBinding
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.view.fragments.AuthCompletionData
@@ -32,8 +33,10 @@ class PreAuthCompleteFragment : Fragment() {
 
         iDiag = (activity as NavigationActivity)
 
-        binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH COMPLETE"
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)
+        /*binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH COMPLETE"
+        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth)*/
+        refreshSubToolbarLogos(this,null,R.drawable.ic_preauth, "PRE-AUTH COMPLETE")
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }

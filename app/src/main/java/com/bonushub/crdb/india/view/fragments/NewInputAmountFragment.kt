@@ -121,6 +121,8 @@ class NewInputAmountFragment : Fragment() {
         brandDataMaster = arguments?.getSerializable("brandDataMaster") as? BrandEMIMasterDataModal
         testEmiTxnType = (arguments?.getSerializable("TestEmiOption") ?: "") as? String
 
+        refreshSubToolbarLogos(this@NewInputAmountFragment, eDashBoardItem)
+
         (activity as NavigationActivity).manageTopToolBar(false)
 
 

@@ -16,7 +16,9 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.MainActivity
@@ -28,6 +30,7 @@ import com.bonushub.crdb.india.di.scope.BHFieldParseIndex
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.repository.GenericResponse
 import com.bonushub.crdb.india.transactionprocess.CreateTransactionPacket
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
@@ -2116,5 +2119,120 @@ suspend fun showMerchantAlertBox(
                 }
                 activity.hideProgress()
             })
+    }
+}
+
+//Below code to check Bank Code and on basis of that it will inflate Both bank & bonushub logo or only bank logo on basis of condition:-
+fun refreshToolbarLogos(activity: Activity) {
+    //Show Logo of Bank by checking Bank Code:-
+    val tpt = getTptData()
+    val bonushubLogo = activity.findViewById<ImageView>(R.id.main_toolbar_BhLogo)
+    val bankLogoImageView = activity.findViewById<ImageView>(R.id.toolbar_Bank_logo)
+    var bankLogo = 0
+
+    when (AppPreference.getBankCode()) {
+        "02" -> bankLogo = R.mipmap.ic_amex_logo_new
+        "01" -> bankLogo = R.drawable.ic_hdfcsvg
+        else -> {
+        }
+    }
+
+    //Show Both BonusHub and Bank Logo on base of condition check on tpt.reservedValues 10th Position:-
+    if (tpt != null) {
+        if (!TextUtils.isEmpty(tpt.reservedValues)) {
+            if (tpt.reservedValues.length > 10) {
+                for (i in tpt.reservedValues.indices) {
+                    if (i == 9) {
+                        if (tpt.reservedValues[i].toString() == "1") {
+                            bonushubLogo?.visibility = View.VISIBLE
+                            bankLogoImageView?.setImageResource(bankLogo)
+                            bankLogoImageView?.visibility = View.VISIBLE
+                            break
+                        } else {
+                            bonushubLogo?.visibility = View.GONE
+                            bankLogoImageView?.setImageResource(bankLogo)
+                            bankLogoImageView?.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            } else {
+                bonushubLogo?.visibility = View.GONE
+                bankLogoImageView?.setImageResource(bankLogo)
+                bankLogoImageView?.visibility = View.VISIBLE
+            }
+        } else {
+            bonushubLogo?.visibility = View.GONE
+            bankLogoImageView?.setImageResource(bankLogo)
+            bankLogoImageView?.visibility = View.VISIBLE
+        }
+    }
+
+    if (!AppPreference.getLogin()) {
+        bonushubLogo?.visibility = View.VISIBLE
+        //   bankLogoImageView?.setImageResource(bankLogo)
+        bankLogoImageView?.visibility = View.GONE
+
+    }
+}
+
+fun refreshSubToolbarLogos(fragment: Fragment, eDashboardItem: EDashboardItem?, subHeadetIcon:Int = 0, subHeaderTittle:String = "") {
+    //Show Logo of Bank by checking Bank Code:-
+    val tpt = getTptData()
+   // val bonushubLogo = fragment.view?.findViewById<ImageView>(R.id.main_toolbar_BhLogo)
+    val headerImage = fragment.view?.findViewById<ImageView>(R.id.header_Image)
+    val subheadertext = fragment.view?.findViewById<TextView>(R.id.sub_header_text)
+    val bankLogoImageView = fragment.view?.findViewById<ImageView>(R.id.toolbar_Bank_logo)
+    var bankLogo = 0
+
+    if(eDashboardItem != null){
+    headerImage?.setImageResource(eDashboardItem.res)
+    subheadertext?.text = eDashboardItem.title
+    }else{
+        headerImage?.setImageResource(subHeadetIcon)
+        subheadertext?.text = subHeaderTittle
+    }
+
+    when (AppPreference.getBankCode()) {
+        "02" -> bankLogo = R.mipmap.ic_amex_logo_new
+        "01" -> bankLogo = R.drawable.ic_hdfcsvg
+        else -> {
+        }
+    }
+
+    //Show Both BonusHub and Bank Logo on base of condition check on tpt.reservedValues 10th Position:-
+    if (tpt != null) {
+        if (!TextUtils.isEmpty(tpt.reservedValues)) {
+            if (tpt.reservedValues.length > 10) {
+                for (i in tpt.reservedValues.indices) {
+                    if (i == 9) {
+                        if (tpt.reservedValues[i].toString() == "1") {
+                           // bonushubLogo?.visibility = View.VISIBLE
+                            bankLogoImageView?.setImageResource(bankLogo)
+                            bankLogoImageView?.visibility = View.VISIBLE
+                            break
+                        } else {
+                           // bonushubLogo?.visibility = View.GONE
+                            bankLogoImageView?.setImageResource(bankLogo)
+                            bankLogoImageView?.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            } else {
+               // bonushubLogo?.visibility = View.GONE
+                bankLogoImageView?.setImageResource(bankLogo)
+                bankLogoImageView?.visibility = View.VISIBLE
+            }
+        } else {
+            //bonushubLogo?.visibility = View.GONE
+            bankLogoImageView?.setImageResource(bankLogo)
+            bankLogoImageView?.visibility = View.VISIBLE
+        }
+    }
+
+    if (!AppPreference.getLogin()) {
+       // bonushubLogo?.visibility = View.VISIBLE
+        //   bankLogoImageView?.setImageResource(bankLogo)
+        bankLogoImageView?.visibility = View.GONE
+
     }
 }

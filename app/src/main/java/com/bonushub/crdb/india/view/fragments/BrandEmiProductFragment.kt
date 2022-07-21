@@ -23,6 +23,7 @@ import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.logger
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.BrandEmiProductAdapter
 import com.bonushub.crdb.india.view.base.IDialog
@@ -100,8 +101,11 @@ class BrandEmiProductFragment : Fragment() {
         )*/
 
         if (eDashBoardItem  == EDashboardItem.BRAND_EMI_CATALOGUE) {
-            brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
-            brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+//            brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+//            brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_emicatalogue)
+
+            refreshSubToolbarLogos(this,null,R.drawable.ic_emicatalogue, getString(R.string.brandEmiCatalogue))
+
             brandEmiProductBinding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
             brandEmiProductBinding?.subHeaderView?.headerHome?.setOnClickListener {   (activity as NavigationActivity).transactFragment(
                 DashboardFragment()
@@ -109,10 +113,12 @@ class BrandEmiProductFragment : Fragment() {
           //  eDashBoardItem= EDashboardItem.BRAND_EMI_CATALOGUE
 
         }else{
-            brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
-        brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+            /*brandEmiProductBinding?.subHeaderView?.subHeaderText?.text = "Brand Emi"//uiAction.title
+        brandEmiProductBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)*/
           //  eDashBoardItem= EDashboardItem.BRAND_EMI
-    }
+            refreshSubToolbarLogos(this,null,R.drawable.ic_brandemi, "Brand Emi")
+
+        }
         //  brandMasterBinding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_sub_header_logo)
 
         brandEmiProductBinding?.subHeaderView?.backImageButton?.setOnClickListener {
