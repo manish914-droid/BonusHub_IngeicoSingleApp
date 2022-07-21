@@ -13,6 +13,7 @@ import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
+import com.bonushub.crdb.india.vxutils.stringToHex
 import com.google.gson.Gson
 import com.usdk.apiservice.aidl.emv.*
 import java.util.*
@@ -198,6 +199,10 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             }else if(responseCode!="00" &&  ((iemv!!.getTLV(Integer.toHexString(0x84))?:"").take(10))==CardAid.VISA.aid){
                 cardProcessedDataModal?.txnResponseMsg = data.isoMap[58]?.parseRaw2String()
                 hostRespCode="3035"
+                onlineApproved=false
+            }else{
+                hostRespCode= stringToHex(responseCode)
+                cardProcessedDataModal?.txnResponseMsg = data.isoMap[58]?.parseRaw2String()
                 onlineApproved=false
             }
 

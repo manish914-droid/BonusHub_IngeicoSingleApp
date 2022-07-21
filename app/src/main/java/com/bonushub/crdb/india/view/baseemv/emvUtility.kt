@@ -7,7 +7,7 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.utils.BytesUtil
 import com.bonushub.crdb.india.utils.DeviceHelper
 import com.bonushub.crdb.india.utils.addPad
-import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
+import com.bonushub.crdb.india.utils.hexString2String
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
@@ -28,6 +28,9 @@ import com.usdk.apiservice.aidl.emv.EMVTag.*
  * settingAids(emv: UEMV?) used for setting the AIDs that are
  * supported by the terminal.
  */
+
+
+
 fun settingAids(emv: UEMV?) {
     println("****** Setting AID ******")
     val aids = arrayOf(
@@ -564,10 +567,7 @@ Log.e("TLV LIST --> ",tlvList)
         }
         KernelID.VISA.toByte() -> {               // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
             tlvList = StringBuilder()
-
-
                 .append("9F410400000001")
-
                 .append("9F350122")
                 .append("9F3303E0F0C8")
              //   .append("9F3303E0E8C8")
@@ -580,7 +580,8 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F1B0400003A98")
 
-                .append("9F660436004000") // TTQ
+               // .append("9F660436004000") // TTQ
+                .append("9F6604F6004000") // TTQ
                 .append("DF06027C00")
 
                 .append("DF918111050010000000") // Terminal action code(decline)
@@ -593,9 +594,7 @@ Log.e("TLV LIST --> ",tlvList)
             //    .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
 
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
-                .append("DF81300100")            //Try Again Flag
-                //.append("")
-
+               // .append("DF81300100")            //Try Again Flag
 
              //   .append("DF812306000000100000")
               //  .append("DF812606000000100000")
@@ -763,4 +762,83 @@ Log.e("TLV LIST --> ",tlvList)
 
     println(""+emv?.setTLVList(finalData.kernelID.toInt(),tlvList) +"...onFinalSelect: setTLVList")
     println("...onFinalSelect: respondEvent" + emv?.respondEvent(null))
+}
+
+fun utitiyfunction(cardProcessedDataModal: CardProcessedDataModal, emv: UEMV) {
+
+    try {
+        val tlvcardTypeLabel = emv?.getTLV(Integer.toHexString(0x50))  // card Type TAG //50
+        val cardTypeLabel = if (tlvcardTypeLabel?.isNotEmpty() == true) {
+            tlvcardTypeLabel
+        }
+        else {
+            ""
+        }
+        Log.d(EmvHandler.TAG,"Card Type ->${hexString2String(cardTypeLabel)}")
+        cardProcessedDataModal.setcardLabel(hexString2String(cardTypeLabel))
+
+    } catch (ex: Exception) {
+        Log.e(EmvHandler.TAG, ex.message ?: "")
+    }
+
+    try {
+        val tlvcardHolderName = emv?.getTLV(Integer.toHexString(0x5F20))   // CardHolder Name TAG //5F20
+        val cardHolderName = if (tlvcardHolderName?.isNotEmpty() == true) {
+            tlvcardHolderName
+        }
+        else {""}
+        Log.d(EmvHandler.TAG,"Card Holder Name ---> ${hexString2String(cardHolderName)}")
+
+        cardProcessedDataModal.setCardHolderName(hexString2String(cardHolderName))
+
+    } catch (ex: Exception) {
+        Log.e(EmvHandler.TAG, ex.message ?: "")
+    }
+
+    try {
+        val tlvAppLabel = emv?.getTLV(Integer.toHexString(0x9F12))   // application label  TAG // 9F12
+        val appLabel = if (tlvAppLabel?.isNotEmpty() == true) {
+            val removespace = hexString2String(tlvAppLabel)
+            val finalstr = removespace.trimEnd()
+            finalstr
+        }
+        else {
+            ""
+        }
+        Log.d(EmvHandler.TAG,"Application label ->${appLabel}")
+        cardProcessedDataModal.setApplicationLabel(appLabel)
+    } catch (ex: Exception) {
+        Log.e(EmvHandler.TAG, ex.message ?: "")
+    }
+
+    try {
+        val tlvissuerCounTryCode = emv?.getTLV(Integer.toHexString(0x5F2A))    //issuer country code 5F2A
+        val issuerCountryCode = if (tlvissuerCounTryCode?.isNotEmpty() == true) {
+            tlvissuerCounTryCode
+        }
+        else {
+            ""
+        }
+        Log.d(EmvHandler.TAG,"Card issuer country code ---> $issuerCountryCode")
+        cardProcessedDataModal.setCardIssuerCountryCode(issuerCountryCode)
+    } catch (ex: Exception) {
+        Log.e(EmvHandler.TAG, ex.message ?: "")
+    }
+
+    try {
+        val tlvAid = emv?.getTLV(Integer.toHexString(0x84))     // AID  TAG //84
+        val aidStr = if (tlvAid?.isNotEmpty() == true) {
+            val aidstr = tlvAid.take(10)
+            aidstr
+        }
+        else {
+            ""
+        }
+        Log.d(EmvHandler.TAG,"Aid  code ---> $aidStr")
+        cardProcessedDataModal.setAID(aidStr)
+
+    } catch (ex: Exception) {
+        Log.e(EmvHandler.TAG, ex.message ?: "")
+    }
+
 }
