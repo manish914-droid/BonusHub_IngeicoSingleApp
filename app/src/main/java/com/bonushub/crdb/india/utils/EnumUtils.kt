@@ -660,7 +660,9 @@ enum class CardAid(val aid: String) {
     Jcb("A000000065"),
     UnionPay("A000000333"),
     AMEX("A000000025"),
-    Master("A000000004")
+    Master("A000000004"),
+
+    VISA("A000000003"),
 }
 //endregion
 

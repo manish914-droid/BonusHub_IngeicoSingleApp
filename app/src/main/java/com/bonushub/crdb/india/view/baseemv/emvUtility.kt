@@ -495,7 +495,8 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
         KernelID.EMV.toByte() -> {
             tlvList = StringBuilder()
                 .append("9F350122")
-                .append("9F3303E0E8C8")
+              //  .append("9F3303E0E8C8")
+                .append("9F3303E0F0C8")
                 .append("9F40056000F0B001")
                 .append("9F1A020356")
                 .append("5F2A020356")
@@ -588,8 +589,8 @@ Log.e("TLV LIST --> ",tlvList)
                 //D84000A812
                 .append("DF91811005D84000A812")  // Terminal action code(default)
 
-                .append("9F6D01C0")              // Contactless Reader Capabilities
-                .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
+              //  .append("9F6D01C0")              // Contactless Reader Capabilities
+            //    .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
 
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
                 .append("DF81300100")            //Try Again Flag

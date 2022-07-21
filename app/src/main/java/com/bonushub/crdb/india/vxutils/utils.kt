@@ -1435,3 +1435,34 @@ fun changeEditTextBackground(editText:TextInputEditText?,editTextBorder:TextInpu
         editTextBorder?.defaultHintTextColor = myColorList
     }
 }
+
+
+fun stringToHex(ascii:String) :String?{
+    // Initialize final String
+    var hex: String? = ""
+
+    // Make a loop to iterate through
+    // every character of ascii string
+    for (i in ascii.indices) {
+
+        // take a char from
+        // position i of string
+        val ch: Char = ascii[i]
+
+        // cast char to integer and
+        // find its ascii value
+        val ini = ch.code
+
+        // change this ascii value
+        // integer to hexadecimal value
+        val part = Integer.toHexString(ini)
+
+        // add this hexadecimal value
+        // to final string.
+        hex += part
+    }
+
+    // return the final string hex
+    println(hex)
+      return hex
+}

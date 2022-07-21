@@ -23,11 +23,13 @@ public class HexStringConverter extends Observable {
         return HexStringConverter.bufferToHex(buffer, 0, buffer.length);
     }
 
-//    public static String stringToHex(String s) {
-//        byte[] stringBytes = s.getBytes();
-//
-//        return HexStringConverter.bufferToHex(stringBytes);
-//    }
+/*
+   public static String stringToHex(String s)
+   { byte[] stringBytes = s.getBytes();
+
+        return HexStringConverter.bufferToHex(stringBytes);
+   }
+*/
 
 
     public static String bufferToHex(byte[] buffer, int startOffset, int length) {

@@ -86,7 +86,7 @@ class CardProcessedDataModal : Serializable {
     private var invoice: String? = null
     private var cardMode: String? = null
     //region end
-
+var txnResponseMsg:String?=null
     fun getTrack1Data(): String? {
         return track1Data
     }

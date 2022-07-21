@@ -878,7 +878,11 @@ continue
                     ACType.EMV_ACTION_AAC->{
                         println("ACType.EMV_ACTION_AAC")
                         emv?.stopProcess()
+                        (activity as BaseActivityNew).hideProgress()
+                       if(cardProcessedDataModal.txnResponseMsg.isNullOrBlank())
                         activity.txnDeclinedDialog()
+                        else
+                           activity.txnDeclinedDialog(msg = cardProcessedDataModal.txnResponseMsg!!)
                     }
                     // Transaction go online form authorization
                     ACType.EMV_ACTION_ARQC->{
@@ -932,23 +936,25 @@ continue
     }
 
 
-    private fun doFlowTypeAction(flowType: Byte, result: Int, transData: TransData) {
+    private fun doFlowTypeAction(cbFlowType: Byte, result: Int, transData: TransData) {
         val desc: String
-       Log.e("getFlow",transData.flowType.toString())
+
         var flowType: Byte? = null
 
         try {
-            val tlvcardTypeLabel =    lastCardRecord?.flowType.toString()
-             flowType = if (tlvcardTypeLabel.isNotEmpty()) {
+            val tlvcardTypeLabel =    lastCardRecord?.flowType
+             flowType = if (tlvcardTypeLabel!=null) {
                    lastCardRecord?.flowType
                 //Log.d(TAG,"Card Type ->${hexString2String(tlvcardTypeLabel)}")
             }
             else {
-                flowType
+                 cbFlowType
             }
         } catch (ex: Exception) {
             Log.e(TAG, ex.message ?: "")
         }
+        Log.e("getFlow",flowType.toString())
+        Log.e("CbgetFlow",cbFlowType.toString())
 
 
         when (flowType) {
@@ -962,32 +968,12 @@ continue
             }
             FlowType.EMV_FLOWTYPE_ECASH.toByte() -> println("ECASH")
             FlowType.EMV_FLOWTYPE_QPBOC.toByte() ->println( "QPBOC")
-           /* FlowType.EMV_FLOWTYPE_QVSDC.toByte() -> {
-
-                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_ENTRY_CODE.posEntry.toString())
-                cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
-
-                val applicationsquence = emv!!.getTLV(Integer.toHexString(0x5F34))
-                cardProcessedDataModal.setApplicationPanSequenceValue(applicationsquence)
-
-                val track2data = emv!!.getTLV(Integer.toHexString(0x57))
-                var field57 =   "35|"+track2data.replace("D", "=")?.replace("F", "")
-                println("Field 57 data is"+field57)
-                val encrptedPan = getEncryptedPanorTrackData(field57,true)
-                cardProcessedDataModal.setEncryptedPan(encrptedPan)
-
-                val field55: String = getFields55()
-                println("Field 55 is $field55")
-                cardProcessedDataModal.setField55(field55)
-
-                vfEmvHandlerCallback(cardProcessedDataModal)
-            }*/
             FlowType.EMV_FLOWTYPE_PBOC_CTLESS.toByte() -> println("PBOC_CTLESS")
             FlowType.EMV_FLOWTYPE_M_STRIPE.toByte() -> println("M_STRIPE")
             FlowType.EMV_FLOWTYPE_MSD.toByte() ->println( "MSD")
             FlowType.EMV_FLOWTYPE_MSD_LEGACY.toByte() -> println("MSD_LEGACY")
             FlowType.EMV_FLOWTYPE_WAVE2.toByte() -> println("WAVE2")
-            FlowType.EMV_FLOWTYPE_A_XP2_MS.toByte(),FlowType.EMV_FLOWTYPE_A_XPM_MS.toByte(),FlowType.EMV_FLOWTYPE_QVSDC.toByte() -> {
+            FlowType.EMV_FLOWTYPE_A_XP2_MS.toByte(),FlowType.EMV_FLOWTYPE_A_XPM_MS.toByte() -> {
 
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_MSD_POS_ENTRY_CODE.posEntry.toString())
                 cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE)
@@ -1246,7 +1232,7 @@ continue
     // CVM rule
     @Throws(RemoteException::class)
     open fun doCardHolderVerify(cvm: CVMMethod) {
-        System.out.println("=> onCardHolderVerify | " + EMVInfoUtil.getCVMDataDesc(cvm))
+        println("=> onCardHolderVerify | " + EMVInfoUtil.getCVMDataDesc(cvm))
         val param = Bundle()
         //optional Pin Block format by default its 0
         param.putByte(PinpadData.PIN_BLOCK_FORMAT,0)
@@ -1255,7 +1241,7 @@ continue
         val listener: OnPinEntryListener = object : OnPinEntryListener.Stub() {
             override fun onInput(arg0: Int, arg1: Int) {}
             override fun onConfirm(data: ByteArray, arg1: Boolean) {
-                System.out.println("PinBlock is"+byte2HexStr(data))
+                println("PinBlock is"+byte2HexStr(data))
                 Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
                 respondCVMResult(1.toByte())
 
@@ -1683,11 +1669,14 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
         try {
             val tlvcardTypeLabel = emv?.getTLV(Integer.toHexString(0x50))  // card Type TAG //50
             val cardTypeLabel = if (tlvcardTypeLabel?.isNotEmpty() == true) {
-                cardProcessedDataModal.setcardLabel(hexString2String(tlvcardTypeLabel))
-
-                Log.d(TAG,"Card Type ->${hexString2String(tlvcardTypeLabel)}")
+                tlvcardTypeLabel
             }
-            else {}
+            else {
+                ""
+            }
+            Log.d(TAG,"Card Type ->${hexString2String(cardTypeLabel)}")
+            cardProcessedDataModal.setcardLabel(hexString2String(cardTypeLabel))
+
         } catch (ex: Exception) {
             Log.e(TAG, ex.message ?: "")
         }
@@ -1695,11 +1684,13 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
         try {
             val tlvcardHolderName = emv?.getTLV(Integer.toHexString(0x5F20))   // CardHolder Name TAG //5F20
             val cardHolderName = if (tlvcardHolderName?.isNotEmpty() == true) {
-                cardProcessedDataModal.setCardHolderName(hexString2String(tlvcardHolderName))
-
-                Log.d(TAG,"Card Holder Name ---> ${hexString2String(tlvcardHolderName)}")
+                tlvcardHolderName
             }
-            else {}
+            else {""}
+            Log.d(TAG,"Card Holder Name ---> ${hexString2String(cardHolderName)}")
+
+            cardProcessedDataModal.setCardHolderName(hexString2String(cardHolderName))
+
         } catch (ex: Exception) {
             Log.e(TAG, ex.message ?: "")
         }
@@ -1707,13 +1698,15 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
         try {
             val tlvAppLabel = emv?.getTLV(Integer.toHexString(0x9F12))   // application label  TAG // 9F12
             val appLabel = if (tlvAppLabel?.isNotEmpty() == true) {
-                var removespace = hexString2String(tlvAppLabel)
-                var finalstr = removespace.trimEnd()
-                cardProcessedDataModal.setApplicationLabel(finalstr)
-
-                Log.d(TAG,"Application label ->${finalstr}")
+                val removespace = hexString2String(tlvAppLabel)
+                val finalstr = removespace.trimEnd()
+               finalstr
             }
-            else {}
+            else {
+                ""
+            }
+            Log.d(TAG,"Application label ->${appLabel}")
+            cardProcessedDataModal.setApplicationLabel(appLabel)
         } catch (ex: Exception) {
             Log.e(TAG, ex.message ?: "")
         }
@@ -1721,11 +1714,13 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
         try {
             val tlvissuerCounTryCode = emv?.getTLV(Integer.toHexString(0x5F2A))    //issuer country code 5F2A
             val issuerCountryCode = if (tlvissuerCounTryCode?.isNotEmpty() == true) {
-                cardProcessedDataModal.setCardIssuerCountryCode(tlvissuerCounTryCode)
-
-                Log.d(TAG,"Card issuer country code ---> ${tlvissuerCounTryCode}")
+                tlvissuerCounTryCode
             }
-            else {}
+            else {
+                ""
+            }
+            Log.d(TAG,"Card issuer country code ---> $issuerCountryCode")
+            cardProcessedDataModal.setCardIssuerCountryCode(issuerCountryCode)
         } catch (ex: Exception) {
             Log.e(TAG, ex.message ?: "")
         }
@@ -1733,12 +1728,15 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
         try {
             val tlvAid = emv?.getTLV(Integer.toHexString(0x84))     // AID  TAG //84
             val aidStr = if (tlvAid?.isNotEmpty() == true) {
-                var aidstr = tlvAid.take(10)
-                cardProcessedDataModal.setAID(aidstr)
-
-                Log.d(TAG,"Aid  code ---> ${aidstr}")
+                val aidstr = tlvAid.take(10)
+                aidstr
             }
-            else {}
+            else {
+                ""
+            }
+            Log.d(TAG,"Aid  code ---> $aidStr")
+            cardProcessedDataModal.setAID(aidStr)
+
         } catch (ex: Exception) {
             Log.e(TAG, ex.message ?: "")
         }

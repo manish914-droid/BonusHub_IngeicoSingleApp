@@ -189,11 +189,21 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             val onlineResult = StringBuffer()
             onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
 
-          //  val hostRespCode = "3030"
-          val hostRespCode = "3035"
+            var onlineApproved = false
+            var hostRespCode = "3030"
+            if(responseCode=="00"){
+                hostRespCode="3030"
+                onlineApproved=true
+               // hexString2String(hostRespCode)
+            }else if(responseCode!="00" &&  ((iemv!!.getTLV(Integer.toHexString(0x84))?:"").take(10))==CardAid.VISA.aid){
+                cardProcessedDataModal?.txnResponseMsg = data.isoMap[58]?.parseRaw2String()
+                hostRespCode="3035"
+                onlineApproved=false
+            }
+
             onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
 
-            val onlineApproved = true
+
             onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
 
             val hostTlvData = field55
