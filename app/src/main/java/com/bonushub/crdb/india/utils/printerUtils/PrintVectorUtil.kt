@@ -654,6 +654,7 @@ class PrintVectorUtil(context: Context?) {
                             sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER, TextSize.NORMAL)
                         } else {
                             sigleLineText("SIGN ...................", AlignMode.CENTER, TextSize.SMALL)
+                            sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                         }
 
 
@@ -678,6 +679,7 @@ class PrintVectorUtil(context: Context?) {
                         ex.printStackTrace()
                     }
 
+                    sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                     sigleLineText(copyType.pName, AlignMode.CENTER)
                     sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                     sigleLineText(footerText[0], AlignMode.CENTER)

@@ -4812,7 +4812,7 @@ class PrintUtil(context: Context?) {
     }
 }
 
-fun checkForPrintReversalReceipt(
+/*fun checkForPrintReversalReceipt(
     context: Context?,
     field60Data: String,
     callback: (String) -> Unit
@@ -4821,6 +4821,7 @@ fun checkForPrintReversalReceipt(
         val tpt = getTptData()
         tpt?.canceledTransactionReceiptPrint?.let { logger("CancelPrinting", it, "e") }
         if (tpt?.canceledTransactionReceiptPrint == "01") {
+            AppPreference.saveString(AppPreference.FIELD_60_DATA_REVERSAL_KEY, field60Data)
             PrintUtil(context).printReversal(context, field60Data) {
                 callback(it)
             }
@@ -4830,4 +4831,4 @@ fun checkForPrintReversalReceipt(
     } else {
         callback("")
     }
-}
+}*/
