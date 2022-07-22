@@ -598,7 +598,8 @@ Log.e("TLV LIST --> ",tlvList)
 
              //   .append("DF812306000000100000")
               //  .append("DF812606000000100000")
-                .append("DF918165050100000000")
+                    
+             //   .append("DF918165050100000000") --->
                 .append("DF040102")
                 .append("DF810602C000")
                 .append("DF9181040100").toString()
@@ -657,7 +658,6 @@ Log.e("TLV LIST --> ",tlvList)
             //  M_TAG_TM_FLOOR_LIMIT
         //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,limitCvm)//DF8125
         }
-
         KernelID.RUPAY.toByte() , KernelID.DISCOVER.toByte()-> {
             tlvList = StringBuilder()
                // .append("9F0206000000000100")
