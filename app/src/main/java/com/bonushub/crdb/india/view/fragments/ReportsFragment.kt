@@ -1,6 +1,7 @@
 package com.bonushub.crdb.india.view.fragments
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -99,7 +100,14 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
         }
     }
 
+    private var lastTimeClicked: Long = 0
+    private var defaultInterval: Int = 1500
     override fun ReportsOptionItemClick(reportsItem: ReportsItem, itemPosition:Int) {
+
+        if (SystemClock.elapsedRealtime() - lastTimeClicked < defaultInterval) {
+            return
+        }
+        lastTimeClicked = SystemClock.elapsedRealtime()
 
         when (reportsItem) {
 
