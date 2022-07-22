@@ -1490,8 +1490,12 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
         cardProcessedDataModal.setPanNumberData(track22 ?: "")
         System.out.println("Card pannumber data "+cardProcessedDataModal.getPanNumberData())
 
-       val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
-         cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+       if(((emv?.getTLV(Integer.toHexString(0x84))?:"").take(10))!=CardAid.AMEX.aid){
+           val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
+           cardProcessedDataModal.setEncryptedPan(encrptedPan)
+       }
+
 
         cardProcessedDataModal.setFlowType(record?.flowType.toString() ?: "")
         println("Flow Type ---> " + record?.flowType.toString())

@@ -54,9 +54,9 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
     //Below method is used to complete second gen ac in case of EMV Card Type:-
     fun performSecondGenAc(cardProcessedDataModal: CardProcessedDataModal?,data: IsoDataReader) {
 
-        var aidstr = cardProcessedDataModal?.getAID() ?: ""
+        val aidstr = cardProcessedDataModal?.getAID() ?: ""
 
-        val finalaidstr = if(aidstr.isNotBlank()) { aidstr.subSequence(0,10).toString() } else { aidstr = ""}
+        val finalaidstr = if(aidstr.isNotBlank()) { aidstr.subSequence(0,10).toString() } else { ""}
 
         try {
             //   var  cardStatus =  VFService.vfsmartReader?.checkCardStatus()
@@ -218,16 +218,30 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
 
 
-            onlineResult.append(
-                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(field55ServerResponse)).toString()
-            )
+
 
             // Here we are passing taf 55 forsecond gen as it is with adding extra Tag 8A in that.
+
+
       val newfield55=   field55+EMVTag.EMV_TAG_TM_ARC+"02"+hostRespCode
-            onlineResult.append(
-                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(newfield55)).toString()
-            )
-println("F55 For second gen ---->   $newfield55")
+            if(aidstr==CardAid.AMEX.aid){
+                val hostTlvData = field55ServerResponse+EMVTag.EMV_TAG_TM_ARC+"02"+hostRespCode
+                println("F55 For second gen ---->   $hostTlvData")
+                onlineResult.append(
+                    TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
+                )
+
+            }
+            else {
+                println("F55 For second gen ---->   $newfield55")
+                onlineResult.append(
+                    TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(newfield55))
+                        .toString()
+                )
+            }
+
+
+
 
             testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
             iemv?.respondEvent(onlineResult.toString())
