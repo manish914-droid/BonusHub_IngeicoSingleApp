@@ -994,7 +994,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                             //insert with pin
                                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                                         } else {
-                                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                                            cardProcessedDataModal.setGeneratePinBlock("")
                                             //off line pin
                                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
                                         }
@@ -1020,7 +1020,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                             vfEmvHandlerCallback(cardProcessedDataModal)
 
                                         } else {
-                                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                                            cardProcessedDataModal.setGeneratePinBlock("")
                                             //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                                         }
                                     }
@@ -1220,7 +1220,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             //insert with pin
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                         } else {
-                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                            cardProcessedDataModal.setGeneratePinBlock("")
                             //off line pin
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
                         }
@@ -1230,7 +1230,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
                         } else {
-                            cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                            cardProcessedDataModal.setGeneratePinBlock("")
                             //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
                         }
                     }
@@ -1486,8 +1486,9 @@ println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
 
         cardProcessedDataModal.setPanNumberData(track22 ?: "")
         System.out.println("Card pannumber data "+cardProcessedDataModal.getPanNumberData())
-       // val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
-        // cardProcessedDataModal.setEncryptedPan(encrptedPan)
+
+       val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
+         cardProcessedDataModal.setEncryptedPan(encrptedPan)
 
         cardProcessedDataModal.setFlowType(record?.flowType.toString() ?: "")
         println("Flow Type ---> " + record?.flowType.toString())

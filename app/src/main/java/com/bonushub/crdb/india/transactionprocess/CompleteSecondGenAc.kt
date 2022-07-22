@@ -143,7 +143,6 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                 val ba = tagDatatag91.hexStr2ByteArr()
                 mba.addAll(ba.asList())
                 mbaCheckSize.addAll(ba.asList())
-
                 mba.addAll(tagData8a.str2ByteArr().asList())
 
                 logger(TAG, "On setting ${Integer.toHexString(ta91)} tag status = $", "e")
@@ -155,27 +154,29 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
         var f71 = f55Hash[0x71] ?: ""
         var f72 = f55Hash[0x72] ?: ""
 
-        try {
-            val script71 = if (f71.isNotEmpty()) {
+        val script71 :ByteArray =  try {
+            if (f71.isNotEmpty()) {
                 var lenStr = Integer.toHexString(f71.length / 2)
                 lenStr = addPad(lenStr, "0", 2)
 
                 f71= "${Integer.toHexString(0x71)}$lenStr$f71"
+                logger("Field71:- ", "71 = ${f71}")
+
                 f71.hexStr2ByteArr()
 
-                logger("Exception:- ", "On setting ${Integer.toHexString(0x71)} tag status = $")
             }
             else byteArrayOf()
         } catch (ex: Exception) {
             logger("Exception:- ", ex.message ?: "")
+            byteArrayOf()
+
         }
 
-        val script72 = if (f72.isNotEmpty()) {
+        val script72 :ByteArray = if (f72.isNotEmpty()) {
             var lenStr = Integer.toHexString(f72.length / 2)
             lenStr = addPad(lenStr, "0", 2)
-
             f72 = "${Integer.toHexString(0x72)}$lenStr$f72"
-            logger("Field72:- ", "72 = $f72")
+            logger("Field72:- ", "72 = ${f72}")
             f72.hexStr2ByteArr()
         } else byteArrayOf()
 
@@ -183,9 +184,11 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
         try {
 
-            println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+           // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+            println("Field55 value inside ---> " +  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + byte2HexStr(script71) + byte2HexStr(script72))
 
-            val field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
+         //   val field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
+            val field55ServerResponse =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + byte2HexStr(script71) + byte2HexStr(script72)
 
             val onlineResult = StringBuffer()
             onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
@@ -206,22 +209,27 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                 onlineApproved=false
             }
 
-            onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
+            onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)// --> 8A
+          //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSAUTHDT).append("02").append(hostRespCode)// --> 91
+          //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSSCR1).append("02").append(hostRespCode)// --> 71
+          //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSSCR2).append("02").append(hostRespCode)// --> 72
 
 
             onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
 
-            val hostTlvData = field55
+
             onlineResult.append(
-                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
+                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(field55ServerResponse)).toString()
+            )
+         //   field55+
+            onlineResult.append(
+                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(field55)).toString()
             )
 
 
             testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
             iemv?.respondEvent(onlineResult.toString())
-
             // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
-
 
         } catch (ex: java.lang.Exception) {
             ex.printStackTrace()
