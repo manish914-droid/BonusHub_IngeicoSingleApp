@@ -728,7 +728,10 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F36,
             0x9F37,
             0x9F10,
-         /*   0x8E,
+
+         /*
+           0x9F08// App version
+          0x8E,
             0x9F2E,
             0x9F2D,
             0x9F2F*/

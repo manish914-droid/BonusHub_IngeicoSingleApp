@@ -506,6 +506,10 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
                 .append("9A03").append(splitStr[0])   //Txn Date - M
                 .append("9F2103").append(splitStr[1]) //Txn Time - M
 
+                .append("9F09020002")// Application version
+
+
+
                 .append("9F410400000001")  //Transaction Sequence Counter - 0
                 .append("DF918111050010000000") // Terminal action code(decline)
                     //D84000F800
