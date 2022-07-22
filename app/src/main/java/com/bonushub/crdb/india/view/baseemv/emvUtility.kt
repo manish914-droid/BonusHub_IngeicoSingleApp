@@ -498,7 +498,8 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
             tlvList = StringBuilder()
                 .append("9F350122")
               //  .append("9F3303E0E8C8")
-                .append("9F3303E0F0C8") // Terminal Capability // value is changed for support Enciphered
+            .append("9F3303E0F0C8") // Terminal Capability // value is changed for support Enciphered
+               // .append("9F3303E0D0C8") // Terminal Capability //value for Not supporting Sign [Just for test purpose of sign]
                 .append("9F40056000F0B001")
                 .append("9F1A020356")
                 .append("5F2A020356")
@@ -650,8 +651,8 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9182080120").toString()
 
 
-            val limitCvm="000000010000"
-            val cvmTransLimit="000000030000"
+            val limitCvm="000000020000"
+            val cvmTransLimit="000000050000"
 
             emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
               emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
