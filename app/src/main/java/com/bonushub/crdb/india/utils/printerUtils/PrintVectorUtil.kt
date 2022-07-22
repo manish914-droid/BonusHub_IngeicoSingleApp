@@ -4288,3 +4288,24 @@ class PrintVectorUtil(context: Context?) {
         }
     }
 }
+
+fun checkForPrintReversalReceipt(
+    context: Context?,
+    field60Data: String,
+    callback: (String) -> Unit
+) {
+    if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+        val tpt = getTptData()
+        tpt?.canceledTransactionReceiptPrint?.let { logger("CancelPrinting", it, "e") }
+        if (tpt?.canceledTransactionReceiptPrint == "01") {
+            AppPreference.saveString(AppPreference.FIELD_60_DATA_REVERSAL_KEY, field60Data)
+            PrintVectorUtil(context).printReversal(context, field60Data) {
+                callback(it)
+            }
+        } else {
+            callback("")
+        }
+    } else {
+        callback("")
+    }
+}

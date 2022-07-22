@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.transactionprocess
 
+import android.util.Log
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
@@ -233,9 +234,10 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
             else -> {
             }
         }
-
+        Log.e("cardDataModal->pin ->", "" + cardProcessedDataModal.getIsOnline().toString())
         batchFileData.isPinverified =
             cardProcessedDataModal.getIsOnline() == 1 || cardProcessedDataModal.getIsOnline() == 2 //
+        Log.e("batchFileData->pin ->", "" + batchFileData.isPinverified.toString())
 
         batchFileData.referenceNumber =
             hexString2String(cardProcessedDataModal.getRetrievalReferenceNumber() ?: "")

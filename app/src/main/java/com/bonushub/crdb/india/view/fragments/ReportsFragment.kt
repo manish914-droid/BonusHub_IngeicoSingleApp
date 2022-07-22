@@ -204,7 +204,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             }
                             lifecycleScope.launch {
                                 try {
-                                    PrintVectorUtil(context).printReversal(context, "") {
+                                    PrintVectorUtil(context).printReversal(context, AppPreference.getString(AppPreference.FIELD_60_DATA_REVERSAL_KEY)) {
                                         //  VFService.showToast(it)
                                         iDiag?.hideProgress()
                                     }

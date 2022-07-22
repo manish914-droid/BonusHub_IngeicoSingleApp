@@ -136,8 +136,8 @@ class TransactionActivity : BaseActivityNew() {
         emvBinding?.txnAmtLl?.visibility = View.VISIBLE
 
         globalCardProcessedModel.setTransType(transactionType)
-        globalCardProcessedModel.setTransactionAmount((saleAmt.toFloat() * 100).toLong())
-        globalCardProcessedModel.setOtherAmount((cashBackAmt.toFloat() * 100).toLong())
+        globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
+        globalCardProcessedModel.setOtherAmount((cashBackAmt.toDouble() * 100).toLong())
         globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
 
         tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
@@ -1215,6 +1215,8 @@ return false
         // cardView_l.visibility = View.GONE
         //}
         // If case Sale data sync to server
+        Log.e("cardDataModal->pin ->", "" + cardProcessedDataModal.getIsOnline().toString())
+
         Log.e("1REVERSAL obj ->", "" + AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
         println(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
         val reversalObj = AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)
