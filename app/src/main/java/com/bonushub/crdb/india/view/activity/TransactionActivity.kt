@@ -136,8 +136,8 @@ class TransactionActivity : BaseActivityNew() {
         emvBinding?.txnAmtLl?.visibility = View.VISIBLE
 
         globalCardProcessedModel.setTransType(transactionType)
-        globalCardProcessedModel.setTransactionAmount((saleAmt.toFloat() * 100).toLong())
-        globalCardProcessedModel.setOtherAmount((cashBackAmt.toFloat() * 100).toLong())
+        globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
+        globalCardProcessedModel.setOtherAmount((cashBackAmt.toDouble() * 100).toLong())
         globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
 
         tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
