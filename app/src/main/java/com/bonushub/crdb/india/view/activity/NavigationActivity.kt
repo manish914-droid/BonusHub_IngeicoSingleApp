@@ -1643,7 +1643,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                         AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), true)
                     }
                     runOnUiThread {
-                        Toast.makeText(this@NavigationActivity,"Settlement Failure",Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this@NavigationActivity,"Settlement Failure",Toast.LENGTH_SHORT).show()
+                        alertBoxWithActionNew("","Settlement Failure",R.drawable.ic_info_orange,"","",false,true,{},{})
 
                     }
                     Log.d("Failure Data:- ", result)
