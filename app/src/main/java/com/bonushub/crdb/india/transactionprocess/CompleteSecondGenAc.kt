@@ -221,11 +221,13 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             onlineResult.append(
                 TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(field55ServerResponse)).toString()
             )
-         //   field55+
-            onlineResult.append(
-                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(field55)).toString()
-            )
 
+            // Here we are passing taf 55 forsecond gen as it is with adding extra Tag 8A in that.
+      val newfield55=   field55+EMVTag.EMV_TAG_TM_ARC+"02"+hostRespCode
+            onlineResult.append(
+                TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(newfield55)).toString()
+            )
+println("F55 For second gen ---->   $newfield55")
 
             testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
             iemv?.respondEvent(onlineResult.toString())
