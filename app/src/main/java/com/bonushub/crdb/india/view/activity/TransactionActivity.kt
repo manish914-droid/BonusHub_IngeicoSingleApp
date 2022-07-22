@@ -835,7 +835,7 @@ class TransactionActivity : BaseActivityNew() {
                             //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
                             // cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
 
-                            if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
+                            if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)
                                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
                             else
                                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
@@ -865,7 +865,7 @@ class TransactionActivity : BaseActivityNew() {
                 ?.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
 
         } else {
-            if (cardProcessedDataModal.getFallbackType() == com.bonushub.crdb.india.utils.EFallbackCode.EMV_fallback.fallBackCode)
+            if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
             else
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
