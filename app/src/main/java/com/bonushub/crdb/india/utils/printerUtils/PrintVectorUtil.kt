@@ -1014,16 +1014,25 @@ class PrintVectorUtil(context: Context?) {
 //            totalAmount = "%.2f".format((amt.toDouble() ))
         } else {
             if(batchTable.transactionType == BhTransactionType.SALE_WITH_CASH.type){ // kushal
-//                val amt1=(((receiptDetail.totalAmmount)?.toLong())?.div(100))
+                val saleAmount=(((receiptDetail.baseAmmount)?.toLong())?.div(100))
+                val cashAmount=(((receiptDetail.cashBackAmount)?.toLong())?.div(100))
+                val totalAmountNew=(((receiptDetail.totalAmmount)?.toLong())?.div(100))
 //                val otherAmt1=(((receiptDetail.otherAmount)?.toLong())?.div(100))
 //                val saleAmount= otherAmt1?.let { amt1?.minus(it) }
-//                textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
-//                textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(saleAmount?.toDouble())}", AlignMode.RIGHT))
-//                printer?.addMixStyleText(textBlockList)
-//                textBlockList.clear()
+
+                textBlockList.put(AlignMode.LEFT, "SALE AMOUNT:")
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(saleAmount?.toDouble())}")
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
 
                 textBlockList.put(AlignMode.LEFT, "CASH WITHDRAWN AMT: ")
-                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(tipAmount?.toDouble())}",)
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(cashAmount?.toDouble())}",)
+                mixStyleTextPrint(textBlockList,TextSize.SMALL, true)
+                textBlockList.clear()
+
+
+                textBlockList.put(AlignMode.LEFT, "TOTAl AMOUNT: ")
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(totalAmountNew?.toDouble())}",)
                 mixStyleTextPrint(textBlockList,TextSize.SMALL, true)
                 textBlockList.clear()
                 totalAmount = "%.2f".format((amt.toDouble())).toString()

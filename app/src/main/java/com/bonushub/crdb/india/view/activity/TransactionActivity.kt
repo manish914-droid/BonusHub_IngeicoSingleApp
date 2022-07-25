@@ -147,6 +147,7 @@ class TransactionActivity : BaseActivityNew() {
             BhTransactionType.SALE_WITH_CASH.type -> {
                 val amt = saleAmt.toFloat() + cashBackAmt.toFloat()
                 val frtAmt = "%.2f".format(amt)
+                txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
                 emvBinding?.tvInsertCard?.text = "Please Insert/Swipe/TAP Card"
             }
