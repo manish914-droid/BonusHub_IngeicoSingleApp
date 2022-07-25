@@ -40,8 +40,8 @@ fun settingAids(emv: UEMV?) {
         "A000000333010102",
         "A000000333010101",
         "A0000000651010",
-        "A0000000043060",
-        "A0000000041010",
+      //  "A0000000043060", // mastero
+        "A0000000041010", // master aid
         "A000000003101001",
         "A000000003101002",
         "A000000003101004",
@@ -617,11 +617,14 @@ Log.e("TLV LIST --> ",tlvList)
           //  emv?.setTLV(finalData.kernelID.toInt(),EMVTag.EMV_TAG_TM_CVMRESULT,"3F0000")//9F34
 
         }
+
         KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
 
             tlvList = StringBuilder()
                 .append("9F350122")
-                .append("9F3303E0F8C8")
+             //   .append("9F3303E0F8C8")
+                .append("9F3303E068C8")
+             // .append("9F3303E008C8")
                 .append("9F40056000F0A001")
                 .append("9A03171020")
                 .append("9F2103150512")
@@ -651,10 +654,11 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9182080120").toString()
 
 
-            val limitCvm="000000020000"
-            val cvmTransLimit="000000050000"
+            val limitCvm="000000050000"
+            val cvmTransLimit="000000200000"
 
             emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
+            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,cvmTransLimit)//DF8125
               emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
 
             //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.R_TAG_TM_CVM_LIMIT,limitCvm)// DF48
