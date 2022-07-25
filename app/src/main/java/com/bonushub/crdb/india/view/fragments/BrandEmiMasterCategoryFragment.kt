@@ -118,7 +118,8 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                     brandMasterBinding?.brandSearchET?.setText("")
                     brandEmiMasterDataList.addAll(genericResp.data as List<BrandEMIMasterDataModal>)
 
-                    brandEMIMasterCategoryAdapter.submitList(genericResp.data)
+                    val dataList = genericResp.data.sortedBy { it.brandName }
+                    brandEMIMasterCategoryAdapter.submitList(dataList)
                 }
                 is GenericResponse.Error -> {
                     //    ToastUtils.showToast(activity, genericResp.errorMessage)
@@ -155,6 +156,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {
                 if (TextUtils.isEmpty(p0.toString())) {
                     brandMasterBinding?.emptyTxt?.visibility = View.GONE
+                    brandEmiMasterDataList.sortBy { it.brandName }
                     brandEMIMasterCategoryAdapter.submitList(brandEmiMasterDataList)
                     DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 }
@@ -165,6 +167,12 @@ class BrandEmiMasterCategoryFragment : Fragment() {
             logger("searchButton","click","e")
             logger("searchButton",""+brandMasterBinding?.brandSearchET?.text.toString(),"e")
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+
+            if(brandMasterBinding?.brandSearchET?.text.toString().trim().isEmpty())
+            {
+                return@setOnClickListener
+            }
+
             (activity as IDialog).showProgress()
             getSearchedBrands(brandMasterBinding?.brandSearchET?.text.toString().trim())
         }
@@ -241,6 +249,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.Main) {
 
                     if(searchedDataList.size>0) {
+                        searchedDataList.sortBy { it.brandName }
                         brandEMIMasterCategoryAdapter.submitList(searchedDataList)
                         brandMasterBinding?.emptyTxt?.visibility = View.GONE
                         (activity as IDialog).hideProgress()

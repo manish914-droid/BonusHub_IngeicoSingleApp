@@ -140,7 +140,9 @@ class BrandEmiProductFragment : Fragment() {
                             println(Gson().toJson(genericResp.data))
                             println("dataListSize" + Gson().toJson(genericResp.data?.size))
                             setUpRecyclerView()
-                            brandEMIProductAdapter.submitList(genericResp.data)
+                            val dataList = genericResp.data?.sortedBy { it?.productName }
+                           // brandEMIProductAdapter.submitList(genericResp.data)
+                            brandEMIProductAdapter.submitList(dataList)
                             latestData = ArrayList()
                             latestData!!.addAll(genericResp.data!!)
                             if (isFirstTime) {
@@ -158,7 +160,8 @@ class BrandEmiProductFragment : Fragment() {
                             println("firstTimeData"+firstTimeData?.size)
                             println("GenericResponse"+genericResp.data?.size)
                             println("latestData"+latestData?.size)
-                            brandEMIProductAdapter.submitList(latestData)
+                            //brandEMIProductAdapter.submitList(latestData)
+                            brandEMIProductAdapter.submitList(ArrayList<BrandEMIProductDataModal>())
                         }
                         is GenericResponse.Loading -> {
 
@@ -168,6 +171,7 @@ class BrandEmiProductFragment : Fragment() {
                     Log.e("set","recyclerview")
                     isdataChange = false
                     setUpRecyclerView()
+                    firstTimeData?.sortBy { it?.productName }
                     brandEMIProductAdapter.submitList(firstTimeData)
                 }
             })
@@ -193,6 +197,7 @@ class BrandEmiProductFragment : Fragment() {
                     if(firstTimeData != null){
                         logger("kushal","brandSearchET2","e")
                         logger("firstTimeData",""+firstTimeData?.size,"e")
+                        firstTimeData?.sortBy { it?.productName }
                         brandEMIProductAdapter.submitList(firstTimeData)
                     }
                 }else{

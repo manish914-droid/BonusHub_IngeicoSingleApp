@@ -368,6 +368,7 @@ class PreAuthRepository @Inject constructor() {
 
 
             logger("coroutine 5", Thread.currentThread().name, "e")
+            logger("pre auth request", transactionISOByteArray.isoMap, "e")
             syncAuthTransactionToHost(transactionISOByteArray, cardProcessedDataModal) { syncStatus, responseCode, transactionMsg ->
 
                 if (syncStatus && responseCode == "00") {

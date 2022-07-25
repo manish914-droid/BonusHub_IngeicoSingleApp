@@ -94,6 +94,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
             brandSubCatBinding?.emptyTxt?.visibility=View.GONE
             brandSubCatBinding?.dataSearchUi?.visibility=View.VISIBLE
             setUpRecyclerView()
+            filteredSubCat.sortBy { it.categoryName }
             brandEMISubCategoryAdapter.submitList(filteredSubCat)
 
         }
@@ -108,6 +109,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
                 if (TextUtils.isEmpty(p0.toString())) {
 
                     brandSubCatBinding?.emptyTxt?.visibility = View.GONE
+                    filteredSubCat.sortBy { it.categoryName }
                     brandEMISubCategoryAdapter.submitList(filteredSubCat)
                     DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
                 }
@@ -118,6 +120,12 @@ class BrandEmiSubCategoryFragment : Fragment() {
             logger("searchButton","click","e")
             logger("searchButton",""+brandSubCatBinding?.brandSearchET?.text.toString(),"e")
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
+
+            if(brandSubCatBinding?.brandSearchET?.text.toString().trim().isEmpty())
+            {
+                return@setOnClickListener
+            }
+
             (activity as IDialog).showProgress()
             getSearchedSubCategory(brandSubCatBinding?.brandSearchET?.text.toString().trim())
         }
@@ -192,6 +200,7 @@ class BrandEmiSubCategoryFragment : Fragment() {
                 }
                 withContext(Dispatchers.Main) {
                     if(searchedDataList.size>0) {
+                        searchedDataList.sortBy { it.categoryName }
                         brandEMISubCategoryAdapter.submitList(searchedDataList)
                         (activity as IDialog).hideProgress()
                         brandSubCatBinding?.emptyTxt?.visibility = View.GONE

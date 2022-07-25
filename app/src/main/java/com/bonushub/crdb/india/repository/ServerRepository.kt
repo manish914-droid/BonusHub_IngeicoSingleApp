@@ -393,6 +393,8 @@ class ServerRepository @Inject constructor(val appDB: AppDatabase, private val r
                     getBrandSubCategoryData("0")
                 }
 
+                brandEmiMasterDataList.sortBy { it.brandName }
+
                 withContext(Dispatchers.IO) {
                     brandEMIMasterCategoryMLData.postValue(
                         GenericResponse.Success(
