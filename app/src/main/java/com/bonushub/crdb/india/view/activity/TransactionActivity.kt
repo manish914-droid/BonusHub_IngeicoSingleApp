@@ -325,7 +325,7 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                                 //Checking the card has a PIN or WITHOUTPIN
                                 // Here the changes are , Now we have to ask pin for all swipe txns ...
-                                val isPin = true
+                                val isPin = false
                                 /* scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7'*/ //true //
                                 //Here we are bypassing the pin condition for test case ANSI_MAG_001.
                                 //  isPin = false
@@ -868,7 +868,7 @@ class TransactionActivity : BaseActivityNew() {
             if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
             else
-                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC.posEntry.toString())
             cardProcessedDataModal.setApplicationPanSequenceValue("00")
             emvProcessNext(cardProcessedDataModal)
         }

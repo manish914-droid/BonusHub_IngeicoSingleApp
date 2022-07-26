@@ -39,13 +39,13 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                 data: IsoDataReader, isoData: IsoDataWriter? = null,
                 testEmvHandler:EmvHandler,
                 printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this(printExtraDataSB) {
-                    this.cardProcessedDataModal = cardProcessedDataModal
-                    this.data = data
-                    this.isoData = isoData
-                    //this.printExtraDataSB = printExtraDataSB
-                    this.testEmvHandler = testEmvHandler
+        this.cardProcessedDataModal = cardProcessedDataModal
+        this.data = data
+        this.isoData = isoData
+        //this.printExtraDataSB = printExtraDataSB
+        this.testEmvHandler = testEmvHandler
 
-                }
+    }
 
     /*init {
         performSecondGenAc(cardProcessedDataModal,data)
@@ -81,7 +81,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
         }
         val responseCode = (data.isoMap[39]?.parseRaw2String().toString())
         val field55 = data.isoMap[55]?.rawData ?: ""
-     // ===================== Dummy field 55 start ===========================
+        // ===================== Dummy field 55 start ===========================
         //910A16F462F8DCDBD7400012720F860D84240000088417ADCFE4D04B81
         //910A55A52CC220D48AEC0014722C9F180430303030860E84DA00CB090767BED29D791A7B70861384DA00C80E0000000000009039CED44D2F36E5
         //910ADE930EAD11D6F1720014
@@ -105,7 +105,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             //val formatedDate = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault()).format(dateTime)
             //In reversal we have to send Old date and old time means trnsaction date and trnsaction time
 
-             val OldformatedDateTime = AppPreference.getString("OldCurrentDate")+AppPreference.getString("OldCurrentTime")
+            val OldformatedDateTime = AppPreference.getString("OldCurrentDate")+AppPreference.getString("OldCurrentTime")
 
             field56data = "${hostTID}${hostBatchNumber}${hostRoc}${OldformatedDateTime}${""}${hostInvoice}"
 
@@ -132,7 +132,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                 logger(TAG, "On setting ${Integer.toHexString(ta8A)} tag status = $ba.", "e")
             }
         } catch (ex: Exception) {
-                logger(TAG, ex.message ?: "", "e")
+            logger(TAG, ex.message ?: "", "e")
         }
 
         val tagDatatag91 = f55Hash[ta91] ?: ""
@@ -184,10 +184,10 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
         try {
 
-           // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+            // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
             println("Field55 value inside ---> " +  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + byte2HexStr(script71) + byte2HexStr(script72))
 
-         //   val field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
+            //   val field55 =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72
             val field55ServerResponse =  Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + byte2HexStr(script71) + byte2HexStr(script72)
 
             val onlineResult = StringBuffer()
@@ -198,7 +198,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             if(responseCode=="00"){
                 hostRespCode="3030"
                 onlineApproved=true
-               // hexString2String(hostRespCode)
+                // hexString2String(hostRespCode)
             }else if(responseCode!="00" &&  ((iemv!!.getTLV(Integer.toHexString(0x84))?:"").take(10))==CardAid.VISA.aid){
                 cardProcessedDataModal?.txnResponseMsg = data.isoMap[58]?.parseRaw2String()
                 hostRespCode="3035"
@@ -210,9 +210,9 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             }
 
             onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)// --> 8A
-          //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSAUTHDT).append("02").append(hostRespCode)// --> 91
-          //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSSCR1).append("02").append(hostRespCode)// --> 71
-          //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSSCR2).append("02").append(hostRespCode)// --> 72
+            //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSAUTHDT).append("02").append(hostRespCode)// --> 91
+            //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSSCR1).append("02").append(hostRespCode)// --> 71
+            //  onlineResult.append(EMVTag.EMV_TAG_TM_ISSSCR2).append("02").append(hostRespCode)// --> 72
 
 
             onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
@@ -223,7 +223,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
             // Here we are passing taf 55 forsecond gen as it is with adding extra Tag 8A in that.
 
 
-      val newfield55=   field55+EMVTag.EMV_TAG_TM_ARC+"02"+hostRespCode
+            val newfield55=   field55+EMVTag.EMV_TAG_TM_ARC+"02"+hostRespCode
             if(aidstr==CardAid.AMEX.aid){
                 val hostTlvData = field55ServerResponse+EMVTag.EMV_TAG_TM_ARC+"02"+hostRespCode
                 println("F55 For second gen ---->   $hostTlvData")
@@ -243,7 +243,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
 
 
-            testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+         //   testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
             iemv?.respondEvent(onlineResult.toString())
             // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
 
@@ -254,15 +254,15 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
 
     }
 
-fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
-    val onlineResult = StringBuffer()
-    val hostRespCode = "3035"
-    onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
+    fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
+        val onlineResult = StringBuffer()
+        val hostRespCode = "3035"
+        onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
 
-    testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
-    iemv?.respondEvent(onlineResult.toString())
+//        testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+        iemv?.respondEvent(onlineResult.toString())
 
-}
+    }
     fun getEndProcessData(result: Int, transData: TransData?) {
 
         logger("end txn","call","e")
@@ -274,7 +274,7 @@ fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
 
         if (result != EMVError.SUCCESS) {
 
-             when (result) {
+            when (result) {
                 EMVError.ERROR_POWERUP_FAIL -> "ERROR_POWERUP_FAIL"
                 EMVError.ERROR_ACTIVATE_FAIL -> "ERROR_ACTIVATE_FAIL"
                 EMVError.ERROR_WAITCARD_TIMEOUT -> "ERROR_WAITCARD_TIMEOUT"
@@ -303,7 +303,7 @@ fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
                     }
 
                     val reversalPacket = Gson().toJson(isoData)
-              //      AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    //      AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
 
@@ -320,7 +320,7 @@ fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
                     }
 
                     val reversalPacket = Gson().toJson(isoData)
-                //    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    //    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
 
@@ -332,7 +332,7 @@ fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
                 else -> "unknow error"
             }
 
-           // System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
+            // System.out.println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
         } else {
             System.out.println("=> onEndProcess | EMV_RESULT_NORMAL | " + EMVInfoUtil.getTransDataDesc(transData))
             val getAcType: String = EMVInfoUtil.getACTypeDesc(transData!!.acType)
@@ -357,7 +357,7 @@ fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
                     Log.e("2REVERSAL obj ->",""+isoData.toString())
                     val reversalPacket = Gson().toJson(isoData)
                     Log.e("3REVERSAL obj ->",""+reversalPacket)
-               //     AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    //     AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, false)
                     Log.e("4REVERSAL obj ->",""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
                     println(""+AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))
@@ -376,7 +376,7 @@ fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
                     }
 
                     val reversalPacket = Gson().toJson(isoData)
-                //    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
+                    //    AppPreference.saveStringReversal(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveString(GENERIC_REVERSAL_KEY, reversalPacket)
                     AppPreference.saveBoolean(ONLINE_EMV_DECLINED, true)
 

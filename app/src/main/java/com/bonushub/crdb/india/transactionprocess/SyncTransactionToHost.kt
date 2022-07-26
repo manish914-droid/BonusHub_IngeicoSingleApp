@@ -14,7 +14,6 @@ import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.bonushub.crdb.india.vxutils.Mti
 import com.google.gson.Gson
-import com.usdk.apiservice.aidl.emv.EMVTag
 import com.usdk.apiservice.aidl.emv.UEMV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -217,9 +216,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                                 }*/
 
                                                 testEmvHandler?.let {
-                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData,
-                                                        it
-                                                    ) { printExtraData, de55 ->
+                                                    CompleteSecondGenAc(cardProcessedDataModal, responseIsoData, transactionISOData, it) { printExtraData, de55 ->
                                                         syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
                                                     }.performSecondGenAc(cardProcessedDataModal, responseIsoData)
                                                 }
@@ -254,14 +251,17 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                     //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
                                     //ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
                                     Utility().incrementRoc()
-                                    SecondGenAcOnNetworkError(result.toString(), cardProcessedDataModal) { secondGenAcErrorStatus ->
-                                        if (secondGenAcErrorStatus) {
-                                            syncTransactionCallback(false, successResponseCode.toString(), result, null, null, null)
-                                        } else {
-                                            syncTransactionCallback(false, ConnectionError.NetworkError.errorCode.toString(), result, null, null, null)
-                                        }
-                                    }
 
+                                    testEmvHandler?.let {
+                                        SecondGenAcOnNetworkError(result.toString(), cardProcessedDataModal, it) { secondGenAcErrorStatus ->
+                                            if (secondGenAcErrorStatus) {
+                                                syncTransactionCallback(false, successResponseCode.toString(), result, null, null, null)
+                                            } else {
+                                                syncTransactionCallback(false, ConnectionError.NetworkError.errorCode.toString(), result, null, null, null)
+                                            }
+                                        }.generateSecondGenAcForNetworkErrorCase(result.toString())
+
+                                    }
                                 }
 
                                 else -> {
