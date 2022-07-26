@@ -47,6 +47,7 @@ object AppPreference {
     const val EmiTimestampPrimaryKey = 1
     // kushal bank functions
     const val GENERIC_REVERSAL_KEY = "generic_reversal_key"
+    const val FIELD_60_DATA_REVERSAL_KEY = "field60Data"
     const val PCKT_TIME = "packetTime"
     const val PCKT_DATE = "packetDate"
     const val PCKT_TIMESTAMP = "packetimestamp"

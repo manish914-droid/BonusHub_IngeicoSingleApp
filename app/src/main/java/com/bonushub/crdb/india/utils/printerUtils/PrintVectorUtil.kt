@@ -654,6 +654,7 @@ class PrintVectorUtil(context: Context?) {
                             sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER, TextSize.NORMAL)
                         } else {
                             sigleLineText("SIGN ...................", AlignMode.CENTER, TextSize.SMALL)
+                            sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                         }
 
 
@@ -678,6 +679,7 @@ class PrintVectorUtil(context: Context?) {
                         ex.printStackTrace()
                     }
 
+                    sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                     sigleLineText(copyType.pName, AlignMode.CENTER)
                     sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                     sigleLineText(footerText[0], AlignMode.CENTER)
@@ -1012,16 +1014,25 @@ class PrintVectorUtil(context: Context?) {
 //            totalAmount = "%.2f".format((amt.toDouble() ))
         } else {
             if(batchTable.transactionType == BhTransactionType.SALE_WITH_CASH.type){ // kushal
-//                val amt1=(((receiptDetail.totalAmmount)?.toLong())?.div(100))
+                val saleAmount=(((receiptDetail.baseAmmount)?.toLong())?.div(100))
+                val cashAmount=(((receiptDetail.cashBackAmount)?.toLong())?.div(100))
+                val totalAmountNew=(((receiptDetail.totalAmmount)?.toLong())?.div(100))
 //                val otherAmt1=(((receiptDetail.otherAmount)?.toLong())?.div(100))
 //                val saleAmount= otherAmt1?.let { amt1?.minus(it) }
-//                textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
-//                textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(saleAmount?.toDouble())}", AlignMode.RIGHT))
-//                printer?.addMixStyleText(textBlockList)
-//                textBlockList.clear()
+
+                textBlockList.put(AlignMode.LEFT, "SALE AMOUNT:")
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(saleAmount?.toDouble())}")
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
 
                 textBlockList.put(AlignMode.LEFT, "CASH WITHDRAWN AMT: ")
-                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(tipAmount?.toDouble())}",)
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(cashAmount?.toDouble())}",)
+                mixStyleTextPrint(textBlockList,TextSize.SMALL, true)
+                textBlockList.clear()
+
+
+                textBlockList.put(AlignMode.LEFT, "TOTAl AMOUNT: ")
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(totalAmountNew?.toDouble())}",)
                 mixStyleTextPrint(textBlockList,TextSize.SMALL, true)
                 textBlockList.clear()
                 totalAmount = "%.2f".format((amt.toDouble())).toString()
@@ -4286,5 +4297,26 @@ class PrintVectorUtil(context: Context?) {
         } finally {
             //   VFService.connectToVFService(VerifoneApp.appContext)
         }
+    }
+}
+
+fun checkForPrintReversalReceipt(
+    context: Context?,
+    field60Data: String,
+    callback: (String) -> Unit
+) {
+    if (!TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY))) {
+        val tpt = getTptData()
+        tpt?.canceledTransactionReceiptPrint?.let { logger("CancelPrinting", it, "e") }
+        if (tpt?.canceledTransactionReceiptPrint == "01") {
+            AppPreference.saveString(AppPreference.FIELD_60_DATA_REVERSAL_KEY, field60Data)
+            PrintVectorUtil(context).printReversal(context, field60Data) {
+                callback(it)
+            }
+        } else {
+            callback("")
+        }
+    } else {
+        callback("")
     }
 }

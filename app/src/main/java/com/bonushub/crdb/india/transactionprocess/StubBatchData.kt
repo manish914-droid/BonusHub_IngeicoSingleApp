@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.transactionprocess
 
+import android.util.Log
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
@@ -183,12 +184,14 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
                 baseAmount = cardProcessedDataModal.getSaleAmount() ?: 0L
                 cashAmount = cardProcessedDataModal.getOtherAmount() ?: 0L
                 totalAmount = cardProcessedDataModal.getTransactionAmount() ?: 0L
-                batchFileData.baseAmmount = (baseAmount).toString()//
+                batchFileData.baseAmmount = (totalAmount).toString()//
                 batchFileData.cashBackAmount = (cashAmount).toString()
-                batchFileData.totalAmmount = (totalAmount).toString()//
+                batchFileData.totalAmmount = (totalAmount + cashAmount).toString()//
                 // this is used in settlement and iso packet amount
-                batchFileData.transactionalAmmount =
-                    cardProcessedDataModal.getTransactionAmount().toString() //
+//                batchFileData.transactionalAmmount =
+//                    cardProcessedDataModal.getTransactionAmount().toString() //
+
+                 batchFileData.transactionalAmmount = (totalAmount + cashAmount).toString()
             }
             else -> {
                 baseAmount = cardProcessedDataModal.getTransactionAmount() ?: 0L
@@ -233,9 +236,10 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
             else -> {
             }
         }
-
+        Log.e("cardDataModal->pin ->", "" + cardProcessedDataModal.getIsOnline().toString())
         batchFileData.isPinverified =
             cardProcessedDataModal.getIsOnline() == 1 || cardProcessedDataModal.getIsOnline() == 2 //
+        Log.e("batchFileData->pin ->", "" + batchFileData.isPinverified.toString())
 
         batchFileData.referenceNumber =
             hexString2String(cardProcessedDataModal.getRetrievalReferenceNumber() ?: "")
