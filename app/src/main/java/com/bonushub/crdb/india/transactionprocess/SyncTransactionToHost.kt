@@ -244,16 +244,16 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                         val value = readtimeout.toIntOrNull()
                         if (null != value) {
                             when (value) {
-                                504 -> {
+                                ConnectionError.NetworkError.errorCode -> {
                                     AppPreference.saveBoolean(PrefConstant.SERVER_HIT_STATUS.keyName.toString(), false)
-                                    ConnectionError.NetworkError.errorCode
+                                   value
                                     //Clear reversal
                                     clearReversal()
                                     //Below we are incrementing previous ROC (Because ROC will always be incremented whenever Server Hit is performed:-
                                     //ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
                                     Utility().incrementRoc()
 
-                                    testEmvHandler?.let {
+                                  /*  testEmvHandler?.let {
                                         SecondGenAcOnNetworkError(result.toString(), cardProcessedDataModal, it) { secondGenAcErrorStatus ->
                                             if (secondGenAcErrorStatus) {
                                                 syncTransactionCallback(false, successResponseCode.toString(), result, null, null, null)
@@ -262,7 +262,14 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                             }
                                         }.generateSecondGenAcForNetworkErrorCase(result.toString())
 
+                                    }*/
+
+                                    testEmvHandler?.let {
+                                        CompleteSecondGenAc(cardProcessedDataModal, null, transactionISOData, it) { printExtraData, de55 ->
+                                            syncTransactionCallback(true, successResponseCode.toString(), result, printExtraData, de55, null)
+                                        }.performSecondGenAc(cardProcessedDataModal, IsoDataReader())
                                     }
+
                                 }
 
                                 else -> {

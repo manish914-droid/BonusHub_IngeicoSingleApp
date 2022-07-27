@@ -1486,7 +1486,8 @@ return false
                     }
 
 
-                } else {
+                }
+                else {
 
                     runOnUiThread { hideProgress() }
                     //below condition is for print reversal receipt if reversal is generated

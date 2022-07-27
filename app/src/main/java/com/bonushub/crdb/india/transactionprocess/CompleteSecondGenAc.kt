@@ -36,11 +36,13 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
     var field56data: String? = null
 
     constructor(cardProcessedDataModal: CardProcessedDataModal?,
-                data: IsoDataReader, isoData: IsoDataWriter? = null,
+                data: IsoDataReader?, isoData: IsoDataWriter? = null,
                 testEmvHandler:EmvHandler,
                 printExtraDataSB: (Triple<String, String, String>?,String?) -> Unit):this(printExtraDataSB) {
         this.cardProcessedDataModal = cardProcessedDataModal
-        this.data = data
+        if (data != null) {
+            this.data = data
+        }
         this.isoData = isoData
         //this.printExtraDataSB = printExtraDataSB
         this.testEmvHandler = testEmvHandler
@@ -79,7 +81,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
         if (authCode.isNotEmpty()) {
             val ac = authCode.byteArr2Str().replace(" ", "").str2ByteArr()
         }
-        val responseCode = (data.isoMap[39]?.parseRaw2String().toString())
+        val responseCode = (data?.isoMap[39]?.parseRaw2String().toString())
         val field55 = data.isoMap[55]?.rawData ?: ""
         // ===================== Dummy field 55 start ===========================
         //910A16F462F8DCDBD7400012720F860D84240000088417ADCFE4D04B81
@@ -239,11 +241,7 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
                         .toString()
                 )
             }
-
-
-
-
-         //   testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+            testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
             iemv?.respondEvent(onlineResult.toString())
             // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
 
@@ -253,6 +251,71 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
         }
 
     }
+
+    fun performSecondGenOnNetworkFail(){
+
+            //Here Second GenAC performed in Every Network Failure cases or Time out case:-
+          //  Log.d("Failure Data:- ", result)
+            when (cardProcessedDataModal?.getReadCardType()) {
+                DetectCardType.MAG_CARD_TYPE -> {
+                  //  networkErrorSecondGenCB(false)
+                }
+                DetectCardType.EMV_CARD_TYPE -> {
+                    //Test case 15 Unable to go Online
+                    //here 2nd genearte AC
+
+                    try {
+
+                        val field55 =  "8A" + "02" + "5A33"
+
+                        val onlineResult = StringBuffer()
+                        onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("01")
+
+                        val hostRespCode = "Z3"
+                        onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
+
+                        val onlineApproved = false
+                        onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
+
+                        val hostTlvData = field55
+                        onlineResult.append(
+                            TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
+                        )
+
+                      /*  testEmvHandler.SecondGenAcOnNetworkError(this,cardProcessedDataModal)
+                        iemv?.respondEvent(onlineResult.toString())*/
+
+                        testEmvHandler.getCompleteSecondGenAc(this,cardProcessedDataModal)
+                        iemv?.respondEvent(onlineResult.toString())
+
+                        // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
+
+                    } catch (ex: java.lang.Exception) {
+                        ex.printStackTrace()
+                        //println("Exception is" + ex.printStackTrace())
+                    }
+
+                }
+                DetectCardType.CONTACT_LESS_CARD_TYPE -> {
+                  //  networkErrorSecondGenCB(false)
+                }
+                DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE -> {
+                 //   networkErrorSecondGenCB(false)
+                }
+                else -> {
+                    logger(
+                        "CARD_ERROR:- ",
+                        cardProcessedDataModal?.getReadCardType().toString(),
+                        "e"
+
+                    )
+                //    networkErrorSecondGenCB(false)
+                }
+            }
+        }
+
+
+
 
     fun performSecondGenOnFail(cardProcessedDataModal: CardProcessedDataModal?){
         val onlineResult = StringBuffer()
