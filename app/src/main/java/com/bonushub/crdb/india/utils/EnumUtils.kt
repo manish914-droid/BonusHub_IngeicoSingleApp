@@ -681,7 +681,8 @@ enum class DetectError(val errorCode: Int) {
     OtherErrorTransactionterminated(11),
     CTLS_CARD_READ_FAILED_ERROR(29),
     TransactionDeclined(1),
-    SecondTap_Approved(209)
+    SecondTap_Approved(209),
+    APP_LOCK(60939)
 }
 
 enum class ApiStatus(val code: String) {

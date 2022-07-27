@@ -1110,7 +1110,7 @@ return false
                 }
             }
 
-            EFallbackCode.EMV_fallback.fallBackCode -> {
+              EFallbackCode.EMV_fallback.fallBackCode -> {
                 //EMV Fallback case when we insert card from other side then chip side:-
                 globalCardProcessedModel.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
                 globalCardProcessedModel.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
@@ -1128,6 +1128,24 @@ return false
                 }
 
             }
+
+              DetectError.APP_LOCK.errorCode -> {
+                  lifecycleScope.launch(Dispatchers.Main) {
+                      alertBoxWithActionNew(
+                          getString(R.string.transaction_delined_msg),
+                          "App Locked",
+                          R.drawable.ic_txn_declined,
+                          getString(R.string.positive_button_ok),
+                          "", false, false,
+                          { alertPositiveCallback ->
+                              if (alertPositiveCallback) {
+                                  goToDashBoard()
+                              }
+                          },
+                          {})
+                      Log.e("onEndProcessCalled", "Error in onEndProcessCalled Result --> $result")
+                  }
+              }
 
             else -> {
                 val errorMsg = when (result) {
