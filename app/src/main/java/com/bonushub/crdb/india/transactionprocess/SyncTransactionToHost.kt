@@ -253,7 +253,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                     //ROCProviderV2.incrementFromResponse(ROCProviderV2.getRoc(AppPreference.getBankCode()).toString(), AppPreference.getBankCode())
                                     Utility().incrementRoc()
 
-                                  /*  testEmvHandler?.let {
+                                    testEmvHandler?.let {
                                         SecondGenAcOnNetworkError(result.toString(), cardProcessedDataModal, it) { secondGenAcErrorStatus ->
                                             if (secondGenAcErrorStatus) {
                                                 syncTransactionCallback(false, successResponseCode.toString(), result, null, null, null)
@@ -262,7 +262,7 @@ class SyncTransactionToHost(var transactionISOByteArray: IsoDataWriter?,
                                             }
                                         }.generateSecondGenAcForNetworkErrorCase(result.toString())
 
-                                    }*/
+                                    }
 
                                     testEmvHandler?.let {
                                         CompleteSecondGenAc(cardProcessedDataModal, null, transactionISOData, it) { printExtraData, de55 ->

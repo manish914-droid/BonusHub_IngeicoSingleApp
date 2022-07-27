@@ -8,6 +8,7 @@ import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.google.gson.Gson
 import com.usdk.apiservice.aidl.emv.*
+import java.lang.StringBuilder
 import java.util.*
 
 
@@ -49,21 +50,18 @@ class SecondGenAcOnNetworkError(var networkErrorSecondGenCB: (Boolean) -> Unit) 
                         val onlineResult = StringBuffer()
                         onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("01")
 
-                        val hostRespCode = "Z3"
+                        val hostRespCode = "5A33"
                         onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
 
                         val onlineApproved = false
                         onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01").append(if (onlineApproved) "01" else "00")
 
-                        val hostTlvData = field55
-                        onlineResult.append(
-                            TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString()
-                        )
+                        val hostTlvData = "8A" + "02" + "5A33"
+                        onlineResult.append(TLV.fromData(EMVTag.DEF_TAG_HOST_TLVDATA, BytesUtil.hexString2Bytes(hostTlvData)).toString())
 
                         testEmvHandler.SecondGenAcOnNetworkError(this,cardProcessedDataModal)
                         iemv?.respondEvent(onlineResult.toString())
 
-                        // println("Field55 value inside ---> " + Integer.toHexString(ta91) + "0A" + byte2HexStr(mba.toByteArray()) + f71 + f72)
 
                 } catch (ex: java.lang.Exception) {
                     ex.printStackTrace()
@@ -78,12 +76,7 @@ class SecondGenAcOnNetworkError(var networkErrorSecondGenCB: (Boolean) -> Unit) 
                 networkErrorSecondGenCB(false)
             }
             else -> {
-                logger(
-                    "CARD_ERROR:- ",
-                    cardProcessedDataModal?.getReadCardType().toString(),
-                    "e"
-
-                )
+                logger("CARD_ERROR:- ", cardProcessedDataModal?.getReadCardType().toString(), "e")
                 networkErrorSecondGenCB(false)
             }
         }
