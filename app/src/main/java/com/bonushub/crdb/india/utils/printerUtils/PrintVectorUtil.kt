@@ -2412,7 +2412,7 @@ class PrintVectorUtil(context: Context?) {
                 }
 
 
-                sigleLineText("ZERO SETTLEMENT SUCCESSFUL", AlignMode.CENTER, TextSize.NORMAL)
+               // sigleLineText("ZERO SETTLEMENT SUCCESSFUL", AlignMode.CENTER, TextSize.NORMAL)
 
                 // Below code is used for Digi POS Settlement report
                 if (!isLastSummary) {
