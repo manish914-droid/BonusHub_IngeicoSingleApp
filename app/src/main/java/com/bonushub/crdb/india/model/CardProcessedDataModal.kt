@@ -76,6 +76,10 @@ class CardProcessedDataModal : Serializable {
     private var doubleTap: Boolean = false
     //region
 
+    //region==================================================PTLE value (PIN try Limit exceed value :-
+    private var lastAttempt: Boolean = false
+    //region
+
      var testEmiOption:String=""
     var indicatorF58=""
 /// region=====================================================Ingenico response
@@ -540,5 +544,11 @@ var txnResponseMsg:String?=null
     fun setFlowType(flowType: String?) {
         this.flowType = flowType
 
+    }
+    fun setLastAttempt(lastAttempt: Boolean) {
+        this.lastAttempt = lastAttempt
+    }
+    fun getLastAttempt(): Boolean{
+        return lastAttempt
     }
 }

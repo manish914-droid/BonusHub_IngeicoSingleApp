@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
+import android.util.SparseArray
 import android.widget.Toast
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
@@ -370,16 +371,91 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         // println("...onOnlineProcess: respondEvent" + ret)
         //  tagOfF55.toString()
 
-        val field55: String = getFields55()
-        println("Field 55 is $field55")
-        cardProcessedDataModal.setField55(field55)
-        vfEmvHandlerCallback(cardProcessedDataModal)
+        //02 35 128 -80
+
+       val tlv2 = emv?.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
+        val tlv3 =  Utility.hexStr2Byte(tlv2)
+        println("PTLE byte array value in hex 95  ----> ${tlv3}")
+        if(CardAid.AMEX.aid == cardProcessedDataModal.getAID()) {
+            println("PTLE byte array value in hex 951  ----> ${tlv3}")
+
+            var ptlebyte: Byte? = tlv3?.get(2)
+            val ptlebyteArray: ByteArray = ByteArray(1)
+            if (ptlebyte != null) {
+                ptlebyteArray[0] = ptlebyte
+                println("PTLE byte array value in hex ----> ${Utility.byte2HexStr(ptlebyteArray)}")
+
+                println("Last  attempt  is " + cardProcessedDataModal.getLastAttempt())
+                if (cardProcessedDataModal.getLastAttempt() == true) {
+                    if((Integer.parseInt(byte2HexStr(ptlebyteArray), 16) and 0x20) == (0x20)){
+                        println("Last  attempt  is " + cardProcessedDataModal.getLastAttempt())
+                        GlobalScope.launch(Dispatchers.Main) {
+                            (activity as BaseActivityNew).alertBoxWithAction("Invalid PIN",
+                                "Wrong PIN.Pin Try limit exceeded.", false, "OK", { alertCallback ->
+                                    if (alertCallback) {
+                                        try {
+                                            GlobalScope.launch(Dispatchers.Main) {
+                                                activity.declinedTransaction()
+                                            }
+                                        } catch (ex: Exception) {
+                                            ex.printStackTrace()
+                                        }
+
+                                    }
+                                },{ alertCallback -> })
+                        }
+
+                    }
+                    else{
+                        val field55: String = getFields55()
+                        println("Field 55 is $field55")
+                        cardProcessedDataModal.setField55(field55)
+                        vfEmvHandlerCallback(cardProcessedDataModal)
+                    }
+
+
+                } else {
+                    var issuerCountryCode = emv?.getTLV(Integer.toHexString(0x5F28).toUpperCase(Locale.ROOT))
+                    //   VFService.showToast("Pin try limit exceeded in else India")
+                    println("Issuer country code " + issuerCountryCode)
+
+                    if((Integer.parseInt(byte2HexStr(ptlebyteArray), 16) and 0x20) == (0x20) &&  "0356" == "0356" ) {
+                        println("Last  attempt  is " + cardProcessedDataModal.getLastAttempt())
+                        // VFService.showToast("Pin try limit exceeded in else India")
+                        processSwipeCardWithPINorWithoutPIN(true, cardProcessedDataModal) { it ->
+                            val field55: String = getFields55()
+                            println("Field 55 is $field55")
+                            cardProcessedDataModal.setField55(field55)
+                            vfEmvHandlerCallback(it)
+
+                        }
+
+                    }
+                    else {
+                        val field55: String = getFields55()
+                        println("Field 55 is $field55")
+                        cardProcessedDataModal.setField55(field55)
+                        vfEmvHandlerCallback(cardProcessedDataModal)
+
+                      }
+
+                    }
+               }
+        }
+        else {
+            val field55: String = getFields55()
+            println("Field 55 is $field55")
+            cardProcessedDataModal.setField55(field55)
+            vfEmvHandlerCallback(cardProcessedDataModal)
+        }
+
     }
 
 
     @Throws(RemoteException::class)
     open fun getFields55(): String {
         val tagList = arrayOf(
+            0x5F28, //issuer country code
             0x5F2A,
             0x5F34,
             0x82,
@@ -1002,6 +1078,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                     R.drawable.ic_txn_declined,
                                     (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
                                     "", false, false, { alertPositiveCallback ->
+                                        cardProcessedDataModal.setLastAttempt(true)
                                         if (alertPositiveCallback) {
                                             pinPad!!.startOfflinePinEntry(param, listener).also {
                                                 pinTryCounter--
@@ -1039,6 +1116,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                     R.drawable.ic_txn_declined,
                                     (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
                                     "", false, false, { alertPositiveCallback ->
+                                        cardProcessedDataModal.setLastAttempt(true)
                                         if (alertPositiveCallback) {
                                             pinPad!!.startOfflinePinEntry(param, listener).also {
                                                 pinTryCounter--
@@ -1068,6 +1146,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             R.drawable.ic_txn_declined,
                             (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
                             "", false, false, { alertPositiveCallback ->
+                                cardProcessedDataModal.setLastAttempt(true)
                                 if (alertPositiveCallback) {
                                     pinPad!!.startOfflinePinEntry(param, listener).also {
                                         pinTryCounter--
@@ -1226,6 +1305,83 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         if (cardProcessedDataModal != null) {
             this.cardProcessedDataModal  = cardProcessedDataModal
         }
+    }
+
+    // Process Swipe card with or without PIN .
+    private fun processSwipeCardWithPINorWithoutPIN(ispin: Boolean, cardProcessedDataModal: CardProcessedDataModal,transactionCallback: (CardProcessedDataModal) -> Unit) {
+        activity.runOnUiThread {
+            activity.hideProgress()
+        }
+        if (ispin) {
+            val panBlock: String? = cardProcessedDataModal.getPanNumberData()
+            val param = Bundle()
+            param.putByteArray(PinpadData.PIN_LIMIT, byteArrayOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+
+
+            val listener: OnPinEntryListener = object : OnPinEntryListener.Stub() {
+                override fun onInput(arg0: Int, arg1: Int) {}
+                override fun onConfirm(data: ByteArray, arg1: Boolean) {
+                    System.out.println("PinBlock is" + byte2HexStr(data))
+                    Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
+
+                 //   respondCVMResult(1.toByte())
+
+                    cardProcessedDataModal.setIsOnline(1)
+
+                    when (cardProcessedDataModal.getReadCardType()) {
+                        DetectCardType.EMV_CARD_TYPE -> {
+                            if (cardProcessedDataModal.getIsOnline() == 1) {
+                               cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                                //insert with pin
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
+                            } else {
+                                cardProcessedDataModal.setGeneratePinBlock( "")
+                                //off line pin
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_OFFLINE_PIN.posEntry.toString())
+                            }
+                        }
+                        DetectCardType.CONTACT_LESS_CARD_TYPE -> {
+                            if (cardProcessedDataModal.getIsOnline() == 1) {
+                                cardProcessedDataModal.setGeneratePinBlock(hexString2String(BytesUtil.bytes2HexString(data)))
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_EMV_POS_WITH_PIN.posEntry.toString())
+                            } else {
+                                cardProcessedDataModal.setGeneratePinBlock( "")
+                                //  cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_PIN.posEntry.toString())
+                            }
+                        }
+                        DetectCardType.MAG_CARD_TYPE -> {
+                            //   vfIEMV?.importPin(1, data) // in Magnetic pin will not import
+                            // cardProcessedDataModal.setGeneratePinBlock(BytesUtil.bytes2HexString(data))
+
+                            if (cardProcessedDataModal.getFallbackType() == TransactionActivity.EFallbackCode.EMV_fallback.fallBackCode)
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
+                            else
+                                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+                            cardProcessedDataModal.setApplicationPanSequenceValue("00")
+                        }
+
+                        else -> {
+                        }
+                    }
+
+                    transactionCallback(cardProcessedDataModal)
+                }
+
+                override fun onCancel() {
+                  //  respondCVMResult(0.toByte())
+                }
+
+                override fun onError(error: Int) {
+                   // respondCVMResult(2.toByte())
+                }
+            }
+            println("=> onCardHolderVerify | onlinpin")
+            param.putByteArray(PinpadData.PAN_BLOCK, panBlock?.str2ByteArr())
+            DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
+                ?.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+
+        }
+
     }
 
 }
