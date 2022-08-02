@@ -1237,9 +1237,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
             when (result.status) {
                 Status.SUCCESS -> {
-
                     var isStaticQrAvailable=false
-
                     CoroutineScope(Dispatchers.IO).launch{
                         Utility().readInitServer(result?.data?.data as java.util.ArrayList<ByteArray>) { result, message ->
 
@@ -1330,6 +1328,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                                     //withContext(Dispatchers.IO){
                                     getStaticQrFromServerAndSaveToFile(this@NavigationActivity){
                                         // FAIL AND SUCCESS HANDELED IN FUNCTION getStaticQrFromServerAndSaveToFile itself
+                                  println("Static QR from getting status ---->> $it")
                                     }
                                     //}
 
@@ -1337,18 +1336,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                                 // end region
                                 hideProgress()
                                 //Field48ResponseTimestamp.showToast("Navigation")
-                                var checkinitstatus = checkInitializationStatus(appDao)
-                                if(checkinitstatus) {
+                             //   var checkinitstatus = checkInitializationStatus(appDao)
+                             //   if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         alertBoxMsgWithIconOnly(
                                             R.drawable.ic_success_with_star,
                                             this@NavigationActivity.getString(R.string.successfull_init)
                                         )
                                     }
-                                }
-                                else{
+                             //   }
+                            //    else{
                                     transactFragment(DashboardFragment())
-                                }
+                            //    }
                             }
 
 

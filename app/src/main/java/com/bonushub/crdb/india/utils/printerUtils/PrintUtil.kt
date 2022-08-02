@@ -212,6 +212,9 @@ class PrintUtil(context: Context?) {
                         AlignMode.LEFT
                     )
                 )
+
+
+
                 receiptDetail.entryMode?.let { sigleLineformat(it, AlignMode.RIGHT) }?.let {
                     textBlockList.add(
                         it
@@ -969,7 +972,7 @@ class PrintUtil(context: Context?) {
     }
 
 
-    @SuppressLint("SimpleDateFormat")
+ /*   @SuppressLint("SimpleDateFormat")
     fun printReversal(
         context: Context?, field60Data: String, callback: (String) -> Unit
     ) {
@@ -1128,11 +1131,11 @@ class PrintUtil(context: Context?) {
                         printer?.addMixStyleText(textBlockList)
                         textBlockList.clear()
                     }
-                    /*alignLeftRightText(
+                    *//*alignLeftRightText(
                         textInLineFormatBundle,
                         "CARD NO:$card",
                         hostCardType
-                    )//chip,swipe,cls*/
+                    )//chip,swipe,cls*//*
 
 
                     val tvr = isoW.additionalData["tvr"] ?: ""
@@ -1215,7 +1218,7 @@ class PrintUtil(context: Context?) {
             })
 
     }
-
+*/
     //printing for logo or you can print any image from assets
     private fun printLogo(ctx: Context, fileName: String): ByteArray? {
         var input: InputStream? = null

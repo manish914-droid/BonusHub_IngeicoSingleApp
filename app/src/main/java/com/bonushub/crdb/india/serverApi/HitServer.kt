@@ -84,7 +84,7 @@ object HitServer  {
         }
     }
 
-
+//@Synchronized
     suspend fun hitServersale(data: ByteArray, callbackSale: ServerMessageCallbackSale, progressMsg: ProgressCallback) {
         this@HitServer.callbackSale = callbackSale
         try {

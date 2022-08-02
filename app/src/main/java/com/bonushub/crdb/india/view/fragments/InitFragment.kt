@@ -328,8 +328,8 @@ class InitFragment : Fragment() {
                                 }
                                 (activity as NavigationActivity).hideProgress()
                                //showToast("Navigation")
-                                var checkinitstatus = checkInitializationStatus(appDao)
-                                if(checkinitstatus) {
+                             //   var checkinitstatus = checkInitializationStatus(appDao)
+                            //    if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
@@ -338,10 +338,10 @@ class InitFragment : Fragment() {
                                             )
                                         }
                                     }
-                                }
-                                else{
+                            //    }
+                               /* else{
                                     (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
-                                }
+                                }*/
                             }
                             // end region
                       /*      (activity as NavigationActivity).hideProgress()

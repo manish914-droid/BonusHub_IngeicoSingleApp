@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 class InitViewModel @ViewModelInject constructor(private val roomDBRepository: RoomDBRepository) :
     ViewModel() {
-
     val initData = MutableLiveData<Result<ResponseHandler>>()
     fun insertInfo1(tid: String) {
         viewModelScope.launch{

@@ -56,9 +56,9 @@ class CompleteSecondGenAc constructor(var printExtraDataSB: (Triple<String, Stri
     //Below method is used to complete second gen ac in case of EMV Card Type:-
     fun performSecondGenAc(cardProcessedDataModal: CardProcessedDataModal?,data: IsoDataReader) {
 
-        val aidstr = cardProcessedDataModal?.getAID() ?: ""
+        val aidstr = cardProcessedDataModal?.getAID()?.take(10) ?: ""
 
-        val finalaidstr = if(aidstr.isNotBlank()) { aidstr.subSequence(0,10).toString() } else { ""}
+
 
         try {
             //   var  cardStatus =  VFService.vfsmartReader?.checkCardStatus()

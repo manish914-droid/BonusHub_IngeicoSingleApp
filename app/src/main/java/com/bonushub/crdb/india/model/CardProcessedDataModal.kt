@@ -89,6 +89,9 @@ class CardProcessedDataModal : Serializable {
     private var batch: String? = null
     private var invoice: String? = null
     private var cardMode: String? = null
+
+     var tvrCls:String?=null
+     var tsiCls:String?=null
     //region end
 var txnResponseMsg:String?=null
     fun getTrack1Data(): String? {

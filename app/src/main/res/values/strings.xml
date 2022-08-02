@@ -370,5 +370,6 @@
 
     <!--wifi setting-->
     <string name="wifi_settings">Wifi Settings</string>
+    <string name="app_selection">App Selection</string>
 
 </resources>
