@@ -1,7 +1,6 @@
 package com.bonushub.crdb.india.view.baseemv
 
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.utils.DeviceHelper
 import com.bonushub.crdb.india.utils.byteArr2HexStr
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.usdk.apiservice.aidl.emv.*
@@ -21,7 +20,7 @@ class GenericCardReadHandler constructor(val emv:UEMV?, val activity: BaseActivi
 
     override fun onFinalSelect(finalData: FinalData?) {
         if (finalData != null) {
-           createAndSetCDOL1ForFirstGenAC(finalData,cardProcessedDataModal,emv)
+           doFinalSelect(finalData,cardProcessedDataModal,emv)
         }
     }
 

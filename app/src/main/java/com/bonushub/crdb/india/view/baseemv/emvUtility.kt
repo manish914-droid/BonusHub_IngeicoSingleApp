@@ -4,10 +4,8 @@ import android.os.RemoteException
 import android.util.Log
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.utils.BytesUtil
-import com.bonushub.crdb.india.utils.DeviceHelper
-import com.bonushub.crdb.india.utils.addPad
-import com.bonushub.crdb.india.utils.hexString2String
+import com.bonushub.crdb.india.model.local.TerminalParameterTable
+import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
 import com.bonushub.crdb.india.utils.ingenico.TLV
@@ -119,7 +117,8 @@ fun settingAids(emv: UEMV?) {
              "9F0605A000000003" +
                      "9F220195" +
                      "DF050420291231" +
-                     "DF028190BE9E1FA5E9A803852999C4AB432DB28600DCD9DAB76DFAAA47355A0FE37B1508AC6BF38860D3C6C2E5B12A3CAAF2A7005A7241EBAA7771112C74CF9A0634652FBCA0E5980C54A64761EA101A114E0F0B5572ADD57D010B7C9C887E104CA4EE1272DA66D997B9A90B5A6D624AB6C57E73C8F919000EB5F684898EF8C3DBEFB330C62660BED88EA78E909AFF05F6DA627BDF040103" +
+                     "DF028190BE9E1FA5E" +
+                     "803852999C4AB432DB28600DCD9DAB76DFAAA47355A0FE37B1508AC6BF38860D3C6C2E5B12A3CAAF2A7005A7241EBAA7771112C74CF9A0634652FBCA0E5980C54A64761EA101A114E0F0B5572ADD57D010B7C9C887E104CA4EE1272DA66D997B9A90B5A6D624AB6C57E73C8F919000EB5F684898EF8C3DBEFB330C62660BED88EA78E909AFF05F6DA627BDF040103" +
                      "DF040103" + //exponent
                      "DF0314EE1511CEC71020A9B90443B37B1D5F6E703030F6" +
                      "BF010131",
@@ -478,23 +477,31 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
 }
 
 //doFinalSelect
- fun createAndSetCDOL1ForFirstGenAC(finalData: FinalData, cardProcessedDataModal: CardProcessedDataModal, emv: UEMV?) {
-    println("=> onFinalSelect | " + EMVInfoUtil.getFinalSelectDesc(finalData))
+ fun doFinalSelect(finalData: FinalData, cardProcessedDataModal: CardProcessedDataModal, emv: UEMV?) {
+    println("=> onFinalSelect | createAndSetCDOL1ForFirstGenAC -->  " + EMVInfoUtil.getFinalSelectDesc(finalData))
     val datetime: String = DeviceHelper.getCurentDateTime()
     val splitStr = datetime.split("\\s+".toRegex()).toTypedArray()
-   val txnDate=splitStr[0]
+    val txnDate=splitStr[0]
     val txnTime=splitStr[1]
 
 
     val txnAmount = addPad(cardProcessedDataModal.getTransactionAmount().toString(), "0", 12, true)
    val otherAmount= addPad(cardProcessedDataModal.getOtherAmount().toString(), "0", 12, true)
 
+  val terminalData = Utility().getTptData()
+
+     val clsCvmLimit=   addPad(terminalData?.minCtlsTransAmt ?: "", "0", 12, true)
+     val clsMaxTransLimit =  addPad(terminalData?.maxCtlsTransAmt ?: "", "0", 12, true)
+
+
+
     var aidstr = BytesUtil.bytes2HexString(finalData.aid).subSequence(0, 10).toString()
     var tlvList: String? = null
+
     when (finalData.kernelID) {
       //  emv?.setTLV(KernelID.AMEX, EMVTag.DEF_TAG_PSE_FLAG, "03")
         // for EMV this call is common for every payment scheme
-        KernelID.EMV.toByte() -> {
+        KernelID.EMV.toByte()   -> {
             tlvList = StringBuilder()
                 .append("9F350122")
               //  .append("9F3303E0E8C8")
@@ -504,8 +511,8 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
                 .append("9F1A020356")
                 .append("5F2A020356")
                 .append("9F09020001")
-                .append("9A03").append(splitStr[0])   //Txn Date - M
-                .append("9F2103").append(splitStr[1]) //Txn Time - M
+
+
 
                 .append("9F09020002")// Application version
 
@@ -521,8 +528,8 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
 
                 .append("9F6D01C0")              // Contactless Reader Capabilities
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
-                .append("DF812406000000010000") //Terminal Contactless Transaction Limit
-                .append("DF812606000000000100") // Terminal CVM Required Limit
+
+
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
                 .append("DF81300100")            //Try Again Flag
                 .toString()
@@ -534,7 +541,7 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
 Log.e("TLV LIST --> ",tlvList)
 
         }
-        KernelID.AMEX.toByte() -> {
+        KernelID.AMEX.toByte()  -> {
             tlvList = StringBuilder()
              //   .append("9F6604A6004000") ///terminal transaction attribute 86004000  // "9F660426000080 //TTQ
                // .append("DF812304A6004000")
@@ -544,11 +551,11 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("9F1A020356")
                 .append("5F2A020356")
                 .append("9F09020001")
-              //  .append("9C0100")
-             //   .append("9F0206").append(txnAmount) //Txn Amount
-            //    .append("9F0306000000000000")
-             //   .append("9A03").append(splitStr[0])   //Txn Date - M
-             //   .append("9F2103").append(splitStr[1]) //Txn Time - M
+
+
+
+
+
                 .append("9F410400000001")
                 .append("DF918111050000000000") // Terminal action code(decline)
                 .append("DF918112050000000000") // Terminal action code(online)
@@ -556,20 +563,20 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F6D01C0")              // Contactless Reader Capabilities
                 .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
-                .append("DF812406000000010000") //Terminal Contactless Transaction Limit
-                .append("DF812606000000000500") // Terminal CVM Required Limit
+
+
                 .append("DF812306000000000000")  //Terminal Contactless Floor Limit
                 .append("DF81300100")            //Try Again Flag
                 .toString()
 
         }
-        KernelID.PBOC.toByte() -> {              // if suport PBOC Ecash，see transaction parameters of PBOC Ecash in《UEMV develop guide》.
+        KernelID.PBOC.toByte()  -> {              // if suport PBOC Ecash，see transaction parameters of PBOC Ecash in《UEMV develop guide》.
             // If support qPBOC, see transaction parameters of QuickPass in《UEMV develop guide》.
             // For reference only below
             tlvList =
                 "9F02060000000001009F03060000000000009A031710209F21031505129F4104000000019F660427004080"
         }
-        KernelID.VISA.toByte() -> {               // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
+        KernelID.VISA.toByte()  -> {               // Parameter settings, see transaction parameters of PAYWAVE in《UEMV develop guide》.
             tlvList = StringBuilder()
                 .append("9F410400000001")
                 .append("9F350122")
@@ -601,36 +608,27 @@ Log.e("TLV LIST --> ",tlvList)
                // .append("DF81300100")            //Try Again Flag
 
              //   .append("DF812306000000100000")
-              //  .append("DF812606000000100000")
-                    
-             //   .append("DF918165050100000000") --->This tag is used for Visa International
+
+             //   .append("DF918165050100000000") --->This tag is used for Visa International we have to comment this
                 .append("DF040102")
                 .append("DF810602C000")
                 .append("DF9181040100").toString()
 
 
-            val cvmTransLimit="000000200000"
-            val limitCvm="000000050000"
 
-            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.V_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
-            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.V_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
           //  emv?.setTLV(finalData.kernelID.toInt(),EMVTag.EMV_TAG_TM_CVMRESULT,"3F0000")//9F34
 
         }
-
-        KernelID.MASTER.toByte() -> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
-
+        KernelID.MASTER.toByte()-> {            // Parameter settings, see transaction parameters of PAYPASS in《UEMV develop guide》.
             tlvList = StringBuilder()
                 .append("9F350122")
              //   .append("9F3303E0F8C8")
-                .append("9F3303E068C8")
-             // .append("9F3303E008C8")
+              //  .append("9F3303E068C8") // MCD 19 test case
+             .append("9F3303E060C8") // MCD 04
                 .append("9F40056000F0A001")
-                .append("9A03171020")
-                .append("9F2103150512")
-                //    .append("9F0206").append(txnAmount)
-                .append("9F1A020156")
-                .append("5F2A020156")
+
+                .append("9F1A020356")
+                .append("5F2A020356")
 
 
                 .append("DF918111050000000000")
@@ -640,47 +638,45 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9182020100")
                 .append("DF9181150100")
                 .append("DF9182040100")
-
-
-
-                //  .append("DF812406000000030000") //Terminal Contactless Transaction Limit --> working
                 .append("DF812506000000010000")
-                //    .append("DF812606000000010000")// Terminal CVM Required Limit
                 .append("DF812306000000000000")// //Terminal Contactless Floor Limit
-
                 .append("DF9182050160")
-                .append("DF9182060160")
                 .append("DF9182070120")
+                //.append("9F1D086C00800000000000")
                 .append("DF9182080120").toString()
 
 
-            val limitCvm="000000050000"
-            val cvmTransLimit="000000200000"
+            // relay resistance in vx--> DF81 01 B0
+          //  DEF_TAG_M_RRP_SWITCH
+           // 0x9F,0x1D,0x08,0x6C,0x00,0x80,0x00,0x00,0x00,0x00,0x00
+            //6C00800000000000
+            emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_RMDATA,"6C00800000000000") // 9F1D
+            emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_RRP_SWITCH,"01") // Used for relay resistance
+            emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_REQ_NOCVM,"08")//Changing this tag value 06 to 08 for CVM limit PIN
 
-            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT,cvmTransLimit)//DF8124
-            emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,cvmTransLimit)//DF8125
-              emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_CVM_LIMIT,limitCvm)//DF8126
+            emv?.setTLV(finalData.kernelID.toInt(),M_TAG_TM_TRANS_LIMIT_CDV,clsMaxTransLimit)//DF8125
 
             //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.R_TAG_TM_CVM_LIMIT,limitCvm)// DF48
             //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.DEF_TAG_J_CVM_LIMIT,limitCvm)//DF918403
             //  M_TAG_TM_FLOOR_LIMIT
         //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,limitCvm)//DF8125
         }
-        KernelID.RUPAY.toByte() , KernelID.DISCOVER.toByte()-> {
+        KernelID.RUPAY.toByte(),
+        KernelID.DISCOVER.toByte() -> {
             tlvList = StringBuilder()
-               // .append("9F0206000000000100")
+
                 .append("9F3303E06840")
                 .append("DF4C06000000015000")
-                .append("DF812406000000015000")
+
                 .append("DF8142011E")
                 .append("9F350122")
                 .append("9F4005F040F0B001")
                 .append("9F1A020156")
                 .append("5F2A020156")
                 .append("9F09020002")
-                .append("9C0100")
-                .append("9A03171020")
-                .append("9F2103150512")
+
+
+
                 .append("9F410400001234")
                 .append("9F1B0400002710")
                 .append("DF918111050410000000")
@@ -690,8 +686,8 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF16020015")
                 .append("DF3A050040000000")
                 .append("DF4D06000000010000")
-            //    .append("DF812406000000020000")//Trans Limit
-                .append("DF812606000000010000")//Terminal CVM Required Limit
+
+
 
                 .append("DF812306000000008000")
                 .append("DF9181050100")
@@ -737,7 +733,6 @@ Log.e("TLV LIST --> ",tlvList)
     val tag9f02Data:String //Txn Amount
     val tag9f03Data:String //Other Amount
 
-
     when(cardProcessedDataModal.getTransType()){
 
         BhTransactionType.SALE_WITH_CASH.type->{
@@ -761,12 +756,13 @@ Log.e("TLV LIST --> ",tlvList)
             tag9f03Data=otherAmount
         }
     }
-
-    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_AUTHAMNTN,tag9f02Data)
-    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_OTHERAMNTN,tag9f03Data)
-    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTYPE,tag9CData)
-    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSDATE,txnDate)
-    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTIME,txnTime)
+    emv?.setTLV(finalData.kernelID.toInt(), V_TAG_TM_TRANS_LIMIT,clsMaxTransLimit)//DF8124 --> Terminal Contactless Transaction Limit
+    emv?.setTLV(finalData.kernelID.toInt(),V_TAG_TM_CVM_LIMIT,clsCvmLimit)//DF8126 --> Terminal CVM Required Limit
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_AUTHAMNTN,tag9f02Data) // 9F02 --> Auth Amount
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_OTHERAMNTN,tag9f03Data)// 9F03 --> Other Amount
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTYPE,tag9CData)// 9C --> Txn Type
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSDATE,txnDate)//9A --> Txn Date
+    emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTIME,txnTime)//9F21 --> Txn Time
 
     println(""+emv?.setTLVList(finalData.kernelID.toInt(),tlvList) +"...onFinalSelect: setTLVList")
     println("...onFinalSelect: respondEvent" + emv?.respondEvent(null))
@@ -790,7 +786,8 @@ fun utilityFunctionForCardDataSetting(cardProcessedDataModal: CardProcessedDataM
     }
 
     try {
-        val tlvcardHolderName = emv?.getTLV(Integer.toHexString(0x5F20))   // CardHolder Name TAG //5F20
+        val tlvcardHolderName =
+            emv.getTLV(Integer.toHexString(0x5F20))   // CardHolder Name TAG //5F20
         val cardHolderName = if (tlvcardHolderName?.isNotEmpty() == true) {
             tlvcardHolderName
         }

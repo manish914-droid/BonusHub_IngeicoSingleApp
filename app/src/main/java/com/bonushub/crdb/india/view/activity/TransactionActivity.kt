@@ -326,7 +326,7 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                                 //Checking the card has a PIN or WITHOUTPIN
                                 // Here the changes are , Now we have to ask pin for all swipe txns ...
-                                val isPin = true
+                                val isPin = false
                                 /* scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7'*/ //true //
                                 //Here we are bypassing the pin condition for test case ANSI_MAG_001.
                                 //  isPin = false
@@ -869,7 +869,7 @@ class TransactionActivity : BaseActivityNew() {
             if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.EMV_POS_ENTRY_FALL_MAGPIN.posEntry.toString())
             else
-                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
+                cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC.posEntry.toString())
             cardProcessedDataModal.setApplicationPanSequenceValue("00")
             emvProcessNext(cardProcessedDataModal)
         }
@@ -1110,7 +1110,7 @@ return false
                 }
             }
 
-            EFallbackCode.EMV_fallback.fallBackCode -> {
+              EFallbackCode.EMV_fallback.fallBackCode -> {
                 //EMV Fallback case when we insert card from other side then chip side:-
                 globalCardProcessedModel.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
                 globalCardProcessedModel.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
@@ -1128,6 +1128,24 @@ return false
                 }
 
             }
+
+              DetectError.APP_LOCK.errorCode -> {
+                  lifecycleScope.launch(Dispatchers.Main) {
+                      alertBoxWithActionNew(
+                          getString(R.string.transaction_delined_msg),
+                          "App Locked",
+                          R.drawable.ic_txn_declined,
+                          getString(R.string.positive_button_ok),
+                          "", false, false,
+                          { alertPositiveCallback ->
+                              if (alertPositiveCallback) {
+                                  goToDashBoard()
+                              }
+                          },
+                          {})
+                      Log.e("onEndProcessCalled", "Error in onEndProcessCalled Result --> $result")
+                  }
+              }
 
             else -> {
                 val errorMsg = when (result) {
@@ -1486,7 +1504,8 @@ return false
                     }
 
 
-                } else {
+                }
+                else {
 
                     runOnUiThread { hideProgress() }
                     //below condition is for print reversal receipt if reversal is generated
