@@ -427,7 +427,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                 logger("repost", ReportsItem.SUMMERY_REPORT._name)
                // (activity as NavigationActivity).transactFragment(ReportSummaryFragment(), true)
 
-                lifecycleScope.launch{
+               // lifecycleScope.launch{
 
                         settlementViewModel?.getTempBatchFileData()?.observe(viewLifecycleOwner) { batList ->
                             //onlyPreAuthCheck(batList as MutableList<BatchTable>) // do later
@@ -516,7 +516,7 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
                             }
 
                         }
-                }
+               // }
 
 
             }

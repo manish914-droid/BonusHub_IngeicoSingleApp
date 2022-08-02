@@ -2128,11 +2128,12 @@ fun refreshToolbarLogos(activity: Activity) {
     val tpt = getTptData()
     val bonushubLogo = activity.findViewById<ImageView>(R.id.main_toolbar_BhLogo)
     val bankLogoImageView = activity.findViewById<ImageView>(R.id.toolbar_Bank_logo)
+    val bankLogoRightImageView = activity.findViewById<ImageView>(R.id.toolbar_Bank_logo_right)
     var bankLogo = 0
 
     when (AppPreference.getBankCode()) {
-        "02" -> bankLogo = R.mipmap.ic_amex_logo_new
-        "01" -> bankLogo = R.drawable.ic_hdfcsvg
+        "02","2" -> bankLogo = R.mipmap.ic_amex_logo_new
+        "01","1" -> bankLogo = R.drawable.ic_hdfcsvg
         else -> {
         }
     }
@@ -2147,23 +2148,27 @@ fun refreshToolbarLogos(activity: Activity) {
                             bonushubLogo?.visibility = View.VISIBLE
                             bankLogoImageView?.setImageResource(bankLogo)
                             bankLogoImageView?.visibility = View.VISIBLE
+                            bankLogoRightImageView?.visibility = View.GONE
                             break
                         } else {
                             bonushubLogo?.visibility = View.GONE
-                            bankLogoImageView?.setImageResource(bankLogo)
-                            bankLogoImageView?.visibility = View.VISIBLE
+                            bankLogoImageView?.visibility = View.GONE
+                            bankLogoRightImageView?.setImageResource(bankLogo)
+                            bankLogoRightImageView?.visibility = View.VISIBLE
                         }
                     }
                 }
             } else {
                 bonushubLogo?.visibility = View.GONE
-                bankLogoImageView?.setImageResource(bankLogo)
-                bankLogoImageView?.visibility = View.VISIBLE
+                bankLogoImageView?.visibility = View.GONE
+                bankLogoRightImageView?.setImageResource(bankLogo)
+                bankLogoRightImageView?.visibility = View.VISIBLE
             }
         } else {
             bonushubLogo?.visibility = View.GONE
-            bankLogoImageView?.setImageResource(bankLogo)
-            bankLogoImageView?.visibility = View.VISIBLE
+            bankLogoImageView?.visibility = View.GONE
+            bankLogoRightImageView?.setImageResource(bankLogo)
+            bankLogoRightImageView?.visibility = View.VISIBLE
         }
     }
 
@@ -2171,6 +2176,7 @@ fun refreshToolbarLogos(activity: Activity) {
         bonushubLogo?.visibility = View.VISIBLE
         //   bankLogoImageView?.setImageResource(bankLogo)
         bankLogoImageView?.visibility = View.GONE
+        bankLogoRightImageView?.visibility = View.GONE
 
     }
 }
@@ -2193,8 +2199,8 @@ fun refreshSubToolbarLogos(fragment: Fragment, eDashboardItem: EDashboardItem?, 
     }
 
     when (AppPreference.getBankCode()) {
-        "02" -> bankLogo = R.mipmap.ic_amex_logo_new
-        "01" -> bankLogo = R.drawable.ic_hdfcsvg
+        "02","2" -> bankLogo = R.mipmap.ic_amex_logo_new
+        "01","1" -> bankLogo = R.drawable.ic_hdfcsvg
         else -> {
         }
     }
