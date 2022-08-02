@@ -536,7 +536,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
             withContext(Dispatchers.Main){
 
                 navigationBinding?.footer?.mdTidTv?.text = tid
-                navigationBinding?.footer?.mdMidTv?.text = mid
+                // navigationBinding?.footer?.mdMidTv?.text = mid  // hide MID from side drawer
 //                mainDrawerBinding?.mdTidTv?.text = tid
 //                mainDrawerBinding?.mdMidTv?.text = mid
             }

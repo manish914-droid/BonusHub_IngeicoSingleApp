@@ -36,8 +36,9 @@
                         android:orientation="vertical"
                         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-                        <include layout="@layout/app_toolbar"
-                            android:id="@+id/toobar" />
+                        <include
+                            android:id="@+id/toobar"
+                            layout="@layout/app_toolbar" />
 
                         <androidx.fragment.app.FragmentContainerView
                             android:id="@+id/nav_host_fragment"

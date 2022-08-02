@@ -37,7 +37,8 @@
         app:layout_constraintTop_toTopOf="@+id/imgViewTid"
         android:layout_marginStart="@dimen/pad_10"
         android:fontFamily="@font/muli_bold"
-        app:layout_constraintStart_toEndOf="@+id/imgViewTid"/>
+        app:layout_constraintStart_toEndOf="@+id/imgViewTid"
+        app:layout_constraintBottom_toTopOf="@+id/md_mid_tv"/>
 
     <TextView
         android:id="@+id/md_mid_tv"
@@ -50,7 +51,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/imgViewTid"
         android:layout_marginStart="@dimen/pad_10"
         android:fontFamily="@font/muli_bold"
-        app:layout_constraintStart_toEndOf="@+id/imgViewTid"/>
+        app:layout_constraintStart_toEndOf="@+id/imgViewTid"
+        android:visibility="gone"/>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardBankFunction"
