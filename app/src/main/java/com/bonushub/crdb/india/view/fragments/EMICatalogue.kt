@@ -62,6 +62,7 @@ class EMICatalogue : Fragment() {
         (action as? EDashboardItem)?.res?.let {
             binding?.subHeaderView?.headerImage?.setImageResource(it)
         }*/
+        (activity as NavigationActivity).manageTopToolBar(false)
         refreshSubToolbarLogos(this,null,(action as? EDashboardItem)?.res?:0, getString(R.string.emi_catalogue))
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager.popBackStackImmediate() }

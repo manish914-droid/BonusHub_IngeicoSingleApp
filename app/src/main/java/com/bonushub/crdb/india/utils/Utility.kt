@@ -2152,23 +2152,41 @@ fun refreshToolbarLogos(activity: Activity) {
                             break
                         } else {
                             bonushubLogo?.visibility = View.GONE
-                            bankLogoImageView?.visibility = View.GONE
-                            bankLogoRightImageView?.setImageResource(bankLogo)
-                            bankLogoRightImageView?.visibility = View.VISIBLE
+
+                            if(bankLogoRightImageView != null){
+                                bankLogoImageView?.visibility = View.GONE
+                                bankLogoRightImageView.setImageResource(bankLogo)
+                                bankLogoRightImageView.visibility = View.VISIBLE
+                            }else{
+                                bankLogoImageView?.setImageResource(bankLogo)
+                                bankLogoImageView?.visibility = View.VISIBLE
+                            }
+
+                            break
                         }
                     }
                 }
             } else {
                 bonushubLogo?.visibility = View.GONE
-                bankLogoImageView?.visibility = View.GONE
-                bankLogoRightImageView?.setImageResource(bankLogo)
-                bankLogoRightImageView?.visibility = View.VISIBLE
+                if(bankLogoRightImageView != null){
+                    bankLogoImageView?.visibility = View.GONE
+                    bankLogoRightImageView.setImageResource(bankLogo)
+                    bankLogoRightImageView.visibility = View.VISIBLE
+                }else{
+                    bankLogoImageView?.setImageResource(bankLogo)
+                    bankLogoImageView?.visibility = View.VISIBLE
+                }
             }
         } else {
             bonushubLogo?.visibility = View.GONE
-            bankLogoImageView?.visibility = View.GONE
-            bankLogoRightImageView?.setImageResource(bankLogo)
-            bankLogoRightImageView?.visibility = View.VISIBLE
+            if(bankLogoRightImageView != null){
+                bankLogoImageView?.visibility = View.GONE
+                bankLogoRightImageView?.setImageResource(bankLogo)
+                bankLogoRightImageView?.visibility = View.VISIBLE
+            }else{
+                bankLogoImageView?.setImageResource(bankLogo)
+                bankLogoImageView?.visibility = View.VISIBLE
+            }
         }
     }
 
