@@ -95,6 +95,7 @@ class DashboardFragment : androidx.fragment.app.Fragment() {
         Log.d("Dashboard:- ", "onViewCreated")
         AppPreference.saveBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString(), false)
 
+        refreshToolbarLogos(activity as NavigationActivity)
         (activity as NavigationActivity).manageTopToolBar(true)
         isDashboardOpen = true
         Utility().hideSoftKeyboard(requireActivity())
