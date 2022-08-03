@@ -170,13 +170,26 @@ class TransactionActivity : BaseActivityNew() {
             }
         }
 
-        val cardOption = CardOption.create().apply {
-            supportICCard(true)
-            supportMagCard(true)
-            supportRFCard(true)
+        if(transactionType != BhTransactionType.BRAND_EMI.type &&
+            transactionType != BhTransactionType.EMI_SALE.type &&
+            transactionType != BhTransactionType.TEST_EMI.type){
+            val cardOption = CardOption.create().apply {
+                supportICCard(true)
+                supportMagCard(true)
+                supportRFCard(true)
+            }
+
+            detectCard(globalCardProcessedModel, cardOption)
+        }else{
+            val cardOption = CardOption.create().apply {
+                supportICCard(true)
+                supportMagCard(true)
+                supportRFCard(false)
+            }
+
+            detectCard(globalCardProcessedModel, cardOption)
         }
 
-        detectCard(globalCardProcessedModel, cardOption)
 
         emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             declinedTransaction()
