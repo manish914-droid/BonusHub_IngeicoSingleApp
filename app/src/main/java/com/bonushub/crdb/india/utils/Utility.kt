@@ -118,7 +118,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
     //region======================Read Host Response and Write in Init File===========
     suspend fun readInitServer(data: ArrayList<ByteArray>, callback: (Boolean, String) -> Unit) {
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val filename = "init_file.txt"
                 HDFCApplication.appContext.openFileOutput(filename, Context.MODE_PRIVATE).apply {
@@ -151,11 +151,11 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     line = fin.readLine()
                 }
                 fin.close()
-                GlobalScope.launch(Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch  {
                     callback(true, "Successful init")
                 }
             } catch (ex: Exception) {
-                GlobalScope.launch(Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch  {
                     callback(false, ex.message ?: "")
                 }
             }
@@ -173,7 +173,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "101" -> {
                 val terminalCommunicationTable = TerminalCommunicationTable()
                 parseTableData(terminalCommunicationTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (terminalCommunicationTable.actionId) {
                             "1", "2" -> {
@@ -193,7 +193,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "102" -> {
                 val issuerParameterTable = IssuerParameterTable()
                 parseTableData(issuerParameterTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (issuerParameterTable.actionId) {
                             "1", "2" -> {
@@ -214,7 +214,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "106" -> {
                 val terminalParameterTable = TerminalParameterTable()
                 parseTableData(terminalParameterTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (terminalParameterTable.actionId) {
                             "1", "2" -> {
@@ -256,7 +256,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "107" -> {
                 val cardDataTable = CardDataTable()
                 parseTableData(cardDataTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (cardDataTable.actionId) {
                             "1", "2" -> {
@@ -272,7 +272,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "201" -> {  // HDFC TPT
                 val hdfcTpt = HDFCTpt()
                 parseTableData(hdfcTpt, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (hdfcTpt.actionId) {
                             "1", "2" -> {
@@ -288,7 +288,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "202" -> {   // HDFC CDT/IPT-->(Cantains both parameters of HDFC CDT and IPT table)
                 val hdfcCdt = HDFCCdt()
                 parseTableData(hdfcCdt, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch {
                         var insertStatus = 0L
                         when (hdfcCdt.actionId) {
                             "1", "2" -> {
@@ -304,7 +304,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "203" -> {
                 val wifiCtTable = WifiCommunicationTable()
                 parseTableData(wifiCtTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (wifiCtTable.actionId) {
                             "1", "2" -> {
