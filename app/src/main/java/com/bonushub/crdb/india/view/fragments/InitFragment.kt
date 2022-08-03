@@ -328,7 +328,8 @@ class InitFragment : Fragment() {
                                 }
                                 (activity as NavigationActivity).hideProgress()
                                //showToast("Navigation")
-                                var checkinitstatus = checkInitializationStatus(appDao)
+                               // not need to check init status because we are in success case
+                                /* var checkinitstatus = checkInitializationStatus(appDao)
                                 if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
@@ -341,7 +342,19 @@ class InitFragment : Fragment() {
                                 }
                                 else{
                                     (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
+                                }*/
+
+                                lifecycleScope.launch(Dispatchers.Main){
+                                    (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
+                                        (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
+                                            R.drawable.ic_success_with_star,
+                                            it
+                                        )
+                                    }
+
+                                   // (activity as? NavigationActivity)?.transactFragment(DashboardFragment()) // not need because in alert dialog box launch activity
                                 }
+
                             }
                             // end region
                       /*      (activity as NavigationActivity).hideProgress()
