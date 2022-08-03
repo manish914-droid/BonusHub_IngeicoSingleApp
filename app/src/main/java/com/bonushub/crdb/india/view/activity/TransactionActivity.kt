@@ -149,7 +149,7 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(amt)
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe/TAP Card"
+                emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert_swipe_tap)
             }
 
             BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type, BhTransactionType.TEST_EMI.type -> {
@@ -157,7 +157,7 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(amt)
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+                emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert_swipe)
                 globalCardProcessedModel.setEmiTransactionAmount((saleAmt.toDouble() * 100).toLong())
             }
 
@@ -165,7 +165,7 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(saleAmt.toFloat())
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe/TAP Card"
+                emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert_swipe_tap)
 
             }
         }
@@ -1112,6 +1112,7 @@ return false
                     getString(R.string.fallback),
                     getString(R.string.please_use_another_option), false
                 ) {
+                    emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert)
                     globalCardProcessedModel.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
 
                     detectCard(globalCardProcessedModel, CardOption.create().apply {
@@ -1131,6 +1132,7 @@ return false
                     getString(R.string.fallback),
                     getString(R.string.please_use_another_option), false
                 ) {
+                    emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_swipe)
                     //   globalCardProcessedModel.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
                     detectCard(globalCardProcessedModel, CardOption.create().apply {
                         supportICCard(false)

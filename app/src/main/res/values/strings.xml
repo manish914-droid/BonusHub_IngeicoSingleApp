@@ -370,5 +370,9 @@
 
     <!--wifi setting-->
     <string name="wifi_settings">Wifi Settings</string>
+    <string name="card_msg_insert_swipe_tap">Please Insert/Swipe/TAP Card</string>
+    <string name="card_msg_insert_swipe">Please Insert/Swipe Card</string>
+    <string name="card_msg_swipe">Please Swipe Card</string>
+    <string name="card_msg_insert">Please Insert Card</string>
 
 </resources>
