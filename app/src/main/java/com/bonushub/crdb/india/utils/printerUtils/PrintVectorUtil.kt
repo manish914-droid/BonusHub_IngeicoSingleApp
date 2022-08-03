@@ -2472,7 +2472,7 @@ class PrintVectorUtil(context: Context?) {
                 // todo Digipos txncode here
 
                 sigleLineText("BonusHub", AlignMode.CENTER)
-                sigleLineText("App Version", AlignMode.CENTER)
+                sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
 
 
                 vectorPrinter!!.startPrint(object : OnPrintListener.Stub() {
