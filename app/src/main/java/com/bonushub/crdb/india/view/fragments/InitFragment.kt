@@ -28,6 +28,7 @@ import com.bonushub.crdb.india.vxutils.checkInitializationStatus
 import com.bonushub.crdb.india.vxutils.writeAppRevisionIDInFile
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
+import com.usdk.apiservice.aidl.beeper.BeeperFrequency
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -345,6 +346,7 @@ class InitFragment : Fragment() {
                                 }*/
 
                                 lifecycleScope.launch(Dispatchers.Main){
+                                    DeviceHelper.getBeeper()?.startBeep(500)
                                     (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                         (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
                                             R.drawable.ic_success_with_star,
