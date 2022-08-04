@@ -1,10 +1,15 @@
 package com.bonushub.crdb.india.view.baseemv
+import android.app.Dialog
 import android.content.Intent
 import android.os.RemoteException
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RadioButton
+import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.CardProcessedDataModal
-import com.bonushub.crdb.india.model.local.TerminalParameterTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.ingenico.DialogUtil
 import com.bonushub.crdb.india.utils.ingenico.EMVInfoUtil
@@ -32,6 +37,8 @@ import com.usdk.apiservice.aidl.emv.EMVTag.*
 fun settingAids(emv: UEMV?) {
     println("****** Setting AID ******")
     val aids = arrayOf(
+        //visa
+        "A0000000031010",
         "A000000025",
         "A000000333010106",
         "A000000333010103",
@@ -43,7 +50,7 @@ fun settingAids(emv: UEMV?) {
         "A000000003101001",
         "A000000003101002",
         "A000000003101004",
-        "A0000000031010",
+
         // rupay
         "A0000005241010",
         // dinners
@@ -143,127 +150,7 @@ fun settingAids(emv: UEMV?) {
 
 //endregion =========================================================================== Visa Live cap keys ends==================================================================================================================================================================================================================================
 
-          /*   // region ===================Visa CLS cap keys=============
-             "9F3303E0F8C8" +
-                     "97099F02065F2A029A0390" +
-                     "9F40056F00F0F001" + //additional terminal capability
-                     "9F0607A0000000038010" +
-                     "DF0306009999999999" +
-                   //  "DF2006${ctlsVal}" +
-                     "DF010100" +
-                     "DF14039F3704" +
-                     "9F6604F6004000" +
-                     "5F2A020356" +
-                     "DF170101" +
-                     "9F09020096" + //Application version number
-                     "DF180101" +
-                     "DF1205D84004F800" + //Tac online
-                     "9F1B0400000000" +
-                     "9F1A020356" +
-                    // "DF2106${cvmVal}" +
-                     "DF160101" +
-                     "DF150400000000" +
-                     "DF1105D84004A800" +
-                     "DF0406000000000000" +
-                     "DF1906000000000000" +
-                     "DF13050010000000",
 
-             "9F3303E0F8C8" +
-                     "97099F02065F2A029A0390" +
-                     "9F40056F00F0F001" + //additional terminal capability
-                     "9F0607A0000000032010" +
-                     "DF0306009999999999" +
-                 //    "DF2006${ctlsVal}" +
-                     "DF010100" +
-                     "DF14039F3704" +
-                     "9F6604F6004000" +
-                     "5F2A020356" +
-                     "DF170101" +
-                     "9F09020096" + //Application version number
-                     "DF180101" +
-                     "DF1205D84004F800" + //Tac online
-                     "9F1B0400000000" +
-                     "9F1A020356" +
-                   //  "DF2106${cvmVal}" +
-                     "DF160101" +
-                     "DF150400000000" +
-                     "DF1105D84004A800" +
-                     "DF0406000000000000" +
-                     "DF1906000000000000" +
-                     "DF13050010000000",
-
-
-             "9F3303E0F8C8" +
-                     "97099F02065F2A029A0390" +
-                     "9F40056F00F0F001" +  //Additional terminal capability
-                     "9F0607A0000000031010" +
-                     "DF0306009999999999" +
-                  //   "DF2006${ctlsVal}" + //Contact less Maximum Transaction Limit
-                     "DF010100" +           //Application id
-                     "DF14039F3704" +       //DDOL (Dynamic data authetication...)
-                     "9F6604F6004000" +           //Teminal transaction qualifier
-                     "5F2A020356" +         //  Transaction currency code
-                     "DF170101" +           //The target percentage randomly choosen
-                     "9F09020096" + //Application version number
-                     "DF180101" +           //Online pin
-                     "DF1205A0109C9800" +   //TAC online
-                     "9F1B0400000000" +      //Minimum Limit //floor limit
-                     "9F1A020356" +          //Terminal Country code
-                   //  "DF2106${cvmVal}" +  //Terminal cvm(cardholder verification methods) quota
-                     "DF160101" +             //Bias select the maximum percentage of target
-                     "DF150400000000" +       //offset Randomly selected thresold
-                     "DF1105A4109C0000" +     //TAC Default
-                     "DF0406000000000000" +
-                     "DF1906000000000000" +    //Contact less offline minimum
-                     "DF13055C40000000",       //TAC Refuse
-
-             "9F3303E0F8C8" +
-                     "97099F02065F2A029A0390" +
-                     "9F40056F00F0F001" +  //Additional terminal capability
-                     "9F0608A000000003101001" +
-                   //  "DF2006${ctlsVal}" +
-                     "DF010100" +
-                     "DF14039F3704" +
-                     "9F6604F6004000" +
-                     "5F2A020156" +
-                     "DF170101" +
-                     "9F0902008D" + //Application version number
-                     "DF180101" +
-                     "DF1205A0109C9800" +
-                     "9F1B0400000000" +
-                     "9F1A020356" +
-                   //  "DF2106${cvmVal}" +
-                     "DF160101" +
-                     "DF150400000000" +
-                     "DF1105A4109C0000" +
-                     "DF0406000000000000" +
-                     "DF1906000000000000" +
-                     "DF13055C40000000",
-
-             "9F3303E0F8C8" +
-                     "97099F02065F2A029A0390" +
-                     "9F40056F00F0F001" +  //Additional terminal capability
-                     "9F0608A000000003101002" +
-                   //  "DF2006${ctlsVal}" +
-                     "DF010100" +
-                     "DF14039F3704" +
-                     "9F6604F6004000" +
-                     "5F2A020156" +
-                     "DF170101" +
-                     "9F0902008D" + //Application version number
-                     "DF180101" +
-                     "DF1205A0109C9800" +
-                     "9F1B0400000000" +
-                     "9F1A020356" +
-                 //    "DF2106${cvmVal}" +
-                     "DF160101" +
-                     "DF150400000000" +
-                     "DF1105A4109C0000" +
-                     "DF0406000000000000" +
-                     "DF1906000000000000" +
-                     "DF13055C40000000",
-
-             // endregion =============*/
 
 //region ======================= Master Testcap keys starts=======================================================
                 // MasterCard
@@ -391,6 +278,88 @@ fun settingAids(emv: UEMV?) {
                      "DF070101",// ARITH_IND
 //endregion =========================================================================== Rupay Live Cap keys ends==================================================================================================================================================================================================================================
 
+
+             //region =========================================================================== Diners Test cap keys starts==================================================================================================================================================================================================================================
+                    //Diners Capk keys
+                    //  DINERS CAPK
+                    "9F0605A000000152" + // Aids
+                            "9F22015A" + // key Id
+                            "DF0506333131323138" + // exp date
+                            "DF060101" +  // Hash Ind
+                            "DF070101" + // ARith Index
+                            "DF028180EDD8252468A705614B4D07DE3211B30031AEDB6D33A4315F2CFF7C97DB918993C2DC02E79E2FF8A2683D5BBD0F614BC9AB360A448283EF8B9CF6731D71D6BE939B7C5D0B0452D660CF24C21C47CAC8E26948C8EED8E3D00C016828D642816E658DC2CFC61E7E7D7740633BEFE34107C1FB55DEA7FAAEA2B25E85BED948893D07" + // Module
+                            "DF040103" + // exponent
+                            "DF0314CC9585E8E637191C10FCECB32B5AE1B9D410B52D",//Check Sum
+
+                    "9F0605A000000152" + // Aids
+                            "9F22015C" + // Key Id
+                            "DF050420291231" + //Expiry Date
+                            "DF0281B0833F275FCF5CA4CB6F1BF880E54DCFEB721A316692CAFEB28B698CAECAFA2B2D2AD8517B1EFB59DDEFC39F9C3B33DDEE40E7A63C03E90A4DD261BC0F28B42EA6E7A1F307178E2D63FA1649155C3A5F926B4C7D7C258BCA98EF90C7F4117C205E8E32C45D10E3D494059D2F2933891B979CE4A831B301B0550CDAE9B67064B31D8B481B85A5B046BE8FFA7BDB58DC0D7032525297F26FF619AF7F15BCEC0C92BCDCBC4FB207D115AA65CD04C1CF982191" + // module
+                            "DF040103" + //exponent
+                            "DF031460154098CBBA350F5F486CA31083D1FC474E31F8" +  // Checksum
+                            "DF070101", // ARITH_IND
+
+                    "9F0605A000000152" + //Aids
+                            "9F22015B" + //Key id
+                            "DF050420291231" + //Expiry Date
+                            "DF028190D3F45D065D4D900F68B2129AFA38F549AB9AE4619E5545814E468F382049A0B9776620DA60D62537F0705A2C926DBEAD4CA7CB43F0F0DD809584E9F7EFBDA3778747BC9E25C5606526FAB5E491646D4DD28278691C25956C8FED5E452F2442E25EDC6B0C1AA4B2E9EC4AD9B25A1B836295B823EDDC5EB6E1E0A3F41B28DB8C3B7E3E9B5979CD7E079EF024095A1D19DD" + // Module
+                            "DF040103" + // exponent
+                            "DF03140000000000000000000000000000000000000000BF010131" + // Checksum
+                            "DF070101",// ARITH_IND
+
+                    "9F0605A000000152" + // Aids
+                            "9F22015D" + // Key Id
+                            "DF050420241231" + //Expiry Date
+                            "DF0281F8AD938EA9888E5155F8CD272749172B3A8C504C17460EFA0BED7CBC5FD32C4A80FD810312281B5A35562800CDC325358A9639C501A537B7AE43DF263E6D232B811ACDB6DDE979D55D6C911173483993A423A0A5B1E1A70237885A241B8EEBB5571E2D32B41F9CC5514DF83F0D69270E109AF1422F985A52CCE04F3DF269B795155A68AD2D6B660DDCD759F0A5DA7B64104D22C2771ECE7A5FFD40C774E441379D1132FAF04CDF55B9504C6DCE9F61776D81C7C45F19B9EFB3749AC7D486A5AD2E781FA9D082FB2677665B99FA5F1553135A1FD2A2A9FBF625CA84A7D736521431178F13100A2516F9A43CE095B032B886C7A6AB126E203BE7" + // Module
+                            "DF040103" + // exponent
+                            "DF0314B51EC5F7DE9BB6D8BCE8FB5F69BA57A04221F39BBF010131" + // checksum
+                            "DF070101",// ARITH_IND
+    //endregion =========================================================================== Diners Test cap keys ends==================================================================================================================================================================================================================================
+
+         //region ========================================= Diners Live cap keys starts==================================================================================================================================================================================================================================
+             //Diners Live cap keys 01//
+             "9F0605A000000152" + // Aids
+                     "9F220101" + // Key Id
+                     "DF050420241231" + //Expiry Date
+                     "DF028180"+"8D1727AB9DC852453193EA0810B110F2A3FD304BE258338AC2650FA2A040FA10301EA53DF18FD9F40F55C44FE0EE7C7223BC649B8F9328925707776CB86F3AC37D1B22300D0083B49350E09ABB4B62A96363B01E4180E158EADDD6878E85A6C9D56509BF68F0400AFFBC441DDCCDAF9163C4AACEB2C3E1EC13699D23CDA9D3AD" + // Module
+                     "DF040103" + // exponent
+                     "DF0314"+"E0C2C1EA411DB24EC3E76A9403F0B7B6F406F398" + // checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Diners Live cap keys 03//
+             "9F0605A000000152" + // Aids
+                     "9F220103" + // Key Id
+                     "DF050420241231" + //Expiry Date
+                     "DF028190"+"BF321241BDBF3585FFF2ACB89772EBD18F2C872159EAA4BC179FB03A1B850A1A758FA2C6849F48D4C4FF47E02A575FC13E8EB77AC37135030C5600369B5567D3A7AAF02015115E987E6BE566B4B4CC03A4E2B16CD9051667C2CD0EEF4D76D27A6F745E8BBEB45498ED8C30E2616DB4DBDA4BAF8D71990CDC22A8A387ACB21DD88E2CC27962B31FBD786BBB55F9E0B041" + // Module
+                     "DF040103" + // exponent
+                     "DF0314"+"CA1E9099327F0B786D8583EC2F27E57189503A57" + // checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+             //Diners Live cap keys 04//
+             "9F0605A000000152" + // Aids
+                     "9F220104" + // Key Id
+                     "DF050420241231" + //Expiry Date
+                     "DF0281B0"+"8EEEC0D6D3857FD558285E49B623B109E6774E06E9476FE1B2FB273685B5A235E955810ADDB5CDCC2CB6E1A97A07089D7FDE0A548BDC622145CA2DE3C73D6B14F284B3DC1FA056FC0FB2818BCD7C852F0C97963169F01483CE1A63F0BF899D412AB67C5BBDC8B4F6FB9ABB57E95125363DBD8F5EBAA9B74ADB93202050341833DEE8E38D28BD175C83A6EA720C262682BEABEA8E955FE67BD9C2EFF7CB9A9F45DD5BDA4A1EEFB148BC44FFF68D9329FD" + // Module
+                     "DF040103" + // exponent
+                     "DF0314"+"17F971CAF6B708E5B9165331FBA91593D0C0BF66" + // checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND*/
+
+             //Diners Live cap keys 05//
+             "9F0605A000000152" + // Aids
+                     "9F220105" + // Key Id
+                     "DF050420241231" + //Expiry Date
+                     "DF0281F8"+"E1200E9F4428EB71A526D6BB44C957F18F27B20BACE978061CCEF23532DBEBFAF654A149701C14E6A2A7C2ECAC4C92135BE3E9258331DDB0967C3D1D375B996F25B77811CCCC06A153B4CE6990A51A0258EA8437EDBEB701CB1F335993E3F48458BC1194BAD29BF683D5F3ECB984E31B7B9D2F6D947B39DEDE0279EE45B47F2F3D4EEEF93F9261F8F5A571AFBFB569C150370A78F6683D687CB677777B2E7ABEFCFC8F5F93501736997E8310EE0FD87AFAC5DA772BA277F88B44459FCA563555017CD0D66771437F8B6608AA1A665F88D846403E4C41AFEEDB9729C2B2511CFE228B50C1B152B2A60BBF61D8913E086210023A3AA499E423" + // Module
+                     "DF040103" + // exponent
+                     "DF0314"+"12BCD407B6E627A750FDF629EE8C2C9CC7BA636A" + // checksum
+                     "DF060101" + // Hash Ind
+                     "DF070101",// ARITH_IND
+
+//endregion =========================================================================== Diners Live cap keys ends==================================================================================================================================================================================================================================
+
+
          )
          for (item: String in ca) {
              val tlvList: TLVList = TLVList.fromBinary(item)
@@ -503,20 +472,17 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
         // for EMV this call is common for every payment scheme
         KernelID.EMV.toByte()   -> {
             tlvList = StringBuilder()
-                .append("9F350122")
+                .append("9F350122") // terminal type
               //  .append("9F3303E0E8C8")
-            .append("9F3303E0F0C8") // Terminal Capability // value is changed for support Enciphered
+          .append("9F3303E0F0C8") // Terminal Capability // value is changed for support Enciphered pin
+
                // .append("9F3303E0D0C8") // Terminal Capability //value for Not supporting Sign [Just for test purpose of sign]
                 .append("9F40056000F0B001")
                 .append("9F1A020356")
                 .append("5F2A020356")
                 .append("9F09020001")
 
-
-
                 .append("9F09020002")// Application version
-
-
 
                 .append("9F410400000001")  //Transaction Sequence Counter - 0
                 .append("DF918111050010000000") // Terminal action code(decline)
@@ -551,11 +517,6 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("9F1A020356")
                 .append("5F2A020356")
                 .append("9F09020001")
-
-
-
-
-
                 .append("9F410400000001")
                 .append("DF918111050000000000") // Terminal action code(decline)
                 .append("DF918112050000000000") // Terminal action code(online)
@@ -591,8 +552,10 @@ Log.e("TLV LIST --> ",tlvList)
 
                 .append("9F1B0400003A98")
 
-               // .append("9F660436004000") // TTQ
-                .append("9F6604F6004000") // TTQ
+               // .append("9F660436004000") // TTQ incorrect
+           //   .append("9F6604F6004000") // TTQ --> working ttq
+              .append("9F660476E04000") // TTQ --> for test case 1002
+
                 .append("DF06027C00")
 
                 .append("DF918111050010000000") // Terminal action code(decline)
@@ -601,11 +564,12 @@ Log.e("TLV LIST --> ",tlvList)
                 //D84000A812
                 .append("DF91811005D84000A812")  // Terminal action code(default)
 
-              //  .append("9F6D01C0")              // Contactless Reader Capabilities
-            //    .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities
+           //    .append("9F6D01C0")              // Contactless Reader Capabilities --->
+         //    .append("9F6E04D8E00000")      //  Enhanced Contactless Reader Capabilities--->
+          //       .append("DF81300100")            //Try Again Flag--->
 
-                .append("DF812306000000000000")  //Terminal Contactless Floor Limit
-               // .append("DF81300100")            //Try Again Flag
+              .append("DF812306000000000000")  //Terminal Contactless Floor Limit--->
+
 
              //   .append("DF812306000000100000")
 
@@ -623,36 +587,33 @@ Log.e("TLV LIST --> ",tlvList)
             tlvList = StringBuilder()
                 .append("9F350122")
              //   .append("9F3303E0F8C8")
-              //  .append("9F3303E068C8") // MCD 19 test case
-             .append("9F3303E060C8") // MCD 04
+            //   .append("9F3303E068C8") // MCD 19 test case
+            .append("9F3303E060C8") // MCD 04
+                    //e008c8
                 .append("9F40056000F0A001")
-
                 .append("9F1A020356")
                 .append("5F2A020356")
-
-
                 .append("DF918111050000000000")
                 .append("DF91811205FFFFFFFFFF")
                 .append("DF91811005FFFFFFFFFF")
                 .append("DF9182010102")
                 .append("DF9182020100")
                 .append("DF9181150100")
-                .append("DF9182040100")
-                .append("DF812506000000010000")
+         //   .append("DF9182040100") // -->
+            .append("DF9182040101") // -->DEF_TAG_M_CDV_SUP --. is used for
                 .append("DF812306000000000000")// //Terminal Contactless Floor Limit
                 .append("DF9182050160")
                 .append("DF9182070120")
-                //.append("9F1D086C00800000000000")
                 .append("DF9182080120").toString()
-
-
             // relay resistance in vx--> DF81 01 B0
           //  DEF_TAG_M_RRP_SWITCH
            // 0x9F,0x1D,0x08,0x6C,0x00,0x80,0x00,0x00,0x00,0x00,0x00
             //6C00800000000000
             emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_RMDATA,"6C00800000000000") // 9F1D
             emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_RRP_SWITCH,"01") // Used for relay resistance
-            emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_REQ_NOCVM,"08")//Changing this tag value 06 to 08 for CVM limit PIN
+       emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_REQ_NOCVM,"08")//Changing this tag value 06 to 08 for CVM limit PIN
+  //emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_REQ_NOCVM,"60")//todo change
+ emv?.setTLV(finalData.kernelID.toInt(),DEF_TAG_M_REQ_CVM,"60") // sac sir
 
             emv?.setTLV(finalData.kernelID.toInt(),M_TAG_TM_TRANS_LIMIT_CDV,clsMaxTransLimit)//DF8125
 
@@ -665,18 +626,14 @@ Log.e("TLV LIST --> ",tlvList)
         KernelID.DISCOVER.toByte() -> {
             tlvList = StringBuilder()
 
-                .append("9F3303E06840")
+                /*
                 .append("DF4C06000000015000")
-
                 .append("DF8142011E")
                 .append("9F350122")
                 .append("9F4005F040F0B001")
                 .append("9F1A020156")
                 .append("5F2A020156")
                 .append("9F09020002")
-
-
-
                 .append("9F410400001234")
                 .append("9F1B0400002710")
                 .append("DF918111050410000000")
@@ -686,44 +643,30 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF16020015")
                 .append("DF3A050040000000")
                 .append("DF4D06000000010000")
-
-
-
                 .append("DF812306000000008000")
                 .append("DF9181050100")
-                .append("DF9181020100").toString()
+                .append("DF9181020100").toString()*/
 
+                .append("9F3303E060C8")
+                .append("9F350122")
+                .append("9F40056000F0A001")
+                .append("9F1A020356")
+                .append("5F2A020356")
+                .append("9F09020001")
+                .append("9F1B0400002710")
+                .append("9A03171020")
+                .append("9F2103150512")
+                .append("9F410400000001")
+                .append("DF81170101")
+                .append("9F6604F6004000") // TTQ
+               // .append("9F660436004000") // default in doc
+                .append("DF0602FC80")
 
+                .append("DF812306000000000000").toString() //Terminal Contactless Floor Limit
 
-         /*
-         ========= VERIFONE ====
-         tlvList=    "9F3303E0F8C8" + // terminal capability
-                    "97099F02065F2A029A0390" +
-                    "9F40056F00F0F001" + //additional terminal capability
-                    "9f0607A0000005241010" +
-                    "DF0306009999999999" +
-                  // "DF2006${ctlsVal}" +
-                  "DF2006000000009999" +
-                    "DF010100" +
-                    "DF14039F3704" +
-                    "9F6604F6004000" + //TTQ
-                    "5F2A020356" +
-                    "DF170101" +
-                    "9F09020002" +
-                    "DF180101" +
-                    "DF1205D84004F800" +
-                    "9F1B0400000000" +
-                    "9F1A020356" +
-                   // "DF2106${cvmVal}" +   //CVm Limit
-                  "DF2106000000050000" +   //CVm Limit
-                    "DF160101" +
-                    "DF150400000000" +
-                    "DF1105D84004A800" +
-                    "DF0406000000000000" +
-                    "DF1906000000000000" +
-                    "DF13050010000000"*/
 
         }
+
        // KernelID.DISCOVER.toByte() -> {}
         KernelID.JCB.toByte() -> {}
         else -> {}
@@ -763,7 +706,7 @@ Log.e("TLV LIST --> ",tlvList)
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTYPE,tag9CData)// 9C --> Txn Type
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSDATE,txnDate)//9A --> Txn Date
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTIME,txnTime)//9F21 --> Txn Time
-
+println("SEECTED KERNAL ------->  ${finalData.kernelID.toInt()}")
     println(""+emv?.setTLVList(finalData.kernelID.toInt(),tlvList) +"...onFinalSelect: setTLVList")
     println("...onFinalSelect: respondEvent" + emv?.respondEvent(null))
 }
@@ -812,6 +755,7 @@ fun utilityFunctionForCardDataSetting(cardProcessedDataModal: CardProcessedDataM
         }
         Log.d(EmvHandler.TAG,"Application label ->${appLabel}")
         cardProcessedDataModal.setApplicationLabel(appLabel)
+
     } catch (ex: Exception) {
         Log.e(EmvHandler.TAG, ex.message ?: "")
     }
@@ -831,19 +775,64 @@ fun utilityFunctionForCardDataSetting(cardProcessedDataModal: CardProcessedDataM
     }
 
     try {
-        val tlvAid = emv?.getTLV(Integer.toHexString(0x84))     // AID  TAG //84
+        val tlvAid = emv.getTLV(Integer.toHexString(0x84))     // AID  TAG //84
         val aidStr = if (tlvAid?.isNotEmpty() == true) {
-            val aidstr = tlvAid.take(10)
-            aidstr
+           tlvAid
         }
         else {
             ""
         }
         Log.d(EmvHandler.TAG,"Aid  code ---> $aidStr")
         cardProcessedDataModal.setAID(aidStr)
-
+cardProcessedDataModal.tvrCls= emv.getTLV(Integer.toHexString(0x95))
+    cardProcessedDataModal.tsiCls= emv.getTLV(Integer.toHexString(0x9B))
     } catch (ex: Exception) {
         Log.e(EmvHandler.TAG, ex.message ?: "")
     }
 
 }
+
+
+
+open class MultiSelectionAppAdapter(
+    var appList: MutableList<CandidateAID>,
+    var dialog: Dialog,
+    var updatePosition: (Int) -> Unit
+) :
+    RecyclerView.Adapter<MultiSelectionAppViewHolder>() {
+    private var lastSelectedPosition = 0
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MultiSelectionAppViewHolder {
+        return MultiSelectionAppViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_multiapp_selection_layout, parent, false)
+        )
+    }
+
+    override fun getItemCount(): Int = appList.size
+
+    override fun onBindViewHolder(holder: MultiSelectionAppViewHolder, noUsePosition: Int) {
+
+
+        val aidBundle = appList[holder.adapterPosition]
+      //  val aidName = aidBundle.appLabel.byteArr2Str()aidBundle.appLabel.toString()//aidBundle.getString("aidName")
+     //   val aid = aidBundle.aid.byteArr2Str()//aidBundle.getString("aid")
+        val aidLabel =  aidBundle.appLabel.byteArr2Str()//aidBundle.getString("aidLabel")
+        Log.i("App Selection", " AID Label=$aidLabel ")
+        val appRB = holder.view.findViewById<RadioButton>(R.id.app_Rb)
+        appRB.text = aidLabel
+
+        //since only one radio button is allowed to be selected,
+        // this condition un-checks previous selections
+        appRB.isChecked = lastSelectedPosition == holder.adapterPosition
+
+        appRB.setOnClickListener {
+            //VFService.showToast("onSelectApplication..." + (appList[position]))
+
+            lastSelectedPosition = holder.adapterPosition
+            updatePosition(holder.adapterPosition)
+           notifyDataSetChanged()
+        }
+    }
+}
+
+class MultiSelectionAppViewHolder(val view: View) : RecyclerView.ViewHolder(view)

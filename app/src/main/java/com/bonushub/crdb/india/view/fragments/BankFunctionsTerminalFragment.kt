@@ -45,7 +45,8 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClick {
+class BankFunctionsTerminalFragment : Fragment(),IBankFunctionsTerminalItemClick{
+   // BankFunctionsTerminalFragment.IBankFunctionsTerminalItemClick
 
     @Inject
     lateinit var appDao: AppDao
@@ -88,11 +89,11 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
 
         lifecycleScope.launch(Dispatchers.Main) {
-            bankFunctionsViewModel.getTerminalParamField()?.observe(viewLifecycleOwner,{
+            bankFunctionsViewModel.getTerminalParamField()?.observe(viewLifecycleOwner) {
 
                 //logger("menuList",""+it)
                 setupRecyclerview(it)
-            })
+            }
 
         }
 
@@ -427,8 +428,8 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
                                 }
 
-                                var checkinitstatus = checkInitializationStatus(appDao)
-                                if(checkinitstatus) {
+                          //      var checkinitstatus = checkInitializationStatus(appDao)
+                           //     if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
@@ -437,10 +438,10 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
                                             )
                                         }
                                     }
-                                }
-                                else{
+                            //    }
+                               /* else{
                                     (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
-                                }
+                                }*/
                             }
 
 
@@ -477,9 +478,9 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
      suspend fun reupdateTable(titleValue: String?) {
          bankFunctionsViewModel.updateTerminalTable(dataList, requireContext())
-             ?.observe(viewLifecycleOwner, { isUpdateTid ->
+             ?.observe(viewLifecycleOwner) {
 
-             })
+             }
      }
 
 

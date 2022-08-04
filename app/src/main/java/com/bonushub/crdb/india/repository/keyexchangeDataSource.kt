@@ -227,10 +227,11 @@ class keyexchangeDataSource @Inject constructor(private val appDao: AppDao) : IK
 
                             val insertkeys = insertSecurityKeys(ppk.hexStr2ByteArr(), dpk.hexStr2ByteArr(), ppkKcv, dpkKcv)
                             if (insertkeys) {
-                                AppPreference.saveLogin(true)
+
                                 return if (keWithInit) {
                                     val (strResult,strSucess,initList) = startInit(tid)
                                     if(strSucess == true){
+                                        AppPreference.saveLogin(true)
                                         Result.success(ResponseHandler(Status.SUCCESS,"Init Successful",false,initList))
                                     } else{
                                         AppPreference.saveBoolean(PrefConstant.INIT_AFTER_SETTLEMENT.keyName.toString(), true)

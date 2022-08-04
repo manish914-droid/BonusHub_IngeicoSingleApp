@@ -1317,7 +1317,8 @@ return false
                                             emiSelectedData,
                                             emiTAndCData,
                                             brandEMIData/*, brandEMIAccessData*/
-                                        ) { data ->
+                                        )
+                                        { data ->
                                             Log.d("StubbedEMIData:- ", data.toString())
 
                                             printAndSaveBatchDataInDB(stubbedData) {
@@ -1726,30 +1727,28 @@ return false
                 }
             }*/
 
-            if (stubbedData != null) {
-                PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
-                    stubbedData,
-                    EPrintCopyType.MERCHANT,
-                    this@TransactionActivity as BaseActivityNew
-                ) { printCB, printingFail ->
-                    Log.e("hideProgress", "3")
-                    (this@TransactionActivity as BaseActivityNew).hideProgress()
-                    if (printCB) {
-                        printsts = printCB
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            showMerchantAlertBox(stubbedData, cb)
-                        }
-
-                    } else {
-                        ToastUtils.showToast(
-                            this@TransactionActivity as BaseActivityNew,
-                            getString(R.string.printer_error)
-                        )
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            cb(false)
-                        }
-
+            PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
+                stubbedData,
+                EPrintCopyType.MERCHANT,
+                this@TransactionActivity as BaseActivityNew
+            ) { printCB, printingFail ->
+                Log.e("hideProgress", "3")
+                (this@TransactionActivity as BaseActivityNew).hideProgress()
+                if (printCB) {
+                    printsts = printCB
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        showMerchantAlertBox(stubbedData, cb)
                     }
+
+                } else {
+                    ToastUtils.showToast(
+                        this@TransactionActivity as BaseActivityNew,
+                        getString(R.string.printer_error)
+                    )
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        cb(false)
+                    }
+
                 }
             }
         }

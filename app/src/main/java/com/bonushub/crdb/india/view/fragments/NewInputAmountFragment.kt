@@ -630,10 +630,9 @@ class NewInputAmountFragment : Fragment() {
         if (saleAmountStr != "") {
             saleAmount = (binding?.saleAmount?.text.toString()).toDouble()
         }
-        if (saleAmount < 1) {
+        if (saleAmount <= 0) {
            //showToast(getString(R.string.sale_amount_should_greater_then_1))
             setErrorInField(getString(R.string.sale_amount_should_greater_then_1), binding?.saleAmount!!)
-
             return
         }
         when (eDashBoardItem) {
@@ -707,7 +706,6 @@ class NewInputAmountFragment : Fragment() {
                 }
             }
             EDashboardItem.BANK_EMI, EDashboardItem.TEST_EMI -> {
-
                 var uiAction = UiAction.BANK_EMI
                 if (eDashBoardItem == EDashboardItem.TEST_EMI) {
                     uiAction = UiAction.TEST_EMI
@@ -744,7 +742,6 @@ class NewInputAmountFragment : Fragment() {
                     }
                 }
             }
-
             EDashboardItem.BRAND_EMI -> {
                 when {
                     // mobile entry  optional handling
@@ -859,7 +856,6 @@ class NewInputAmountFragment : Fragment() {
                 }
             }
             EDashboardItem.BANK_EMI_CATALOGUE -> {
-
                 when {
                     TextUtils.isEmpty(
                         saleAmount.toString().trim()
@@ -1217,7 +1213,7 @@ class NewInputAmountFragment : Fragment() {
 
     private fun setErrorInField(str:String,edt:TextInputEditText){
         lifecycleScope.launch(Dispatchers.Main) {
-            edt.setError(str)
+            edt.error = str
         }
     }
 

@@ -228,10 +228,15 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
             DetectCardType.CONTACT_LESS_CARD_TYPE -> {
                 /*   val aidArray = arrayOf("0x9F06")
                val aidData = vfIEMV?.getAppTLVList(aidArray)*/
-                var aidData = cardProcessedDataModal.getAIDPrint() ?: ""
+               // var aidData = cardProcessedDataModal.getAIDPrint() ?: ""
                 //println("Aid Data is ----> $aidData")
                 //val formattedAid = aidData?.subSequence(6, aidData.length)
-                batchFileData.aid = cardProcessedDataModal.getAIDPrint() ?: ""
+               batchFileData.aid = cardProcessedDataModal.getAID() ?: ""
+                if(cardProcessedDataModal.tvrCls?.toInt()!=0)
+                batchFileData.tvr=cardProcessedDataModal.tvrCls?:""
+                if(cardProcessedDataModal.tsiCls?.toInt()!=0)
+                batchFileData.tsi=cardProcessedDataModal.tsiCls?:""
+
             }
             else -> {
             }

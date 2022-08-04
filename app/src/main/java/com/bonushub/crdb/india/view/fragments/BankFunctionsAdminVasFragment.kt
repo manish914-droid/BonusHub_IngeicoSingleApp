@@ -633,8 +633,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                         //}
 
                                     }
-                                    var checkinitstatus = checkInitializationStatus(appDao)
-                                    if (checkinitstatus) {
+                                //    var checkinitstatus = checkInitializationStatus(appDao)
+                                //    if (checkinitstatus) {
                                         CoroutineScope(Dispatchers.Main).launch {
                                             (activity as? NavigationActivity)?.getString(R.string.successfull_init)
                                                 ?.let {
@@ -644,11 +644,12 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                     )
                                                 }
                                         }
-                                    } else {
+                                //    }
+                                      /*else {
                                         (activity as? NavigationActivity)?.transactFragment(
                                             DashboardFragment()
                                         )
-                                    }
+                                    }*/
                                 }
 
                             }
