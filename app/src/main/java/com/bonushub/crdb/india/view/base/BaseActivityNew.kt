@@ -152,7 +152,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             msg,
             icon,
             getString(R.string.positive_button_ok),
-            "",false,false,
+            "",false,true,
             { acceptCb() },
             {})
 
@@ -253,7 +253,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
                 msg,
                 icon,
                 positiveButtonText,
-                "No",showCancelButton,false,
+                "No",showCancelButton,true,
                 { alertCallback (it)},
                 { cancelButtonCallback (it)})
         }else{
@@ -407,7 +407,12 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
                 /*startActivity(Intent(this, NavigationActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })*/
-            }, 2000)
+                if(isShowNegativeBtn) {
+                    noButtonCallback(true)
+                }else{
+                    yesButtonCallback(true)
+                }
+            }, 3000)
         }
 
        /* bindingg.yesBtn.text = positiveButtonText
@@ -716,7 +721,7 @@ interface IDialog {
     )
 
     fun alertBoxWithActionNew(header:String, msg:String, icon: Int, positiveButtonText: String, negativeButtonText:String, isShowNegativeBtn:Boolean,
-                              isAutoCancel:Boolean, yesButtonCallback: (Boolean) -> Unit, noButtonCallback: (Boolean) -> Unit)
+                              isAutoCancel:Boolean=true, yesButtonCallback: (Boolean) -> Unit, noButtonCallback: (Boolean) -> Unit)
 }
 
 

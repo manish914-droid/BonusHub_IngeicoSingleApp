@@ -109,7 +109,7 @@ class PreAuthPendingFragment : Fragment() {
                         pendingPreAuthData.msg ?: "",
                         R.drawable.ic_info_new,
                         getString(R.string.positive_button_ok),
-                        "", false, false,
+                        "", false, true,
                         { alertPositiveCallback ->
                             if (alertPositiveCallback) {
 
@@ -146,11 +146,11 @@ class PreAuthPendingFragment : Fragment() {
                     (activity as BaseActivityNew).hideProgress()
 
                     if(!printCb){
-                        iDialog?.alertBoxWithActionNew("Alert","Printing error!",R.drawable.ic_init_next,"OK","",false,false,{},{})
+                        iDialog?.alertBoxWithActionNew("Alert","Printing error!",R.drawable.ic_init_next,"OK","",false,true,{},{})
                     }
                 }
             }else{
-                iDialog?.alertBoxWithActionNew("","Pending Pre-Auth not available.",R.drawable.ic_init_next,"OK","",false,false,{},{})
+                iDialog?.alertBoxWithActionNew("","Pending Pre-Auth not available.",R.drawable.ic_init_next,"OK","",false,true,{},{})
             }
         }
 
@@ -196,7 +196,7 @@ class PreAuthPendingFragment : Fragment() {
                                                 getString(R.string.positive_button_yes),
                                                 getString(R.string.no),
                                                 true,
-                                                false,
+                                                true,
                                                 {
                                                     lifecycleScope.launch(Dispatchers.IO)
                                                     {
@@ -244,7 +244,7 @@ class PreAuthPendingFragment : Fragment() {
                             getString(R.string.reversal_upload_fail),
                             R.drawable.ic_info_new,
                             getString(R.string.positive_button_ok),
-                            "",false,false,
+                            "",false,true,
                             {},
                             {})
                     }else {
@@ -259,7 +259,7 @@ class PreAuthPendingFragment : Fragment() {
                                         "Transaction Declined",
                                         R.drawable.ic_info_new,
                                         getString(R.string.positive_button_ok),
-                                        "", false, false,
+                                        "", false, true,
                                         { alertPositiveCallback ->
                                             gotoDashboard()
                                         },
@@ -274,7 +274,7 @@ class PreAuthPendingFragment : Fragment() {
                                 it.msg ?: "",
                                 R.drawable.ic_info_new,
                                 getString(R.string.positive_button_ok),
-                                "", false, false,
+                                "", false, true,
                                 { alertPositiveCallback ->
                                     // gotoDashboard()
                                 },
@@ -404,7 +404,7 @@ class PreAuthPendingFragment : Fragment() {
             dialogBuilder.dismiss()
 
             if(!printCb){
-                iDialog?.alertBoxWithActionNew("Alert","Printing error!",R.drawable.ic_init_next,"OK","",false,false,{},{})
+                iDialog?.alertBoxWithActionNew("Alert","Printing error!",R.drawable.ic_init_next,"OK","",false,true,{},{})
             }
         }
     }

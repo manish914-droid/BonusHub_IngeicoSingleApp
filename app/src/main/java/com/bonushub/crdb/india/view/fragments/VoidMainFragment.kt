@@ -152,7 +152,7 @@ class VoidMainFragment : Fragment() {
                                     withContext(Dispatchers.Main){
                                         (activity as? NavigationActivity)?.alertBoxWithActionNew("Error",
                                             respnosedatareader?.isoMap?.get(58)?.parseRaw2String()
-                                                .toString(),R.drawable.ic_info_orange,"Ok","",false,false,{},{})
+                                                .toString(),R.drawable.ic_info_orange,"Ok","",false,true,{},{})
                                     }
 
                                     startActivity(
@@ -262,7 +262,7 @@ class VoidMainFragment : Fragment() {
                                                                 "",
                                                                 getString(R.string.print_customer_copy),
                                                                 R.drawable.ic_print_customer_copy,
-                                                                "yes", "no",true,false ,{
+                                                                "yes", "no",true,true ,{
 
                                                                     (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
@@ -411,7 +411,7 @@ class VoidMainFragment : Fragment() {
                         (context).runOnUiThread {
                             (context).hideProgress()
                             (context).alertBoxWithActionNew("",transactionMsg?:"Something went wrong.",R.drawable.ic_info_orange,
-                            "OK","",false,false,{ callback(2, null, "") },{})
+                            "OK","",false,true,{ callback(2, null, "") },{})
 
 //                            ToastUtils.showToast(HDFCApplication.appContext,"No Internet Available , Please check your Internet and try again")
 //                            callback(2, null, "")
@@ -529,7 +529,7 @@ class VoidMainFragment : Fragment() {
 
                             CoroutineScope(Dispatchers.Main).launch {
                                 (activity as? NavigationActivity)?.alertBoxWithActionNew("Error",
-                                    getString(R.string.no_data_found),R.drawable.ic_info_orange,"Ok","",false,false,{},{})
+                                    getString(R.string.no_data_found),R.drawable.ic_info_orange,"Ok","",false,true,{},{})
                             }
                         }
                         1 -> {
@@ -572,7 +572,7 @@ class VoidMainFragment : Fragment() {
             confirmCallback = {
                               it.dismiss()
                 (activity as NavigationActivity).alertBoxWithActionNew("","Do you want to Void Sale this transaction?"
-                    ,R.drawable.ic_info_orange,"OK","Cancel",true,false,{
+                    ,R.drawable.ic_info_orange,"OK","Cancel",true,true,{
 
                         activity?.runOnUiThread { (activity as NavigationActivity).showProgress(getString(R.string.processing)) }
                         onContinueClicked(batchTable)

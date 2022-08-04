@@ -143,7 +143,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                         "Execute CDCVM",
                         R.drawable.ic_txn_declined,
                         activity?.getString(R.string.positive_button_ok),
-                        "", false, false,
+                        "", false, true,
                         { alertPositiveCallback ->
                             if (alertPositiveCallback) {
                                 try {
@@ -980,7 +980,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                     "Wrong PIN.Please try again",
                                     R.drawable.ic_txn_declined,
                                     (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
-                                    "", false, false, { alertPositiveCallback ->
+                                    "", false, true, { alertPositiveCallback ->
                                         if (alertPositiveCallback) {
                                             pinPad!!.startOfflinePinEntry(param, listener).also {
                                                 pinTryCounter--
@@ -1001,7 +1001,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                     "Wrong PIN.This is your last attempt",
                                     R.drawable.ic_txn_declined,
                                     (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
-                                    "", false, false, { alertPositiveCallback ->
+                                    "", false, true, { alertPositiveCallback ->
                                         if (alertPositiveCallback) {
                                             pinPad!!.startOfflinePinEntry(param, listener).also {
                                                 pinTryCounter--
@@ -1038,7 +1038,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                     "This is your last attempt",
                                     R.drawable.ic_txn_declined,
                                     (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
-                                    "", false, false, { alertPositiveCallback ->
+                                    "", false, true, { alertPositiveCallback ->
                                         if (alertPositiveCallback) {
                                             pinPad!!.startOfflinePinEntry(param, listener).also {
                                                 pinTryCounter--
@@ -1067,7 +1067,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             "This is your last PIN attempt",
                             R.drawable.ic_txn_declined,
                             (activity as? BaseActivityNew)!!.getString(R.string.positive_button_ok),
-                            "", false, false, { alertPositiveCallback ->
+                            "", false, true, { alertPositiveCallback ->
                                 if (alertPositiveCallback) {
                                     pinPad!!.startOfflinePinEntry(param, listener).also {
                                         pinTryCounter--

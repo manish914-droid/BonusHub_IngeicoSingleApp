@@ -130,7 +130,7 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                             "",
                             R.drawable.ic_info_new,
                             getString(R.string.positive_button_ok),"",false,
-                            false,
+                            true,
                             {
                                 /* finish()
                                  goToDashBoard()*/

@@ -2090,7 +2090,7 @@ suspend fun showMerchantAlertBox(
         val printerUtil: PrintUtil? = null
         activity.alertBoxWithActionNew("",
             activity.getString(R.string.print_customer_copy),
-            R.drawable.ic_print_customer_copy, activity.getString(R.string.positive_button_yes), activity.getString(R.string.no),true,false,{ status ->
+            R.drawable.ic_print_customer_copy, activity.getString(R.string.positive_button_yes), activity.getString(R.string.no),true,true,{ status ->
                 activity.showProgress(activity.getString(R.string.printing))
 
                 runBlocking(Dispatchers.IO){

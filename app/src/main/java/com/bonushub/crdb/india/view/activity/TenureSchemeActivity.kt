@@ -153,7 +153,7 @@ private val emiIssuerTAndCDataFromIntent by lazy {
                                     genericResp.errorMessage ?: "Oops something went wrong",
                                     "",
                                     R.drawable.ic_info_orange,
-                                    getString(R.string.positive_button_ok),"",false,false,
+                                    getString(R.string.positive_button_ok),"",false,true,
                                     {
                                         finish()
                                         startActivity(

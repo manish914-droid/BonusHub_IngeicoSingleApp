@@ -167,7 +167,7 @@ class SettlementFragment : Fragment() {
                                                     getString(R.string.transaction_delined_msg),
                                                     R.drawable.ic_txn_declined,
                                                     getString(R.string.positive_button_ok),"",
-                                                    false,false,
+                                                    false,true,
                                                     {},
                                                     {})
 

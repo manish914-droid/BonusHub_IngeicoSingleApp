@@ -459,7 +459,7 @@ class BankFunctionsTerminalFragment : Fragment(), IBankFunctionsTerminalItemClic
 
                     CoroutineScope(Dispatchers.Main).launch {
                         (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", result.error ?: "",R.drawable.ic_info_orange,
-                            getString(R.string.ok),"",false,false,{},{})
+                            getString(R.string.ok),"",false,true,{},{})
                     }
 
                  //   ToastUtils.showToast(activity,"Error called  ${result.error}")

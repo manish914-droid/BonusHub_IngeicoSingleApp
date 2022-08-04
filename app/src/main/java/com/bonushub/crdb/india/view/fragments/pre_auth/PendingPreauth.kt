@@ -233,7 +233,7 @@ class PendingPreauth(var context: Context) {
                                 resIso.isoMap[58]?.parseRaw2String().toString(),
                                 R.drawable.ic_info,
                                 context.getString(R.string.positive_button_ok),
-                                "",false,false,
+                                "",false,true,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         if (!TextUtils.isEmpty(autoSettlementCheck))
@@ -257,7 +257,7 @@ class PendingPreauth(var context: Context) {
                             (context as BaseActivityNew).getString(R.string.pending_preauthdetails),
                             R.drawable.ic_info,
                             (context as BaseActivityNew).getString(R.string.positive_button_ok),
-                            "",false,false,
+                            "",false,true,
                             { alertPositiveCallback ->
                                 if (alertPositiveCallback)
                                     declinedTransaction()

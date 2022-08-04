@@ -375,7 +375,7 @@ class InitFragment : Fragment() {
                     iDialog?.hideProgress()
                     CoroutineScope(Dispatchers.Main).launch {
                         (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", result.error ?: "",
-                            R.drawable.ic_info_orange,"OK","",false,false,{},{})
+                            R.drawable.ic_info_orange,"OK","",false,true,{},{})
                     }
                 }
                 Status.LOADING -> {

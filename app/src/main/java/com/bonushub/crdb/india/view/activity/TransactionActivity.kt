@@ -663,7 +663,7 @@ class TransactionActivity : BaseActivityNew() {
                         "OK",
                         "",
                         false,
-                        false,
+                        true,
                         { declinedTransaction() },
                         {})
                 }
@@ -678,7 +678,7 @@ class TransactionActivity : BaseActivityNew() {
                         "OK",
                         "",
                         false,
-                        false,
+                        true,
                         { declinedTransaction() },
                         {})
                 }
@@ -1151,7 +1151,7 @@ return false
                           "App Locked",
                           R.drawable.ic_txn_declined,
                           getString(R.string.positive_button_ok),
-                          "", false, false,
+                          "", false, true,
                           { alertPositiveCallback ->
                               if (alertPositiveCallback) {
                                   goToDashBoard()
@@ -1196,7 +1196,7 @@ return false
                         "onEndProcessCalled $result --> $errorMsg",
                         R.drawable.ic_txn_declined,
                         getString(R.string.positive_button_ok),
-                        "", false, false,
+                        "", false, true,
                         { alertPositiveCallback ->
                             if (alertPositiveCallback) {
                                 goToDashBoard()
@@ -1498,7 +1498,7 @@ return false
                                 msg,
                                 R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok),
-                                "", false, false,
+                                "", false, true,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         /*if (!TextUtils.isEmpty(autoSettlementCheck)) {
@@ -1537,7 +1537,7 @@ return false
                                     getString(R.string.network_error),
                                     R.drawable.ic_info_orange,
                                     getString(R.string.positive_button_ok),
-                                    "", false, false,
+                                    "", false, true,
                                     { alertPositiveCallback ->
                                         if (alertPositiveCallback)
                                             declinedTransaction()
@@ -1553,7 +1553,7 @@ return false
                                     R.drawable.ic_info_orange,
                                     getString(R.string.positive_button_ok),
                                     "", false,
-                                    false,
+                                    true,
                                     { alertPositiveCallback ->
                                         if (alertPositiveCallback)
                                             declinedTransaction()
@@ -1570,7 +1570,7 @@ return false
                                     "OK",
                                     "",
                                     false,
-                                    false,
+                                    true,
                                     { declinedTransaction() },
                                     {})
                             }
@@ -1610,7 +1610,7 @@ return false
                                 getString(R.string.transaction_delined_msg),
                                 R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok), "",
-                                false, false,
+                                false, true,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback)
                                         declinedTransaction()
@@ -1654,7 +1654,7 @@ return false
                 msg,
                 R.drawable.ic_txn_declined,
                 getString(R.string.positive_button_ok),
-                "", isShowNegativeBtn = false, isAutoCancel = false,
+                "", isShowNegativeBtn = false, isAutoCancel = true,
                 yesButtonCallback = {
                     goToDashBoard()
                 },
@@ -1801,7 +1801,7 @@ return false
                 getString(R.string.positive_button_yes),
                 getString(R.string.no),
                 true,
-                false,
+                true,
                 { status ->
                     showProgress(getString(R.string.printing))
                     PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
@@ -1854,7 +1854,7 @@ return false
                 getString(R.string.positive_button_ok),
                 "Cancel",
                 showCancelButton,
-                false,
+                true,
                 { alertCallback ->
                     if (alertCallback) {
                         emvFromError(true)
