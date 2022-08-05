@@ -665,20 +665,22 @@ Log.e("TLV LIST --> ",tlvList)
         // todo below changes is used for only Rupay
         KernelID.RUPAY.toByte(),
         KernelID.DISCOVER.toByte() -> {
+/*
             tlvList = StringBuilder()
               //  .append("9F3303E0F8C8") // Terminal capabilities
                 .append("9F3303E0F0C8")// Terminal capabilities
                 .append("9F350122") // Terminal type
                 .append("9F40056000F0A001")//EMV_TAG_TM_CAP_AD
-                .append("9F6604F6004000") // TTQ
+             //   .append("9F6604F6004000") // TTQ
+                .append("9F6604B680C000") // TTQ
           //  String DEF_TAG_TORN_SUPPORT = "DF918115";
-                .append("DF918115020b")
+              //      .append("DF918115020b")
                     //1b
 
-/*//region =======extra demo tags start =========
+//region =======extra demo tags start =========
                 .append("9F4005F040F0B001")
                 .append("DF8142011E")//R_TAG_TM_TIMELIMIT
-                  .append("DF9181050100")//DEF_TAG_START_RECOVERY
+                .append("DF9181050100")//DEF_TAG_START_RECOVERY
                 .append("DF814002002C")
                 .append("DF16020015")
                 .append("DF3A050040000000")
@@ -686,7 +688,7 @@ Log.e("TLV LIST --> ",tlvList)
                 .append("DF9181020100")
                 .append("DF4C06000000015000")
 
- //endregion ========= extra demo tags End*/
+ //endregion ========= extra demo tags End
 
                 .append("9F1A020356")//EMV_TAG_TM_CNTRYCODE
 
@@ -707,15 +709,66 @@ Log.e("TLV LIST --> ",tlvList)
 
                // .append("DF81170101")//D_TAG_TM_ISSSCRIPT_USE_ONWAITCARD
 
-
-
                // .append("DF0602FC80")//demo
                 .append("DF06027C00")// visa //D_TAG_TM_RD_RCP
 
                 .append("DF812306000000000000").toString() //Terminal Contactless Floor Limit
 
-            emv?.setTLV(finalData.kernelID.toInt(), R_TAG_TM_TRANS_LIMIT,clsMaxTransLimit)//DF8124 --> Terminal Contactless Transaction Limit
-            emv?.setTLV(finalData.kernelID.toInt(),R_TAG_TM_CVM_LIMIT,clsCvmLimit)//DF8126 --> Terminal CVM Required Limit
+         //   emv?.setTLV(finalData.kernelID.toInt(), R_TAG_TM_TRANS_LIMIT,clsMaxTransLimit)//DF8124 --> Terminal Contactless Transaction Limit
+        //    emv?.setTLV(finalData.kernelID.toInt(),R_TAG_TM_CVM_LIMIT,clsCvmLimit)//DF8126 --> Terminal CVM Required Limit
+*/
+
+
+            tlvList = StringBuilder()
+                //  .append("9F3303E0F8C8") // Terminal capabilities
+                .append("9F3303E0F0C8")// Terminal capabilities
+                .append("9F350122") // Terminal type
+                .append("9F40056000F0A001")//EMV_TAG_TM_CAP_AD
+                .append("9F6604F6004000") // TTQ
+/*//region =======extra demo tags start =========
+                .append("9F4005F040F0B001")
+                .append("DF8142011E")//R_TAG_TM_TIMELIMIT
+                  .append("DF9181050100")//DEF_TAG_START_RECOVERY
+                .append("DF814002002C")
+                .append("DF16020015")
+                .append("DF3A050040000000")
+                .append("DF4D06000000010000")
+                .append("DF9181020100")
+                .append("DF4C06000000015000")
+
+ //endregion ========= extra demo tags End*/
+
+                .append("9F1A020356")//EMV_TAG_TM_CNTRYCODE
+
+                .append("5F2A020356")//     EMV_TAG_TM_CURCODE
+
+                .append("9F09020001")//EMV_TAG_TM_APPVERNO
+
+
+                // .append("9F1B0400003A98")//EMV_TAG_TM_FLOORLMT
+
+                .append("DF918111050010000000") // Terminal action code(decline)
+
+                .append("DF91811205D84004F800") // Terminal action code(online)
+
+                .append("DF91811005D84004A800")  // Terminal action code(default)
+
+                // .append("9F410400000001")  //EMV_TAG_TM_TRSEQCNTR
+
+                // .append("DF81170101")//D_TAG_TM_ISSSCRIPT_USE_ONWAITCARD
+
+
+
+                // .append("DF0602FC80")//demo
+                .append("DF06027C00")// visa //D_TAG_TM_RD_RCP
+
+                .append("DF812306000000000000").toString() //Terminal Contactless Floor Limit
+
+         //   emv?.setTLV(finalData.kernelID.toInt(), R_TAG_TM_TRANS_LIMIT,clsMaxTransLimit)//DF8124 --> Terminal Contactless Transaction Limit
+          //  emv?.setTLV(finalData.kernelID.toInt(),R_TAG_TM_CVM_LIMIT,clsCvmLimit)//DF8126 --> Terminal CVM Required Limit
+
+
+
 
 
         }
