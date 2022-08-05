@@ -339,8 +339,7 @@ class TransactionActivity : BaseActivityNew() {
                                 }
                                 //Checking the card has a PIN or WITHOUTPIN
                                 // Here the changes are , Now we have to ask pin for all swipe txns ...
-                                val isPin = false
-                                /* scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7'*/ //true //
+                                val isPin = scLastbyte == '0' || scLastbyte == '3' || scLastbyte == '5' || scLastbyte == '6' || scLastbyte == '7' //true //
                                 //Here we are bypassing the pin condition for test case ANSI_MAG_001.
                                 //  isPin = false
                                 if (isPin) {
@@ -1124,7 +1123,7 @@ return false
                 }
             }
 
-              EFallbackCode.EMV_fallback.fallBackCode -> {
+              EFallbackCode.EMV_fallback.fallBackCode,ERROR_EMV_RESULT_NOAPP -> {
                 //EMV Fallback case when we insert card from other side then chip side:-
                 globalCardProcessedModel.setReadCardType(DetectCardType.EMV_Fallback_TYPE)
                 globalCardProcessedModel.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
@@ -1172,7 +1171,7 @@ return false
                     ERROR_MULTIERR -> "ERROR_MULTIERR"
                     ERROR_CARD_NOT_SUPPORT -> "ERROR_CARD_NOT_SUPPORT"
                     ERROR_EMV_RESULT_BUSY -> "ERROR_EMV_RESULT_BUSY"
-                    ERROR_EMV_RESULT_NOAPP -> "ERROR_EMV_RESULT_NOAPP"
+                  //  ERROR_EMV_RESULT_NOAPP -> "ERROR_EMV_RESULT_NOAPP"
                     ERROR_EMV_RESULT_NOPUBKEY -> "ERROR_EMV_RESULT_NOPUBKEY"
                     ERROR_EMV_RESULT_EXPIRY -> "ERROR_EMV_RESULT_EXPIRY"
                     ERROR_EMV_RESULT_FLASHCARD -> "ERROR_EMV_RESULT_FLASHCARD"
@@ -1841,10 +1840,10 @@ return false
         })
     }
 
-    fun handleEMVFallbackFromError(
+    private fun handleEMVFallbackFromError(
         title: String,
         msg: String,
-        showCancelButton: Boolean,
+        showCancelButton: Boolean,isAutoCancel:Boolean =false,
         emvFromError: (Boolean) -> Unit
     ) {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -1854,7 +1853,7 @@ return false
                 getString(R.string.positive_button_ok),
                 "Cancel",
                 showCancelButton,
-                true,
+                isAutoCancel,
                 { alertCallback ->
                     if (alertCallback) {
                         emvFromError(true)

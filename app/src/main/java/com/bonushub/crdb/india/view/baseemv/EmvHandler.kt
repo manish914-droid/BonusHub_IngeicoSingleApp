@@ -156,7 +156,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                         "Execute CDCVM",
                         R.drawable.ic_txn_declined,
                         activity.getString(R.string.positive_button_ok),
-                        "", false, false,
+                        "", false, true,
                         { alertPositiveCallback ->
                             if (alertPositiveCallback) {
                                 try {
