@@ -6,6 +6,7 @@ import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.type.DemoConfigs
 import com.bonushub.crdb.india.utils.DetectCardType
 import com.bonushub.crdb.india.utils.DeviceHelper
+import com.usdk.apiservice.aidl.beeper.BeeperFrequency
 import com.usdk.apiservice.aidl.emv.EMVData
 import com.usdk.apiservice.aidl.emv.SearchCardListener
 import com.usdk.apiservice.aidl.emv.UEMV
@@ -24,12 +25,14 @@ class SearchCard (val cardProcessedDataModal: CardProcessedDataModal,val cardOpt
                     override fun onCardPass(cardType: Int) {
                         println("=> onCardPass | cardType = $cardType")
                         cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_TYPE)
+                        DeviceHelper.getBeeper()?.startBeep(200)
                         searchCardCb(cardProcessedDataModal)
                     }
 
                     override fun onCardInsert() {
                         println("=> onCardInsert")
                         cardProcessedDataModal.setReadCardType(DetectCardType.EMV_CARD_TYPE)
+                        DeviceHelper.getBeeper()?.startBeep(200)
                         searchCardCb(cardProcessedDataModal)
                     }
 
@@ -56,6 +59,7 @@ class SearchCard (val cardProcessedDataModal: CardProcessedDataModal,val cardOpt
                         //Expiry Date
                         serviceCode?.let { cardProcessedDataModal.setExpiredDate(track.getString(EMVData.EXPIRED_DATE)) }
 
+                        DeviceHelper.getBeeper()?.startBeep(200)
                         searchCardCb(cardProcessedDataModal)
 
 

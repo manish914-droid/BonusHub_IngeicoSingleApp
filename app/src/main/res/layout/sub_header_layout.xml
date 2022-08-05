@@ -25,8 +25,9 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/guideline"
         app:layout_constraintStart_toEndOf="@+id/back_image_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toStartOf="@+id/header_home"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="@dimen/pad_15">
 
         <ImageView
             android:id="@+id/header_Image"
@@ -61,7 +62,7 @@
             android:id="@+id/toolbar_Bank_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/pad_20"
+            android:layout_marginEnd="@dimen/pad_5"
             android:scaleType="fitXY"
             android:src="@mipmap/ic_amex_logo_new"
             android:visibility="visible"

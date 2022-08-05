@@ -118,7 +118,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
 
     //region======================Read Host Response and Write in Init File===========
     suspend fun readInitServer(data: ArrayList<ByteArray>, callback: (Boolean, String) -> Unit) {
-        GlobalScope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val filename = "init_file.txt"
                 HDFCApplication.appContext.openFileOutput(filename, Context.MODE_PRIVATE).apply {
@@ -151,11 +151,11 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                     line = fin.readLine()
                 }
                 fin.close()
-                GlobalScope.launch(Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch  {
                     callback(true, "Successful init")
                 }
             } catch (ex: Exception) {
-                GlobalScope.launch(Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch  {
                     callback(false, ex.message ?: "")
                 }
             }
@@ -173,7 +173,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "101" -> {
                 val terminalCommunicationTable = TerminalCommunicationTable()
                 parseTableData(terminalCommunicationTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (terminalCommunicationTable.actionId) {
                             "1", "2" -> {
@@ -193,7 +193,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "102" -> {
                 val issuerParameterTable = IssuerParameterTable()
                 parseTableData(issuerParameterTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (issuerParameterTable.actionId) {
                             "1", "2" -> {
@@ -214,7 +214,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "106" -> {
                 val terminalParameterTable = TerminalParameterTable()
                 parseTableData(terminalParameterTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (terminalParameterTable.actionId) {
                             "1", "2" -> {
@@ -256,7 +256,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "107" -> {
                 val cardDataTable = CardDataTable()
                 parseTableData(cardDataTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (cardDataTable.actionId) {
                             "1", "2" -> {
@@ -272,7 +272,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "201" -> {  // HDFC TPT
                 val hdfcTpt = HDFCTpt()
                 parseTableData(hdfcTpt, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (hdfcTpt.actionId) {
                             "1", "2" -> {
@@ -288,7 +288,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "202" -> {   // HDFC CDT/IPT-->(Cantains both parameters of HDFC CDT and IPT table)
                 val hdfcCdt = HDFCCdt()
                 parseTableData(hdfcCdt, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch {
                         var insertStatus = 0L
                         when (hdfcCdt.actionId) {
                             "1", "2" -> {
@@ -304,7 +304,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
             splitter[2] == "203" -> {
                 val wifiCtTable = WifiCommunicationTable()
                 parseTableData(wifiCtTable, splitter) {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    CoroutineScope(Dispatchers.IO).launch  {
                         var insertStatus = 0L
                         when (wifiCtTable.actionId) {
                             "1", "2" -> {
@@ -2090,7 +2090,7 @@ suspend fun showMerchantAlertBox(
         val printerUtil: PrintUtil? = null
         activity.alertBoxWithActionNew("",
             activity.getString(R.string.print_customer_copy),
-            R.drawable.ic_print_customer_copy, activity.getString(R.string.positive_button_yes), activity.getString(R.string.no),true,false,{ status ->
+            R.drawable.ic_print_customer_copy, activity.getString(R.string.positive_button_yes), activity.getString(R.string.no),true,true,{ status ->
                 activity.showProgress(activity.getString(R.string.printing))
 
                 runBlocking(Dispatchers.IO){
@@ -2128,11 +2128,12 @@ fun refreshToolbarLogos(activity: Activity) {
     val tpt = getTptData()
     val bonushubLogo = activity.findViewById<ImageView>(R.id.main_toolbar_BhLogo)
     val bankLogoImageView = activity.findViewById<ImageView>(R.id.toolbar_Bank_logo)
+    val bankLogoRightImageView = activity.findViewById<ImageView>(R.id.toolbar_Bank_logo_right)
     var bankLogo = 0
 
     when (AppPreference.getBankCode()) {
-        "02" -> bankLogo = R.mipmap.ic_amex_logo_new
-        "01" -> bankLogo = R.drawable.ic_hdfcsvg
+        "02","2" -> bankLogo = R.mipmap.ic_amex_logo_new
+        "01","1" -> bankLogo = R.drawable.ic_hdfcsvg
         else -> {
         }
     }
@@ -2147,23 +2148,45 @@ fun refreshToolbarLogos(activity: Activity) {
                             bonushubLogo?.visibility = View.VISIBLE
                             bankLogoImageView?.setImageResource(bankLogo)
                             bankLogoImageView?.visibility = View.VISIBLE
+                            bankLogoRightImageView?.visibility = View.GONE
                             break
                         } else {
                             bonushubLogo?.visibility = View.GONE
-                            bankLogoImageView?.setImageResource(bankLogo)
-                            bankLogoImageView?.visibility = View.VISIBLE
+
+                            if(bankLogoRightImageView != null){
+                                bankLogoImageView?.visibility = View.GONE
+                                bankLogoRightImageView.setImageResource(bankLogo)
+                                bankLogoRightImageView.visibility = View.VISIBLE
+                            }else{
+                                bankLogoImageView?.setImageResource(bankLogo)
+                                bankLogoImageView?.visibility = View.VISIBLE
+                            }
+
+                            break
                         }
                     }
                 }
             } else {
                 bonushubLogo?.visibility = View.GONE
-                bankLogoImageView?.setImageResource(bankLogo)
-                bankLogoImageView?.visibility = View.VISIBLE
+                if(bankLogoRightImageView != null){
+                    bankLogoImageView?.visibility = View.GONE
+                    bankLogoRightImageView.setImageResource(bankLogo)
+                    bankLogoRightImageView.visibility = View.VISIBLE
+                }else{
+                    bankLogoImageView?.setImageResource(bankLogo)
+                    bankLogoImageView?.visibility = View.VISIBLE
+                }
             }
         } else {
             bonushubLogo?.visibility = View.GONE
-            bankLogoImageView?.setImageResource(bankLogo)
-            bankLogoImageView?.visibility = View.VISIBLE
+            if(bankLogoRightImageView != null){
+                bankLogoImageView?.visibility = View.GONE
+                bankLogoRightImageView?.setImageResource(bankLogo)
+                bankLogoRightImageView?.visibility = View.VISIBLE
+            }else{
+                bankLogoImageView?.setImageResource(bankLogo)
+                bankLogoImageView?.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -2171,6 +2194,7 @@ fun refreshToolbarLogos(activity: Activity) {
         bonushubLogo?.visibility = View.VISIBLE
         //   bankLogoImageView?.setImageResource(bankLogo)
         bankLogoImageView?.visibility = View.GONE
+        bankLogoRightImageView?.visibility = View.GONE
 
     }
 }
@@ -2193,8 +2217,8 @@ fun refreshSubToolbarLogos(fragment: Fragment, eDashboardItem: EDashboardItem?, 
     }
 
     when (AppPreference.getBankCode()) {
-        "02" -> bankLogo = R.mipmap.ic_amex_logo_new
-        "01" -> bankLogo = R.drawable.ic_hdfcsvg
+        "02","2" -> bankLogo = R.mipmap.ic_amex_logo_new
+        "01","1" -> bankLogo = R.drawable.ic_hdfcsvg
         else -> {
         }
     }

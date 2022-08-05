@@ -149,7 +149,7 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(amt)
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe/TAP Card"
+                emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert_swipe_tap)
             }
 
             BhTransactionType.BRAND_EMI.type, BhTransactionType.EMI_SALE.type, BhTransactionType.TEST_EMI.type -> {
@@ -157,7 +157,7 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(amt)
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe Card"
+                emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert_swipe)
                 globalCardProcessedModel.setEmiTransactionAmount((saleAmt.toDouble() * 100).toLong())
             }
 
@@ -165,18 +165,31 @@ class TransactionActivity : BaseActivityNew() {
                 val frtAmt = "%.2f".format(saleAmt.toFloat())
                 txnAmountAfterApproved = frtAmt
                 emvBinding?.baseAmtTv?.text = getString(R.string.rupees_symbol) + frtAmt
-                emvBinding?.tvInsertCard?.text = "Please Insert/Swipe/TAP Card"
+                emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert_swipe_tap)
 
             }
         }
 
-        val cardOption = CardOption.create().apply {
-            supportICCard(true)
-            supportMagCard(true)
-            supportRFCard(true)
+        if(transactionType != BhTransactionType.BRAND_EMI.type &&
+            transactionType != BhTransactionType.EMI_SALE.type &&
+            transactionType != BhTransactionType.TEST_EMI.type){
+            val cardOption = CardOption.create().apply {
+                supportICCard(true)
+                supportMagCard(true)
+                supportRFCard(true)
+            }
+
+            detectCard(globalCardProcessedModel, cardOption)
+        }else{
+            val cardOption = CardOption.create().apply {
+                supportICCard(true)
+                supportMagCard(true)
+                supportRFCard(false)
+            }
+
+            detectCard(globalCardProcessedModel, cardOption)
         }
 
-        detectCard(globalCardProcessedModel, cardOption)
 
         emvBinding?.subHeaderView?.backImageButton?.setOnClickListener {
             declinedTransaction()
@@ -650,7 +663,7 @@ class TransactionActivity : BaseActivityNew() {
                         "OK",
                         "",
                         false,
-                        false,
+                        true,
                         { declinedTransaction() },
                         {})
                 }
@@ -665,7 +678,7 @@ class TransactionActivity : BaseActivityNew() {
                         "OK",
                         "",
                         false,
-                        false,
+                        true,
                         { declinedTransaction() },
                         {})
                 }
@@ -1099,6 +1112,7 @@ return false
                     getString(R.string.fallback),
                     getString(R.string.please_use_another_option), false
                 ) {
+                    emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_insert)
                     globalCardProcessedModel.setFallbackType(EFallbackCode.Swipe_fallback.fallBackCode)
 
                     detectCard(globalCardProcessedModel, CardOption.create().apply {
@@ -1118,6 +1132,7 @@ return false
                     getString(R.string.fallback),
                     getString(R.string.please_use_another_option), false
                 ) {
+                    emvBinding?.tvInsertCard?.text = getString(R.string.card_msg_swipe)
                     //   globalCardProcessedModel.setFallbackType(EFallbackCode.EMV_fallback.fallBackCode)
                     detectCard(globalCardProcessedModel, CardOption.create().apply {
                         supportICCard(false)
@@ -1136,7 +1151,7 @@ return false
                           "App Locked",
                           R.drawable.ic_txn_declined,
                           getString(R.string.positive_button_ok),
-                          "", false, false,
+                          "", false, true,
                           { alertPositiveCallback ->
                               if (alertPositiveCallback) {
                                   goToDashBoard()
@@ -1182,7 +1197,7 @@ return false
                         "onEndProcessCalled $result --> $errorMsg",
                         R.drawable.ic_txn_declined,
                         getString(R.string.positive_button_ok),
-                        "", false, false,
+                        "", false, true,
                         { alertPositiveCallback ->
                             if (alertPositiveCallback) {
                                 goToDashBoard()
@@ -1485,7 +1500,7 @@ return false
                                 msg,
                                 R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok),
-                                "", false, false,
+                                "", false, true,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         /*if (!TextUtils.isEmpty(autoSettlementCheck)) {
@@ -1524,7 +1539,7 @@ return false
                                     getString(R.string.network_error),
                                     R.drawable.ic_info_orange,
                                     getString(R.string.positive_button_ok),
-                                    "", false, false,
+                                    "", false, true,
                                     { alertPositiveCallback ->
                                         if (alertPositiveCallback)
                                             declinedTransaction()
@@ -1540,7 +1555,7 @@ return false
                                     R.drawable.ic_info_orange,
                                     getString(R.string.positive_button_ok),
                                     "", false,
-                                    false,
+                                    true,
                                     { alertPositiveCallback ->
                                         if (alertPositiveCallback)
                                             declinedTransaction()
@@ -1557,7 +1572,7 @@ return false
                                     "OK",
                                     "",
                                     false,
-                                    false,
+                                    true,
                                     { declinedTransaction() },
                                     {})
                             }
@@ -1597,7 +1612,7 @@ return false
                                 getString(R.string.transaction_delined_msg),
                                 R.drawable.ic_txn_declined,
                                 getString(R.string.positive_button_ok), "",
-                                false, false,
+                                false, true,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback)
                                         declinedTransaction()
@@ -1641,7 +1656,7 @@ return false
                 msg,
                 R.drawable.ic_txn_declined,
                 getString(R.string.positive_button_ok),
-                "", isShowNegativeBtn = false, isAutoCancel = false,
+                "", isShowNegativeBtn = false, isAutoCancel = true,
                 yesButtonCallback = {
                     goToDashBoard()
                 },
@@ -1786,7 +1801,7 @@ return false
                 getString(R.string.positive_button_yes),
                 getString(R.string.no),
                 true,
-                false,
+                true,
                 { status ->
                       showProgress(getString(R.string.printing))
                     PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
@@ -1839,7 +1854,7 @@ return false
                 getString(R.string.positive_button_ok),
                 "Cancel",
                 showCancelButton,
-                false,
+                true,
                 { alertCallback ->
                     if (alertCallback) {
                         emvFromError(true)

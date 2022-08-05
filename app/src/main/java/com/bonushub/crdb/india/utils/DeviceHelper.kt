@@ -327,15 +327,15 @@ object DeviceHelper   {
 
      @JvmStatic
     @Throws(IllegalStateException::class)
-    fun getBeeper(): UEMV? {
+    fun getBeeper(): UBeeper? {
         val iBinder = object : IBinderCreator() {
             override fun create(): IBinder {
-                Log.e("EMV INSTANCE", vfDeviceService!!.emv.toString())
-                return vfDeviceService!!.emv
+                Log.e("Beeper INSTANCE", vfDeviceService!!.beeper.toString())
+                return vfDeviceService!!.beeper
             }
 
         }.start()
-        return UEMV.Stub.asInterface(iBinder)
+        return UBeeper.Stub.asInterface(iBinder)
     }
 
 

@@ -39,7 +39,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
+            <!--<LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:gravity="right"
@@ -81,7 +81,63 @@
                     android:tint="@color/txt_color_blue"
                     android:layout_gravity="center_vertical"
                     android:visibility="visible"/>
-            </LinearLayout>
+            </LinearLayout>-->
+
+            <ImageView
+                android:id="@+id/toolbar_Bank_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/pad_5"
+                android:layout_marginEnd="@dimen/pad_16"
+                android:contentDescription="@string/app_name"
+                android:paddingStart="@dimen/pad_4"
+                android:paddingTop="@dimen/pad_2"
+                android:paddingEnd="@dimen/pad_4"
+                android:paddingBottom="@dimen/pad_2"
+                android:src="@mipmap/ic_amex_logo_new"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/main_toolbar_start"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <ImageView
+                android:id="@+id/main_toolbar_BhLogo"
+                android:layout_width="150dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="@dimen/pad_4"
+                android:contentDescription="@string/app_name"
+                android:paddingStart="@dimen/pad_4"
+                android:paddingTop="@dimen/pad_2"
+                android:paddingEnd="@dimen/pad_4"
+                android:paddingBottom="@dimen/pad_2"
+                android:src="@drawable/bonushub_white"
+                android:tint="@color/txt_color_blue"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/toolbar_Bank_logo"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/toolbar_Bank_logo_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/pad_5"
+                android:layout_marginEnd="@dimen/pad_16"
+                android:contentDescription="@string/app_name"
+                android:paddingStart="@dimen/pad_4"
+                android:paddingTop="@dimen/pad_2"
+                android:paddingEnd="@dimen/pad_4"
+                android:paddingBottom="@dimen/pad_2"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <ImageView
                 android:id="@+id/imgViewAmex"

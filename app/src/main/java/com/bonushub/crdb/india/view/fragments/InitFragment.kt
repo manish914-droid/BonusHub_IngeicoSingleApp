@@ -28,6 +28,7 @@ import com.bonushub.crdb.india.vxutils.checkInitializationStatus
 import com.bonushub.crdb.india.vxutils.writeAppRevisionIDInFile
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
+import com.usdk.apiservice.aidl.beeper.BeeperFrequency
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -328,8 +329,9 @@ class InitFragment : Fragment() {
                                 }
                                 (activity as NavigationActivity).hideProgress()
                                //showToast("Navigation")
-                             //   var checkinitstatus = checkInitializationStatus(appDao)
-                            //    if(checkinitstatus) {
+                               // not need to check init status because we are in success case
+                                /* var checkinitstatus = checkInitializationStatus(appDao)
+                                if(checkinitstatus) {
                                     CoroutineScope(Dispatchers.Main).launch {
                                         (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
                                             (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
@@ -338,10 +340,23 @@ class InitFragment : Fragment() {
                                             )
                                         }
                                     }
-                            //    }
-                               /* else{
+                                }
+                                else{
                                     (activity as? NavigationActivity)?.transactFragment(DashboardFragment())
                                 }*/
+
+                                lifecycleScope.launch(Dispatchers.Main){
+                                    DeviceHelper.getBeeper()?.startBeep(500)
+                                    (activity as? NavigationActivity)?.getString(R.string.successfull_init)?.let {
+                                        (activity as? NavigationActivity)?.alertBoxMsgWithIconOnly(
+                                            R.drawable.ic_success_with_star,
+                                            it
+                                        )
+                                    }
+
+                                   // (activity as? NavigationActivity)?.transactFragment(DashboardFragment()) // not need because in alert dialog box launch activity
+                                }
+
                             }
                             // end region
                       /*      (activity as NavigationActivity).hideProgress()
@@ -360,7 +375,7 @@ class InitFragment : Fragment() {
                     iDialog?.hideProgress()
                     CoroutineScope(Dispatchers.Main).launch {
                         (activity as? NavigationActivity)?.alertBoxWithActionNew("Error", result.error ?: "",
-                            R.drawable.ic_info_orange,"OK","",false,false,{},{})
+                            R.drawable.ic_info_orange,"OK","",false,true,{},{})
                     }
                 }
                 Status.LOADING -> {

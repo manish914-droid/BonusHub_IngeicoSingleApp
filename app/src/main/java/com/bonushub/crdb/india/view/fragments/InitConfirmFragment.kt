@@ -35,6 +35,8 @@ class InitConfirmFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as NavigationActivity).manageTopToolBar(true)
+
         binding?.txtViewInitTerminal?.setOnClickListener {
 
             DialogUtilsNew1.showDialog(activity,getString(R.string.super_admin_password),getString(R.string.hint_enter_super_admin_password),onClickDialogOkCancel, false)

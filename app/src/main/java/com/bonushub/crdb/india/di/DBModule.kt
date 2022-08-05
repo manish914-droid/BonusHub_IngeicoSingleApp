@@ -45,13 +45,13 @@ object DBModule {
             .fallbackToDestructiveMigration()
             .build()*/
 
-        appDatabase =  Room.databaseBuilder(appContext, AppDatabase::class.java, "database.db")
+        appDatabase =  Room.databaseBuilder(appContext, AppDatabase::class.java, "database_db")
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    GlobalScope.launch {
+                    //GlobalScope.launch {
                     //   AppDatabase.onCreate(appDatabase, appContext) // in companion of MyDatabase
-                    }
+                    //}
 
                 }
             })

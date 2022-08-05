@@ -117,7 +117,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                                                 getString(R.string.positive_button_yes),
                                                 getString(R.string.no),
                                                 true,
-                                                false,
+                                                true,
                                                 {
                                                     lifecycleScope.launch(Dispatchers.IO)
                                                     {
@@ -168,7 +168,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                             getString(R.string.reversal_upload_fail),
                             R.drawable.ic_info_new,
                             getString(R.string.positive_button_ok),
-                            "",false,false,
+                            "",false,true,
                             {},
                             {})
                     }else {
@@ -182,7 +182,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                                         "Transaction Declined",
                                         R.drawable.ic_info_new,
                                         getString(R.string.positive_button_ok),
-                                        "", false, false,
+                                        "", false, true,
                                         { alertPositiveCallback ->
                                             //gotoDashboard()
                                         },
@@ -197,7 +197,7 @@ class PreAuthCompleteInputDetailFragment : Fragment() {
                                 it.msg ?: "",
                                 R.drawable.ic_info_new,
                                 getString(R.string.positive_button_ok),
-                                "", false, false,
+                                "", false, true,
                                 { alertPositiveCallback ->
                                     // gotoDashboard()
                                 },

@@ -296,7 +296,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                     getString(R.string.no_reversal_found),
                                                     R.drawable.ic_info_orange,
                                                     getString(R.string.positive_button_ok),"",
-                                                    false,false,
+                                                    false,true,
                                                     {
                                                         unselectItem()
                                                     },
@@ -366,7 +366,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                                 "Batch is empty",
                                                 R.drawable.ic_info_orange,
                                                 "OK","",false,
-                                                false,
+                                                true,
                                                 {
                                                     unselectItem()
                                                 }, {
@@ -662,7 +662,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                             (activity as? NavigationActivity)?.alertBoxWithActionNew(
                                 "Error",
                                 result.error ?: ""
-                            ,R.drawable.ic_info_orange,getString(R.string.ok),"",false,false,{ unselectItem() },{}
+                            ,R.drawable.ic_info_orange,getString(R.string.ok),"",false,true,{ unselectItem() },{}
                             )
                         }
                         // ToastUtils.showToast(activity,"Error called  ${result.error}")

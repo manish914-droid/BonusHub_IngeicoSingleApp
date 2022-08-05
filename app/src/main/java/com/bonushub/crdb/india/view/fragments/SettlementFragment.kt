@@ -31,9 +31,7 @@ import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.SettlementViewModel
-import com.bonushub.crdb.india.vxutils.BhTransactionType
-import com.bonushub.crdb.india.vxutils.getTransactionTypeName
-import com.bonushub.crdb.india.vxutils.invoiceWithPadding
+import com.bonushub.crdb.india.vxutils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -101,7 +99,7 @@ class SettlementFragment : Fragment() {
         //region========================OnClick Event of SettleBatch Button:-
         fragmensettlementBinding?.settlementFloatingButton?.setOnClickListener {
 
-            if(tempDataList.size > 0 ){
+            if(true/*tempDataList.size > 0*/ ){  // doing true for zero settlement enable
 
                 //DialogUtilsNew1.alertBoxWithAction(requireContext(), getString(R.string.do_you_want_to_settle_batch),"",getString(R.string.confirm),"Cancel",R.drawable.ic_info, {
                 iDialog?.alertBoxWithActionNew(getString(R.string.do_you_want_to_settle_batch),"",R.drawable.ic_info_orange,getString(R.string.confirm),"Cancel",true,false, {
@@ -125,6 +123,10 @@ class SettlementFragment : Fragment() {
                                 ex.printStackTrace()
                             }
                         }
+
+                        // check zero settlement charge slip
+                        /*PrintVectorUtil(requireContext()).printSettlementReportupdate(requireContext(), ArrayList(), true, false) {
+                        }*/
 
                     }else{
 
@@ -165,7 +167,7 @@ class SettlementFragment : Fragment() {
                                                     getString(R.string.transaction_delined_msg),
                                                     R.drawable.ic_txn_declined,
                                                     getString(R.string.positive_button_ok),"",
-                                                    false,false,
+                                                    false,true,
                                                     {},
                                                     {})
 
@@ -398,13 +400,13 @@ class SettlementFragment : Fragment() {
                 itemAnimator = DefaultItemAnimator()
                 adapter = settlementAdapter
             }
-            fragmensettlementBinding?.conLaySettleBatchBtn?.alpha = 1f
+           // fragmensettlementBinding?.conLaySettleBatchBtn?.alpha = 1f //enable zero settlement
         } else {
             fragmensettlementBinding?.settlementFloatingButton?.visibility = View.VISIBLE  // visible for zero settlement
             fragmensettlementBinding?.settlementRv?.visibility = View.GONE
             //fragmensettlementBinding?.lvHeadingView?.visibility = View.GONE   // now show always
             fragmensettlementBinding?.emptyViewPlaceholder?.visibility = View.VISIBLE
-            fragmensettlementBinding?.conLaySettleBatchBtn?.alpha = .5f
+           // fragmensettlementBinding?.conLaySettleBatchBtn?.alpha = .5f //enable zero settlement
         }
 
 
