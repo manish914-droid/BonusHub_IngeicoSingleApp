@@ -18,11 +18,12 @@ import com.bonushub.crdb.india.utils.ingenico.TLVList
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.vxutils.BhTransactionType
+import com.usdk.apiservice.aidl.data.StringValue
 import com.usdk.apiservice.aidl.emv.*
 import com.usdk.apiservice.aidl.emv.EMVTag.*
 
 /**
- * Author Lucky Rajput
+ * 🔥   Author Lucky Rajput
  *
  */
 //=========================================================//
@@ -36,6 +37,7 @@ import com.usdk.apiservice.aidl.emv.EMVTag.*
 
 fun settingAids(emv: UEMV?) {
     println("****** Setting AID ******")
+  //  getKernelVersion(emv)
     val aids = arrayOf(
         //visa
         "A0000000031010",
@@ -216,7 +218,7 @@ fun settingAids(emv: UEMV?) {
                      "DF0314" + "F910A1504D5FFB793D94F3B500765E1ABCAD72D9", //exponent
 //endregion =========================================================================== Master Live cap keys ends==================================================================================================================================================================================================================================
 
-             // region =========================================================================== Rupay Cap keys Starts==================================================================================================================================================================================================================================
+             // region =========================================================== Rupay Cap keys Starts==================================================================================================================================================================================================================================
              //Rupay Live cap keys 01
              "9F0605A000000524" + //Aids
                      "9F220101" + //Key Id
@@ -277,6 +279,43 @@ fun settingAids(emv: UEMV?) {
                      "DF060101" + // Hash Ind
                      "DF070101",// ARITH_IND
 //endregion =========================================================================== Rupay Live Cap keys ends==================================================================================================================================================================================================================================
+// region ======================================================== Rupay Test Cap keys starts==================================================================================================================================================================================================================================
+                //Rupay Cap Keys
+                //Test
+                "9F0605A000000524" + //Aids
+                        "9F22016A" + //Key Id
+                        "DF050420221231" + //expiry Date
+                        "DF02" + "8180" + "92795EAA4FE39EB30441FE952D5423778E02F86783B89DD7C587AE80A69F4D6DC55EAFB6604040D875C72002425EE529CE4EA26FD864BAD760160C2AA0C5AF92381894A5CBBC8AB3AF2641606C379B927A397CB1E9B9EA2EF8C0A9C0DDEBB81B0F8913A118F7044156EA7D23AF626EAF30C2C9ECE8534D3563EF5FE95DE76249" + //Module
+                        "DF040103" + //exponent
+                        "DF031451ED4570323CD41A0348BDFEA81CCC0B8D9BAB3F" + //checksum
+                        "DF070101", //ARITH IND
+
+                //Test
+                "9F0605A000000524" + //Aids
+                        "9F22016C" + //Key Id
+                        "DF050420221231" + //expiry Date
+                        "DF02" + "81B0" + "C76259FF785ABD5FF613223C01F5BDA0F36F9342CF336B66C32D4B2CD5096E094D8E04DFA11A9B2E3BC78DA63B5C10148D8ED79EBA685D5D0EFE1C58B3F929D861B40FF3AAA3B527148D0C24921EE42DA048E01E38F6A3A49DFA67DD1CD5DD2091412DD36D3269FAF7D2E0FFB1A3E028969CB6BA5A9303A6FF65540F421B069A31B553398EE525EFA5C2CE26BCB81C5345018D5E3E9B7130F72F598C0EAA4682D4DA2F2204518780A8108F82DDC9CF1F" + //Module
+                        "DF040103" + //exponent
+                        "DF03" + "14" + "3B18A21BF34F781208145D7567982513D1CE8C92" + //checksum
+                        "DF070101", //ARITH IND
+                //Test
+                "9F0605A000000524" + //Aids
+                        "9F22016D" + //Key Id
+                        "DF050420221231" + //expiry Date
+                        "DF02" + "81F8" + "B747E8CB3615E8D26231355488F3C76C4746F7BB1C381E6C6E6ABF0A6D7CD93CFC6B2C310288CA8BE7EE1730DE621A59D1BB2D8C02C9148FA06E5D1F5E672EEFCE8AECBAD4A1C18F3175F1BEA1AEF539376592366B46A5044E32E59B3F35F50E85F843BA01851E5386B7EBE27367D3D483C5472D3020AF42116DDDA32341557EBABB043EBC6006B99A652009045BFA50C527028586E05942E1D594223B49FE8566931C31FBE8C903ABD4F283E1FAB03D758247EC4B728A85A9897601B753293263ADBD10BE988D0C52FE0091C2721DC02C5130FC7663E95739A70EE2F84DFD2E50C88A1A26587EF7CC047FCA2D03C2CF0CE4B524B4EC3F07" + //Module
+                        "DF040103" + //exponent
+                        "DF03" + "14" + "411008F9921B89C62E2160F6D0358614115ECD4A" + //checksum
+                        "DF070101", //ARITH IND
+
+                //Test
+                "9F0605A000000524" + //Aids
+                        "9F22016B" + //Key Id
+                        "DF050420221231" + //expiry Date
+                        "DF02" + "8190" + "C9DFDB625ADA4B5E86049F85A0237627B59524F52BD499B4C5482C1EE012D61A1446E9383CC0B7EE2922D323A5ECDA12941EA8177CFA512DA6B5B7663A89B793B10D314CBB776EB96D0B1734EDE7E1591713915E9991B7B4E8A017A6901279AEBDD6136C9FE7E0C6CBF94C77FA606B629D00B1F890473905EB4DAD1AD93B29C2C1829A82F880B08986B9387611EE409D" + //Module
+                        "DF040103" + //exponent
+                        "DF03" + "14" + "9602428A46271C63CCC6DD99477CDB70435D6D5B" + //checksum
+                        "DF070101", //ARITH IND
+//endregion =========================================================================== Rupay Test keys ends==================================================================================================================================================================================================================================
 
 
              //region =========================================================================== Diners Test cap keys starts==================================================================================================================================================================================================================================
@@ -461,7 +500,8 @@ fun setSelectedEmvApp(aid: ByteArray?, emv: UEMV?){
 
      val clsCvmLimit=   addPad(terminalData?.minCtlsTransAmt ?: "", "0", 12, true)
      val clsMaxTransLimit =  addPad(terminalData?.maxCtlsTransAmt ?: "", "0", 12, true)
-
+println("MAX CLS TRANS LIMIT ---> $clsMaxTransLimit")
+    println("CLS  CVM LIMIT ---> $clsCvmLimit")
 
 
     var aidstr = BytesUtil.bytes2HexString(finalData.aid).subSequence(0, 10).toString()
@@ -556,7 +596,7 @@ Log.e("TLV LIST --> ",tlvList)
            //   .append("9F6604F6004000") // TTQ --> working ttq
               .append("9F660476E04000") // TTQ --> for test case 1002
 
-                .append("DF06027C00")
+                .append("DF06027C00")//
 
                 .append("DF918111050010000000") // Terminal action code(decline)
                 //D84000F800
@@ -622,47 +662,60 @@ Log.e("TLV LIST --> ",tlvList)
             //  M_TAG_TM_FLOOR_LIMIT
         //    emv?.setTLV(finalData.kernelID.toInt(),EMVTag.M_TAG_TM_TRANS_LIMIT_CDV,limitCvm)//DF8125
         }
+        // todo below changes is used for only Rupay
         KernelID.RUPAY.toByte(),
         KernelID.DISCOVER.toByte() -> {
             tlvList = StringBuilder()
+              //  .append("9F3303E0F8C8") // Terminal capabilities
+                .append("9F3303E0F0C8")// Terminal capabilities
+                .append("9F350122") // Terminal type
+                .append("9F40056000F0A001")//EMV_TAG_TM_CAP_AD
+                .append("9F6604F6004000") // TTQ
+          //  String DEF_TAG_TORN_SUPPORT = "DF918115";
+                .append("DF918115020b")
+                    //1b
 
-                /*
-                .append("DF4C06000000015000")
-                .append("DF8142011E")
-                .append("9F350122")
+/*//region =======extra demo tags start =========
                 .append("9F4005F040F0B001")
-                .append("9F1A020156")
-                .append("5F2A020156")
-                .append("9F09020002")
-                .append("9F410400001234")
-                .append("9F1B0400002710")
-                .append("DF918111050410000000")
-                .append("DF918112059060009000")
-                .append("DF918110059040008000")
+                .append("DF8142011E")//R_TAG_TM_TIMELIMIT
+                  .append("DF9181050100")//DEF_TAG_START_RECOVERY
                 .append("DF814002002C")
                 .append("DF16020015")
                 .append("DF3A050040000000")
                 .append("DF4D06000000010000")
-                .append("DF812306000000008000")
-                .append("DF9181050100")
-                .append("DF9181020100").toString()*/
+                .append("DF9181020100")
+                .append("DF4C06000000015000")
 
-                .append("9F3303E060C8")
-                .append("9F350122")
-                .append("9F40056000F0A001")
-                .append("9F1A020356")
-                .append("5F2A020356")
-                .append("9F09020001")
-                .append("9F1B0400002710")
-                .append("9A03171020")
-                .append("9F2103150512")
-                .append("9F410400000001")
-                .append("DF81170101")
-                .append("9F6604F6004000") // TTQ
-               // .append("9F660436004000") // default in doc
-                .append("DF0602FC80")
+ //endregion ========= extra demo tags End*/
+
+                .append("9F1A020356")//EMV_TAG_TM_CNTRYCODE
+
+                .append("5F2A020356")//     EMV_TAG_TM_CURCODE
+
+                .append("9F09020001")//EMV_TAG_TM_APPVERNO
+
+
+               // .append("9F1B0400003A98")//EMV_TAG_TM_FLOORLMT
+
+                .append("DF918111050010000000") // Terminal action code(decline)
+
+                .append("DF91811205D84004F800") // Terminal action code(online)
+
+                .append("DF91811005D84004A800")  // Terminal action code(default)
+
+               // .append("9F410400000001")  //EMV_TAG_TM_TRSEQCNTR
+
+               // .append("DF81170101")//D_TAG_TM_ISSSCRIPT_USE_ONWAITCARD
+
+
+
+               // .append("DF0602FC80")//demo
+                .append("DF06027C00")// visa //D_TAG_TM_RD_RCP
 
                 .append("DF812306000000000000").toString() //Terminal Contactless Floor Limit
+
+            emv?.setTLV(finalData.kernelID.toInt(), R_TAG_TM_TRANS_LIMIT,clsMaxTransLimit)//DF8124 --> Terminal Contactless Transaction Limit
+            emv?.setTLV(finalData.kernelID.toInt(),R_TAG_TM_CVM_LIMIT,clsCvmLimit)//DF8126 --> Terminal CVM Required Limit
 
 
         }
@@ -701,12 +754,15 @@ Log.e("TLV LIST --> ",tlvList)
     }
     emv?.setTLV(finalData.kernelID.toInt(), V_TAG_TM_TRANS_LIMIT,clsMaxTransLimit)//DF8124 --> Terminal Contactless Transaction Limit
     emv?.setTLV(finalData.kernelID.toInt(),V_TAG_TM_CVM_LIMIT,clsCvmLimit)//DF8126 --> Terminal CVM Required Limit
+
+
+
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_AUTHAMNTN,tag9f02Data) // 9F02 --> Auth Amount
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_OTHERAMNTN,tag9f03Data)// 9F03 --> Other Amount
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTYPE,tag9CData)// 9C --> Txn Type
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSDATE,txnDate)//9A --> Txn Date
     emv?.setTLV(finalData.kernelID.toInt(),EMV_TAG_TM_TRANSTIME,txnTime)//9F21 --> Txn Time
-println("SEECTED KERNAL ------->  ${finalData.kernelID.toInt()}")
+println("SELECTED KERNAL ID ------->  ${finalData.kernelID.toInt()}")
     println(""+emv?.setTLVList(finalData.kernelID.toInt(),tlvList) +"...onFinalSelect: setTLVList")
     println("...onFinalSelect: respondEvent" + emv?.respondEvent(null))
 }
@@ -792,7 +848,19 @@ cardProcessedDataModal.tvrCls= emv.getTLV(Integer.toHexString(0x95))
 
 }
 
-
+private fun getKernelVersion(emv: UEMV?) {
+    try {
+        val version = StringValue()
+        val ret: Int? = emv?.getKernelVersion(version)
+        if (ret == EMVError.SUCCESS) {
+            println("EMV kernel version: " + version.data)
+        } else {
+            println("EMV kernel version: fail, ret = $ret")
+        }
+    } catch (e: RemoteException) {
+        e.printStackTrace()
+    }
+}
 
 open class MultiSelectionAppAdapter(
     var appList: MutableList<CandidateAID>,

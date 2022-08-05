@@ -894,7 +894,7 @@ class TransactionActivity : BaseActivityNew() {
     }
 
     private fun onEmvprocessnext(cardProcessedDataModal: CardProcessedDataModal) {
-        println("processflow called")
+        println("onEmvprocessnext called")
 
         hideEmvCardImage()
 
@@ -1173,6 +1173,7 @@ return false
                     ERROR_EMV_RESULT_ALL_FLASH_CARD -> "ERROR_EMV_RESULT_ALL_FLASH_CARD"
                     EMV_RESULT_AMOUNT_EMPTY -> "EMV_RESULT_AMOUNT_EMPTY"
                     ERROR_EMV_RESULT_CARD_DATA_ERROR->"ERROR_EMV_RESULT_CARD_DATA_ERROR"
+                    ERROR_EMV_RESULT_OTHER->"ERROR_EMV_RESULT_OTHER"
                     else -> "unknow error"
                 }
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -1773,7 +1774,7 @@ return false
                      }
                      (this@TransactionActivity as BaseActivityNew).hideProgress()
  //                    val intent = Intent(this@TransactionActivity, NavigationActivity::class.java)
- //                    startActivity(intent)
+ //                   startActivity(intent)
                  })
          }*/
 
@@ -1787,7 +1788,7 @@ return false
                 true,
                 false,
                 { status ->
-                    showProgress(getString(R.string.printing))
+                      showProgress(getString(R.string.printing))
                     PrintVectorUtil(this@TransactionActivity as BaseActivityNew).startPrinting(
                         batchTable,
                         EPrintCopyType.CUSTOMER,

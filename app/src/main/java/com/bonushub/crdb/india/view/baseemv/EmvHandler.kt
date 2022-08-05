@@ -37,6 +37,7 @@ import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
 import com.usdk.apiservice.aidl.emv.*
 
 
+
 import com.usdk.apiservice.aidl.pinpad.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -310,27 +311,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     open fun doAppSelect(reSelect: Boolean, candList: List<CandidateAID>) {
         println("=> onAppSelect: cand AID size = " + candList.size)
         if (candList.size > 1) {
-           /* selectApp(candList, object : DialogUtil.OnSelectListener {
-                override fun onCancel() {
-                    try {
-                        emv!!.stopEMV()
-                        val intent = Intent(activity, NavigationActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        activity.startActivity(intent)
-
-                    } catch (e: RemoteException) {
-                        e.printStackTrace()
-                    }
-                }
-
-                override fun onSelected(item: Int) {
-                    respondAID(candList[item].aid)
-                }
-            })*/
-
             inflateAppsDialog(candList as MutableList<CandidateAID>) { multiAppPosition ->
                 Log.e("APPSEL_vfEmvhand", multiAppPosition.toString())
-               // iemv?.importAppSelection(multiAppPosition)
+
                 respondAID(candList[multiAppPosition].aid)
             }
         } else {
@@ -375,7 +358,6 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     logger("cancel_Btn", "$appSelectedPosition  ", "e")
                     dismiss()
               //todo  iemv?.stopCheckCard()
-                 //   multiAppCB(0)
                     val intent = Intent(activity, NavigationActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     activity.startActivity(intent)
@@ -459,25 +441,25 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
        val tlv2 = emv?.getTLV(Integer.toHexString(0x95).toUpperCase(Locale.ROOT))
         val tlv3 =  Utility.hexStr2Byte(tlv2)
         println("PTLE byte array value in hex 95  ----> ${tlv3}")
-        if(CardAid.AMEX.aid == cardProcessedDataModal.getAID()) {
+        if(CardAid.AMEX.aid == cardProcessedDataModal.getAID()?.take(10)) {
             println("PTLE byte array value in hex 951  ----> ${tlv3}")
 
-            var ptlebyte: Byte? = tlv3?.get(2)
+            val ptlebyte: Byte? = tlv3?.get(2)
             val ptlebyteArray: ByteArray = ByteArray(1)
             if (ptlebyte != null) {
                 ptlebyteArray[0] = ptlebyte
                 println("PTLE byte array value in hex ----> ${Utility.byte2HexStr(ptlebyteArray)}")
 
                 println("Last  attempt  is " + cardProcessedDataModal.getLastAttempt())
-                if (cardProcessedDataModal.getLastAttempt() == true) {
+                if (cardProcessedDataModal.getLastAttempt()) {
                     if((Integer.parseInt(byte2HexStr(ptlebyteArray), 16) and 0x20) == (0x20)){
                         println("Last  attempt  is " + cardProcessedDataModal.getLastAttempt())
-                        GlobalScope.launch(Dispatchers.Main) {
+                        CoroutineScope(Dispatchers.Main).launch {
                             (activity as BaseActivityNew).alertBoxWithAction("Invalid PIN",
                                 "Wrong PIN.Pin Try limit exceeded.", false, "OK", { alertCallback ->
                                     if (alertCallback) {
                                         try {
-                                            GlobalScope.launch(Dispatchers.Main) {
+                                            CoroutineScope(Dispatchers.Main).launch {
                                                 activity.declinedTransaction()
                                             }
                                         } catch (ex: Exception) {
@@ -645,6 +627,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     open fun doEndProcess(result: Int, transData: TransData?) {
         if (result != EMVError.SUCCESS) {
             println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
+            println("=> onEndProcess  Error DATA | " + EMVInfoUtil.getTransDataDesc(transData))
             if(cardProcessedDataModal.getSuccessResponseCode() == "00"){
                 if(this::testCompleteSecondGenAc.isInitialized){
                     testCompleteSecondGenAc.getEndProcessData(result,transData)
@@ -785,7 +768,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 vfEmvHandlerCallback(cardProcessedDataModal)
 
             }
-            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte(),FlowType.EMV_FLOWTYPE_QVSDC.toByte() ,FlowType.EMV_FLOWTYPE_M_CHIP.toByte(),FlowType.EMV_FLOWTYPE_D_DPAS_EMV.toByte() -> {
+            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte(),FlowType.EMV_FLOWTYPE_QVSDC.toByte() ,FlowType.EMV_FLOWTYPE_M_CHIP.toByte(),FlowType.EMV_FLOWTYPE_D_DPAS_EMV.toByte()
+
+                  ,  FlowType. EMV_FLOWTYPE_R_LEGACY.toByte()-> {
 
                 when (transData.cvm) {
                     CVMFlag.EMV_CVMFLAG_NOCVM.toByte() -> {
@@ -901,7 +886,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                 respondCVMResult(2.toByte())
                                 Log.d("Data", "PinPad onError, code:$error")
                                 try {
-                                    GlobalScope.launch(Dispatchers.Main) {
+                                    CoroutineScope(Dispatchers.Main).launch{
                                         (activity as TransactionActivity).declinedTransaction()
                                     }
                                 } catch (ex: Exception) {
@@ -1098,7 +1083,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 respondCVMResult(2.toByte())
                 Log.d("Data", "PinPad onError, code:$error")
                 try {
-                    GlobalScope.launch(Dispatchers.Main) {
+                    CoroutineScope(Dispatchers.Main).launch{
                         (activity as TransactionActivity).declinedTransaction()
                     }
                 } catch (ex: Exception) {
@@ -1141,7 +1126,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             }
                         }
                         2 -> {
-                            GlobalScope.launch(Dispatchers.Main) {
+                            CoroutineScope(Dispatchers.Main).launch{
                                 (activity as? BaseActivityNew)?.alertBoxWithActionNew(
                                     "Invalid PIN",
                                     "Wrong PIN.Please try again",
@@ -1162,7 +1147,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
                         }
                         1 -> {
-                            GlobalScope.launch(Dispatchers.Main) {
+                            CoroutineScope(Dispatchers.Main).launch {
                                 (activity as? BaseActivityNew)?.alertBoxWithActionNew(
                                     "Invalid PIN",
                                     "Wrong PIN.This is your last attempt",
@@ -1200,7 +1185,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             }
                         }
                         1 -> {
-                            GlobalScope.launch(Dispatchers.Main) {
+                            CoroutineScope(Dispatchers.Main).launch {
                                 (activity as? BaseActivityNew)?.alertBoxWithActionNew(
                                     "Invalid PIN",
                                     "This is your last attempt",
@@ -1230,7 +1215,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 }
                 else {
                     println("Going in else")
-                    GlobalScope.launch(Dispatchers.Main) {
+                    CoroutineScope(Dispatchers.Main).launch {
                         (activity as? BaseActivityNew)?.alertBoxWithActionNew(
                             "Invalid PIN",
                             "This is your last PIN attempt",
@@ -1302,18 +1287,18 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     open fun doReadRecord(record: CardRecord?) {
         println("=> onReadRecord | " + BytesUtil.bytes2HexString(record?.pan))
         var track22: String? = null
-        val track2 = BytesUtil.bytes2HexString(record?.pan)
+        val panNum = BytesUtil.bytes2HexString(record?.pan)
 
-        var a = track2.indexOf('F')
+        var a = panNum.indexOf('F')
         if (a > 0) {
-            track22 = track2.substring(0, a)
+            track22 = panNum.substring(0, a)
         } else {
-            a = track2.indexOf('=')
+            a = panNum.indexOf('=')
 
             track22 = if (a > 0) {
-                track2.substring(0, a)
+                panNum.substring(0, a)
             }else{
-                track2
+                panNum
             }
         }
 
@@ -1321,26 +1306,30 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         System.out.println("Card pannumber data "+cardProcessedDataModal.getPanNumberData())
 
         // todo changed for a visa case ........ L3 card 23
-        if(((emv?.getTLV(Integer.toHexString(0x84))?:"").take(10))!=CardAid.AMEX.aid){
-          //  val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
+      //  if(((emv?.getTLV(Integer.toHexString(0x84))?:"").take(10))!=CardAid.AMEX.aid){
+          //  if(CardAid.Rupay.aid == cardProcessedDataModal.getAID()?.take(10)) {
+       /*     val tagDF46 = emv!!.getTLV(Integer.toHexString(0xDF46))
+            val tagDf46Str = hexString2String(tagDF46)
+            val track2data = tagDf46Str.substring(1,tagDf46Str.length-1)
+            val field57 =   "35|"+ track2data.replace("D", "=").replace("F", "")
+            println("Field 57 data for encription is$field57")
+            val encrptedPan = getEncryptedPanorTrackData(field57,true)
+            cardProcessedDataModal.setEncryptedPan(encrptedPan)*/
 
-/*
-println("Plain data before encipher doReadRecord -->"+EMVInfoUtil.getRecordDataDesc(record))
-            val encrptedPan = getEncryptedPanorTrackData(EMVInfoUtil.getRecordDataDesc(record),false)
-            println("Plain data after encipher doReadRecord -->"+encrptedPan)
-            cardProcessedDataModal.setEncryptedPan(encrptedPan)
-*/
+if(((emv?.getTLV(Integer.toHexString(0x9f06))?:"").take(10))==CardAid.Rupay.aid) {
+    val track2 = emv!!.getTLV(Integer.toHexString(0x57))
+    println("track 2 data doReadRecord " + track2)
+    val field57 = "35|" + track2.replace("D", "=")?.replace("F", "")
 
+    println("Field 57 data after encrypted doReadRecord  " + field57)
+    val encrptedPan = getEncryptedPanorTrackData(field57, true)
+    cardProcessedDataModal.setEncryptedPan(encrptedPan)
+    println("Field 57 data after encrypted doSendOut  " + field57)
+    println("=> doReadRecord | track2 = $field57")
 
-            /*  val field57 =   "35|"+track2.replace("D", "=")?.replace("F", "")
-              println("Field 57 data after encrypted doReadRecord  "+field57)
-              val encrptedPan = getEncryptedPanorTrackData(field57,true)
-              println("Field 57 data before encrypted doReadRecord  "+field57)
-              cardProcessedDataModal.setEncryptedPan(encrptedPan)
-              println("=> onSendOut | track2 = $field57")*/
+}
 
-
-        }
+    //    }
 
 
         cardProcessedDataModal.setFlowType(record?.flowType.toString() ?: "")
@@ -1363,6 +1352,7 @@ println("Plain data before encipher doReadRecord -->"+EMVInfoUtil.getRecordDataD
 
     // 4 calling
     open fun doSendOut(ins: Int, data: ByteArray) {
+        println("INS --> ${ins.toInt()}")
         when (ins) {
             KernelINS.DISPLAY ->            // DisplayMsg: MsgID（1 byte） + Currency（1 byte）+ DataLen（1 byte） + Data（30 bytes）
                 if (data[0] == MessageID.ICC_ACCOUNT.toByte() ) {
@@ -1395,6 +1385,11 @@ println("Plain data before encipher doReadRecord -->"+EMVInfoUtil.getRecordDataD
                 println("=> onSendOut: Notify the application to halt contactless module")
                 emv!!.halt()
             }
+            KernelINS. DEL_TORN->{
+                println("=> onSendOut: -->   DEL_TORN")
+                emv!!.halt()
+            }
+
             else -> println(
                 "=> onSendOut: instruction is 0x" + Integer.toHexString(ins) + ", data is " + BytesUtil.bytes2HexString(data)
             )

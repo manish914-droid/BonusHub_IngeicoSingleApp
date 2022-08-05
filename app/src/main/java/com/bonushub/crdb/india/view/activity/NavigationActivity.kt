@@ -44,6 +44,7 @@ import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.serverApi.HitServer
+import com.bonushub.crdb.india.testPackage.TestCorutinesActivity
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
@@ -901,6 +902,7 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
 
     override  fun onDashBoardItemClick(action: EDashboardItem) {
         isDashboardOpen = false
+        println("CLICKED ITEM ${action.title}")
         when (action) {
             EDashboardItem.SALE, EDashboardItem.BANK_EMI,
             EDashboardItem.SALE_WITH_CASH, EDashboardItem.CASH_ADVANCE,
@@ -1157,6 +1159,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                 }else{
                     ToastUtils.showToast(this,R.string.no_internet_available_please_check_your_internet)
                 }
+            }
+
+            EDashboardItem.OFFLINE_SALE->{
+                startActivity(
+                    Intent(this, TestCorutinesActivity::class.java).apply {
+
+                    }
+                )
             }
 
             else->{}
