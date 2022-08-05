@@ -65,9 +65,8 @@ class CreateSettlementPacket @Inject constructor(private var appDao: AppDao) : I
                 }
             }*/
 
-            if(batchListData.size > 0){
-                batchNumber = tptbatchnumber?.batchNumber
-            }
+            // batch no. also go in zero settlement
+            batchNumber = tptbatchnumber?.batchNumber
             //Batch Number
             batchNumber?.let { addPad(it, "0", 6, true) }?.let { addFieldByHex(60, it) }
 
