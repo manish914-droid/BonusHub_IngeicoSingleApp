@@ -376,7 +376,8 @@ class ReportsFragment : Fragment(), IReportsFragmentItemClick {
 
                                         }
 
-                                    } else {
+                                    }
+                                    else {
 
                                         iDiag?.hideProgress()
                                         iDiag?.showToast("  Batch is empty.  ") // here not need to show dialog box because allready check batch empty

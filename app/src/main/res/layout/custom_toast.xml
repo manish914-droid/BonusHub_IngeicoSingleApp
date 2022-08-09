@@ -8,8 +8,11 @@
     android:paddingStart="@dimen/pad_16"
     android:paddingTop="20dp"
     android:paddingEnd="@dimen/pad_16"
+
+    android:layout_gravity="center"
+    android:gravity="center"
     android:paddingBottom="20dp"
-    android:textColor="@color/black"
+    android:textColor="@color/hdfc_red_color"
     android:textSize="@dimen/text_size_small">
 
 </TextView>

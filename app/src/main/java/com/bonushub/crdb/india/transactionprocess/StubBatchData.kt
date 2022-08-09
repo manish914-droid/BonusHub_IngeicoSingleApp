@@ -232,10 +232,22 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
                 //println("Aid Data is ----> $aidData")
                 //val formattedAid = aidData?.subSequence(6, aidData.length)
                batchFileData.aid = cardProcessedDataModal.getAID() ?: ""
-                if(cardProcessedDataModal.tvrCls?.toInt()!=0)
+
+
                 batchFileData.tvr=cardProcessedDataModal.tvrCls?:""
-                if(cardProcessedDataModal.tsiCls?.toInt()!=0)
                 batchFileData.tsi=cardProcessedDataModal.tsiCls?:""
+               /* if(!cardProcessedDataModal.tvrCls.isNullOrBlank()){
+                    val decimalTvr = Integer.decode(cardProcessedDataModal.tvrCls?:"0")
+                    if(decimalTvr!=0)
+                        batchFileData.tvr=cardProcessedDataModal.tvrCls?:""
+                }
+
+                if(!cardProcessedDataModal.tsiCls.isNullOrBlank()){
+                    val decimalTvr = Integer.decode(cardProcessedDataModal.tsiCls?:"0")
+                    if(decimalTvr!=0)
+                        batchFileData.tsi=cardProcessedDataModal.tsiCls?:""
+                }*/
+
 
             }
             else -> {

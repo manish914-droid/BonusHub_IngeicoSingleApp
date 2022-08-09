@@ -321,24 +321,28 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         }
 
 
-        navigationBinding?.footer?.cardSettlement?.setOnClickListener{
+        navigationBinding?.footer?.cardSettlement?.setOnClickListener {
 
-            navigationBinding?.footer?.cardSettlement?.setBackgroundResource(R.drawable.edge_brand_selected)
+            if (AppPreference.getLogin()){
+
+                navigationBinding?.footer?.cardSettlement?.setBackgroundResource(R.drawable.edge_brand_selected)
             isDashboardOpen = false
             closeDrawer()
-            if(AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
-                    alertBoxWithAction(
-                        getString(R.string.batch_settle),
-                        getString(R.string.please_settle_batch),
-                        false, getString(R.string.positive_button_ok),
-                        {
-                            //autoSettleBatchData()
-                        },
-                        {})
-                }
-                else {
-                    transactFragment(SettlementFragment())
-                }
+            if (AppPreference.getBoolean(PrefConstant.BLOCK_MENU_OPTIONS.keyName.toString())) {
+                alertBoxWithAction(
+                    getString(R.string.batch_settle),
+                    getString(R.string.please_settle_batch),
+                    false, getString(R.string.positive_button_ok),
+                    {
+                        //autoSettleBatchData()
+                    },
+                    {})
+            } else {
+                transactFragment(SettlementFragment())
+            }
+        }else{
+            showToast("Please Initialize Terminal")
+        }
 
             }
 
@@ -1044,7 +1048,8 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     } else {
                         ToastUtils.showToast(this,getString(R.string.no_internet_available_please_check_your_internet))
                     }
-                } else {
+                }
+                else {
                     showToast("PreAuth Not Found")
                     return
                 }

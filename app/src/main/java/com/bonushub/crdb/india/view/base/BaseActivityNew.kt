@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.text.TextUtils.replace
 import android.view.*
 import android.webkit.WebView
 import android.widget.LinearLayout
@@ -16,6 +17,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
@@ -47,14 +49,18 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     }
 
     override fun showToast(msg: String) {
-        Toast(HDFCApplication.appContext).apply {
+        // Below code is commented as now we no need to
+          Toast(HDFCApplication.appContext).apply {
             setGravity(Gravity.NO_GRAVITY, 0, 0)
-            duration = Toast.LENGTH_LONG
+            duration = Toast.LENGTH_SHORT
             val vi = (layoutInflater.inflate(R.layout.custom_toast, null) as TextView)
             vi.text = msg
             view = vi
 
         }.show()
+
+
+
     }
 
     override fun isShowProgress(): Boolean {
@@ -544,7 +550,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
             Handler(Looper.getMainLooper()).postDelayed({
                 dialogBuilder.dismiss()
                 dialogBuilder.cancel()
-               if(msg.equals(getString(R.string.successfull_init))){
+               if(msg == getString(R.string.successfull_init)){
                 startActivity(Intent(this, NavigationActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })

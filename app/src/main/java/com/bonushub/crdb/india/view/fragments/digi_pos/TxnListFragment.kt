@@ -389,7 +389,9 @@ class TxnListFragment : Fragment() {
                                         EDigiPosPaymentStatus.Pending.desciption -> {
                                             withContext(Dispatchers.Main) {
                                                 (activity as BaseActivityNew).hideProgress()
-                                                ToastUtils.showToast(requireContext(), getString(R.string.txn_status_still_pending))
+                                                (activity as BaseActivityNew).showToast(getString(R.string.txn_status_still_pending))
+
+
                                             }
                                         }
                                         EDigiPosPaymentStatus.Approved.desciption -> {
@@ -404,7 +406,8 @@ class TxnListFragment : Fragment() {
                                             if(statusRespDataList[1].toLowerCase(Locale.ROOT).equals("Failed", true)){
                                                     withContext(Dispatchers.Main){
                                                         (activity as BaseActivityNew).hideProgress()
-                                                        ToastUtils.showToast(requireContext(),statusRespDataList[1])
+
+                                                        (activity as BaseActivityNew).showToast(statusRespDataList[1])
                                                     }
 
                                             }
@@ -412,7 +415,8 @@ class TxnListFragment : Fragment() {
                                         else -> {
                                             withContext(Dispatchers.Main) {
                                                 (activity as BaseActivityNew).hideProgress()
-                                                ToastUtils.showToast(requireContext(),modal.txnStatus)
+                                                (activity as BaseActivityNew).showToast(modal.txnStatus)
+
                                             }
                                         }
                                     }
@@ -583,7 +587,8 @@ class TxnListFragment : Fragment() {
                             lifecycleScope.launch(Dispatchers.Main) {
                                 iDialog?.hideProgress()
                                 // binding?.emptyViewPlaceholder?.visibility= View.VISIBLE
-                                ToastUtils.showToast(requireContext(),responseMsg)
+
+                                (activity as BaseActivityNew).showToast(responseMsg)
                                 digiPosTxnListAdapter.refreshAdapterList(txnDataList)
                             }
                         }
@@ -668,7 +673,8 @@ class TxnListFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 iDialog?.hideProgress()
                 hasMoreData = false
-                ToastUtils.showToast(requireContext(),"No Data Found")
+                (activity as BaseActivityNew).showToast("No Data Found")
+
             }
         }
     }
@@ -754,7 +760,7 @@ class DigiPosTxnListAdapter( private var dataList: MutableList<DigiPosTxnModal>?
             //Showing Visibility of All Views:-
             holder.viewBinding.imgViewTxnStatus.visibility = View.VISIBLE
             holder.viewBinding.parentSubHeader.visibility = View.VISIBLE
-            if(modal.customerMobileNumber.isNullOrEmpty())
+            if(modal.customerMobileNumber.isEmpty())
                 holder.viewBinding.txtViewPhoneNumber.visibility = View.INVISIBLE
             //holder.viewBinding.sepraterLineView.visibility = View.VISIBLE
         }

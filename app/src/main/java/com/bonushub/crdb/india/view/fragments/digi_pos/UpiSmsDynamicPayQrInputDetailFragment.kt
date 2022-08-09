@@ -18,6 +18,7 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosDa
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -166,14 +167,14 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
     }
 
 
-    fun isVerify():Boolean{
+    private fun isVerify():Boolean{
         amount_ =  binding?.amountEt?.text.toString().trim()
         vpa_ =  binding?.vpaEt?.text.toString().trim()
         mobile_ =  binding?.mobileNumberEt?.text.toString().trim()
 
         if(amount_.isEmpty())
         {
-            ToastUtils.showToast(requireContext(),"Please Enter Amount")
+            ( activity as IDialog).showToast("Please Enter Amount")// ToastUtils.showToast(requireContext(),"Please Enter Amount")
             return false
         }
         else if(vpa_.isEmpty())
@@ -192,7 +193,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
     private fun validateAndSyncRequestToServer(amt: String) {
         if (amt == "") {
-            ToastUtils.showToast(activity,"Please Enter Amount")
+      //      ToastUtils.showToast(activity,"Please Enter Amount")
+            ( activity as IDialog).showToast("Please Enter Amount")
             return
         }
         val formattedAmt = "%.2f".format(amt.toFloat())

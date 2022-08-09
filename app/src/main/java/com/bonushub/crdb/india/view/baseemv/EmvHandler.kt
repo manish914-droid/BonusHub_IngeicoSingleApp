@@ -35,7 +35,7 @@ import com.bonushub.crdb.india.vxutils.Utility
 import com.bonushub.crdb.india.vxutils.Utility.byte2HexStr
 import com.bonushub.crdb.india.vxutils.getEncryptedPanorTrackData
 import com.usdk.apiservice.aidl.emv.*
-
+import com.usdk.apiservice.aidl.emv.FlowType.EMV_FLOWTYPE_R_NONLEGACY
 
 
 import com.usdk.apiservice.aidl.pinpad.*
@@ -249,6 +249,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     @Throws(RemoteException::class)
     override fun onReadRecord(cardRecord: CardRecord) {
         Log.e("VFEmvHandler","onReadRecord")
+      //  settingCAPkeys(emv)
         lastCardRecord = cardRecord
         doReadRecord(cardRecord)
     }
@@ -480,11 +481,11 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
 
                 } else {
-                    var issuerCountryCode = emv?.getTLV(Integer.toHexString(0x5F28).toUpperCase(Locale.ROOT))
+                    val issuerCountryCode = emv?.getTLV(Integer.toHexString(0x5F28).toUpperCase(Locale.ROOT))
                     //   VFService.showToast("Pin try limit exceeded in else India")
-                    println("Issuer country code " + issuerCountryCode)
+                    println("Issuer country code $issuerCountryCode")
 
-                    if((Integer.parseInt(byte2HexStr(ptlebyteArray), 16) and 0x20) == (0x20) &&  "0356" == "0356" ) {
+                    if((Integer.parseInt(byte2HexStr(ptlebyteArray), 16) and 0x20) == (0x20)) {
                         println("Last  attempt  is " + cardProcessedDataModal.getLastAttempt())
                         // VFService.showToast("Pin try limit exceeded in else India")
                         processSwipeCardWithPINorWithoutPIN(true, cardProcessedDataModal) { it ->
@@ -507,12 +508,49 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     }
                }
         }
+
+        else if(CardAid.Rupay.aid == cardProcessedDataModal.getAID()?.take(10)){
+            when(transData.acType.toInt()){
+                // Transaction declined offline
+                ACType.EMV_ACTION_AAC->{
+                    println("ACType.EMV_ACTION_AAC")
+                    emv?.stopProcess()
+                    (activity as BaseActivityNew).hideProgress()
+                    if(cardProcessedDataModal.txnResponseMsg.isNullOrBlank())
+                        activity.txnDeclinedDialog()
+                    else
+                        activity.txnDeclinedDialog(msg = cardProcessedDataModal.txnResponseMsg!!)
+                }
+                // Transaction go online form authorization
+                ACType.EMV_ACTION_ARQC->{
+                    println("ACType.EMV_ACTION_ARQC")
+                    doFlowTypeAction(transData.flowType,0, transData)
+                }
+                // Transaction approved by the terminal itself
+                ACType.EMV_ACTION_TC->{
+                    println("ACType.EMV_ACTION_TC")
+                    if(this::testCompleteSecondGenAc.isInitialized){
+                        doFlowTypeAction(transData.flowType,0, transData)
+                    }else{
+                        emv?.stopProcess()
+                        activity.txnDeclinedDialog()
+                        println("testCompleteSecondGenAc is null , EMV declined --> Terminal declined the txn")
+                    }
+
+
+                }
+            }
+
+        }
         else {
             val field55: String = getFields55()
             println("Field 55 is $field55")
             cardProcessedDataModal.setField55(field55)
             vfEmvHandlerCallback(cardProcessedDataModal)
         }
+
+
+
 
     }
 
@@ -543,7 +581,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             0x9F37,
             0x9F10,
 
+
             /*
+             0x8F//Cap key index
               0x9F08// App version
              0x8E,
                0x9F2E,
@@ -593,41 +633,11 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         return sb.toString().toUpperCase(Locale.ROOT)
     }
 
-    open fun doOnlineProcess(): String {
-        println("****** doOnlineProcess ******")
-        println("... ...")
-        println("... ...")
-        val onlineSuccess = true
-        return if (onlineSuccess) {
-            val onlineResult = StringBuffer()
-            onlineResult.append(EMVTag.DEF_TAG_ONLINE_STATUS).append("01").append("00")
-            val hostRespCode = "3030"
-            onlineResult.append(EMVTag.EMV_TAG_TM_ARC).append("02").append(hostRespCode)
-            val onlineApproved = true
-            onlineResult.append(EMVTag.DEF_TAG_AUTHORIZE_FLAG).append("01")
-                .append(if (onlineApproved) "01" else "00")
-            val hostTlvData =
-                "9F3501229C01009F3303E0F1C89F02060000000000019F03060000000000009F101307010103A0A802010A010000000052856E2C9B9F2701809F260820F63D6E515BD2CC9505008004E8009F1A0201565F2A0201569F360201C982027C009F34034203009F37045D5F084B9A031710249F1E0835303530343230308408A0000003330101019F090200309F410400000001"
-            onlineResult.append(
-                TLV.fromData(
-                    EMVTag.DEF_TAG_HOST_TLVDATA,
-                    BytesUtil.hexString2Bytes(hostTlvData)
-                ).toString()
-            )
-            activity.runOnUiThread {
-                Toast.makeText(activity, hostTlvData, Toast.LENGTH_LONG).show()
-            }
-            onlineResult.toString()
-        } else {
-            println("!!! online failed !!!")
-            "DF9181090101"
-        }
-    }
 
     open fun doEndProcess(result: Int, transData: TransData?) {
         if (result != EMVError.SUCCESS) {
-            println("=> onEndProcess | " + EMVInfoUtil.getErrorMessage(result))
-            println("=> onEndProcess  Error DATA | " + EMVInfoUtil.getTransDataDesc(transData))
+            println("=> onEndProcess , result != EMVError.SUCCESS " + EMVInfoUtil.getErrorMessage(result))
+            println("=> onEndProcess | EMV_RESULT_ERROR | " + EMVInfoUtil.getTransDataDesc(transData))
             if(cardProcessedDataModal.getSuccessResponseCode() == "00"){
                 if(this::testCompleteSecondGenAc.isInitialized){
                     testCompleteSecondGenAc.getEndProcessData(result,transData)
@@ -749,7 +759,8 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             FlowType.EMV_FLOWTYPE_MSD.toByte() ->println( "MSD")
             FlowType.EMV_FLOWTYPE_MSD_LEGACY.toByte() -> println("MSD_LEGACY")
             FlowType.EMV_FLOWTYPE_WAVE2.toByte() -> println("WAVE2")
-            FlowType.EMV_FLOWTYPE_A_XP2_MS.toByte(),FlowType.EMV_FLOWTYPE_A_XPM_MS.toByte() -> {
+            FlowType.EMV_FLOWTYPE_A_XP2_MS.toByte(),
+            FlowType.EMV_FLOWTYPE_A_XPM_MS.toByte() -> {
 
                 cardProcessedDataModal.setPosEntryMode(PosEntryModeType.CTLS_MSD_POS_ENTRY_CODE.posEntry.toString())
                 cardProcessedDataModal.setReadCardType(DetectCardType.CONTACT_LESS_CARD_WITH_MAG_TYPE)
@@ -768,9 +779,13 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 vfEmvHandlerCallback(cardProcessedDataModal)
 
             }
-            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte(),FlowType.EMV_FLOWTYPE_QVSDC.toByte() ,FlowType.EMV_FLOWTYPE_M_CHIP.toByte(),FlowType.EMV_FLOWTYPE_D_DPAS_EMV.toByte()
 
-                  ,  FlowType. EMV_FLOWTYPE_R_LEGACY.toByte()-> {
+            FlowType.EMV_FLOWTYPE_A_XP2_EMV.toByte(),
+            FlowType.EMV_FLOWTYPE_QVSDC.toByte() ,
+            FlowType.EMV_FLOWTYPE_M_CHIP.toByte(),
+            FlowType.EMV_FLOWTYPE_D_DPAS_EMV.toByte(),
+            FlowType. EMV_FLOWTYPE_R_LEGACY.toByte(),
+            FlowType.EMV_FLOWTYPE_R_NONLEGACY.toByte()-> {
 
                 when (transData.cvm) {
                     CVMFlag.EMV_CVMFLAG_NOCVM.toByte() -> {
@@ -813,7 +828,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             override fun onConfirm(data: ByteArray, arg1: Boolean) {
                                 System.out.println("PinBlock is"+byte2HexStr(data))
                                 Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
-                                respondCVMResult(1.toByte())
+                           //todo     respondCVMResult(1.toByte())
 
                                 when (cardProcessedDataModal.getReadCardType()) {
                                     DetectCardType.EMV_CARD_TYPE -> {
@@ -842,7 +857,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                                             cardProcessedDataModal.setEncryptedPan(encrptedPan)
 
                                             val field55: String = getFields55()
-                                            println("Field 55 is $field55")
+                                            println("Field 55 in doflowtype $field55")
 
                                             cardProcessedDataModal.setField55(field55)
                                             vfEmvHandlerCallback(cardProcessedDataModal)
@@ -1026,7 +1041,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             override fun onConfirm(data: ByteArray, arg1: Boolean) {
                 println("PinBlock is"+byte2HexStr(data))
                 Log.d("PinBlock", "PinPad hex encrypted data ---> " + hexString2String(BytesUtil.bytes2HexString(data)))
-                respondCVMResult(1.toByte())
+             //this method is called below when condition ,  respondCVMResult(1.toByte())
 
                 when (cardProcessedDataModal.getReadCardType()) {
                     DetectCardType.EMV_CARD_TYPE -> {
@@ -1059,14 +1074,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                             cardProcessedDataModal.setPosEntryMode(PosEntryModeType.POS_ENTRY_SWIPED_NO4DBC_PIN.posEntry.toString())
                         cardProcessedDataModal.setApplicationPanSequenceValue("00")
                     }
-
                     else -> {
                     }
                 }
 
-
+                respondCVMResult(1.toByte())
             }
-
             override fun onCancel() {
                 //  respondCVMResult(0.toByte())
                 Log.d("Data", "PinPad onCancel")
@@ -1078,7 +1091,6 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     ex.printStackTrace()
                 }
             }
-
             override fun onError(error: Int) {
                 respondCVMResult(2.toByte())
                 Log.d("Data", "PinPad onError, code:$error")
@@ -1092,8 +1104,6 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
         }
         when (cvm.cvm) {
-
-
             CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
                 cardProcessedDataModal.setIsOnline(2)
                 println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
@@ -1238,7 +1248,6 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
 
             }
 
-
             CVMFlag.EMV_CVMFLAG_ONLINEPIN.toByte() -> {
                 println("=> onCardHolderVerify | onlinpin")
                 cardProcessedDataModal.setIsOnline(1)
@@ -1263,14 +1272,13 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                 )
                 pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
             }
+
             else -> {
                 println("=> onCardHolderVerify | default")
                 respondCVMResult(1.toByte())
             }
         }
     }
-
-
 
     protected open fun respondCVMResult(result: Byte) {
         try {

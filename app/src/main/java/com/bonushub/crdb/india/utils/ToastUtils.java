@@ -22,6 +22,7 @@ public class ToastUtils {
 
     public static void showToast(Context context, String msg) {
         Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+
     }
     public static void showToast(Context context, int resId) {
         Toast.makeText(context.getApplicationContext(), context.getString(resId), Toast.LENGTH_SHORT).show();

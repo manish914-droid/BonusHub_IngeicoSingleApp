@@ -85,7 +85,8 @@ class SearchTxnFragment : Fragment() {
             //  (context as childFragmentManager).getTxnStatus()
             checkTxnStatus(txn_id_String)
         } else
-            ToastUtils.showToast(requireContext(),"NO Txn ID")
+            (activity as BaseActivityNew).showToast("NO Txn ID")
+
     }
 
     fun checkTxnStatus(txnId: String){
