@@ -139,6 +139,7 @@ class TransactionActivity : BaseActivityNew() {
         globalCardProcessedModel.setTransactionAmount((saleAmt.toDouble() * 100).toLong())
         globalCardProcessedModel.setOtherAmount((cashBackAmt.toDouble() * 100).toLong())
         globalCardProcessedModel.setProcessingCode(transactionProcessingCode)
+        globalCardProcessedModel.setMobileBillExtraData(Pair(mobileNumber, billNumber))
 
         tenureSchemeViewModel = ViewModelProvider(this).get(TenureSchemeViewModel::class.java)
 
