@@ -432,9 +432,9 @@ class TxnListFragment : Fragment() {
                             } else {
                                 lifecycleScope.launch(Dispatchers.Main) {
                                     (activity as BaseActivityNew).hideProgress()
-                                    (activity as BaseActivityNew).alertBoxWithAction(
-                                        getString(R.string.error), responseMsg,
-                                        false, getString(R.string.positive_button_ok),
+                                    (activity as BaseActivityNew).alertBoxWithActionNew(
+                                        getString(R.string.error), responseMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                        false, true,
                                         {}, {})
                                 }
                             }

@@ -276,11 +276,10 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                             msg = getString(R.string.sms_payment_link_sent)
                                         }
 
-                                        (activity as BaseActivityNew).alertBoxWithAction(
+                                        (activity as BaseActivityNew).alertBoxWithActionNew(
                                            getString(R.string.sms_upi_pay),
-                                            msg,
-                                            true,
-                                            getString(R.string.positive_button_yes),
+                                            msg,R.drawable.ic_link_circle,getString(R.string.positive_button_yes),getString(R.string.no),true,
+                                            false,
                                             { status ->
                                                 if (status) {
                                                     lifecycleScope.launch(Dispatchers.IO) {
@@ -403,13 +402,10 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                     lifecycleScope.launch(
                                                                         Dispatchers.Main
                                                                     ) {
-                                                                        (activity as BaseActivityNew).alertBoxWithAction(
-
-
+                                                                        (activity as BaseActivityNew).alertBoxWithActionNew(
                                                                             getString(R.string.transaction_failed_msg),
-                                                                            responseMsg,
-                                                                            false,
-                                                                            getString(R.string.positive_button_ok),
+                                                                            responseMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                                                            false,true,
                                                                             { alertPositiveCallback ->
                                                                                 if (alertPositiveCallback) {
                                                                                     Field48ResponseTimestamp.deleteDigiposData(
@@ -420,8 +416,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack()
                                                                                 }
                                                                             },
-                                                                            {},
-                                                                            R.drawable.ic_info)
+                                                                            {})
                                                                     }
                                                                 }
 
@@ -441,17 +436,15 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                 val dpObj = Gson().toJson(dp)
                                                 logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
                                                 parentFragmentManager.popBackStack()
-                                            },
-                                            R.drawable.ic_link_circle)
+                                            })
                                     } else {
                                         // received other than S101(show Fail info dialog here)
                                         withContext(Dispatchers.Main) {
-                                            (activity as BaseActivityNew).alertBoxWithAction(
+                                            (activity as BaseActivityNew).alertBoxWithActionNew(
 
                                              getString(R.string.transaction_failed_msg),
-                                                getString(R.string.transaction_failed_msg),
-                                                false,
-                                                getString(R.string.positive_button_ok),
+                                                getString(R.string.transaction_failed_msg),R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                                false,true,
                                                 { alertPositiveCallback ->
                                                     if (alertPositiveCallback) {
                                                         Field48ResponseTimestamp.deleteDigiposData(
@@ -460,8 +453,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                         parentFragmentManager.popBackStack()
                                                     }
                                                 },
-                                                {},
-                                                R.drawable.ic_info)
+                                                {})
                                         }
 
                                     }
