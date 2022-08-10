@@ -30,6 +30,7 @@ import com.bonushub.crdb.india.serverApi.EMIRequestType
 import com.bonushub.crdb.india.serverApi.RemoteService
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.utils.UiAction
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.IssuerTenureListAdapter
 import com.bonushub.crdb.india.view.base.IDialog
@@ -127,7 +128,7 @@ class EMIIssuerListFragment : Fragment() {
 
        //emiCatalogueImageList = arguments?.getSerializable("imagesData") as MutableMap<String, Uri>
         setUpRecyclerViews()
-        binding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
+        //binding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
         binding?.subHeaderView?.headerHome?.setOnClickListener {   (activity as NavigationActivity).transactFragment(DashboardFragment()) }
        // binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_catalogue)
         binding?.subHeaderView?.headerImage?.visibility= View.GONE // now header text is show in center
@@ -144,15 +145,17 @@ class EMIIssuerListFragment : Fragment() {
         Log.d("enquiryAmount:- ", enquiryAmount.toString())
         Log.d("action:- ", action.toString())
         if (action == UiAction.BRAND_EMI_CATALOGUE) {
-            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
-            binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+//            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+//            binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brandemi)
+            refreshSubToolbarLogos(this,null,R.drawable.ic_brandemi_new, getString(R.string.brandEmiCatalogue))
             //  brandEMISelectedData = runBlocking(Dispatchers.IO) { BrandEMIDataTable.getAllEMIData() }
             field57RequestData =
                 "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^${brandId}" +
                         "^${brandEMIData?.productID}^^^$enquiryAmount"
         } else {
-            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bankEmiCatalogue)
+           // binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bankEmiCatalogue)
             //  binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_bank_emi)
+            refreshSubToolbarLogos(this,null,R.drawable.ic_bank_emi_new, getString(R.string.bankEmiCatalogue))
             field57RequestData =
                 if (AppPreference.getLongData(AppPreference.ENQUIRY_AMOUNT_FOR_EMI_CATALOGUE) != 0L)
                     "${EMIRequestType.EMI_CATALOGUE_ACCESS_CODE.requestType}^$totalRecord^1^^^^${

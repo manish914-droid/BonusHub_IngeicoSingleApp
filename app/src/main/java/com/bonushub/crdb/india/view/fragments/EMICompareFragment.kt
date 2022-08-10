@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentEmiCompareBinding
 import com.bonushub.crdb.india.databinding.ItemEmiCompareViewBinding
+import com.bonushub.crdb.india.utils.EDashboardItem
 import com.bonushub.crdb.india.utils.UiAction
+import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.adapter.EMICompareDiffUtil
 import com.google.gson.Gson
@@ -56,11 +58,17 @@ class EMICompareFragment : Fragment() {
             arguments?.getParcelableArrayList<IssuerBankModal>("dataModal") as MutableList<IssuerBankModal>
         Log.d("Data:- ", Gson().toJson(dataList))
      //   binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_catalogue)
+
+        (activity as NavigationActivity).manageTopToolBar(false)
         if (action == UiAction.BRAND_EMI_CATALOGUE) {
-            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
+           // binding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
         //    binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_brand_emi_catalogue)
+
+            refreshSubToolbarLogos(this,null,R.drawable.ic_brandemi_new, getString(R.string.brandEmiCatalogue))
         } else {
-            binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bankEmiCatalogue)
+           // binding?.subHeaderView?.subHeaderText?.text = getString(R.string.bankEmiCatalogue)
+            refreshSubToolbarLogos(this,null,R.drawable.ic_bank_emi_new, getString(R.string.bankEmiCatalogue))
+
 
         }
         binding?.subHeaderView?.headerHome?.visibility= View.VISIBLE
