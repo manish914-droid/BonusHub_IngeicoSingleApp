@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.view.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -31,6 +32,7 @@ import com.bonushub.crdb.india.viewmodel.BrandEmiMasterCategoryViewModel
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -70,8 +72,12 @@ class BrandEmiMasterCategoryFragment : Fragment() {
             BrandEmiListAndSearchUiBinding.inflate(layoutInflater, container, false)
         return brandMasterBinding?.root
     }
+
+    var isLiveFragment:Boolean = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        isLiveFragment = true
         eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         if (eDashBoardItem == EDashboardItem.BRAND_EMI_CATALOGUE) {
 //            brandMasterBinding?.subHeaderView?.subHeaderText?.text = getString(R.string.brandEmiCatalogue)
@@ -125,16 +131,21 @@ class BrandEmiMasterCategoryFragment : Fragment() {
                     //    ToastUtils.showToast(activity, genericResp.errorMessage)
                     //(activity as MainActivity).show
                     lifecycleScope.launch(Dispatchers.Main) {
-                        (activity as BaseActivityNew).alertBoxWithActionNew(
+                        (activity as IDialog).alertBoxWithActionNew(
                             genericResp.errorMessage ?: "Oops something went wrong",
                             "",
                             R.drawable.ic_info_new,
                             getString(R.string.positive_button_ok),"",false,
                             true,
                             {
-                                /* finish()
-                                 goToDashBoard()*/
-                                parentFragmentManager.popBackStack()
+                                /*(activity as NavigationActivity).startActivity(Intent(activity, NavigationActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                })*/
+
+                              if(isLiveFragment) {
+                                  parentFragmentManager.popBackStack()
+                                  isLiveFragment = false
+                              }
                             },
                             {})
                     }
