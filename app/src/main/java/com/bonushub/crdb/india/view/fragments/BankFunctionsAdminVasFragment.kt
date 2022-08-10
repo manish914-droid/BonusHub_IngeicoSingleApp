@@ -122,6 +122,8 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 // check before init
                 if (checkInternetConnection()) {
 
+                    iDialog?.showProgress()
+
                     if(!AppPreference.getBoolean(AppPreference.LOGIN_KEY)){
                         //showEnterTIDPopUp
                         /*DialogUtilsNew1.getInputTID_Dialog(requireContext(),"ENTER TID","",true,true,"TID", {
@@ -135,6 +137,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                         },
                             { unselectItem() })*/
 
+                        iDialog?.hideProgress()
                         (activity as NavigationActivity).transactFragment(InitFragment(), isBackStackAdded = false)
 
                     }else{
@@ -147,22 +150,31 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                 .observe(viewLifecycleOwner) { batchData ->
 
                                     when {
-                                        AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->
+                                        AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->{
+                                            iDialog?.hideProgress()
                                             ToastUtils.showToast(
                                                 requireContext(),
                                                 getString(R.string.please_clear_fbatch_before_init)
                                             )
+                                        }
 
-                                        !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->
+
+                                        !TextUtils.isEmpty(AppPreference.getString(AppPreference.GENERIC_REVERSAL_KEY)) ->{
+                                            iDialog?.hideProgress()
                                             ToastUtils.showToast(
                                                 requireContext(),
                                                 getString(R.string.reversal_found_please_clear_or_settle_first_before_init)
                                             )
+                                        }
 
-                                        batchData.size > 0 -> ToastUtils.showToast(
-                                            requireContext(),
-                                            getString(R.string.please_settle_batch_first_before_init)
-                                        )
+
+                                        batchData.size > 0 -> {
+                                            iDialog?.hideProgress()
+                                            ToastUtils.showToast(
+                                                requireContext(),
+                                                getString(R.string.please_settle_batch_first_before_init)
+                                            )
+                                        }
                                         else -> {
                                             startFullInitProcess()
                                         }
@@ -174,6 +186,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
                 } else {
                     ToastUtils.showToast(requireContext(),getString(R.string.no_internet_available_please_check_your_internet))
+                    unselectItem()
                 }
 
 
@@ -224,6 +237,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
 
                     }else{
                         ToastUtils.showToast(requireContext(),getString(R.string.no_internet_available_please_check_your_internet))
+                        unselectItem()
                     }
                 }else{
                     ToastUtils.showToast(requireContext(),"** Initialize Terminal **")
@@ -495,6 +509,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
             }else{
                // get tid by user
                 logger("get tid","by user")
+                iDialog?.hideProgress()
 
                 DialogUtilsNew1.getInputTID_Dialog(requireContext(),"ENTER TID","",true,true,"TID", {
 
