@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentDigiPosMenuBinding
 import com.bonushub.crdb.india.databinding.ItemDigiPosBinding
+import com.bonushub.crdb.india.databinding.ItemReportsBinding
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.BitmapUtils.convertBitmapToByteArray
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
@@ -28,6 +30,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
     private val digiPosItem: MutableList<DigiPosItem> by lazy { mutableListOf<DigiPosItem>() }
     private var iDigiPosMenuItemClick: IDigiPosMenuItemClick? = null
+    private lateinit var adapter : DigiPosMenuAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +46,15 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
         transactionType = arguments?.getSerializable("type") as EDashboardItem
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+//        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
+//        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType
+        )
+
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -57,6 +67,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
         iDigiPosMenuItemClick = this
         digiPosItem.clear()
+
        // digiPosItem.addAll(DigiPosItem.values())
 
         // region get tpt data
@@ -81,6 +92,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
         digiPosItem.add(DigiPosItem.TXN_LIST)
         // end region
 
+        adapter = DigiPosMenuAdapter(iDigiPosMenuItemClick, digiPosItem)
         setupRecyclerview()
 
         /*try {
@@ -98,7 +110,7 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
         lifecycleScope.launch(Dispatchers.Main) {
             binding?.let {
                 it.recyclerView.layoutManager = GridLayoutManager(activity, 1)
-                it.recyclerView.adapter = DigiPosMenuAdapter(iDigiPosMenuItemClick, digiPosItem)
+                it.recyclerView.adapter = adapter
             }
 
         }
@@ -170,7 +182,9 @@ class DigiPosMenuFragment : Fragment(), IDigiPosMenuItemClick {
 
                                 } else {
                                     lifecycleScope.launch(Dispatchers.Main){
-                                        ToastUtils.showToast(requireContext(),"Static Qr not available.")
+                                       // ToastUtils.showToast(requireContext(),"Static Qr not available.")
+                                        (activity as BaseActivityNew).alertBoxWithActionNew("","Static Qr not available.",R.drawable.ic_info_orange,"","",false,true,{},{})
+                                        adapter.notifyDataSetChanged()
                                     }
                                     logger(
                                         "StaticQr",
@@ -232,7 +246,7 @@ class DigiPosMenuAdapter(private var iDigiPosMenuItemClick: IDigiPosMenuItemClic
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DigiPosMenuViewHolder {
 
-        val itemBinding = ItemDigiPosBinding.inflate(LayoutInflater.from(parent.context),
+        val itemBinding = ItemReportsBinding.inflate(LayoutInflater.from(parent.context),
             parent,
             false)
         return DigiPosMenuViewHolder(itemBinding)
@@ -246,15 +260,16 @@ class DigiPosMenuAdapter(private var iDigiPosMenuItemClick: IDigiPosMenuItemClic
         holder.viewBinding.textView.text = model.title
 
         holder.viewBinding.imgViewIcon.setImageResource(model.res)
+        holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_gray)
 
 
         holder.viewBinding.relLayParent.setOnClickListener {
-
+            holder.viewBinding.relLayParent.setBackgroundResource(R.drawable.edge_brand_selected)
             iDigiPosMenuItemClick?.digiPosMenuItemClick(model)
 
         }
 
     }
 
-    inner class DigiPosMenuViewHolder(val viewBinding: ItemDigiPosBinding) : RecyclerView.ViewHolder(viewBinding.root)
+    inner class DigiPosMenuViewHolder(val viewBinding: ItemReportsBinding) : RecyclerView.ViewHolder(viewBinding.root)
 }

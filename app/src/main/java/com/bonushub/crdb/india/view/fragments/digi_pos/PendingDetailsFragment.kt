@@ -15,6 +15,8 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
@@ -47,8 +49,10 @@ class PendingDetailsFragment : Fragment() {
         transactionType = arguments?.getSerializable("type") as EDashboardItem
         detailPageData = arguments?.getParcelable("data")
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -87,7 +91,7 @@ class PendingDetailsFragment : Fragment() {
         binding?.printButton?.setOnClickListener {
             if (binding?.printButton?.text.toString() == getString(R.string.print)) {
                 dataToPrintAfterSuccess?.let { it1 ->
-                    PrintUtil(context).printSMSUPIChagreSlip(
+                    PrintVectorUtil(context).printSMSUPIChagreSlip(
                         it1,
                         EPrintCopyType.DUPLICATE,
                         context
@@ -166,7 +170,8 @@ class PendingDetailsFragment : Fragment() {
                             when (statusRespDataList[5]) {
                                 EDigiPosPaymentStatus.Pending.desciption -> {
                                     tabledata.txnStatus = statusRespDataList[5]
-                                    ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                    //ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                    (activity as BaseActivityNew).alertBoxWithActionNew("",getString(R.string.txn_status_still_pending),R.drawable.ic_info_orange,"","",false,true,{},{})
                                 }
 
                                 EDigiPosPaymentStatus.Approved.desciption -> {
@@ -196,9 +201,9 @@ class PendingDetailsFragment : Fragment() {
                     } else {
                         lifecycleScope.launch(Dispatchers.Main) {
                             (activity as BaseActivityNew)?.hideProgress()
-                            (activity as BaseActivityNew)?.alertBoxWithAction(
-                                getString(R.string.error), responseMsg,
-                                false, getString(R.string.positive_button_ok),
+                            (activity as BaseActivityNew)?.alertBoxWithActionNew(
+                                getString(R.string.error), responseMsg,R.drawable.ic_info_new,getString(R.string.positive_button_ok),"",
+                                false,true ,
                                 {}, {})
                         }
                     }

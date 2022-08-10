@@ -93,8 +93,10 @@ class TxnListFragment : Fragment() {
       //  iTxnListItemClick = this
         transactionType = arguments?.getSerializable("type") as EDashboardItem
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -389,7 +391,9 @@ class TxnListFragment : Fragment() {
                                         EDigiPosPaymentStatus.Pending.desciption -> {
                                             withContext(Dispatchers.Main) {
                                                 (activity as BaseActivityNew).hideProgress()
-                                                (activity as BaseActivityNew).showToast(getString(R.string.txn_status_still_pending))
+                                               // (activity as BaseActivityNew).showToast(getString(R.string.txn_status_still_pending))
+                                                (activity as BaseActivityNew).alertBoxWithActionNew("",getString(R.string.txn_status_still_pending),R.drawable.ic_info_orange,"","",false,true,{},{})
+
 
 
                                             }
@@ -407,7 +411,9 @@ class TxnListFragment : Fragment() {
                                                     withContext(Dispatchers.Main){
                                                         (activity as BaseActivityNew).hideProgress()
 
-                                                        (activity as BaseActivityNew).showToast(statusRespDataList[1])
+                                                        //(activity as BaseActivityNew).showToast(statusRespDataList[1])
+                                                        (activity as BaseActivityNew).alertBoxWithActionNew("",statusRespDataList[1],R.drawable.ic_info_orange,"","",false,true,{},{})
+
                                                     }
 
                                             }
@@ -415,7 +421,9 @@ class TxnListFragment : Fragment() {
                                         else -> {
                                             withContext(Dispatchers.Main) {
                                                 (activity as BaseActivityNew).hideProgress()
-                                                (activity as BaseActivityNew).showToast(modal.txnStatus)
+                                                //(activity as BaseActivityNew).showToast(modal.txnStatus)
+                                                (activity as BaseActivityNew).alertBoxWithActionNew("",modal.txnStatus,R.drawable.ic_info_orange,"","",false,true,{},{})
+
 
                                             }
                                         }
@@ -588,7 +596,8 @@ class TxnListFragment : Fragment() {
                                 iDialog?.hideProgress()
                                 // binding?.emptyViewPlaceholder?.visibility= View.VISIBLE
 
-                                (activity as BaseActivityNew).showToast(responseMsg)
+//                                (activity as BaseActivityNew).showToast(responseMsg)
+                                (activity as BaseActivityNew).alertBoxWithActionNew("",responseMsg,R.drawable.ic_info_orange,"","",false,true,{},{})
                                 digiPosTxnListAdapter.refreshAdapterList(txnDataList)
                             }
                         }
@@ -598,10 +607,10 @@ class TxnListFragment : Fragment() {
                                 iDialog?.hideProgress()
                                 digiPosTxnListAdapter.refreshAdapterList(txnDataList)
                                 hasMoreData = false
-                                iDialog?.alertBoxWithAction(
-                                    getString(R.string.error), txnMsg,
-                                    false, getString(R.string.positive_button_ok),
-                                    { parentFragmentManager.popBackStackImmediate() }, {}, R.drawable.ic_info)
+                                iDialog?.alertBoxWithActionNew(
+                                    getString(R.string.error), txnMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                    false,true,
+                                    { parentFragmentManager.popBackStackImmediate() }, {})
                             }
                         }
                     }
@@ -616,10 +625,11 @@ class TxnListFragment : Fragment() {
                     lifecycleScope.launch(Dispatchers.Main) {
                         iDialog?.hideProgress()
                         hasMoreData = false
-                        iDialog?.alertBoxWithAction(
-                            getString(R.string.error), result,
-                            false, getString(R.string.positive_button_ok),
-                            { parentFragmentManager.popBackStackImmediate() }, {},R.drawable.ic_info)
+                        iDialog?.alertBoxWithActionNew(
+                            getString(R.string.error), result,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                            false, true,
+                            { //parentFragmentManager.popBackStackImmediate()
+                            }, {})
                     }
                 }
             }
@@ -673,7 +683,9 @@ class TxnListFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Main) {
                 iDialog?.hideProgress()
                 hasMoreData = false
-                (activity as BaseActivityNew).showToast("No Data Found")
+                //(activity as BaseActivityNew).showToast("No Data Found")
+                (activity as BaseActivityNew).alertBoxWithActionNew("","No Data Found",R.drawable.ic_info_orange,"","",false,true,{},{})
+
 
             }
         }

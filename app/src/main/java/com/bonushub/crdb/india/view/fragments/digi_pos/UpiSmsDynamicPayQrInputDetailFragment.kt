@@ -11,12 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentUpiSmsDynamicPayQrInputDetailBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
+import com.bonushub.crdb.india.serverApi.HitServer
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
@@ -53,10 +55,12 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         transactionType = arguments?.getSerializable("type") as EDashboardItem
-       // digiPosItemType = arguments?.getSerializable("type") as DigiPosItem
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType
+        )
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -96,10 +100,10 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
         when (transactionType) {
             EDashboardItem.SMS_PAY, EDashboardItem.BHARAT_QR -> {
-                binding?.mobileNumberEt?.hint = getString(R.string.enter_mobile_number)
+                binding?.mobileNumberCrdView?.hint = getString(R.string.enter_mobile_number)
             }
             EDashboardItem.UPI -> {
-                binding?.mobileNumberEt?.hint = getString(R.string.enter_mobile_number_optional)
+                binding?.mobileNumberCrdView?.hint = getString(R.string.enter_mobile_number_optional)
 
             }
             else -> {
@@ -107,8 +111,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
             }
         }
 
-
-        binding?.amountEt?.text.toString().trim()
+        AmountTextWatcher(binding?.amountEt!!)
         binding?.btnProceed?.setOnClickListener {
 
             DialogUtilsNew1.hideKeyboardIfOpen(requireActivity())
@@ -174,17 +177,18 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
 
         if(amount_.isEmpty())
         {
-            ( activity as IDialog).showToast("Please Enter Amount")// ToastUtils.showToast(requireContext(),"Please Enter Amount")
+           // ( activity as IDialog).showToast("Please Enter Amount")// ToastUtils.showToast(requireContext(),"Please Enter Amount")
+            binding?.amountEt?.setError(getString(R.string.error_plz_enter_amount))
             return false
         }
         else if(vpa_.isEmpty())
         {
-            ToastUtils.showToast(requireContext(),"Enter Valid VPA")
+            binding?.vpaEt?.setError(getString(R.string.error_enter_vap))
             return false
         }
         else if(mobile_.isNotEmpty() && mobile_.length <10)
         {
-            ToastUtils.showToast(requireContext(),"Enter Valid Mobile Number")
+            binding?.mobileNumberEt?.setError(getString(R.string.error_enter_mobile))
             return false
         }
 
@@ -194,31 +198,28 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
     private fun validateAndSyncRequestToServer(amt: String) {
         if (amt == "") {
       //      ToastUtils.showToast(activity,"Please Enter Amount")
-            ( activity as IDialog).showToast("Please Enter Amount")
+            //( activity as IDialog).showToast("Please Enter Amount")
+            binding?.amountEt?.setError(getString(R.string.error_plz_enter_amount))
             return
         }
         val formattedAmt = "%.2f".format(amt.toFloat())
         val amtValue = formattedAmt.toFloat()
         when {
             amtValue <= 0 -> {
-                ToastUtils.showToast(activity,"Please Enter Amount")
+                binding?.amountEt?.setError(getString(R.string.error_plz_enter_amount))
             }
             transactionType == EDashboardItem.UPI && !TextUtils.isEmpty(binding?.mobileNumberEt?.text.toString()) && binding?.mobileNumberEt?.text.toString().length != 10 ->
-                context?.getString(R.string.enter_valid_mobile_number)
-                    ?.let {  ToastUtils.showToast(activity,it) }
+                binding?.mobileNumberEt?.setError(getString(R.string.enter_valid_mobile_number))
 
             (transactionType == EDashboardItem.SMS_PAY || transactionType == EDashboardItem.BHARAT_QR) && binding?.mobileNumberEt?.text.toString().length != 10 -> {
-                context?.getString(R.string.enter_valid_mobile_number)
-                    ?.let {  ToastUtils.showToast(activity,it) }
+                binding?.mobileNumberEt?.setError(getString(R.string.enter_valid_mobile_number))
             }
 
             transactionType == EDashboardItem.BHARAT_QR && !TextUtils.isEmpty(binding?.mobileNumberEt?.text.toString()) && binding?.mobileNumberEt?.text.toString().length != 10 ->
-                context?.getString(R.string.enter_valid_mobile_number)
-                    ?.let {  ToastUtils.showToast(activity,it) }
-
+                binding?.mobileNumberEt?.setError(getString(R.string.enter_valid_mobile_number))
 
             !TextUtils.isEmpty(binding?.vpaEt?.text.toString()) && transactionType == EDashboardItem.UPI &&(!(binding?.vpaEt?.text.toString().contains('@')))-> {
-                ToastUtils.showToast(activity,"Enter Valid VPA")
+                binding?.vpaEt?.setError(getString(R.string.error_enter_vap))
             }
             else -> {
                 //   "5^1.08^^8287305603^064566935811302^:"
@@ -247,7 +248,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 (activity as BaseActivityNew).showProgress()
             }
-            val isSavedTrans = true//transactionType != EDashboardItem.DYNAMIC_QR
+            val isSavedTrans = false//transactionType != EDashboardItem.DYNAMIC_QR
 
             getDigiPosStatus(
                 field57,
@@ -258,6 +259,9 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                 try {
 
                     if (isSuccess) {
+
+                        saveDigiPosPendingTxn(field57)
+
                         when (transactionType) {
                             EDashboardItem.SMS_PAY, EDashboardItem.UPI -> {
                                 lifecycleScope.launch(Dispatchers.Main) {
@@ -517,7 +521,8 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                     } else {
 
                         lifecycleScope.launch(Dispatchers.Main) {
-                            ToastUtils.showToast(activity, responseMsg)
+                           // ToastUtils.showToast(activity, responseMsg)
+                            (activity as BaseActivityNew).alertBoxWithActionNew("",responseMsg,R.drawable.ic_info_orange,"","",false,true,{},{})
                         }
                     }
 
@@ -529,5 +534,37 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
         }
     }
 
+    private fun saveDigiPosPendingTxn(field57:String){
+
+            //val datatosave = isoWriterData.isoMap[57]?.parseRaw2String().toString()
+            logger(HitServer.TAG, "SAVED TO DIGIPOS -->$field57", "e")
+            val datalist = field57.split("^")
+
+            val digiposData = DigiPosDataTable()
+            digiposData.requestType = datalist[0].toInt()
+            digiposData.amount = datalist[1]
+            digiposData.description = datalist[2]
+            digiposData.customerMobileNumber = datalist[3]
+            digiposData.displayFormatedDate = getCurrentDateInDisplayFormatDigipos()
+
+            when {
+                datalist[0].toInt() == EnumDigiPosProcess.UPIDigiPOS.code.toInt() -> {
+                    digiposData.vpa = datalist[4]
+                    digiposData.partnerTxnId = datalist[5]
+                    digiposData.paymentMode = "UPI Pay"
+                }
+                datalist[0].toInt() == EnumDigiPosProcess.DYNAMIC_QR.code.toInt() -> {
+                    digiposData.partnerTxnId = datalist[4]
+                    digiposData.paymentMode = "Bhqr Pay"
+                }
+                else -> {
+                    digiposData.partnerTxnId = datalist[4]
+                    digiposData.paymentMode = "SMS Pay"
+                }
+            }
+            //
+
+            insertOrUpdateDigiposData(digiposData)
+    }
 
 }

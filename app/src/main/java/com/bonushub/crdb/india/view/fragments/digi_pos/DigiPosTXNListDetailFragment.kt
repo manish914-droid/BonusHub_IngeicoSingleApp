@@ -12,7 +12,7 @@ import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentPendingDetailsBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
 import com.bonushub.crdb.india.utils.*
-import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
@@ -44,7 +44,11 @@ class DigiPosTXNListDetailFragment : Fragment() {
 
         detailPageData = arguments?.getParcelable("data")
 
-        binding?.subHeaderView?.subHeaderText?.text = getString(R.string.txn_detail_page)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            null,R.drawable.ic_txn_list,getString(R.string.txn_detail_page))
+
         binding?.subHeaderView?.backImageButton?.setOnClickListener { parentFragmentManager.popBackStackImmediate() }
 
         if (detailPageData?.txnStatus?.toLowerCase(Locale.ROOT).equals("success", true)) {
@@ -117,7 +121,7 @@ class DigiPosTXNListDetailFragment : Fragment() {
                     //tabledata.txnStatus = detailPageData.txnStatus
                 }
 
-                PrintUtil(context).printSMSUPIChagreSlip(
+                PrintVectorUtil(context).printSMSUPIChagreSlip(
                     tabledata,
                     EPrintCopyType.DUPLICATE,
                     context
@@ -162,21 +166,23 @@ class DigiPosTXNListDetailFragment : Fragment() {
                             if (txnStatus.toLowerCase(Locale.ROOT).equals("InProgress", true)) {
                               //  ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.no_data_found) ?: "") {}
+                                    //(activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.no_data_found) ?: "") {}
+                                    (activity as NavigationActivity).alertBoxWithActionNew("Error", getString(R.string.no_data_found),R.drawable.ic_info_orange,"","",false,true,{},{})
+
                                 }
                             }
                             if(txnStatus.isBlank() || statusRespDataList[1].toLowerCase(Locale.ROOT).equals("Failed", true)){
-                                (activity as BaseActivityNew)?.alertBoxWithAction(
-                                    getString(R.string.error), statusRespDataList[1],
-                                    false, getString(R.string.positive_button_ok),
-                                    {}, {}, R.drawable.ic_info)
+                                (activity as BaseActivityNew)?.alertBoxWithActionNew(
+                                    getString(R.string.error), statusRespDataList[1],R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                    false, true,
+                                    {}, {})
 
                             }
                             else{
-                                (activity as BaseActivityNew)?.alertBoxWithAction(
-                                    getString(R.string.error), txnStatus,
-                                    false, getString(R.string.positive_button_ok),
-                                    {}, {}, R.drawable.ic_info)
+                                (activity as BaseActivityNew)?.alertBoxWithActionNew(
+                                    getString(R.string.error), txnStatus,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                    false, true,
+                                    {}, {})
 
                             }
                         }
@@ -184,10 +190,10 @@ class DigiPosTXNListDetailFragment : Fragment() {
                     } else {
                         lifecycleScope.launch(Dispatchers.Main) {
                             (activity as BaseActivityNew)?.hideProgress()
-                            (activity as BaseActivityNew)?.alertBoxWithAction(
-                                getString(R.string.error), responseMsg,
-                                false, getString(R.string.positive_button_ok),
-                                {}, {}, R.drawable.ic_info)
+                            (activity as BaseActivityNew)?.alertBoxWithActionNew(
+                                getString(R.string.error), responseMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                false, true,
+                                {}, {})
                         }
                     }
                 } catch (ex: Exception) {

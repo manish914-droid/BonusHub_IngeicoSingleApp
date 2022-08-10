@@ -59,8 +59,11 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
         binding?.linLayPendingTnx?.visibility = View.VISIBLE
         binding?.linLaySearch?.visibility = View.GONE
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -196,8 +199,7 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
                                         EDigiPosPaymentStatus.Pending.desciption -> {
                                             tabledata.txnStatus = statusRespDataList[5]
                                             lifecycleScope.launch(Dispatchers.Main){
-                                               // ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
-                                                (activity as? NavigationActivity)?.getInfoDialog("Error", getString(R.string.txn_status_still_pending) ?: "") {}
+                                                (activity as NavigationActivity).alertBoxWithActionNew("",getString(R.string.txn_status_still_pending),R.drawable.ic_info_orange,"","",false,true,{},{})
                                             }
 
                                         }
@@ -289,16 +291,15 @@ class PendingTxnFragment : Fragment(), IPendingListItemClick {
 
                             } else {
                                 lifecycleScope.launch(Dispatchers.Main) {
-                                    (activity as BaseActivityNew).alertBoxWithAction(
+                                    (activity as BaseActivityNew).alertBoxWithActionNew(
                                         getString(R.string.transaction_failed_msg),
-                                        responseMsg,
-                                        false,
-                                        getString(R.string.positive_button_ok),
+                                        responseMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                        false,true,
                                         { alertPositiveCallback ->
                                             if (alertPositiveCallback) {
                                                 /* DigiPosDataTable.deletRecord(
                                                      field57.split("^").last())*/
-                                                parentFragmentManager.popBackStack()
+//                                                parentFragmentManager.popBackStack()
                                             }
                                         },
                                         {})

@@ -11,12 +11,15 @@ import android.text.TextUtils
 import android.util.Log
 import com.bonushub.crdb.india.BuildConfig
 import com.bonushub.crdb.india.HDFCApplication
+import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.local.*
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.panMasking
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.transactionType2Name
 import com.bonushub.crdb.india.utils.Utility
+import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.view.fragments.digi_pos.DigiPosMenuFragment
 import com.bonushub.crdb.india.view.fragments.pre_auth.PendingPreauthData
 import com.bonushub.crdb.india.vxutils.*
 import com.google.gson.Gson
@@ -25,8 +28,7 @@ import com.usdk.apiservice.aidl.printer.ASCSize
 import com.usdk.apiservice.aidl.printer.AlignMode
 import com.usdk.apiservice.aidl.printer.FactorMode
 import com.usdk.apiservice.aidl.vectorprinter.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -2328,6 +2330,125 @@ class PrintVectorUtil(context: Context?) {
         }
 
     }
+    fun printSMSUPIChagreSlip(
+        digiPosData: DigiPosDataTable,
+        copyType: EPrintCopyType,
+        context: Context?,
+        printerCallback: (Boolean, Int) -> Unit
+    ) {
+        //  printer=null
+        try {
+            var currencySymbol: String? = "Rs"
+            val terminalData = getTptData()
+            currencySymbol = terminalData?.currencySymbol
+
+            printLogo(PrintUtil.DIGI_SMART_HUB_LOGO)
+
+            headerPrinting()
+
+            printSeperator()
+            textBlockList.put(AlignMode.LEFT,"DATE:${digiPosData.txnDate}")
+            textBlockList.put(AlignMode.RIGHT, "TIME:${digiPosData.txnTime}")
+            mixStyleTextPrint(textBlockList)
+            textBlockList.clear()
+
+            sigleLineText("TID:${terminalData?.terminalId}", AlignMode.LEFT, TextSize.SMALL)
+            sigleLineText("Partner Txn Id:${digiPosData.partnerTxnId}", AlignMode.LEFT, TextSize.SMALL)
+            sigleLineText("mTxnId:${digiPosData.mTxnId}", AlignMode.LEFT, TextSize.SMALL)
+            sigleLineText("PgwTxnId:${digiPosData.pgwTxnId}", AlignMode.LEFT, TextSize.SMALL)
+
+
+            printSeperator()
+
+            val str = "Txn Status:${digiPosData.txnStatus}"
+            sigleLineText(
+                str,
+                AlignMode.CENTER , TextSize.NORMAL
+            )
+
+            sigleLineText(
+                "Txn Amount :  $currencySymbol ${digiPosData.amount}",
+                AlignMode.CENTER , TextSize.NORMAL
+            )
+
+            printSeperator()
+
+
+            textBlockList.put(AlignMode.LEFT, "Mob:${digiPosData.customerMobileNumber}")
+            textBlockList.put(AlignMode.RIGHT,"Mode:${digiPosData.paymentMode}")
+            mixStyleTextPrint(textBlockList)
+            textBlockList.clear()
+
+            sigleLineText(copyType.pName, AlignMode.CENTER)
+            sigleLineText(footerText[0], AlignMode.CENTER)
+            sigleLineText(footerText[1], AlignMode.CENTER)
+
+            printLogo("BH.bmp")
+
+            sigleLineText(
+                "App Version :${BuildConfig.VERSION_NAME}",
+                AlignMode.CENTER, TextSize.SMALL
+            )
+
+
+            // start print here
+            vectorPrinter!!.startPrint(object : OnPrintListener.Stub() {
+                @Throws(RemoteException::class)
+                override fun onFinish() {
+                    // outputText("=> onFinish | sheetNo = $curSheetNo")
+                    // println("time cost = + " + (System.currentTimeMillis() - startTime))
+                    println("0onFinish")
+                    if(copyType == EPrintCopyType.MERCHANT) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            showMerchantAlertBox(digiPosData) { a, b ->
+                                printerCallback(a, b)
+                            }
+                        }
+
+                    }else{
+                        printerCallback(true, 0)
+                    }
+                }
+
+                @Throws(RemoteException::class)
+                override fun onStart() {
+                    //  outputText("=> onStart | sheetNo = $curSheetNo")
+                    println("0onStart")
+                }
+
+                @Throws(RemoteException::class)
+                override fun onError(error: Int, errorMsg: String) {
+                    //  outputRedText("=> onError: $errorMsg")
+                    println("0onError")
+                    printerCallback(true, 0)
+                }
+            })
+        } catch (ex: DeadObjectException) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take charge slip from the Report menu."
+            )
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take charge slip from the Report menu."
+            )
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take charge slip from the Report menu."
+            )
+        } finally {
+            //   VFService.connectToVFService(VerifoneApp.appContext)
+        }
+    }
+
 
     fun printSettlementReportupdate(
         context: Context?,
@@ -3323,6 +3444,38 @@ class PrintVectorUtil(context: Context?) {
             )
         } finally {
             //   VFService.connectToVFService(VerifoneApp.appContext)
+        }
+    }
+
+
+    private suspend fun showMerchantAlertBox(
+        digiPosData: DigiPosDataTable,
+        printerCallback: (Boolean, Int) -> Unit
+    ) {
+        withContext(Dispatchers.Main) {
+            (context as BaseActivityNew).alertBoxWithActionNew("",
+                (context as BaseActivityNew).getString(R.string.print_customer_copy),
+                R.drawable.ic_print_customer_copy,
+                (context as BaseActivityNew).getString(R.string.positive_button_yes),
+                (context as BaseActivityNew).getString(R.string.no),
+                true,
+                true,
+                { status ->
+                    (context as BaseActivityNew).showProgress((context as BaseActivityNew).getString(R.string.printing))
+                    this@PrintVectorUtil.printSMSUPIChagreSlip(
+                        digiPosData,
+                        EPrintCopyType.CUSTOMER,
+                        context
+                    ) { printCB, printingFail ->
+                        Log.e("hideProgress", "4")
+                        (context as BaseActivityNew)?.hideProgress()
+                        printerCallback(true, 0)
+                    }
+                },
+                {
+                    printerCallback(true, 0)
+
+                })
         }
     }
 }

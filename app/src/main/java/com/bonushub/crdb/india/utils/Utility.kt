@@ -660,7 +660,7 @@ class Utility @Inject constructor(appDatabase: AppDatabase)  {
                 val imei = DeviceHelper.getImeiNumber()
                 //Have to findout battery level
                 // val batteryStrength = DeviceHelper
-                val simNo = DeviceHelper.getSimNumber()
+                val simNo = DeviceHelper.getSimNumber()?:""
                 Log.e("[1] iemi,battry,simNo", "$imei ,${HDFCApplication.batteryStrength} -----> ${simNo}  ")
                 "~${HDFCApplication.networkStrength}~${HDFCApplication.batteryStrength}~${imei}~${simNo}~${HDFCApplication.operatorName}"
             } catch (ex: java.lang.Exception) {

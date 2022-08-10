@@ -1,5 +1,6 @@
 package com.bonushub.crdb.india.view.fragments.digi_pos
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,11 +11,15 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentUpiCollectBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
+import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +40,7 @@ class UpiCollectFragment : Fragment() {
     var des = ""
 
     var binding:FragmentUpiCollectBinding? = null
+    private var iDialog: IDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +54,8 @@ class UpiCollectFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        iDialog = (activity as NavigationActivity)
+
         transactionType = arguments?.getSerializable("type") as EDashboardItem
         amount = arguments?.getSerializable("amount").toString()
         vpa = arguments?.getSerializable("vpa").toString()
@@ -57,11 +65,12 @@ class UpiCollectFragment : Fragment() {
         binding?.txtViewVpa?.text = vpa
         binding?.txtViewMobile?.text = mobile
 
-
-
-
-        binding?.subHeaderView?.subHeaderText?.text = "UPI COLLECT"
-        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_upi)
+//        binding?.subHeaderView?.subHeaderText?.text = "UPI COLLECT"
+//        binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_upi)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            null, R.drawable.ic_upi,"UPI COLLECT")
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -86,7 +95,8 @@ class UpiCollectFragment : Fragment() {
 
     private fun validateAndSyncRequestToServer(amt: String) {
         if (amount == "") {
-            ToastUtils.showToast(activity,"Please Enter Amount")
+            //ToastUtils.showToast(activity,"Please Enter Amount")
+            iDialog?.alertBoxWithActionNew("",getString(R.string.error_plz_enter_amount),R.drawable.ic_info_orange,"","",false,true,{},{})
             return
         }
         val formattedAmt = "%.2f".format(amount.toFloat())
@@ -111,7 +121,7 @@ class UpiCollectFragment : Fragment() {
     private fun sendReceiveDataFromHost(field57: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
-                (activity as BaseActivityNew).showProgress()
+                iDialog?.showProgress()
             }
             val isSavedTrans = true//transactionType != EDashboardItem.DYNAMIC_QR
 
@@ -120,7 +130,7 @@ class UpiCollectFragment : Fragment() {
                 EnumDigiPosProcessingCode.DIGIPOSPROCODE.code,
                 isSavedTrans
             ) { isSuccess, responseMsg, responsef57, fullResponse ->
-                (activity as BaseActivityNew).hideProgress()
+                iDialog?.hideProgress()
                 try {
 
                     if (isSuccess) {
@@ -138,16 +148,15 @@ class UpiCollectFragment : Fragment() {
                                             msg = getString(R.string.sms_payment_link_sent)
                                         }
 
-                                        (activity as BaseActivityNew).alertBoxWithAction(
+                                        iDialog?.alertBoxWithActionNew(
                                             getString(R.string.sms_upi_pay),
-                                            msg,
-                                            true,
-                                            getString(R.string.positive_button_yes),
+                                            msg, R.drawable.ic_info_orange,"Yes","No",
+                                            true,false,
                                             { status ->
                                                 if (status) {
                                                     lifecycleScope.launch(Dispatchers.IO) {
                                                         withContext(Dispatchers.Main) {
-                                                            (activity as BaseActivityNew).showProgress()
+                                                            iDialog?.showProgress()
                                                         }
                                                         val req57 =
                                                             EnumDigiPosProcess.GET_STATUS.code + "^" + respDataList[1] + "^"
@@ -158,7 +167,7 @@ class UpiCollectFragment : Fragment() {
                                                             false
                                                         ) { isSuccess, responseMsg, responsef57, fullResponse ->
                                                             try {
-                                                                (activity as BaseActivityNew).hideProgress()
+                                                                iDialog?.hideProgress()
                                                                 if (isSuccess) {
                                                                     val statusRespDataList =
                                                                         responsef57.split("^")
@@ -213,10 +222,11 @@ class UpiCollectFragment : Fragment() {
                                                                                 responsef57
                                                                             )
                                                                             lifecycleScope.launch(Dispatchers.Main){
-                                                                                ToastUtils.showToast(
+                                                                                iDialog?.alertBoxWithActionNew("",getString(R.string.txn_status_still_pending),R.drawable.ic_info_orange,"","",false,true,{},{})
+                                                                                /*ToastUtils.showToast(
                                                                                     activity,
                                                                                     getString(R.string.txn_status_still_pending)
-                                                                                )
+                                                                                )*/
 
                                                                                 parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                                                                             }
@@ -233,18 +243,23 @@ class UpiCollectFragment : Fragment() {
                                                                                 responsef57
                                                                             )
                                                                             lifecycleScope.launch(Dispatchers.Main){
-                                                                            (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,"Transaction Approved")
+                                                                           // (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,"Transaction Approved")
+                                                                                iDialog?.alertBoxWithActionNew("",getString(R.string.txn_approved),R.drawable.ic_success_with_star,getString(R.string.ok),"",false,true,{},{})
                                                                             }
                                                                             //txnSuccessToast(activity as Context)
                                                                         // kushal
-                                                                        PrintUtil(context).printSMSUPIChagreSlip(
+                                                                        PrintVectorUtil(context).printSMSUPIChagreSlip(
                                                                                 tabledata,
                                                                                 EPrintCopyType.MERCHANT,
                                                                                 context
                                                                             ) { alertCB, printingFail ->
                                                                                 //context.hideProgress()
-                                                                                if (!alertCB) {
-                                                                                    parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
+
+
+                                                                                if (alertCB) {
+                                                                                    lifecycleScope.launch(Dispatchers.Main) {
+                                                                                        parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0)
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }
@@ -258,13 +273,11 @@ class UpiCollectFragment : Fragment() {
                                                                     lifecycleScope.launch(
                                                                         Dispatchers.Main
                                                                     ) {
-                                                                        (activity as BaseActivityNew).alertBoxWithAction(
-
-
+                                                                        iDialog?.alertBoxWithActionNew(
                                                                             getString(R.string.transaction_failed_msg),
-                                                                            responseMsg,
-                                                                            false,
-                                                                            getString(R.string.positive_button_ok),
+                                                                            responseMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                                                            false,true,
+
                                                                             { alertPositiveCallback ->
                                                                                 if (alertPositiveCallback) {
 
@@ -277,7 +290,7 @@ class UpiCollectFragment : Fragment() {
                                                                                     parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                                                                                 }
                                                                             },
-                                                                            {}, R.drawable.ic_info)
+                                                                            {})
                                                                     }
                                                                 }
 
@@ -298,16 +311,15 @@ class UpiCollectFragment : Fragment() {
                                                 logger(LOG_TAG.DIGIPOS.tag, "--->      $dpObj ")
 
                                                 parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
-                                            }, R.drawable.ic_link_circle)
+                                            })
                                     } else {
                                         // received other than S101(show Fail info dialog here)
                                         withContext(Dispatchers.Main) {
-                                            (activity as BaseActivityNew).alertBoxWithAction(
+                                            iDialog?.alertBoxWithActionNew(
 
                                                 getString(R.string.transaction_failed_msg),
-                                                getString(R.string.transaction_failed_msg),
-                                                false,
-                                                getString(R.string.positive_button_ok),
+                                                getString(R.string.transaction_failed_msg),R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                                false,true,
                                                 { alertPositiveCallback ->
                                                     if (alertPositiveCallback) {
                                                         Field48ResponseTimestamp.deleteDigiposData(
@@ -317,7 +329,7 @@ class UpiCollectFragment : Fragment() {
                                                         parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                                                     }
                                                 },
-                                                {}, R.drawable.ic_info)
+                                                {})
                                         }
 
                                     }
@@ -374,7 +386,8 @@ class UpiCollectFragment : Fragment() {
                         }
                     } else {
                         lifecycleScope.launch(Dispatchers.Main){
-                            ToastUtils.showToast(activity, responseMsg)
+                            //ToastUtils.showToast(activity, responseMsg)
+                            iDialog?.alertBoxWithActionNew("",responseMsg,R.drawable.ic_info_orange,"","",false,true,{},{})
                         }
 
                     }

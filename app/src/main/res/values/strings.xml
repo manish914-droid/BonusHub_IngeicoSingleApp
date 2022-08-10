@@ -376,4 +376,11 @@
     <string name="card_msg_swipe">Please Swipe Card</string>
     <string name="card_msg_insert">Please Insert Card</string>
 
+    <!--error msg-->
+    <string name="error_plz_enter_amount">Please Enter Amount</string>
+    <string name="error_enter_vap">Enter Valid VPA</string>
+    <string name="error_enter_mobile">Enter Valid Mobile Number</string>
+
+    <string name="txn_approved">Transaction Approved</string>
+
 </resources>

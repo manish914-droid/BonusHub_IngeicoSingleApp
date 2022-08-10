@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,7 +8,7 @@
     android:fillViewport="true"
     tools:context=".view.fragments.digi_pos.UpiSmsDynamicPayQrInputDetailFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -15,182 +16,140 @@
         <include
             android:id="@+id/sub_header_view"
             layout="@layout/sub_header_layout"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <!--Enter Amount-->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/enter_amount_crd_view"
+            style="@style/TextInputEditText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_amount"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
 
-            <!--Enter Amount-->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/enter_amount_crd_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone"
-              >
-
-
-                <com.bonushub.crdb.india.vxutils.AmountEditText
-                    android:id="@+id/amount_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/edge_blue_bg_white"
-                    android:drawableStart="@drawable/ic_rupay_circle"
-                    android:drawablePadding="@dimen/pad_16"
-                    android:ems="10"
-                    android:fontFamily="@font/muli_regular"
-                    android:gravity="start|center_vertical"
-                    android:hint="@string/enter_amount"
-                    android:imeOptions="actionDone"
-                    android:inputType="number"
-                    android:lines="1"
-                    android:maxLength="11"
-                    android:padding="@dimen/pad_16"
-                    android:textColor="@color/txt_color"
-                    android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_regular" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <!--VPA-->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/vpa_crd_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone"
-                >
-
-                <EditText
-                    android:id="@+id/vpa_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/edge_blue_bg_white"
-                    android:drawableLeft="@drawable/ic_vpa"
-                    android:drawablePadding="@dimen/pad_16"
-                    android:ems="10"
-                    android:fontFamily="@font/muli_regular"
-                    android:gravity="start|center_vertical"
-                    android:hint="@string/vpa"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:lines="1"
-
-                    android:padding="@dimen/pad_16"
-                    android:textColor="@color/txt_color"
-                    android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_regular" />
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <!--Mobile NUMBER-->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mobile_number_crd_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone"
-               >
-
-                <EditText
-                    android:id="@+id/mobile_number_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/edge_blue_bg_white"
-                    android:drawableStart="@drawable/ic_mobile"
-                    android:drawablePadding="@dimen/pad_16"
-                    android:ems="10"
-                    android:fontFamily="@font/muli_regular"
-                    android:gravity="start|center_vertical"
-                    android:hint="ENTER MOBILE NUMBER"
-                    android:imeOptions="actionDone"
-                    android:inputType="number"
-                    android:lines="1"
-                    android:maxLength="10"
-                    android:padding="@dimen/pad_16"
-                    android:textColor="@color/txt_color"
-                    android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_regular" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!--ENTER DESCRIPTION (OPTIONAL)-->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/enter_description_crd_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:layout_marginStart="@dimen/pad_16"
-                android:layout_marginEnd="@dimen/pad_16"
-                android:theme="@style/Theme.MaterialComponents.Light"
-                android:visibility="gone"
-              >
-
-                <EditText
-                    android:id="@+id/enter_description_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/edge_blue_bg_white"
-                    android:drawableStart="@drawable/ic_description"
-                    android:drawablePadding="@dimen/pad_16"
-                    android:ems="10"
-                    android:fontFamily="@font/muli_regular"
-                    android:gravity="start|center_vertical"
-                    android:hint="ENTER DESCRIPTION (OPTIONAL)"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:maxLines="4"
-                    android:maxLength="20"
-                    android:padding="@dimen/pad_16"
-                    android:textColor="@color/txt_color"
-                    android:textColorHint="@color/colorGrey"
-                    android:textSize="@dimen/text_size_regular" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <TextView
-                android:id="@+id/btnProceed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:background="@drawable/edge_button_blue"
-                android:drawablePadding="10dp"
-                android:fontFamily="@font/muli_regular"
-                android:gravity="center"
-                android:paddingStart="30dp"
-                android:paddingTop="9dp"
-                android:paddingEnd="30dp"
-                android:paddingBottom="9dp"
-                android:text="Proceed"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_small"
-                android:layout_gravity="center_horizontal"/>
-
-            <!--<LinearLayout
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/amount_et"
+                style="@style/TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="bottom">
+                android:drawableStart="@drawable/ic_rupay_circle"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:maxLength="11"
+                android:padding="@dimen/pad_8" />
 
-                <include
-                    android:id="@+id/main_keyBoard"
-                    layout="@layout/new_enter_amount_keyboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/pad_5"
-                    android:visibility="visible" />
-            </LinearLayout>-->
-        </LinearLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
+        <!--VPA-->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/vpa_crd_view"
+            style="@style/TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/vpa"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/enter_amount_crd_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/vpa_et"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_vpa"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:padding="@dimen/pad_8" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <!--Mobile NUMBER-->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/mobile_number_crd_view"
+            style="@style/TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginRight="@dimen/pad_20"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/vpa_crd_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/mobile_number_et"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_mobile"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:maxLength="10"
+                android:padding="@dimen/pad_8" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--ENTER DESCRIPTION (OPTIONAL)-->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/enter_description_crd_view"
+            style="@style/TextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/pad_20"
+            android:layout_marginTop="@dimen/pad_10"
+            android:layout_marginRight="@dimen/pad_20"
+            android:hint="@string/enter_description_optional"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mobile_number_crd_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/enter_description_et"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_description"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLength="20"
+                android:maxLines="4"
+                android:padding="@dimen/pad_8" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <TextView
+            android:id="@+id/btnProceed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pad_20"
+            android:background="@drawable/edge_blue3"
+            android:fontFamily="@font/muli_regular"
+            android:maxLines="1"
+            android:paddingStart="@dimen/pad_30"
+            android:paddingTop="@dimen/pad_15"
+            android:paddingEnd="@dimen/pad_30"
+            android:paddingBottom="@dimen/pad_15"
+            android:text="Proceed"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_medium"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/enter_description_crd_view" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>

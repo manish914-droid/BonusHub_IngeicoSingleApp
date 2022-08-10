@@ -15,6 +15,7 @@ import com.bonushub.crdb.india.model.local.DigiPosDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
@@ -45,8 +46,10 @@ class SearchTxnFragment : Fragment() {
         binding?.linLayPendingTnx?.visibility = View.GONE
         binding?.linLaySearch?.visibility = View.VISIBLE
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -85,7 +88,9 @@ class SearchTxnFragment : Fragment() {
             //  (context as childFragmentManager).getTxnStatus()
             checkTxnStatus(txn_id_String)
         } else
-            (activity as BaseActivityNew).showToast("NO Txn ID")
+        {//  (activity as BaseActivityNew).showToast("NO Txn ID")
+        (activity as BaseActivityNew).alertBoxWithActionNew("","NO Txn ID",R.drawable.ic_info_orange,"","",false,true,{},{})
+        }
 
     }
 
@@ -131,11 +136,10 @@ class SearchTxnFragment : Fragment() {
                             ex.printStackTrace()
 
                             lifecycleScope.launch(Dispatchers.Main){
-                                (activity as BaseActivityNew).alertBoxWithAction(
+                                (activity as BaseActivityNew).alertBoxWithActionNew(
                                     getString(R.string.failed),
-                                    statusRespDataList[1],
-                                    false,
-                                    getString(R.string.positive_button_ok),
+                                    statusRespDataList[1],R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                    false,true,
                                     { alertPositiveCallback ->
                                         if (alertPositiveCallback) {
                                             //parentFragmentManager.popBackStack()
@@ -150,15 +154,14 @@ class SearchTxnFragment : Fragment() {
                     }
                     else {
                         lifecycleScope.launch(Dispatchers.Main) {
-                            (activity as BaseActivityNew).alertBoxWithAction(
+                            (activity as BaseActivityNew).alertBoxWithActionNew(
                                 getString(R.string.failed),
-                                responseMsg,
-                                false,
-                                getString(R.string.positive_button_ok),
+                                responseMsg,R.drawable.ic_info_orange,getString(R.string.positive_button_ok),"",
+                                false,true,
                                 { alertPositiveCallback ->
                                     if (alertPositiveCallback) {
                                         //parentFragmentManager.popBackStack()
-                                        parentFragmentManager.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
+//                                        parentFragmentManager?.popBackStack(DigiPosMenuFragment::class.java.simpleName, 0);
                                     }
                                 },
                                 {})

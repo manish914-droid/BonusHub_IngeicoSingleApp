@@ -15,6 +15,8 @@ import com.bonushub.crdb.india.utils.BitmapUtils.convertCompressedByteArrayToBit
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
+import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import kotlinx.coroutines.Dispatchers
@@ -56,8 +58,10 @@ class QrFragment : Fragment() {
             ex.printStackTrace()
         }
 
-        binding?.subHeaderView?.subHeaderText?.text = transactionType.title
-        binding?.subHeaderView?.headerImage?.setImageResource(transactionType.res)
+        (activity as NavigationActivity).manageTopToolBar(false)
+        refreshSubToolbarLogos(
+            this,
+            transactionType)
 
         binding?.subHeaderView?.backImageButton?.setOnClickListener {
             try {
@@ -169,7 +173,8 @@ class QrFragment : Fragment() {
                                                 )
                                                 Log.e("F56->>", responsef57)
                                                 lifecycleScope.launch(Dispatchers.Main){
-                                                ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                               // ToastUtils.showToast(requireContext(),getString(R.string.txn_status_still_pending))
+                                                    (activity as BaseActivityNew).alertBoxWithActionNew("",getString(R.string.txn_status_still_pending),R.drawable.ic_info_orange,"","",false,true,{},{})
                                                 }
                                                 lifecycleScope.launch(Dispatchers.Main) {
 //                                                    parentFragmentManager.popBackStack(
@@ -191,17 +196,18 @@ class QrFragment : Fragment() {
                                                 Log.e("F56->>", responsef57)
 
                                                 lifecycleScope.launch(Dispatchers.Main){
-                                                (activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,"Transaction Approved")
-                                                    }
+                                                //(activity as BaseActivityNew).alertBoxMsgWithIconOnly(R.drawable.ic_tick_green,"Transaction Approved")
+                                                    (activity as BaseActivityNew).alertBoxWithActionNew("",getString(R.string.txn_approved),R.drawable.ic_success_with_star,getString(R.string.ok),"",false,true,{},{})
+                                                }
                                                 //txnSuccessToast(activity as Context)
                                                 // kushal
-                                                PrintUtil(context).printSMSUPIChagreSlip(
+                                                PrintVectorUtil(context).printSMSUPIChagreSlip(
                                                     tabledata,
                                                     EPrintCopyType.MERCHANT,
                                                     context
                                                 ) { alertCB, printingFail ->
                                                     //context.hideProgress()
-                                                    if (!alertCB) {
+                                                    if (alertCB) {
                                                         lifecycleScope.launch(Dispatchers.Main) {
                                                             parentFragmentManager.popBackStack(
                                                                 DigiPosMenuFragment::class.java.simpleName,
@@ -218,7 +224,8 @@ class QrFragment : Fragment() {
                                                     tabledata.partnerTxnId
                                                 )
                                                 lifecycleScope.launch(Dispatchers.Main){
-                                                ToastUtils.showToast(requireContext(),statusRespDataList[5])
+                                               // ToastUtils.showToast(requireContext(),statusRespDataList[5])
+                                                    (activity as BaseActivityNew).alertBoxWithActionNew("",statusRespDataList[5],R.drawable.ic_info_orange,"","",false,true,{},{})
                                                 }
 
                                             }
@@ -229,11 +236,10 @@ class QrFragment : Fragment() {
                                         lifecycleScope.launch(
                                             Dispatchers.Main
                                         ) {
-                                            (activity as BaseActivityNew).alertBoxWithAction(
+                                            (activity as BaseActivityNew).alertBoxWithActionNew(
                                                 getString(R.string.transaction_failed_msg),
-                                                statusRespDataList[1],
-                                                false,
-                                                getString(R.string.positive_button_ok),
+                                                statusRespDataList[1],R.drawable.ic_info_orange, getString(R.string.positive_button_ok),"",
+                                                false,true,
                                                 { alertPositiveCallback ->
                                                     if (alertPositiveCallback) {
                                                         deleteDigiposData(
@@ -253,11 +259,10 @@ class QrFragment : Fragment() {
                                     lifecycleScope.launch(
                                         Dispatchers.Main
                                     ) {
-                                        (activity as BaseActivityNew).alertBoxWithAction(
+                                        (activity as BaseActivityNew).alertBoxWithActionNew(
                                             getString(R.string.transaction_failed_msg),
-                                            responseMsg,
-                                            false,
-                                            getString(R.string.positive_button_ok),
+                                            responseMsg,R.drawable.ic_info_orange, getString(R.string.positive_button_ok), "",
+                                            false,true,
                                             { alertPositiveCallback ->
                                                 if (alertPositiveCallback) {
                                                     deleteDigiposData(

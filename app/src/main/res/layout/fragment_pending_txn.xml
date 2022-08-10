@@ -80,7 +80,7 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <com.google.android.material.card.MaterialCardView
+           <!-- <com.google.android.material.card.MaterialCardView
                 android:id="@+id/enter_description_crd_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -107,7 +107,31 @@
                     android:textColor="@color/txt_color"
                     android:textColorHint="@color/colorGrey"
                     android:textSize="@dimen/text_size_regular" />
-            </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>-->
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/enter_description_crd_view"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="SEARCH"
+                android:layout_marginTop="@dimen/pad_10">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txnIdSearchET"
+                    style="@style/TextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:drawableStart="@drawable/ic_search_24"
+                    android:drawableTint="@color/themeBackground"
+                    android:maxLength="30"
+                    android:singleLine="true"
+                    android:lines="1"
+                    android:padding="@dimen/pad_8"
+                    android:inputType="text"
+                    android:imeOptions="actionDone" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/btnSearch"
