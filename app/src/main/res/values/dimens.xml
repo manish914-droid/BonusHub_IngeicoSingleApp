@@ -6,14 +6,17 @@
     <dimen name="pad_6">6dp</dimen>
 
     <dimen name="pad_20">20dp</dimen>
+    <dimen name="otp_size">29dp</dimen>
     <dimen name="key_text_size">24sp</dimen>
     <dimen name="pad_8">8dp</dimen>
     <dimen name="pad_16">16dp</dimen>
     <dimen name="pad_24">24dp</dimen>
     <dimen name="pad_32">32dp</dimen>
+
     <dimen name="width_drawer">280dp</dimen>
 
     <dimen name="small_btn_size">40dp</dimen>
+    <dimen name="text_size_OR">28sp</dimen>
 
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_xsmall">12sp</dimen>
@@ -46,6 +49,7 @@
     <dimen name="font_size_normal">20sp</dimen>
     <dimen name="font_size_larger">25sp</dimen>
     <dimen name="font_size_small">17sp</dimen>
+    <dimen name="font_size_16_sp">16sp</dimen>
     <dimen name="pad_40">40dp</dimen>
     <dimen name="pad_36">36dp</dimen>
 

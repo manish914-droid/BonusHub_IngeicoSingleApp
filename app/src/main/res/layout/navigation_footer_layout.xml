@@ -268,6 +268,47 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/ttc_cardviw"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardSettlement"
+        app:cardElevation="@dimen/pad_10"
+        app:cardCornerRadius="@dimen/pad_5"
+        android:layout_marginStart="@dimen/pad_20"
+        android:layout_marginEnd="@dimen/pad_20"
+        android:layout_marginTop="@dimen/pad_10"
+        app:rippleColor="@android:color/transparent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <Switch
+                android:id="@+id/tts_switch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Text to speech"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/txt_color"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="@dimen/pad_10"
+                app:layout_constraintStart_toStartOf="parent"
+                android:fontFamily="@font/muli_semi_bold" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
     <View
         android:id="@+id/viewLine"
         android:layout_width="match_parent"

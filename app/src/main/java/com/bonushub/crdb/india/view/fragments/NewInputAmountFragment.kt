@@ -35,6 +35,7 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.isTipEnable
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.maxAmountLimitDialog
 import com.bonushub.crdb.india.view.activity.IFragmentRequest
 import com.bonushub.crdb.india.view.activity.NavigationActivity
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.crdb.india.viewmodel.NewInputAmountViewModel
 import com.bonushub.crdb.india.vxutils.BhTransactionType
@@ -50,7 +51,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
-class NewInputAmountFragment : Fragment() {
+class NewInputAmountFragment : Fragment()/*,TextToSpeech.OnInitListener*/ {
+
+
+
+    /*private lateinit var speechtext: TextToSpeech*/
 
     /** need to use Hilt for instance initializing here..*/
     private val remoteService: RemoteService = RemoteService()
@@ -110,6 +115,34 @@ class NewInputAmountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+       // speechtext = TextToSpeech(activity, this)
+
+
+        /* binding.tipAmt.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus)
+                speaktiphint()
+            /*else
+                hideSomething()*/
+        }
+
+        binding.etInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus)
+                speakhint()
+            /*else
+                hideSomething()*/
+        }*/
+
+       /* binding?.saleAmtCrdView?.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus)
+                speaktiphint()
+            *//*else
+                    hideSomething()*//*
+        }*/
+
+
+
+
         eDashBoardItem = (arguments?.getSerializable("type")) as EDashboardItem
         newInputAmountViewModel = ViewModelProvider(this).get(NewInputAmountViewModel::class.java)
         brandEmiSubCatData =
@@ -270,6 +303,8 @@ class NewInputAmountFragment : Fragment() {
             inputInMobilenumber = false
 
             setFocusColor(binding?.saleAmtCrdView)
+
+            (activity as BaseActivityNew).speakText("Please enter amount")
         }
 
         binding?.cashAmount?.setOnClickListener {
@@ -388,6 +423,7 @@ class NewInputAmountFragment : Fragment() {
     {
         binding?.saleAmount?.addTextChangedListener {
             changeEditTextBackground(binding?.saleAmount,binding?.saleAmtCrdView)
+            //speaktiphint()
         }
 
         binding?.cashAmount?.addTextChangedListener {
@@ -826,6 +862,10 @@ class NewInputAmountFragment : Fragment() {
         Pair(saleAmount.toString().trim(), "0")
     )
 
+
+
+
+
 }
             EDashboardItem.EMI_ENQUIRY -> {
                 if (tpt?.bankEnquiryMobNumberEntry == true) {
@@ -1222,4 +1262,5 @@ class NewInputAmountFragment : Fragment() {
 
         Utility().hideSoftKeyboard(activity!!)
     }
+
 }

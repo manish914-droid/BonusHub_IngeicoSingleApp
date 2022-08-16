@@ -15,6 +15,8 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.utils.refreshSubToolbarLogos
 import com.bonushub.crdb.india.view.activity.NavigationActivity
+import com.bonushub.crdb.india.view.fragments.EmiCardAndCardLessFragment
+import com.bonushub.crdb.india.view.fragments.PayLaterFragment
 
 
 class PreAuthFragment : Fragment() {
@@ -48,6 +50,13 @@ class PreAuthFragment : Fragment() {
         (activity as NavigationActivity).manageTopToolBar(false)
         /*binding?.subHeaderView?.subHeaderText?.text = "PRE-AUTH"
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_preauth_new)*/
+
+        binding?.subHeaderView?.subHeaderText?.setOnClickListener {
+            (activity as NavigationActivity).transactFragment(EmiCardAndCardLessFragment().apply {
+
+            }, isBackStackAdded = true)
+        }
+
         refreshSubToolbarLogos(this,null,R.drawable.ic_preauth_new, "PRE-AUTH")
 
         binding?.rvPerAuthCategory?.apply{

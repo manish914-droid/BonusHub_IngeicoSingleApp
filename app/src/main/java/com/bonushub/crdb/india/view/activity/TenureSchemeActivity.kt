@@ -2,6 +2,7 @@ package com.bonushub.crdb.india.view.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentTenureSchemeBinding
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.remote.BankEMIIssuerTAndCDataModal
 import com.bonushub.crdb.india.model.remote.BankEMITenureDataModal
 import com.bonushub.crdb.india.model.remote.TenuresWithIssuerTncs
@@ -42,6 +44,8 @@ class TenureSchemeActivity : BaseActivityNew() {
 
     @Inject
    lateinit var serverRepository: ServerRepository
+
+    /*private lateinit var speechtext: TextToSpeech*/
 
     private lateinit var tenureSchemeViewModel: TenureSchemeViewModel
     var binding: FragmentTenureSchemeBinding? = null
@@ -92,6 +96,9 @@ private val emiIssuerTAndCDataFromIntent by lazy {
         setContentView(binding?.root)
 
         refreshToolbarLogos(this)
+
+        /*speechtext = TextToSpeech(this , this)*/
+
 
         // txtViewIssuerName imgViewIssuerIcon
         cardProcessedDataModal = intent?.getSerializableExtra("cardProcessedData") as? CardProcessedDataModal?
@@ -280,6 +287,9 @@ private val emiIssuerTAndCDataFromIntent by lazy {
 
     //region=========================SetUp RecyclerView Data:-
     private fun setUpRecyclerView() {
+
+        speakText("Please select the Tenure")
+
             binding?.emiSchemeOfferRV?.apply {
                 layoutManager = LinearLayoutManager(context)
                 itemAnimator = DefaultItemAnimator()

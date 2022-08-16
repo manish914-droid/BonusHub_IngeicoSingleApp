@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pay_later_backgroind_theme"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".view.fragments.PayLaterFragment">
+
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+<com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/pad_15"
+    android:layout_marginEnd="@dimen/pad_15"
+    app:cardCornerRadius="@dimen/pad_10"
+    app:cardElevation="@dimen/pad_10"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pay_later_background">
+
+
+
+        <TextView
+            android:id="@+id/pay_ltr_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/would_you_like_to_register_for_following_products"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_xregular"
+            android:fontFamily="@font/muli_bold"
+            android:textColor="@color/txt_color_blue"
+            android:layout_marginTop="@dimen/pad_30"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/pay_ltr2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pay_later"
+            android:layout_marginTop="@dimen/pad_20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pay_ltr_msg"/>
+
+        <TextView
+            android:id="@+id/py_ltr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pay_later"
+            android:textSize="@dimen/pad_15"
+            android:gravity="center"
+            android:fontFamily="@font/muli_bold"
+            android:textColor="@color/text_color_line1"
+            android:layout_marginTop="@dimen/pad_10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pay_ltr2"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/pay_latr_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/pad_10"
+            app:cardElevation="@dimen/pad_5"
+            app:rippleColor="@color/colorAccent"
+            android:layout_marginStart="@dimen/pad_40"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginBottom="@dimen/pad_30"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/py_ltr">
+
+            <TextView
+                android:layout_width="@dimen/pad_100"
+                android:layout_height="@dimen/pad_40"
+                android:text="@string/no"
+                android:gravity="center"
+                android:textSize="@dimen/pad_20"
+                android:textColor="@color/txt_color"
+                android:background="@drawable/pay_later_no_button"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/pay_latr_yes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardElevation="@dimen/pad_5"
+            app:rippleColor="@color/background"
+            app:cardCornerRadius="@dimen/pad_10"
+            android:checkable="true"
+            android:layout_marginEnd="@dimen/pad_40"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/pay_latr_no"
+            app:layout_constraintTop_toTopOf="@+id/pay_latr_no">
+
+            <TextView
+                android:layout_width="@dimen/pad_100"
+                android:layout_height="@dimen/pad_40"
+                android:text="@string/yes"
+                android:gravity="center"
+                android:textSize="@dimen/pad_20"
+                android:textColor="@color/white"
+                android:background="@drawable/pay_later_yes_button"/>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>
+
+
+  <!--  <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pay_later_background"
+        android:layout_marginStart="@dimen/pad_15"
+        android:layout_marginEnd="@dimen/pad_15"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <TextView
+            android:id="@+id/pay_ltr_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/would_you_like_to_register_for_following_products"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_xregular"
+            android:fontFamily="@font/muli_bold"
+            android:textColor="@color/txt_color_blue"
+            android:layout_marginTop="@dimen/pad_30"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/pay_ltr2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pay_later"
+            android:layout_marginTop="@dimen/pad_20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pay_ltr_msg"/>
+
+        <TextView
+            android:id="@+id/py_ltr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pay_later"
+            android:textSize="@dimen/pad_15"
+            android:gravity="center"
+            android:fontFamily="@font/muli_bold"
+            android:textColor="@color/text_color_line1"
+            android:layout_marginTop="@dimen/pad_10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pay_ltr2"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/pay_latr_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/pad_10"
+            app:cardElevation="@dimen/pad_10"
+            app:rippleColor="@color/colorAccent"
+            android:layout_marginStart="@dimen/pad_40"
+            android:layout_marginTop="@dimen/pad_20"
+            android:layout_marginBottom="@dimen/pad_30"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/py_ltr">
+
+            <TextView
+                android:layout_width="@dimen/pad_100"
+                android:layout_height="@dimen/pad_40"
+                android:text="@string/no"
+                android:gravity="center"
+                android:textSize="@dimen/pad_20"
+                android:textColor="@color/txt_color"
+                android:background="@drawable/pay_later_no_button"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/pay_latr_yes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardElevation="@dimen/pad_10"
+            app:rippleColor="@color/background"
+            app:cardCornerRadius="@dimen/pad_10"
+            android:checkable="true"
+            android:layout_marginEnd="@dimen/pad_40"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/pay_latr_no"
+            app:layout_constraintTop_toTopOf="@+id/pay_latr_no">
+
+            <TextView
+            android:layout_width="@dimen/pad_100"
+            android:layout_height="@dimen/pad_40"
+            android:text="@string/yes"
+            android:gravity="center"
+            android:textSize="@dimen/pad_20"
+            android:textColor="@color/white"
+            android:background="@drawable/pay_later_yes_button"/>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

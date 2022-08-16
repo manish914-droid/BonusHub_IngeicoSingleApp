@@ -19,6 +19,7 @@ import com.bonushub.crdb.india.MainActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.entity.CardOption
 import com.bonushub.crdb.india.model.CardProcessedDataModal
+import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.transactionprocess.CompleteSecondGenAc
 import com.bonushub.crdb.india.transactionprocess.SecondGenAcOnNetworkError
 import com.bonushub.crdb.india.type.DemoConfigs
@@ -1030,6 +1031,9 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
     // CVM rule
     @Throws(RemoteException::class)
     open fun doCardHolderVerify(cvm: CVMMethod) {
+
+        (activity as BaseActivityNew).speakText("Please enter your pin")
+
         println("=> onCardHolderVerify | " + EMVInfoUtil.getCVMDataDesc(cvm))
         val param = Bundle()
         //optional Pin Block format by default its 0
@@ -1270,7 +1274,12 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                         )
                     )
                 )
+                /*if(AppPreference.isTTSon())
+                {
+                    (activity as BaseActivityNew).speakText("Please enter your pin")
+                }*/
                 pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+
             }
 
             else -> {

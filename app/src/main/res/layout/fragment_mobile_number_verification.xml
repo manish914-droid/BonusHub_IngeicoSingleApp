@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".view.fragments.MobileNumberVerification">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/mobile_txt_crdvw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/registered_mobile_number"
+        style="@style/TextInputEditTextAmount"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/mob_txt_viw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="19dp"
+            android:fontFamily="@font/muli_regular"
+            android:gravity="center"
+
+
+            android:textAlignment="center"
+            android:inputType="number"
+            android:textIsSelectable="false"
+            android:cursorVisible="false"
+
+            android:singleLine="false"
+            android:maxLength="10"
+            android:drawableStart="@drawable/ic_mobile_img"
+            android:padding="@dimen/pad_10" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+   <!-- <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/mobile_txtvw"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_50"
+        android:hint="@string/registered_mobile_number"
+        android:textSize="19sp"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
+        android:inputType="phone"
+        android:maxLength="10"
+        android:textAlignment="gravity"
+        android:drawableStart="@drawable/ic_mobile_img"
+        android:background="@drawable/set_mobile_number_corner"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_24"
+        android:padding="@dimen/pad_10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view"/>-->
+
+    <TextView
+        android:id="@+id/mobile_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:fontFamily="@string/pay_later"
+        android:textSize="@dimen/pad_14"
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mobile_txt_crdvw"/>
+
+    <TextView
+        android:id="@+id/mob_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_24"
+        android:background="@drawable/mobile_num_warning_background"
+        android:text="@string/registered_mobile_number_hint"
+        android:textSize="@dimen/pad_14"
+        android:fontFamily="@font/muli_regular"
+        android:textColor="@color/pay_later_backgroind_theme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mobile_txt_crdvw"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/verify_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:rippleColor="@color/background"
+        app:cardElevation="@dimen/pad_5"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginTop="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mob_warning">
+
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_50"
+        android:text="@string/verify_next"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="@dimen/pad_20"
+        android:fontFamily="@font/muli_regular"
+        android:background="@drawable/pay_later_proced_set"/>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -656,12 +656,10 @@ class PrintVectorUtil(context: Context?) {
                             sigleLineText("SIGNATURE NOT REQUIRED", AlignMode.CENTER, TextSize.NORMAL)
                         } else {
                             sigleLineText("SIGN ...................", AlignMode.CENTER, TextSize.SMALL)
-                            sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                         }
 
 
-                        Log.e("HolderName",""+batchTable.cardHolderName)
-                        batchTable.cardHolderName?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL) }
+                        batchTable.cardHolderName?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL) }
                     }
 
                     try {
@@ -681,7 +679,6 @@ class PrintVectorUtil(context: Context?) {
                         ex.printStackTrace()
                     }
 
-                    sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                     sigleLineText(copyType.pName, AlignMode.CENTER)
                     sigleLineText("", AlignMode.CENTER,TextSize.TINY)
                     sigleLineText(footerText[0], AlignMode.CENTER)
@@ -818,36 +815,36 @@ class PrintVectorUtil(context: Context?) {
             hdfcTpt = Field48ResponseTimestamp.getHDFCTptData()
         }
 
-        if (logo == AMEX_BANK_CODE_SINGLE_DIGIT || logo == AppPreference.AMEX_BANK_CODE) {
-            setLogoAndHeader(AMEX_LOGO)
+        val logo = if (logo == AMEX_BANK_CODE_SINGLE_DIGIT || logo == AppPreference.AMEX_BANK_CODE) {
+            AMEX_LOGO
         } else {
-            setLogoAndHeader(HDFC_LOGO)
+            HDFC_LOGO
         }
 
-        //setLogoAndHeader(logo)
+        setLogoAndHeader(logo)
 
         if (logo == AMEX_BANK_CODE_SINGLE_DIGIT || logo == AppPreference.AMEX_BANK_CODE) {
             tpt?.receiptHeaderOne?.let {
-                sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false)
+                sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false)
             }
-            tpt?.receiptHeaderTwo?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
-            tpt?.receiptHeaderThree?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+            tpt?.receiptHeaderTwo?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+            tpt?.receiptHeaderThree?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
         } else {
             if (null != hdfcTpt && hdfcTpt?.defaultMerchantName?.isNotBlank() ?: false && hdfcTpt?.defaultMerchantName?.isNotEmpty() ?: false) {
                 hdfcTpt?.defaultMerchantName?.trim()
-                    ?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                    ?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
             } else {
-                tpt?.receiptHeaderOne?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                tpt?.receiptHeaderOne?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
             }
             if (null != hdfcTpt && hdfcTpt?.receiptL2?.isNotBlank() ?: false && hdfcTpt?.receiptL2?.isNotEmpty() ?: false) {
-                hdfcTpt?.receiptL2?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                hdfcTpt?.receiptL2?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
             } else {
-                tpt?.receiptHeaderTwo?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                tpt?.receiptHeaderTwo?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
             }
             if (null != hdfcTpt && hdfcTpt?.receiptL3?.isNotBlank() ?: false && hdfcTpt?.receiptL3?.isNotEmpty() ?: false) {
-                hdfcTpt?.receiptL3?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                hdfcTpt?.receiptL3?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
             } else {
-                tpt?.receiptHeaderThree?.let { sigleLineText(it.trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                tpt?.receiptHeaderThree?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
             }
         }
 
@@ -1016,25 +1013,16 @@ class PrintVectorUtil(context: Context?) {
 //            totalAmount = "%.2f".format((amt.toDouble() ))
         } else {
             if(batchTable.transactionType == BhTransactionType.SALE_WITH_CASH.type){ // kushal
-                val saleAmount=(((receiptDetail.baseAmmount)?.toLong())?.div(100))
-                val cashAmount=(((receiptDetail.cashBackAmount)?.toLong())?.div(100))
-                val totalAmountNew=(((receiptDetail.totalAmmount)?.toLong())?.div(100))
+//                val amt1=(((receiptDetail.totalAmmount)?.toLong())?.div(100))
 //                val otherAmt1=(((receiptDetail.otherAmount)?.toLong())?.div(100))
 //                val saleAmount= otherAmt1?.let { amt1?.minus(it) }
-
-                textBlockList.put(AlignMode.LEFT, "SALE AMOUNT:")
-                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(saleAmount?.toDouble())}")
-                mixStyleTextPrint(textBlockList)
-                textBlockList.clear()
+//                textBlockList.add(sigleLineformat("SALE AMOUNT:", AlignMode.LEFT))
+//                textBlockList.add(sigleLineformat("$currencySymbol :${"%.2f".format(saleAmount?.toDouble())}", AlignMode.RIGHT))
+//                printer?.addMixStyleText(textBlockList)
+//                textBlockList.clear()
 
                 textBlockList.put(AlignMode.LEFT, "CASH WITHDRAWN AMT: ")
-                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(cashAmount?.toDouble())}",)
-                mixStyleTextPrint(textBlockList,TextSize.SMALL, true)
-                textBlockList.clear()
-
-
-                textBlockList.put(AlignMode.LEFT, "TOTAl AMOUNT: ")
-                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(totalAmountNew?.toDouble())}",)
+                textBlockList.put(AlignMode.RIGHT, "$currencySymbol:${"%.2f".format(tipAmount?.toDouble())}",)
                 mixStyleTextPrint(textBlockList,TextSize.SMALL, true)
                 textBlockList.clear()
                 totalAmount = "%.2f".format((amt.toDouble())).toString()
@@ -2259,6 +2247,464 @@ class PrintVectorUtil(context: Context?) {
 
     }
 
+    fun printDetailReportupdate2(
+        batch: MutableList<TempBatchFileDataTable>,
+        context: Context?,
+        printCB: (Boolean) -> Unit
+    ) {
+        try {
+            var isFirstTimeForAmxLogo = true
+            val pp = vectorPrinter?.status
+            Log.e("Printer Status", pp.toString())
+            if (pp == 0) {
+
+                val appVersion = BuildConfig.VERSION_NAME
+                val tpt = getTptData()
+                batch.sortBy { it.tid }
+
+                if (batch.isEmpty()) {
+                    // alignLeftRightText(textInLineFormatBundle, "MID : ${tpt?.merchantId}", "TID : ${tpt?.terminalId}")
+                }
+                else {
+                    //-----------------------------------------------
+                    // setLogoAndHeader() // handel in headerPrintiong methid
+                    /*  receiptDetail.merAddHeader1?.let { sigleLineText(it, AlignMode.CENTER) }
+                      receiptDetail.merAddHeader2?.let { sigleLineText(it, AlignMode.CENTER) }*/
+//                    val ingtpt=getInitdataList()
+//                    val header1= ingtpt?.merAddHeader1
+//                    val header2=ingtpt?.merAddHeader2
+//                    val merchantName=ingtpt?.merchantName.toString().trim()
+//
+//                    sigleLineText(merchantName, AlignMode.CENTER)
+//                    sigleLineText(hexString2String(header1?:"").trim(), AlignMode.CENTER)
+//                    sigleLineText(hexString2String(header2?:"").trim(), AlignMode.CENTER)
+
+                    // headerPrinting()
+                    val isHdfcPresent = batch.find{ it.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT) || it.hostBankID.equals(HDFC_BANK_CODE)}
+                    val isAmexPresent = batch.find{ it.hostBankID.equals(AppPreference.AMEX_BANK_CODE) || it.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)}
+                    if(isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE) || isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT)){
+                        headerPrinting(HDFC_BANK_CODE)}
+                    else if(isAmexPresent?.hostBankID.equals(AppPreference.AMEX_BANK_CODE) || isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)){
+                        headerPrinting(AppPreference.AMEX_BANK_CODE)
+                        isFirstTimeForAmxLogo = false
+                    }else{
+                        headerPrinting(DEFAULT_BANK_CODE)
+                    }
+
+
+
+
+                    //  ------------------------------------------
+                    val td = System.currentTimeMillis()
+                    val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                    val formattime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+
+                    val date = formatdate.format(td)
+                    val time = formattime.format(td)
+
+
+                    textBlockList.put(AlignMode.LEFT, "DATE:${date}")
+                    textBlockList.put(AlignMode.RIGHT, "TIME:${time}")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+                    sigleLineText("DETAIL REPORT", AlignMode.CENTER, TextSize.NORMAL)
+
+                    val terminalData = getTptData()
+
+                    textBlockList.put( AlignMode.LEFT, "MID:${terminalData?.merchantId}")
+                    textBlockList.put(
+                        AlignMode.RIGHT, "TID:${batch[0].tid}")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.put(AlignMode.LEFT,
+                            "BATCH NO:${batch[0].hostBatchNumber}")
+                    textBlockList.put(AlignMode.RIGHT,
+                            " ")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+
+                    printSeperator()
+                }
+
+                if (batch.isEmpty()) {
+                    // alignLeftRightText(textInLineFormatBundle, "Total Transaction", "0")
+                } else {
+                    textBlockList.put(AlignMode.LEFT, "TRANS-TYPE")
+                    textBlockList.put(AlignMode.RIGHT, "AMOUNT")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.put(AlignMode.LEFT, "ISSUER")
+                    textBlockList.put(AlignMode.RIGHT, "PAN/CID")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+
+                    textBlockList.put(AlignMode.LEFT, "DATE-TIME")
+                    textBlockList.put(AlignMode.RIGHT, "INVOICE")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+                    printSeperator()
+
+                    val totalMap = mutableMapOf<Int, SummeryTotalType>()
+                    val deformatter = SimpleDateFormat("yyMMdd HHmmss", Locale.ENGLISH)
+
+                    var frequency = 0
+                    var count = 0
+                    var lastfrequecny = 0
+                    var hasfrequency = false
+                    var updatedindex = 0
+                    var iteration = 0
+                    val frequencylist = mutableListOf<String>()
+                    val tidlist = mutableListOf<String>()
+
+                    for (item in batch) {
+                        item.tid.let {
+                            if (it != null) {
+                                tidlist.add(it)
+                            }
+                        }
+                    }
+                    for (item in tidlist.distinct()) {
+                        println(
+                            "Frequency of item" + item + ": " + Collections.frequency(
+                                tidlist,
+                                item
+                            )
+                        )
+                        frequencylist.add("" + Collections.frequency(tidlist, item))
+                    }
+
+                    iteration = tidlist.distinct().size - 1
+                    var pre_authLastItem:Boolean=false
+
+                    for (b in batch) {
+                        //  || b.transactionType == BhTransactionType.VOID_PREAUTH.type
+                        if (updatedindex <= frequencylist.size - 1)
+                            frequency = frequencylist[updatedindex].toInt() + lastfrequecny
+                        count++
+                        if (b.transactionType == BhTransactionType.PRE_AUTH.type) {
+
+                            if(count<frequency || count==1)
+                                continue  // Do not add pre auth transactions
+                            else {
+                                pre_authLastItem = true // just to hanlde if pre-auth is last item
+                            }
+
+                        }
+                        if(!pre_authLastItem) {
+                            if (b.transactionType == BhTransactionType.EMI_SALE.type || b.transactionType == BhTransactionType.BRAND_EMI.type || b.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+                                b.transactionType = BhTransactionType.EMI_SALE.type
+                            }
+
+                            if (b.transactionType == BhTransactionType.TEST_EMI.type) {
+                                b.transactionType = BhTransactionType.SALE.type
+                            }
+
+
+
+
+
+                            if (totalMap.containsKey(b.transactionType)) {
+                                val x = totalMap[b.transactionType]
+                                if (x != null) {
+                                    x.count += 1
+                                    x.total += b.transactionalAmmount?.toLong()!!
+                                }
+                            } else {
+                                if(b.transactionalAmmount != null && !b.transactionalAmmount.equals("null")){
+                                    totalMap[b.transactionType] =
+                                        b.transactionalAmmount?.toLong()
+                                            ?.let { SummeryTotalType(1, it) }!!
+                                }else{
+                                    logger("vd","vd")
+                                }
+
+
+                            }
+                            var transAmount = "0.0"
+                            if(b.transactionalAmmount != null && !b.transactionalAmmount.equals("null")){
+                                transAmount = "%.2f".format(
+                                    b.transactionalAmmount?.toDouble()
+                                        ?.div(100)
+                                )
+                            }
+
+                            if (b.transationName.equals("TEST EMI TXN")) {
+                                textBlockList.put(AlignMode.LEFT, "${"SALE"}")
+                            } else {
+                                textBlockList.put( AlignMode.LEFT, "${b.transationName}")
+                            }
+
+                            textBlockList.put(AlignMode.RIGHT, transAmount)
+                            mixStyleTextPrint(textBlockList)
+                            textBlockList.clear()
+                            if (b.transactionType == BhTransactionType.VOID_PREAUTH.type) {
+                                textBlockList.put(
+                                    AlignMode.LEFT,
+                                    b.appName
+                                )
+                                textBlockList.put(AlignMode.RIGHT, b.panMask)
+                                mixStyleTextPrint(textBlockList)
+                                textBlockList.clear()
+                            } else {
+                                textBlockList.put(
+                                    AlignMode.LEFT,
+                                    b.cardType
+                                )
+                                textBlockList.put(AlignMode.RIGHT, b.cardNumber)
+                                mixStyleTextPrint(textBlockList)
+                                textBlockList.clear()
+                            }
+                            if (b.transactionType == BhTransactionType.OFFLINE_SALE.type || b.transactionType == BhTransactionType.VOID_OFFLINE_SALE.type) {
+                                try {
+
+                                    //val dat = "${b.dateTime}"
+                                    val dat = "${b.printDate} - ${b.time}"
+                                    textBlockList.put(AlignMode.LEFT , dat)
+                                    b.hostInvoice?.let { invoiceWithPadding(it) }?.let {
+                                        textBlockList.put(
+                                            AlignMode.RIGHT, it
+                                        )
+                                    }
+                                    mixStyleTextPrint(textBlockList)
+                                    textBlockList.clear()
+
+
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                }
+
+                            } else {
+//                                val date = b.dateTime
+//                                val parts = date?.split(" ")
+//                                println("Date: " + parts!![0])
+//                                println("Time: " + (parts[1]))
+
+                                val timee = b.time
+                                val timeFormat = SimpleDateFormat("HHmmss", Locale.getDefault())
+                                val timeFormat2 = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                                var formattedTime = ""
+
+                                try {
+
+                                    //val dat = "${parts!![0]} - ${parts[1]}"
+
+                                    val t1 = timeFormat.parse(timee)
+                                    formattedTime = timeFormat2.format(t1)
+                                    Log.e("Time", formattedTime)
+                                    val dat = "${b.transactionDate} - $formattedTime"
+
+                                    textBlockList.put(AlignMode.LEFT, dat)
+
+                                    b.hostInvoice?.let { invoiceWithPadding(it) }?.let {
+                                        textBlockList.put(
+                                            AlignMode.RIGHT, it
+                                        )
+                                    }
+                                    mixStyleTextPrint(textBlockList)
+                                    textBlockList.clear()
+                                    //alignLeftRightText(textInLineFormatBundle," "," ")
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                }
+                            }
+
+                            printSeperator()
+                        }
+                        if (frequency == count) {
+                            lastfrequecny = frequency
+                            hasfrequency = true
+                            updatedindex++
+                        } else {
+                            hasfrequency = false
+                        }
+                        if (hasfrequency) {
+
+
+                            sigleLineText("***TOTAL TRANSACTIONS***", AlignMode.CENTER, TextSize.NORMAL)
+                            val sortedMap = totalMap.toSortedMap(compareByDescending { it })
+
+                            for ((k, m) in sortedMap) {
+                                textBlockList.put(
+                                    AlignMode.LEFT,
+                                        Field48ResponseTimestamp.transactionType2Name(k).toUpperCase(
+                                            Locale.ROOT
+                                        ))
+                                textBlockList.put(
+                                    /*sigleLineformat(
+                                        "=" + m.count + " ${
+                                            getCurrencySymbol(
+                                                tpt
+                                            )
+                                        }", AlignMode.CENTER
+                                    )*/
+                                    AlignMode.CENTER, "= ${m.count}"
+                                )
+                                /*textBlockList.add(
+                                    sigleLineformat(
+                                        "%.2f".format(
+                                            (((m.total).toDouble()).div(
+                                                100
+                                            )).toString().toDouble()
+                                        ), AlignMode.RIGHT
+                                    )
+                                )*/
+                                textBlockList.put(AlignMode.RIGHT, "${getCurrencySymbol(tpt)}:${"%.2f".format((((m.total).toDouble()).div(100)).toString().toDouble())}")
+                                printToalTxnList(textBlockList)
+                                textBlockList.clear()
+                            }
+                            val terminalData = getTptData()
+                            if (iteration > 0) {
+                                printSeperator()
+
+                                // handling printing logo
+                                val bankId = batch[frequency].hostBankID
+                                var logo = ""
+                                if (bankId == AMEX_BANK_CODE_SINGLE_DIGIT || bankId == AppPreference.AMEX_BANK_CODE) {
+                                    AMEX_LOGO
+                                } else if (bankId == HDFC_BANK_CODE_SINGLE_DIGIT || bankId == HDFC_BANK_CODE){
+                                    logo = HDFC_LOGO
+                                }else{
+                                    logo = ""
+                                }
+
+                                if (isFirstTimeForAmxLogo && logo != null && !logo.equals("")) {
+                                    isFirstTimeForAmxLogo = false
+                                    printLogo(logo)
+                                    printSeperator()
+                                }
+                                // end region
+
+                                textBlockList.put( AlignMode.LEFT,
+                                        "MID:${terminalData?.merchantId}")
+                                textBlockList.put(AlignMode.RIGHT,
+                                        "TID:${batch[frequency].tid}")
+                                mixStyleTextPrint(textBlockList)
+                                textBlockList.clear()
+                                textBlockList.put( AlignMode.LEFT,
+                                        "BATCH NO:${batch[frequency].batchNumber}")
+                                mixStyleTextPrint(textBlockList)
+                                textBlockList.clear()
+                                printSeperator()
+                                iteration--
+                            }
+
+                            totalMap.clear()
+                        }
+                    }
+
+                }
+
+                //endregion
+                // region === Below code is execute when digi txns are available on POS
+                val digiPosDataList =
+                    Field48ResponseTimestamp.selectDigiPosDataAccordingToTxnStatus(
+                        EDigiPosPaymentStatus.Approved.desciption
+                    ) as ArrayList<DigiPosDataTable>
+                if (digiPosDataList.isNotEmpty()) {
+                    printSeperator()
+                    // centerText(textFormatBundle, "---------X-----------X----------")
+
+                    sigleLineText("Digi Pos Detail Report", AlignMode.CENTER)
+
+                    tpt?.terminalId?.let { sigleLineText( "TID : $it",AlignMode.CENTER) }
+                    printSeperator()
+                    // Txn description
+                    textBlockList.put(AlignMode.LEFT, "MODE")
+                    textBlockList.put(AlignMode.RIGHT, "AMOUNT(INR)")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+                    textBlockList.put(AlignMode.LEFT, "PartnetTxnId")
+                    textBlockList.put(AlignMode.RIGHT,"DATE-TIME")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+                    textBlockList.put(AlignMode.LEFT, "mTxnId")
+                    textBlockList.put(AlignMode.RIGHT, "pgwTxnId")
+                    mixStyleTextPrint(textBlockList)
+                    textBlockList.clear()
+                    printSeperator()
+                    //Txn Detail
+                    for (digiPosData in digiPosDataList) {
+
+                        textBlockList.put(AlignMode.LEFT, digiPosData.paymentMode)
+                        textBlockList.put(AlignMode.RIGHT, digiPosData.amount)
+                        mixStyleTextPrint(textBlockList)
+                        textBlockList.clear()
+                        textBlockList.put(AlignMode.LEFT, digiPosData.partnerTxnId)
+                        textBlockList.put(AlignMode.RIGHT, digiPosData.txnDate + "  " + digiPosData.txnTime)
+                        mixStyleTextPrint(textBlockList)
+                        textBlockList.clear()
+
+                        textBlockList.put(AlignMode.LEFT, digiPosData.mTxnId)
+                        textBlockList.put(AlignMode.RIGHT, digiPosData.pgwTxnId)
+                        mixStyleTextPrint(textBlockList)
+                        textBlockList.clear()
+
+                        printSeperator()
+                    }
+                    //   DigiPosDataTable.deletAllRecordAccToTxnStatus(EDigiPosPaymentStatus.Approved.desciption)
+                }
+                //endregion
+
+
+                if (batch.isNotEmpty()) {
+                    printSeperator()
+                    sigleLineText("Bonushub", AlignMode.CENTER)
+                    sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
+
+                }
+
+                vectorPrinter!!.startPrint(object : OnPrintListener.Stub() {
+                    @Throws(RemoteException::class)
+                    override fun onFinish() {
+                        // outputText("=> onFinish | sheetNo = $curSheetNo")
+                        // println("time cost = + " + (System.currentTimeMillis() - startTime))
+                        println("0onFinish")
+                        printCB(true)
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onStart() {
+                        //  outputText("=> onStart | sheetNo = $curSheetNo")
+                        println("0onStart")
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onError(error: Int, errorMsg: String) {
+                        //  outputRedText("=> onError: $errorMsg")
+                        println("0onError")
+                        printCB(false)
+                    }
+                })
+
+            }
+        } catch (ex: DeadObjectException) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take chargeslip from the Report menu."
+            )
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take chargeslip from the Report menu."
+            )
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            failureImpl(
+                context as Activity,
+                "Printer Service stopped.",
+                "Please take chargeslip from the Report menu."
+            )
+        } finally {
+//   VFService.connectToVFService(VerifoneApp.appContext)
+        }
+    }
+
     private fun getCurrencySymbol(tpt: TerminalParameterTable?): String {
         return if (!TextUtils.isEmpty(tpt?.currencySymbol)) {
             tpt?.currencySymbol ?: "Rs"
@@ -2267,6 +2713,515 @@ class PrintVectorUtil(context: Context?) {
         }
     }
 
+    fun printSettlementReportupdate2(
+        context: Context?,
+        batch: MutableList<TempBatchFileDataTable>,
+        isSettlementSuccess: Boolean = false,
+        isLastSummary: Boolean = false,
+        callBack: (Boolean) -> Unit
+    ) {
+        var isFirstTimeForAmxLogo = true
+
+//  val format = Bundle()
+//   val fmtAddTextInLine = Bundle()
+
+//below if condition is for zero settlement
+        if (batch.size <= 0) {
+            try {
+                val tpt = getTptData()
+                // setLogoAndHeader()
+
+
+                headerPrinting(DEFAULT_BANK_CODE)
+
+                val td = System.currentTimeMillis()
+                val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                val formattime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+                val date = formatdate.format(td)
+                val time = formattime.format(td)
+
+                textBlockList.put(AlignMode.LEFT, "DATE:${date}")
+                textBlockList.put(AlignMode.RIGHT, "TIME:${time}")
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
+
+                if (isLastSummary) {
+
+                    sigleLineText("LAST SUMMARY REPORT", AlignMode.CENTER, TextSize.NORMAL)
+                } else {
+
+                    sigleLineText("SUMMARY REPORT", AlignMode.CENTER, TextSize.NORMAL)
+                }
+
+
+                textBlockList.put(AlignMode.LEFT, "TID:${tpt?.terminalId}")
+                textBlockList.put(AlignMode.RIGHT, "MID:${tpt?.merchantId}")
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
+
+                textBlockList.put(AlignMode.LEFT, "BATCH NO:${tpt?.batchNumber}")
+
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
+
+
+                printSeperator()
+                textBlockList.put(AlignMode.LEFT, "TOTAL TXN = 0")
+                textBlockList.put(AlignMode.RIGHT,"${getCurrencySymbol(tpt)}")
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
+
+                sigleLineText("ZERO SETTLEMENT SUCCESSFUL", AlignMode.CENTER, TextSize.NORMAL)
+                if (!isLastSummary)
+                    digiposReport()
+                sigleLineText("BonusHub", AlignMode.CENTER)
+                sigleLineText("App Version", AlignMode.CENTER)
+
+
+
+                vectorPrinter!!.startPrint(object : OnPrintListener.Stub() {
+                    @Throws(RemoteException::class)
+                    override fun onFinish() {
+                        // outputText("=> onFinish | sheetNo = $curSheetNo")
+                        // println("time cost = + " + (System.currentTimeMillis() - startTime))
+                        println("0onFinish")
+                        callBack(true)
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onStart() {
+                        //  outputText("=> onStart | sheetNo = $curSheetNo")
+                        println("0onStart")
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onError(error: Int, errorMsg: String) {
+                        //  outputRedText("=> onError: $errorMsg")
+                        println("0onError")
+                        callBack(false)
+                    }
+                })
+
+            } catch (ex: DeadObjectException) {
+                ex.printStackTrace()
+                failureImpl(
+                    context as Activity,
+                    "Printer Service stopped.",
+                    "Please take chargeslip from the Report menu."
+                )
+            } catch (e: RemoteException) {
+                e.printStackTrace()
+                failureImpl(
+                    context as Activity,
+                    "Printer Service stopped.",
+                    "Please take chargeslip from the Report menu."
+                )
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                failureImpl(
+                    context as Activity,
+                    "Printer Service stopped.",
+                    "Please take chargeslip from the Report menu."
+                )
+            }
+        }
+////below if condition is for settlement(Other than zero settlement)
+        else {
+            try {
+                val mapTidToBankId = mutableMapOf<String, String>()
+
+                val map = mutableMapOf<String, MutableMap<Int, PrintUtil.SummeryModel>>()
+                val map1 = mutableMapOf<String, MutableMap<Int, PrintUtil.SummeryModel>>()
+                //to hold the tid for which tid mid printed
+                val listTidPrinted = mutableListOf<String>()
+                val tpt = getTptData()
+                var firstTimePrintedTid = ""
+
+                // setLogoAndHeader()
+                //headerPrinting()
+                val isHdfcPresent = batch.find{ it.hostBankID.equals(HDFC_BANK_CODE) || it.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT)}
+                val isAmexPresent = batch.find{ it.hostBankID.equals(AppPreference.AMEX_BANK_CODE) || it.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)}
+                if(isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE) || isHdfcPresent?.hostBankID.equals(HDFC_BANK_CODE_SINGLE_DIGIT)){
+                    headerPrinting(HDFC_BANK_CODE)
+                    firstTimePrintedTid = isHdfcPresent!!.hostTID.toString()
+                }
+                else if(isAmexPresent?.hostBankID.equals(AppPreference.AMEX_BANK_CODE) || isAmexPresent?.hostBankID.equals(AMEX_BANK_CODE_SINGLE_DIGIT)){
+                    headerPrinting(AppPreference.AMEX_BANK_CODE)
+                    isFirstTimeForAmxLogo = false
+                    firstTimePrintedTid = isAmexPresent!!.hostTID.toString()
+                }else{
+                    headerPrinting(DEFAULT_BANK_CODE)
+                }
+
+
+                val td = System.currentTimeMillis()
+                val formatdate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                val formattime = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
+
+                val date = formatdate.format(td)
+                val time = formattime.format(td)
+
+                textBlockList.put(AlignMode.LEFT, "DATE:${date}")
+                textBlockList.put(AlignMode.RIGHT, "TIME:${time}")
+                mixStyleTextPrint(textBlockList)
+                textBlockList.clear()
+
+                //  alignLeftRightText(fmtAddTextInLine,"DATE : ${batch.date}","TIME : ${batch.time}")
+                /*   alignLeftRightText(textInLineFormatBundle, "MID : ${batch[0].mid}", "TID : ${batch[0].tid}")
+                   alignLeftRightText(textInLineFormatBundle, "BATCH NO  : ${batch[0].batchNumber}", "")*/
+
+                if (isLastSummary) {
+
+                    sigleLineText("LAST SUMMARY REPORT", AlignMode.CENTER, TextSize.NORMAL)
+                } else {
+
+                    sigleLineText("SUMMARY REPORT", AlignMode.CENTER, TextSize.NORMAL)
+                }
+
+                batch.sortBy { it?.tid }
+
+                var tempTid = batch[0]?.tid
+
+                val list = mutableListOf<String>()
+                val frequencylist = mutableListOf<String>()
+
+                for (it in batch) {  // Do not count preauth transaction
+// || it.transactionType == BhTransactionType.VOID_PREAUTH.type
+
+                    mapTidToBankId[it.hostTID] = it.hostBankID
+
+                    if (it.transactionType == BhTransactionType.PRE_AUTH.type) continue
+
+                    if (it.transactionType == BhTransactionType.EMI_SALE.type ||
+                        it.transactionType == BhTransactionType.BRAND_EMI.type ||
+                        it.transactionType == BhTransactionType.BRAND_EMI_BY_ACCESS_CODE.type) {
+                        //it?.appName = it.emiIssuerDataModel?.issuerName//
+                        it.transactionType = BhTransactionType.EMI_SALE.type
+                    }
+                    if (it.transactionType == BhTransactionType.VOID_EMI.type) {
+                        // it?.appName = it.emiIssuerDataModel?.issuerName//
+                    }
+
+                    if (it.transactionType == BhTransactionType.TEST_EMI.type) {
+                        it?.appName = "Test Issuer"
+                        it?.cardType = "Test Issuer"
+                        it.transactionType = BhTransactionType.SALE.type
+
+                    }
+
+                    val transAmt = try {
+                        it?.baseAmmount?.toLong()
+                    } catch (ex: Exception) {
+                        0L
+                    }
+
+
+                    if (tempTid == it?.tid) {
+                        _issuerName = it?.appName
+                        if (map.containsKey(it?.tid + it.mid + it.batchNumber + it.appName)) {
+                            _issuerName = it.appName
+
+                            val ma =
+                                map[it.tid + it.mid + it.batchNumber + it.appName] as MutableMap<Int, PrintUtil.SummeryModel>
+                            if (ma.containsKey(it.transactionType)) {
+                                val m = ma[it.transactionType] as PrintUtil.SummeryModel
+                                m.count += 1
+                                if (transAmt != null) {
+                                    m.total = m.total?.plus(transAmt)
+                                }
+                            } else {
+                                val txnName = it.transationName
+                                val rtid = it.tid
+                                val sm = PrintUtil.SummeryModel(
+                                    txnName, 1, transAmt, rtid
+                                )
+                                ma[it.transactionType] = sm
+                            }
+                        } else {
+                            val hm = HashMap<Int, PrintUtil.SummeryModel>().apply {
+                                this[it.transactionType] = transAmt?.let { it1 ->
+                                    it.transationName?.let { it2 ->
+                                        it.tid?.let { it3 ->
+                                            PrintUtil.SummeryModel(
+                                                it2,
+                                                1,
+                                                it1,
+                                                it3
+                                            )
+                                        }
+                                    }
+                                }!!
+                            }
+                            map[it.tid + it.mid + it.batchNumber + it.appName] =
+                                hm
+                            it.tid?.let { it1 -> list.add(it1) }
+                        }
+                    } else {
+                        tempTid = it.tid
+                        _issuerName = it.appName
+                        val hm = HashMap<Int, PrintUtil.SummeryModel>().apply {
+                            this[it.transactionType] = transAmt?.let { it1 ->
+                                it.transationName?.let { it2 ->
+                                    it.tid?.let { it3 ->
+                                        PrintUtil.SummeryModel(
+                                            it2,
+                                            1,
+                                            it1,
+                                            it3
+                                        )
+                                    }
+                                }
+                            }!!
+                        }
+                        map[it.tid + it.mid + it.batchNumber + it.appName] =
+                            hm
+                        it.tid?.let { it1 -> list.add(it1) }
+                    }
+
+                }
+
+                for (item in list.distinct()) {
+                    println("Frequency of item" + item + ": " + Collections.frequency(list, item))
+                    frequencylist.add("" + Collections.frequency(list, item))
+                }
+
+
+                val totalMap = mutableMapOf<Int, SummeryTotalType>()
+
+
+                var ietration = list.distinct().size
+                var curentIndex = 0
+                var frequency = 0
+                var count = 0
+                var lastfrequecny = 0
+                var hasfrequency = false
+                var updatedindex = 0
+
+                for ((key, _map) in map.onEachIndexed { index, entry -> curentIndex = index }) {
+
+
+                    count++
+                    if (updatedindex <= frequencylist.size - 1)
+                        frequency = frequencylist.get(updatedindex).toInt() + lastfrequecny
+
+                    if (key.isNotBlank()) {
+
+                        var hostTid = if (key.isNotBlank() && key.length >= 8) {
+                            key.subSequence(0, 8).toString()
+                        } else {
+                            ""
+                        }
+                        var hostMid = if (key.isNotBlank() && key.length >= 23) {
+                            key.subSequence(8, 23).toString()
+                        } else {
+                            ""
+                        }
+                        var hostBatchNumber = if (key.isNotBlank() && key.length >= 29) {
+                            key.subSequence(23, 29).toString()
+                        } else {
+                            ""
+                        }
+                        var cardIssuer = if (key.isNotBlank() && key.length >= 30) {
+                            key.subSequence(29, key.length).toString()
+                        } else {
+                            ""
+                        }
+
+                        val tptTemp= getTptData()
+                        val mid=tptTemp?.merchantId
+                        //  if (ietration > 0) {
+                        // if hostid is not avialable in this or list is blanck then print this line
+                        if((listTidPrinted.size==0) || !(listTidPrinted.contains(hostTid)))
+                        {
+                            // handle logo printing
+                            var bankId = mapTidToBankId[hostTid]
+                            var logo = ""
+                            if (bankId.equals(AMEX_BANK_CODE_SINGLE_DIGIT) || bankId.equals(
+                                    AppPreference.AMEX_BANK_CODE
+                                )) {
+                                logo = AMEX_LOGO
+                            } else if(bankId.equals(HDFC_BANK_CODE_SINGLE_DIGIT)  || bankId.equals(HDFC_BANK_CODE)){
+                                logo = HDFC_LOGO
+                            }else{
+                                logo = ""
+                            }
+
+                            if (hostTid != firstTimePrintedTid && isFirstTimeForAmxLogo && logo != null && !logo.equals("")) {
+                                isFirstTimeForAmxLogo = false
+                                printSeperator()
+                                printLogo(logo)
+                            }
+                            // end region
+
+                            listTidPrinted.add(hostTid)// add the tid for which this code is printed
+                            printSeperator()
+                            textBlockList.put(AlignMode.LEFT, "MID:${mid}")
+                            textBlockList.put(AlignMode.RIGHT, "TID:${hostTid}")
+                            mixStyleTextPrint(textBlockList)
+                            textBlockList.clear()
+                            textBlockList.put(AlignMode.LEFT, "BATCH NO:${hostBatchNumber}")
+                            mixStyleTextPrint(textBlockList)
+                            textBlockList.clear()
+                            // take a mutable list here
+
+
+                            //   ietration--
+                        }
+                        // }
+                        if (cardIssuer.isEmpty()) {
+                            cardIssuer = _issuerName.toString()
+                            _issuerNameString = "CARD ISSUER"
+                        }
+                        printSeperator()
+                        textBlockList.put(AlignMode.LEFT, _issuerNameString)
+                        textBlockList.put(AlignMode.CENTER, "${cardIssuer.toUpperCase(Locale.ROOT)}")
+                        textBlockList.put(AlignMode.RIGHT, "        ")
+                        mixStyleTextPrint(textBlockList)
+                        textBlockList.clear()
+                        // if(ind==0){
+                        textBlockList.put(AlignMode.LEFT, "TXN TYPE")
+                        textBlockList.put(AlignMode.CENTER, "COUNT      ")
+                        textBlockList.put(AlignMode.RIGHT, "TOTAL")
+                        mixStyleTextPrint(textBlockList)
+                        textBlockList.clear()
+
+                    }
+                    for ((k, m) in _map) {
+                        val amt =
+                            "%.2f".format((((m.total)?.toDouble())?.div(100)).toString().toDouble())
+                        if (/*k == BhTransactionType.PRE_AUTH_COMPLETE.type ||*/ k == BhTransactionType.VOID_PREAUTH.type) {
+                            // need Not to show
+                        } else {
+                            m.type?.let {
+                                if(it == "TEST EMI TXN"){
+                                    textBlockList.put(
+                                        AlignMode.LEFT, "SALE"
+                                    )
+                                }else{
+                                    textBlockList.put(  AlignMode.LEFT,
+                                        Field48ResponseTimestamp.transactionType2Name(k).toUpperCase(Locale.ROOT))
+                                }
+
+                            }
+                            textBlockList.put(
+                                AlignMode.CENTER,
+                                    "${m.count}")
+                            textBlockList.put( AlignMode.RIGHT, "${getCurrencySymbol(tpt)}:$amt")
+                            printToalTxnList(textBlockList)
+                            textBlockList.clear()
+                        }
+
+                        if (totalMap.containsKey(k)) {
+                            val x = totalMap[k]
+                            if (x != null) {
+                                x.count += m.count
+                                x.total += m.total!!
+                            }
+                        } else {
+                            totalMap[k] = m.total?.let { SummeryTotalType(m.count, it) }!!
+                        }
+                    }
+
+                    if (frequency == count) {
+                        lastfrequecny = frequency
+                        hasfrequency = true
+                        updatedindex++
+                    } else {
+                        hasfrequency = false
+                    }
+                    if (hasfrequency) {
+                        printSeperator()
+                        sigleLineText("***TOTAL TRANSACTION***", AlignMode.CENTER, TextSize.NORMAL)
+
+                        val sortedMap = totalMap.toSortedMap(compareByDescending { it })
+                        for ((k, m) in sortedMap) {
+
+                            textBlockList.put( AlignMode.LEFT,
+                                    Field48ResponseTimestamp.transactionType2Name(k).toUpperCase(
+                                        Locale.ROOT
+                                    ))
+                            textBlockList.put( AlignMode.CENTER,
+                                    "  = " + m.count)
+                            textBlockList.put( AlignMode.RIGHT, "${getCurrencySymbol(tpt)}:${"%.2f".format(
+                                    (((m.total).toDouble()).div(
+                                        100
+                                    )).toString().toDouble()
+                                )}")
+
+                            printToalTxnList(textBlockList)
+                            textBlockList.clear()
+
+                        }
+
+
+
+                        totalMap.clear()
+                    }
+
+                    //  sb.appendln()
+                }
+
+                //    sb.appendln(getChar(LENGTH, '='))
+
+                printSeperator()
+                if (isSettlementSuccess) {
+                    sigleLineText("SETTLEMENT SUCCESSFUL", AlignMode.CENTER)
+
+                }
+                // Below code is used for Digi POS Settlement report
+                // Below code is used for Digi POS Settlement report
+                if (!isLastSummary)
+                    digiposReport()
+                sigleLineText("Bonushub", AlignMode.CENTER)
+                sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
+
+
+                vectorPrinter!!.startPrint(object : OnPrintListener.Stub() {
+                    @Throws(RemoteException::class)
+                    override fun onFinish() {
+                        // outputText("=> onFinish | sheetNo = $curSheetNo")
+                        // println("time cost = + " + (System.currentTimeMillis() - startTime))
+                        println("0onFinish")
+                        callBack(true)
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onStart() {
+                        //  outputText("=> onStart | sheetNo = $curSheetNo")
+                        println("0onStart")
+                    }
+
+                    @Throws(RemoteException::class)
+                    override fun onError(error: Int, errorMsg: String) {
+                        //  outputRedText("=> onError: $errorMsg")
+                        println("0onError")
+                        callBack(false)
+                    }
+                })
+            } catch (ex: DeadObjectException) {
+                ex.printStackTrace()
+                failureImpl(
+                    context as Activity,
+                    "Printer Service stopped.",
+                    "Please take chargeslip from the Report menu."
+                )
+            } catch (e: RemoteException) {
+                e.printStackTrace()
+                failureImpl(
+                    context as Activity,
+                    "Printer Service stopped.",
+                    "Please take chargeslip from the Report menu."
+                )
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                failureImpl(
+                    context as Activity,
+                    "Printer Service stopped.",
+                    "Please take chargeslip from the Report menu."
+                )
+            }
+        }
+    }
 
 
     fun digiposReport(){
@@ -2480,9 +3435,7 @@ class PrintVectorUtil(context: Context?) {
                     isFirstTimeForAmxLogo = false
                 }else
                 {
-                    //headerPrinting(DEFAULT_BANK_CODE)
-                    //headerPrinting(AppPreference.getBankCode())
-                    headerPrinting(tpt?.tidBankCode)
+                    headerPrinting(DEFAULT_BANK_CODE)
                 }
 
                 if (isLastSummary) {
@@ -2533,7 +3486,7 @@ class PrintVectorUtil(context: Context?) {
                 }
 
 
-               // sigleLineText("ZERO SETTLEMENT SUCCESSFUL", AlignMode.CENTER, TextSize.NORMAL)
+                sigleLineText("ZERO SETTLEMENT SUCCESSFUL", AlignMode.CENTER, TextSize.NORMAL)
 
                 // Below code is used for Digi POS Settlement report
                 if (!isLastSummary) {
@@ -2593,7 +3546,7 @@ class PrintVectorUtil(context: Context?) {
                 // todo Digipos txncode here
 
                 sigleLineText("BonusHub", AlignMode.CENTER)
-                sigleLineText("App Version:${BuildConfig.VERSION_NAME}", AlignMode.CENTER)
+                sigleLineText("App Version", AlignMode.CENTER)
 
 
                 vectorPrinter!!.startPrint(object : OnPrintListener.Stub() {
@@ -2661,9 +3614,7 @@ class PrintVectorUtil(context: Context?) {
                     isFirstTimeForAmxLogo = false
                 }else
                 {
-                    //headerPrinting(DEFAULT_BANK_CODE)
-                    //headerPrinting(AppPreference.getBankCode())
-                    headerPrinting(tpt?.tidBankCode)
+                    headerPrinting(DEFAULT_BANK_CODE)
                 }
 
                 if (isLastSummary) {
@@ -3100,9 +4051,7 @@ class PrintVectorUtil(context: Context?) {
                         headerPrinting(AMEX_BANK_CODE)
                         isFirstTimeForAmxLogo = false
                     }else{
-                        //headerPrinting(DEFAULT_BANK_CODE)
-                        //headerPrinting(AppPreference.getBankCode())
-                        headerPrinting(tpt?.tidBankCode)
+                        headerPrinting(DEFAULT_BANK_CODE)
                     }
                     //  ------------------------------------------
                     val td = System.currentTimeMillis()

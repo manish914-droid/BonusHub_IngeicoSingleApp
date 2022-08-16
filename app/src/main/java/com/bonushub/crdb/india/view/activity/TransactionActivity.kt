@@ -36,6 +36,7 @@ import com.bonushub.crdb.india.utils.ingenico.TLV
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
+
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.view.baseemv.GenericCardReadHandler
@@ -104,6 +105,7 @@ class TransactionActivity : BaseActivityNew() {
     private fun onCardDetectionAction(cardProcessedDataModal: CardProcessedDataModal) {
         println("Detected card type ------> ${cardProcessedDataModal.getReadCardType()}")
         processAccordingToCardType(cardProcessedDataModal)
+
     }
 
 
@@ -651,6 +653,10 @@ class TransactionActivity : BaseActivityNew() {
                     emvProcessHandler = emvHandler()
                     DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(), emvProcessHandler)
                     DeviceHelper.getEMV()?.switchDebug(2) //emvLogLevel -> 2
+                    /*if(AppPreference.isTTSon())
+                    {
+                        (this as BaseActivityNew).speakText("Please enter your pin")
+                    }*/
                 }
             }
 
@@ -877,6 +883,8 @@ class TransactionActivity : BaseActivityNew() {
             param.putByteArray(PinpadData.PAN_BLOCK, panBlock?.str2ByteArr())
             DeviceHelper.getPinpad(KAPId(0, 0), 0, DeviceName.IPP)
                 ?.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+
+            speakText("Please enter your pin")
 
         } else {
             if (cardProcessedDataModal.getFallbackType() == EFallbackCode.EMV_fallback.fallBackCode)

@@ -62,7 +62,9 @@
             android:exported="true" />
         <activity
             android:name="com.bonushub.crdb.india.view.activity.NavigationActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

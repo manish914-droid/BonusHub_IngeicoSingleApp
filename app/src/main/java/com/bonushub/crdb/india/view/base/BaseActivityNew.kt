@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.text.TextUtils
 import android.text.TextUtils.replace
 import android.view.*
@@ -25,12 +26,13 @@ import com.bonushub.crdb.india.databinding.DialogAlertMsgNewBinding
 import com.bonushub.crdb.india.databinding.DialogMsgWithIconBinding
 import com.bonushub.crdb.india.databinding.DialogTxnApprovedBinding
 import com.bonushub.crdb.india.databinding.ItemOkBtnDialogBinding
+import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
 import com.bonushub.crdb.india.utils.EPrintCopyType
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 
-abstract class BaseActivityNew : AppCompatActivity(), IDialog {
+abstract class BaseActivityNew : AppCompatActivity(),TextToSpeech.OnInitListener, IDialog {
 
     private lateinit var progressDialog: Dialog
     lateinit var progressTitleMsg: TextView
@@ -39,6 +41,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
     lateinit var horizontalPLL:LinearLayout
     lateinit var verticalProgressBar: WebView
 
+    private lateinit var speechtext: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -46,6 +49,7 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
 
         setProgressDialog()
 
+        speechtext = TextToSpeech(this , this)
     }
 
     override fun showToast(msg: String) {
@@ -357,6 +361,8 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         //  builder.setMessage(msg)
         val bindingg = DialogAlertMsgNewBinding.inflate(LayoutInflater.from(this))
 
+        speakText(msg)
+
        // dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(bindingg.root)
         dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -473,6 +479,8 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         val bindingg = DialogTxnApprovedBinding.inflate(LayoutInflater.from(this))
 
         dialogBuilder.setContentView(bindingg.root)
+
+        speakText("Your transaction has been approved Please take your card")
 
         if(headerImage != 0) {
             bindingg.subHeaderView?.headerImage.setImageResource(headerImage)
@@ -675,7 +683,24 @@ abstract class BaseActivityNew : AppCompatActivity(), IDialog {
         super.onDestroy()
     }
 
+    fun speakText(text:String){
+        if(AppPreference.isTTSon())
+        {
+            speechtext.speak(text, TextToSpeech.QUEUE_FLUSH,null,"")
+        }
+        //speechtext.speak(text, TextToSpeech.QUEUE_FLUSH,null,"")
+    }
 
+    override fun onInit(status: Int) {
+
+        //speechtext.setLanguage(Locale.JAPAN)
+        /*if (status == TextToSpeech.SUCCESS) {
+            val result = speechtext.setLanguage(Locale.US)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS","The Language not supported!")
+            }
+        }*/
+    }
 }
 
 interface IDialog {

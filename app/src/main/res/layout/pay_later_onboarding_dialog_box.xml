@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/pay_later_background"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <ImageView
+        android:id="@+id/ic_congrats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_pay_later_congrats"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ic_pay_ltr"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <ImageView
+        android:id="@+id/ic_pay_ltr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_pay_later3"
+        app:layout_constraintTop_toBottomOf="@+id/ic_congrats"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/txt_vw_pay_ltr"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/txt_vw_pay_ltr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pay_later"
+        android:textSize="@dimen/pad_15"
+        android:gravity="center"
+        android:fontFamily="@font/muli_bold"
+        android:textColor="@color/text_color_line1"
+        app:layout_constraintStart_toStartOf="@+id/ic_pay_ltr"
+        app:layout_constraintEnd_toEndOf="@+id/ic_pay_ltr"
+        app:layout_constraintBottom_toTopOf="@+id/txt_viw_pay_ltr2"
+        app:layout_constraintTop_toBottomOf="@+id/ic_pay_ltr" />
+
+    <TextView
+        android:id="@+id/txt_viw_pay_ltr2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/you_have_sucessefully"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_small"
+        android:fontFamily="@font/muli_semi_bold"
+        android:textColor="@color/txt_color_blue"
+        android:layout_marginTop="@dimen/pad_15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ok_btn_onboarding"
+        app:layout_constraintTop_toBottomOf="@+id/txt_vw_pay_ltr"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/ok_btn_onboarding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:cardElevation="@dimen/pad_5"
+        app:rippleColor="@color/cardview_light_background"
+        android:layout_marginTop="@dimen/pad_15"
+        android:layout_marginBottom="@dimen/pad_15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_viw_pay_ltr2">
+
+        <TextView
+            android:layout_width="@dimen/pad_100"
+            android:layout_height="@dimen/pad_40"
+            android:text="@string/positive_button_ok"
+            android:textSize="@dimen/pad_20"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@drawable/pay_later_yes_button"/>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/pay_later_background"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+            <ImageView
+                android:id="@+id/ic_congrats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pay_later_congrats"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+            <ImageView
+                android:id="@+id/ic_pay_ltr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pay_later3"
+                android:layout_marginTop="@dimen/pad_20"
+                app:layout_constraintTop_toBottomOf="@+id/ic_congrats"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+            <TextView
+                android:id="@+id/txt_vw_pay_ltr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pay_later"
+                android:textSize="@dimen/pad_15"
+                android:gravity="center"
+                android:fontFamily="@font/muli_bold"
+                android:textColor="@color/text_color_line1"
+                app:layout_constraintStart_toStartOf="@+id/ic_pay_ltr"
+                app:layout_constraintEnd_toEndOf="@+id/ic_pay_ltr"
+                app:layout_constraintTop_toBottomOf="@+id/ic_pay_ltr"
+                android:layout_marginTop="@dimen/pad_10"/>
+
+            <TextView
+                android:id="@+id/txt_viw_pay_ltr2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/you_have_sucessefully"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_small"
+                android:fontFamily="@font/muli_semi_bold"
+                android:textColor="@color/txt_color_blue"
+                android:layout_marginTop="@dimen/pad_20"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_vw_pay_ltr"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/ok_btn_onboarding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/pad_10"
+                app:cardElevation="@dimen/pad_5"
+                app:rippleColor="@color/cardview_light_background"
+                android:layout_marginTop="@dimen/pad_30"
+                android:layout_marginBottom="@dimen/pad_20"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_viw_pay_ltr2">
+
+                <TextView
+                    android:layout_width="@dimen/pad_100"
+                    android:layout_height="@dimen/pad_40"
+                    android:text="@string/positive_button_ok"
+                    android:textSize="@dimen/pad_20"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:background="@drawable/pay_later_yes_button"/>
+            </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>-->

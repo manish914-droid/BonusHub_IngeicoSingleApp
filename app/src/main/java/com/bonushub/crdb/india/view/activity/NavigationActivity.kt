@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.net.wifi.WifiManager
 import android.os.*
+import android.speech.tts.TextToSpeech
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -44,7 +45,7 @@ import com.bonushub.crdb.india.model.remote.BrandEMIDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIMasterDataModal
 import com.bonushub.crdb.india.model.remote.BrandEMIProductDataModal
 import com.bonushub.crdb.india.serverApi.HitServer
-import com.bonushub.crdb.india.testPackage.TestCorutinesActivity
+//import com.bonushub.crdb.india.testPackage.TestCorutinesActivity
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
@@ -95,8 +96,14 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/*,NavigationView.OnNavigationItemSelectedListener not need*/,
     ActivityCompat.OnRequestPermissionsResultCallback , IFragmentRequest {
+
+
+
     private  var  j : Long = 0
     private var tms: UTMS? = null
+
+    /*lateinit var speechtext: TextToSpeech*/
+
     @Inject
     lateinit var appDao: AppDao
     private var navigationBinding: ActivityNavigationBinding?=null
@@ -147,12 +154,15 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         navigationBinding = ActivityNavigationBinding.inflate(layoutInflater)
         setContentView(navigationBinding?.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
+        navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment?
         DeviceHelper.setServiceListener(this)
         refreshToolbarLogos(this)
         manageTopToolBar(true)
         setupNavigationDrawerLayout()
+
+        /*speechtext = TextToSpeech(this , this)*/
+
+        navigationBinding?.footer?.ttsSwitch?.isChecked= AppPreference.isTTSon()
          //lockStatusBar()
 /*         isFresAppStatus = WifiPrefManager(this).isWifiStatus
          if (!isFresAppStatus) {
@@ -345,6 +355,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
         }
 
             }
+
+
+        //tts=isTtsOn
+
+        navigationBinding?.footer?.ttsSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            AppPreference.saveBoolean(AppPreference.TEXT_TO_SPEACH,isChecked)
+
+        }
 
     }
 
@@ -1001,14 +1019,18 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                     println("RESULT TWO --->  $resultTwo")
                 }*/
-                transactFragment(VoidMainFragment())
+               //transactFragment(VoidMainFragment())
+
+
+                /*change void sale
+                * before comit */
                 // todo uncomment below
-                /*  lifecycleScope.launch(Dispatchers.IO) {
+                  lifecycleScope.launch(Dispatchers.IO) {
                       //    appDao.insertBatchData(batchData)
                       val dd=    DBModule.appDatabase.appDao.getBatchData()
                       println(dd.toString())
                   }
-                  transactFragment(VoidMainFragment())*/
+                  transactFragment(VoidMainFragment())
                // val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber("53")
 
                 //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
@@ -1167,11 +1189,11 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
             }
 
             EDashboardItem.OFFLINE_SALE->{
-                startActivity(
+               /* startActivity(
                     Intent(this, TestCorutinesActivity::class.java).apply {
 
                     }
-                )
+                )*/
             }
 
             else->{}

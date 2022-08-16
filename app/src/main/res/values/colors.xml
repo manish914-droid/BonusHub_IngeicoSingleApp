@@ -55,4 +55,9 @@
     <color name="keyboard_backgroung_btn">#EEF6FF</color>
     <color name="keyboard_backgroung_cal">#B6030A</color>
     <color name="keyboard_backgroung_ok">#009000</color>
+    <color name="color_line">#4E63A2</color>
+    <color name="text_color_line">#BBBBBB</color>
+    <color name="text_color_line1">#002D57</color>
+    <color name="pay_later_backgroind_theme">#515B64</color>
+    <color name="dark_yellow_theme">#FFFF00</color>
 </resources>

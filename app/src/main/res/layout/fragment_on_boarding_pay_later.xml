@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".view.fragments.OnBoardingPayLaterFragment">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/onboarding_recycle_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        tools:itemCount="1"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_15"
+        tools:listitem="@layout/item_pay_later_onboarding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ano_lyt"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ano_lyt"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pad_50"
+        android:background="@drawable/select_terminal_background"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginBottom="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/poced_btn">
+
+        <ImageView
+            android:id="@+id/img_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_terminal"
+            android:layout_marginStart="@dimen/pad_15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_terminal"
+            android:textColor="@color/txt_color"
+            android:fontFamily="@font/muli_semi_bold"
+            android:textSize="@dimen/pad_15"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/pad_15"
+            app:layout_constraintTop_toTopOf="@+id/img_terminal"
+            app:layout_constraintBottom_toBottomOf="@+id/img_terminal"
+            app:layout_constraintStart_toEndOf="@+id/img_terminal"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_spiner_btn"
+            android:layout_marginEnd="@dimen/pad_10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/poced_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:rippleColor="@color/background"
+        app:cardCornerRadius="@dimen/pad_10"
+        app:cardElevation="@dimen/pad_5"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginBottom="@dimen/pad_20"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pad_50"
+            android:text="@string/proceed"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="@dimen/pad_20"
+            android:fontFamily="@font/muli_regular"
+            android:background="@drawable/pay_later_proced_set"/>
+
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -112,10 +112,13 @@
     <string name="please_select_tenure">Please select Tenure </string>
     <string name="please_select_one_issuer_bank">Please Select 1 Issuer Bank</string>
     <string name="total_amount_with_interest">Total Amount \n (With Interest)</string>
+    <string name="emi_sale_with_card">EMI Sale with Card</string>
+    <string name="Cardless_EMI">Cardless EMI</string>
     <string name="amex">AMEX</string>
     <string name="hdfc">HDFC</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="or">OR</string>
     <string name="_500_00">\u20B9 500.00</string>
     <string name="rupees_symbol">\u20B9</string>
     <string name="invoice">Invoice</string>
@@ -146,6 +149,7 @@
     <string name="txn_param_header">TXN PARAM</string>
     <string name="app_update_param_header">APP UPDATE PARAM</string>
     <string name="admin_password">ADMIN PASSWORD</string>
+    <string name="available_on">AVAILABLE ON</string>
     <string name="hint_enter_admin_password"><font size="10">ENTER ADMIN PASSWORD</font></string>
     <string name="super_admin_password">SUPER ADMIN PASSWORD</string>
     <string name="hint_enter_super_admin_password"><font size="10">ENTER SUPER ADMIN PASSWORD</font></string>
@@ -382,5 +386,30 @@
     <string name="error_enter_mobile">Enter Valid Mobile Number</string>
 
     <string name="txn_approved">Transaction Approved</string>
+
+
+    <!--pay later-->
+    <string name="manage">MANAGE</string>
+    <string name="would_you_like_to_register_for_following_products">Would you like to register for \n following products:</string>
+    <string name="pay_later">Pay Later</string>
+    <string name="registered_mobile_number">Registered mobile number</string>
+    <string name="verify_next"><![CDATA[Verify & Next]]></string>
+    <string name="you_have_sucessefully">You have successfully registered for \n products and you can start transactions now.</string>
+    <string name="select_terminal">Select Terminal</string>
+    <string name="tnc_onboarding"><![CDATA[Fee & Terms and Conditions]]></string>
+    <string name="registered_mobile_number_hint">We will send OTP on registered mobile number.\n\n We will also send another OTP on registered Email Id. Please check your email and keep the OTP handy.</string>
+    <string name="otp_warning">One Time Password (OTP) has been sent to customer\'s mobile number XXXXXX0123.\nOTP will be valid till 59 seconds</string>
+    <string name="submit_info">By clicking the submit button below, I hereby agree to a comply by the accepted terms and conditions.</string>
+    <string name="selected_terminals">Selected Terminals</string>
+    <string name="enter_mobile_otp">Enter Mobile OTP</string>
+    <string name="enter_email_otp">Enter Email OTP</string>
+    <string name="resend_both_otp_in_00_59">Resend both OTP in 00:59</string>
+    <string name="terms_conditions"><![CDATA[Terms & Conditions]]></string>
+    <string name="fees">Fees:</string>
+    <string name="you_will_charge_inr_0_10_per_transactions">You will charge INR 0.10 per transactions</string>
+    <string name="other_terms">Other Terms:</string>
+    <string name="tnc_string">Our Terms and Conditions Generator makes it easy to create a Terms and Conditions agreement for your business. Just follow these steps:\n\n At Step 1, select the Website option or the App option or both.\n\n At Step 2, select the Website option or the App option or both.</string>
+    <string name="i_have_read_and_agree_to_terms">I have read and agree to Terms</string>
+
 
 </resources>

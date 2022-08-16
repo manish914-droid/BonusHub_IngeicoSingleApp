@@ -58,7 +58,9 @@ object AppPreference {
     const val LAST_CANCEL_RECEIPT_KEY = "Last_Cancel_Receipt"
     const val ONLINE_EMV_DECLINED = "online_emv_Declined"
 
+
     const val LAST_BATCH_TimeStamp = "last_batch_time_stemp"
+    const val TEXT_TO_SPEACH="TEXT_TO_SPEACH"
 
     @JvmStatic
     fun initializeEncryptedSharedPreferences(context: Context) {
@@ -431,10 +433,9 @@ object AppPreference {
             null
     }
 
-    // end reegion
-
-
-    // region
+   fun isTTSon():Boolean{
+     return  AppPreference.getBoolean(TEXT_TO_SPEACH)
+   }
 
 
 }

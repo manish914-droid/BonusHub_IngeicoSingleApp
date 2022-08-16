@@ -1,0 +1,1022 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".view.fragments.OnBoardingEnterOtpFragment">
+
+   <!-- <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <include
+                    android:id="@+id/sub_header_view"
+                    layout="@layout/sub_header_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/otp_img"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/otp_img_background"
+                    android:layout_marginStart="@dimen/pad_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/oto_warning"
+                    app:layout_constraintTop_toTopOf="@+id/oto_warning">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_otp_img"
+                        android:layout_margin="@dimen/pad_15"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/oto_warning"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/otp_warning"
+                    android:textSize="13dp"
+                    android:fontFamily="@font/muli_regular"
+                    android:textColor="@color/txt_color"
+
+                    android:layout_marginEnd="@dimen/pad_24"
+                    android:layout_marginStart="@dimen/pad_30"
+                    app:layout_constraintStart_toEndOf="@+id/otp_img"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/txtvw_mob_otp"
+                    app:layout_constraintTop_toBottomOf="@+id/sub_header_view"/>
+
+                <TextView
+                    android:id="@+id/txtvw_mob_otp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enter_mobile_otp"
+                    android:textSize="@dimen/pad_15"
+                    android:textColor="@color/txt_color"
+                    android:fontFamily="@font/muli_semi_bold"
+                    android:gravity="center"
+                    android:layout_marginStart="@dimen/pad_24"
+                    app:layout_constraintBottom_toTopOf="@+id/mob_d1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/otp_img"/>
+
+                <EditText
+                    android:id="@+id/mob_d1"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    android:layout_marginStart="@dimen/pad_24"
+
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/txtvw_eml_otp"
+                    app:layout_constraintTop_toBottomOf="@+id/txtvw_mob_otp"/>
+                <EditText
+                    android:id="@+id/mob_d2"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintEnd_toStartOf="@+id/mob_d3"
+                    app:layout_constraintTop_toTopOf="@+id/mob_d1"
+                    app:layout_constraintStart_toEndOf="@+id/mob_d1"
+                    app:layout_constraintBottom_toBottomOf="@+id/mob_d1"/>
+                <EditText
+                    android:id="@+id/mob_d3"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintEnd_toStartOf="@+id/mob_d4"
+                    app:layout_constraintTop_toTopOf="@+id/mob_d2"
+                    app:layout_constraintStart_toEndOf="@+id/mob_d2"
+                    app:layout_constraintBottom_toBottomOf="@+id/mob_d2"/>
+                <EditText
+                    android:id="@+id/mob_d4"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintEnd_toStartOf="@+id/mob_d5"
+                    app:layout_constraintTop_toTopOf="@+id/mob_d3"
+                    app:layout_constraintStart_toEndOf="@+id/mob_d3"
+                    app:layout_constraintBottom_toBottomOf="@+id/mob_d3"/>
+                <EditText
+                    android:id="@+id/mob_d5"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintEnd_toStartOf="@+id/mob_d6"
+                    app:layout_constraintTop_toTopOf="@+id/mob_d4"
+                    app:layout_constraintStart_toEndOf="@+id/mob_d4"
+                    app:layout_constraintBottom_toBottomOf="@+id/mob_d4"/>
+                <EditText
+                    android:id="@+id/mob_d6"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    android:layout_marginEnd="@dimen/pad_24"
+                    app:layout_constraintTop_toTopOf="@+id/mob_d5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/mob_d5"/>
+
+                <TextView
+                    android:id="@+id/txtvw_eml_otp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enter_email_otp"
+                    android:textSize="@dimen/pad_15"
+                    android:textColor="@color/txt_color"
+                    android:fontFamily="@font/muli_semi_bold"
+                    android:layout_marginStart="@dimen/pad_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/eml_d1"
+                    app:layout_constraintTop_toBottomOf="@+id/mob_d1"/>
+
+                <TextView
+                    android:id="@+id/eml_d1"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    android:layout_marginStart="@dimen/pad_24"
+
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/txtvw_resend_otp"
+                    app:layout_constraintTop_toBottomOf="@+id/txtvw_eml_otp"/>
+
+                <TextView
+                    android:id="@+id/eml_d2"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintBottom_toBottomOf="@+id/eml_d1"
+                    app:layout_constraintTop_toTopOf="@+id/eml_d1"
+                    app:layout_constraintEnd_toStartOf="@+id/eml_d3"
+                    app:layout_constraintStart_toEndOf="@+id/eml_d1"/>
+                <TextView
+                    android:id="@+id/eml_d3"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintBottom_toBottomOf="@+id/eml_d2"
+                    app:layout_constraintTop_toTopOf="@+id/eml_d2"
+                    app:layout_constraintEnd_toStartOf="@+id/eml_d4"
+                    app:layout_constraintStart_toEndOf="@+id/eml_d2"/>
+                <TextView
+                    android:id="@+id/eml_d4"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintBottom_toBottomOf="@+id/eml_d3"
+                    app:layout_constraintTop_toTopOf="@+id/eml_d3"
+                    app:layout_constraintEnd_toStartOf="@+id/eml_d5"
+                    app:layout_constraintStart_toEndOf="@+id/eml_d3"/>
+                <TextView
+                    android:id="@+id/eml_d5"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    app:layout_constraintBottom_toBottomOf="@+id/eml_d4"
+                    app:layout_constraintTop_toTopOf="@+id/eml_d4"
+                    app:layout_constraintEnd_toStartOf="@+id/eml_d6"
+                    app:layout_constraintStart_toEndOf="@+id/eml_d4"/>
+                <TextView
+                    android:id="@+id/eml_d6"
+                    android:layout_width="@dimen/pad_40"
+                    android:layout_height="@dimen/pad_40"
+                    android:background="@drawable/otp_border_background"
+                    android:layout_marginEnd="@dimen/pad_24"
+                    app:layout_constraintBottom_toBottomOf="@+id/eml_d5"
+                    app:layout_constraintTop_toTopOf="@+id/eml_d5"
+
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <TextView
+                    android:id="@+id/txtvw_resend_otp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/resend_both_otp_in_00_59"
+                    android:textSize="13dp"
+                    android:textColor="@color/pay_later_backgroind_theme"
+                    android:fontFamily="@font/muli_regular"
+                    android:gravity="center"
+                    android:layout_marginEnd="@dimen/pad_24"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/laut_term"
+                    app:layout_constraintTop_toBottomOf="@+id/eml_d6"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/laut_term"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/pad_24"
+                    android:layout_marginEnd="@dimen/pad_24"
+
+                    android:background="@drawable/select_terminal_background"
+                    app:layout_constraintBottom_toTopOf="@+id/info_submit"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txtvw_resend_otp">
+
+                    <ImageView
+                        android:id="@+id/img_terminal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/pad_10"
+                        android:src="@drawable/ic_terminal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/select_terminal_txtvw"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/pad_15"
+                        android:layout_marginTop="@dimen/pad_5"
+                        android:fontFamily="@font/muli_bold"
+                        android:gravity="center"
+                        android:text="@string/selected_terminals"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/pad_15"
+                        app:layout_constraintStart_toEndOf="@+id/img_terminal"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/pad_15"
+                        android:layout_marginBottom="@dimen/pad_10"
+                        android:fontFamily="@font/muli_light"
+                        android:gravity="center"
+                        android:text="788993456, 788993459, 788993456"
+                        android:textColor="@color/txt_color"
+                        android:textSize="@dimen/pad_14"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/img_terminal"
+                        app:layout_constraintTop_toBottomOf="@+id/select_terminal_txtvw" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/info_submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/submit_info"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/muli_regular"
+                    android:textColor="@color/txt_color"
+                    android:background="@drawable/submit_info_background"
+                    android:layout_marginStart="@dimen/pad_24"
+                    android:layout_marginEnd="@dimen/pad_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/laut_term"
+                    app:layout_constraintBottom_toTopOf="@+id/submit_btn" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/submit_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rippleColor="@color/background"
+                    app:cardElevation="@dimen/pad_5"
+                    app:cardCornerRadius="@dimen/pad_10"
+                    android:layout_marginStart="@dimen/pad_24"
+                    android:layout_marginEnd="@dimen/pad_24"
+
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/info_submit"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/pad_50"
+                        android:text="@string/submit"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/pad_20"
+                        android:fontFamily="@font/muli_regular"
+                        android:background="@drawable/pay_later_proced_set"
+                        android:gravity="center"/>
+                </com.google.android.material.card.MaterialCardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/otp_img"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/otp_img_background"
+        android:layout_marginStart="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/oto_warning"
+        app:layout_constraintTop_toTopOf="@+id/oto_warning">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_otp_img"
+            android:layout_margin="@dimen/pad_15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/oto_warning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/otp_warning"
+        android:textSize="13dp"
+        android:fontFamily="@font/muli_regular"
+        android:textColor="@color/txt_color"
+
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginStart="@dimen/pad_30"
+        app:layout_constraintStart_toEndOf="@+id/otp_img"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/txtvw_mob_otp"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view"/>
+
+    <TextView
+        android:id="@+id/txtvw_mob_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_mobile_otp"
+        android:textSize="@dimen/pad_15"
+        android:textColor="@color/txt_color"
+        android:fontFamily="@font/muli_semi_bold"
+        android:gravity="center"
+        android:layout_marginStart="@dimen/pad_24"
+        app:layout_constraintBottom_toTopOf="@+id/mob_d1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/otp_img"/>
+
+    <EditText
+        android:id="@+id/mob_d1"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:gravity="center"
+        android:maxLength="1"
+        android:scrollbars="none"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:inputType="number"
+        android:layout_marginStart="@dimen/pad_24"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/txtvw_eml_otp"
+        app:layout_constraintTop_toBottomOf="@+id/txtvw_mob_otp"/>
+    <EditText
+        android:id="@+id/mob_d2"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d3"
+        app:layout_constraintTop_toTopOf="@+id/mob_d1"
+        app:layout_constraintStart_toEndOf="@+id/mob_d1"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d1"/>
+    <EditText
+        android:id="@+id/mob_d3"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d4"
+        app:layout_constraintTop_toTopOf="@+id/mob_d2"
+        app:layout_constraintStart_toEndOf="@+id/mob_d2"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d2"/>
+    <EditText
+        android:id="@+id/mob_d4"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d5"
+        app:layout_constraintTop_toTopOf="@+id/mob_d3"
+        app:layout_constraintStart_toEndOf="@+id/mob_d3"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d3"/>
+    <EditText
+        android:id="@+id/mob_d5"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d6"
+        app:layout_constraintTop_toTopOf="@+id/mob_d4"
+        app:layout_constraintStart_toEndOf="@+id/mob_d4"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d4"/>
+    <EditText
+        android:id="@+id/mob_d6"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintTop_toTopOf="@+id/mob_d5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d5"/>
+
+    <TextView
+        android:id="@+id/txtvw_eml_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_email_otp"
+        android:textSize="@dimen/pad_15"
+        android:textColor="@color/txt_color"
+        android:fontFamily="@font/muli_semi_bold"
+        android:layout_marginStart="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/eml_d1"
+        app:layout_constraintTop_toBottomOf="@+id/mob_d1"/>
+
+    <EditText
+        android:id="@+id/eml_d1"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        android:layout_marginStart="@dimen/pad_24"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/txtvw_resend_otp"
+        app:layout_constraintTop_toBottomOf="@+id/txtvw_eml_otp"/>
+
+    <EditText
+        android:id="@+id/eml_d2"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d1"
+        app:layout_constraintTop_toTopOf="@+id/eml_d1"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d3"
+        app:layout_constraintStart_toEndOf="@+id/eml_d1"/>
+    <EditText
+        android:id="@+id/eml_d3"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d2"
+        app:layout_constraintTop_toTopOf="@+id/eml_d2"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d4"
+        app:layout_constraintStart_toEndOf="@+id/eml_d2"/>
+    <EditText
+        android:id="@+id/eml_d4"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d3"
+        app:layout_constraintTop_toTopOf="@+id/eml_d3"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d5"
+        app:layout_constraintStart_toEndOf="@+id/eml_d3"/>
+    <EditText
+        android:id="@+id/eml_d5"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d4"
+        app:layout_constraintTop_toTopOf="@+id/eml_d4"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d6"
+        app:layout_constraintStart_toEndOf="@+id/eml_d4"/>
+    <EditText
+        android:id="@+id/eml_d6"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:maxLength="1"
+        android:fontFamily="@font/muli_bold"
+        android:textSize="@dimen/otp_size"
+        android:gravity="center"
+        android:inputType="number"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d5"
+        app:layout_constraintTop_toTopOf="@+id/eml_d5"
+
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/txtvw_resend_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/resend_both_otp_in_00_59"
+        android:textSize="13dp"
+        android:textColor="@color/pay_later_backgroind_theme"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/laut_term"
+        app:layout_constraintTop_toBottomOf="@+id/eml_d6"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/laut_term"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+
+        android:background="@drawable/select_terminal_background"
+        app:layout_constraintBottom_toTopOf="@+id/info_submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtvw_resend_otp">
+
+        <ImageView
+            android:id="@+id/img_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/pad_10"
+            android:src="@drawable/ic_terminal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/select_terminal_txtvw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/pad_15"
+            android:layout_marginTop="@dimen/pad_5"
+            android:fontFamily="@font/muli_bold"
+            android:gravity="center"
+            android:text="@string/selected_terminals"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/pad_15"
+            app:layout_constraintStart_toEndOf="@+id/img_terminal"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/pad_15"
+            android:layout_marginBottom="@dimen/pad_10"
+            android:fontFamily="@font/muli_light"
+            android:gravity="center"
+            android:text="788993456, 788993459, 788993456"
+            android:textColor="@color/txt_color"
+            android:textSize="@dimen/pad_14"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/img_terminal"
+            app:layout_constraintTop_toBottomOf="@+id/select_terminal_txtvw" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/info_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/submit_info"
+        android:textSize="12sp"
+        android:fontFamily="@font/muli_regular"
+        android:textColor="@color/txt_color"
+        android:background="@drawable/submit_info_background"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/laut_term"
+        app:layout_constraintBottom_toTopOf="@+id/submit_btn" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/submit_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:rippleColor="@color/background"
+        app:cardElevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_10"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/info_submit"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pad_50"
+            android:text="@string/submit"
+            android:textColor="@color/white"
+            android:textSize="@dimen/pad_20"
+            android:fontFamily="@font/muli_regular"
+            android:background="@drawable/pay_later_proced_set"
+            android:gravity="center"/>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".view.fragments.OnBoardingEnterOtpFragment">
+
+    <include
+        android:id="@+id/sub_header_view"
+        layout="@layout/sub_header_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/otp_img"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/otp_img_background"
+        android:layout_marginStart="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/oto_warning"
+        app:layout_constraintTop_toTopOf="@+id/oto_warning">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_otp_img"
+            android:layout_margin="@dimen/pad_15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/oto_warning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/otp_warning"
+        android:textSize="13dp"
+        android:fontFamily="@font/muli_regular"
+        android:textColor="@color/txt_color"
+        android:layout_marginTop="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginStart="@dimen/pad_30"
+        app:layout_constraintStart_toEndOf="@+id/otp_img"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sub_header_view"/>
+
+    <TextView
+        android:id="@+id/txtvw_mob_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_mobile_otp"
+        android:textSize="@dimen/pad_15"
+        android:textColor="@color/txt_color"
+        android:fontFamily="@font/muli_semi_bold"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_30"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/otp_img"/>
+
+    <EditText
+        android:id="@+id/mob_d1"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtvw_mob_otp"/>
+    <EditText
+        android:id="@+id/mob_d2"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d3"
+        app:layout_constraintTop_toTopOf="@+id/mob_d1"
+        app:layout_constraintStart_toEndOf="@+id/mob_d1"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d1"/>
+    <EditText
+        android:id="@+id/mob_d3"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d4"
+        app:layout_constraintTop_toTopOf="@+id/mob_d2"
+        app:layout_constraintStart_toEndOf="@+id/mob_d2"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d2"/>
+    <EditText
+        android:id="@+id/mob_d4"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d5"
+        app:layout_constraintTop_toTopOf="@+id/mob_d3"
+        app:layout_constraintStart_toEndOf="@+id/mob_d3"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d3"/>
+    <EditText
+        android:id="@+id/mob_d5"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintEnd_toStartOf="@+id/mob_d6"
+        app:layout_constraintTop_toTopOf="@+id/mob_d4"
+        app:layout_constraintStart_toEndOf="@+id/mob_d4"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d4"/>
+    <EditText
+        android:id="@+id/mob_d6"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintTop_toTopOf="@+id/mob_d5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/mob_d5"/>
+
+    <TextView
+        android:id="@+id/txtvw_eml_otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enter_email_otp"
+        android:textSize="@dimen/pad_15"
+        android:textColor="@color/txt_color"
+        android:fontFamily="@font/muli_semi_bold"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mob_d1"/>
+
+    <TextView
+        android:id="@+id/eml_d1"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginTop="@dimen/pad_15"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@+id/txtvw_eml_otp"/>
+
+    <TextView
+        android:id="@+id/eml_d2"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d1"
+        app:layout_constraintTop_toTopOf="@+id/eml_d1"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d3"
+        app:layout_constraintStart_toEndOf="@+id/eml_d1"/>
+    <TextView
+        android:id="@+id/eml_d3"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d2"
+        app:layout_constraintTop_toTopOf="@+id/eml_d2"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d4"
+        app:layout_constraintStart_toEndOf="@+id/eml_d2"/>
+    <TextView
+        android:id="@+id/eml_d4"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d3"
+        app:layout_constraintTop_toTopOf="@+id/eml_d3"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d5"
+        app:layout_constraintStart_toEndOf="@+id/eml_d3"/>
+    <TextView
+        android:id="@+id/eml_d5"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d4"
+        app:layout_constraintTop_toTopOf="@+id/eml_d4"
+        app:layout_constraintEnd_toStartOf="@+id/eml_d6"
+        app:layout_constraintStart_toEndOf="@+id/eml_d4"/>
+    <TextView
+        android:id="@+id/eml_d6"
+        android:layout_width="@dimen/pad_40"
+        android:layout_height="@dimen/pad_40"
+        android:background="@drawable/otp_border_background"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintBottom_toBottomOf="@+id/eml_d5"
+        app:layout_constraintTop_toTopOf="@+id/eml_d5"
+
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/resend_both_otp_in_00_59"
+        android:textSize="13dp"
+        android:textColor="@color/pay_later_backgroind_theme"
+        android:fontFamily="@font/muli_regular"
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/laut_term"
+        app:layout_constraintTop_toBottomOf="@+id/eml_d6"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/laut_term"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/select_terminal_background"
+        android:layout_marginBottom="@dimen/pad_15"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/info_submit">
+
+        <ImageView
+            android:id="@+id/img_terminal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_terminal"
+            android:layout_marginStart="@dimen/pad_10"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/select_terminal_txtvw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/selected_terminals"
+            android:textSize="@dimen/pad_15"
+            android:textColor="@color/txt_color"
+            android:fontFamily="@font/muli_bold"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/pad_15"
+            android:layout_marginTop="@dimen/pad_5"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/img_terminal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="788993456, 788993459, 788993456"
+            android:textSize="@dimen/pad_14"
+            android:textColor="@color/txt_color"
+            android:fontFamily="@font/muli_light"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/pad_15"
+            android:layout_marginBottom="@dimen/pad_10"
+            app:layout_constraintStart_toEndOf="@+id/img_terminal"
+            app:layout_constraintTop_toBottomOf="@+id/select_terminal_txtvw"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/info_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/submit_info"
+        android:textSize="12sp"
+        android:fontFamily="@font/muli_regular"
+        android:textColor="@color/txt_color"
+        android:background="@drawable/submit_info_background"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginBottom="@dimen/pad_20"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/submit_btn" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/submit_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:rippleColor="@color/background"
+        app:cardElevation="@dimen/pad_5"
+        app:cardCornerRadius="@dimen/pad_10"
+        android:layout_marginStart="@dimen/pad_24"
+        android:layout_marginEnd="@dimen/pad_24"
+        android:layout_marginBottom="@dimen/pad_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/pad_50"
+            android:text="@string/submit"
+            android:textColor="@color/white"
+            android:textSize="@dimen/pad_20"
+            android:fontFamily="@font/muli_regular"
+            android:background="@drawable/pay_later_proced_set"
+            android:gravity="center"/>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>-->
