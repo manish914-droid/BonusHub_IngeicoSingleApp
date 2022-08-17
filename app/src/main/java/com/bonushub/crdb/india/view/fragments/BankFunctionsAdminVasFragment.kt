@@ -19,6 +19,7 @@ import com.bonushub.crdb.india.model.local.AppPreference
 import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.checkInternetConnection
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.showToast
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.dialog.OnClickDialogOkCancel
 import com.bonushub.crdb.india.view.activity.NavigationActivity
@@ -152,8 +153,7 @@ class BankFunctionsAdminVasFragment : Fragment() , IBankFunctionsAdminVasItemCli
                                     when {
                                         AppPreference.getBoolean(PreferenceKeyConstant.SERVER_HIT_STATUS.keyName.toString()) ->{
                                             iDialog?.hideProgress()
-                                            ToastUtils.showToast(
-                                                requireContext(),
+                                           showToast(
                                                 getString(R.string.please_clear_fbatch_before_init)
                                             )
                                         }

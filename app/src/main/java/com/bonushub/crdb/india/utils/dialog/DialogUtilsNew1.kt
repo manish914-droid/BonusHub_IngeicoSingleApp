@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.utils.ToastUtils
 import com.bonushub.crdb.india.utils.Utility
+import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.fragments.getEditorActionListener
 import com.bonushub.crdb.india.vxutils.BhTransactionType
 import com.google.android.material.textfield.TextInputEditText
@@ -64,6 +65,8 @@ class DialogUtilsNew1 {
 
             //textViewHeader.text = header
             inputTexLayout.hint = hint
+
+            (activity as BaseActivityNew).speakText(hint.toString())
 
             if (header?.equals("ADMIN PASSWORD") == true) {
 

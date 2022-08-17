@@ -1469,7 +1469,7 @@ object Field48ResponseTimestamp {
 
     //Below method is used to show Toast on UI Thread:-
     fun showToast(message: String) {
-        GlobalScope.launch(Dispatchers.Main) {
+        CoroutineScope(Dispatchers.Main).launch {
             Toast.makeText(HDFCApplication.appContext, message, Toast.LENGTH_SHORT).show()
         }
 
