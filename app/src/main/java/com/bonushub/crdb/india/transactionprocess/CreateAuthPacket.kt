@@ -6,6 +6,7 @@ import com.bonushub.crdb.india.HDFCApplication.Companion.appContext
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.model.CardProcessedDataModal
 import com.bonushub.crdb.india.model.local.AppPreference
+
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getIssuerData
 import com.bonushub.crdb.india.utils.Utility
@@ -118,7 +119,7 @@ class CreateAuthPacket {
                     AppPreference.WALLET_ISSUER_ID
                 )
                 val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-                val pcNumber = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
+                val pcNumber = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
                 val data = getConnectionType() +addPad(
                     AppPreference.getString("deviceModel"),
                     " ",
@@ -199,7 +200,7 @@ class CreateAuthPacket {
                 //val issuerParameterTable = IssuerParameterTable.selectFromIssuerParameterTable(AppPreference.WALLET_ISSUER_ID)
                 val issuerParameterTable = getIssuerData(AppPreference.WALLET_ISSUER_ID)
                 val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-                val pcNumber = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
+                val pcNumber = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
                 val data = getConnectionType() +addPad(
                     AppPreference.getString("deviceModel"),
                     " ",

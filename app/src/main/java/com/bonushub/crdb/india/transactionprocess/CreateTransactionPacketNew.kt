@@ -239,7 +239,7 @@ when(cardProcessedData.getTransType()){
             val issuerParameterTable = getIssuerData(AppPreference.WALLET_ISSUER_ID)
            // val issuerParameterTable = IssuerParameterTable.selectFromIssuerParameterTable(AppPreference.WALLET_ISSUER_ID)
             val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-            val pcNumbers= addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)+addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
+            val pcNumbers= addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)+addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
             val data = getConnectionType() + addPad(
                 deviceModel(),
                 " ",
