@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputFilter
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,6 +32,8 @@ import com.bonushub.crdb.india.repository.ServerRepository
 import com.bonushub.crdb.india.serverApi.RemoteService
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.convertValue2BCD
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getHDFCTptData
+import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.isTipEnable
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.maxAmountLimitDialog
 import com.bonushub.crdb.india.view.activity.IFragmentRequest
@@ -263,6 +266,41 @@ class NewInputAmountFragment : Fragment()/*,TextToSpeech.OnInitListener*/ {
         inputInMobilenumber = false
         setOnClickListeners()
         setOnTextChangeListeners()
+
+        binding?.saleAmount?.filters = arrayOf<InputFilter>(
+            InputFilter.LengthFilter(
+                4
+            )
+        )
+
+        lifecycleScope.launch(Dispatchers.IO){
+            val hdfcTPTData = getHDFCTptData()
+            if (null != hdfcTPTData && hdfcTPTData.transAmountDigit.isNotBlank() && hdfcTPTData.transAmountDigit.isNotEmpty())  {
+                withContext(Dispatchers.Main){
+                    binding?.saleAmount?.filters = arrayOf<InputFilter>(
+                        InputFilter.LengthFilter(
+                            hdfcTPTData.transAmountDigit.toInt()+1
+                        )
+                    )
+                }
+
+            }else{
+                val tpt = getTptData()
+                withContext(Dispatchers.Main){
+                    binding?.saleAmount?.filters = tpt?.maxAmtEntryDigits?.toInt()?.plus(1)?.let {
+                        InputFilter.LengthFilter(
+                            it
+                        )
+                    }?.let {
+                        arrayOf<InputFilter>(
+                            it
+                        )
+                    }
+                }
+
+            }
+        }
+
 
     }
 

@@ -17,10 +17,9 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
-import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -378,7 +377,7 @@ class UpiSmsDynamicPayQrInputDetailFragment : Fragment() {
                                                                             //txnSuccessToast(activity as Context)
                                                                             // kushal
                                                                             logger("call","printSMSUPIChagreSlip","e")
-                                                                            PrintUtil(context).printSMSUPIChagreSlip(
+                                                                            PrintVectorUtil(context).printSMSUPIChagreSlip(
                                                                                 tabledata,
                                                                                 EPrintCopyType.MERCHANT,
                                                                                 context

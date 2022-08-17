@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="@dimen/pad_10"
-    app:strokeColor="#BBBBBB"
+    app:strokeColor="@color/themeBackground"
+    app:strokeWidth=".5dp"
     app:cardElevation="@dimen/pad_5"
     android:id="@+id/linLayItem"
     android:layout_margin="@dimen/pad_10"
@@ -177,156 +178,16 @@
             app:layout_constraintTop_toBottomOf="@+id/txtViewDateTittle"
             app:layout_constraintEnd_toEndOf="@+id/txtViewRocTittle"/>
 
+        <ImageView
+            android:id="@+id/imgViewArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pending_preauth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtViewTime"
+            android:padding="@dimen/pad_5"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-  <!--  <RelativeLayout
-        android:layout_width="@dimen/pad_0"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.2">
-
-        <TextView
-            android:id="@+id/txtViewBatchTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/muli_light"
-            android:text="BATCH NO:"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewBatch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:layout_toEndOf="@+id/txtViewBatchTitle"
-            android:fontFamily="@font/muli_light"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewPanTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewBatch"
-            android:layout_marginTop="@dimen/pad_5"
-            android:fontFamily="@font/muli_light"
-            android:text="PAN:"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewPan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewBatch"
-            android:layout_marginStart="3dp"
-            android:layout_marginTop="@dimen/pad_5"
-            android:layout_toEndOf="@+id/txtViewPanTitle"
-            android:fontFamily="@font/muli_light"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewDateTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewPan"
-            android:layout_marginTop="@dimen/pad_5"
-            android:fontFamily="@font/muli_light"
-            android:text="DATE:"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewPan"
-            android:layout_marginStart="3dp"
-            android:layout_marginTop="@dimen/pad_5"
-            android:layout_toEndOf="@+id/txtViewDateTitle"
-            android:fontFamily="@font/muli_light"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="@dimen/pad_0"
-        android:layout_height="wrap_content"
-        android:layout_weight=".8">
-
-        <TextView
-            android:id="@+id/txtViewRocTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/muli_light"
-            android:text="ROC:"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewRoc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:layout_toEndOf="@+id/txtViewRocTitle"
-            android:fontFamily="@font/muli_light"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewAmtTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewRoc"
-            android:layout_marginTop="@dimen/pad_5"
-            android:fontFamily="@font/muli_light"
-            android:text="AMT:"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewAmt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewRoc"
-            android:layout_marginStart="3dp"
-            android:layout_marginTop="@dimen/pad_5"
-            android:layout_toEndOf="@+id/txtViewAmtTitle"
-            android:fontFamily="@font/muli_light"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewTimeTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewAmt"
-            android:layout_marginTop="@dimen/pad_5"
-            android:fontFamily="@font/muli_light"
-            android:text="TIME:"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-        <TextView
-            android:id="@+id/txtViewTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtViewAmt"
-            android:layout_marginStart="3dp"
-            android:layout_marginTop="@dimen/pad_5"
-            android:layout_toEndOf="@+id/txtViewTimeTitle"
-            android:fontFamily="@font/muli_light"
-            android:textColor="@color/txt_color"
-            android:textSize="@dimen/text_size_xsmall" />
-
-    </RelativeLayout>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_right_arrow"
-        android:tint="#013480" />-->
 </com.google.android.material.card.MaterialCardView>

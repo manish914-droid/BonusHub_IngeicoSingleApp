@@ -659,7 +659,7 @@ class PrintVectorUtil(context: Context?) {
                         }
 
 
-                        batchTable.cardHolderName?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL) }
+                        batchTable.cardHolderName.trim().let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL) }
                     }
 
                     try {
@@ -824,27 +824,27 @@ class PrintVectorUtil(context: Context?) {
         setLogoAndHeader(logo)
 
         if (logo == AMEX_BANK_CODE_SINGLE_DIGIT || logo == AppPreference.AMEX_BANK_CODE) {
-            tpt?.receiptHeaderOne?.let {
-                sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false)
+            tpt?.receiptHeaderOne?.trim()?.let {
+                sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false)
             }
-            tpt?.receiptHeaderTwo?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
-            tpt?.receiptHeaderThree?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+            tpt?.receiptHeaderTwo?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
+            tpt?.receiptHeaderThree?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
         } else {
             if (null != hdfcTpt && hdfcTpt?.defaultMerchantName?.isNotBlank() ?: false && hdfcTpt?.defaultMerchantName?.isNotEmpty() ?: false) {
                 hdfcTpt?.defaultMerchantName?.trim()
-                    ?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                    ?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
             } else {
-                tpt?.receiptHeaderOne?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                tpt?.receiptHeaderOne?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
             }
             if (null != hdfcTpt && hdfcTpt?.receiptL2?.isNotBlank() ?: false && hdfcTpt?.receiptL2?.isNotEmpty() ?: false) {
-                hdfcTpt?.receiptL2?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                hdfcTpt?.receiptL2?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
             } else {
-                tpt?.receiptHeaderTwo?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                tpt?.receiptHeaderTwo?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
             }
             if (null != hdfcTpt && hdfcTpt?.receiptL3?.isNotBlank() ?: false && hdfcTpt?.receiptL3?.isNotEmpty() ?: false) {
-                hdfcTpt?.receiptL3?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                hdfcTpt?.receiptL3?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
             } else {
-                tpt?.receiptHeaderThree?.let { sigleLineText(it ?: "".trim(), AlignMode.CENTER, TextSize.NORMAL, false) }
+                tpt?.receiptHeaderThree?.trim()?.let { sigleLineText(it, AlignMode.CENTER, TextSize.NORMAL, false) }
             }
         }
 
@@ -2134,7 +2134,7 @@ class PrintVectorUtil(context: Context?) {
 
     }
 
-    private fun printPendingPreAuth(context: Context?, listPendingPreauthData:ArrayList<PendingPreauthData>, printerCallback: (Boolean, Int) -> Unit){
+    fun printPendingPreAuth(context: Context?, listPendingPreauthData:ArrayList<PendingPreauthData>, printerCallback: (Boolean, Int) -> Unit){
 
         try{
 
@@ -2173,7 +2173,8 @@ class PrintVectorUtil(context: Context?) {
                 textBlockList.clear()
 
                 // getTransactionTypeName(batchTable.transactionType)?.let { sigleLineText(it, AlignMode.CENTER) }
-                sigleLineText("PRE-AUTH TXN", AlignMode.CENTER)
+                sigleLineText("PRE-AUTH TXN", AlignMode.CENTER, TextSize.NORMAL, false)
+
                 printSeperator()
 
 

@@ -1,6 +1,5 @@
 package com.bonushub.crdb.india.view.fragments.digi_pos
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,14 +10,11 @@ import androidx.lifecycle.lifecycleScope
 import com.bonushub.crdb.india.R
 import com.bonushub.crdb.india.databinding.FragmentUpiCollectBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
-import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectAllDigiPosData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
-import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.base.IDialog
 import com.bonushub.pax.utils.KeyExchanger
 import com.google.gson.Gson

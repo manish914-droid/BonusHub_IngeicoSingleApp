@@ -14,7 +14,6 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.BitmapUtils.convertCompressedByteArrayToBitmap
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
-import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew

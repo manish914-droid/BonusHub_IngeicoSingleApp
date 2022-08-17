@@ -24,6 +24,7 @@ import com.bonushub.crdb.india.databinding.ItemPreAuthPendingBinding
 import com.bonushub.crdb.india.transactionprocess.StubBatchData
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
@@ -141,7 +142,7 @@ class PreAuthPendingFragment : Fragment() {
 
             if(pendingPreAuthDataResponse.pendingList.size > 0 ){
                 iDialog?.showProgress(getString(R.string.printing))
-                PrintUtil(activity).printPendingPreAuth(activity, pendingPreAuthDataResponse.pendingList){
+                PrintVectorUtil(activity).printPendingPreAuth(activity, pendingPreAuthDataResponse.pendingList){
                     printCb,_ ->
 
                     (activity as BaseActivityNew).hideProgress()
@@ -421,7 +422,7 @@ class PreAuthPendingFragment : Fragment() {
 
     private fun printReceipt(arList: ArrayList<PendingPreauthData>, dialogBuilder: Dialog) {
         iDialog?.showProgress(getString(R.string.printing))
-        PrintUtil(activity).printPendingPreAuth(activity, arList){
+        PrintVectorUtil(activity).printPendingPreAuth(activity, arList){
                 printCb,_ ->
 
             (activity as BaseActivityNew).hideProgress()
@@ -461,7 +462,7 @@ class PreAuthPendingAdapter(val pendPreauthData: ArrayList<PendingPreauthData>,
         holder.viewBinding.txtViewDate.text = pendPreauthData[position].date
         holder.viewBinding.txtViewTime.text = pendPreauthData[position].time
 
-        holder.viewBinding.linLayItem.setOnClickListener { ontouchView(pendPreauthData[position], position) }
+        holder.viewBinding.imgViewArrow.setOnClickListener { ontouchView(pendPreauthData[position], position) }
 
     }
 

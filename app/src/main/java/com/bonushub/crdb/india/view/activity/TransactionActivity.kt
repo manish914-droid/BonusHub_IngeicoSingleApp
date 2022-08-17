@@ -31,12 +31,9 @@ import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getMaskedPan
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.india.utils.ingenico.DialogUtil.showProgress
 import com.bonushub.crdb.india.utils.ingenico.TLV
-import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
 import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
-
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.crdb.india.view.baseemv.EmvHandler
 import com.bonushub.crdb.india.view.baseemv.GenericCardReadHandler
@@ -1840,7 +1837,6 @@ return false
          }*/
 
         withContext(Dispatchers.Main) {
-            val printerUtil: PrintUtil? = null
             (this@TransactionActivity as BaseActivityNew).alertBoxWithActionNew("",
                 getString(R.string.print_customer_copy),
                 R.drawable.ic_print_customer_copy,

@@ -14,7 +14,7 @@ import com.bonushub.crdb.india.databinding.FragmentPendingTxnBinding
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
 import com.bonushub.crdb.india.utils.*
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
-import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
@@ -226,7 +226,7 @@ class SearchTxnFragment : Fragment() {
             txtViewPrint.setOnClickListener {
                 dismiss()
 
-                PrintUtil(context).printSMSUPIChagreSlip(
+                PrintVectorUtil(context).printSMSUPIChagreSlip(
                     digiData,
                     EPrintCopyType.DUPLICATE,
                     context
