@@ -930,7 +930,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                         param.putByteArray(PinpadData.PAN_BLOCK, Utility.hexStr2Byte(addPad(cardProcessedDataModal.getPanNumberData() ?: "", "0", 16, true)))
 
                         pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
-
+                        (activity as BaseActivityNew).speakText("Please enter your pin")
 
                     }
                     CVMFlag.EMV_CVMFLAG_SIGNATURE.toByte() -> {
@@ -971,7 +971,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
             }
 
             else -> {
-                println("Unkown Flow Type")
+                println("Unknown Flow Type")
 
             }
         }
@@ -1109,6 +1109,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
         }
         when (cvm.cvm) {
             CVMFlag.EMV_CVMFLAG_OFFLINEPIN.toByte() ->  {
+                //(activity as BaseActivityNew).speakText("Please enter your pin")
                 cardProcessedDataModal.setIsOnline(2)
                 println("ORIGINAL PIN LIMIT ---> ${cvm.pinTimes.toInt()}")
                 // hexString2String(emv!!.getTLV(Integer.toHexString(0x9F17).toUpperCase(Locale.ROOT))  )
@@ -1279,6 +1280,7 @@ open class EmvHandler constructor(): EMVEventHandler.Stub() {
                     (activity as BaseActivityNew).speakText("Please enter your pin")
                 }*/
                 pinPad!!.startPinEntry(DemoConfig.KEYID_PIN, param, listener)
+                //(activity as BaseActivityNew).speakText("Please enter your pin")
 
             }
 

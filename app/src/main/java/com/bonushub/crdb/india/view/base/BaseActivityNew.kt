@@ -5,12 +5,13 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.text.TextUtils
-import android.text.TextUtils.replace
 import android.view.*
 import android.webkit.WebView
 import android.widget.LinearLayout
@@ -18,7 +19,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.Fragment
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.R
@@ -361,7 +361,7 @@ abstract class BaseActivityNew : AppCompatActivity(),TextToSpeech.OnInitListener
         //  builder.setMessage(msg)
         val bindingg = DialogAlertMsgNewBinding.inflate(LayoutInflater.from(this))
 
-        speakText(msg)
+        //speakText(msg)
 
        // dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(bindingg.root)
@@ -372,8 +372,23 @@ abstract class BaseActivityNew : AppCompatActivity(),TextToSpeech.OnInitListener
             ViewGroup.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
+        if (header == "Transaction Declined" || header == "Error" || msg== "Transaction Declined"){
+            val toneG = ToneGenerator(AudioManager.STREAM_ALARM, 100)
+            toneG.startTone(ToneGenerator.TONE_SUP_ERROR, 200)
+            //Thread.sleep(10)
+            toneG.startTone(ToneGenerator.TONE_CDMA_ABBR_REORDER, 800)
 
+            /*toneG.startTone(ToneGenerator.TONE_DTMF_S, 200)
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed({
+                toneG.release()
+            }, (200 + 50).toLong())*/
+            //Thread.sleep(100)
 
+        }
+        else{
+            speakText(msg)
+        }
         if(header.isNotEmpty()) {
             bindingg?.txtViewHeading.text = header
             bindingg?.txtViewHeading.visibility = View.VISIBLE

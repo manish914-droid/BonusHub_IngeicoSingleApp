@@ -650,10 +650,7 @@ class TransactionActivity : BaseActivityNew() {
                     emvProcessHandler = emvHandler()
                     DeviceHelper.getEMV()?.startEMV(emvOption.toBundle(), emvProcessHandler)
                     DeviceHelper.getEMV()?.switchDebug(2) //emvLogLevel -> 2
-                    /*if(AppPreference.isTTSon())
-                    {
-                        (this as BaseActivityNew).speakText("Please enter your pin")
-                    }*/
+                   // speakText("Please enter your pin")
                 }
             }
 

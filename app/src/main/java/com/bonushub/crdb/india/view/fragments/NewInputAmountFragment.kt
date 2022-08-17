@@ -355,6 +355,8 @@ class NewInputAmountFragment : Fragment()/*,TextToSpeech.OnInitListener*/ {
             inputInMobilenumber = false
 
             setFocusColor(binding?.cashAmtCrdView)
+
+            (activity as BaseActivityNew).speakText(binding?.cashAmount?.hint.toString())
         }
 
         binding?.mobNumbr?.setOnClickListener {
@@ -366,7 +368,14 @@ class NewInputAmountFragment : Fragment()/*,TextToSpeech.OnInitListener*/ {
             inputInMobilenumber = true
 
             setFocusColor(binding?.mobNoCrdView)
+
+            (activity as BaseActivityNew).speakText(binding?.mobNumbr?.hint.toString())
         }
+
+        binding?.descriptionEt?.setOnClickListener {
+            (activity as BaseActivityNew).speakText(binding?.descriptionEt?.hint.toString())
+        }
+
         onSetKeyBoardButtonClick()
     }
 

@@ -80,6 +80,9 @@ class VoidMainFragment : Fragment() {
 
         (activity as NavigationActivity).manageTopToolBar(false)
 
+        binding?.edtTextSearchTransaction?.setOnClickListener {
+            (activity as BaseActivityNew).speakText(binding?.edtTextSearchTransaction?.hint.toString())
+        }
         // set header
         /*binding?.subHeaderView?.subHeaderText?.text = getString(R.string.void_sale)
         binding?.subHeaderView?.headerImage?.setImageResource(R.drawable.ic_void)*/
