@@ -30,6 +30,7 @@ import com.bonushub.crdb.india.vxutils.dateFormaterNew
 import com.bonushub.crdb.india.vxutils.invoiceWithPadding
 import com.bonushub.crdb.india.vxutils.timeFormaterNew
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -149,6 +150,29 @@ class PreAuthVoidFragment : Fragment() {
                         ) {
                                 status , dialog ->
                             lifecycleScope.launch(Dispatchers.IO) {
+
+                                // region sync card call back
+                                withContext(Dispatchers.Main){ iDialog?.showProgress(getString(R.string.please_wait)) }
+
+                                    val tpt = Field48ResponseTimestamp.getTptData()
+                                    if(tpt?.digiPosCardCallBackRequired == "1"){
+
+                                        withContext(Dispatchers.Main){ iDialog?.showProgress(getString(R.string.transaction_syncing_msg)) }
+
+                                        saveEcrSale(stubbedData, it.cardProcessedDataModal.getTransType())
+
+                                        syncTxnCallBackToHost(true){
+                                            Log.e(
+                                                "TXN CB ",
+                                                "SYNCED TO SERVER  --> $it")
+                                            iDialog?.hideProgress()
+                                        }
+                                    }else{
+                                        withContext(Dispatchers.Main){ iDialog?.hideProgress() }
+
+                                    }
+                                // end region
+
                                 withContext(Dispatchers.Main) {
                                     printChargeSlip(
                                         (activity as BaseActivityNew),

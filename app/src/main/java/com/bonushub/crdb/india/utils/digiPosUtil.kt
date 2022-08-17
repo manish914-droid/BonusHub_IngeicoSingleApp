@@ -7,7 +7,10 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import com.bonushub.crdb.india.HDFCApplication
 import com.bonushub.crdb.india.db.AppDao
+import com.bonushub.crdb.india.di.DBModule
 import com.bonushub.crdb.india.model.local.DigiPosDataTable
+import com.bonushub.crdb.india.model.local.TempBatchFileDataTable
+import com.bonushub.crdb.india.model.local.TxnCallBackRequestTable
 import com.bonushub.crdb.india.utils.BitmapUtils.convertCompressedByteArrayToBitmap
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.deleteDigiposData
 import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.insertOrUpdateDigiposData
@@ -15,9 +18,7 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.selectDigiPosDataA
 import com.bonushub.crdb.india.view.base.BaseActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
 import com.bonushub.pax.utils.KeyExchanger.Companion.getDigiPosStatus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -454,4 +455,120 @@ fun saveStaticQrToInternalStorage(bmp: Bitmap): Boolean {
         ex.printStackTrace()
         false
     }
+}
+
+suspend fun syncTxnCallBackToHost(multipleHit:Boolean?=null,cb: (Boolean) -> Unit) {
+
+
+    val txnCbAllPendingReqList =
+        DBModule.appDatabase.appDao.getAllTxnCallBackRequestTable()
+
+    var ecrTxnId:String?=null
+    if (txnCbAllPendingReqList.isNotEmpty()) {
+        for (i in txnCbAllPendingReqList) {
+            var field57: String
+            var procCode: String
+            /*if (AppPreference.getBoolean(AppPreference.IsECRon)) {
+                //todo dummy data for ECR CardPayment --> 202^0^41501121^000193^000654^500000^15^0^20220302145902^CardPayment^^^
+                //todo dummy data for ECR SMS Pay -->202^0^41501121^^^200.00^24^0^20220302185945^SMS^66884881646227792916^22066095896432002^
+                var syncingType = ""
+                var dateTime = ""
+                var transAmount="0"
+                //CardPayment/SMS/UPI
+                when (i.txnType) {
+                    TransactionType.BHART_QR_TXN.type -> {
+                        syncingType = "QR"
+                        dateTime = getDesiredFormatDateTimeForDigiPosSyncing(i.txnDate, i.txnTime)
+                        transAmount  = i.amount
+                    }
+                    TransactionType.UPI_TXN.type -> {
+                        syncingType = "UPI"
+                        dateTime = getDesiredFormatDateTimeForDigiPosSyncing(i.txnDate, i.txnTime)
+                        transAmount  = i.amount
+                    }
+                    TransactionType.SMS_TXN.type -> {
+                        syncingType = "SMS"
+                        dateTime = getDesiredFormatDateTimeForDigiPosSyncing(i.txnDate, i.txnTime)
+                        transAmount  = i.amount
+                    }
+                    else -> {
+
+                        dateTime = getDesiredFormatDateTime(i.txnDate, i.txnTime)
+                        syncingType = "CardPayment"
+                        transAmount  = ((i.amount.toFloat()) * 100).toInt().toString()
+
+                    }
+                }
+
+                field57 = "202^0^${i.tid}^${i.batchnum}^${i.roc}^${transAmount}^${i.ecrSaleReqId}^${"0"}^${dateTime}^${syncingType}^${i.mTxnId}^${i.pgwtxnId}"
+                procCode = EnumDigiPosProcessingCode.ECRSCYNPROCODE.code
+                ecrTxnId=i.ecrSaleReqId
+            } else {
+                field57 = "${i.reqtype}^${i.tid}^${i.batchnum}^${i.roc}^${i.amount}"
+                procCode = EnumDigiPosProcessingCode.DIGIPOSPROCODE.code
+            }*/
+
+            field57 = "${i.reqtype}^${i.tid}^${i.batchnum}^${i.roc}^${i.amount}"
+            procCode = EnumDigiPosProcessingCode.DIGIPOSPROCODE.code
+
+            getDigiPosStatus(field57, procCode/*,ecrTxnId = ecrTxnId*/) { isSuccess, responseMsg, responsef57, fullResponse ->
+                if (responsef57.isNotBlank()) {
+                    // deleting txncb from table
+                    Log.e("isSuccess",isSuccess.toString())
+                    Log.e("responseMsg",responseMsg.toString())
+                    Log.e("responsef57",responsef57.toString())
+                    if(isSuccess) {
+                        CoroutineScope(Dispatchers.IO).launch{ DBModule.appDatabase.appDao.deleteTxnCallBackRequest(i) }
+                    }
+                } else {
+                    if((responseMsg == "no_response_error") && multipleHit == true) {
+                        if (i == txnCbAllPendingReqList.last()){
+                            runBlocking {
+                                getDigiPosStatus(
+                                    field57,
+                                    procCode
+                                ) { isSuccess, responseMsg, responsef57, fullResponse ->
+                                    if (responsef57.isNotBlank()) {
+                                        // deleting txncb from table
+                                        Log.e("isSuccess", isSuccess.toString())
+                                        Log.e("responseMsg", responseMsg.toString())
+                                        Log.e("responsef57", responsef57.toString())
+                                        if(isSuccess) {
+                                            CoroutineScope(Dispatchers.IO).launch{ DBModule.appDatabase.appDao.deleteTxnCallBackRequest(i) }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Log.e("UPLOAD TXN CallBack", " -------->  FAIL")
+                }
+            }
+        }
+        cb(true)
+    } else {
+        Log.e("txnCbAllPendingReqList", " is Empty")
+    }
+}
+
+fun saveEcrSale(stubbedData:TempBatchFileDataTable,type:Int){
+    val amount = MoneyUtil.fen2yuan(
+        stubbedData.totalAmmount.toDouble()
+            .toLong()
+    )
+    val txnCbReqData = TxnCallBackRequestTable()
+    txnCbReqData.reqtype =
+        EnumDigiPosProcess.TRANSACTION_CALL_BACK.code
+    txnCbReqData.tid = stubbedData.hostTID
+    txnCbReqData.batchnum =
+        stubbedData.hostBatchNumber
+    txnCbReqData.roc = stubbedData.hostRoc
+    txnCbReqData.amount = amount
+
+    txnCbReqData.ecrSaleReqId=stubbedData.ecrTxnSaleRequestId
+    txnCbReqData.txnTime = stubbedData.time
+    txnCbReqData.txnDate = stubbedData.transactionDate
+    txnCbReqData.txnType= type
+
+    runBlocking(Dispatchers.IO) { DBModule.appDatabase.appDao.insertOrUpdateTxnCallBackRequestTable(txnCbReqData ) }
 }

@@ -586,4 +586,19 @@ interface AppDao{
 
     @Query("DELETE From  TempBatchFileDataTable WHERE invoiceNumber = :invoice and hostTID = :hostTid")
     suspend fun deleteTempBatchFileDataTableFromInvoice(invoice: String?, hostTid:String?)
+
+    // region ========================== TxnCallBackRequestTable table dao ==================
+    @Query("SELECT * FROM TxnCallBackRequestTable")
+    fun getAllTxnCallBackRequestTable(): MutableList<TxnCallBackRequestTable>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateTxnCallBackRequestTable(txnCallBackRequestTable: TxnCallBackRequestTable): Long?
+
+    @Delete
+    suspend fun deleteTxnCallBackRequest(txnCallBackRequestTable: TxnCallBackRequestTable)
+
+    @Query("DELETE From TxnCallBackRequestTable")
+    suspend fun deleteTxnCallBackRequestTable()
+
+    // end region
 }

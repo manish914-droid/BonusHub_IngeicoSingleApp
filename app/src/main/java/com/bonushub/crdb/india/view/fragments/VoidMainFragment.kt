@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ import com.bonushub.crdb.india.utils.Field48ResponseTimestamp.getTptData
 import com.bonushub.crdb.india.utils.ProcessingCode
 import com.bonushub.crdb.india.utils.dialog.DialogUtilsNew1
 import com.bonushub.crdb.india.utils.printerUtils.PrintUtil
+import com.bonushub.crdb.india.utils.printerUtils.PrintVectorUtil
 import com.bonushub.crdb.india.utils.printerUtils.checkForPrintReversalReceipt
 import com.bonushub.crdb.india.view.activity.NavigationActivity
 import com.bonushub.crdb.india.view.base.BaseActivityNew
@@ -245,60 +247,86 @@ class VoidMainFragment : Fragment() {
                                                 amt,"${transactionDate}, ${transactionTime}") {
                                                     status , dialog ->
 
-                                                (activity as NavigationActivity).showProgress(getString(R.string.printing))
+                                                lifecycleScope.launch(Dispatchers.IO){
+                                                    withContext(Dispatchers.Main){  (activity as NavigationActivity).showProgress(getString(R.string.please_wait)) }
 
-                                                PrintUtil(activity).startPrinting(
-                                                    voidData,
-                                                    EPrintCopyType.MERCHANT,
-                                                    requireContext()
-                                                ) { printCB, printingFail ->
+                                                    // region sync card call back
+                                                  //  CoroutineScope(Dispatchers.IO).launch{
+                                                        val tpt = getTptData()
+                                                        if(tpt?.digiPosCardCallBackRequired == "1"){
+                                                            saveEcrSale(voidData, voidData.transactionType)
 
-                                                    (activity as NavigationActivity).hideProgress()
+                                                            syncTxnCallBackToHost(true){
+                                                                Log.e(
+                                                                    "TXN CB ",
+                                                                    "SYNCED TO SERVER  --> $it")
+                                                                (activity as NavigationActivity).hideProgress()
+                                                            }
+                                                        }else{
+                                                            withContext(Dispatchers.Main){ (activity as NavigationActivity).hideProgress() }
 
-                                                    lifecycleScope.launch(Dispatchers.Main){
-                                                        if (printCB) {
+                                                        }
+                                                   // }
+                                                    // end region
 
-                                                            (activity as NavigationActivity).alertBoxWithActionNew(
-                                                                "",
-                                                                getString(R.string.print_customer_copy),
-                                                                R.drawable.ic_print_customer_copy,
-                                                                "yes", "no",true,true ,{
+                                                    withContext(Dispatchers.Main){  (activity as NavigationActivity).showProgress(getString(R.string.printing))
 
-                                                                    (activity as NavigationActivity).showProgress(getString(R.string.printing))
+                                                    PrintVectorUtil(activity).startPrinting(
+                                                        voidData,
+                                                        EPrintCopyType.MERCHANT,
+                                                        requireContext()
+                                                    ) { printCB, printingFail ->
 
-                                                                    PrintUtil(activity).startPrinting(
-                                                                        voidData,
-                                                                        EPrintCopyType.CUSTOMER,
-                                                                        requireContext()
-                                                                    ) { printCB, printingFail ->
+                                                        (activity as NavigationActivity).hideProgress()
+
+                                                        lifecycleScope.launch(Dispatchers.Main){
+                                                            if (printCB) {
+
+                                                                (activity as NavigationActivity).alertBoxWithActionNew(
+                                                                    "",
+                                                                    getString(R.string.print_customer_copy),
+                                                                    R.drawable.ic_print_customer_copy,
+                                                                    "yes", "no",true,true ,{
+
+                                                                        (activity as NavigationActivity).showProgress(getString(R.string.printing))
+
+                                                                        PrintVectorUtil(activity).startPrinting(
+                                                                            voidData,
+                                                                            EPrintCopyType.CUSTOMER,
+                                                                            requireContext()
+                                                                        ) { printCB, printingFail ->
+                                                                            (activity as NavigationActivity).hideProgress()
+                                                                            // go to dashboard
+
+                                                                            dialog.dismiss()
+                                                                            startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
+                                                                                flags =
+                                                                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                            })
+
+
+                                                                        }
+                                                                    }, {
+
                                                                         (activity as NavigationActivity).hideProgress()
-                                                                        // go to dashboard
 
+                                                                        // go to dashboard
                                                                         dialog.dismiss()
                                                                         startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
                                                                             flags =
                                                                                 Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                                                         })
 
-
-                                                                    }
-                                                                }, {
-
-                                                                    (activity as NavigationActivity).hideProgress()
-
-                                                                    // go to dashboard
-                                                                    dialog.dismiss()
-                                                                    startActivity(Intent(requireActivity(), NavigationActivity::class.java).apply {
-                                                                        flags =
-                                                                            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                                                     })
 
-                                                                })
-
+                                                            }
                                                         }
+
                                                     }
 
+                                                    }
                                                 }
+
 
                                             }
                                         }

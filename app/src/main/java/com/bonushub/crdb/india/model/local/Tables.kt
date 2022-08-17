@@ -1509,3 +1509,21 @@ data class DigiPosDataTable(
 }
 
 //end region
+
+// region
+@Entity
+data class TxnCallBackRequestTable(
+    @PrimaryKey
+    var roc: String = "",
+    var reqtype: String = "",
+    var tid: String = "",
+    var batchnum: String = "",
+    var amount: String = "",
+    var ecrSaleReqId: String = "",
+    var txnDate: String = "",
+    var txnTime: String = "",
+    var txnType:Int = 0,
+    var mTxnId: String = "",
+    var pgwtxnId: String = ""
+)
+// end region

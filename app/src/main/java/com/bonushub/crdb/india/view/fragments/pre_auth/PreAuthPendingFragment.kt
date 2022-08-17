@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -184,6 +185,29 @@ class PreAuthPendingFragment : Fragment() {
                                 status , dialog ->
 
                             lifecycleScope.launch(Dispatchers.IO) {
+
+                                // region sync card call back
+                                withContext(Dispatchers.Main){ iDialog?.showProgress(getString(R.string.please_wait)) }
+
+                                val tpt = Field48ResponseTimestamp.getTptData()
+                                if(tpt?.digiPosCardCallBackRequired == "1"){
+
+                                    withContext(Dispatchers.Main){ iDialog?.showProgress(getString(R.string.transaction_syncing_msg)) }
+
+                                    saveEcrSale(stubbedData, it.cardProcessedDataModal.getTransType())
+
+                                    syncTxnCallBackToHost(true){
+                                        Log.e(
+                                            "TXN CB ",
+                                            "SYNCED TO SERVER  --> $it")
+                                        iDialog?.hideProgress()
+                                    }
+                                }else{
+                                    withContext(Dispatchers.Main){ iDialog?.hideProgress() }
+
+                                }
+                                // end region
+
                                 withContext(Dispatchers.Main){
                                     printChargeSlip((activity as BaseActivityNew), EPrintCopyType.MERCHANT,stubbedData) { it ->
 

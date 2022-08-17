@@ -1019,18 +1019,14 @@ class NavigationActivity : BaseActivityNew(), DeviceHelper.ServiceReadyListener/
                     val resultTwo = withContext(Dispatchers.IO) {  doInitializtion(appDao,listofTids,this@NavigationActivity) }
                     println("RESULT TWO --->  $resultTwo")
                 }*/
-               //transactFragment(VoidMainFragment())
-
-
-                /*change void sale
-                * before comit */
+                transactFragment(VoidMainFragment())
                 // todo uncomment below
-                  lifecycleScope.launch(Dispatchers.IO) {
+                /*  lifecycleScope.launch(Dispatchers.IO) {
                       //    appDao.insertBatchData(batchData)
                       val dd=    DBModule.appDatabase.appDao.getBatchData()
                       println(dd.toString())
                   }
-                  transactFragment(VoidMainFragment())
+                  transactFragment(VoidMainFragment())*/
                // val cardDataTable = DBModule.appDatabase.appDao.getCardDataByPanNumber("53")
 
                 //  val cardDataTable = CardDataTable.selectFromCardDataTable(cardProcessedData.getTrack2Data()!!)
