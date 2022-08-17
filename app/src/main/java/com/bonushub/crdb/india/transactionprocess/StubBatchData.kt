@@ -99,7 +99,7 @@ class StubBatchData(private var de55: String?, var transactionType: Int, var car
         val buildDate: String =
             SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date(BuildConfig.TIMESTAMP))
         batchFileData.appVersion = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-        batchFileData.pcNumber = AppPreference.getString(AppPreference.PC_NUMBER_KEY)
+      //  batchFileData.pcNumber = AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName)
         //batchFileData.operationType = isoPackageWriter.operationType(Need to Discuss by Ajay)
         batchFileData.transationName =
             TransactionTypeValues.getTransactionStringType(transactionType)

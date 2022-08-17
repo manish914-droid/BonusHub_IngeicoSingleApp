@@ -119,9 +119,10 @@ class KeyExchanger(private var context: Context, private val tid: String, privat
 
                     //adding Field 61
                     val version = addPad(getAppVersionNameAndRevisionID(), "0", 15, false)
-                    val pcNumber = addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY), "0", 9)
+                    val pcNumber = addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_ONE.keyName), "0", 9)
+
                     val pcNumber2 =
-                        addPad(AppPreference.getString(AppPreference.PC_NUMBER_KEY_2), "0", 9)
+                        addPad(AppPreference.getString(PreferenceKeyConstant.PC_NUMBER_TWO.keyName), "0", 9)
                     val f61 = getConnectionType() + addPad(
                         deviceModel(),
                         " ",
